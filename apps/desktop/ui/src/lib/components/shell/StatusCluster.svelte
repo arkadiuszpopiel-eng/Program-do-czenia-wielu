@@ -23,12 +23,15 @@
   const loadCosts = () => import('./CostDetails.svelte');
   const loadModes = () => import('./ModeMenu.svelte');
   const session = $derived(app.sessions.active);
-  // Ten sam profil co w okienku stanu i w polu rozmowy — wybór widać od razu wszędzie.
+  // Ten sam profil co w okienku stanu i w polu rozmowy — wybór widać od razu wszędzie; bez kluczy
+  // działa tylko profil lokalny.
   const profileId = $derived(
-    app.str(
-      'models.default_profile',
-      app.system?.profile ?? session?.profile ?? 'hybrid',
-    ) as ModelProfile,
+    app.system?.keys_configured === false
+      ? 'local'
+      : (app.str(
+          'models.default_profile',
+          app.system?.profile ?? session?.profile ?? 'hybrid',
+        ) as ModelProfile),
   );
   const profile = $derived(t(`profile.${profileId}`));
   const level = $derived(session?.autonomy ?? 'L3');

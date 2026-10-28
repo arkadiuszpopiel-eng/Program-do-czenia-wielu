@@ -19,11 +19,13 @@
   const { t, tk } = app.i18n;
   const session = $derived(app.sessions.active);
   // Wybór z tego okienka widać od razu, zanim rdzeń odświeży stan.
-  const profileId = $derived(
+  const saved = $derived(
     app.str('models.default_profile', app.system?.profile ?? session?.profile ?? 'hybrid'),
   );
   const PROFILES = ['local', 'hybrid', 'cloud'] as const;
   const noKeys = $derived(app.system?.keys_configured === false);
+  // Bez kluczy działa tylko profil lokalny — zaznaczony jest ten, który działa (jak w pasku pisania).
+  const profileId = $derived(noKeys ? 'local' : saved);
   // Grupa wyboru wg wzorca ARIA: jeden przystanek Tab, strzałki przesuwają wybór (bez wyłączonych).
   const usable = $derived(PROFILES.filter((p) => p === 'local' || !noKeys));
   const stop = $derived(usable.find((p) => p === profileId) ?? usable[0]);
@@ -75,7 +77,7 @@
         {/each}
       </div>
       <span class="desc">{tk(`status.profileDesc.${profileId}`)}</span>
-      {#if app.system && !app.system.keys_configured && profileId !== 'local'}
+      {#if noKeys && saved !== 'local'}
         <span class="desc warn">{t('status.noKeys')}</span>
       {/if}
     </dd>
@@ -159,11 +161,14 @@
     font-size: var(--alfa-font-size-xs);
     cursor: pointer;
   }
+  /* Obwódka: w jasnym Szkle tło wybranego i grupy mają prawie ten sam kolor. */
   .seg button[aria-checked='true'] {
     background: var(--alfa-color-surface);
     color: var(--alfa-color-text);
     font-weight: var(--alfa-weight-semibold);
     box-shadow: var(--alfa-shadow-1);
+    outline: 1px solid var(--alfa-color-border);
+    outline-offset: -1px;
   }
   .seg button:disabled {
     cursor: not-allowed;

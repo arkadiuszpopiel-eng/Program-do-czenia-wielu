@@ -72,6 +72,10 @@ mówiące awatary z literami wylatującymi z ust i uporządkowane okno Pipeline'
 - Klawiatura: Enter na znaczniku schowanego panelu przenosi fokus do panelu, a po schowaniu wraca na znacznik;
   wybór profilu w okienku stanu działa strzałkami, z jednym przystankiem Tab.
 - „Zmień tryb pracy” w bardzo wąskim oknie (bez przycisku trybu w belce) otwiera stronę Uprawnienia.
+- Menu „Tryb pracy” w stylu Szkło ma jednolite tło (lista trybów nie odcina się prostokątem innego koloru).
+- Bez kluczy API belka i okienko stanu pokazują profil „Lokalny” — ten, który naprawdę działa (jak pasek
+  pisania), zamiast zapisanej „Hybrydy” z wyglądem wyłączonego przycisku; wybrany profil ma obwódkę widoczną
+  także w jasnym stylu Szkło.
 - Pipeline'y: wybór „Inny…” w polu modelu nie przeskakuje na inny etap.
 
 ### Testy

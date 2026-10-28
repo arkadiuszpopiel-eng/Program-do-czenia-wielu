@@ -42,6 +42,22 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
     await shot(alfa, `42a-menu-trybu-${skin}-${theme}`);
     await main.keyboard.press('Escape');
     await expect(menu).toHaveCount(0);
+    // Okienko stanu z belki i menu adresatki z paska pisania (okienka nad rozmową).
+    await main.getByRole('button', { name: /^Stan: / }).click();
+    const details = main.getByRole('dialog', { name: 'Stan Alfy' });
+    await expect(details).toBeVisible();
+    await shot(alfa, `42d-okienko-stanu-${skin}-${theme}`);
+    await main.keyboard.press('Escape');
+    await expect(details).toHaveCount(0);
+    await main
+      .locator('form.composer')
+      .getByRole('button', { name: /^Adresatka: / })
+      .click();
+    const models = main.getByRole('menu', { name: /^Adresatka: / });
+    await expect(models).toBeVisible();
+    await shot(alfa, `42e-menu-adresatki-${skin}-${theme}`);
+    await main.keyboard.press('Escape');
+    await expect(models).toHaveCount(0);
   });
 
   // Panele chowane: przełącznik z palety, znacznik przy krawędzi, wysunięcie po najechaniu.
