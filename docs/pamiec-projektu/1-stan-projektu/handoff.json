@@ -4,13 +4,13 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-27T23:58:00+01:00"
+    "updated": "2026-10-28T02:40:00+01:00"
   },
-  "current_state": "Laptop. Wersja 0.0.75 wgrana 27.10 ok. 23:55 (deploy-owner --no-start), verify wersja zielone 19/19 na 9a0debd5; commity lokalne na gałęzi ccr-af4b63c6-3fyzaj, bez wypchnięcia. Raport alfa/docs/plan/42-raport-2026-10-28-noc.md. Kopia bezpieczeństwa F:\\Alfa\\kopia-<data>_<godzina> (data startu kopii) (backup.sh, bez target/node_modules).",
+  "current_state": "Laptop. Wersja 0.0.75 wgrana ponownie 28.10 02:33 z 18adc876 (deploy-owner --no-start); verify wersja na 5bc28f90: 18/19 (dokumenty — nieodświeżony changelog.html, poprawione 999ca689, krok powtórzony zielono). Commity lokalne, bez wypchnięcia. Raport alfa/docs/plan/42-raport-2026-10-28-noc.md. Kopia bezpieczeństwa F:\\Alfa\\kopia-<data>_<godzina> (backup.sh, bez target/node_modules) — przed 5:00.",
   "session_goal": "Właściciel 27.10 (/goal): 9 uwag do UI (Pipeline'y, Broker bez limitu czasu, tryb pracy w pasku, okienko stanu, symetryczna belka i pasek pisania, panele chowane z LED, awatary z literami, dzieci) + własne usprawnienia do 5:00, potem kopia na F: w katalogu programu bez plików kompilacji.",
   "in_progress": [
-    "Do decyzji właściciela: panele chowane domyślnie włączone?; odpowiedzi na 4 pytania etapu K (docs/plan/41); odstępstwo L4 (obcy głos / niska pewność STT pyta zawsze, raport 40 §3).",
-    "Do zrobienia: przegląd w świeżym kontekście zmian Brokera z 27.10 (safety-broker-impl standing.rs, risk-classifier-contract, broker-ui-contract card.rs) — wymóg AGENTS.md."
+    "Do decyzji właściciela: panele chowane domyślnie włączone?; odpowiedzi na 4 pytania etapu K (docs/plan/41); L4 a operacje administracyjne (raport 42 propozycja 5).",
+    "Gałąź do-przeglądu-broker-2026-10-28 (worktree alfa-broker-przeglad, commity 6dec9083, c3566dbe, 50872adb): poprawki ustaleń przeglądu Brokera z 27.10 — czeka na przegląd człowieka, NIE w wgranej wersji."
   ],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
