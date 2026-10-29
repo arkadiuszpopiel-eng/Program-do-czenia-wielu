@@ -6,12 +6,14 @@
 
 ## Aktualny cel
 
-**Bieżący (2026-10-28):** wersja **0.0.75** (raport 42), wgrana do Alfa-uruchomiona ponownie 28.10 03:07 z `d4da052c` (deploy-owner --no-start; Alfa zamknięta — otwiera ją właściciel skrótem „Alfa”). Gałąź `do-przegladu-broker-2026-10-28` (worktree alfa-broker-przeglad, 6 commitów do 6407c88f; trzy przeglądy w świeżym kontekście, ustalenia poprawione, testy workspace 3265/0/41) czeka na przegląd człowieka. Projekt wyróżniania czytanego zdania: docs/plan/43 (do decyzji).
+**Bieżący (2026-10-30):** wersja **0.0.78** (raport 44), wgrana do Alfa-uruchomiona 30.10 0:45 z `55dcfaff` (deploy-owner --no-start; Alfa zamknięta — otwiera ją właściciel skrótem „Alfa”). verify wersja na `55dcfaff` ZIELONE 19/19. Gałęzie `do-przegladu-broker-2026-10-28` i `do-przegladu-pelny-dostep` nadal czekają na przegląd człowieka.
 
 Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KONTYNUACJA.md`, etapy 0–3);
 (2) plan v6 prowadzony na bieżąco w `alfa/docs/plan/` (MD) i `alfa/docs/html/` (HTML, generowany).
 
 ## Stan projektu
+
+- **2026-10-29/30 noc (laptop) — WERSJA 0.0.78 — WGRANA 30.10 0:45 (polecenie właściciela: „pracuj automatycznie do 4:30, poprawki i plan, potem kopia na F:, stop do 5:10”; raport alfa/docs/plan/44-raport-2026-10-30-noc.md):** C2.3 ZROBIONE — narzędzia modelu lokalnego zmierzone na prawdziwym Bieliku 4.5B Q8_0 (llama-server b11559 CUDA, eval F3 `eval_tools.rs --ignored`): 0/35 → 10–12/35 po poprawkach (koperta anyOf z wywołaniem na początku, samoweryfikacja zwraca odpowiedź i ignoruje wywołania przy werdykcie, backend stały bez profilu, ścieżki względne w prompcie, `ShellToolsConfig::detected()` — Windows PowerShell bez PS 7, dopisek przy powtórzonym wywołaniu, temperatura 0,2 przy narzędziach, zapowiedź działania w `response`); live_catalog zielony (tool_request OK, pobranie 7 GB na E: i usunięte). C2.8 ZROBIONE — historia wersji artefaktu w kanwie (przełącznik + karta „Zmiany”). Sprzątanie: alfa 166 → 23 GB. Zgoda na pobrania podniesiona do 5 GB. Do decyzji człowieka (raport 44): `*` w analizatorze powłoki (mnożenie odrzucane jako ścieżka poświadczeń), Kosz po wstrzymanym trwałym usunięciu (fs-23), próg F3-07. Następne: ścieżki względne w wynikach narzędzi (model kopiuje „Tepm”), pole planu w kopercie, drugi model C2.2.
 
 - **2026-10-29 wieczór — WERSJA 0.0.77 wgrana 18:54** (deploy-owner --no-start przez sesję etapu B/K; zawiera 0.0.76: panele chowane w całości i wysuwane, stan w pasku pisania, naprawione przełączanie trybu pracy — ee1c116b; pulldown-cmark 0.13.5 — b1b78fd4). verify wersja 45d9572f ZIELONE 19/19: Rust 3269/0/41, interfejs 518, przeglądarka 738, aplikacja 52 (92,5 %). Kopia F:Kopie zapasowe programów SpopielonyAlfakopia-2026-10-29_2053 (45d9572f, 400 MB, SHA-256 6332/0 błędów). Uwaga: kilka sesji pracowało naraz w tym samym katalogu — bramka 0.0.76 o 12:10 wyszła czerwona przez zderzenie.
 

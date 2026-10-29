@@ -4,13 +4,12 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
-    "updated": "2026-10-28T05:10:00+01:00"
+    "updated": "2026-10-30T01:00:00+01:00"
   },
-  "current_state": "Laptop. Wersja 0.0.75 wgrana ponownie 28.10 03:07 z d4da052c (deploy-owner --no-start); verify wersja na 8850c4a2 zielone 19/19. Commity lokalne, bez wypchnięcia. Raport alfa/docs/plan/42-raport-2026-10-28-noc.md. Kopia bezpieczeństwa F:\\Alfa\\kopia-2026-10-28_0500 (83ed995a; wcześniejsza kopia-2026-10-28_0351, 1f3a9c49, backup.sh, bez target/node_modules, sumy SHA-256 sprawdzone).",
-  "session_goal": "Właściciel 27.10 (/goal): 9 uwag do UI (Pipeline'y, Broker bez limitu czasu, tryb pracy w pasku, okienko stanu, symetryczna belka i pasek pisania, panele chowane z LED, awatary z literami, dzieci) + własne usprawnienia do 5:00, potem kopia na F: w katalogu programu bez plików kompilacji.",
+  "current_state": "Laptop. Wersja 0.0.78 wgrana 30.10 0:45 z 55dcfaff (deploy-owner --no-start); verify wersja na 55dcfaff zielone 19/19 (Rust 3273/0/41, interfejs 530, przeglądarka 747, aplikacja 52). Commity lokalne, bez wypchnięcia. Raport alfa/docs/plan/44-raport-2026-10-30-noc.md. Kopia na F:\\Kopie zapasowe programów Spopielony\\Alfa po 4:30 (backup.sh).",
+  "session_goal": "Właściciel 29.10 (/goal): pracuj automatycznie do 4:30 (poprawki i plan), potem kopia na F:, koniec pracy najpóźniej 5:10. Wcześniej: C2.3 i C2.8, zgoda na pobrania 5 GB, sprzątanie kompilacji, pobierać na E:.",
   "in_progress": [
-    "Do decyzji właściciela: panele chowane domyślnie włączone?; odpowiedzi na 4 pytania etapu K (docs/plan/41); L4 a operacje administracyjne (raport 42 propozycja 5); wyróżnianie czytanego zdania (docs/plan/43).",
-    "Gałąź do-przegladu-broker-2026-10-28 (worktree alfa-broker-przeglad, commity 6dec9083, c3566dbe, 50872adb, 3d8e838f, 8755fc60, 6407c88f): poprawki ustaleń trzech przeglądów Brokera, testy workspace 3265/0/41 — czeka na przegląd człowieka, NIE w wgranej wersji."
+    "Do decyzji człowieka (raport 44 §2 i „Co dalej”): `*` w analizatorze powłoki, Kosz po wstrzymanym trwałym usunięciu (fs-23), próg F3-07, gałęzie do-przegladu-broker-2026-10-28 i do-przegladu-pelny-dostep, odpowiedzi K.0."
   ],
   "blocking_issues": [
     "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
@@ -48,18 +47,7 @@
       "alfa-docs (podgląd HTML)": 5180
     }
   },
-  "test_results": {
-    "0.0.63": "verify wersja 96588e5b: 16 zielonych / 2 czerwone (brak Edge, cargo deny: zip) / 1 nieuruchomiony (jq); Rust 2898/0/40, interfejs 395/395, prawdziwa aplikacja 41 + 1 pominięty, pokrycie łącza 235/264 (89 %); przeglądarka na Chromium Playwrighta 467/467; RX 9070 XT: DXCore/PDH (odczyt samej pamięci 89 µs), Supertonic CPU vs DirectML, Qwen3-ASR Vulkan",
-    "0.0.65": "verify wersja d40bb372: Rust 3063/0/41, interfejs 473, aplikacja 48/48, pokrycie łącza 259/271 (95,6 %); po poprawce budżetu 93ef8a5a: przeglądarka Edge 547/547, budżet 149,6 KB; app-core 121/0 po przełączniku baneru; duty na Bieliku 4/4 zielone.",
-    "0.0.66": "verify wersja 5e7baed4: Rust 3065 (1 czerwony app-broker portable_mode pod obciążeniem, osobno 3× zielony), UI 473, przeglądarka 549/549; po poprawkach 08c80c91: lint zielony, aplikacja 48/48, pokrycie 259/271; duty Bielik: morning/evening/costs zielone, tidy niestabilny bez katalogu.",
-    "0.0.67": "verify wersja 0e54f5b9: 15 zielonych / 3 czerwone (test wywłaszczenia pod obciążeniem — osobno zielony; start przeglądarki — osobno 3/3; cargo deny — zip) / 1 nieuruchomiony (graf, brak jq); Rust 3079 + 1, vitest 478, Chromium 551 + 1, aplikacja 47 + 1 pominięty, pokrycie 259/273 (94,9 %).",
-    "0.0.68": "verify wersja 77d5403c: 16 zielonych / 2 czerwone (przeglądarka: zerwane połączenie z serwerem podglądu w updates.spec — osobno 17/17; cargo deny — zip) / 1 nieuruchomiony (graf); Rust 3086/0, interfejs 478, Chromium 551 + 1, aplikacja 47 + 1 pominięty, pokrycie 259/273 (94,9 %). Przeglądy: 16 + 9 (0.0.67), 5 + 4 (seria 8), spójność dokumentów 2.",
-    "0.0.69": "verify wersja 7c1445a3: 15 zielonych / 4 czerwone (lint — app-core 8002 linii, poprawione 7a656482; dokumenty — HTML, aa10fb85; audyt-npm — @vitest/mocker 4.1.12, 077ae005; zaleznosci — zip 8.6, decyzja właściciela); Rust 3103/0/41, interfejs 478, przeglądarka 552 (Chromium), aplikacja 47, pokrycie łącza 259/273 (94,9 %), graf zielony (jq).",
-    "0.0.70": "verify wersja 9a5b4d56: 18 zielonych / 1 czerwony (zaleznosci — zip 8.6, decyzja właściciela); Rust 3110/0/41, interfejs 478, przeglądarka 552 (Chromium), aplikacja 47, pokrycie łącza 259/273 (94,9 %).",
-    "seria 11": "Drugi bieg na `6203afe8` (5:35–6:03): 18 z 19 zielonych, czerwony tylko `zip`; Rust 3111/0/41, interfejs 478, przeglądarka 552, aplikacja 47 (94,9 %) — seria 11 gotowa do następnej wersji.",
-    "0.0.71": "verify wersja 18/19 (zip); Rust 3117/0/41; interfejs 479; przeglądarka 552; aplikacja 47 (94,9 %); wgrana 9:38, próbny start bez CDP",
-    "0.0.72": "verify 16/19 (zip, laptop_voice losowy, budżet — poprawiony 7cc597b4); po poprawce: vitest 485, e2e 551/552 (losowy), aplikacja 48 (94,9 %)"
-  },
+  "test_results": "verify wersja 55dcfaff ZIELONE 19/19; F3 Bielik 4.5B: v1 0/35, v3 11/35, v6 12/35, v7 10/35; live_catalog zielony (tool_request OK).",
   "decisions_this_session": [
     "Właściciel 21.10: brak zgód ma być naprawiony „raz na zawsze” — skrót „Alfa” do Alfa-uruchomiona, odświeżany przy każdym wgraniu; skrót instalatora NSIS nie jest nadpisywany.",
     "Właściciel 21.10: usunąć stare kompilacje — zwolnione 229 GB (target/debug/deps, .fingerprint, incremental, shell, trial-profile, release, src-tauri/target).",
@@ -73,9 +61,10 @@
     "Właściciel 21.10 ~20:40: „Zamknij wszystkie otwarte tematy, wykonaj pełną działającą wersję… potem wszystko zapisz i zrób pauzę”; wgranie: „To co napisałem wcześniej ma być zrobione”; /goal do 7:00."
   ],
   "next_steps": [
-    "Właściciel: decyzje z raportu 40 §3 (reguły głosu na L4, sesje z własnym poziomem, okno 721–900 px), przegląd gałęzi do-przegladu-pelny-dostep.",
-    "Właściciel: wpisać katalog silnika w Ustawienia → Zaawansowane po wgraniu 0.0.74.",
-    "Wgranie 0.0.74 do kopii właściciela przy następnym wydaniu (deploy-owner).",
-    "Silnik etap 6: zapis/eksport świata — dodać narzędzia, gdy silnik je udostępni."
+    "Ścieżki względne w wynikach narzędzi fs (model kopiuje bezwzględne i myli Temp→Tepm).",
+    "Koperta z polem planu przed wywołaniem (zapowiedź zamiast „zrobione”).",
+    "Pomiar F3 na drugim modelu C2.2 (Qwen3.5-4B / Bielik-Minitron-7B, pobranie ≤5 GB na E:).",
+    "Pole wyboru 24 px w ui-kit (chwiejny axe target-size w oknie obowiązków).",
+    "Etap A na sprzęcie: A.4/A.5/A.6 przy właścicielu."
   ]
 }
