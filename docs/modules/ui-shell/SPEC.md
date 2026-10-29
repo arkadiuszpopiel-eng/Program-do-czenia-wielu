@@ -72,7 +72,7 @@ Frontend testowany z atrapą `FakeAlfaClient` (`apps/desktop/ui/src/lib/api/fake
 
 ## Implementacja F1 — rdzeń i powłoka (stan)
 - **Rdzeń komend:** `crates/app-core` (korzeń kompozycji `app-*`): każda komenda z COMMANDS.md jako
-  `AppCore::<przestrzeń>_<nazwa>`; DTO serde 1:1 z `types*.ts` (test round-trip na ładunkach atrapy UI);
+  `AppCore::<przestrzeń>_<nazwa>`; DTO serde 1:1 z `generated/ipc.ts` (przekazywanymi przez `types*.ts`) (test round-trip na ładunkach atrapy UI);
   lista komend jednym źródłem — makro `app_core::with_commands!` (handlery Tauri + test sygnatur `Send`).
 - **Zdarzenia:** `EventHub` grupuje zdarzenia w paczki raz na klatkę (16 ms, `AppOptions::frame`),
   scala sąsiednie `TextDelta` tej samej tury i `MicLevel`; brak zdarzeń = brak wybudzeń. Powłoka emituje

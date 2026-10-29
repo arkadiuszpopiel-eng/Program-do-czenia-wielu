@@ -1,0 +1,147 @@
+{
+  "_comment": "B.5 (ADR 0019): polecenia zakładające lokalną maszynę i pola DTO ze ścieżką hosta. reason: system_dialog — okno systemu na ekranie hosta; asset_preview — podgląd przez protokół asset: (plik hosta); host_path — ścieżka bezwzględna hosta w argumencie albo wyniku; host_desktop — okna, schowek, terminal, ustawienia albo restart na hoście. remote: command — istniejący odpowiednik dla klienta zdalnego; planned — zadanie etapu D i sposób; none — tylko lokalnie (powód). Kontrolę spójności robią testy app-api/tests/local_only.rs.",
+  "commands": {
+    "accounts_import_env": {
+      "reason": "host_desktop",
+      "remote": { "none": "czyta zmienne środowiskowe procesu na hoście — klucz zdalnie dodaje się kreatorem konta" }
+    },
+    "agents_open_terminal": {
+      "reason": "host_desktop",
+      "remote": { "none": "terminal otwiera się na ekranie hosta; zdalnie polecenie zostaje do skopiowania w kroku" }
+    },
+    "app_open_system_settings": {
+      "reason": "host_desktop",
+      "remote": { "none": "strona ustawień Windows otwiera się na hoście; klient zdalny pokazuje tylko opis" }
+    },
+    "attachments_add_dropped": {
+      "reason": "host_desktop",
+      "remote": { "planned": "D.6", "how": "plik wysyłany z urządzenia klienta kanałem zamiast upuszczenia na okno hosta" }
+    },
+    "attachments_paste": {
+      "reason": "host_desktop",
+      "remote": { "planned": "D.6", "how": "wklejenie ze schowka urządzenia klienta, treść wysyłana kanałem" }
+    },
+    "attachments_pick": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "plik wybrany na urządzeniu klienta i wysłany kanałem" }
+    },
+    "backups_choose_dir": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "katalog z listy katalogów hosta w granicach dozwolonych korzeni" }
+    },
+    "backups_restore": {
+      "reason": "host_path",
+      "remote": { "planned": "D.1", "how": "kopia wskazywana identyfikatorem z backups_status, nie ścieżką" }
+    },
+    "bridges_open_login": {
+      "reason": "host_desktop",
+      "remote": { "none": "logowanie do mostu CLI wykonuje człowiek w terminalu na hoście" }
+    },
+    "diag_export": {
+      "reason": "host_path",
+      "remote": { "planned": "D.6", "how": "raport przesyłany kanałem jako plik do pobrania" }
+    },
+    "files_act": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "„Zapisz jako” = pobranie na urządzenie klienta; „Otwórz” i „Pokaż w Eksploratorze” tylko lokalnie" }
+    },
+    "files_preview": {
+      "reason": "asset_preview",
+      "remote": { "planned": "D.6", "how": "podgląd przesyłany strumieniem w ramkach zamiast adresu asset:" }
+    },
+    "mcp_save": {
+      "reason": "host_path",
+      "remote": { "planned": "D.1", "how": "katalog roboczy serwera z wyboru po stronie hosta, nie z tekstu klienta" }
+    },
+    "memory_teach_pick_file": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "plik wybrany na urządzeniu klienta i wysłany kanałem" }
+    },
+    "permissions_open_approval": {
+      "reason": "host_desktop",
+      "remote": { "planned": "D.5", "how": "dowód zgody z urządzenia sparowanego zamiast okna Brokera na hoście" }
+    },
+    "projects_pick_dir": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "katalog z listy katalogów hosta w granicach dozwolonych korzeni" }
+    },
+    "projects_save": {
+      "reason": "host_path",
+      "remote": { "planned": "D.1", "how": "katalog projektu z wyboru po stronie hosta (uchwyt), nie ze ścieżki w tekście" }
+    },
+    "quick_expand_to_main": {
+      "reason": "host_desktop",
+      "remote": { "command": "app_set_active_session" }
+    },
+    "quick_hide": {
+      "reason": "host_desktop",
+      "remote": { "none": "chowa okno Szybkiego pytania na ekranie hosta" }
+    },
+    "sessions_choose_workdir": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "wybory „domyślny” i „bez katalogu” działają od razu; „wskaż” — katalog z listy hosta" }
+    },
+    "sessions_export": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "paczka .alfa przesyłana kanałem do pobrania" }
+    },
+    "sessions_export_conversation": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "plik rozmowy przesyłany kanałem do pobrania" }
+    },
+    "sessions_workdir": {
+      "reason": "host_path",
+      "remote": { "planned": "D.1", "how": "brama skraca ścieżkę do nazwy katalogu" }
+    },
+    "skills_export": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "plik umiejętności przesyłany kanałem do pobrania" }
+    },
+    "skills_import": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "plik wybrany na urządzeniu klienta i wysłany kanałem" }
+    },
+    "system_clipboard_text": {
+      "reason": "host_desktop",
+      "remote": { "none": "schowek hosta nie wychodzi do klienta zdalnego" }
+    },
+    "transfer_export": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "paczka .alfa przesyłana kanałem do pobrania" }
+    },
+    "transfer_import": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "paczka wysłana z urządzenia klienta, potem transfer_inspect po uchwycie" }
+    },
+    "transfer_inspect": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "paczka wysłana z urządzenia klienta, sprawdzana po uchwycie" }
+    },
+    "turns_save_code": {
+      "reason": "system_dialog",
+      "remote": { "planned": "D.6", "how": "blok kodu przesyłany kanałem do pobrania" }
+    },
+    "updates_restart": {
+      "reason": "host_desktop",
+      "remote": { "none": "restart programu na hoście tylko z okna lokalnego" }
+    }
+  },
+  "host_paths": [
+    "AgentRun.workdir",
+    "ArtifactInfo.path",
+    "AttachmentInfo.path",
+    "BackupConfig.dir",
+    "BackupEntry.path",
+    "BridgeCard.path",
+    "BridgeLogin.cwd",
+    "ExportResult.path",
+    "ImproverIssue.path",
+    "McpServerInput.cwd",
+    "McpServerView.cwd",
+    "McpServerView.resolved",
+    "PricingView.file",
+    "ProjectInfo.workdir",
+    "SessionWorkdir.path",
+    "ToolIntent.cwd"
+  ]
+}

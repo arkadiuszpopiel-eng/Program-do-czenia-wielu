@@ -12246,6 +12246,47 @@
         }
       ]
     },
+    "TerminalFrame": {
+      "description": "Ramka strumienia terminala — wyłącznie kanał `tauri::ipc::Channel` otwarcia (nigdy zdarzenia).",
+      "oneOf": [
+        {
+          "properties": {
+            "data_b64": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "output",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "data_b64"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "code": {
+              "format": "int32",
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "kind": {
+              "const": "exit",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "code"
+          ],
+          "type": "object"
+        }
+      ]
+    },
     "TerminalProfileId": {
       "description": "Profil terminala.",
       "enum": [
@@ -18156,6 +18197,241 @@
   },
   "events_resume": {
     "$ref": "#/$defs/EventsResume"
+  },
+  "local_only": {
+    "_comment": "B.5 (ADR 0019): polecenia zakładające lokalną maszynę i pola DTO ze ścieżką hosta. reason: system_dialog — okno systemu na ekranie hosta; asset_preview — podgląd przez protokół asset: (plik hosta); host_path — ścieżka bezwzględna hosta w argumencie albo wyniku; host_desktop — okna, schowek, terminal, ustawienia albo restart na hoście. remote: command — istniejący odpowiednik dla klienta zdalnego; planned — zadanie etapu D i sposób; none — tylko lokalnie (powód). Kontrolę spójności robią testy app-api/tests/local_only.rs.",
+    "commands": {
+      "accounts_import_env": {
+        "reason": "host_desktop",
+        "remote": {
+          "none": "czyta zmienne środowiskowe procesu na hoście — klucz zdalnie dodaje się kreatorem konta"
+        }
+      },
+      "agents_open_terminal": {
+        "reason": "host_desktop",
+        "remote": {
+          "none": "terminal otwiera się na ekranie hosta; zdalnie polecenie zostaje do skopiowania w kroku"
+        }
+      },
+      "app_open_system_settings": {
+        "reason": "host_desktop",
+        "remote": {
+          "none": "strona ustawień Windows otwiera się na hoście; klient zdalny pokazuje tylko opis"
+        }
+      },
+      "attachments_add_dropped": {
+        "reason": "host_desktop",
+        "remote": {
+          "how": "plik wysyłany z urządzenia klienta kanałem zamiast upuszczenia na okno hosta",
+          "planned": "D.6"
+        }
+      },
+      "attachments_paste": {
+        "reason": "host_desktop",
+        "remote": {
+          "how": "wklejenie ze schowka urządzenia klienta, treść wysyłana kanałem",
+          "planned": "D.6"
+        }
+      },
+      "attachments_pick": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "plik wybrany na urządzeniu klienta i wysłany kanałem",
+          "planned": "D.6"
+        }
+      },
+      "backups_choose_dir": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "katalog z listy katalogów hosta w granicach dozwolonych korzeni",
+          "planned": "D.6"
+        }
+      },
+      "backups_restore": {
+        "reason": "host_path",
+        "remote": {
+          "how": "kopia wskazywana identyfikatorem z backups_status, nie ścieżką",
+          "planned": "D.1"
+        }
+      },
+      "bridges_open_login": {
+        "reason": "host_desktop",
+        "remote": {
+          "none": "logowanie do mostu CLI wykonuje człowiek w terminalu na hoście"
+        }
+      },
+      "diag_export": {
+        "reason": "host_path",
+        "remote": {
+          "how": "raport przesyłany kanałem jako plik do pobrania",
+          "planned": "D.6"
+        }
+      },
+      "files_act": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "„Zapisz jako” = pobranie na urządzenie klienta; „Otwórz” i „Pokaż w Eksploratorze” tylko lokalnie",
+          "planned": "D.6"
+        }
+      },
+      "files_preview": {
+        "reason": "asset_preview",
+        "remote": {
+          "how": "podgląd przesyłany strumieniem w ramkach zamiast adresu asset:",
+          "planned": "D.6"
+        }
+      },
+      "mcp_save": {
+        "reason": "host_path",
+        "remote": {
+          "how": "katalog roboczy serwera z wyboru po stronie hosta, nie z tekstu klienta",
+          "planned": "D.1"
+        }
+      },
+      "memory_teach_pick_file": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "plik wybrany na urządzeniu klienta i wysłany kanałem",
+          "planned": "D.6"
+        }
+      },
+      "permissions_open_approval": {
+        "reason": "host_desktop",
+        "remote": {
+          "how": "dowód zgody z urządzenia sparowanego zamiast okna Brokera na hoście",
+          "planned": "D.5"
+        }
+      },
+      "projects_pick_dir": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "katalog z listy katalogów hosta w granicach dozwolonych korzeni",
+          "planned": "D.6"
+        }
+      },
+      "projects_save": {
+        "reason": "host_path",
+        "remote": {
+          "how": "katalog projektu z wyboru po stronie hosta (uchwyt), nie ze ścieżki w tekście",
+          "planned": "D.1"
+        }
+      },
+      "quick_expand_to_main": {
+        "reason": "host_desktop",
+        "remote": {
+          "command": "app_set_active_session"
+        }
+      },
+      "quick_hide": {
+        "reason": "host_desktop",
+        "remote": {
+          "none": "chowa okno Szybkiego pytania na ekranie hosta"
+        }
+      },
+      "sessions_choose_workdir": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "wybory „domyślny” i „bez katalogu” działają od razu; „wskaż” — katalog z listy hosta",
+          "planned": "D.6"
+        }
+      },
+      "sessions_export": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "paczka .alfa przesyłana kanałem do pobrania",
+          "planned": "D.6"
+        }
+      },
+      "sessions_export_conversation": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "plik rozmowy przesyłany kanałem do pobrania",
+          "planned": "D.6"
+        }
+      },
+      "sessions_workdir": {
+        "reason": "host_path",
+        "remote": {
+          "how": "brama skraca ścieżkę do nazwy katalogu",
+          "planned": "D.1"
+        }
+      },
+      "skills_export": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "plik umiejętności przesyłany kanałem do pobrania",
+          "planned": "D.6"
+        }
+      },
+      "skills_import": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "plik wybrany na urządzeniu klienta i wysłany kanałem",
+          "planned": "D.6"
+        }
+      },
+      "system_clipboard_text": {
+        "reason": "host_desktop",
+        "remote": {
+          "none": "schowek hosta nie wychodzi do klienta zdalnego"
+        }
+      },
+      "transfer_export": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "paczka .alfa przesyłana kanałem do pobrania",
+          "planned": "D.6"
+        }
+      },
+      "transfer_import": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "paczka wysłana z urządzenia klienta, potem transfer_inspect po uchwycie",
+          "planned": "D.6"
+        }
+      },
+      "transfer_inspect": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "paczka wysłana z urządzenia klienta, sprawdzana po uchwycie",
+          "planned": "D.6"
+        }
+      },
+      "turns_save_code": {
+        "reason": "system_dialog",
+        "remote": {
+          "how": "blok kodu przesyłany kanałem do pobrania",
+          "planned": "D.6"
+        }
+      },
+      "updates_restart": {
+        "reason": "host_desktop",
+        "remote": {
+          "none": "restart programu na hoście tylko z okna lokalnego"
+        }
+      }
+    },
+    "host_paths": [
+      "AgentRun.workdir",
+      "ArtifactInfo.path",
+      "AttachmentInfo.path",
+      "BackupConfig.dir",
+      "BackupEntry.path",
+      "BridgeCard.path",
+      "BridgeLogin.cwd",
+      "ExportResult.path",
+      "ImproverIssue.path",
+      "McpServerInput.cwd",
+      "McpServerView.cwd",
+      "McpServerView.resolved",
+      "PricingView.file",
+      "ProjectInfo.workdir",
+      "SessionWorkdir.path",
+      "ToolIntent.cwd"
+    ]
+  },
+  "terminal_frame": {
+    "$ref": "#/$defs/TerminalFrame"
   },
   "title": "Alfa IPC",
   "version": 1

@@ -1,5 +1,5 @@
 {
-  "_comment": "Warianty typów z types*.ts, których atrapa UI nie emituje (pisane ręcznie, zgodne z typami TS).",
+  "_comment": "Warianty typów łącza (generated/ipc.ts), których atrapa UI nie emituje (pisane ręcznie, zgodne z typami TS).",
   "events": [
     {
       "type": "AccountChanged",

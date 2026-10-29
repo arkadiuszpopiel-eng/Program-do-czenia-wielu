@@ -8,7 +8,7 @@ use schemars::SchemaGenerator;
 use schemars::generate::SchemaSettings;
 use serde_json::{Map, Value, json};
 
-use crate::dto::{EventFrame, EventsResume};
+use crate::dto::{EventFrame, EventsResume, TerminalFrame};
 use crate::error::AppError;
 
 /// Wersja kształtu pliku schematu (nie wersja programu).
@@ -50,6 +50,8 @@ pub fn ipc_schema() -> Value {
     let frame = generator.subschema_for::<EventFrame>();
     let resume = generator.subschema_for::<EventsResume>();
     let error = generator.subschema_for::<AppError>();
+    // Kanał `Channel` otwarcia terminala — poza komendami i zdarzeniami, ale też część łącza.
+    let terminal = generator.subschema_for::<TerminalFrame>();
     let definitions = generator.take_definitions(true);
     json!({
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -59,6 +61,10 @@ pub fn ipc_schema() -> Value {
         "event_frame": frame,
         "events_resume": resume,
         "error": error,
+        "terminal_frame": terminal,
+        // Polecenia zakładające lokalną maszynę i pola ze ścieżką hosta (B.5, `local_only`).
+        "local_only": serde_json::from_str::<Value>(crate::local_only::LOCAL_ONLY_JSON)
+            .unwrap_or(Value::Null),
         "$defs": definitions,
     })
 }

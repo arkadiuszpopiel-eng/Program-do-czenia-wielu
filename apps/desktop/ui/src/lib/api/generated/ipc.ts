@@ -1,6 +1,27 @@
 // PLIK GENEROWANY — nie edytuj ręcznie. Źródło: typy Rust w `crates/app-api` → schemat
 // `packages/schemas/ipc.v1.json` → `node scripts/gen-ipc-types.mjs` (ADR 0013).
 
+import type { AgentId } from '@alfa/ui-kit';
+
+/** Autor tury: użytkownik albo jedna z agentek. */
+export type Author = 'user' | AgentId;
+/** Przeznaczenie modelu rozpoznane po nazwie (`ModelInfo.purpose`). */
+export type ModelPurpose =
+  | 'chat'
+  | 'reasoning'
+  | 'embedding'
+  | 'speech'
+  | 'transcription'
+  | 'realtime'
+  | 'image'
+  | 'video'
+  | 'moderation'
+  | 'other';
+/** Wielkość modelu (`ModelInfo.tier`). */
+export type ModelTier = 'standard' | 'small' | 'tiny' | 'premium';
+/** Rola karty przy kilku kartach: modele główne, lekkie zadania albo nieużywana (`GpuView.role`). */
+export type GpuRole = 'heavy' | 'light' | 'spare';
+
 /** Wersja kształtu schematu łącza. */
 export const IPC_SCHEMA_VERSION = 1;
 
@@ -55,7 +76,7 @@ export interface Account {
 
 /** Przypisania konta. */
 export interface AccountAssignment {
-  readonly agents: readonly string[];
+  readonly agents: readonly AgentId[];
   readonly task_classes: readonly string[];
   readonly voice_stt: boolean;
   readonly voice_tts: boolean;
@@ -84,7 +105,7 @@ export type AccountState =
 
 /** Kapsuła aktywności. */
 export interface ActivityInfo {
-  readonly agent: string;
+  readonly agent: AgentId;
   readonly description: string;
   readonly session_id: string;
   readonly started_at: string;
@@ -131,7 +152,7 @@ export interface AgentDraft {
 
 /** Przebieg agentki (nagłówek; kroki — `AgentRunDetail.steps` / zdarzenie `AgentStep`). */
 export interface AgentRun {
-  readonly agent: string;
+  readonly agent: AgentId;
   /** Most CLI (`claude_code`, `codex`) — zdarzenia niezweryfikowane przez Alfę. */
   readonly bridge?: string | null;
   readonly budget: RunBudgetView;
@@ -162,7 +183,7 @@ export interface AgentRunDetail {
 /** Agentka w sesji. */
 export interface AgentState {
   readonly activity: string | null;
-  readonly id: string;
+  readonly id: AgentId;
   readonly role_ids: readonly string[];
   readonly status: AgentStatus;
 }
@@ -436,7 +457,7 @@ export type ArtifactAction = 'open' | 'reveal' | 'copy' | 'save_as';
 
 /** Artefakt (plik wyjściowy) sesji. */
 export interface ArtifactInfo {
-  readonly agent: string | null;
+  readonly agent: AgentId | null;
   readonly created_at: string;
   readonly id: string;
   readonly mime: string;
@@ -1486,7 +1507,7 @@ export interface GpuView {
    * Rola na maszynie z kilkoma kartami: `heavy` (modele główne), `light` (lekkie zadania
    * na karcie zintegrowanej), `spare` (nieużywana przez Alfę).
    */
-  readonly role: string;
+  readonly role: GpuRole;
   /** Pamięć współdzielona z systemem (MB). */
   readonly shared_mb: number;
   readonly vendor: string;
@@ -2248,11 +2269,11 @@ export interface ModelInfo {
    * Przeznaczenie rozpoznane po nazwie: `chat`, `reasoning`, `embedding`, `speech`,
    * `transcription`, `realtime`, `image`, `video`, `moderation`, `other`.
    */
-  readonly purpose: string;
+  readonly purpose: ModelPurpose;
   /** Przypięta migawka z datą w nazwie (`…-2024-08-06`). */
   readonly snapshot: boolean;
   /** Wielkość: `standard`, `small`, `tiny`, `premium`. */
-  readonly tier: string;
+  readonly tier: ModelTier;
 }
 
 /** Pozycja katalogu z jej stanem na tej maszynie. */
@@ -2939,7 +2960,7 @@ export interface SelfTestView {
 
 /** Opcje wysłania wiadomości. */
 export interface SendOptions {
-  readonly addressed_to: string | null;
+  readonly addressed_to: AgentId | null;
   /** Identyfikatory załączników przygotowanych w composerze (`attachments_*`). */
   readonly attachments?: readonly string[];
   readonly parent_id: string | null;
@@ -3362,6 +3383,17 @@ export type TeachSource =
       readonly kind: 'conversation';
     };
 
+/** Ramka strumienia terminala — wyłącznie kanał `tauri::ipc::Channel` otwarcia (nigdy zdarzenia). */
+export type TerminalFrame =
+  | {
+      readonly data_b64: string;
+      readonly kind: 'output';
+    }
+  | {
+      readonly code: number | null;
+      readonly kind: 'exit';
+    };
+
 /** Profil terminala. */
 export type TerminalProfileId = 'shell' | 'cmd' | 'claude_login' | 'codex_login' | 'agy_login';
 
@@ -3407,7 +3439,7 @@ export interface ThinkingInfo {
 
 /** Zdarzenie osi czasu v0. */
 export interface TimelineEvent {
-  readonly agent: string | null;
+  readonly agent: AgentId | null;
   readonly cost: Money | null;
   readonly detail: string | null;
   readonly id: string;
@@ -3566,27 +3598,27 @@ export interface TtsEngineView {
 
 /** Tura (węzeł drzewa gałęzi, append-only). */
 export interface Turn {
-  readonly addressed_to: string | null;
-  readonly approval: ApprovalPending | null;
+  readonly addressed_to: AgentId | null;
+  approval: ApprovalPending | null;
   /** Załączniki tury (artefakty sesji; pole pomijane, gdy brak). */
   readonly attachments?: readonly TurnAttachment[];
-  readonly author: string;
-  readonly blocks: readonly RenderedBlock[];
+  readonly author: Author;
+  blocks: RenderedBlock[];
   readonly continues: string | null;
   readonly created_at: string;
-  readonly error: TurnError | null;
+  error: TurnError | null;
   /** Usłyszany prefiks przerwanej odpowiedzi głosowej (tekst; `None` = wysłuchana w całości). */
-  readonly heard_prefix: string | null;
+  heard_prefix: string | null;
   readonly id: string;
   readonly parent_id: string | null;
   readonly role_id: string | null;
   readonly session_id: string;
-  readonly status: TurnStatus;
-  readonly text: string;
-  readonly thinking: ThinkingInfo | null;
-  readonly tools: readonly ToolStep[];
-  readonly truncated: boolean;
-  readonly usage: TurnUsage | null;
+  status: TurnStatus;
+  text: string;
+  thinking: ThinkingInfo | null;
+  tools: ToolStep[];
+  truncated: boolean;
+  usage: TurnUsage | null;
 }
 
 /** Adnotacje widoku (osobne rekordy, nie zmieniają tury). */
@@ -3785,7 +3817,7 @@ export type VoiceMode = 'toggle' | 'ptt';
 
 /** Pigułka głosowa. */
 export interface VoicePillState {
-  readonly agent: string;
+  readonly agent: AgentId;
   readonly level: number;
   readonly mic: MicState;
   /** Transkrypt częściowy wypowiedzi użytkownika (szary w UI). */
@@ -3805,7 +3837,7 @@ export type VoiceState = 'unavailable' | 'off' | 'active';
 
 /** Stan potoku głosu (pasek tytułu, Ustawienia → Głos). */
 export interface VoiceStatus {
-  readonly agent: string;
+  readonly agent: AgentId;
   readonly missing: readonly string[];
   readonly mode: VoiceMode;
   readonly muted: boolean;
@@ -4997,3 +5029,43 @@ export type IpcCommandName = keyof IpcCommands;
 export type IpcEventFrame = EventFrame;
 /** Odrzucenie komendy. */
 export type IpcError = AppError;
+
+/** Powód, dla którego polecenie wymaga lokalnej maszyny (B.5, `crates/app-api/data/local-only.json`). */
+export type LocalReason = 'system_dialog' | 'asset_preview' | 'host_path' | 'host_desktop';
+/**
+ * Polecenia zakładające lokalną maszynę (okno systemu, `asset:`, ścieżka hosta, okna i schowek hosta):
+ * klient zdalny ich nie dostanie — interfejs po kanale zdalnym chowa ich kontrolki albo używa odpowiednika.
+ */
+export const LOCAL_ONLY_COMMANDS = {
+  accounts_import_env: 'host_desktop',
+  agents_open_terminal: 'host_desktop',
+  app_open_system_settings: 'host_desktop',
+  attachments_add_dropped: 'host_desktop',
+  attachments_paste: 'host_desktop',
+  attachments_pick: 'system_dialog',
+  backups_choose_dir: 'system_dialog',
+  backups_restore: 'host_path',
+  bridges_open_login: 'host_desktop',
+  diag_export: 'host_path',
+  files_act: 'system_dialog',
+  files_preview: 'asset_preview',
+  mcp_save: 'host_path',
+  memory_teach_pick_file: 'system_dialog',
+  permissions_open_approval: 'host_desktop',
+  projects_pick_dir: 'system_dialog',
+  projects_save: 'host_path',
+  quick_expand_to_main: 'host_desktop',
+  quick_hide: 'host_desktop',
+  sessions_choose_workdir: 'system_dialog',
+  sessions_export: 'system_dialog',
+  sessions_export_conversation: 'system_dialog',
+  sessions_workdir: 'host_path',
+  skills_export: 'system_dialog',
+  skills_import: 'system_dialog',
+  system_clipboard_text: 'host_desktop',
+  transfer_export: 'system_dialog',
+  transfer_import: 'system_dialog',
+  transfer_inspect: 'system_dialog',
+  turns_save_code: 'system_dialog',
+  updates_restart: 'host_desktop',
+} as const satisfies Partial<Record<IpcCommandName, LocalReason>>;

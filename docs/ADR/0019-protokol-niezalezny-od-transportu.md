@@ -29,7 +29,7 @@ oznaczenia poleceń zakładających lokalną maszynę oraz generowanych typów T
 | Tożsamość klienta | każda sesja klienta ma `ClientId`, rodzaj (okno lokalne / urządzenie sparowane) i jawny zestaw dozwolonych poleceń |
 | ACL poleceń | sprawdzana po stronie hosta przed wykonaniem; klient nie wywoła polecenia, którego mu nie przyznano, nawet po modyfikacji interfejsu; domyślnie urządzenie sparowane ma wszystkie (decyzja właściciela 3) |
 | Polecenia `local_only` | oznaczenie w liście poleceń (okna dialogowe systemu, podgląd `asset:`, ścieżki bezwzględne w DTO); dla klientów zdalnych odpowiedniki: wybór pliku z listy hosta, podgląd przesyłany strumieniem |
-| Typy TS | generowane z Rust (ADR 0013); CI sprawdza `git diff --exit-code`; ręczne `types*.ts` znikają |
+| Typy TS | generowane z Rust (ADR 0013); CI sprawdza `git diff --exit-code`; ręczne kopie w `types*.ts` usunięte w B.1 etap 2 (2026-10-29) |
 | Transporty | te same ramki przez Tauri IPC, przez kanał szyfrowany (ADR 0021) i przez atrapę w testach; klient nie wie, którego używa |
 
 Szkic ramek (z planu; źródłem prawdy będzie `app-api`):
@@ -60,6 +60,13 @@ Szkic ramek (z planu; źródłem prawdy będzie `app-api`):
 - Okno Tauri korzysta na zmianie od razu: przestaje po cichu gubić zdarzenia i dostaje kody błędów.
 - Lista poleceń `local_only` i ich zdalnych odpowiedników wymaga przeglądu wszystkich 210 poleceń; ścieżki
   bezwzględne w DTO to także kwestia prywatności (klient zdalny widzi układ dysku hosta) — do oceny przy B.5.
+  **Zrobione 2026-10-29 (B.5):** przegląd 281 poleceń — 31 oznaczonych w `crates/app-api/data/local-only.json`
+  (powód: okno systemu, podgląd `asset:`, ścieżka hosta, okna/schowek/terminal hosta; odpowiednik: istniejące
+  polecenie, zadanie D.1/D.5/D.6 albo „tylko lokalnie” z powodem) i 16 pól DTO ze ścieżką hosta, które brama
+  D.1 skróci albo zastąpi uchwytem. Tabela jest w schemacie łącza i w typach TS (`LOCAL_ONLY_COMMANDS`);
+  testy `app-api/tests/local_only.rs` pilnują, że wpisy wskazują prawdziwe polecenia i pola, a polecenie
+  z nazwą wyboru, eksportu, importu albo otwarcia nie ominie tabeli. Egzekucja (odmowa klientowi
+  zdalnemu) przychodzi z bramą w D.1.
 - Test wymagany przed włączeniem dostępu zdalnego: zerwanie i wznowienie połączenia przy trwającej odpowiedzi —
   żadne zdarzenie nie ginie; klient bez uprawnienia do polecenia dostaje odmowę po stronie hosta.
 - Rozmiar bufora zdarzeń i limit rozmiaru ramki są budżetem zasobów modułu `remote-gateway` — progi ustala

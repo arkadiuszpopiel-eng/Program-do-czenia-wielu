@@ -19,6 +19,6 @@ git diff --exit-code packages/schemas   # w CI: musi być czysto
 ```
 Zmiana niezgodna wstecz = nowy plik `*.v2.json` + upcaster + test migracji (PLAN §13); stare pliki zostają.
 Typy TS dla UI powstają z `ipc.v1.json`: `node scripts/gen-ipc-types.mjs` zapisuje
-`apps/desktop/ui/src/lib/api/generated/ipc.ts` (typy i mapa komend) oraz `generated/compat.ts` (sprawdzenie
-w czasie kompilacji, że typy pisane ręcznie w `types*.ts` zgadzają się z generowanymi). Pozostałe schematy
+`apps/desktop/ui/src/lib/api/generated/ipc.ts` (typy, mapa komend, ramka kanału terminala); `types*.ts` tylko
+je przekazują, a ręczna kopia typu łącza zatrzymuje generator (B.1 etap 2). Pozostałe schematy
 służą walidacji zdarzeń w testach, logom NDJSON i wtyczkom Wasm.

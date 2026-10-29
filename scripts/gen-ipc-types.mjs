@@ -18,6 +18,64 @@ const OUT = join(ROOT, 'apps', 'desktop', 'ui', 'src', 'lib', 'api', 'generated'
 const schema = JSON.parse(readFileSync(SCHEMA, 'utf8'));
 const defs = schema.$defs;
 
+/**
+ * Zawężenie po stronie okna (B.1 etap 2): Rust trzyma te pola jako napis, a interfejs zna zamkniętą
+ * listę wartości (cztery agentki, przeznaczenie i klasa modelu). Klucz `Typ.pole`; pierwszy element —
+ * typ, który musi wyjść ze schematu (inny = rozjazd z Rustem, generator przerywa), drugi — typ w oknie.
+ */
+const NARROW = {
+  'AccountAssignment.agents': ['readonly string[]', 'readonly AgentId[]'],
+  'ActivityInfo.agent': ['string', 'AgentId'],
+  'AgentRun.agent': ['string', 'AgentId'],
+  'AgentState.id': ['string', 'AgentId'],
+  'ArtifactInfo.agent': ['string | null', 'AgentId | null'],
+  'GpuView.role': ['string', 'GpuRole'],
+  'ModelInfo.purpose': ['string', 'ModelPurpose'],
+  'ModelInfo.tier': ['string', 'ModelTier'],
+  'SendOptions.addressed_to': ['string | null', 'AgentId | null'],
+  'TimelineEvent.agent': ['string | null', 'AgentId | null'],
+  'Turn.addressed_to': ['string | null', 'AgentId | null'],
+  'Turn.author': ['string', 'Author'],
+  'VoicePillState.agent': ['string', 'AgentId'],
+  'VoiceStatus.agent': ['string', 'AgentId'],
+};
+/** Słowniki zawężeń (wartości z dokumentacji pól w Rust). */
+const VOCABULARY = [
+  "import type { AgentId } from '@alfa/ui-kit';",
+  '',
+  '/** Autor tury: użytkownik albo jedna z agentek. */',
+  "export type Author = 'user' | AgentId;",
+  '/** Przeznaczenie modelu rozpoznane po nazwie (`ModelInfo.purpose`). */',
+  'export type ModelPurpose =',
+  "  | 'chat' | 'reasoning' | 'embedding' | 'speech' | 'transcription'",
+  "  | 'realtime' | 'image' | 'video' | 'moderation' | 'other';",
+  '/** Wielkość modelu (`ModelInfo.tier`). */',
+  "export type ModelTier = 'standard' | 'small' | 'tiny' | 'premium';",
+  '/** Rola karty przy kilku kartach: modele główne, lekkie zadania albo nieużywana (`GpuView.role`). */',
+  "export type GpuRole = 'heavy' | 'light' | 'spare';",
+  '',
+];
+const VOCABULARY_TYPES = ['Author', 'ModelPurpose', 'ModelTier', 'GpuRole'];
+/**
+ * Pola, które okno uzupełnia na miejscu z delt strumienia (stan `$state`): bez `readonly`, tablice
+ * zmienne. Reszta typu zostaje tylko do odczytu.
+ */
+const MUTABLE_IN_UI = {
+  Turn: [
+    'approval',
+    'blocks',
+    'error',
+    'heard_prefix',
+    'status',
+    'text',
+    'thinking',
+    'tools',
+    'truncated',
+    'usage',
+  ],
+};
+const narrowed = new Set();
+
 const camel = (name) => name.replace(/_([a-z0-9])/g, (_, c) => c.toUpperCase());
 const literal = (value) => JSON.stringify(value);
 const key = (name) => (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(name) ? name : literal(name));
@@ -70,12 +128,31 @@ function type(node) {
   }
 }
 
-function object(node) {
+function fieldType(owner, name, child) {
+  const generated = type(child);
+  const rule = owner && NARROW[`${owner}.${name}`];
+  if (!rule) return generated;
+  if (generated !== rule[0])
+    throw new Error(`zawężenie ${owner}.${name}: schemat daje ${generated}, oczekiwano ${rule[0]}`);
+  narrowed.add(`${owner}.${name}`);
+  return rule[1];
+}
+
+function object(node, owner = null) {
   const required = new Set(node.required ?? []);
-  const fields = Object.entries(node.properties ?? {}).map(
-    ([name, child]) =>
-      `${doc(child.description)}readonly ${key(name)}${required.has(name) ? '' : '?'}: ${type(child)};`,
-  );
+  const mutable = new Set(MUTABLE_IN_UI[owner] ?? []);
+  const fields = Object.entries(node.properties ?? {}).map(([name, child]) => {
+    const live = mutable.has(name);
+    let field = fieldType(owner, name, child);
+    if (live) {
+      field = field.replace(/^readonly /, '');
+      mutable.delete(name);
+    }
+    const opt = required.has(name) ? '' : '?';
+    return `${doc(child.description)}${live ? '' : 'readonly '}${key(name)}${opt}: ${field};`;
+  });
+  if (mutable.size > 0)
+    throw new Error(`pola zmienne bez pola w schemacie: ${owner}.${[...mutable]}`);
   const extra = node.additionalProperties;
   const record = extra && extra !== true ? `Readonly<Record<string, ${type(extra)}>>` : null;
   if (fields.length === 0) return record ?? 'Readonly<Record<string, unknown>>';
@@ -85,7 +162,7 @@ function object(node) {
 
 function declaration(name, node) {
   const plain = node.type === 'object' && node.properties && !node.additionalProperties;
-  if (plain) return `${doc(node.description)}export interface ${name} ${object(node)}`;
+  if (plain) return `${doc(node.description)}export interface ${name} ${object(node, name)}`;
   return `${doc(node.description)}export type ${name} = ${type(node)};`;
 }
 
@@ -93,10 +170,13 @@ const parts = [
   '// PLIK GENEROWANY — nie edytuj ręcznie. Źródło: typy Rust w `crates/app-api` → schemat',
   '// `packages/schemas/ipc.v1.json` → `node scripts/gen-ipc-types.mjs` (ADR 0013).',
   '',
+  ...VOCABULARY,
   `/** Wersja kształtu schematu łącza. */\nexport const IPC_SCHEMA_VERSION = ${schema.version};`,
   '',
 ];
 for (const name of Object.keys(defs).sort()) parts.push(declaration(name, defs[name]), '');
+const unused = Object.keys(NARROW).filter((k) => !narrowed.has(k));
+if (unused.length > 0) throw new Error(`zawężenia bez pola w schemacie: ${unused.join(', ')}`);
 
 const commands = Object.keys(schema.commands)
   .sort()
@@ -115,81 +195,47 @@ parts.push(
   `/** Ładunek kanału \`alfa://events\`. */\nexport type IpcEventFrame = ${type(schema.event_frame)};`,
   `/** Odrzucenie komendy. */\nexport type IpcError = ${type(schema.error)};`,
   '',
+  '/** Powód, dla którego polecenie wymaga lokalnej maszyny (B.5, `crates/app-api/data/local-only.json`). */',
+  "export type LocalReason = 'system_dialog' | 'asset_preview' | 'host_path' | 'host_desktop';",
+  '/**',
+  ' * Polecenia zakładające lokalną maszynę (okno systemu, `asset:`, ścieżka hosta, okna i schowek hosta):',
+  ' * klient zdalny ich nie dostanie — interfejs po kanale zdalnym chowa ich kontrolki albo używa odpowiednika.',
+  ' */',
+  `export const LOCAL_ONLY_COMMANDS = {\n${Object.entries(schema.local_only.commands)
+    .map(([name, entry]) => `${key(name)}: ${literal(entry.reason)},`)
+    .join('\n')}\n} as const satisfies Partial<Record<IpcCommandName, LocalReason>>;`,
+  '',
 );
 
 const options = (await prettier.resolveConfig(OUT)) ?? {};
 const text = await prettier.format(parts.join('\n'), { ...options, parser: 'typescript' });
 
-// ── Zgodność typów pisanych ręcznie (`types*.ts`) z generowanymi ───────────────────────────────
-// Dopóki interfejs korzysta z typów pisanych ręcznie, ten plik pilnuje, żeby nie rozjechały się
-// z Rustem: błąd typów w `generated/compat.ts` (widzi go `pnpm check`) = rozjazd kontraktu.
+// ── Bez ręcznych kopii (B.1 etap 2) ──────────────────────────────────────────────────────────────
+// Typ łącza istnieje tylko w pliku generowanym; `types*.ts` go przekazują (`export type { X } from
+// './generated/ipc'`) i dokładają typy samego interfejsu. Ręczna deklaracja typu o nazwie typu z Rusta
+// (albo słownika zawężeń) = błąd generatora — kontrakt nie może się znowu rozdwoić.
 const API = join(ROOT, 'apps', 'desktop', 'ui', 'src', 'lib', 'api');
-const COMPAT = join(API, 'generated', 'compat.ts');
-/** Interfejs zawęża tu napis z Rusta do listy wartości (`AgentId`, `ModelPurpose`, `Author`, rola karty). */
-const NARROWED_IN_UI = new Set([
-  'Account',
-  'AccountAssignment',
-  'ActivityInfo',
-  'AgentRun',
-  'AgentRunDetail',
-  'AgentState',
-  'AlfaEvent',
-  'ArtifactInfo',
-  'DeviceProfile',
-  'EventFrame',
-  'EventsResume',
-  'ModelInfo',
-  'SendOptions',
-  'TestReport',
-  'TimelineEvent',
-  'Turn',
-  'TurnsSnapshot',
-  'VoicePillState',
-  'VoiceStatus',
-]);
 const handwritten = new Map();
 for (const file of readdirSync(API)
   .filter((f) => /^types.*\.ts$/.test(f))
   .sort()) {
   const source = readFileSync(join(API, file), 'utf8');
   for (const match of source.matchAll(/^export (?:interface|type) (\w+)/gm))
-    if (!handwritten.has(match[1])) handwritten.set(match[1], file.replace(/\.ts$/, ''));
+    if (!handwritten.has(match[1])) handwritten.set(match[1], file);
 }
-const shared = [...handwritten.keys()].filter((name) => name in defs).sort();
-const modules = [...new Set(shared.map((name) => handwritten.get(name)))].sort();
-const alias = (module) => `H${modules.indexOf(module)}`;
-const checks = shared.flatMap((name) => {
-  const hand = `${alias(handwritten.get(name))}.${name}`;
-  const out = [];
-  if (!NARROWED_IN_UI.has(name)) out.push(`  Expect<Fits<G.${name}, ${hand}>>,`);
-  out.push(`  Expect<Fits<${hand}, G.${name}>>,`);
-  return out;
-});
-const compatSource = [
-  '// PLIK GENEROWANY — nie edytuj ręcznie (`node scripts/gen-ipc-types.mjs`).',
-  '// Każdy wiersz sprawdza w czasie kompilacji, że typ pisany ręcznie (`types*.ts`) zgadza się',
-  '// z typem generowanym z Rusta: `Fits<G.X, H.X>` — to, co wysyła rdzeń, pasuje do typu',
-  '// interfejsu; `Fits<H.X, G.X>` — typ interfejsu ma wszystkie pola, które zna rdzeń.',
-  '// Błąd w tym pliku = rozjazd kontraktu: popraw typ ręczny (albo DTO w Rust i wygeneruj ponownie).',
-  "import type * as G from './ipc';",
-  ...modules.map((module) => `import type * as ${alias(module)} from '../${module}';`),
-  '',
-  'type Fits<A, B> = [A] extends [B] ? true : false;',
-  'type Expect<T extends true> = T;',
-  '',
-  `/** ${shared.length} typów wspólnych, ${checks.length} sprawdzeń. */`,
-  `export type IpcCompat = [\n${checks.join('\n')}\n];`,
-  '',
-].join('\n');
-const compat = await prettier.format(compatSource, { ...options, parser: 'typescript' });
-const onlyRust = Object.keys(defs).filter((name) => !handwritten.has(name));
-const onlyUi = [...handwritten.keys()].filter((name) => !(name in defs));
+const duplicates = [...handwritten.keys()].filter(
+  (name) => name in defs || VOCABULARY_TYPES.includes(name),
+);
+if (duplicates.length > 0) {
+  for (const name of duplicates)
+    console.error(
+      `gen-ipc-types: ${handwritten.get(name)} deklaruje ${name} — to typ łącza, przekaż go z generated/ipc`,
+    );
+  process.exit(1);
+}
 
-const outputs = [
-  [OUT, text],
-  [COMPAT, compat],
-];
-const summary = `${Object.keys(defs).length} typów, ${commands.length} komend; wspólnych z typami ręcznymi: ${shared.length} (${checks.length} sprawdzeń), tylko w Rust: ${onlyRust.length}, tylko w interfejsie: ${onlyUi.length}`;
+const outputs = [[OUT, text]];
+const summary = `${Object.keys(defs).length} typów, ${commands.length} komend, ${narrowed.size} pól zawężonych; typy samego interfejsu: ${handwritten.size}`;
 if (process.argv.includes('--check')) {
   const stale = outputs.filter(
     ([path, wanted]) =>

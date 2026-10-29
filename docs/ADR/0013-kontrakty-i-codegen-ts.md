@@ -43,6 +43,19 @@ Zasady:
 - Koszt: dodatkowy krok builda i narzędzia w toolchainie; łagodzony hookami lokalnymi.
 - Ryzyko: `tauri-specta` RC — decyzja tauri-specta vs ts-rs w F0 po próbie na pierwszym module-przykładzie.
 
+## Wdrożenie (stan 2026-10-29)
+
+- Generator: `schemars` (był już w drzewie) zamiast `tauri-specta`/`ts-rs` — `app-api/src/schema.rs` →
+  `packages/schemas/ipc.v1.json` → `scripts/gen-ipc-types.mjs` → `apps/desktop/ui/src/lib/api/generated/ipc.ts`
+  (etap 1, wersja 0.0.21).
+- Etap 2 (B.1, 2026-10-29): ręczne kopie typów łącza w `types*.ts` usunięte — pliki tylko przekazują typy
+  generowane i dokładają typy samego interfejsu (np. API klienta, raport rozruchu z powłoki). Ręczna deklaracja
+  o nazwie typu z Rusta zatrzymuje generator. Napisy, które interfejs zna jako zamkniętą listę (`AgentId`,
+  `Author`, `ModelPurpose`, `ModelTier`, `GpuRole`), zawęża tabela w generatorze, sprawdzająca, że schemat
+  daje dla tego pola napis — **wybrano zawężenie po stronie okna**, nie wyliczenia w Rust (łącze i rdzeń bez
+  zmian). Pola tury uzupełniane na miejscu z delt strumienia generator wypisuje bez `readonly`.
+- `dependency-cruiser` z punktu „Decyzja” nie jest wdrożony; tę rolę pełni strażnik generatora.
+
 ## Jak cofnąć
 
 - Przełączenie `tauri-specta` ↔ `ts-rs` dotyczy tylko generatora; kontrakty Rust bez zmian.

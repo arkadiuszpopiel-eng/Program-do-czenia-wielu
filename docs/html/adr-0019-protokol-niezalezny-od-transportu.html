@@ -340,7 +340,7 @@ oznaczenia poleceń zakładających lokalną maszynę oraz generowanych typów T
 <tr><td>Tożsamość klienta</td><td>każda sesja klienta ma <code>ClientId</code>, rodzaj (okno lokalne / urządzenie sparowane) i jawny zestaw dozwolonych poleceń</td></tr>
 <tr><td>ACL poleceń</td><td>sprawdzana po stronie hosta przed wykonaniem; klient nie wywoła polecenia, którego mu nie przyznano, nawet po modyfikacji interfejsu; domyślnie urządzenie sparowane ma wszystkie (decyzja właściciela 3)</td></tr>
 <tr><td>Polecenia <code>local_only</code></td><td>oznaczenie w liście poleceń (okna dialogowe systemu, podgląd <code>asset:</code>, ścieżki bezwzględne w DTO); dla klientów zdalnych odpowiedniki: wybór pliku z listy hosta, podgląd przesyłany strumieniem</td></tr>
-<tr><td>Typy TS</td><td>generowane z Rust (ADR 0013); CI sprawdza <code>git diff --exit-code</code>; ręczne <code>types*.ts</code> znikają</td></tr>
+<tr><td>Typy TS</td><td>generowane z Rust (ADR 0013); CI sprawdza <code>git diff --exit-code</code>; ręczne kopie w <code>types*.ts</code> usunięte w B.1 etap 2 (2026-10-29)</td></tr>
 <tr><td>Transporty</td><td>te same ramki przez Tauri IPC, przez kanał szyfrowany (ADR 0021) i przez atrapę w testach; klient nie wie, którego używa</td></tr></tbody></table></div>
 <p>Szkic ramek (z planu; źródłem prawdy będzie <code>app-api</code>):</p>
 <pre><code>→ { &quot;v&quot;: 1, &quot;id&quot;: 4711, &quot;cmd&quot;: &quot;turn_send&quot;, &quot;args&quot;: { … } }
@@ -362,7 +362,14 @@ i B.5 (<code>local_only</code>) nie dodają funkcji i mogą iść równolegle z 
 <li>B.2 zamyka przy okazji otwarte ustalenie o deltach przychodzących w czasie wczytywania rozmowy.</li>
 <li>Okno Tauri korzysta na zmianie od razu: przestaje po cichu gubić zdarzenia i dostaje kody błędów.</li>
 <li>Lista poleceń <code>local_only</code> i ich zdalnych odpowiedników wymaga przeglądu wszystkich 210 poleceń; ścieżki
-bezwzględne w DTO to także kwestia prywatności (klient zdalny widzi układ dysku hosta) — do oceny przy B.5.</li>
+bezwzględne w DTO to także kwestia prywatności (klient zdalny widzi układ dysku hosta) — do oceny przy B.5.
+<strong>Zrobione 2026-10-29 (B.5):</strong> przegląd 281 poleceń — 31 oznaczonych w <code>crates/app-api/data/local-only.json</code>
+(powód: okno systemu, podgląd <code>asset:</code>, ścieżka hosta, okna/schowek/terminal hosta; odpowiednik: istniejące
+polecenie, zadanie D.1/D.5/D.6 albo „tylko lokalnie” z powodem) i 16 pól DTO ze ścieżką hosta, które brama
+D.1 skróci albo zastąpi uchwytem. Tabela jest w schemacie łącza i w typach TS (<code>LOCAL_ONLY_COMMANDS</code>);
+testy <code>app-api/tests/local_only.rs</code> pilnują, że wpisy wskazują prawdziwe polecenia i pola, a polecenie
+z nazwą wyboru, eksportu, importu albo otwarcia nie ominie tabeli. Egzekucja (odmowa klientowi
+zdalnemu) przychodzi z bramą w D.1.</li>
 <li>Test wymagany przed włączeniem dostępu zdalnego: zerwanie i wznowienie połączenia przy trwającej odpowiedzi —
 żadne zdarzenie nie ginie; klient bez uprawnienia do polecenia dostaje odmowę po stronie hosta.</li>
 <li>Rozmiar bufora zdarzeń i limit rozmiaru ramki są budżetem zasobów modułu <code>remote-gateway</code> — progi ustala

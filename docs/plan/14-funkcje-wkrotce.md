@@ -52,7 +52,7 @@ gdy brakuje silnika, modelu albo moduł zgłosił błąd przy starcie.
 | Kreator agentek, umiejętności, Ulepszacz, diagnosta   | `agent-builder`, `skills`, `improver`, `diagnostician` | błąd startu modułu                                         | —                          |
 | Porządkowanie pamięci                                 | `memory-consolidation`                            | błąd startu modułu                                         | —                          |
 | Evale w „Zdrowie systemu”                             | `evals`                                           | błąd startu modułu                                         | C2.1                       |
-| Okna wyboru pliku i katalogu, zapis przez okno, terminal | powłoka programu                                  | tylko w testach bez okna (nie w programie)                 | B.5                        |
+| Okna wyboru pliku i katalogu, zapis przez okno, terminal | powłoka programu | tylko w testach bez okna (nie w programie); oznaczone `local_only` (B.5), odpowiedniki zdalne w D.6 | D.6 |
 
 Wiersze z „—” nie mają otwartego zadania: funkcja działa, a komunikat jest tylko zabezpieczeniem.
 

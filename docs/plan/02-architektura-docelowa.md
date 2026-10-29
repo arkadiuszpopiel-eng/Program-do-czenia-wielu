@@ -92,8 +92,8 @@ To bardzo dobry punkt wyjścia. Brakuje pięciu rzeczy:
 | Numery sekwencji zdarzeń              | klient, który nie nadąża, po cichu gubi paczki (`pump.rs`)          | każde zdarzenie dostaje `seq`; host trzyma bufor ostatnich N; klient po przerwie prosi „od `seq`”, a gdy bufor nie sięga — dostaje `resync` i czyta stan od nowa |
 | Błędy strukturalne na łączu           | powłoka spłaszcza `AppError` do tekstu                              | przez łącze idzie `{ code, message, details }`; tekst tłumaczy klient                                                                                            |
 | Tożsamość klienta i uprawnienia       | jedyne ACL to uprawnienia okien Tauri                               | każda sesja klienta ma `ClientId`, rodzaj (okno / urządzenie sparowane) i zestaw dozwolonych poleceń                                                             |
-| Polecenia zakładające lokalną maszynę | okna dialogowe systemu, podgląd `asset:`, ścieżki bezwzględne w DTO | polecenia oznaczone `local_only`; dla klientów zdalnych odpowiedniki: wybór pliku z listy hosta, podgląd przesyłany strumieniem                                  |
-| Typy TS pisane ręcznie                | ryzyko rozjazdu przy trzech klientach                               | generator z Rust (ADR 0013); CI sprawdza `git diff --exit-code`                                                                                                  |
+| Polecenia zakładające lokalną maszynę | okna dialogowe systemu, podgląd `asset:`, ścieżki bezwzględne w DTO | polecenia oznaczone `local_only` (B.5, 2026-10-29: `app-api/data/local-only.json`, 31 poleceń, 16 pól ze ścieżką); odpowiedniki w D.1/D.5/D.6 |
+| Typy TS pisane ręcznie                | ryzyko rozjazdu przy trzech klientach                               | generator z Rust (ADR 0013); CI sprawdza `git diff --exit-code`; ręczne kopie usunięte (B.1 etap 2, 2026-10-29) |
 
 Ramka protokołu (szkic do ADR 0019):
 

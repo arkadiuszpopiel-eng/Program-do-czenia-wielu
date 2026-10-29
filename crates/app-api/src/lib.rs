@@ -13,6 +13,7 @@ pub mod error;
 pub mod event_log;
 pub mod events;
 pub mod ids;
+pub mod local_only;
 pub mod notify;
 pub mod paths;
 pub mod ports;
