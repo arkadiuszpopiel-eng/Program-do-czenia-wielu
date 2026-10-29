@@ -35,13 +35,16 @@ pierwszy pomiar na prawdziwym Bieliku 4.5B wykazał kilka błędów, które ta w
   literówki i zapisywał pliki w złym miejscu.
 - Powtórzone wywołanie z tymi samymi argumentami dostaje podpowiedź, żeby zakończyć, zamiast kręcić się aż do
   wykrycia pętli.
+- Model lokalny wywołuje narzędzia z niską temperaturą (0,2), gdy nie ustawisz innej — mniej przekręconych nazw
+  plików i stabilniejsze wyniki.
+- Tekst przy wywołaniu narzędzia zapowiada, co agentka robi („Odczytuję plik…”), zamiast od razu ogłaszać wynik.
 - Wybrana na stałe karta graficzna (CUDA/Vulkan) działa także bez profilu urządzenia — wcześniej serwer modelu
   liczył wtedy na procesorze.
 
 ### Testy
 
 - Historia wersji kanwy: testy jednostkowe porównania wierszy i e2e we wszystkich stylach i motywach (axe,
-  kontrast). Pomiar F3 na Bieliku 4.5B (llama-server b11559, CUDA): przed poprawkami 0/35, po nich 11/35;
+  kontrast). Pomiar F3 na Bieliku 4.5B (llama-server b11559, CUDA): przed poprawkami 0/35, po nich 10–12/35;
   test wykrywania powłoki i podpowiedzi przy powtórzonym wywołaniu.
 
 ## 0.0.77 — 2026-10-29

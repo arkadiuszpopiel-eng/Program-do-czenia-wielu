@@ -44,7 +44,7 @@ modeli z narzędziami). `--list-devices` — lista urządzeń (`devices.rs`).
 - Koperta `{"response", "tool_call"?}` z `response` na początku → model wpisywał wywołanie jako tekst do `response`
   (0/35). Wywołanie jako wybór na początku (`anyOf`: obiekt z wymaganym `tool_call` albo sam `response`) → 5/35;
   z poprawkami runtime (ścieżki względne, wykrywanie powłoki, podpowiedź przy powtórzeniu) → 11/35 (`fs` 9/24,
-  `shell` 2/11). Szczegóły i pozostałe przyczyny porażek: `docs/plan/44-raport-2026-10-30-noc.md`.
+  `shell` 2/11); z temperaturą 0,2 przy narzędziach (domyślna serwera to 0,8) 10–12/35 i mniejszy rozrzut. Szczegóły i pozostałe przyczyny porażek: `docs/plan/44-raport-2026-10-30-noc.md`.
 - `anyOf` w korzeniu schematu konwerter b11559 przyjmuje (gramatyka z alternatywą).
 
 ## Czego nie sprawdziliśmy

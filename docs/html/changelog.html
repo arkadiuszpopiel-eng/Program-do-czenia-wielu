@@ -350,13 +350,16 @@ zamiast kończyć każde polecenie błędem „nie znaleziono ścieżki”.</li>
 literówki i zapisywał pliki w złym miejscu.</li>
 <li>Powtórzone wywołanie z tymi samymi argumentami dostaje podpowiedź, żeby zakończyć, zamiast kręcić się aż do
 wykrycia pętli.</li>
+<li>Model lokalny wywołuje narzędzia z niską temperaturą (0,2), gdy nie ustawisz innej — mniej przekręconych nazw
+plików i stabilniejsze wyniki.</li>
+<li>Tekst przy wywołaniu narzędzia zapowiada, co agentka robi („Odczytuję plik…”), zamiast od razu ogłaszać wynik.</li>
 <li>Wybrana na stałe karta graficzna (CUDA/Vulkan) działa także bez profilu urządzenia — wcześniej serwer modelu
 liczył wtedy na procesorze.</li>
 </ul>
 <h3 id="testy">Testy</h3>
 <ul>
 <li>Historia wersji kanwy: testy jednostkowe porównania wierszy i e2e we wszystkich stylach i motywach (axe,
-kontrast). Pomiar F3 na Bieliku 4.5B (llama-server b11559, CUDA): przed poprawkami 0/35, po nich 11/35;
+kontrast). Pomiar F3 na Bieliku 4.5B (llama-server b11559, CUDA): przed poprawkami 0/35, po nich 10–12/35;
 test wykrywania powłoki i podpowiedzi przy powtórzonym wywołaniu.</li>
 </ul>
 <h2 id="0-0-77-2026-10-29">0.0.77 — 2026-10-29</h2>
