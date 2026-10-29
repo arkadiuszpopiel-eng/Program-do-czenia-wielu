@@ -261,11 +261,15 @@ export const test = base.extend<object, { alfa: Alfa }>({
 
 export { expect };
 
-/** Zrzut okna głównego jako załącznik testu i plik w `out/screens` (błąd zrzutu nie psuje testu). */
+/**
+ * Zrzut okna głównego jako załącznik testu i plik w `out/screens` (błąd zrzutu nie psuje testu).
+ * Animacje wejścia (okienka, panele) przewinięte do końca — zrzut pokazuje stan ustalony, a nie
+ * półprzezroczystą klatkę z połowy wjazdu (29.10 menu trybu wyglądało na zrzucie na przezroczyste).
+ */
 export async function shot(alfa: Alfa, name: string): Promise<void> {
   const path = join(OUT, 'screens', `${name}.png`);
   try {
-    await alfa.main.screenshot({ path, timeout: 20_000 });
+    await alfa.main.screenshot({ path, timeout: 20_000, animations: 'disabled' });
     await test.info().attach(name, { path, contentType: 'image/png' });
   } catch (error) {
     test
