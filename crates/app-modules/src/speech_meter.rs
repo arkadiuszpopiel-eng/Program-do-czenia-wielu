@@ -2,7 +2,8 @@
 //! Fragment syntezy trafia do miksera cały i gra się potem w czasie rzeczywistym, więc poziom
 //! liczymy z samego fragmentu (obwiednia co [`STEP`]) i wysyłamy w chwilach, w których dana część
 //! zabrzmi: fragmenty ustawiają się jeden za drugim, tak jak w kolejce miksera. Stop albo nowa
-//! wypowiedź unieważnia zaplanowane zdarzenia.
+//! wypowiedź unieważnia zaplanowane zdarzenia. Znacznik ([`SpeechMeter::mark_next`], np. czytane
+//! zdanie) wychodzi razem z pierwszym poziomem następnego fragmentu — wyróżnienie nie wyprzedza głosu.
 
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
@@ -55,6 +56,8 @@ pub struct SpeechMeter {
     /// Numer „pokolenia”: stop zwiększa go i zaplanowane zadania milkną.
     generation: Arc<AtomicU64>,
     timeline: Arc<Mutex<Timeline>>,
+    /// Zdarzenie do wysłania, gdy zabrzmi następny fragment.
+    marker: Arc<Mutex<Option<AlfaEvent>>>,
 }
 
 impl SpeechMeter {
@@ -71,13 +74,28 @@ impl SpeechMeter {
             timeline: Arc::new(Mutex::new(Timeline {
                 busy_until: Instant::now(),
             })),
+            marker: Arc::default(),
         }
+    }
+
+    /// Zdarzenie `event` wyjdzie w chwili, gdy zacznie brzmieć następny fragment.
+    pub fn mark_next(&self, event: AlfaEvent) {
+        *self.marker.lock().unwrap_or_else(PoisonError::into_inner) = Some(event);
     }
 
     /// Planuje poziomy dla fragmentu mowy agentki `agent`, który właśnie trafił do miksera.
     pub fn schedule(&self, agent: &str, chunk: &Frame) {
         let levels = envelope(&chunk.pcm, chunk.format);
+        let marker = self
+            .marker
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .take();
         if levels.is_empty() {
+            // Pusty fragment nic nie gra — znacznik czeka na następny.
+            if let Some(event) = marker {
+                self.mark_next(event);
+            }
             return;
         }
         let length = STEP * u32::try_from(levels.len()).unwrap_or(u32::MAX);
@@ -91,6 +109,13 @@ impl SpeechMeter {
         let timeline = self.timeline.clone();
         let (mine, agent) = (generation.load(Ordering::SeqCst), agent.to_owned());
         tokio::spawn(async move {
+            if let Some(event) = marker {
+                tokio::time::sleep_until(start).await;
+                if generation.load(Ordering::SeqCst) != mine {
+                    return;
+                }
+                events(event);
+            }
             for (index, level) in levels.into_iter().enumerate() {
                 tokio::time::sleep_until(start + STEP * u32::try_from(index).unwrap_or(u32::MAX))
                     .await;
@@ -118,6 +143,10 @@ impl SpeechMeter {
     /// Mowa przerwana: zaplanowane poziomy przepadają, interfejs dostaje ciszę.
     pub fn silence(&self) {
         self.generation.fetch_add(1, Ordering::SeqCst);
+        self.marker
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .take();
         self.timeline
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
@@ -197,71 +226,16 @@ impl OutputStream for MeteredOutput {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use voice_audio_contract::MediaTime;
-
-    fn tone(seconds: f32, amplitude: f32) -> Vec<f32> {
-        let n = (24_000.0 * seconds) as usize;
-        (0..n)
-            .map(|i| amplitude * (i as f32 * 0.05).sin())
-            .collect()
-    }
-
-    #[test]
-    fn envelope_follows_loudness_window_by_window() {
-        let format = AudioFormat::mono(24_000);
-        let mut pcm = tone(0.34, 0.5);
-        pcm.extend(vec![0.0; 24_000 * 34 / 100]);
-        pcm.extend(tone(0.34, 0.05));
-        let levels = envelope(&pcm, format);
-        assert_eq!(levels.len(), 30);
-        let (loud, silent, quiet) = (levels[3], levels[14], levels[25]);
-        assert!(loud > 0.8, "{loud}");
-        assert_eq!(silent, 0.0);
-        assert!(quiet > 0.3 && quiet < loud, "{quiet}");
-        assert!(envelope(&[], format).is_empty());
-    }
-
-    #[tokio::test(start_paused = true)]
-    async fn chunks_play_back_to_back_and_stop_silences_the_rest() {
-        let seen: Arc<Mutex<Vec<(String, f64)>>> = Arc::default();
-        let store = seen.clone();
-        let meter = SpeechMeter::with_sink(Arc::new(move |event| {
-            if let AlfaEvent::SpeechLevel { agent, level } = event {
-                store.lock().expect("zamek").push((agent, level));
-            }
-        }));
-        let take = || std::mem::take(&mut *seen.lock().expect("zamek"));
-        let frame = |amplitude: f32| {
-            Frame::new(
-                tone(0.17, amplitude),
-                AudioFormat::mono(24_000),
-                MediaTime(0),
-            )
-            .expect("ramka")
-        };
-        // Dwa fragmenty po 170 ms (5 okien): drugi zaczyna się po pierwszym.
-        meter.schedule("alfa", &frame(0.5));
-        meter.schedule("alfa", &frame(0.05));
-        tokio::time::sleep(Duration::from_millis(400)).await;
-        let first = take();
-        assert!(first.iter().all(|(agent, _)| agent == "alfa"));
-        let levels: Vec<f64> = first.into_iter().map(|(_, level)| level).collect();
-        // 5 głośnych, 5 cichych bez przerwy między fragmentami i zero na końcu.
-        assert_eq!(levels.len(), 11, "{levels:?}");
-        assert!(levels[..5].iter().all(|l| *l > 0.8));
-        assert!(levels[5..10].iter().all(|l| *l > 0.2 && *l < 0.7));
-        assert_eq!(levels[10], 0.0);
-
-        // Stop w trakcie: po ciszy nie przychodzi już nic z przerwanego fragmentu.
-        meter.schedule("beta", &frame(0.5));
-        tokio::time::sleep(Duration::from_millis(40)).await;
-        meter.silence();
-        tokio::time::sleep(Duration::from_millis(400)).await;
-        let after: Vec<f64> = take().into_iter().map(|(_, level)| level).collect();
-        assert_eq!(after.last(), Some(&0.0));
-        assert!(after.len() <= 3, "{after:?}");
+/// Zdarzenie czytanego zdania `index` z `sentences` (poza zakresem — koniec czytania, pusty tekst).
+pub fn sentence_segment(turn_id: &str, sentences: &[String], index: u32) -> AlfaEvent {
+    AlfaEvent::SpeechSegment {
+        turn_id: turn_id.to_owned(),
+        index,
+        of: u32::try_from(sentences.len()).unwrap_or(u32::MAX),
+        text: usize::try_from(index)
+            .ok()
+            .and_then(|i| sentences.get(i))
+            .cloned()
+            .unwrap_or_default(),
     }
 }

@@ -256,11 +256,32 @@ async fn read_aloud_uses_tts_and_audio_on_fakes() {
     until(&mut rx, ends(&answer)).await;
     core.turns_read_aloud(answer.clone()).await.unwrap();
     let deadline = Instant::now() + Duration::from_secs(10);
-    while audio.recorded_output().iter().all(|s| s.abs() < 1e-4) {
-        assert!(Instant::now() < deadline, "brak dźwięku na wyjściu");
+    let mut segments = Vec::new();
+    while audio.recorded_output().iter().all(|s| s.abs() < 1e-4) || segments.is_empty() {
+        assert!(
+            Instant::now() < deadline,
+            "brak dźwięku albo zdania na wyjściu"
+        );
         audio.advance(Duration::from_millis(50));
         tokio::time::sleep(Duration::from_millis(5)).await;
+        while let Ok(batch) = rx.try_recv() {
+            for event in batch.iter() {
+                if let AlfaEvent::SpeechSegment {
+                    turn_id,
+                    index,
+                    of,
+                    text,
+                } = event
+                {
+                    segments.push((turn_id.clone(), *index, *of, text.clone()));
+                }
+            }
+        }
     }
+    // Czytane zdanie (plan 43): pierwsze zdanie tej tury, z tekstem i liczbą zdań.
+    let (turn_id, index, of, text) = &segments[0];
+    assert_eq!((turn_id, *index), (&answer, 0), "{segments:?}");
+    assert!(*of >= 1 && !text.is_empty(), "{segments:?}");
     core.voice_stop_speech().await.unwrap();
 
     // Bez silnika TTS — czytelny komunikat.

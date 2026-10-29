@@ -56,7 +56,20 @@ Zdarzenie idzie przez `app-api`, nie przez magistralę `core-bus` (zmiana tam wy
   znika po zatrzymaniu; przy ograniczonym ruchu bez animacji.
 - Test w prawdziwym oknie (WebView2) i odsłuch na sprzęcie (`verify sprzet`) — **za dnia**, nie w nocy.
 
-## 5. Do decyzji właściciela
+## 5. Decyzja i stan (2026-10-29)
 
-1. Czy wprowadzać (szacunek: jedna seria — rdzeń, okno, testy)?
-2. Czy od razu w rozmowie głosowej, czy najpierw tylko przycisk „Przeczytaj na głos”?
+Właściciel: **„OK”** — wprowadzać. Faza 1 (przycisk „Przeczytaj na głos”) jest w kodzie:
+
+- rdzeń: `AlfaEvent::SpeechSegment { turn_id, index, of, text }`; `VoicePort::read_aloud(agent, text, turn)`;
+  znacznik zdania wychodzi z `SpeechMeter::mark_next` razem z pierwszym poziomem fragmentu (to samo opóźnienie co
+  ruch ust); koniec czytania — `index == of` z pustym tekstem; „Stop” kasuje czekający znacznik;
+- okno: `state/reading.svelte.ts` (stan), `logic/sentence-match.ts` (dopasowanie po słowach z tolerancją,
+  wybór najlepszego trafienia), `components/conversation/reading-mark.svelte.ts` (CSS Custom Highlight API),
+  `::highlight(alfa-reading)` w `@alfa/ui-kit/base.css` (odcień barwy agentki); awatar wiadomości mówi i wypuszcza
+  litery z czytanego zdania; Esc zatrzymuje czytanie wiadomości;
+- testy: `app-modules/tests/speech_meter.rs`, `app-core/tests/wiring.rs` (zdarzenie z atrapą syntezy),
+  vitest `sentence-match`, `reading`, przeglądarka `e2e/read-aloud-mark.spec.ts` (zdania z ekranu, Esc, 6 wyglądów
+  z axe).
+
+**Faza 2** (rozmowa głosowa, `voice-pipeline-impl/src/speech/play.rs` → most w `app-voice`) — następna seria.
+Odsłuch na sprzęcie (`verify sprzet`) — za dnia.

@@ -103,8 +103,10 @@ pub trait VoicePort: Send + Sync {
     async fn set_muted(&self, muted: bool) -> Result<(), AppError>;
     /// Stop mowy.
     async fn stop_speech(&self) -> Result<(), AppError>;
-    /// Czytanie tekstu głosem agentki.
-    async fn read_aloud(&self, agent: &str, text: &str) -> Result<(), AppError>;
+    /// Czytanie tekstu głosem agentki. Z `turn` (czytanie wiadomości) okno dostaje
+    /// `SpeechSegment` z każdym zdaniem w chwili, gdy zaczyna brzmieć.
+    async fn read_aloud(&self, agent: &str, text: &str, turn: Option<&str>)
+    -> Result<(), AppError>;
     /// Mówienie z przytrzymaniem (PTT) — wciśnięcie/puszczenie.
     async fn ptt(&self, _pressed: bool) -> Result<(), AppError> {
         Err(AppError::unavailable(
@@ -122,7 +124,7 @@ pub trait VoicePort: Send + Sync {
     }
     /// Próbka głosu agentki (głosy v0).
     async fn preview(&self, agent: &str) -> Result<(), AppError> {
-        self.read_aloud(agent, VOICE_PREVIEW_TEXT).await
+        self.read_aloud(agent, VOICE_PREVIEW_TEXT, None).await
     }
     /// Podpina czat (rdzeń po zbudowaniu) — odpowiedzi rozmowy głosowej idą do tej samej sesji.
     fn attach(&self, _chat: Arc<dyn VoiceChat>) {}
@@ -182,7 +184,12 @@ impl VoicePort for VoiceUnavailable {
     async fn stop_speech(&self) -> Result<(), AppError> {
         Ok(())
     }
-    async fn read_aloud(&self, _agent: &str, _text: &str) -> Result<(), AppError> {
+    async fn read_aloud(
+        &self,
+        _agent: &str,
+        _text: &str,
+        _turn: Option<&str>,
+    ) -> Result<(), AppError> {
         Err(AppError::unavailable("Czytanie na głos", "voice-tts"))
     }
 }

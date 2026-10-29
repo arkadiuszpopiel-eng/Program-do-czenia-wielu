@@ -47,7 +47,12 @@ impl VoicePort for SpyVoice {
         self.note("stop_speech");
         Ok(())
     }
-    async fn read_aloud(&self, _agent: &str, _text: &str) -> Result<(), AppError> {
+    async fn read_aloud(
+        &self,
+        _agent: &str,
+        _text: &str,
+        _turn: Option<&str>,
+    ) -> Result<(), AppError> {
         Ok(())
     }
     async fn dictation(&self, action: DictationAction) -> Result<VoiceFeatures, AppError> {

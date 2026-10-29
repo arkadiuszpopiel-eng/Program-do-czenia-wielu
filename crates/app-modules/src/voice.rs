@@ -12,7 +12,7 @@ use providers_contract::PrivacyTag;
 use voice_audio_contract::{AudioIo, DeviceId, DeviceKind, SourceId, StreamConfig};
 use voice_dsp_contract::{AecMode, Dsp, DspCfg, NoiseSetting};
 use voice_dsp_impl::DspPipeline;
-use voice_tts_contract::{CancelToken, SpeechStyle, Tts, TtsRequest};
+use voice_tts_contract::{CancelToken, SpeechStyle, Tts, TtsRequest, split_sentences};
 
 use app_api::dto::{AlfaEvent, AudioDevice, LocalizedText, ToastKind};
 use app_api::error::{AppError, ErrorCode};
@@ -207,7 +207,12 @@ impl VoicePort for VoiceAdapter {
         lock(&self.state).speech.is_some()
     }
 
-    async fn read_aloud(&self, agent: &str, text: &str) -> Result<(), AppError> {
+    async fn read_aloud(
+        &self,
+        agent: &str,
+        text: &str,
+        turn: Option<&str>,
+    ) -> Result<(), AppError> {
         let tts = crate::tts::ready(self.tts.as_ref())
             .ok_or_else(|| AppError::new(ErrorCode::Unavailable, NO_TTS))?;
         if text.trim().is_empty() {
@@ -235,12 +240,13 @@ impl VoicePort for VoiceAdapter {
             .io
             .open_output(None, &StreamConfig::output_default())
             .map_err(|e| audio_error("Czytanie na głos — głośnik", e))?;
-        // Poziom mowy do interfejsu (awatar mówiącej agentki).
-        let mut output: Box<dyn voice_audio_contract::OutputStream> =
-            Box::new(crate::speech_meter::MeteredOutput::new(
-                output,
-                crate::speech_meter::SpeechMeter::new(self.events.clone()),
-            ));
+        // Poziom mowy do interfejsu (awatar mówiącej agentki); przy czytaniu wiadomości także
+        // czytane zdanie — fragment syntezy to jedno zdanie z `split_sentences` (ten sam podział).
+        let meter = crate::speech_meter::SpeechMeter::new(self.events.clone());
+        let mut output: Box<dyn voice_audio_contract::OutputStream> = Box::new(
+            crate::speech_meter::MeteredOutput::new(output, meter.clone()),
+        );
+        let sentences = turn.map(|t| (t.to_owned(), split_sentences(text)));
         lock(&self.state).speech = Some((utterance, cancel.clone()));
         let events = self.events.clone();
         let state = self.state.clone();
@@ -254,6 +260,11 @@ impl VoicePort for VoiceAdapter {
                 match chunk {
                     Ok(chunk) => {
                         played += chunk.audio.duration();
+                        if let Some((turn_id, all)) = &sentences {
+                            meter.mark_next(crate::speech_meter::sentence_segment(
+                                turn_id, all, chunk.seq,
+                            ));
+                        }
                         if let Err(e) = output.play(&source, utterance, &chunk.audio) {
                             Self::toast(&events, format!("Czytanie na głos: {e}"));
                             break;
@@ -276,6 +287,13 @@ impl VoicePort for VoiceAdapter {
             }
             if cancel.is_cancelled() {
                 let _ = output.stop_all();
+            } else if let Some((turn_id, all)) = &sentences {
+                // Koniec czytania tej tury (po „Stop” okno czyści wyróżnienie po ciszy miernika).
+                events.emit(crate::speech_meter::sentence_segment(
+                    turn_id,
+                    all,
+                    u32::try_from(all.len()).unwrap_or(u32::MAX),
+                ));
             }
             let mut st = lock(&state);
             if st.speech.as_ref().is_some_and(|(u, _)| *u == utterance) {

@@ -295,7 +295,7 @@ impl BuilderApp {
         };
         let name = draft.name.as_deref().unwrap_or("nowa agentka");
         let text = format!("Cześć, jestem {name}. Tak mniej więcej brzmi mój głos.");
-        self.voice.read_aloud(speaker, &text).await
+        self.voice.read_aloud(speaker, &text, None).await
     }
 
     /// `builder_library`: agentki zapisane Kreatorem.

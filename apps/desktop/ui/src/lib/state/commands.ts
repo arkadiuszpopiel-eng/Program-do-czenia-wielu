@@ -1,6 +1,7 @@
 // Komendy okna głównego: jedno miejsce dla skrótów klawiszowych i palety poleceń.
 // Skróty globalne (Szybkie pytanie, STOP WSZYSTKIEGO) obsługuje rdzeń — nie ma ich tutaj.
 import { errorText } from '../api/command-error';
+import { reading } from './reading.svelte';
 import type { ConversationFormat } from '../api/types-files';
 import type { PanelId } from '../api/types-system';
 import { nextColumn, stepZoom } from '../logic/layout';
@@ -194,7 +195,7 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'action.panels':
       // Panele chowane przy krawędziach (właściciel 27.10) — włączane jednym poleceniem z palety.
-      void app.setSetting('ui.panels_autohide', !app.bool('ui.panels_autohide', false));
+      void app.setSetting('ui.panels_autohide', !app.bool('ui.panels_autohide', true));
       break;
     case 'action.transfer':
       app.openSettings('transfer');
@@ -297,7 +298,8 @@ export function escapeChain(app: AppState): boolean {
     app.layout.setFocus(false);
     return true;
   }
-  if (app.micState === 'speaking') {
+  // Mowa agentki w rozmowie i czytanie wiadomości na głos (wyróżnione zdanie, plan 43).
+  if (app.micState === 'speaking' || reading.turnId !== null) {
     void attempt(app.toasts, () => app.client.voice.stopSpeech());
     return true;
   }

@@ -135,6 +135,19 @@ pub enum AlfaEvent {
         agent: String,
         level: f64,
     },
+    /// Zdanie, które właśnie słychać przy czytaniu wiadomości na głos — okno wyróżnia je w treści
+    /// (plan 43). Wysyłane w chwili, gdy zdanie zaczyna brzmieć; `index == of` z pustym `text` —
+    /// czytanie tej tury się skończyło.
+    SpeechSegment {
+        /// Czytana tura.
+        turn_id: String,
+        /// Numer zdania (od 0).
+        index: u32,
+        /// Liczba zdań w czytanym tekście.
+        of: u32,
+        /// Tekst mówiony zdania (bez znaczników; kod zastąpiony opisem).
+        text: String,
+    },
     VoicePill {
         state: VoicePillState,
     },

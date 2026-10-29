@@ -51,7 +51,10 @@ impl AppCore {
         let turn = self.inner.sessions.turn(&id, turn)?;
         let agent = self.agent_of(&id, &turn);
         let spoken = lib_markdown::to_spoken_text(&turn.content.text);
-        self.inner.voice.read_aloud(&agent, &spoken).await
+        self.inner
+            .voice
+            .read_aloud(&agent, &spoken, Some(&turn_id))
+            .await
     }
 
     fn code_block(

@@ -246,6 +246,13 @@ export type AlfaEvent =
   | { readonly type: 'MicLevel'; readonly level: number; readonly raw?: number | null }
   /** Poziom mowy agentki z głośnika (0–1); `agent` pusty = cisza po przerwaniu. */
   | { readonly type: 'SpeechLevel'; readonly agent: string; readonly level: number }
+  | {
+      readonly type: 'SpeechSegment';
+      readonly turn_id: string;
+      readonly index: number;
+      readonly of: number;
+      readonly text: string;
+    }
   /** Zmiana listy albo stanu kamer (podłączenie, otwarcie, uśpienie, przełącznik). */
   | { readonly type: 'CamerasChanged'; readonly state: CamerasState }
   | { readonly type: 'VoicePill'; readonly state: VoicePillState }

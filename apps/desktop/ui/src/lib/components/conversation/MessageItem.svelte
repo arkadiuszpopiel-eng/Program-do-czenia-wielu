@@ -1,7 +1,6 @@
 <!--
-  Wiadomość: nagłówek (awatar + imię + chip roli, czas względny, warianty ‹ i/n ›), pasek akcji,
-  myślenie (zwinięte, z czasem), kroki narzędzi, bloki treści z Rust, karta „czeka na zatwierdzenie",
-  błąd z „Ponów / inny model", „Kontynuuj" dla uciętej odpowiedzi, edycja → nowa gałąź.
+  Wiadomość: nagłówek (awatar, imię, rola, czas, warianty), akcje, myślenie, narzędzia, treść z Rust
+  (czytane zdanie wyróżnione), zgoda, błąd z „Ponów”, „Kontynuuj” uciętej odpowiedzi, edycja → gałąź.
 -->
 <script lang="ts">
   import {
@@ -28,6 +27,7 @@
   import MessageActions from './MessageActions.svelte';
   import MessageAttachments from './MessageAttachments.svelte';
   import ToolSteps from './ToolSteps.svelte';
+  import { readingMark, voiceOf } from './reading-mark.svelte';
   interface Props {
     turn: Turn;
     conv: ConversationState;
@@ -125,7 +125,7 @@
   >
     <header class="head">
       {#if agent}
-        <Avatar {agent} size={24} speaking={streaming} words={streaming ? turn.text : undefined} />
+        <Avatar {agent} size={24} {...voiceOf(turn, streaming)} />
         <span class="name agent-name">{name}</span>
         {#if turn.role_id}<Chip size="sm" {agent}>{app.i18n.tk(`role.${turn.role_id}`)}</Chip>{/if}
       {:else}
@@ -192,7 +192,7 @@
         </div>
       </div>
     {:else}
-      <div class="body" bind:this={bodyEl}>
+      <div class="body" bind:this={bodyEl} use:readingMark={turn.id}>
         {#each turn.blocks as block (block.index)}
           {#if block.kind === 'code'}
             <CodeBlock {block} turnId={turn.id} settled={!streaming} />

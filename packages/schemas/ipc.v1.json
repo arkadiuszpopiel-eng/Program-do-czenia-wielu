@@ -1030,6 +1030,43 @@
           "type": "object"
         },
         {
+          "description": "Zdanie, które właśnie słychać przy czytaniu wiadomości na głos — okno wyróżnia je w treści\n(plan 43). Wysyłane w chwili, gdy zdanie zaczyna brzmieć; `index == of` z pustym `text` —\nczytanie tej tury się skończyło.",
+          "properties": {
+            "index": {
+              "description": "Numer zdania (od 0).",
+              "format": "uint32",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "of": {
+              "description": "Liczba zdań w czytanym tekście.",
+              "format": "uint32",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "text": {
+              "description": "Tekst mówiony zdania (bez znaczników; kod zastąpiony opisem).",
+              "type": "string"
+            },
+            "turn_id": {
+              "description": "Czytana tura.",
+              "type": "string"
+            },
+            "type": {
+              "const": "SpeechSegment",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "turn_id",
+            "index",
+            "of",
+            "text"
+          ],
+          "type": "object"
+        },
+        {
           "properties": {
             "state": {
               "$ref": "#/$defs/VoicePillState"

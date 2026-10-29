@@ -92,7 +92,10 @@ to, co Alfa właśnie usłyszała, oraz przyciski **Stop** i **Wycisz**.
 
 ## Czytanie na głos
 
-Akcja **Przeczytaj na głos** przy każdej wiadomości czyta ją głosem agentki, która ją napisała.
+Akcja **Przeczytaj na głos** przy każdej wiadomości czyta ją głosem agentki, która ją napisała. Zdanie, które
+właśnie słychać, jest wyróżnione w treści wiadomości barwą agentki, a awatar mówi i wypuszcza litery z tego
+zdania — łatwo śledzić tekst wzrokiem (pomaga w nauce czytania). Fragmenty kodu agentka pomija („kod na ekranie”).
+`Esc` zatrzymuje czytanie i zdejmuje wyróżnienie.
 
 ## Panel Głos (`Alt+6`): słowa wywoławcze, Twój głos, dyktowanie, czytanie
 

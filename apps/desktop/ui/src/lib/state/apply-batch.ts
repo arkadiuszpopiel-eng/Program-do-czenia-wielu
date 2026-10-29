@@ -4,6 +4,7 @@ import { setSpeechLevel } from '@alfa/ui-kit';
 import type { AlfaEvent } from '../api/types-system';
 import { isChatEvent } from '../logic/apply-event';
 import type { AppState } from './app.svelte';
+import { reading } from './reading.svelte';
 import { UNDO_TOAST_MS } from './runs.svelte';
 
 export function applyEvent(app: AppState, event: AlfaEvent): void {
@@ -37,6 +38,11 @@ export function applyEvent(app: AppState, event: AlfaEvent): void {
     case 'SpeechLevel':
       setSpeechLevel(event.level);
       app.noteSpeech(event.agent, event.level);
+      // Cisza po „Stop” (bez agentki) kończy wyróżnianie czytanego zdania.
+      if (!event.agent) reading.clear();
+      break;
+    case 'SpeechSegment':
+      reading.apply(event);
       break;
     case 'VoicePill':
       app.micState = event.state.mic;

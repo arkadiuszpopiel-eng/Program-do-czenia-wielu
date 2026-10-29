@@ -84,6 +84,13 @@ a {
   background: var(--alfa-color-surface3);
 }
 
+/* Zdanie czytane właśnie na głos (plan 43): odcień barwy czytającej agentki (`--accent` wiadomości),
+   tekst bez zmiany koloru — kontrast jak w zwykłej treści w każdym stylu i motywie. */
+::highlight(alfa-reading) {
+  background-color: color-mix(in srgb, var(--accent, var(--alfa-color-focus)) 30%, transparent);
+  color: inherit;
+}
+
 /* Cienkie paski przewijania w stylu Windows 11 (WebView2 = Chromium). */
 * {
   scrollbar-width: thin;

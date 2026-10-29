@@ -1,5 +1,6 @@
 // Atrapa: sesje i tury (append-only, gałęzie, strumień, kolejka offline, 429).
 import type { AgentId } from '@alfa/ui-kit';
+import { fakeReadAloud } from './read-aloud';
 import type { AlfaClient } from '../client';
 import type { Turn, TurnError, TurnUsage } from '../types';
 import { TEMPLATE_TITLES } from './api-sessions';
@@ -242,7 +243,7 @@ export class FakeChat {
         return core.reply(undefined);
       },
       remember: () => core.reply(undefined),
-      readAloud: () => core.reply(undefined),
+      readAloud: (turnId) => core.reply(void fakeReadAloud(core, turnId)),
       saveCode: () => core.reply(undefined),
       runCode: () =>
         core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') }),

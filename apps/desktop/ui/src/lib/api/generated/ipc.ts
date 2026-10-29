@@ -281,6 +281,17 @@ export type AlfaEvent =
       readonly type: 'SpeechLevel';
     }
   | {
+      /** Numer zdania (od 0). */
+      readonly index: number;
+      /** Liczba zdań w czytanym tekście. */
+      readonly of: number;
+      /** Tekst mówiony zdania (bez znaczników; kod zastąpiony opisem). */
+      readonly text: string;
+      /** Czytana tura. */
+      readonly turn_id: string;
+      readonly type: 'SpeechSegment';
+    }
+  | {
       readonly state: VoicePillState;
       readonly type: 'VoicePill';
     }

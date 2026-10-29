@@ -4,6 +4,7 @@ import type { AlfaClient } from '../client';
 import type { VoiceStatus } from '../types-agents';
 import type { VoicePillState } from '../types-system';
 import type { FakeCore } from './core';
+import { stopFakeReading } from './read-aloud';
 
 const PARTIAL = ['Co', 'Co mam', 'Co mam jutro', 'Co mam jutro w planie?'];
 
@@ -122,6 +123,7 @@ export function voiceApi(core: FakeCore): AlfaClient['voice'] {
     },
     stopSpeech: () => {
       stopTalk();
+      stopFakeReading(core);
       if (core.voice.active) pill({});
       return core.reply(undefined);
     },
