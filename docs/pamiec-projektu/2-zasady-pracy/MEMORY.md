@@ -5,7 +5,7 @@
 - [Alfa — zasady pracy](alfa-zasady-pracy.md) — Codex nie recenzuje, najpierw porządek i katalogowanie, potem rozwój
 - [Alfa — weryfikacja UI](alfa-weryfikacja-ui.md) — każdy stan otwarty w każdym stylu i motywie, bez kontrolek systemowych, sprawdzać wielokrotnie
 - [Alfa — budowanie aplikacji](alfa-budowanie-aplikacji.md) — wersja i budowa co 10 ukończonych punktów (od 15.10), nie po każdym
-- [Alfa — zgoda na pobrania](alfa-zgoda-na-pobrania.md) — do 3 GB bez pytania, powyżej pytać z rzeczywistym rozmiarem
+- [Alfa — zgoda na pobrania](alfa-zgoda-na-pobrania.md) — do 5 GB bez pytania (od 29.10), powyżej pytać z rzeczywistym rozmiarem
 - [Alfa — głos lokalnie](alfa-glos-lokalnie.md) — chmura odrzucona z powodu kosztu; najpierw warianty lokalne, pobieranie nadal za zgodą
 - [Alfa — przegląd i historia zmian](alfa-przeglad-i-historia-zmian.md) — każde okno/panel/skrót, wagi w CHANGELOG, spis funkcji „wkrótce”
 - [Alfa — praca nocna](alfa-praca-nocna.md) — sesja do rana kończy się raportem, planem HTML i zbudowaną wersją; bez dźwięku w nocy
@@ -13,3 +13,5 @@
 - [Alfa — pełny dostęp AI](alfa-pelny-dostep-ai.md) — 20.10 „Pełny dostęp” bez zgód; 27.10 menu 4 trybów, L4 potwierdzane raz i pamiętane, pyta tylko o wysyłkę po obcej treści
 - [Alfa — pamięć w repozytorium](alfa-pamiec-w-repozytorium.md) — kopia pamięci w alfa/docs/pamiec-projektu, `scripts/memory-sync.sh` na końcu sesji; na nowym PC najpierw przywrócić zasady z repo
 - [Alfa — silnik NextGO.Gray](alfa-silnik-nextgo.md) — katalog silnika tylko do odczytu (inny model); tools-engine od 0.0.74, ustawienie engine.nextgo.root
+- [Alfa — pulpit i panele 29.10](alfa-pulpit-panele-2026-10-29.md) — stan w pasku pisania, panele chowane w całości, wysuwane i przypinane; tryb pracy czyta poziom globalny
+- [Alfa — miejsce kopii zapasowych](alfa-kopia-zapasowa-miejsce.md) — od 29.10 F:\Kopie zapasowe programów Spopielony\Alfa, kopia-<data> po każdym wgraniu

@@ -89,7 +89,7 @@ Właściciel po porównaniu z Deltą AI 0.8.35 (`E:\PROGRAMY W CZASIE PRAC\Delta
 - Głos Edge „Zofia” tylko jako opcja wyłączona domyślnie, nigdy w sesji prywatnej.
 - ADR 0025 (dane biometryczne): „możesz wykonać w pełni, masz zgodę” — przyjęty.
 - Biblioteka multimediów nie musi być przenoszona; system odtwarzania i sterowania tak, rozbudowany.
-- STAŁA ZGODA na pobieranie plików i modeli do 3 GB bez pytania; powyżej — pytać.
+- STAŁA ZGODA na pobieranie plików i modeli do 3 GB bez pytania; powyżej — pytać (od 29.10: 5 GB — wpis niżej).
 - Wielu użytkowników po koncie i logowaniu, na Windows, Linux, panelu WWW i Androidzie (etap U, ADR 0027 —
   Proponowany; moja interpretacja: zlecenie kierunku, podpis pod ADR nadal potrzebny, bo zmienia Brokera).
 - Agentki mają programować jak asystent programisty: pisać, uruchamiać i budować oprogramowanie z pełnymi
@@ -343,4 +343,15 @@ po 500 s procesora spowalniały laptop i każdego agenta.
 **Powód:** spowolnienie całej maszyny.
 **Konsekwencje:** na początku sesji na laptopie sprawdzić, że nie działają procesy `post-tool-hook.sh`.
 **Źródło:** `status.md` (18.10); `handoff.json` → `next_session`.
+**Status:** Aktywna
+
+### [2026-10-29] Stała zgoda na pobrania podniesiona do 5 GB
+
+**Kontekst:** próba C2.3 (`live_catalog`) pobiera Bielika 4.5B (4,8 GB) z silnikami — ponad dawną granicę 3 GB.
+**Decyzja (właściciel):** „zmień limit pobierania do 5GB”, a dla tej próby: „wykonaj i tak pobieranie, jeśli to ma
+być lepsze i wydajniejsze”; pobierać na E: (po sprzątaniu starych kompilacji), nie na C:.
+**Powód:** pytania o pobrania przerywają pracę; dysk E: ma miejsce po usunięciu starych kompilacji.
+**Konsekwencje:** do 5 GB bez pytania, powyżej pytać z rzeczywistym rozmiarem (z zależnościami); katalog pobrań
+poza repozytorium na E:, po próbie posprzątany. 29.10 wieczorem usunięto stare kompilacje (`alfa` 166 → 23 GB).
+**Źródło:** rozmowa 29.10; pamięć `alfa-zgoda-na-pobrania.md`.
 **Status:** Aktywna
