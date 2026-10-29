@@ -8,9 +8,10 @@
 
 mod support;
 
+use device_profile_contract::Backend;
 use futures_util::StreamExt;
 use providers_contract::{CancellationToken, ChatRequest, Message, ModelProvider, ProviderEvent};
-use providers_local_impl::{BackendKey, LocalConfig, LocalProvider};
+use providers_local_impl::{BackendChoice, BackendKey, GpuLayers, LocalConfig, LocalProvider};
 use support::{Env, MODEL, fake_server};
 
 async fn reply(p: &LocalProvider, text: &str) -> Vec<ProviderEvent> {
@@ -87,4 +88,30 @@ async fn server_installed_after_start_works_without_restart() {
     let (_, plan, _) = p.sidecar().running_plan().await.unwrap();
     assert_eq!(plan.program, installed);
     p.sidecar().stop("test").await;
+}
+
+/// Bez profilu urządzenia (pomiar F3, `app-agents/tests/eval_tools.rs`) jawny backend i warstwy
+/// obowiązują — wcześniej plan bez profilu zawsze schodził na procesor (`-ngl 0`), także przy
+/// wybranej karcie; `Auto` bez profilu nadal oznacza procesor.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn fixed_backend_applies_without_device_profile() {
+    let env = Env::new();
+    for (choice, layers, want) in [
+        (
+            BackendChoice::Fixed(Backend::Cuda),
+            33,
+            (BackendKey::Cuda, 33),
+        ),
+        (BackendChoice::Auto, 33, (BackendKey::Cpu, 0)),
+    ] {
+        let mut config = env.config();
+        config.backend = choice;
+        config.gpu_layers = GpuLayers::Fixed(layers);
+        let p = env.provider_with(config, env.launcher("ok", None), None, None);
+        let out = reply(&p, "plan").await;
+        assert_eq!(echo(&out), "Echo: plan", "{out:?}");
+        let (_, plan, _) = p.sidecar().running_plan().await.unwrap();
+        assert_eq!((plan.backend, plan.gpu_layers), want, "{choice:?}");
+        p.sidecar().stop("test").await;
+    }
 }

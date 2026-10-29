@@ -12,7 +12,7 @@ use tools_common_contract::{Tool, ToolCtx, ToolErrorKind, ToolOutcome, ToolStatu
 use crate::boundary::{Boundary, SKIP_YIELDED};
 use crate::engine::{Engine, Next};
 use crate::flow::{append_capped, args_untrusted, fingerprint};
-use crate::prompt::{skipped, summary, tool_result};
+use crate::prompt::{REPEAT_NOTE, skipped, summary, tool_result};
 
 /// Rodziny zdolności utrwalające treść poza przebiegiem (pamięć długoterminowa).
 const PERSISTENT_WRITE_CAPS: [&str; 1] = ["memory.write"];
@@ -146,7 +146,14 @@ impl Engine {
             .await;
         let block_id = format!("{step}-{}", tu.id);
         let max = self.shared.config.tool_result_max_chars;
-        let result = tool_result(&tu.id, &tu.name, outcome, &block_id, max);
+        let mut result = tool_result(&tu.id, &tu.name, outcome, &block_id, max);
+        if crate::flow::repeats(&self.cp.recent_calls, &fingerprint(&tu.name, &tu.input)) >= 2 {
+            result
+                .content
+                .push(providers_contract::ToolResultPart::Text {
+                    text: REPEAT_NOTE.into(),
+                });
+        }
         self.cp
             .completed_pending
             .insert(tu.id.clone(), result.clone());

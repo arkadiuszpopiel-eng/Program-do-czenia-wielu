@@ -92,7 +92,7 @@ fn missing_or_non_object_schema_means_any_object() {
 }
 
 #[test]
-fn envelope_has_text_and_an_optional_named_call() {
+fn envelope_offers_a_call_first_or_a_plain_answer() {
     let tools = [
         spec(
             "zeta",
@@ -106,11 +106,19 @@ fn envelope_has_text_and_an_optional_named_call() {
     let offered = offered(&tools, &ToolChoice::Auto);
     assert_eq!(offered[0].name, "alfa", "kolejność nazw");
     let schema = envelope(&parameters_of(&offered), false);
-    assert_eq!(schema["required"], json!(["response"]));
-    assert_eq!(schema["additionalProperties"], json!(false));
-    let keys: Vec<&String> = schema["properties"].as_object().unwrap().keys().collect();
-    assert_eq!(keys, ["response", "tool_call"], "tekst przed wywołaniem");
-    let calls = schema["properties"]["tool_call"]["anyOf"]
+    // Wariant z wywołaniem: wymagane tylko `tool_call` — gramatyka stawia je przed tekstem.
+    let calling = &schema["anyOf"][0];
+    assert_eq!(
+        calling["required"],
+        json!(["tool_call"]),
+        "wywołanie pierwsze"
+    );
+    assert_eq!(calling["additionalProperties"], json!(false));
+    let plain = &schema["anyOf"][1];
+    assert_eq!(plain["required"], json!(["response"]));
+    let keys: Vec<&String> = plain["properties"].as_object().unwrap().keys().collect();
+    assert_eq!(keys, ["response"], "odpowiedź bez wywołania");
+    let calls = calling["properties"]["tool_call"]["anyOf"]
         .as_array()
         .unwrap();
     assert_eq!(calls[0]["properties"]["name"], json!({"const": "alfa"}));
@@ -133,14 +141,15 @@ fn envelope_has_text_and_an_optional_named_call() {
     );
     assert!(!validator.is_valid(&json!({"response": "", "tool_call": call("inne", json!({}))})));
     assert!(
-        !validator.is_valid(&json!({"tool_call": call("zeta", json!({"n": 1}))})),
-        "bez tekstu"
+        validator.is_valid(&json!({"tool_call": call("zeta", json!({"n": 1}))})),
+        "wywołanie bez tekstu"
     );
+    assert!(!validator.is_valid(&json!({})), "pusty obiekt");
     assert!(!validator.is_valid(&json!({"response": "x", "extra": 1})));
     let format = response_format(schema);
     assert_eq!(format["type"], "json_schema");
     assert_eq!(
-        format["json_schema"]["schema"]["required"],
+        format["json_schema"]["schema"]["anyOf"][1]["required"],
         json!(["response"])
     );
 }
@@ -157,7 +166,11 @@ fn forced_choice_requires_the_call() {
     assert!(must_call(&named) && must_call(&ToolChoice::Required));
     assert!(!must_call(&ToolChoice::Auto));
     let schema = envelope(&parameters_of(&only), true);
-    assert_eq!(schema["required"], json!(["response", "tool_call"]));
+    assert_eq!(schema["required"], json!(["tool_call"]));
+    assert!(
+        schema.get("anyOf").is_none(),
+        "bez wariantu z samą odpowiedzią"
+    );
     assert_eq!(
         schema["properties"]["tool_call"]["properties"]["name"],
         json!({"const": "b"})

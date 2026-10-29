@@ -25,7 +25,9 @@ fn loop_rules(spec: &RunSpec) -> Vec<String> {
         "W dużym repozytorium edytuj pojedyncze pliki narzędziami plikowymi (fs_write / edycja), zamiast uruchamiać powłokę do każdego zapisu. Powłoka kopiuje cały cwd do cofania; przekroczenie rozmiaru snapshotu jest błędem kopii, a nie odmową Brokera. Zawęź cwd lub użyj narzędzia plikowego, nie ponawiaj tej samej zbyt szerokiej kopii.".to_owned(),
     ];
     if let Some(dir) = &spec.workdir {
-        rules.push(format!("Katalog roboczy zadania: {dir}"));
+        // Ścieżki względne: lekki model przepisujący długą ścieżkę bezwzględną robił literówki
+        // („Tepm” zamiast „Temp”) i zapisywał poza katalogiem zadania (pomiar F3, 2026-10-29).
+        rules.push(format!("Katalog roboczy zadania: {dir}\nPliki i katalogi w nim podawaj ścieżką względną (np. `wynik.txt`, `src/main.rs`) — narzędzia rozwiązują ją względem katalogu roboczego. Ścieżki bezwzględnej używaj tylko dla miejsc spoza niego."));
     }
     if spec
         .roles
@@ -92,6 +94,11 @@ pub(crate) fn goal_message(goal: &str, delegated: bool) -> String {
         format!("Zadanie od właściciela: {goal}")
     }
 }
+
+/// Dopisek do wyniku wywołania powtórzonego z tymi samymi argumentami: lekki model doklejał to samo
+/// wywołanie do gotowej odpowiedzi aż do wykrycia pętli (pomiar F3, 2026-10-29). Wywołanie się
+/// wykonuje (odpytywanie stanu dalej działa) — dopisek tylko podpowiada zakończenie.
+pub(crate) const REPEAT_NOTE: &str = "[Runtime] To samo wywołanie z tymi samymi argumentami było już wykonane. Jeśli masz już odpowiedź, podaj ją właścicielowi bez wywoływania narzędzia.";
 
 /// Wynik narzędzia dla modelu: niezaufany tekst w bloku delimitacji, obrazy jako części.
 pub(crate) fn tool_result(

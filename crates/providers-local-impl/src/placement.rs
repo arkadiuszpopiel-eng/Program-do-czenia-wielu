@@ -9,7 +9,7 @@ use model_residency_contract::{
     Device, GpuId, Lease, LeaseId, LeaseRequest, ModelRole, Placement, Priority, card_for,
 };
 
-use crate::config::{BackendKey, GpuLayers, LaunchPlan, layers_for};
+use crate::config::{BackendChoice, BackendKey, GpuLayers, LaunchPlan, layers_for};
 use crate::error::LocalError;
 use crate::manifest::ModelEntry;
 use crate::sidecar::{Sidecar, lock, ms};
@@ -209,9 +209,12 @@ impl Sidecar {
                 .as_ref()
                 .map_or(4, |d| d.current().cpu.physical_cores.max(1))
         });
-        let mut backend = rec
-            .as_ref()
-            .map_or(BackendKey::Cpu, |r| self.config.backend_for(r));
+        // Bez profilu urządzenia (testy, pomiary) jawny wybór backendu nadal obowiązuje; `Auto` — CPU.
+        let mut backend = match (&rec, self.config.backend) {
+            (Some(r), _) => self.config.backend_for(r),
+            (None, BackendChoice::Fixed(b)) => BackendKey::of(b),
+            (None, BackendChoice::Auto) => BackendKey::Cpu,
+        };
         let gpu = self.target_gpu(backend);
         let budget = self.vram_budget(rec.as_ref(), gpu);
         let (ctx, wanted) = self.ctx_and_layers(entry, backend, budget, rec.as_ref());

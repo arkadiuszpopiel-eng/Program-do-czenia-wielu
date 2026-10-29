@@ -224,9 +224,19 @@ impl Engine {
         }
         let text = turn.message.visible_text();
         self.invalid_args = invalid;
-        let uses = self.normalize_calls(turn.message.tool_uses().cloned().collect());
-        if !turn.message.content.is_empty() {
-            self.cp.messages.push(turn.message.clone());
+        let mut uses = self.normalize_calls(turn.message.tool_uses().cloned().collect());
+        let mut message = turn.message.clone();
+        // Werdykt kończy weryfikację: wywołania doklejone do odpowiedzi z werdyktem (lekki model
+        // w kopercie dopisuje je odruchowo) nie są wykonywane ani zapisywane w historii — inaczej
+        // weryfikacja krążyła „OK → fs_read” aż do wykrycia pętli (pomiar F3, 2026-10-29).
+        if self.cp.verifying && !uses.is_empty() && verdict(&text).is_some() {
+            uses.clear();
+            message
+                .content
+                .retain(|b| !matches!(b, ContentBlock::ToolUse(_)));
+        }
+        if !message.content.is_empty() {
+            self.cp.messages.push(message);
         }
         let names: Vec<&str> = uses.iter().map(|u| u.name.as_str()).collect();
         let output = if names.is_empty() {
@@ -285,8 +295,16 @@ impl Engine {
                 );
                 return Next::Continue;
             }
+            // Wynikiem jest sprawdzana odpowiedź (jak przy Krytyczce), a nie tekst werdyktu —
+            // inaczej użytkownik dostawał „WERYFIKACJA: OK” zamiast odpowiedzi (pomiar F3).
+            let answer = self
+                .cp
+                .verified_answer
+                .take()
+                .filter(|a| !a.trim().is_empty())
+                .unwrap_or(text);
             return Next::Finish(RunOutcome::Completed {
-                summary: text,
+                summary: answer,
                 verified: ok,
             });
         }
@@ -301,6 +319,7 @@ impl Engine {
         }
         self.cp.verifying = true;
         self.cp.verify_rounds += 1;
+        self.cp.verified_answer = Some(text);
         self.push(Role::User, vec![ContentBlock::text(VERIFY_PROMPT)]);
         Next::Continue
     }

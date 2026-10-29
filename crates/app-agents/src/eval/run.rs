@@ -52,6 +52,8 @@ pub struct EvalOptions {
     pub timeout: Duration,
     /// Limit kroków.
     pub max_steps: u32,
+    /// Każde zdarzenie przebiegu na stderr (diagnoza pomiaru na prawdziwym modelu).
+    pub trace: bool,
 }
 
 impl Default for EvalOptions {
@@ -61,6 +63,7 @@ impl Default for EvalOptions {
             verify: true,
             timeout: Duration::from_secs(300),
             max_steps: 24,
+            trace: false,
         }
     }
 }
@@ -97,7 +100,7 @@ fn tools(env: &EvalEnv) -> AgentTools {
         deny: DenyLists::baseline(),
         jobs: env.jobs.clone(),
         bus: None,
-        shell: ShellToolsConfig::default(),
+        shell: ShellToolsConfig::detected(),
         base_env: None,
         extra: Vec::new(),
         apps: None,
@@ -186,6 +189,12 @@ pub async fn run_task(
     let mut outcome = None;
     let wait = tokio::time::timeout(opts.timeout, async {
         while let Some(env) = feed.next().await {
+            if opts.trace {
+                #[allow(clippy::print_stderr)]
+                {
+                    eprintln!("[{}] {:?}", task.id, env.event);
+                }
+            }
             match env.event {
                 RunEvent::StepStarted { kind, .. } => {
                     result.steps += 1;

@@ -48,7 +48,7 @@ async fn plan_act_observe_verify() {
     assert_eq!(
         outcome,
         RunOutcome::Completed {
-            summary: "WERYFIKACJA: OK — pliki na miejscu.".into(),
+            summary: "Gotowe: folder uporządkowany.".into(),
             verified: Some(true)
         }
     );
@@ -233,4 +233,81 @@ async fn role_filtering_and_invalid_spec() {
         w.runtime.start(bad).await,
         Err(RunError::InvalidSpec(_))
     ));
+}
+
+/// Werdykt kończy weryfikację: lekki model w kopercie dopisuje do „WERYFIKACJA: OK” wywołanie
+/// narzędzia — nie jest wykonywane ani zapisywane w historii, przebieg kończy się z werdyktem,
+/// a wynikiem jest sprawdzana odpowiedź, nie tekst werdyktu (pomiar F3 na Bieliku 4.5B, 2026-10-29:
+/// weryfikacja krążyła „OK → fs_read” do wykrycia pętli, a odpowiedzią było „WERYFIKACJA: OK”).
+#[tokio::test(start_paused = true)]
+async fn verdict_with_tool_call_finishes_verification() {
+    let w = world();
+    w.provider.push_script(answer("Port aplikacji to 8080."));
+    w.provider.push_script(say_and_call(
+        "WERYFIKACJA: OK — port to 8080.",
+        "t1",
+        "fs_read",
+        json!({"path": "config.ini"}),
+    ));
+    let mut s = spec();
+    s.verify = true;
+    let run = w.runtime.start(s).await.unwrap();
+    let outcome = w.runtime.wait(&run).await.unwrap();
+    assert_eq!(
+        outcome,
+        RunOutcome::Completed {
+            summary: "Port aplikacji to 8080.".into(),
+            verified: Some(true)
+        }
+    );
+    let events = w.runtime.events(&run).unwrap();
+    assert!(
+        !events.iter().any(|e| matches!(
+            e.event,
+            RunEvent::StepStarted {
+                kind: StepKind::Tool,
+                ..
+            }
+        )),
+        "wywołanie doklejone do werdyktu nie jest wykonywane"
+    );
+}
+
+#[tokio::test(start_paused = true)]
+async fn repeated_call_gets_a_note_to_finish() {
+    let w = world();
+    for _ in 0..2 {
+        w.fs.push(FsToolKind::Read, ToolOutcome::ok("port=8080", json!({})));
+    }
+    let read = json!({"path": "config.ini"});
+    w.provider.push_script(call("t1", "fs_read", read.clone()));
+    w.provider
+        .push_script(say_and_call("Port to 8080.", "t2", "fs_read", read));
+    w.provider.push_script(answer("Port to 8080."));
+    let run = w.runtime.start(spec()).await.unwrap();
+    let outcome = w.runtime.wait(&run).await.unwrap();
+    assert!(
+        matches!(outcome, RunOutcome::Completed { .. }),
+        "{outcome:?}"
+    );
+    // Wywołanie się wykonuje (odpytywanie działa), ale drugi wynik podpowiada zakończenie.
+    assert_eq!(w.fs.calls(FsToolKind::Read).len(), 2);
+    let notes: Vec<usize> = w
+        .provider
+        .requests()
+        .iter()
+        .map(|r| {
+            r.messages
+                .iter()
+                .flat_map(|m| m.content.iter())
+                .filter(|b| match b {
+                    ContentBlock::ToolResult(r) => r.content.iter().any(
+                        |p| matches!(p, ToolResultPart::Text { text } if text.contains("było już wykonane")),
+                    ),
+                    _ => false,
+                })
+                .count()
+        })
+        .collect();
+    assert_eq!(notes, [0, 0, 1]);
 }

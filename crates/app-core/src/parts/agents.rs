@@ -82,7 +82,7 @@ impl Extra {
             deny: app_modules::workdir::tool_deny_lists(paths),
             jobs: Some(kernel.jobs.clone()),
             bus: Some(bus.clone()),
-            shell: ShellToolsConfig::default(),
+            shell: ShellToolsConfig::detected(),
             base_env: None,
             extra,
             apps: Some(app_agents::AppsDeps::system(&paths.local)),

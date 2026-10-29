@@ -10,6 +10,7 @@
 
 mod analysis;
 mod build_env;
+mod detect;
 mod effects;
 
 pub use analysis::{CommandAnalysis, analyze, analyze_powershell, tokens};

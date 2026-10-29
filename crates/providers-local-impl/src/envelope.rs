@@ -3,10 +3,11 @@
 //! Gdy żądanie niesie narzędzia, a wymuszanie jest włączone (`LocalConfig::tool_schema`, w
 //! aplikacji ustawienie `engines.llm.tool_schema`), do `llama-server` idzie `response_format`
 //! ze schematem koperty ([`crate::schema::envelope`]). Serwer zamienia schemat na gramatykę, więc
-//! model nie może wygenerować niczego poza `{"response": "…", "tool_call": {"name": …,
-//! "parameters": {…}}}` (wywołanie opcjonalne) z argumentami zgodnymi ze schematem wybranego
-//! narzędzia — niezależnie od tego, czy szablon czatu modelu zna format narzędzi. Tekst i wywołanie
-//! w jednej turze (plan, potem akcja) działają jak przy natywnych narzędziach. Narzędzia nie idą
+//! model nie może wygenerować niczego poza `{"tool_call": {"name": …, "parameters": {…}},
+//! "response": "…"}` albo `{"response": "…"}` z argumentami zgodnymi ze schematem wybranego
+//! narzędzia — niezależnie od tego, czy szablon czatu modelu zna format narzędzi. Wywołanie jest
+//! wyborem na początku obiektu (tekst po nim), bo lekki model z tekstem na początku wpisywał
+//! wywołanie do tekstu; tekst i wywołanie w jednej turze działają jak przy natywnych narzędziach. Narzędzia nie idą
 //! w polu `tools` (przy `response_format` serwer buduje parser odpowiedzi, nie parser narzędzi),
 //! tylko w prompcie systemowym; wcześniejsze wywołania i wyniki — jako tekst w tym samym
 //! formacie. [`EnvelopeGuard`] zamienia kopertę z powrotem na zdarzenia tekstu i wywołań.
@@ -28,12 +29,14 @@ use crate::window::estimate_tokens;
 
 /// Format koperty (wspólny początek zasad).
 const FORMAT: &str = r#"## Format odpowiedzi
-Odpowiadasz zawsze jednym obiektem JSON i niczym poza nim: {"response": "…", "tool_call": {"name": "…", "parameters": {…}}}.
-- "response" — tekst dla użytkownika: odpowiedź, plan albo krótki komentarz (może być pusty).
+Odpowiadasz zawsze jednym obiektem JSON i niczym poza nim:
+- wywołanie narzędzia: {"tool_call": {"name": "…", "parameters": {…}}, "response": "…"} — zacznij od "tool_call";
+- odpowiedź bez narzędzia: {"response": "…"}.
+- "response" — tekst dla użytkownika: odpowiedź albo krótki komentarz (może być pusty). Nigdy nie wpisuj wywołania do "response".
 "#;
 
 /// Zasady pola `tool_call`, gdy wywołanie jest opcjonalne.
-const RULES: &str = r#"- "tool_call" — tylko gdy wywołujesz jedno narzędzie z listy poniżej; "parameters" muszą pasować do jego schematu. Wynik przyjdzie w następnej wiadomości jako „[Wynik narzędzia …]”. Bez "tool_call" odpowiedź jest ostateczna.
+const RULES: &str = r#"- "tool_call" — gdy chcesz użyć jednego narzędzia z listy poniżej; "parameters" muszą pasować do jego schematu. Wynik przyjdzie w następnej wiadomości jako „[Wynik narzędzia …]”. Bez "tool_call" odpowiedź jest ostateczna.
 Narzędzia:"#;
 
 /// Zasady pola `tool_call`, gdy wywołanie jest wymagane (`ToolChoice::Required`/`Tool`).
@@ -131,16 +134,17 @@ fn rules(tools: &[&ToolSpec], parameters: &BTreeMap<String, Value>, must_call: b
     out
 }
 
-/// Wywołania tury asystentki jako koperty: tekst tury w pierwszej, kolejne wywołania (historia
+/// Wywołania tury asystentki jako koperty (wywołanie przed tekstem): tekst tury w pierwszej, kolejne wywołania (historia
 /// innego dostawcy, kilka wywołań naraz) — w osobnych, z pustym tekstem.
 fn assistant_text(msg: &Message) -> String {
     let mut text = msg.visible_text();
     let lines: Vec<String> = msg
         .tool_uses()
         .map(|t| {
-            let response = std::mem::take(&mut text);
-            json!({"response": response, "tool_call": {"name": t.name, "parameters": t.input}})
-                .to_string()
+            // Wywołanie pierwsze — jak w gramatyce koperty (`schema::envelope`).
+            let call = json!({"name": t.name, "parameters": t.input});
+            let response = Value::String(std::mem::take(&mut text));
+            format!(r#"{{"tool_call":{call},"response":{response}}}"#)
         })
         .collect();
     lines.join("\n")

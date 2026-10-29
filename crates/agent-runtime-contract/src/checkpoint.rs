@@ -87,6 +87,9 @@ pub struct Checkpoint {
     /// Model (`dostawca:model`), który napisał ostatnią odpowiedź przebiegu.
     #[serde(default)]
     pub answer_model: Option<String>,
+    /// Odpowiedź sprawdzana w samoweryfikacji — wynik przebiegu po werdykcie (nie tekst werdyktu).
+    #[serde(default)]
+    pub verified_answer: Option<String>,
     /// Definicje odnalezione w katalogu, zachowane po wznowieniu przebiegu.
     #[serde(default)]
     pub discovered_tools: Vec<String>,
@@ -131,6 +134,7 @@ impl Checkpoint {
             delegated: UsageTotals::default(),
             route: RouteHint::default(),
             answer_model: None,
+            verified_answer: None,
             discovered_tools: Vec::new(),
         }
     }

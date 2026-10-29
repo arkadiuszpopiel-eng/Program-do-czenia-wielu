@@ -301,11 +301,13 @@ fn closed_object(properties: Value, required: &[&str]) -> Value {
     })
 }
 
-/// Schemat koperty: `{"response": "…", "tool_call": {"name": …, "parameters": {…}}}` — tekst dla
-/// użytkownika (odpowiedź albo plan przed wywołaniem; może być pusty) i opcjonalnie jedno
-/// wywołanie (`must_call` — obowiązkowe). Gramatyka zachowuje kolejność pól, więc model pisze
-/// najpierw tekst, potem wywołanie; nazwa jest stałą (`const`), więc argumenty idą zawsze wg
-/// schematu wybranego narzędzia.
+/// Schemat koperty: wywołanie `{"tool_call": {"name": …, "parameters": {…}}, "response": "…"}` albo
+/// sama odpowiedź `{"response": "…"}` (`must_call` — tylko wariant z wywołaniem). Konwerter
+/// gramatyki stawia pola wymagane przed opcjonalnymi, a klucze idą alfabetycznie — w wariancie
+/// z wywołaniem wymagane jest tylko `tool_call`, więc model wybiera wywołanie od pierwszego pola,
+/// a tekst (komentarz) pisze po nim. Przy opcjonalnym `tool_call` po tekście Bielik 4.5B wpisywał
+/// wywołanie do tekstu i nic się nie wykonywało (pomiar F3, 2026-10-29). Nazwa jest stałą
+/// (`const`), więc argumenty idą zawsze wg schematu wybranego narzędzia.
 pub(crate) fn envelope(parameters: &BTreeMap<String, Value>, must_call: bool) -> Value {
     let mut calls: Vec<Value> = parameters
         .iter()
@@ -321,15 +323,16 @@ pub(crate) fn envelope(parameters: &BTreeMap<String, Value>, must_call: bool) ->
     } else {
         json!({"anyOf": calls})
     };
-    let mut properties = Map::new();
-    properties.insert("response".into(), json!({"type": "string"}));
-    properties.insert("tool_call".into(), call);
-    let required: &[&str] = if must_call {
-        &["response", "tool_call"]
-    } else {
-        &["response"]
-    };
-    closed_object(Value::Object(properties), required)
+    let mut with_call = Map::new();
+    with_call.insert("response".into(), json!({"type": "string"}));
+    with_call.insert("tool_call".into(), call);
+    let calling = closed_object(Value::Object(with_call), &["tool_call"]);
+    if must_call {
+        return calling;
+    }
+    let mut text = Map::new();
+    text.insert("response".into(), json!({"type": "string"}));
+    json!({"anyOf": [calling, closed_object(Value::Object(text), &["response"])]})
 }
 
 /// Pole `response_format` żądania (`llama-server`: `json_schema.schema` → gramatyka).

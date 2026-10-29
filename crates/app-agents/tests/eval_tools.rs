@@ -120,6 +120,7 @@ async fn scripted_tasks_pass_through_agent_runtime() {
         verify: false,
         timeout: Duration::from_secs(30),
         max_steps: 12,
+        trace: false,
     };
     let root = dir.path().join("zadania");
     let mut results = Vec::new();
@@ -143,31 +144,40 @@ async fn scripted_tasks_pass_through_agent_runtime() {
 /// Pełny pomiar na modelu lokalnym (Windows, llama.cpp). Zmienne środowiskowe:
 /// `ALFA_EVAL_LLAMA_SERVER` (ścieżka `llama-server`), `ALFA_EVAL_MODELS_DIR` (katalog modeli
 /// Alfy), `ALFA_EVAL_MODEL` (identyfikator z manifestu; domyślnie pierwszy), opcjonalnie
-/// `ALFA_EVAL_ONLY` (`fs`/`shell`), `ALFA_EVAL_REPORT` (plik raportu Markdown).
+/// `ALFA_EVAL_ONLY` (`fs`/`shell`), `ALFA_EVAL_REPORT` (plik raportu Markdown), `ALFA_EVAL_BACKEND`
+/// (`cuda`/`vulkan`; bez niej — procesor), `ALFA_EVAL_GPU_LAYERS` (domyślnie wszystkie warstwy) i
+/// `ALFA_EVAL_TRACE` (zdarzenia przebiegu na stderr), `ALFA_EVAL_IDS` (początki identyfikatorów zadań po
+/// przecinku).
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 #[ignore = "pomiar na modelu lokalnym — uruchamia użytkownik (evals/F3/tools/README.md)"]
 async fn measure_on_local_model() {
-    use providers_local_impl::{LocalConfig, LocalProvider, Sidecar, TokioLauncher};
+    use providers_local_impl::{
+        BackendChoice, GpuLayers, LocalConfig, LocalProvider, Sidecar, TokioLauncher,
+    };
     let var = |name: &str| std::env::var(name).ok().filter(|v| !v.is_empty());
     let server = var("ALFA_EVAL_LLAMA_SERVER").expect("ALFA_EVAL_LLAMA_SERVER");
     let models_dir = var("ALFA_EVAL_MODELS_DIR").expect("ALFA_EVAL_MODELS_DIR");
     let models = providers_local_impl::builtin_models().unwrap();
     let model = var("ALFA_EVAL_MODEL").unwrap_or_else(|| models[0].id.clone());
-    let sidecar = Sidecar::new(
-        LocalConfig::new(models_dir, server),
-        Arc::new(TokioLauncher::default()),
-        None,
-        None,
-    )
-    .unwrap();
+    // Bez profilu urządzenia budżet VRAM jest nieznany i serwer liczyłby na procesorze — karta
+    // i warstwy jak w aplikacji podaje się jawnie (`cuda`/`vulkan`, liczba warstw na GPU).
+    let mut config = LocalConfig::new(models_dir, server);
+    if let Some(backend) = var("ALFA_EVAL_BACKEND") {
+        config.backend = BackendChoice::Fixed(serde_json::from_value(backend.into()).unwrap());
+        let layers = var("ALFA_EVAL_GPU_LAYERS").map_or(999, |n| n.parse().unwrap());
+        config.gpu_layers = GpuLayers::Fixed(layers);
+    }
+    let sidecar = Sidecar::new(config, Arc::new(TokioLauncher::default()), None, None).unwrap();
     let provider: Arc<dyn ModelProvider> = Arc::new(LocalProvider::new(models, sidecar));
     let dir = tempfile::tempdir().unwrap();
     let exec: Arc<dyn ExecPort> = Arc::new(platform_windows_impl::WindowsPlatform::default());
     let env = env(dir.path(), exec);
     let set = load(&env);
     let only = var("ALFA_EVAL_ONLY");
+    let ids = var("ALFA_EVAL_IDS");
     let opts = EvalOptions {
         model: model.clone(),
+        trace: var("ALFA_EVAL_TRACE").is_some(),
         ..EvalOptions::default()
     };
     let root = dir.path().join("zadania");
@@ -175,6 +185,12 @@ async fn measure_on_local_model() {
     for task in &set.tasks {
         let kind = serde_json::to_value(task.kind).unwrap();
         if only.as_deref().is_some_and(|o| kind != o) {
+            continue;
+        }
+        if ids
+            .as_deref()
+            .is_some_and(|ids| !ids.split(',').any(|id| task.id.starts_with(id.trim())))
+        {
             continue;
         }
         let r = run_task(task, &root, provider.clone(), &env, &opts).await;

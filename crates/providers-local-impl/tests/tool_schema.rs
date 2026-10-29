@@ -88,7 +88,7 @@ async fn tools_go_in_a_schema_envelope_and_come_back_as_a_call() {
     let body = last_body(&env);
     assert_eq!(body["response_format"]["type"], "json_schema", "{body}");
     let schema = &body["response_format"]["json_schema"]["schema"];
-    let call_branch = &schema["properties"]["tool_call"];
+    let call_branch = &schema["anyOf"][0]["properties"]["tool_call"];
     assert_eq!(
         call_branch["properties"]["name"],
         json!({"const": "pogoda"})
@@ -97,9 +97,14 @@ async fn tools_go_in_a_schema_envelope_and_come_back_as_a_call() {
     assert_eq!(params["properties"]["miasto"], json!({"type": "string"}));
     assert_eq!(params["additionalProperties"], json!(false));
     assert_eq!(
-        schema["required"],
+        schema["anyOf"][0]["required"],
+        json!(["tool_call"]),
+        "wywołanie pierwsze"
+    );
+    assert_eq!(
+        schema["anyOf"][1]["required"],
         json!(["response"]),
-        "wywołanie opcjonalne"
+        "albo sama odpowiedź"
     );
     assert!(body.get("tools").is_none() && body.get("tool_choice").is_none());
     let system = body["messages"][0]["content"].as_str().unwrap();
@@ -227,7 +232,7 @@ async fn tool_history_goes_to_the_server_as_envelope_text() {
     assert!(messages.iter().all(|m| m.get("tool_calls").is_none()));
     assert_eq!(
         messages[2]["content"],
-        "{\"response\":\"\",\"tool_call\":{\"name\":\"pogoda\",\"parameters\":{\"miasto\":\"Gdańsk\"}}}"
+        "{\"tool_call\":{\"name\":\"pogoda\",\"parameters\":{\"miasto\":\"Gdańsk\"}},\"response\":\"\"}"
     );
     assert_eq!(
         messages[3]["content"],

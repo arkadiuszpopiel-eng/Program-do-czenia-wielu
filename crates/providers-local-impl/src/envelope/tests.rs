@@ -337,7 +337,7 @@ fn wire_request_moves_tools_to_the_prompt_and_history_to_text() {
     );
     assert_eq!(
         wire.messages[1].visible_text(),
-        r#"{"response":"Sprawdzam.","tool_call":{"name":"pogoda","parameters":{"miasto":"Gdańsk"}}}"#
+        r#"{"tool_call":{"name":"pogoda","parameters":{"miasto":"Gdańsk"}},"response":"Sprawdzam."}"#
     );
     assert_eq!(wire.messages[1].tool_uses().count(), 0);
     assert_eq!(
@@ -349,7 +349,8 @@ fn wire_request_moves_tools_to_the_prompt_and_history_to_text() {
         "odpowiedź bez narzędzi bez zmian"
     );
     let schema = &format["json_schema"]["schema"];
-    assert_eq!(schema["required"], json!(["response"]));
+    assert_eq!(schema["anyOf"][0]["required"], json!(["tool_call"]));
+    assert_eq!(schema["anyOf"][1]["required"], json!(["response"]));
     assert_eq!(schemas(&req).len(), 1);
     // Wywołanie wymagane: `tool_call` obowiązkowe i inne zasady.
     let mut forced = req.clone();
@@ -357,7 +358,7 @@ fn wire_request_moves_tools_to_the_prompt_and_history_to_text() {
     let (wire, format) = Prepared::new(&forced).wire_request(&forced);
     assert_eq!(
         format["json_schema"]["schema"]["required"],
-        json!(["response", "tool_call"])
+        json!(["tool_call"])
     );
     assert!(wire.system.unwrap().contains("obowiązkowe"));
     // Bez narzędzi albo z `None` — bez koperty.

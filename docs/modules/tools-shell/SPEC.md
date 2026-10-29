@@ -41,7 +41,7 @@ Zdolności: `shell.exec(zakres)` (polecenie trafia do reguł Jądra/klasyfikator
 Start powłoki ≤ 300 ms (pwsh7 cold start bywa wolniejszy — mierzone); RAM kontrolera ≤ 3 MB; limit wyjścia domyślnie 1 MB.
 
 ## Konfiguracja (klucze TOML)
-`[tools.shell] default = "pwsh7"`, `timeout = "120s"`, `output_max_kb = 1024`, `env_allowlist = ["PATH", "TEMP", ...]`, `job.max_ram_mb = 2048`, `snapshot_required = true` (kernel_policy).
+`[tools.shell] default = "pwsh7"` (bez zainstalowanego PowerShell 7 `ShellToolsConfig::detected()` ustawia Windows PowerShell jako domyślną i kieruje do niego jawne `pwsh` — inaczej każde polecenie kończyło się „nie znaleziono ścieżki”; pomiar F3 2026-10-29), `timeout = "120s"`, `output_max_kb = 1024`, `env_allowlist = ["PATH", "TEMP", ...]`, `job.max_ram_mb = 2048`, `snapshot_required = true` (kernel_policy).
 
 ## Wkład do UI
 Krok w wątku i Replay (polecenie, skrócone wyjście, kod wyjścia), karta „czeka na zatwierdzenie” dla poleceń poza zakresem/sieciowych, karta intencji „Uruchom w terminalu” (polecenie do skopiowania, `agents_open_terminal` otwiera Windows Terminal/pwsh w `cwd` bez wykonania), Ustawienia → Komputer.

@@ -38,7 +38,16 @@ modeli z narzędziami). `--list-devices` — lista urządzeń (`devices.rs`).
   Brak `additionalProperties` konwerter b11559 traktuje jak brak dodatkowych pól (wniosek z kodu konwertera) —
   Alfa i tak domyka obiekty jawnie, żeby walidacja argumentów oceniała to samo co gramatyka.
 
+## Pomiar na prawdziwym modelu (2026-10-29, laptop RTX 4050, `llama-cuda` b11559, Bielik 4.5B Q8_0)
+- Gramatyka działa: każde wywołanie w 35 zadaniach F3 miało argumenty zgodne ze schematem; ok. 33 tok/s, pierwsza
+  odpowiedź w kopercie ok. 2 s (próba bezpośrednia na serwerze).
+- Koperta `{"response", "tool_call"?}` z `response` na początku → model wpisywał wywołanie jako tekst do `response`
+  (0/35). Wywołanie jako wybór na początku (`anyOf`: obiekt z wymaganym `tool_call` albo sam `response`) → 5/35;
+  z poprawkami runtime (ścieżki względne, wykrywanie powłoki, podpowiedź przy powtórzeniu) → 11/35 (`fs` 9/24,
+  `shell` 2/11). Szczegóły i pozostałe przyczyny porażek: `docs/plan/44-raport-2026-10-30-noc.md`.
+- `anyOf` w korzeniu schematu konwerter b11559 przyjmuje (gramatyka z alternatywą).
+
 ## Czego nie sprawdziliśmy
-- Zachowania gramatyki b11559 z prawdziwym Bielikiem 4.5B (jakość odpowiedzi w kopercie) — próba na runnerze.
+- Bielika 1.5B i innych kwantyzacji niż Q8_0 w kopercie; backendu Vulkan (iGPU) z kopertą.
 - Pełnej listy słów kluczowych JSON Schema obsługiwanych przez konwerter gramatyki; schemat, którego nie przetworzy,
   kończy się błędem żądania.

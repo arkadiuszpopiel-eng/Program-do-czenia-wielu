@@ -27,9 +27,9 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
 - Bez pobranego modelu dostawca jest `Unconfigured` (Router go pomija).
 - **Wywołania narzędzi w kopercie ze schematem (C2.3):** żądanie z narzędziami (wybór ≠ `None`) idzie do
   `llama-server` z `response_format: {type: "json_schema", json_schema: {schema}}` zamiast pola `tools`. Schemat koperty:
-  `{"response": string, "tool_call"?: {"name": <const nazwa>, "parameters": <schemat parametrów narzędzia>}}` —
-  tekst (odpowiedź albo plan przed akcją) i opcjonalnie jedno wywołanie (przy `Required`/`Tool` obowiązkowe; `Tool` —
-  tylko wskazane narzędzie). Serwer zamienia schemat na gramatykę, więc argumenty zawsze są poprawnym JSON-em zgodnym
+  `{"tool_call": {"name": <const nazwa>, "parameters": <schemat parametrów narzędzia>}, "response"?: string}` albo
+  `{"response": string}` — wywołanie (z opcjonalnym komentarzem po nim) albo sama odpowiedź (przy `Required`/`Tool`
+  tylko wariant z wywołaniem; `Tool` — tylko wskazane narzędzie). Serwer zamienia schemat na gramatykę, więc argumenty zawsze są poprawnym JSON-em zgodnym
   ze schematem — także gdy szablon czatu modelu nie zna formatu narzędzi. Szczegóły w sekcji „Zmiany — C2.3” na końcu.
 
 Zdarzenia: `local.model.download.progress/finished/failed`, `local.model.loaded/unloaded`, `local.backend.fallback`
@@ -167,10 +167,13 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
   na całą odpowiedź i ma pierwszeństwo przed narzędziami; własne `grammar` razem z `tools` serwer odrzuca. Natywne
   wywoływanie narzędzi Bielika v3 nie jest potwierdzone (plan 11) — dlatego koperta przez `response_format`,
   niezależna od szablonu.
-- **Koperta = jeden obiekt, nie alternatywa:** `response` (wymagane, może być puste) przed opcjonalnym `tool_call` —
-  pętla agentki prosi o plan przed akcją, a przy kopercie „albo tekst, albo wywołanie” sam plan kończyłby przebieg
-  (tura bez wywołania = odpowiedź końcowa). Konwerter gramatyki stawia pola wymagane przed opcjonalnymi, więc model
-  pisze najpierw tekst, potem decyduje o wywołaniu.
+- **Wywołanie jako wybór na początku koperty (2026-10-29):** `anyOf` z dwoma wariantami — z wywołaniem (wymagane tylko
+  `tool_call`, `response` opcjonalne po nim) i bez (sam `response`). Konwerter gramatyki stawia pola wymagane przed
+  opcjonalnymi, a klucze idą alfabetycznie, więc w wariancie z wywołaniem model decyduje o nim od pierwszego pola, a
+  komentarz pisze po nim (plan i akcja w jednej turze nadal działają). Wcześniej koperta była jednym obiektem z
+  wymaganym `response` przed opcjonalnym `tool_call`: pomiar F3 na Bieliku 4.5B (karta RTX 4050, b11559) pokazał, że
+  model w pierwszej turze wpisywał wywołanie jako tekst do `response` (`{"name": "fs_write", …}` i tysiące tokenów
+  dalej) — nic się nie wykonywało, 0/35 zadań. Wcześniejsze wywołania w historii też idą „wywołanie, potem tekst”.
 - **Żądanie** (`envelope::Prepared` — liczone raz na żądanie, `schema::envelope`): narzędzia opisane w prompcie
   systemowym (nazwa, opis, schemat parametrów) z zasadami formatu; wcześniejsze wywołania w historii jako tekst koperty
   asystentki, wyniki jako „[Wynik narzędzia <nazwa>]” w turze użytkownika (bez ról `tool` i pól `tool_calls`). Schemat

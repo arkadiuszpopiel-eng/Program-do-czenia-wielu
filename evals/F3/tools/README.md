@@ -37,13 +37,17 @@ CARGO_INCREMENTAL=0 cargo test -p app-agents --test eval_tools
 Pomiar na modelu lokalnym (Windows, `llama-server` z llama.cpp i model pobrany przez Alfę):
 
 ```powershell
-$env:ALFA_EVAL_LLAMA_SERVER = "$env:LOCALAPPDATA\Alfa\sidecars\llama\llama-server.exe"
+$env:ALFA_EVAL_LLAMA_SERVER = "$env:LOCALAPPDATA\Alfa\sidecars\llama-cuda\llama-server.exe"
 $env:ALFA_EVAL_MODELS_DIR   = "$env:LOCALAPPDATA\Alfa\models"
 $env:ALFA_EVAL_MODEL        = "bielik-4.5b-v3.0-instruct-q8_0"     # opcjonalnie
 $env:ALFA_EVAL_REPORT       = "wynik-F3-tools.md"                   # opcjonalnie
+$env:ALFA_EVAL_BACKEND      = "cuda"                                # karta (cuda/vulkan); bez — procesor
 cargo test -p app-agents --test eval_tools --release -- --ignored --nocapture
 ```
 
-`ALFA_EVAL_ONLY=fs` albo `shell` zawęża zestaw. Raport Markdown: zaliczone ogółem i per rodzaj,
+`ALFA_EVAL_ONLY=fs` albo `shell` zawęża zestaw, `ALFA_EVAL_IDS=fs-01,fs-03` — do wybranych zadań (początki
+identyfikatorów). Test nie ma profilu urządzenia, więc bez `ALFA_EVAL_BACKEND` model liczy na procesorze (wolno — zadania
+przekraczają limit czasu); `ALFA_EVAL_GPU_LAYERS` ogranicza warstwy na karcie (domyślnie wszystkie). `ALFA_EVAL_TRACE=1`
+wypisuje każde zdarzenie przebiegu (tury, wywołania, wyniki narzędzi) — do diagnozy. Raport Markdown: zaliczone ogółem i per rodzaj,
 tabela zadań (wynik, kroki, wywołania narzędzi, czas, niespełnione warunki). Próg zaliczenia
 F3-07 ustala człowiek (ADR 14); zmiana zadań po zamrożeniu wymaga jego zatwierdzenia.
