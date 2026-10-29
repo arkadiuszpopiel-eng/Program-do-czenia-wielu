@@ -46,7 +46,7 @@ for (const theme of ['light', 'dark'] as const) {
   });
 }
 
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`ostatni wynik wyzwalacza z raportem agentki — ${style} ${theme}`, async ({ page }) => {
       await openApp(page, { theme, path: `/?style=${style}` });

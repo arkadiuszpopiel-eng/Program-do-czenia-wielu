@@ -33,7 +33,7 @@ test('kraj, trenowanie i sesja prywatna dla każdej trasy', async ({ page }) => 
   await expect(list.getByText('wyłączona', { exact: true })).toBeVisible();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`gdzie trafiają dane: ${skin}, ${theme}`, async ({ page }) => {
       await open(page, skin, theme);

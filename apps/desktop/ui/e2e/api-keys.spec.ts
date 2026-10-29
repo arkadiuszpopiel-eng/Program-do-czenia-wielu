@@ -342,7 +342,7 @@ test('kreator i panel konta otwarte naraz: bez zdublowanych identyfikatorów', a
   await expectAccessible(page, 'kreator i panel konta');
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`czytelność kreatora i wyniku: ${skin} / ${theme}`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });

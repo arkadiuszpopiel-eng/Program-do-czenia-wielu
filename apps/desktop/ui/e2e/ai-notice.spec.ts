@@ -11,7 +11,7 @@ test('pierwsze uruchomienie mówi, że Alfa to AI', async ({ page }) => {
   await expect(page.getByText(/asystentka oparta na sztucznej inteligencji \(AI\)/)).toBeVisible();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`stała informacja pod polem wpisywania: ${skin}, ${theme}`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });

@@ -58,3 +58,29 @@ describe('styl w oknach', () => {
     expect(attrs.has('data-skin')).toBe(false);
   });
 });
+
+describe('styl Junior', () => {
+  it('jest znanym stylem i powiększa cały interfejs o 15 %', async () => {
+    const { effectiveScale, JUNIOR_SCALE } = await import('../appearance');
+    expect(SKINS).toContain('junior');
+    expect(JUNIOR_SCALE).toBe(1.15);
+    expect(effectiveScale(100, false, 1280, 'junior')).toBeCloseTo(1.15, 5);
+    expect(effectiveScale(100, false, 1280, 'classic')).toBe(1);
+    expect(effectiveScale(120, false, 1280, 'junior')).toBeCloseTo(1.38, 5);
+    // Wąskie okno: powiększenie nie schodzi poniżej 360 px efektywnych (i nigdy nie pomniejsza).
+    expect(380 / effectiveScale(100, false, 380, 'junior')).toBeCloseTo(360, 5);
+    expect(effectiveScale(100, false, 360, 'junior')).toBe(1);
+    expect(effectiveScale(100, false, 300, 'junior')).toBe(1);
+    const { root } = fakeRoot();
+    applyAppearance(root, {
+      theme: 'light',
+      style: 'junior',
+      density: 'comfortable',
+      animations: true,
+      zoom: 100,
+      fit: false,
+      width: 1280,
+    });
+    expect(root.getAttribute('data-skin')).toBe('junior');
+  });
+});

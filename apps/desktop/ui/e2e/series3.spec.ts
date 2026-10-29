@@ -141,7 +141,7 @@ test('tryb skupienia: F11 włącza, Esc wyłącza', async ({ page }) => {
   await expect(page.locator('.shell.focus')).toHaveCount(0);
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`seria 3 — okna i strony: ${skin}, ${theme}`, async ({ page }) => {
       await open(page, skin, theme);

@@ -76,7 +76,7 @@ test('menu sesji: „Statystyki rozmowy”; paleta prowadzi do „Polecenia bez 
   await expect(page.getByRole('heading', { name: 'Polecenia bez modelu', level: 2 })).toBeVisible();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`seria 4 — podpowiedź i przykłady: ${skin}, ${theme}`, async ({ page }) => {
       await open(page, skin, theme);

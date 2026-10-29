@@ -2515,8 +2515,8 @@
      "en": "Style"
     },
     "description": {
-     "pl": "Wygląd całego interfejsu. Każdy styl ma wersję jasną i ciemną — wybiera ją „Motyw”.",
-     "en": "The look of the whole interface. Every style has a light and a dark version — picked by “Theme”."
+     "pl": "Wygląd całego interfejsu. Każdy styl ma wersję jasną i ciemną — wybiera ją „Motyw”. Junior (dla dzieci) jest większy, cieplejszy i bardziej zaokrąglony.",
+     "en": "The look of the whole interface. Every style has a light and a dark version — picked by “Theme”. Junior (for children) is larger, warmer and rounder."
     },
     "default": "classic",
     "scope": "global",
@@ -2542,6 +2542,13 @@
        "label": {
         "pl": "Next",
         "en": "Next"
+       }
+      },
+      {
+       "value": "junior",
+       "label": {
+        "pl": "Junior (dla dzieci)",
+        "en": "Junior (for children)"
        }
       }
      ]

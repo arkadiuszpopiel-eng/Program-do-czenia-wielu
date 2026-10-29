@@ -30,7 +30,7 @@ test('wybór stylu w ustawieniach przełącza interfejs i wraca do klasycznego',
   await expect(html).not.toHaveAttribute('data-skin', /.+/);
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`styl ${skin}, motyw ${theme}: rozmowa i ustawienia dostępne`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
@@ -51,7 +51,7 @@ for (const skin of ['classic', 'glass', 'next'] as const) {
 
 // Błąd z wersji 0.0.3: rozwinięta lista wyboru była systemowa, a w stylu „Szkło" miała jasny tekst
 // na białym tle. Lista jest teraz elementem strony — sprawdzamy ją otwartą w każdym stylu i motywie.
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`lista wyboru otwarta: ${skin}, ${theme} — czytelna, kryjąca, obsługa klawiaturą`, async ({
       page,

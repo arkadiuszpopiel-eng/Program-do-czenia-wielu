@@ -41,7 +41,7 @@ test('lista, Jądro chronione, wyłączenie opcjonalnego, wyszukiwanie', async (
   await expect(optional.getByRole('listitem')).toHaveCount(2);
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`moduły: ${skin}, ${theme}`, async ({ page }) => {
       await openModules(page, skin, theme);

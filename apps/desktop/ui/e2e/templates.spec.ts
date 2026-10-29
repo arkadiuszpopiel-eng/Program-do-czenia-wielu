@@ -71,7 +71,7 @@ test('okno z palety wypełnia zmienne i wstawia tekst do pola wpisywania', async
   );
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`okno szablonu: ${skin}, ${theme}`, async ({ page }) => {
       await open(page, skin, theme);

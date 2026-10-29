@@ -5,7 +5,7 @@ import { expectAccessible, waitForChat } from './helpers';
 // Zlecenie właściciela (2026-10-09): system kamer — kilka kamer naraz, podgląd, przełączniki,
 // widoczny znak działającej kamery. Tu strona „Kamery” i wskaźnik w belce na atrapie.
 
-const SKINS = ['classic', 'glass', 'next'] as const;
+const SKINS = ['classic', 'glass', 'next', 'junior'] as const;
 const THEMES = ['light', 'dark'] as const;
 
 async function openCameras(page: Page, query = '') {

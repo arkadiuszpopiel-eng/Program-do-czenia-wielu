@@ -181,7 +181,7 @@ test('pola liczbowe i sekcje rozwijane bez elementów rysowanych przez system', 
   expect(spin).toBe('textfield');
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`menu kontekstowe i podpowiedź czytelne: ${skin} / ${theme}`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });

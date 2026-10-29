@@ -26,6 +26,10 @@ export async function setSetting(
     else app.settings[key] = before;
     if (app.i18n.locale !== localeBefore) await app.i18n.setLocale(localeBefore);
   }
+  // Styl „Junior”: propozycja wolniejszej mowy i dźwięków (moduł leniwy — poza kodem startowym).
+  if (ok && key === 'ui.style' && value === 'junior' && before !== 'junior') {
+    void import('./junior').then((m) => m.offerJunior(app));
+  }
   return ok;
 }
 

@@ -6,7 +6,7 @@ import { waitForChat } from './helpers';
 // ładowania, ikony agentek do solidnej poprawy (mruganie, mini awatary w rytm mowy), zakładka
 // głosu do rozbudowy (głos sztywny i niemiły).
 
-const SKINS = ['classic', 'glass', 'next'] as const;
+const SKINS = ['classic', 'glass', 'next', 'junior'] as const;
 const THEMES = ['light', 'dark'] as const;
 const CAST = 'cast=speaking,working,waiting_approval,idle';
 
@@ -61,10 +61,13 @@ for (const skin of SKINS) {
         return { gap, worst };
       });
       expect(gap.gap, `odstęp nad paskiem LED (najbliżej: ${gap.worst})`).toBeGreaterThanOrEqual(2);
-      // Pasek ma 3 px i leży na dolnej krawędzi belki.
+      // Pasek ma 3 px (razy skala interfejsu — Junior ×1,15) i leży na dolnej krawędzi belki.
+      const scale = await page.evaluate(() =>
+        Number(getComputedStyle(document.documentElement).zoom),
+      );
       const led = await page.locator('header.titlebar .led').boundingBox();
       const bar = await page.locator('header.titlebar').boundingBox();
-      expect(led?.height).toBe(3);
+      expect(led?.height ?? 0).toBeCloseTo(3 * scale, 1);
       expect(Math.round((led?.y ?? 0) + (led?.height ?? 0))).toBeLessThanOrEqual(
         Math.round((bar?.y ?? 0) + (bar?.height ?? 0)),
       );

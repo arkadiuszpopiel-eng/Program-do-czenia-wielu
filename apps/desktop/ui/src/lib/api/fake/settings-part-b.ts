@@ -181,13 +181,14 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
       'ui.style',
       L('Styl', 'Style'),
       L(
-        'Wygląd całego interfejsu. Każdy styl ma wersję jasną i ciemną — wybiera ją „Motyw”.',
-        'The look of the whole interface. Every style has a light and a dark version — picked by “Theme”.',
+        'Wygląd całego interfejsu. Każdy styl ma wersję jasną i ciemną — wybiera ją „Motyw”. Junior (dla dzieci) jest większy, cieplejszy i bardziej zaokrąglony.',
+        'The look of the whole interface. Every style has a light and a dark version — picked by “Theme”. Junior (for children) is larger, warmer and rounder.',
       ),
       [
         ['classic', L('Klasyczny', 'Classic')],
         ['glass', L('Szkło', 'Glass')],
         ['next', L('Next', 'Next')],
+        ['junior', L('Junior (dla dzieci)', 'Junior (for children)')],
       ],
       'classic',
     ),

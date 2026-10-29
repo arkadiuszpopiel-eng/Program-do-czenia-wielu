@@ -5,7 +5,7 @@ import { waitForChat } from './helpers';
 // Zgłoszenia właściciela (2026-10-09): górna belka z jadącym paskiem LED i własnymi przyciskami
 // okna (belka systemowa zniknęła), dopracowana nawigacja Ustawień, role kart graficznych.
 
-const SKINS = ['classic', 'glass', 'next'] as const;
+const SKINS = ['classic', 'glass', 'next', 'junior'] as const;
 const THEMES = ['light', 'dark'] as const;
 
 async function open(page: Page, query = '', motion: 'reduce' | 'no-preference' = 'reduce') {

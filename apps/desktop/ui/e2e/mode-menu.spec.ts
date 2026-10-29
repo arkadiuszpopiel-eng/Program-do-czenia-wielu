@@ -3,7 +3,7 @@ import { expectAccessible, openApp, waitForChat } from './helpers';
 
 // Menu „Tryb pracy” z paska tytułu (decyzja właściciela 27.10): cztery tryby po polsku, klawisze
 // 1–4, obniżenie od razu, podniesienie przez okno Brokera (raz). Każdy styl i motyw.
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`menu trybu pracy — ${style} ${theme}`, async ({ page }) => {
       await openApp(page, { theme, path: `/?style=${style}` });

@@ -36,8 +36,8 @@ kontach i roli Dziecko z ADR 0027, który czeka na podpis (U.0) — dlatego ten 
 - **K.1–K.2 i K.6–K.7 czekają na etap U** (U.0 → U.1, U.2, U.4, U.6, U.8). Rola Dziecko i twarde blokady w
   Brokerze to obszar Jądra/Brokera — tylko z przeglądem człowieka (AGENTS.md).
 - **K.3 może iść od razu** (interfejs, bez kont): wyróżnianie czytanego zdania jest w kodzie od 29.10 (do następnej wersji po 0.0.76)
-  (plan 43, faza 1 — przycisk „Przeczytaj na głos”); styl „Junior”, wolniejsze tempo mowy i dźwięki potwierdzeń
-  powstaną jako zwykłe ustawienia wyglądu i głosu, a potem będą domyślne dla konta dziecka.
+  (plan 43, faza 1 — przycisk „Przeczytaj na głos”); styl „Junior” (29.10) i propozycja wolniejszej mowy z dźwiękami
+  to zwykłe ustawienia wyglądu i głosu — po etapie U będą domyślne dla konta dziecka.
 - **Strona „Dzieci” (K.6)** ma pola: wiek (przedział z punktu 1), poziom filtra, limit dzienny i godziny, limit
   kosztów, zgoda na chmurę z listą dostawców (punkt 3), czytanie pełnych rozmów (punkt 2).
 - **Zgodność (K.8)**: przegląd prawny RODO przed udostępnieniem kont dzieci komukolwiek poza właścicielem.

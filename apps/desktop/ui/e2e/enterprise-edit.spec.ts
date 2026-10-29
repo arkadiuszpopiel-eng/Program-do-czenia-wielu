@@ -6,7 +6,7 @@ import { expectAccessible, waitForChat } from './helpers';
 // wersja API i wdrożenia Azure OpenAI zmieniane na karcie konta — bez usuwania konta i ponownego
 // wpisywania klucza. Każdy stan formularza w każdym stylu i motywie.
 
-const SKINS = ['classic', 'glass', 'next'] as const;
+const SKINS = ['classic', 'glass', 'next', 'junior'] as const;
 const THEMES = ['light', 'dark'] as const;
 const fakeKey = (prefix: string) => `${prefix}${'XXXX'.repeat(8)}`;
 

@@ -65,7 +65,10 @@ Na końcu kliknij **Zaczynamy**.
 `Ctrl+,` albo ikona w pasku tytułu. Po lewej drzewo sekcji, u góry wyszukiwarka. Przy każdym ustawieniu jest opis,
 wartość domyślna i przycisk „Przywróć domyślne”. W **Ogólne → Profil widoku ustawień** wybierzesz, ile opcji widać
 (Prosty, Zaawansowany, Ekspert). Język interfejsu (polski / angielski) zmienisz w **Język**, motyw jasny, ciemny lub
-automatyczny — w **Wygląd**.
+automatyczny — w **Wygląd**. Tam też **Styl**: Klasyczny, Szkło, Next albo **Junior (dla dzieci)** — cały interfejs
+o 15 % większy, ciepłe kolory i zaokrąglone kształty (za dnia krem z fioletem, w nocy śliwka ze słonecznym akcentem).
+Po wybraniu Juniora Alfa proponuje jednym przyciskiem **Włącz** wolniejszą mowę (85 %) i dźwięki sygnałowe; bez
+kliknięcia nic się nie zmienia, a obie rzeczy ustawisz potem osobno w **Głos** i **Powiadomienia**.
 
 ## Zasobnik systemowy
 

@@ -57,7 +57,7 @@ test('sprawdzenie, odmowa Jądra, zapis, cofnięcie, warstwy, flaga', async ({ p
   ).toBeChecked();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`zaawansowane: ${skin}, ${theme}`, async ({ page }) => {
       await openAdvanced(page, skin, theme);

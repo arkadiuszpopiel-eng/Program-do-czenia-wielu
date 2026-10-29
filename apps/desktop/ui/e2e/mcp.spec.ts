@@ -90,7 +90,7 @@ test('usuwanie serwera z potwierdzeniem', async ({ page }) => {
   await expect(servers(page).getByText('GitHub')).toHaveCount(0);
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`stany otwarte: ${skin}, ${theme} — formularz, narzędzia, okno usuwania`, async ({
       page,

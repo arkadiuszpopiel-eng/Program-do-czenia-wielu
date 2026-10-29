@@ -9,10 +9,11 @@ const shot = async (page: Page, name: string) => {
   if (SHOTS) await page.screenshot({ path: `${SHOTS}/${name}.png` });
 };
 
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`panele chowane w całości i wysuwane — ${style} ${theme}`, async ({ page }) => {
-      await page.setViewportSize({ width: 1600, height: 900 });
+      // Junior powiększa interfejs ×1,15 — okno o tyle szersze daje ten sam (szeroki) układ.
+      await page.setViewportSize({ width: style === 'junior' ? 1840 : 1600, height: 900 });
       await openApp(page, { theme, path: `/?style=${style}` });
       await waitForChat(page);
       const id = `${style}-${theme}`;

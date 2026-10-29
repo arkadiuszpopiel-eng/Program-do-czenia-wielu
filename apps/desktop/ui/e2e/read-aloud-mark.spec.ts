@@ -12,6 +12,8 @@ const SKINS = [
   ['glass', 'dark'],
   ['next', 'light'],
   ['next', 'dark'],
+  ['junior', 'light'],
+  ['junior', 'dark'],
 ] as const;
 
 /** Tekst wyróżnienia `alfa-reading` (pusty — brak wyróżnienia). */

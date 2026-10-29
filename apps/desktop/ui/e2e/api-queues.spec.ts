@@ -182,7 +182,7 @@ test('bez kont: strona prowadzi do dodania dostawcy', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Konta i klucze API' })).toBeVisible();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`czytelność strony API i otwartego menu: ${skin} / ${theme}`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });

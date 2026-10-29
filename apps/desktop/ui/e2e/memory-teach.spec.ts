@@ -94,7 +94,7 @@ test('rozmowa: zakres globalny; sesja bez projektu — błąd zakresu projektu',
   );
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`okno „Naucz Alfę”: formularz, wynik, błąd — ${skin}, ${theme}`, async ({ page }) => {
       await open(page, skin, theme);

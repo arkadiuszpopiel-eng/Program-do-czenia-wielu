@@ -1,5 +1,6 @@
 /*
- * Style interfejsu Alfy (`ui.style` → atrybut `data-skin` na <html>): „Szkło" i „Next". Styl klasyczny
+ * Style interfejsu Alfy (`ui.style` → atrybut `data-skin` na <html>): „Szkło", „Next" i „Junior"
+ * (dla dzieci, etap K — plan 41; większą skalę daje `appearance.ts`, nie fonty). Styl klasyczny
  * to same tokeny z tokens.css (bez atrybutu). Każdy styl ma wariant jasny i ciemny — wybiera go
  * ustawienie „Motyw" (`data-theme` / motyw systemu), a kolory są zapisane raz funkcją `light-dark()`,
  * która czyta `color-scheme` ustawiony w tokens.css.
@@ -134,5 +135,58 @@
   :root[data-skin='glass'] .toasts > * {
     background-color: var(--alfa-skin-solid);
     box-shadow: var(--alfa-shadow-3);
+  }
+
+  /* ── Junior: ciepły krem i fiolet za dnia, śliwka i słońce w nocy; okrągłe kształty ────────────
+     Kontrast policzony dla wszystkich par tekst/tło (≥ 4,5) i fokusu (≥ 3), także barw agentek. */
+  :root[data-skin='junior'] {
+    --alfa-radius-control: 14px;
+    --alfa-radius-card: 20px;
+    --alfa-radius-overlay: 24px;
+    --alfa-color-bg: light-dark(#fff7e8, #1a1230);
+    --alfa-color-surface: light-dark(#ffffff, #241a42);
+    --alfa-color-surface2: light-dark(#fff0d4, #2d2252);
+    --alfa-color-surface3: light-dark(#ffe8bf, #3a2d66);
+    --alfa-color-border: light-dark(#f0d9ae, #3f3370);
+    --alfa-color-border-strong: light-dark(#a2793a, #7a68b8);
+    --alfa-color-text: light-dark(#2b1d0e, #fff8ec);
+    --alfa-color-text-muted: light-dark(#674a24, #e2d6f7);
+    --alfa-color-text-subtle: light-dark(#6e5129, #cbbbeb);
+    --alfa-color-text-on-accent: light-dark(#ffffff, #251400);
+    --alfa-color-focus: light-dark(#6a35d4, #ffc966);
+    --alfa-color-scrim: light-dark(rgba(43, 29, 14, 0.32), rgba(10, 6, 22, 0.72));
+    --alfa-color-success: light-dark(#17733a, #74e3a6);
+    --alfa-color-warning: light-dark(#8a4b00, #ffd166);
+    --alfa-color-error: light-dark(#b8261f, #ff8f8f);
+    /* Informacja i przełączniki w barwie stylu (fiolet / lawenda). */
+    --alfa-color-info: light-dark(#6a35d4, #c4a8ff);
+    --alfa-color-risk-low: var(--alfa-color-success);
+    --alfa-color-risk-medium: var(--alfa-color-warning);
+    --alfa-color-risk-high: var(--alfa-color-error);
+    /* Barwy agentek o ton głębsze za dnia: klasyczne na kremie miały 4,1–4,3 (< 4,5). */
+    --alfa-agent-alfa: light-dark(#b3321f, #f59a84);
+    --alfa-agent-beta: light-dark(#0b6b52, #4fd9a4);
+    --alfa-agent-delta: light-dark(#0b6780, #5eead4);
+    --alfa-shadow-1: 0 1px 2px light-dark(rgba(120, 72, 10, 0.08), rgba(0, 0, 0, 0));
+    --alfa-shadow-2: 0 6px 18px light-dark(rgba(120, 72, 10, 0.12), rgba(0, 0, 0, 0.32));
+    --alfa-shadow-3: 0 26px 70px light-dark(rgba(120, 72, 10, 0.22), rgba(0, 0, 0, 0.6));
+    --alfa-color-accent: light-dark(#6a35d4, #ffb547);
+    --alfa-accent-fill: linear-gradient(
+      135deg,
+      light-dark(#7440e0, #ffc463),
+      light-dark(#5b2bc4, #ffa62e)
+    );
+    --alfa-accent-glow: 0 8px 22px light-dark(rgba(106, 53, 212, 0.25), rgba(255, 181, 71, 0.22));
+    /* Kropki w tle obszaru roboczego (jak kartka z zeszytu w kropki). */
+    --alfa-skin-dots: light-dark(rgba(162, 121, 58, 0.16), rgba(255, 248, 236, 0.07));
+  }
+  :root[data-skin='junior'] [data-surface='app'] {
+    background-color: var(--alfa-color-bg);
+    background-image: radial-gradient(var(--alfa-skin-dots) 1.5px, transparent 1.6px);
+    background-size: 28px 28px;
+  }
+  /* Obszar zagnieżdżony w innym nie rysuje kropek drugi raz (przesunięty wzór). */
+  :root[data-skin='junior'] [data-surface='app'] [data-surface='app'] {
+    background: transparent;
   }
 }

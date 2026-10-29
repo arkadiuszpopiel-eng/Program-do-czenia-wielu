@@ -21,7 +21,8 @@ for (const style of STYLES) {
   for (const theme of THEMES) {
     test(`schowany panel ma znacznik i wysuwa się — ${style} ${theme}`, async ({ page }) => {
       const errors = watchConsole(page);
-      await page.setViewportSize({ width: 1600, height: 900 });
+      // Junior powiększa interfejs ×1,15 — okno o tyle szersze daje ten sam (szeroki) układ.
+      await page.setViewportSize({ width: style === 'junior' ? 1840 : 1600, height: 900 });
       await openApp(page, { theme, path: `/?style=${style}` });
       await waitForChat(page);
       // Panele zadokowane: bez znaczników.

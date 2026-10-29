@@ -204,7 +204,7 @@ test('wąskie okno: kanwa z panelu Pliki zastępuje szufladę (jeden dialog)', a
   await expect(page.getByRole('dialog', { name: 'Panel boczny' })).toBeVisible();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`kanwa — podgląd, źródło, Markdown: ${skin}, ${theme}`, async ({ page }) => {
       await open(page, skin, theme);
@@ -227,7 +227,7 @@ for (const skin of ['classic', 'glass', 'next'] as const) {
 }
 
 // Stany graniczne: artefakt ponad limit podglądu (uwaga + ucięte źródło) i błąd renderu z „Ponów”.
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`kanwa — za duży artefakt i błąd podglądu: ${skin}, ${theme}`, async ({ page }) => {
       await open(page, skin, theme);

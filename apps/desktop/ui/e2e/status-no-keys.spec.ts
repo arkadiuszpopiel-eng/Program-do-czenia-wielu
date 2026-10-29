@@ -4,7 +4,7 @@ import { openApp, waitForChat } from './helpers';
 // Bez kluczy API działa tylko profil lokalny: belka, okienko stanu i pasek pisania pokazują ten
 // sam profil — „Lokalny” — a nie zapisaną w ustawieniach „Hybrydę” (przegląd w WebView2 28.10).
 // Zaznaczony wybór ma obwódkę widoczną w każdym stylu (w jasnym Szkle tła prawie się zlewały).
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`stan bez kluczy: profil Lokalny wszędzie — ${style} ${theme}`, async ({ page }) => {
       await openApp(page, {

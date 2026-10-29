@@ -149,7 +149,7 @@ test('Arena: brak modeli i brak wiadomości', async ({ page }) => {
   await expect(dialog.getByText(/Najpierw wyślij wiadomość/)).toBeVisible();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`Arena — wybór, wyniki, błąd, za mało modeli: ${skin}, ${theme}`, async ({ page }) => {
       await open(page, { skin, theme });

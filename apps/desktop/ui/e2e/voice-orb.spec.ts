@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { expectAccessible, openApp, waitForChat } from './helpers';
 
 // Kula stanu rozmowy w panelu „Głos”: stan słowem, kto mówi i to, co Alfa właśnie rozpoznaje.
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`kula stanu rozmowy przechodzi przez stany — ${style} ${theme}`, async ({ page }) => {
       await openApp(page, { theme, path: `/?style=${style}` });

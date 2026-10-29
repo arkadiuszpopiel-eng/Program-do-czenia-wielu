@@ -6,7 +6,7 @@ import { applySkin, applyTheme } from './window-boot';
 
 export interface Appearance {
   readonly theme: string;
-  /** Styl interfejsu (`ui.style`): `classic`, `glass`, `next`. */
+  /** Styl interfejsu (`ui.style`): `classic`, `glass`, `next`, `junior`. */
   readonly style?: string;
   readonly density: string;
   readonly animations: boolean;
@@ -46,9 +46,19 @@ export function fitScale(width: number): number {
   return last[1];
 }
 
-/** Skala całego interfejsu: zoom użytkownika razy dopasowanie do okna. */
-export function effectiveScale(zoom: number, fit: boolean, width: number): number {
-  return (clampZoom(zoom) / 100) * (fit ? fitScale(width) : 1);
+/** Styl „Junior” (dla dzieci): cały interfejs większy — duże litery i przyciski w każdym widoku. */
+export const JUNIOR_SCALE = 1.15;
+/**
+ * Najwęższy układ, dla którego projektowany jest interfejs (px efektywne). Powiększenie Juniora nie
+ * schodzi poniżej — w oknie 360 px dawało 313 px i przyciski nachodziły na znaczniki paneli.
+ */
+export const JUNIOR_MIN_WIDTH = 360;
+
+/** Skala całego interfejsu: zoom użytkownika razy dopasowanie do okna (razy skala stylu). */
+export function effectiveScale(zoom: number, fit: boolean, width: number, style?: string): number {
+  const base = (clampZoom(zoom) / 100) * (fit ? fitScale(width) : 1);
+  if (style !== 'junior') return base;
+  return base * Math.max(1, Math.min(JUNIOR_SCALE, width / (JUNIOR_MIN_WIDTH * base)));
 }
 
 export function applyAppearance(root: HTMLElement, a: Appearance): void {
@@ -57,12 +67,12 @@ export function applyAppearance(root: HTMLElement, a: Appearance): void {
   root.dataset['density'] = a.density === 'compact' ? 'compact' : 'comfortable';
   if (a.animations) delete root.dataset['motion'];
   else root.dataset['motion'] = 'off';
-  const scale = String(effectiveScale(a.zoom, a.fit, a.width));
+  const scale = String(effectiveScale(a.zoom, a.fit, a.width, a.style));
   root.style.setProperty('zoom', scale);
   // Dla rozmiarów liczonych od okna (`--alfa-vh`, `--alfa-vw` w app.css).
   root.style.setProperty('--alfa-zoom', scale);
 }
 
-export function effectiveWidth(win: Window, zoom: number, fit = false): number {
-  return Math.round(win.innerWidth / effectiveScale(zoom, fit, win.innerWidth));
+export function effectiveWidth(win: Window, zoom: number, fit = false, style?: string): number {
+  return Math.round(win.innerWidth / effectiveScale(zoom, fit, win.innerWidth, style));
 }

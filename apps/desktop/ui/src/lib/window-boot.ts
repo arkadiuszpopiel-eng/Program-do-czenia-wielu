@@ -9,9 +9,9 @@ export function applyTheme(root: HTMLElement, theme: unknown): void {
 }
 
 /** Style interfejsu poza klasycznym (`ui.style`); kolory w `@alfa/ui-kit/skins.css`. */
-export const SKINS = ['glass', 'next'] as const;
+export const SKINS = ['glass', 'next', 'junior'] as const;
 
-/** `ui.style`: `glass` / `next` ustawia `data-skin`, wszystko inne — styl klasyczny (bez atrybutu). */
+/** `ui.style`: `glass` / `next` / `junior` ustawia `data-skin`, wszystko inne — styl klasyczny (bez atrybutu). */
 export function applySkin(root: HTMLElement, style: unknown): void {
   if (SKINS.some((skin) => skin === style)) root.setAttribute('data-skin', style as string);
   else root.removeAttribute('data-skin');

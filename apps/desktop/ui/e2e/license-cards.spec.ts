@@ -16,7 +16,7 @@ const row = (page: Page, name: string) =>
     .getByRole('listitem')
     .filter({ has: page.getByRole('heading', { name, level: 4, exact: true }) });
 
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`karta licencji: ${style}, ${theme}`, async ({ page }) => {
       await openApp(page, { theme, path: `/?style=${style}` });

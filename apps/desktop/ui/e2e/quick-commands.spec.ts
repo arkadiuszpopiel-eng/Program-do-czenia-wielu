@@ -62,7 +62,7 @@ test('tester, dodanie, błąd wyrażenia, usunięcie, katalog', async ({ page })
   await expect(page.getByRole('switch', { name: 'Odpowiadaj bez modelu' })).toBeChecked();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`polecenia bez modelu: ${skin}, ${theme}`, async ({ page }) => {
       await openCommands(page, skin, theme);

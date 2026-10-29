@@ -115,7 +115,7 @@ test('karty w oknie 400 px: jedna kolumna, bez wychodzenia poza okno', async ({ 
   await expectReadable(page, 'karty 400 px');
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`karty rozmów: ${skin}, ${theme}`, async ({ page }) => {
       await open(page, skin, theme);

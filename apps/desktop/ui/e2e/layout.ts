@@ -2,7 +2,7 @@
 // i błędy konsoli.
 import type { Page } from '@playwright/test';
 
-export const STYLES = ['classic', 'glass', 'next'] as const;
+export const STYLES = ['classic', 'glass', 'next', 'junior'] as const;
 export const THEMES = ['light', 'dark'] as const;
 
 /** Wady układu widoczne na ekranie: opis elementu i powód. */

@@ -105,7 +105,7 @@ test('offline: pobieranie kończy się czytelnym błędem', async ({ page }) => 
   await expect(vad.getByText('sieć: brak połączenia (atrapa)')).toBeVisible();
 });
 
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`katalog: wyszukiwanie, kolejność i miejsce na dysku — ${style} ${theme}`, async ({
       page,

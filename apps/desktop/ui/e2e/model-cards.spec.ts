@@ -17,7 +17,7 @@ async function openModels(page: Page) {
 const row = (page: Page, name: string) =>
   page.getByRole('listitem').filter({ has: page.getByRole('heading', { name, level: 4 }) });
 
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`karta modelu: ${style}, ${theme}`, async ({ page }) => {
       await openApp(page, { theme, path: `/?style=${style}` });

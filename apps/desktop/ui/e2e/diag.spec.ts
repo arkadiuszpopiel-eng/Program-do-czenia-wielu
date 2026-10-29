@@ -52,7 +52,7 @@ test('testy lekkie, wybrany dysk, historia i raport', async ({ page }) => {
   await expect(page.getByText(/Raport zapisano: .*Diagnostyka/)).toBeVisible();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`strona z wynikami: ${skin}, ${theme}`, async ({ page }) => {
       await openDiag(page, skin, theme);

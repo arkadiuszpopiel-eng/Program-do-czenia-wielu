@@ -108,7 +108,7 @@ test('tłumaczenie odpowiedzi i styl odpowiedzi w ustawieniach', async ({ page }
   await expect(page.getByRole('combobox', { name: 'Swoboda odpowiedzi' })).toBeVisible();
 });
 
-for (const skin of ['classic', 'glass', 'next'] as const) {
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`seria 2 — okna otwarte: ${skin}, ${theme}`, async ({ page }) => {
       await open(page, skin, theme);

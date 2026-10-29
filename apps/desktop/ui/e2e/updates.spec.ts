@@ -102,7 +102,7 @@ test('offline: sprawdzanie aktualizacji kończy się czytelnym błędem', async 
   await expect(page.getByText('Brak połączenia z serwerem wydań.')).toBeVisible();
 });
 
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`historia zmian: wagi, filtr i zwijanie — ${style} ${theme}`, async ({ page }) => {
       await openApp(page, { theme, path: `/?style=${style}` });
@@ -143,7 +143,7 @@ for (const style of ['classic', 'glass', 'next'] as const) {
   }
 }
 
-for (const style of ['classic', 'glass', 'next'] as const) {
+for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`historia zmian: dziesięć ostatnich i zakładka „Starsze” — ${style} ${theme}`, async ({
       page,

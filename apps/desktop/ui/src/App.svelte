@@ -50,9 +50,10 @@
   $effect(() => {
     const zoom = app.num('ui.zoom', 100);
     const fit = app.bool('ui.zoom_fit', true);
+    const style = app.str('ui.style', 'classic');
     const update = () => {
       windowWidth = window.innerWidth;
-      app.layout.width = effectiveWidth(window, zoom, fit);
+      app.layout.width = effectiveWidth(window, zoom, fit, style);
     };
     update();
     window.addEventListener('resize', update);
