@@ -1,7 +1,12 @@
 // Skrypty odpowiedzi atrapy — deterministyczne (zależne tylko od treści i numeru wariantu).
 import type { AgentId } from '@alfa/ui-kit';
 import type { ApprovalPending, ToolIcon } from '../types';
-import { CANVAS_ARTIFACTS_REPLY, CANVAS_DOCUMENT_REPLY, canvasEdgeTokens } from './canvas-replies';
+import {
+  CANVAS_ARTIFACTS_REPLY,
+  CANVAS_DOCUMENT_REPLY,
+  CANVAS_REVISION_REPLY,
+  canvasEdgeTokens,
+} from './canvas-replies';
 
 export interface ScriptTool {
   readonly icon: ToolIcon;
@@ -51,6 +56,9 @@ export function pickResponse(
   if (has(input, 'kanw') && has(input, 'graniczn')) {
     const tokens = canvasEdgeTokens();
     return { ...base(addressed ?? 'gama', 'coder', tokens.join('')), tokens };
+  }
+  if (has(input, 'kanw') && has(input, 'popraw')) {
+    return base(addressed ?? 'gama', 'coder', CANVAS_REVISION_REPLY);
   }
   if (has(input, 'kanw')) {
     const doc = has(input, 'dokument');

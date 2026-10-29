@@ -32,6 +32,23 @@ export const CANVAS_ARTIFACTS_REPLY = [
   FENCE,
 ].join('\n');
 
+/** Poprawiona strona (historia wersji kanwy): ten sam tytuł, zmieniony termin i nowy wiersz. */
+export const CANVAS_REVISION_REPLY = [
+  'Poprawiłam stronę: nowy termin i osoba odpowiedzialna.',
+  '',
+  `${FENCE}html`,
+  '<!doctype html>',
+  '<html>',
+  '<head><title>Karta projektu</title><style>h1{color:#3730a3}</style></head>',
+  '<body>',
+  '<h1>Karta projektu</h1>',
+  '<p>Termin oddania: 6 listopada.</p>',
+  '<p>Odpowiada: zespół B.</p>',
+  '</body>',
+  '</html>',
+  FENCE,
+].join('\n');
+
 const PARAGRAPH =
   'Sprzedaż w trzecim kwartale wzrosła o dwanaście procent rok do roku, a koszty stałe pozostały ' +
   'na poziomie z poprzedniego kwartału. Największy wkład miał segment B2B, w którym nowi klienci ' +

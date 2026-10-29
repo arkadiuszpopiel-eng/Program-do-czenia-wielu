@@ -1,6 +1,6 @@
 <!--
-  Kanwa artefaktów (C2.8, ADR 0009): artefakt z rozmowy obok czatu — karty Podgląd / Źródło,
-  kopiowanie, zapis istniejącymi ścieżkami (blok kodu, wiadomość, plik sesji), limit rozmiaru.
+  Kanwa artefaktów (C2.8, ADR 0009): artefakt z rozmowy obok czatu — karty Podgląd / Źródło
+  (i Zmiany, gdy artefakt ma wcześniejszą wersję w rozmowie), przełącznik wersji, kopiowanie, zapis istniejącymi ścieżkami (blok kodu, wiadomość, plik sesji), limit rozmiaru.
   Markdown: HTML z Rust wstawiany jako zwykły DOM (SanitizedHtml). HTML i SVG: dokument
   zsanitowany w Rust wyłącznie w ramce `sandbox=""` — bez skryptów, bez `allow-same-origin`,
   więc bez dostępu do okna Alfy, IPC i `__TAURI_INTERNALS__`; dokument dziedziczy CSP okna.
@@ -11,11 +11,14 @@
   import Download from '@lucide/svelte/icons/download';
   import X from '@lucide/svelte/icons/x';
   import { CANVAS_MAX_BYTES, byteSize, clipBytes, tooLarge } from '../../logic/canvas';
+  import { artifactVersions } from '../../logic/canvas-versions';
   import { attempt, load } from '../../state/attempt';
-  import { canvas, closeCanvas, type CanvasTab } from '../../state/canvas.svelte';
+  import { canvas, closeCanvas, showVersion, type CanvasTab } from '../../state/canvas.svelte';
   import { useApp } from '../../state/context';
   import { exportConversation } from '../../state/exports';
   import LoadFailed from '../shell/LoadFailed.svelte';
+  import CanvasDiff from './CanvasDiff.svelte';
+  import CanvasVersions from './CanvasVersions.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -33,7 +36,25 @@
   let frame = $state<HTMLIFrameElement | null>(null);
   let root = $state<HTMLElement | null>(null);
   let heading = $state<HTMLElement | null>(null);
-  const TABS: readonly CanvasTab[] = ['preview', 'source'];
+  // Historia wersji: odpowiedzi na widocznej ścieżce rozmowy z tym samym artefaktem (bez zapisu —
+  // rozmowa jest append-only, więc wersje wynikają z tur).
+  const versions = $derived.by(() => {
+    const conv = app.conversation;
+    if (!item) return [];
+    return conv?.loaded ? artifactVersions(conv.path, item) : [item];
+  });
+  const index = $derived(
+    Math.max(
+      0,
+      versions.findIndex((v) => v.key === item?.key),
+    ),
+  );
+  const previous = $derived(index > 0 ? versions[index - 1] : undefined);
+  const tabs = $derived<readonly CanvasTab[]>(
+    previous ? ['preview', 'source', 'changes'] : ['preview', 'source'],
+  );
+  // Karta Zmiany bez poprzedniej wersji (pierwsza wersja, inny artefakt) — Podgląd.
+  const tab = $derived<CanvasTab>(canvas.tab === 'changes' && !previous ? 'preview' : canvas.tab);
 
   async function render() {
     const current = canvas.item;
@@ -79,14 +100,20 @@
     if (focus) document.getElementById(`${uid}-tab-${tab}`)?.focus();
   }
 
+  // Wersja z przełącznika: fokus zostaje na przełączniku (nie skacze na nagłówek jak przy otwarciu).
+  function selectVersion(version: (typeof versions)[number]) {
+    focusedKey = version.key;
+    showVersion(version);
+  }
+
   function tabKey(event: KeyboardEvent, index: number) {
     const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
-    const edge = event.key === 'Home' ? 0 : event.key === 'End' ? TABS.length - 1 : -1;
-    const next = step ? (index + step + TABS.length) % TABS.length : edge;
-    const tab = TABS[next];
-    if (next < 0 || !tab) return;
+    const edge = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : -1;
+    const next = step ? (index + step + tabs.length) % tabs.length : edge;
+    const target = tabs[next];
+    if (next < 0 || !target) return;
     event.preventDefault();
-    selectTab(tab, true);
+    selectTab(target, true);
   }
 
   // Esc z dowolnego miejsca kanwy zamyka ją (przed skrótami okna — `preventDefault`).
@@ -153,24 +180,30 @@
       </span>
     </header>
 
+    {#if versions.length > 1}
+      <CanvasVersions {versions} {index} onselect={selectVersion} />
+    {/if}
+
     <div class="tabs" role="tablist" aria-label={t('canvas.views')}>
-      {#each TABS as tab, i (tab)}
+      {#each tabs as name, i (name)}
         <button
           type="button"
           role="tab"
           class="tab"
-          id="{uid}-tab-{tab}"
-          aria-selected={canvas.tab === tab}
+          id="{uid}-tab-{name}"
+          aria-selected={tab === name}
           aria-controls="{uid}-panel"
-          tabindex={canvas.tab === tab ? 0 : -1}
-          onclick={() => selectTab(tab)}
-          onkeydown={(e) => tabKey(e, i)}>{t(`canvas.${tab}`)}</button
+          tabindex={tab === name ? 0 : -1}
+          onclick={() => selectTab(name)}
+          onkeydown={(e) => tabKey(e, i)}>{t(`canvas.${name}`)}</button
         >
       {/each}
     </div>
 
-    <div class="panel" id="{uid}-panel" role="tabpanel" aria-labelledby="{uid}-tab-{canvas.tab}">
-      {#if canvas.tab === 'source'}
+    <div class="panel" id="{uid}-panel" role="tabpanel" aria-labelledby="{uid}-tab-{tab}">
+      {#if tab === 'changes' && previous}
+        <CanvasDiff before={previous.source} after={item.source} previous={index} />
+      {:else if tab === 'source'}
         {#if shown.clipped}
           <p class="notice" role="status">
             {t('canvas.truncated', { limit: app.i18n.bytes(CANVAS_MAX_BYTES) })}

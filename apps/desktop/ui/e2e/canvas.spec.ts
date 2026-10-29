@@ -255,3 +255,64 @@ for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
     });
   }
 }
+
+// Historia wersji: poprawiona strona o tym samym tytule to wersja 2 tego samego artefaktu —
+// przełącznik wersji, karta Zmiany (porównanie wierszy), fokus przy przełączaniu.
+async function twoVersions(page: Page) {
+  await ask(page, 'Przygotuj do kanwy stronę i rysunek');
+  await expect(openButton(page, 'html')).toBeVisible({ timeout: 20_000 });
+  await ask(page, 'Popraw w kanwie stronę');
+  // Przycisk kanwy pojawia się po zamknięciu bloku — drugi blok html to już wersja 2.
+  await expect(
+    page
+      .getByRole('figure', { name: 'Blok kodu html', exact: true })
+      .getByRole('button', { name: /^Otwórz w kanwie: / }),
+  ).toHaveCount(2, { timeout: 20_000 });
+  await openBlock(page, 'html');
+}
+
+test('historia wersji: przełącznik, Zmiany i fokus', async ({ page }) => {
+  await open(page);
+  await twoVersions(page);
+  const region = canvas(page);
+  const versions = region.getByRole('group', { name: 'Wersje artefaktu' });
+  await expect(versions).toContainText('Wersja 2 z 2 · najnowsza');
+  await expect(versions.getByRole('button', { name: 'Następna wersja' })).toBeDisabled();
+  await region.getByRole('tab', { name: 'Zmiany' }).click();
+  await expect(region.getByText(/wiersze dodane: 2, usunięte: 2/)).toBeVisible();
+  const diff = region.getByRole('document', { name: 'Zmiany' });
+  await expect(diff).toContainText('Odpowiada: zespół B.');
+  await expect(diff).toContainText('Termin oddania: 30 października.');
+  // Poprzednia wersja: przycisk „Poprzednia” gaśnie, fokus przechodzi na „Następna”, karta
+  // Zmiany znika (pierwsza wersja nie ma z czym się porównać) — kanwa wraca na Podgląd.
+  await versions.getByRole('button', { name: 'Poprzednia wersja' }).click();
+  await expect(versions).toContainText('Wersja 1 z 2');
+  await expect(versions.getByRole('button', { name: 'Następna wersja' })).toBeFocused();
+  await expect(region.getByRole('tab', { name: 'Zmiany' })).toHaveCount(0);
+  await expect(region.getByRole('tab', { name: 'Podgląd', selected: true })).toBeVisible();
+  await region.getByRole('tab', { name: 'Źródło' }).click();
+  await expect(region.locator('pre.source')).toContainText('30 października');
+  await versions.getByRole('button', { name: 'Następna wersja' }).press('Enter');
+  await expect(versions).toContainText('Wersja 2 z 2');
+  await expect(region.locator('pre.source')).toContainText('6 listopada');
+  // Inny artefakt (rysunek bez tytułu) nie ma historii.
+  await openBlock(page, 'svg');
+  await expect(region.getByRole('group', { name: 'Wersje artefaktu' })).toHaveCount(0);
+});
+
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`kanwa — wersje i zmiany: ${skin}, ${theme}`, async ({ page }) => {
+      await open(page, skin, theme);
+      await twoVersions(page);
+      const region = canvas(page);
+      await expect(region.getByRole('group', { name: 'Wersje artefaktu' })).toBeVisible();
+      await expectAccessible(page, `kanwa wersje ${skin} ${theme}`);
+      await expectReadable(page, `kanwa wersje ${skin} ${theme}`);
+      await region.getByRole('tab', { name: 'Zmiany' }).click();
+      await expect(region.getByRole('document', { name: 'Zmiany' })).toBeVisible();
+      await expectAccessible(page, `kanwa zmiany ${skin} ${theme}`);
+      await expectReadable(page, `kanwa zmiany ${skin} ${theme}`);
+    });
+  }
+}

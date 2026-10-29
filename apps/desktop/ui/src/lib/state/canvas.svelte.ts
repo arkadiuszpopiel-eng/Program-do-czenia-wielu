@@ -2,7 +2,8 @@
 // Osobny moduł — stan aplikacji jest u limitu długości pliku.
 import type { CanvasItem } from '../logic/canvas';
 
-export type CanvasTab = 'preview' | 'source';
+/** `changes` — porównanie z poprzednią wersją artefaktu (tylko gdy jest wcześniejsza wersja). */
+export type CanvasTab = 'preview' | 'source' | 'changes';
 
 export const canvas = $state<{ item: CanvasItem | null; tab: CanvasTab }>({
   item: null,
@@ -22,6 +23,14 @@ export function openCanvas(item: CanvasItem): void {
   if (canvas.item?.key !== item.key) canvas.tab = 'preview';
   canvas.item = item;
   openedIn = activeSession;
+}
+
+/**
+ * Inna wersja tego samego artefaktu (historia wersji): ta sama karta i ten sam element powrotu
+ * fokusu — przełącznik jest w kanwie, więc `openCanvas` zapamiętałby go jako „otwierający”.
+ */
+export function showVersion(item: CanvasItem): void {
+  canvas.item = item;
 }
 
 /** Zamyka kanwę bez przenoszenia fokusu (zmiana sesji, zniknięcie tury źródłowej). */

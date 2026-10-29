@@ -25,6 +25,19 @@ export const enCanvas: Record<keyof typeof plCanvas, Message> = {
   'canvas.truncated':
     'Showing the first {limit} of the source — copy it or save it as a file to get all of it.',
   'canvas.loading': 'Preparing preview…',
+  'canvas.versions': 'Artifact versions',
+  'canvas.versionOf': 'Version {n} of {total}',
+  'canvas.versionLatest': 'latest',
+  'canvas.versionPrev': 'Previous version',
+  'canvas.versionNext': 'Next version',
+  'canvas.changes': 'Changes',
+  'canvas.diffSummary':
+    'Changes since version {version} — lines added: {added}, removed: {removed}.',
+  'canvas.diffNone': 'No changes since version {version}.',
+  'canvas.diffSkipped': { one: '… {n} unchanged line', other: '… {n} unchanged lines' },
+  'canvas.diffTooLarge': 'The versions are too long to compare (over {lines} lines).',
+  'canvas.diff.add': 'added: ',
+  'canvas.diff.del': 'removed: ',
   // Panele chowane: znacznik przy krawędzi okna i wysunięty panel.
   'edge.sessions': 'Sessions panel — hover to slide out; click to pin',
   'edge.panel': 'Side panel — hover to slide out; click to pin',
