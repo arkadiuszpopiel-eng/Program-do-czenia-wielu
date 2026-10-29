@@ -1,14 +1,18 @@
 // Styl „Junior” (etap K, plan 41): po wybraniu stylu Alfa proponuje — jednym przyciskiem, bez
-// zmiany po cichu — wolniejszą mowę i dźwięki sygnałowe. Każde z tych ustawień zostaje zwykłym
-// ustawieniem Głosu i Powiadomień (można je potem zmienić osobno).
+// zmiany po cichu — wolniejszą mowę, dźwięki sygnałowe i uproszczony ekran. Każde z tych ustawień
+// zostaje zwykłym ustawieniem Głosu, Powiadomień i Wyglądu (można je potem zmienić osobno).
 import type { AppState } from './app.svelte';
 
 /** Tempo mowy dla dziecka (%, `voice.tts_speed`: 60–160, naturalne 100). */
 export const JUNIOR_SPEED = 85;
 
-/** Czy głos i dźwięki są już ustawione jak dla dziecka. */
+/** Czy głos, dźwięki i ekran są już ustawione jak dla dziecka. */
 export function juniorVoiceReady(app: AppState): boolean {
-  return app.num('voice.tts_speed', 100) <= JUNIOR_SPEED && app.bool('notify.earcons', true);
+  return (
+    app.num('voice.tts_speed', 100) <= JUNIOR_SPEED &&
+    app.bool('notify.earcons', true) &&
+    app.bool('ui.simple', false)
+  );
 }
 
 /** Toast z propozycją po przełączeniu na styl „Junior” (tylko gdy jest co zmienić). */
@@ -30,7 +34,8 @@ export async function applyJuniorVoice(app: AppState): Promise<void> {
     app.num('voice.tts_speed', 100) <= JUNIOR_SPEED ||
     (await app.setSetting('voice.tts_speed', JUNIOR_SPEED));
   const sounds = app.bool('notify.earcons', true) || (await app.setSetting('notify.earcons', true));
-  if (speed && sounds) {
+  const simple = app.bool('ui.simple', false) || (await app.setSetting('ui.simple', true));
+  if (speed && sounds && simple) {
     app.toasts.show({
       key: 'junior-offer',
       kind: 'success',

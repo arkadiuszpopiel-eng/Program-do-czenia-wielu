@@ -22,8 +22,8 @@ function fakeApp(settings: Record<string, number | boolean>) {
   return { app: app as unknown as AppState, toasts, saved };
 }
 
-describe('Junior: propozycja wolniejszej mowy i dźwięków', () => {
-  it('proponuje, a „Włącz” ustawia tempo 85 % i dźwięki', async () => {
+describe('Junior: propozycja wolniejszej mowy, dźwięków i uproszczonego ekranu', () => {
+  it('proponuje, a „Włącz” ustawia tempo 85 %, dźwięki i uproszczony ekran', async () => {
     const { app, toasts, saved } = fakeApp({ 'voice.tts_speed': 100, 'notify.earcons': false });
     offerJunior(app);
     expect(toasts.items.map((t) => t.message)).toEqual([`junior.offer:${JUNIOR_SPEED}`]);
@@ -31,19 +31,28 @@ describe('Junior: propozycja wolniejszej mowy i dźwięków', () => {
     expect(saved).toEqual([
       ['voice.tts_speed', 85],
       ['notify.earcons', true],
+      ['ui.simple', true],
     ]);
     // Ten sam klucz: potwierdzenie zastępuje propozycję.
     expect(toasts.items.map((t) => t.message)).toEqual([`junior.applied:${JUNIOR_SPEED}`]);
   });
 
-  it('nic nie proponuje, gdy głos już jest wolniejszy, a dźwięki włączone', () => {
-    const { app, toasts } = fakeApp({ 'voice.tts_speed': 80, 'notify.earcons': true });
+  it('nic nie proponuje, gdy głos jest wolniejszy, dźwięki i uproszczony ekran włączone', () => {
+    const { app, toasts } = fakeApp({
+      'voice.tts_speed': 80,
+      'notify.earcons': true,
+      'ui.simple': true,
+    });
     offerJunior(app);
     expect(toasts.items).toEqual([]);
   });
 
   it('nie przyspiesza mowy ustawionej wolniej niż 85 %', async () => {
-    const { app, saved } = fakeApp({ 'voice.tts_speed': 70, 'notify.earcons': false });
+    const { app, saved } = fakeApp({
+      'voice.tts_speed': 70,
+      'notify.earcons': false,
+      'ui.simple': true,
+    });
     await applyJuniorVoice(app);
     expect(saved).toEqual([['notify.earcons', true]]);
   });

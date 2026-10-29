@@ -204,7 +204,7 @@ export const enVoice: Record<keyof typeof plVoice, Message> = {
   'shortcut.voice.dictation': 'Dictation on/off (into the foreground window)',
   'shortcut.voice.readSelection': 'Read the selection aloud',
   'junior.offer':
-    'Junior style: also turn on slower speech ({speed}%) and signal sounds? You can change both later in Settings.',
+    'Junior style: also turn on slower speech ({speed}%), signal sounds and the simplified screen? You can change each later in Settings.',
   'junior.offerAction': 'Turn on',
-  'junior.applied': 'Speech at {speed}% and signal sounds turned on.',
+  'junior.applied': 'Speech at {speed}%, signal sounds and the simplified screen turned on.',
 };

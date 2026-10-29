@@ -27,6 +27,7 @@ use voice_readaloud_contract::ReadControl;
 use voice_speaker_contract::{Decision, SpeakerCheck};
 
 use crate::features::F5;
+use crate::speaking::Speaking;
 
 /// Najdłuższe czekanie na wynik weryfikacji mówcy przed startem odpowiedzi.
 pub const CHECK_WAIT: Duration = Duration::from_millis(1_500);
@@ -53,6 +54,7 @@ pub struct ChatReply {
     f5: Option<Arc<F5>>,
     slots: Arc<Mutex<HashMap<u64, Slot>>>,
     checks: Arc<Mutex<HashMap<u64, CheckSlot>>>,
+    speaking: Arc<Speaking>,
 }
 
 fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -145,7 +147,18 @@ impl ChatReply {
             f5,
             slots: Arc::default(),
             checks: Arc::default(),
+            speaking: Arc::default(),
         }
+    }
+
+    /// Czytane zdanie w oknie (plan 43, faza 2): miernik mowy rozmowy głosowej.
+    #[must_use]
+    pub(crate) fn with_meter(
+        mut self,
+        meter: Option<app_modules::speech_meter::SpeechMeter>,
+    ) -> Self {
+        self.speaking = Arc::new(Speaking::new(meter));
+        self
     }
 
     /// Wynik weryfikacji tury: od razu z żądania albo z `speaker_checked` (≤ [`CHECK_WAIT`]).
@@ -178,6 +191,7 @@ impl ReplySource for ChatReply {
         let slots = self.slots.clone();
         let checks = self.checks.clone();
         let f5 = self.f5.clone();
+        let speaking = self.speaking.clone();
         let wait = self.await_check(request.turn, request.voice.as_ref());
         tokio::spawn(async move {
             if let Some(f5) = f5.as_ref().filter(|f| f.voice_busy()) {
@@ -225,6 +239,7 @@ impl ReplySource for ChatReply {
                 match slots.remove(&request.turn) {
                     Some(Slot::Finished(heard)) => Some(heard),
                     _ => {
+                        speaking.bind(request.turn, &turn.turn);
                         slots.insert(request.turn, Slot::Started(turn.turn.clone()));
                         None
                     }
@@ -252,7 +267,13 @@ impl ReplySource for ChatReply {
         let started = {
             let mut slots = lock(&self.slots);
             match slots.remove(&turn) {
-                Some(Slot::Started(r)) => Some(r),
+                Some(Slot::Started(r)) => {
+                    // Pod zamkiem `slots` (tam też jest `bind`): przerwana tura nie zostaje w mapie.
+                    if heard.is_some() {
+                        self.speaking.forget(turn);
+                    }
+                    Some(r)
+                }
                 _ => {
                     slots.insert(turn, Slot::Finished(heard.clone()));
                     None
@@ -283,6 +304,10 @@ impl ReplySource for ChatReply {
         if let Some(f5) = &self.f5 {
             f5.note_check(check_view(&check));
         }
+    }
+
+    fn speaking(&self, turn: u64, text: Option<&str>) {
+        self.speaking.speaking(turn, text);
     }
 }
 

@@ -1,7 +1,7 @@
 // Drzewo ustawień (PLAN §15), część 2: Sesje i okna i dalej (Zaawansowane — w `settings-schema.ts`).
 import type { SettingsPageDef } from '../types-system';
 import { L, later, number, page, select, text, toggle } from './settings-helpers';
-import { PANELS_AUTOHIDE } from './settings-panels';
+import { PANELS_AUTOHIDE, SIMPLE_SCREEN } from './settings-panels';
 
 export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
   page('sessions', L('Sesje i okna', 'Sessions and windows'), 1, [
@@ -263,6 +263,7 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
       'auto',
     ),
     PANELS_AUTOHIDE,
+    SIMPLE_SCREEN,
     select(
       'ui.avatars',
       L('Awatary agentek', 'Agent avatars'),

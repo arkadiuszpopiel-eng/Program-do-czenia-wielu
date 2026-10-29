@@ -25,6 +25,8 @@
   const { t } = app.i18n;
   const session = $derived(app.sessions.active);
   const panels = $derived(app.layout.current(app.activeId));
+  /** Uproszczony ekran (K.3, `ui.simple`): mniej przycisków; wskaźniki i tryb pracy zostają. */
+  const simple = $derived(app.bool('ui.simple', false));
   const place = $derived(app.layout.placement(app.activeId));
   const renaming = $derived(
     session !== null && app.sessions.renamingId === session.id && app.sessions.renamingInTitle,
@@ -85,7 +87,7 @@
       <AlfaMark size={18} />
       <span class="name" data-tauri-drag-region>Alfa</span>
     </div>
-    {#if app.view !== 'settings'}
+    {#if app.view !== 'settings' && !simple}
       <IconButton
         label={place.left === 'hidden' ? t('titlebar.showSessions') : t('titlebar.hideSessions')}
         size="sm"
@@ -138,7 +140,7 @@
     </div>
     <ModeBadge />
     <div class="group tools">
-      {#if app.view !== 'settings'}
+      {#if app.view !== 'settings' && !simple}
         <IconButton
           label={place.right === 'hidden' ? t('titlebar.showRight') : t('titlebar.hideRight')}
           size="sm"

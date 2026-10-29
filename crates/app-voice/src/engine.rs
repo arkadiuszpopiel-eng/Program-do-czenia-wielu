@@ -108,4 +108,8 @@ pub trait VoiceEngineFactory: Send + Sync {
     fn features(&self) -> Option<&dyn FeatureFactory> {
         None
     }
+    /// Miernik mowy interfejsu — czytane zdanie odpowiedzi w oknie (`None` — bez wyróżnienia).
+    fn speech_meter(&self) -> Option<app_modules::speech_meter::SpeechMeter> {
+        None
+    }
 }

@@ -19,6 +19,7 @@ mod pill;
 mod port;
 mod reply;
 mod runloop;
+mod speaking;
 mod system;
 mod system_engines;
 mod system_f5;

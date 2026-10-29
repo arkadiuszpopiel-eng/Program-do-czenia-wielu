@@ -2726,6 +2726,22 @@
     "scope": "global"
    },
    {
+    "key": "ui.simple",
+    "label": {
+     "pl": "Uproszczony ekran",
+     "en": "Simplified screen"
+    },
+    "description": {
+     "pl": "Mniej przycisków: chowa przełączniki paneli, Pipeline’y, wybór agentki i rzadsze akcje wiadomości (zostają „Kopiuj” i „Przeczytaj na głos”). Wskaźniki mikrofonu, kamery i sterowania oraz tryb pracy są widoczne zawsze. To wygoda, nie blokada — ochronę dziecka da konto Dziecko.",
+     "en": "Fewer buttons: hides the panel toggles, Pipelines, the agent picker and less common message actions (“Copy” and “Read aloud” stay). The microphone, camera and control indicators and the work mode are always visible. A convenience, not a lock — a Child account will protect children."
+    },
+    "control": {
+     "kind": "toggle"
+    },
+    "default": false,
+    "scope": "global"
+   },
+   {
     "key": "ui.avatars",
     "label": {
      "pl": "Awatary agentek",

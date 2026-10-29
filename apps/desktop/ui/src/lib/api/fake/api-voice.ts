@@ -4,7 +4,7 @@ import type { AlfaClient } from '../client';
 import type { VoiceStatus } from '../types-agents';
 import type { VoicePillState } from '../types-system';
 import type { FakeCore } from './core';
-import { stopFakeReading } from './read-aloud';
+import { fakeReadAloud, stopFakeReading } from './read-aloud';
 
 const PARTIAL = ['Co', 'Co mam', 'Co mam jutro', 'Co mam jutro w planie?'];
 
@@ -36,6 +36,8 @@ export function voiceApi(core: FakeCore): AlfaClient['voice'] {
   let timer: number | null = null;
   let phase = 0;
   let talk: number | null = null;
+  /** Mowa rozmowy w toku (wyłączenie mikrofonu ją ucina, jak zatrzymanie potoku). */
+  let voicing = false;
   const tick = (): void => {
     phase++;
     // Deterministyczna „mowa": obwiednia sinusoidalna, 30 kl./s.
@@ -57,6 +59,16 @@ export function voiceApi(core: FakeCore): AlfaClient['voice'] {
     core.emit([{ type: 'VoicePill', state }]);
   };
   const announce = (): void => core.emit([{ type: 'VoiceStatusChanged', status: status(core) }]);
+  /**
+   * Agentka mówi: atrapa nie tworzy tur z mowy, więc mówi ostatnią odpowiedź agentki w aktywnej
+   * sesji tak jak rozmowa głosowa — zdania z nieznaną liczbą (`of` = OPEN), wyróżnienie w oknie.
+   */
+  const say = (): void => {
+    const turns = core.turnsOf(core.activeSession ?? '');
+    const last = [...turns].reverse().find((t) => t.author !== 'user' && t.text.trim() !== '');
+    if (last) fakeReadAloud(core, last.id, true);
+    voicing = last !== undefined;
+  };
   /** Scenariusz rozmowy: użytkownik mówi (transkrypt częściowy) → przetwarzanie → Alfa mówi. */
   const conversation = (): void => {
     let step = 0;
@@ -67,6 +79,7 @@ export function voiceApi(core: FakeCore): AlfaClient['voice'] {
       } else if (step === PARTIAL.length) {
         pill({ mic: 'processing', level: 0.1 });
       } else if (step < PARTIAL.length + 4) {
+        if (step === PARTIAL.length + 1) say();
         pill({ mic: 'speaking', speaker: 'agent', level: 0.5 });
       } else {
         pill({});
@@ -108,6 +121,8 @@ export function voiceApi(core: FakeCore): AlfaClient['voice'] {
       core.voice.active = enabled;
       core.voice.mode = 'toggle';
       stopTalk();
+      if (!enabled && voicing) stopFakeReading(core);
+      voicing = false;
       if (enabled) {
         pill({});
         conversation();

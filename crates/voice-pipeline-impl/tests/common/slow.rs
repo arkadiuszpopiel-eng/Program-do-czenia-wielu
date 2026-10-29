@@ -147,6 +147,8 @@ pub struct SlowReply {
     /// Żądania (pochodzenie tury głosowej) i wyniki weryfikacji mówcy — do asercji testów.
     pub requests: std::sync::Mutex<Vec<ReplyRequest>>,
     pub checks: std::sync::Mutex<Vec<(u64, voice_speaker_contract::SpeakerCheck)>>,
+    /// Zgłoszenia czytanego zdania (`speaking`): tura i tekst (`None` — koniec wypowiedzi).
+    pub spoken: std::sync::Mutex<Vec<(u64, Option<String>)>>,
 }
 
 struct DelayedStream {
@@ -179,5 +181,11 @@ impl ReplySource for SlowReply {
     }
     fn speaker_checked(&self, turn: u64, check: voice_speaker_contract::SpeakerCheck) {
         self.checks.lock().unwrap().push((turn, check));
+    }
+    fn speaking(&self, turn: u64, text: Option<&str>) {
+        self.spoken
+            .lock()
+            .unwrap()
+            .push((turn, text.map(str::to_owned)));
     }
 }

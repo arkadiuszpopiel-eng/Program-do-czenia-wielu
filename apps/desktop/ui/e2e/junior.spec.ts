@@ -3,7 +3,8 @@ import { expectReadable } from './contrast';
 import { expectAccessible, pickOption, waitForChat } from './helpers';
 
 // Styl „Junior” (etap K, plan 41 — decyzja właściciela 29.10): większy, cieplejszy, zaokrąglony
-// interfejs dla dzieci. Po wyborze Alfa proponuje (bez zmiany po cichu) wolniejszą mowę i dźwięki.
+// interfejs dla dzieci. Po wyborze Alfa proponuje (bez zmiany po cichu) wolniejszą mowę, dźwięki
+// i uproszczony ekran.
 
 test('Junior: wybór w Wyglądzie powiększa interfejs i proponuje wolniejszą mowę z dźwiękami', async ({
   page,
@@ -27,7 +28,11 @@ test('Junior: wybór w Wyglądzie powiększa interfejs i proponuje wolniejszą m
   const offer = page.getByText(/Styl Junior: włączyć też wolniejszą mowę \(85 %\)/);
   await expect(offer).toBeVisible();
   await page.getByRole('button', { name: 'Włącz', exact: true }).click();
-  await expect(page.getByText('Mowa w tempie 85 % i dźwięki sygnałowe włączone.')).toBeVisible();
+  await expect(
+    page.getByText('Mowa w tempie 85 %, dźwięki sygnałowe i uproszczony ekran włączone.'),
+  ).toBeVisible();
+  // Uproszczony ekran: przełączniki paneli znikają z belki.
+  await expect(page.getByRole('button', { name: 'Pokaż panel Sesje' })).toHaveCount(0);
   const saved = await page.evaluate(async () => {
     const w = window as unknown as {
       __alfaClient?: { settings: { get: (k: string) => Promise<unknown> } };
@@ -63,5 +68,28 @@ for (const theme of ['light', 'dark'] as const) {
     await page.screenshot({ path: `test-results/junior-ustawienia-${theme}.png` });
     await expectAccessible(page, `junior ustawienia ${theme}`);
     await expectReadable(page, `junior ustawienia ${theme}`);
+  });
+}
+
+// Okna poboczne mają stały rozmiar okna natywnego: dostają kolory stylu, ale nie powiększenie
+// (tak samo jak przy ustawieniu Zoom) — ×1,15 przepełniłoby pigułkę.
+for (const theme of ['light', 'dark'] as const) {
+  test(`Junior ${theme}: Szybkie pytanie i pigułka — kolory stylu, czytelne, bez powiększenia`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
+    for (const url of [
+      `/quick.html?style=junior&theme=${theme}`,
+      `/pill.html?style=junior&theme=${theme}&mic=speaking`,
+    ]) {
+      await page.goto(url);
+      const html = page.locator('html');
+      await expect(html).toHaveAttribute('data-skin', 'junior');
+      expect(await html.evaluate((el) => getComputedStyle(el).zoom)).toBe('1');
+      const name = url.startsWith('/quick') ? 'szybkie' : 'pigulka';
+      await page.screenshot({ path: `test-results/junior-${name}-${theme}.png` });
+      await expectAccessible(page, `junior ${name} ${theme}`);
+      await expectReadable(page, `junior ${name} ${theme}`);
+    }
   });
 }

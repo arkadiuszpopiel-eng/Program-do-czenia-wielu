@@ -85,8 +85,10 @@
   // Znaczniki i wysuwanie paneli — ładowane dopiero, gdy któryś panel jest schowany (budżet startu).
   const loadPeek = () => import('./PanelPeek.svelte');
   let paletteReady = $state(false);
+  // Uproszczony ekran (K.3): panele zawsze schowane, bez znaczników przy krawędzi.
+  const simple = $derived(app.bool('ui.simple', false));
   $effect(() => {
-    app.layout.autohide = app.bool('ui.panels_autohide', true);
+    app.layout.autohide = simple || app.bool('ui.panels_autohide', true);
   });
   let cheatsheetReady = $state(false);
 
@@ -151,7 +153,7 @@
     {#if [left, right].some((p) => p === 'hidden' || p === 'peek')}
       <Lazy
         load={loadPeek}
-        props={{ left, right, rightWidth, show: !inSettings && !app.layout.focus }}
+        props={{ left, right, rightWidth, show: !inSettings && !app.layout.focus, tabs: !simple }}
         label={t('common.loading')}
       />
     {/if}

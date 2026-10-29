@@ -175,10 +175,10 @@ impl Voice {
         let (tap, bus_rx) = TapBus::new(self.bus.clone());
         let mut engine = factory
             .build(
-                Arc::new(ChatReply::with_features(
-                    chat.clone(),
-                    Some(self.f5.clone()),
-                )),
+                Arc::new(
+                    ChatReply::with_features(chat.clone(), Some(self.f5.clone()))
+                        .with_meter(factory.speech_meter()),
+                ),
                 Arc::new(tap),
                 self.cfg.clone(),
             )

@@ -296,10 +296,10 @@ test('Ustawienia → Wygląd: lista wyboru Alfy otwarta w każdym stylu', async 
   await expect(main.locator('select')).toHaveCount(0);
   const style = main.getByRole('combobox', { name: 'Styl', exact: true });
   try {
-    for (const skin of ['glass', 'next', 'classic']) {
+    for (const skin of ['glass', 'next', 'junior', 'classic']) {
       await style.click();
       const list = main.getByRole('listbox', { name: 'Styl' });
-      await expect(list.getByRole('option')).toHaveCount(3);
+      await expect(list.getByRole('option')).toHaveCount(4);
       await list.locator(`[role="option"][data-value="${skin}"]`).click();
       await expect(style).toHaveAttribute('data-value', skin);
       await style.click();

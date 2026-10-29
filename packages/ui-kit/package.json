@@ -30,6 +30,7 @@
     "./tokens.css": "./src/tokens.css",
     "./base.css": "./src/base.css",
     "./skins.css": "./src/skins.css",
+    "./skins-app.css": "./src/skins-app.css",
     "./tokens.json": "./src/tokens/tokens.json"
   },
   "files": [

@@ -71,5 +71,17 @@ Właściciel: **„OK”** — wprowadzać. Faza 1 (przycisk „Przeczytaj na g�
   vitest `sentence-match`, `reading`, przeglądarka `e2e/read-aloud-mark.spec.ts` (zdania z ekranu, Esc, 6 wyglądów
   z axe).
 
-**Faza 2** (rozmowa głosowa, `voice-pipeline-impl/src/speech/play.rs` → most w `app-voice`) — następna seria.
-Odsłuch na sprzęcie (`verify sprzet`) — za dnia.
+**Faza 2** (rozmowa głosowa) — w kodzie od 29.10 (etap K.3):
+
+- potok: `ReplySource::speaking(turn, Some(tekst))` tuż **przed** oddaniem fragmentu odpowiedzi do wyjścia audio
+  (`voice-pipeline-impl/src/speech/play.rs`; fillery, wznowienia i mowa proaktywna bez tury czatu — pomijane),
+  `speaking(turn, None)` po wybrzmieniu wypowiedzi; przerwanie (barge-in, „stop”) nie wysyła końca — okno czyści
+  cisza miernika po zatrzymaniu wyjścia;
+- most (`app-voice/src/speaking.rs`): numer tury potoku → tura czatu (`turn_dto`), zdanie przez
+  `SpeechMeter::mark_next` (to samo opóźnienie co ruch ust); liczba zdań nieznana z góry (odpowiedź się jeszcze
+  pisze) — `of = u32::MAX`, koniec `index == of`; pamięć tur ograniczona (64);
+- testy: `voice-pipeline-impl/tests/e2e_turn.rs` (zdania w kolejności, jeden koniec), `e2e_barge.rs` (przerwana
+  tura bez końca), testy `speaking.rs`, vitest `reading`, przeglądarka `e2e/voice-reading-mark.spec.ts`
+  (atrapa w fazie „agentka mówi” mówi ostatnią odpowiedź jak rozmowa głosowa; wyłączenie mikrofonu ucina mowę).
+
+Odsłuch na sprzęcie — ocena właściciela, za dnia.

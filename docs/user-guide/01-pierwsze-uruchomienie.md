@@ -67,8 +67,12 @@ wartość domyślna i przycisk „Przywróć domyślne”. W **Ogólne → Profi
 (Prosty, Zaawansowany, Ekspert). Język interfejsu (polski / angielski) zmienisz w **Język**, motyw jasny, ciemny lub
 automatyczny — w **Wygląd**. Tam też **Styl**: Klasyczny, Szkło, Next albo **Junior (dla dzieci)** — cały interfejs
 o 15 % większy, ciepłe kolory i zaokrąglone kształty (za dnia krem z fioletem, w nocy śliwka ze słonecznym akcentem).
-Po wybraniu Juniora Alfa proponuje jednym przyciskiem **Włącz** wolniejszą mowę (85 %) i dźwięki sygnałowe; bez
-kliknięcia nic się nie zmienia, a obie rzeczy ustawisz potem osobno w **Głos** i **Powiadomienia**.
+Po wybraniu Juniora Alfa proponuje jednym przyciskiem **Włącz** wolniejszą mowę (85 %), dźwięki sygnałowe i
+**Uproszczony ekran**; bez kliknięcia nic się nie zmienia, a każdą z tych rzeczy ustawisz potem osobno w **Głos**,
+**Powiadomienia** i **Wygląd**. Uproszczony ekran chowa przełączniki paneli, Pipeline'y, wybór agentki i rzadsze
+akcje wiadomości (zostają „Kopiuj” i „Przeczytaj na głos”); wskaźniki mikrofonu, kamery i sterowania oraz tryb
+pracy widać zawsze. To wygoda, nie blokada — skróty klawiszowe działają dalej. Gdy Alfa czyta odpowiedź na głos
+(przyciskiem albo w rozmowie głosowej), zdanie, które właśnie słychać, jest wyróżnione w treści wiadomości.
 
 ## Zasobnik systemowy
 

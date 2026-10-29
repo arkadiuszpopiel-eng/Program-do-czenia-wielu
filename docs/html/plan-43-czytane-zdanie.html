@@ -379,8 +379,20 @@ litery z czytanego zdania; Esc zatrzymuje czytanie wiadomości;</li>
 vitest <code>sentence-match</code>, <code>reading</code>, przeglądarka <code>e2e/read-aloud-mark.spec.ts</code> (zdania z ekranu, Esc, 6 wyglądów
 z axe).</li>
 </ul>
-<p><strong>Faza 2</strong> (rozmowa głosowa, <code>voice-pipeline-impl/src/speech/play.rs</code> → most w <code>app-voice</code>) — następna seria.
-Odsłuch na sprzęcie (<code>verify sprzet</code>) — za dnia.</p>
+<p><strong>Faza 2</strong> (rozmowa głosowa) — w kodzie od 29.10 (etap K.3):</p>
+<ul>
+<li>potok: <code>ReplySource::speaking(turn, Some(tekst))</code> tuż <strong>przed</strong> oddaniem fragmentu odpowiedzi do wyjścia audio
+(<code>voice-pipeline-impl/src/speech/play.rs</code>; fillery, wznowienia i mowa proaktywna bez tury czatu — pomijane),
+<code>speaking(turn, None)</code> po wybrzmieniu wypowiedzi; przerwanie (barge-in, „stop”) nie wysyła końca — okno czyści
+cisza miernika po zatrzymaniu wyjścia;</li>
+<li>most (<code>app-voice/src/speaking.rs</code>): numer tury potoku → tura czatu (<code>turn_dto</code>), zdanie przez
+<code>SpeechMeter::mark_next</code> (to samo opóźnienie co ruch ust); liczba zdań nieznana z góry (odpowiedź się jeszcze
+pisze) — <code>of = u32::MAX</code>, koniec <code>index == of</code>; pamięć tur ograniczona (64);</li>
+<li>testy: <code>voice-pipeline-impl/tests/e2e_turn.rs</code> (zdania w kolejności, jeden koniec), <code>e2e_barge.rs</code> (przerwana
+tura bez końca), testy <code>speaking.rs</code>, vitest <code>reading</code>, przeglądarka <code>e2e/voice-reading-mark.spec.ts</code>
+(atrapa w fazie „agentka mówi” mówi ostatnią odpowiedź jak rozmowa głosowa; wyłączenie mikrofonu ucina mowę).</li>
+</ul>
+<p>Odsłuch na sprzęcie — ocena właściciela, za dnia.</p>
 </article>
 <footer>Źródło: <code>docs/plan/43-czytane-zdanie.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>

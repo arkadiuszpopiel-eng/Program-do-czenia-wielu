@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { spokenText, sentencesOf } from '../../api/fake/read-aloud';
+import { OPEN, spokenText, sentencesOf } from '../../api/fake/read-aloud';
 import { reading, voiceOf } from '../reading.svelte';
 import type { Turn } from '../../api/types';
 
@@ -12,6 +12,17 @@ describe('reading (czytane zdanie, plan 43)', () => {
     reading.apply({ turn_id: 's/9', index: 3, of: 3, text: '' });
     expect(reading.turnId).toBe('s/1');
     reading.apply({ turn_id: 's/1', index: 2, of: 2, text: '' });
+    expect(reading.turnId).toBeNull();
+  });
+
+  it('rozmowa głosowa: liczba zdań nieznana (`of` = OPEN), koniec `index == of`', () => {
+    reading.apply({ turn_id: 's/3', index: 0, of: OPEN, text: 'Pierwsze.' });
+    reading.apply({ turn_id: 's/3', index: 1, of: OPEN, text: 'Drugie.' });
+    expect([reading.turnId, reading.index, reading.text]).toEqual(['s/3', 1, 'Drugie.']);
+    // Koniec innej tury nie zdejmuje bieżącej.
+    reading.apply({ turn_id: 's/9', index: OPEN, of: OPEN, text: '' });
+    expect(reading.turnId).toBe('s/3');
+    reading.apply({ turn_id: 's/3', index: OPEN, of: OPEN, text: '' });
     expect(reading.turnId).toBeNull();
   });
 

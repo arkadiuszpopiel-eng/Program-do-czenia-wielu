@@ -8,6 +8,8 @@
  * Reguły twarde projektu (AGENTS.md): bez fontów webowych i bez `backdrop-filter` — „Szkło" uzyskuje
  * efekt półprzezroczystymi powierzchniami na barwnym tle i połyskiem krawędzi, nie rozmyciem.
  * Plik pisany ręcznie (nie generuje go build-tokens.mjs). Wymaga tokens.css; ładuj po nim.
+ * Tła obszaru roboczego okna głównego (siatka, poświata, kropki) są w skins-app.css — okna poboczne
+ * (pigułka ≤ 8 KB gzip) ich nie ładują.
  */
 
 @media (forced-colors: none) {
@@ -46,19 +48,6 @@
       light-dark(#075d73, oklch(66% 0.125 205))
     );
     --alfa-accent-glow: 0 7px 22px light-dark(rgba(10, 119, 145, 0.22), oklch(75% 0.13 200 / 0.2));
-    /* Siatka 32 px z tła obszaru roboczego prototypu. */
-    --alfa-skin-grid: light-dark(rgba(15, 22, 32, 0.045), rgba(255, 255, 255, 0.045));
-  }
-  :root[data-skin='next'] [data-surface='app'] {
-    background-color: var(--alfa-color-bg);
-    background-image:
-      linear-gradient(to right, var(--alfa-skin-grid) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--alfa-skin-grid) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
-  /* Obszar zagnieżdżony w innym nie rysuje siatki drugi raz (przesunięte linie). */
-  :root[data-skin='next'] [data-surface='app'] [data-surface='app'] {
-    background: transparent;
   }
 
   /* ── Szkło: półprzezroczyste tafle na barwnej poświacie ────────────────────────────────────── */
@@ -104,9 +93,6 @@
     --alfa-skin-solid: light-dark(#f7f8ff, #171c36);
     /* Tło elementów pływających nad treścią (lista wyboru, podpowiedzi, „nowe wiadomości”). */
     --alfa-color-overlay: var(--alfa-skin-solid);
-    --alfa-skin-aurora-1: light-dark(rgba(129, 140, 248, 0.42), rgba(99, 102, 241, 0.4));
-    --alfa-skin-aurora-2: light-dark(rgba(56, 189, 248, 0.36), rgba(34, 197, 232, 0.3));
-    --alfa-skin-aurora-3: light-dark(rgba(244, 114, 182, 0.28), rgba(236, 72, 153, 0.24));
   }
   /* Na kryjącej tafli nakładki półprzezroczysta biel podświetlenia byłaby w wersji jasnej niewidoczna. */
   :root[data-skin='glass'] [role='option'].active {
@@ -118,18 +104,6 @@
     --alfa-color-surface: var(--alfa-skin-solid);
     --alfa-color-surface2: light-dark(#e9ecfa, #20264a);
     --alfa-color-surface3: light-dark(#d9def5, #2b3260);
-  }
-  :root[data-skin='glass'] body:has([data-surface='app']) {
-    background:
-      radial-gradient(70vw 60vh at 8% -12%, var(--alfa-skin-aurora-1), transparent 62%),
-      radial-gradient(60vw 55vh at 100% 4%, var(--alfa-skin-aurora-2), transparent 58%),
-      radial-gradient(60vw 70vh at 62% 112%, var(--alfa-skin-aurora-3), transparent 62%),
-      var(--alfa-color-bg);
-    background-attachment: fixed;
-  }
-  /* Duże obszary układu są przezroczyste — poświata przechodzi pod całym oknem. */
-  :root[data-skin='glass'] [data-surface='app'] {
-    background: transparent;
   }
   :root[data-skin='glass'] :is(dialog, [role='dialog'], [role='alertdialog'], [role='menu']),
   :root[data-skin='glass'] .toasts > * {
@@ -177,16 +151,5 @@
       light-dark(#5b2bc4, #ffa62e)
     );
     --alfa-accent-glow: 0 8px 22px light-dark(rgba(106, 53, 212, 0.25), rgba(255, 181, 71, 0.22));
-    /* Kropki w tle obszaru roboczego (jak kartka z zeszytu w kropki). */
-    --alfa-skin-dots: light-dark(rgba(162, 121, 58, 0.16), rgba(255, 248, 236, 0.07));
-  }
-  :root[data-skin='junior'] [data-surface='app'] {
-    background-color: var(--alfa-color-bg);
-    background-image: radial-gradient(var(--alfa-skin-dots) 1.5px, transparent 1.6px);
-    background-size: 28px 28px;
-  }
-  /* Obszar zagnieżdżony w innym nie rysuje kropek drugi raz (przesunięty wzór). */
-  :root[data-skin='junior'] [data-surface='app'] [data-surface='app'] {
-    background: transparent;
   }
 }

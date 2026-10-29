@@ -1,13 +1,17 @@
 // Atrapa „Przeczytaj na głos” (plan 43): jak rdzeń — tekst mówiony (bez znaczników, kod zastąpiony
 // opisem) dzielony na zdania; każde zdanie to `SpeechSegment` w chwili, gdy „zaczyna brzmieć”,
 // potem poziomy mowy w rytmie sylab; na końcu `index == of` i cisza. „Stop” przerywa i wysyła ciszę
-// bez agentki (jak `SpeechMeter::silence`).
+// bez agentki (jak `SpeechMeter::silence`). Rozmowa głosowa (faza 2): liczba zdań nieznana z góry
+// (`of` = [`OPEN`], jak `app-voice/src/speaking.rs`), koniec — `index == of == OPEN`.
 import type { FakeCore } from './core';
 
 /** Czas „mówienia” jednego znaku (ms) — krótki, żeby testy nie czekały. */
 const MS_PER_CHAR = 14;
 /** Odstęp poziomów mowy (jak miernik rdzenia: ok. 30 na sekundę). */
 const STEP_MS = 34;
+
+/** Liczba zdań nieznana (rozmowa głosowa — odpowiedź jeszcze się pisze), jak `u32::MAX` rdzenia. */
+export const OPEN = 4_294_967_295;
 
 const timers = new WeakMap<FakeCore, number>();
 
@@ -53,15 +57,16 @@ export function stopFakeReading(core: FakeCore, silence = true): void {
   if (silence) core.emit([{ type: 'SpeechLevel', agent: '', level: 0 }]);
 }
 
-export function fakeReadAloud(core: FakeCore, turnId: string): void {
+export function fakeReadAloud(core: FakeCore, turnId: string, voice = false): void {
   stopFakeReading(core, false);
   const turn = core.findTurn(turnId);
   if (!turn || turn.author === 'user') return;
   const agent = turn.author;
   const sentences = sentencesOf(spokenText(turn.text));
-  const of = sentences.length;
+  const count = sentences.length;
+  const of = voice ? OPEN : count;
   const next = (index: number, step: number, steps: number): void => {
-    if (index >= of) {
+    if (index >= count) {
       timers.delete(core);
       core.emit([
         { type: 'SpeechSegment', turn_id: turnId, index: of, of, text: '' },

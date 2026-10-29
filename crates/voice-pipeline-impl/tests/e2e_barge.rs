@@ -145,6 +145,14 @@ async fn barge_in(echo: bool) {
         heard.text
     );
     assert_eq!(history[1].visible_text(), lines.join("\n") + "\n");
+    // Czytane zdanie (plan 43, faza 2): przerwana tura nie dostaje końca wypowiedzi — okno
+    // czyści cisza miernika po zatrzymaniu wyjścia.
+    let said = w.slow_reply.spoken.lock().unwrap().clone();
+    let first_turn = said.first().expect("zdanie pierwszej odpowiedzi").0;
+    assert!(
+        said.iter().all(|(t, s)| *t != first_turn || s.is_some()),
+        "{said:?}"
+    );
     // Intencja „korekta” i odpowiedź na korektę słyszalna.
     assert!(w.p.trace().iter().any(|e| matches!(
         &e.command,

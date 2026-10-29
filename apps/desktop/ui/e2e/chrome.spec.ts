@@ -109,7 +109,8 @@ test('nawigacja ustawień: grupy, szukanie, klawiatura, pamięć zwinięcia', as
   await search.fill('mikrofon');
   await expect(node(page, 'Głos')).toBeVisible();
   await expect(node(page, 'Głos').locator('.hits')).toHaveText(/^\d+$/);
-  await expect(node(page, 'Wygląd')).toBeHidden();
+  // Strona bez słowa „mikrofon” (Wygląd ma je w opisie „Uproszczonego ekranu”).
+  await expect(node(page, 'Język')).toBeHidden();
   // Strzałka w dół wchodzi na listę, dalej strzałki i End; Enter otwiera stronę i czyści szukanie.
   await search.press('ArrowDown');
   await expect(pages.first()).toBeFocused();

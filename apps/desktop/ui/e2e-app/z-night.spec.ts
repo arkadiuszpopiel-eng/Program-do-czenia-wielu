@@ -5,6 +5,7 @@
 import type { Page } from '@playwright/test';
 import { plRest } from '../src/lib/i18n/pl-rest';
 import { expect, inEverySkin, shot, test } from './alfa';
+import { call } from './ipc-call';
 
 const REST_KEYS = Object.keys(plRest);
 
@@ -68,6 +69,22 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
     await expect(models).toHaveCount(0);
   });
 
+  const toggle = async () => {
+    await main.keyboard.press('Control+k');
+    await expect(main.locator('dialog[open] input')).toBeFocused();
+    await main.keyboard.type('chowaj panele');
+    await expect(main.locator('dialog [role=option][data-selected]')).toContainText(
+      'Chowaj panele boczne automatycznie',
+    );
+    await main.keyboard.press('Enter');
+  };
+  // Od 29.10 panele chowają się domyślnie: ta część startuje z zadokowanymi, a na końcu wraca
+  // ustawienie sprzed testu.
+  const autohide = (await call<Record<string, unknown>>(main, 'settings_values'))[
+    'ui.panels_autohide'
+  ];
+  if (autohide !== false) await toggle();
+
   // Sesje chowane w całości przyciskiem w nagłówku: znacznik, wysunięcie, „Przypnij panel”.
   const sessions = main.getByRole('navigation', { name: 'Sesje' });
   await main.getByRole('button', { name: 'Schowaj panel Sesje (Ctrl+B)' }).click();
@@ -83,15 +100,6 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
   await expect(leftEdge).toHaveCount(0);
 
   // Panele chowane: przełącznik z palety, znacznik przy krawędzi, wysunięcie po najechaniu.
-  const toggle = async () => {
-    await main.keyboard.press('Control+k');
-    await expect(main.locator('dialog[open] input')).toBeFocused();
-    await main.keyboard.type('chowaj panele');
-    await expect(main.locator('dialog [role=option][data-selected]')).toContainText(
-      'Chowaj panele boczne automatycznie',
-    );
-    await main.keyboard.press('Enter');
-  };
   const edge = main.getByRole('button', { name: /^Panel Sesje — najedź/ });
   await toggle();
   try {
@@ -111,6 +119,7 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
     await toggle();
   }
   await expect(edge).toHaveCount(0);
+  if (autohide !== false) await toggle();
 
   // Panele leniwe z tekstami drugiej części słownika (Pamięć, Głos).
   for (const key of ['Alt+4', 'Alt+6']) {

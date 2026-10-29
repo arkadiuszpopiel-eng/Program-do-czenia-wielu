@@ -114,12 +114,14 @@ function icon(shapes: readonly Shape[]): SVGSVGElement {
 
 const tauri = '__TAURI_INTERNALS__' in window;
 // Język i motyw (`ui.theme`) z `app_bootstrap` przed pierwszym renderem; podgląd poza Tauri —
-// `?lang=`. Błąd odczytu nie blokuje pigułki: zostaje polski i motyw systemu.
+// `?lang=`, `?style=`, `?theme=`. Błąd odczytu nie blokuje pigułki: zostaje polski i motyw systemu.
 const boot = tauri ? await invoke<AppBootstrap>('app_bootstrap').catch(() => null) : null;
-const wanted = boot?.locale ?? new URLSearchParams(location.search).get('lang');
+const search = new URLSearchParams(location.search);
+const wanted = boot?.locale ?? search.get('lang');
 const lang = wanted === 'en' ? 'en' : 'pl';
 const L = TEXT[lang];
-applyBootDocument(document.documentElement, { locale: lang, settings: boot?.settings ?? {} });
+const preview = tauri ? {} : { 'ui.style': search.get('style'), 'ui.theme': search.get('theme') };
+applyBootDocument(document.documentElement, { locale: lang, settings: boot?.settings ?? preview });
 // Pigułka nie ma pól tekstowych: prawy przycisk nie otwiera niczego (zwłaszcza menu systemu),
 // a podpowiedzi przycisków rysuje Alfa.
 window.addEventListener('contextmenu', (event) => event.preventDefault());

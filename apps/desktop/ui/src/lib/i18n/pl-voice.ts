@@ -205,7 +205,7 @@ export const plVoice = {
   'shortcut.voice.dictation': 'Dyktowanie wł./wył. (do okna na pierwszym planie)',
   'shortcut.voice.readSelection': 'Czytaj zaznaczenie na głos',
   'junior.offer':
-    'Styl Junior: włączyć też wolniejszą mowę ({speed} %) i dźwięki sygnałowe? Obie rzeczy zmienisz potem w Ustawieniach.',
+    'Styl Junior: włączyć też wolniejszą mowę ({speed} %), dźwięki sygnałowe i uproszczony ekran? Każdą z tych rzeczy zmienisz potem w Ustawieniach.',
   'junior.offerAction': 'Włącz',
-  'junior.applied': 'Mowa w tempie {speed} % i dźwięki sygnałowe włączone.',
+  'junior.applied': 'Mowa w tempie {speed} %, dźwięki sygnałowe i uproszczony ekran włączone.',
 } as const satisfies Record<string, Message>;

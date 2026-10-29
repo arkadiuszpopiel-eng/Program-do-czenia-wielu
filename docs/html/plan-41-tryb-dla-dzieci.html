@@ -384,15 +384,22 @@ rodzic w telefonie widzi raport dnia, dostaje alert w ciągu minuty i może prze
 </ol>
 <p><strong>Co dalej:</strong> K.1, K.2, K.6, K.7 czekają na etap U (najpierw podpis ADR 0027 — U.0). K.3 (29.10):</p>
 <ul>
-<li>wyróżnianie czytanego zdania (<a href="plan-43-czytane-zdanie.html">43</a>, faza 1) — gotowe;</li>
+<li>wyróżnianie czytanego zdania (<a href="plan-43-czytane-zdanie.html">43</a>) — gotowe: faza 1 (przycisk „Przeczytaj na głos”) i
+faza 2 (rozmowa głosowa — zdanie odpowiedzi wyróżnione w chwili, gdy zaczyna brzmieć);</li>
 <li>styl „Junior” (<code>ui.style = junior</code>) — gotowe: tokeny w <code>@alfa/ui-kit/skins.css</code> (krem i fiolet / śliwka i
 słońce, promienie 14/20/24 px, kropki w tle), cały interfejs ×1,15 (<code>appearance.ts</code>, ta sama droga co Zoom —
 układ liczy szerokość efektywną), kontrast policzony dla wszystkich par tekst/tło (także barwy agentek, w wersji
 jasnej o ton głębsze); styl jest w każdej liście stylów testów przeglądarkowych;</li>
-<li>wolniejsza mowa (85 %) i dźwięki sygnałowe — propozycja „Włącz” po wybraniu stylu (istniejące ustawienia
-<code>voice.tts_speed</code>, <code>notify.earcons</code>; bez zmiany po cichu);</li>
-<li>do zrobienia w K.3: mniej opcji na ekranie (wymaga konta dziecka — wtedy Junior domyślny dla roli Dziecko),
-faza 2 wyróżniania (rozmowa głosowa).</li>
+<li>mniej opcji na ekranie — gotowe jako ustawienie <strong>„Uproszczony ekran”</strong> (<code>ui.simple</code>, Wygląd): chowa
+przełączniki paneli (panele zostają schowane, bez znaczników przy krawędzi), Pipeline&#39;y, wybór agentki i rzadsze
+akcje wiadomości (zostają „Kopiuj” i „Przeczytaj na głos”). Wskaźniki mikrofonu, kamery i sterowania, tryb pracy
+(ze znakiem „Pełna automatyka”) i Ustawienia są widoczne zawsze. To <strong>wygoda, nie blokada</strong> — skróty dalej
+działają; wymuszenie (dziecko nie wyłączy) i Junior domyślny dla roli Dziecko przychodzą z K.1;</li>
+<li>wolniejsza mowa (85 %), dźwięki sygnałowe i uproszczony ekran — propozycja „Włącz” po wybraniu stylu
+(zwykłe ustawienia <code>voice.tts_speed</code>, <code>notify.earcons</code>, <code>ui.simple</code>; bez zmiany po cichu);</li>
+<li>okna poboczne (Szybkie pytanie, pigułka) dostają kolory Juniora bez powiększenia — mają stały rozmiar okna
+natywnego, tak samo jak przy ustawieniu Zoom;</li>
+<li>zostaje: odsłuch na sprzęcie (tempo 85 %, wyróżnienie w rytm głosu) — ocena właściciela, za dnia.</li>
 </ul>
 </article>
 <footer>Źródło: <code>docs/plan/41-tryb-dla-dzieci.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>

@@ -152,6 +152,32 @@ async fn time_to_first_audio_profile_a_budget_100_scenarios() {
     assert!(p50 <= 2_000 && p95 <= 3_000, "p50 {p50}, p95 {p95}");
 }
 
+/// Czytane zdanie w rozmowie głosowej (plan 43, faza 2): zdania odpowiedzi zgłoszone w kolejności
+/// (przed odtworzeniem, bez fillerów), potem jeden koniec wypowiedzi tej samej tury.
+#[tokio::test]
+async fn reply_sentences_are_reported_in_order_then_end() {
+    let mut w = World::new(Opts::default());
+    let mut t = Timeline::new(12_000, 1);
+    t.speech(500, 1_400, 11);
+    w.mic(&t);
+    w.stt.script("Opowiedz coś o zwierzętach.");
+    w.answer(&["Kot śpi na kanapie.", "Pies biega po ogrodzie."]);
+    w.conversation_mode().await;
+    w.run_until(11_000).await;
+    let said = w.slow_reply.spoken.lock().unwrap().clone();
+    let turn = w.slow_reply.requests.lock().unwrap()[0].turn;
+    assert!(said.iter().all(|(t, _)| *t == turn), "{said:?}");
+    let texts: Vec<String> = said
+        .iter()
+        .filter_map(|(_, s)| s.as_deref().map(str::to_lowercase))
+        .collect();
+    let at = |w: &str| texts.iter().position(|s| s.contains(w));
+    let (cat, dog) = (at("kot").expect("kot"), at("pies").expect("pies"));
+    assert!(cat < dog, "{texts:?}");
+    assert_eq!(said.last().map(|(_, s)| s.clone()), Some(None), "{said:?}");
+    assert_eq!(said.iter().filter(|(_, s)| s.is_none()).count(), 1);
+}
+
 /// (h) Awaria STT na GPU: atrapa przechodzi na CPU w trakcie finalu — wypowiedź nie ginie;
 /// błąd sidecara bez wewnętrznego fallbacku → potok ponawia rozpoznanie z bufora wypowiedzi.
 #[tokio::test]

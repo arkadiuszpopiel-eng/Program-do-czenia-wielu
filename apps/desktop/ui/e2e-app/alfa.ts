@@ -282,6 +282,8 @@ export const SKINS: readonly (readonly [string, string])[] = [
   ['glass', 'dark'],
   ['next', 'light'],
   ['next', 'dark'],
+  ['junior', 'light'],
+  ['junior', 'dark'],
 ];
 
 /** Atrybuty stylu i motywu na `<html>` — tym samym sposobem ustawia je program (`window-boot.ts`). */

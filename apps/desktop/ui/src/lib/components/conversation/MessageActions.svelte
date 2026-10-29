@@ -30,6 +30,8 @@
   let { turn, conv, rating, bodyEl, onedit }: Props = $props();
   const app = useApp();
   const { t } = app.i18n;
+  /** Uproszczony ekran (K.3, `ui.simple`): mniej przycisków; wskaźniki i tryb pracy zostają. */
+  const simple = $derived(app.bool('ui.simple', false));
   const isUser = $derived(turn.author === 'user');
   const done = $derived(turn.status !== 'streaming');
   // Długa odpowiedź z nagłówkami → „Otwórz odpowiedź w kanwie” (C2.8).
@@ -189,7 +191,17 @@
   <IconButton label={t('msg.copy')} size="sm" onclick={() => void copy(false)}>
     <Copy size={14} strokeWidth={1.5} />
   </IconButton>
-  {#if isUser}
+  {#if simple}
+    {#if !isUser}
+      <IconButton
+        label={t('msg.readAloud')}
+        size="sm"
+        onclick={() => run(() => app.client.turns.readAloud(turn.id))}
+      >
+        <Volume2 size={14} strokeWidth={1.5} />
+      </IconButton>
+    {/if}
+  {:else if isUser}
     <IconButton label={t('msg.edit')} size="sm" onclick={onedit}>
       <Pencil size={14} strokeWidth={1.5} />
     </IconButton>
@@ -226,18 +238,20 @@
       <ThumbsDown size={14} strokeWidth={1.5} />
     </IconButton>
   {/if}
-  {#if doc}
+  {#if doc && !simple}
     <IconButton label={t('canvas.openDoc')} size="sm" onclick={() => openCanvas(doc)}>
       <PanelRightOpen size={14} strokeWidth={1.5} />
     </IconButton>
   {/if}
-  <Menu items={more} label={t('msg.more')}>
-    {#snippet trigger(props)}
-      <IconButton {...props} label={t('msg.more')} size="sm">
-        <Ellipsis size={14} strokeWidth={1.5} />
-      </IconButton>
-    {/snippet}
-  </Menu>
+  {#if !simple}
+    <Menu items={more} label={t('msg.more')}>
+      {#snippet trigger(props)}
+        <IconButton {...props} label={t('msg.more')} size="sm">
+          <Ellipsis size={14} strokeWidth={1.5} />
+        </IconButton>
+      {/snippet}
+    </Menu>
+  {/if}
 </div>
 
 <style>

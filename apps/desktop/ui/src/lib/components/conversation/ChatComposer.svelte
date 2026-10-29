@@ -46,6 +46,8 @@
 
   let { conv }: Props = $props();
   const app = useApp();
+  /** Uproszczony ekran (K.3, `ui.simple`): mniej przycisków; wskaźniki i tryb pracy zostają. */
+  const simple = $derived(app.bool('ui.simple', false));
   const { t } = app.i18n;
 
   const COMMANDS: readonly { id: string; run: () => void }[] = [
@@ -329,31 +331,31 @@
     {/snippet}
     {#snippet chips()}
       <CameraSnapButton {att} />
-      <Chip size="sm" onclick={() => openPipelines()} label={t('sessions.pipelines')}>
-        {#snippet icon()}<Workflow size={13} strokeWidth={1.75} />{/snippet}
-        <span class="short">{t('sessions.pipelinesBtn')}</span>
-      </Chip>
-      <Menu
-        items={agentItems}
-        label={t('composer.agent', {
-          name: chosenAgent ? agents[chosenAgent].name : t('composer.agentAuto'),
-        })}
-        align="end"
-      >
-        {#snippet trigger(props)}
-          <Chip
-            {...props}
-            agent={chosenAgent ?? undefined}
-            size="sm"
-            onclick={props.onclick}
-            label={t('composer.agent', {
-              name: chosenAgent ? agents[chosenAgent].name : t('composer.agentAuto'),
-            })}
-          >
-            {chosenAgent ? agents[chosenAgent].name : t('composer.agentAuto')} ▾
-          </Chip>
-        {/snippet}
-      </Menu>
+      {#if !simple}<Chip size="sm" onclick={() => openPipelines()} label={t('sessions.pipelines')}>
+          {#snippet icon()}<Workflow size={13} strokeWidth={1.75} />{/snippet}
+          <span class="short">{t('sessions.pipelinesBtn')}</span>
+        </Chip>
+        <Menu
+          items={agentItems}
+          label={t('composer.agent', {
+            name: chosenAgent ? agents[chosenAgent].name : t('composer.agentAuto'),
+          })}
+          align="end"
+        >
+          {#snippet trigger(props)}
+            <Chip
+              {...props}
+              agent={chosenAgent ?? undefined}
+              size="sm"
+              onclick={props.onclick}
+              label={t('composer.agent', {
+                name: chosenAgent ? agents[chosenAgent].name : t('composer.agentAuto'),
+              })}
+            >
+              {chosenAgent ? agents[chosenAgent].name : t('composer.agentAuto')} ▾
+            </Chip>
+          {/snippet}
+        </Menu>{/if}
       <ComposerStatus bind:profileOpen={profileMenuOpen} />
     {/snippet}
     {#snippet trailing()}

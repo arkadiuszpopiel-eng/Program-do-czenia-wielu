@@ -245,6 +245,10 @@ impl SystemVoice {
 }
 
 impl VoiceEngineFactory for SystemVoice {
+    fn speech_meter(&self) -> Option<app_modules::speech_meter::SpeechMeter> {
+        self.meter.clone()
+    }
+
     fn missing(&self) -> Vec<String> {
         let mut out = Vec::new();
         if !self.whisper_server().is_file() {

@@ -95,4 +95,10 @@ pub trait ReplySource: Send + Sync {
     fn speaker_checked(&self, turn: u64, check: SpeakerCheck) {
         let _ = (turn, check);
     }
+    /// Fragment odpowiedzi na turę `turn` zaraz zabrzmi: `Some(tekst)` — wołane tuż przed
+    /// oddaniem fragmentu do wyjścia audio (wyróżnianie czytanego zdania, plan 43);
+    /// `None` — wypowiedź tury wybrzmiała do końca. Domyślnie ignorowane.
+    fn speaking(&self, turn: u64, text: Option<&str>) {
+        let _ = (turn, text);
+    }
 }

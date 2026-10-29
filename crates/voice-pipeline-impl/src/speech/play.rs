@@ -73,7 +73,13 @@ impl Pipeline {
             SourceId::Tts(job.persona.clone())
         };
         let (filler, index, persona) = (job.filler, job.dialog_chunks, job.persona.clone());
+        let turn = job.turn.filter(|_| !filler);
         job.dialog_chunks += 1;
+        let text = chunk_text(request, chunk);
+        if let Some(turn) = turn {
+            // Przed wyjściem: miernik mowy wyśle zdanie razem z pierwszym poziomem fragmentu.
+            self.replies.speaking(turn, Some(&text));
+        }
         if let Err(e) = self.output.play(&source, id, &chunk.audio) {
             self.degraded("audio", e.to_string());
         }
@@ -98,7 +104,6 @@ impl Pipeline {
         if self.st.latency.first_chunk_ms.is_none() {
             self.st.latency.first_chunk_ms = Some(self.st.now_ms);
         }
-        let text = chunk_text(request, chunk);
         let audio_ms = u64::try_from(chunk.audio.duration().as_millis()).unwrap_or(0);
         let marks = dialog_marks(&text, chunk);
         self.dialog_event(DialogEvent::TtsChunkQueued {
@@ -126,6 +131,9 @@ impl Pipeline {
         };
         if job.filler {
             return;
+        }
+        if let Some(turn) = job.turn {
+            self.replies.speaking(turn, None);
         }
         let complete = job.turn.is_some_and(|t| {
             self.st

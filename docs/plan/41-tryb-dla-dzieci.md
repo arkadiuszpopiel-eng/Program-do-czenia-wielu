@@ -80,12 +80,19 @@ Właściciel przyjął wszystkie propozycje („Wykonaj!”); szczegóły i kons
 
 **Co dalej:** K.1, K.2, K.6, K.7 czekają na etap U (najpierw podpis ADR 0027 — U.0). K.3 (29.10):
 
-- wyróżnianie czytanego zdania ([43](43-czytane-zdanie.md), faza 1) — gotowe;
+- wyróżnianie czytanego zdania ([43](43-czytane-zdanie.md)) — gotowe: faza 1 (przycisk „Przeczytaj na głos”) i
+  faza 2 (rozmowa głosowa — zdanie odpowiedzi wyróżnione w chwili, gdy zaczyna brzmieć);
 - styl „Junior” (`ui.style = junior`) — gotowe: tokeny w `@alfa/ui-kit/skins.css` (krem i fiolet / śliwka i
   słońce, promienie 14/20/24 px, kropki w tle), cały interfejs ×1,15 (`appearance.ts`, ta sama droga co Zoom —
   układ liczy szerokość efektywną), kontrast policzony dla wszystkich par tekst/tło (także barwy agentek, w wersji
   jasnej o ton głębsze); styl jest w każdej liście stylów testów przeglądarkowych;
-- wolniejsza mowa (85 %) i dźwięki sygnałowe — propozycja „Włącz” po wybraniu stylu (istniejące ustawienia
-  `voice.tts_speed`, `notify.earcons`; bez zmiany po cichu);
-- do zrobienia w K.3: mniej opcji na ekranie (wymaga konta dziecka — wtedy Junior domyślny dla roli Dziecko),
-  faza 2 wyróżniania (rozmowa głosowa).
+- mniej opcji na ekranie — gotowe jako ustawienie **„Uproszczony ekran”** (`ui.simple`, Wygląd): chowa
+  przełączniki paneli (panele zostają schowane, bez znaczników przy krawędzi), Pipeline'y, wybór agentki i rzadsze
+  akcje wiadomości (zostają „Kopiuj” i „Przeczytaj na głos”). Wskaźniki mikrofonu, kamery i sterowania, tryb pracy
+  (ze znakiem „Pełna automatyka”) i Ustawienia są widoczne zawsze. To **wygoda, nie blokada** — skróty dalej
+  działają; wymuszenie (dziecko nie wyłączy) i Junior domyślny dla roli Dziecko przychodzą z K.1;
+- wolniejsza mowa (85 %), dźwięki sygnałowe i uproszczony ekran — propozycja „Włącz” po wybraniu stylu
+  (zwykłe ustawienia `voice.tts_speed`, `notify.earcons`, `ui.simple`; bez zmiany po cichu);
+- okna poboczne (Szybkie pytanie, pigułka) dostają kolory Juniora bez powiększenia — mają stały rozmiar okna
+  natywnego, tak samo jak przy ustawieniu Zoom;
+- zostaje: odsłuch na sprzęcie (tempo 85 %, wyróżnienie w rytm głosu) — ocena właściciela, za dnia.

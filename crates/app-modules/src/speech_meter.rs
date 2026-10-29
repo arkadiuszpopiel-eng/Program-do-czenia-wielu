@@ -83,6 +83,20 @@ impl SpeechMeter {
         *self.marker.lock().unwrap_or_else(PoisonError::into_inner) = Some(event);
     }
 
+    /// Porzuca czekający znacznik (fragment nie zagrał albo wypowiedź się skończyła) — nie
+    /// podczepi się pod fragment innej wypowiedzi.
+    pub fn clear_mark(&self) {
+        self.marker
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .take();
+    }
+
+    /// Zdarzenie od razu (np. koniec czytania — wypowiedź już wybrzmiała).
+    pub fn send(&self, event: AlfaEvent) {
+        (self.events)(event);
+    }
+
     /// Planuje poziomy dla fragmentu mowy agentki `agent`, który właśnie trafił do miksera.
     pub fn schedule(&self, agent: &str, chunk: &Frame) {
         let levels = envelope(&chunk.pcm, chunk.format);
@@ -143,10 +157,7 @@ impl SpeechMeter {
     /// Mowa przerwana: zaplanowane poziomy przepadają, interfejs dostaje ciszę.
     pub fn silence(&self) {
         self.generation.fetch_add(1, Ordering::SeqCst);
-        self.marker
-            .lock()
-            .unwrap_or_else(PoisonError::into_inner)
-            .take();
+        self.clear_mark();
         self.timeline
             .lock()
             .unwrap_or_else(PoisonError::into_inner)
@@ -177,7 +188,10 @@ impl OutputStream for MeteredOutput {
     }
 
     fn play(&mut self, source: &SourceId, utterance: u64, chunk: &Frame) -> Result<(), AudioError> {
-        self.inner.play(source, utterance, chunk)?;
+        // Fragment nie zagra — jego znacznik nie może przejść na następny.
+        self.inner
+            .play(source, utterance, chunk)
+            .inspect_err(|_| self.meter.clear_mark())?;
         if let SourceId::Tts(persona) | SourceId::Filler(persona) = source {
             self.meter.schedule(&persona.to_string(), chunk);
         }

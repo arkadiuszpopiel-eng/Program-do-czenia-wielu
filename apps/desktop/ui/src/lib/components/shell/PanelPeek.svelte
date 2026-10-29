@@ -20,9 +20,11 @@
     rightWidth: number;
     /** Znaczniki tylko w widoku rozmowy poza trybem skupienia. */
     show: boolean;
+    /** Znaczniki przy krawędzi (uproszczony ekran je chowa; skrót dalej wysuwa panel). */
+    tabs?: boolean;
   }
 
-  let { left, right, rightWidth, show }: Props = $props();
+  let { left, right, rightWidth, show, tabs = true }: Props = $props();
 
   const app = useApp();
   const { t } = app.i18n;
@@ -83,7 +85,7 @@
   };
 </script>
 
-{#if show && left === 'hidden'}
+{#if show && tabs && left === 'hidden'}
   <EdgeTab
     side="left"
     label={t('edge.sessions')}
@@ -92,7 +94,7 @@
     onclick={() => fromTab('left', () => app.layout.toggleLeft(sid))}
   />
 {/if}
-{#if show && right === 'hidden'}
+{#if show && tabs && right === 'hidden'}
   <EdgeTab
     side="right"
     label={t('edge.panel')}

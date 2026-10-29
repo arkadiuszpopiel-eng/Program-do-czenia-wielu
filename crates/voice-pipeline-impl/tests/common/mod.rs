@@ -156,6 +156,7 @@ impl World {
             ttft_ms: std::sync::atomic::AtomicU64::new(opts.ttft_ms),
             requests: Mutex::default(),
             checks: Mutex::default(),
+            spoken: Mutex::default(),
         });
         let sched = Arc::new(FakeScheduler::new());
         let bus = FakeBus::default();
