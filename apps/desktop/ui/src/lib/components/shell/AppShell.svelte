@@ -86,7 +86,7 @@
   const loadPeek = () => import('./PanelPeek.svelte');
   let paletteReady = $state(false);
   $effect(() => {
-    app.layout.autohide = app.bool('ui.panels_autohide', false);
+    app.layout.autohide = app.bool('ui.panels_autohide', true);
   });
   let cheatsheetReady = $state(false);
 

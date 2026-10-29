@@ -2715,7 +2715,7 @@
     "control": {
      "kind": "toggle"
     },
-    "default": false,
+    "default": true,
     "scope": "global"
    },
    {

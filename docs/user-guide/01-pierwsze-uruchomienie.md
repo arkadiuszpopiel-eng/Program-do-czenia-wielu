@@ -44,8 +44,9 @@ Na końcu kliknij **Zaczynamy**.
 - **Panel Sesje** po lewej — lista rozmów (`Ctrl+B` albo przycisk w nagłówku panelu chowa go w całości).
 - **Panele chowane:** schowany panel znika cały, a przy krawędzi okna zostaje cienki świecący znacznik; najechanie
   wysuwa panel nad rozmowę, zjechanie myszą, kliknięcie obok albo `Esc` go chowa, a kliknięcie znacznika albo
-  **Przypnij panel** dokuje go z powrotem. Z klawiatury: `Tab` do znacznika i `Enter`. Żeby oba panele chowały
-  się same, włącz **Wygląd → Panele chowają się same** albo wpisz w palecie „Chowaj panele”. W Ustawieniach tak
+  **Przypnij panel** dokuje go z powrotem. Z klawiatury: `Tab` do znacznika i `Enter`. Oba panele chowają się
+  same od pierwszego uruchomienia; stały układ przywraca **Przypnij panel**, przełącznik **Wygląd → Panele
+  chowają się same** albo polecenie palety „Chowaj panele”. W Ustawieniach tak
   samo chowa się menu stron (przycisk obok tytułu „Ustawienia” albo `Ctrl+B`).
 - **Rozmowa** na środku i pole wiadomości na dole. W pasku pisania obok Pipeline'ów i trybu Auto są żetony
   stanu: profil modeli z kropką połączenia (kliknij — profil zmienisz od razu), **Tryb pracy** (menu z czterema

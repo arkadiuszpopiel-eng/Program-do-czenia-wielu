@@ -29,8 +29,11 @@ export async function createClient(): Promise<AlfaClient> {
   if (theme) settings['ui.theme'] = theme;
   const avatars = params.get('avatars');
   if (avatars) settings['ui.avatars'] = avatars;
-  // Panele chowane od startu: `?panels=autohide`.
-  if (params.get('panels') === 'autohide') settings['ui.panels_autohide'] = true;
+  // Panele: `?panels=autohide|docked`. Domyślnie chowane (właściciel 29.10), ale testy automatyczne
+  // (navigator.webdriver) startują z zadokowanym układem, na którym opiera się większość scenariuszy —
+  // chowanie sprawdzają osobno z `?panels=autohide`.
+  const panels = params.get('panels') ?? (navigator.webdriver ? 'docked' : null);
+  if (panels) settings['ui.panels_autohide'] = panels === 'autohide';
   // Podgląd stanów obsady: `?cast=speaking,working,waiting_approval,idle`.
   const cast = params.get('cast')?.split(',') ?? [];
   return new FakeAlfaClient({ scenario, settings, cast });
