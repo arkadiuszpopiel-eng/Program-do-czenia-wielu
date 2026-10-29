@@ -12,6 +12,42 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.77 — 2026-10-29
+
+Alfa dla dzieci krok dalej: styl „Junior”, czytane zdanie podświetlone w rytm głosu i uproszczony ekran.
+Do tego panele schowane od startu i porządki pod przyszły dostęp zdalny i inne systemy.
+
+### Nowe
+
+- Styl „Junior” (Ustawienia → Wygląd): ciepłe kolory, okrągłe kształty i cały interfejs o 15 % większy. Po
+  wybraniu Alfa proponuje wolniejszą mowę (85 %), dźwięki sygnałowe i uproszczony ekran — każdą z tych rzeczy
+  zmienisz potem w Ustawieniach. Okienko Szybkiego pytania i pigułka głosowa dostają te same kolory.
+- „Przeczytaj na głos” podświetla zdanie, które właśnie brzmi; w rozmowie głosowej podświetlenie idzie za
+  odpowiedzią zdanie po zdaniu i znika, gdy mowa się kończy albo wyłączysz mikrofon.
+- „Uproszczony ekran” (Ustawienia → Wygląd): mniej przycisków — bez przełączników paneli, Pipeline'ów, wyboru
+  agentki i rzadszych akcji wiadomości. Wskaźniki mikrofonu, kamery, sterowania i trybu pracy zostają zawsze.
+
+### Zmiany
+
+- Panele boczne startują schowane (decyzja właściciela 29.10); znacznik przy krawędzi i Ctrl+B wysuwają je jak
+  dotąd.
+- Katalog silników zna system i procesor każdej binarki — pokazuje tylko to, co działa na tym komputerze
+  (przygotowanie pod Linuksa i ARM).
+- Typy danych interfejsu pochodzą już wyłącznie z rdzenia (koniec ręcznych kopii), a polecenia wymagające tego
+  komputera (okna systemu, ścieżki, schowek) są oznaczone pod przyszły dostęp z telefonu.
+
+### Poprawki
+
+- [poważne] Biblioteka Markdown podniesiona do 0.13.5 (ostrzeżenie bezpieczeństwa dotyczące linków wiki).
+- Nieudane logowanie mostu CLI pokazuje jeden komunikat zamiast stosu jednakowych.
+- Logowanie mostu poza Windows nie wskazuje już powłoki `cmd`, której tam nie ma.
+
+### Testy
+
+- Nowe testy: podświetlenie w rozmowie głosowej (Rust i przeglądarka), uproszczony ekran, Junior w oknach
+  pobocznych i w prawdziwym oknie (odmowa błędnych wartości, wybór i przywrócenie ustawień), wymiar system /
+  architektura katalogu, tabela poleceń `local_only`, strażnik generatora typów.
+
 ## 0.0.76 — 2026-10-29
 
 Pulpit główny dopracowany według uwag właściciela z 29.10: wszystkie panele chowają się w całości i płynnie
