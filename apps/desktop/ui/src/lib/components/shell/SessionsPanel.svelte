@@ -16,7 +16,7 @@
   import Lazy from './Lazy.svelte';
 
   interface Props {
-    /** Panel jako szuflada / arkusz — bez przycisku zwijania do paska ikon. */
+    /** Panel jako szuflada / arkusz / wysunięty — bez przycisku chowania (zamyka go klik obok). */
     floating?: boolean;
   }
 
@@ -99,7 +99,8 @@
       <IconButton
         label={t('sessions.collapse')}
         size="sm"
-        onclick={() => app.layout.setLeftCollapsed(true)}
+        onclick={() => app.layout.update(app.activeId, { left_open: false })}
+        aria-keyshortcuts="Control+B"
       >
         <PanelLeftClose size={16} strokeWidth={1.5} />
       </IconButton>

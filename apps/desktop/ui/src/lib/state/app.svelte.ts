@@ -33,6 +33,7 @@ import { ToastState } from './toasts.svelte';
 import { VoiceUiState } from './voice.svelte';
 import { UpdatesState } from './updates.svelte';
 import { BrokerState } from './broker.svelte';
+import { AutonomyState } from './autonomy.svelte';
 import { WorkState } from './work.svelte';
 import { NavHistory, type Place } from '../logic/nav-history';
 import * as flow from './app-flow';
@@ -57,6 +58,7 @@ export class AppState {
   readonly work = new WorkState();
   readonly updates = new UpdatesState();
   readonly broker = new BrokerState();
+  readonly autonomy = new AutonomyState();
   readonly layout: LayoutState;
 
   view = $state<View>('loading');
@@ -197,7 +199,6 @@ export class AppState {
 
   /** Sesje w trakcie sprzątania (zwykła lista — nic w widoku od niej nie zależy). */
   removing: string[] = [];
-
   async forgetSession(id: string): Promise<void> {
     return flow.forgetSession(this, id);
   }
@@ -344,10 +345,9 @@ export class AppState {
 
   /** Bieżące miejsce (rozmowa z sesją albo strona Ustawień); `null` poza nimi (start, wprowadzenie). */
   place(): Place | null {
-    if (this.view === 'chat') return { view: 'chat', page: null, session: this.activeId };
-    if (this.view === 'settings')
-      return { view: 'settings', page: this.settingsPage, session: this.activeId };
-    return null;
+    if (this.view !== 'chat' && this.view !== 'settings') return null;
+    const page = this.view === 'settings' ? this.settingsPage : null;
+    return { view: this.view, page, session: this.activeId };
   }
 
   /** Zapis odwiedzonego miejsca (wołany po każdej zmianie widoku, strony albo sesji). */

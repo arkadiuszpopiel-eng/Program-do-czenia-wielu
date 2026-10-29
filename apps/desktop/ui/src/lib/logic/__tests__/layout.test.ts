@@ -24,7 +24,8 @@ describe('responsywność §14.2', () => {
 
   it('rozmieszczenie paneli', () => {
     expect(resolvePanels('wide', true, true, false)).toEqual({ left: 'docked', right: 'docked' });
-    expect(resolvePanels('medium', true, true, false)).toEqual({ left: 'rail', right: 'docked' });
+    // Średnie okno: oba panele się nie mieszczą — lewy chowa się za znacznik (bez paska ikon).
+    expect(resolvePanels('medium', true, true, false)).toEqual({ left: 'hidden', right: 'docked' });
     expect(resolvePanels('medium', true, false, false)).toEqual({
       left: 'docked',
       right: 'hidden',

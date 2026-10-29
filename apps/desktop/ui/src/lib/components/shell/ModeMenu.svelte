@@ -1,8 +1,9 @@
 <!--
-  Menu „Tryb pracy” z paska tytułu (decyzja właściciela 27.10): cztery tryby jak w Claude Code, po
-  polsku — Tylko podgląd, Pytaj o wszystko, Automatycznie, Pełna automatyka. Tryb obowiązuje we
-  wszystkich rozmowach; podniesienie potwierdzasz raz w oknie Brokera i zostaje po restarcie.
-  Klawisze 1–4 wybierają tryb, strzałki przesuwają zaznaczenie.
+  Menu „Tryb pracy” (decyzja właściciela 27.10, od 29.10 w pasku pisania): cztery tryby jak w Claude
+  Code, po polsku — Tylko podgląd, Pytaj o wszystko, Automatycznie, Pełna automatyka. Tryb
+  obowiązuje we wszystkich rozmowach; podniesienie potwierdzasz raz w oknie Brokera i zostaje po
+  restarcie. Zaznaczony jest poziom globalny odczytany z Brokera, a komunikat o zmianie pojawia
+  się dopiero, gdy Broker ją przyjął. Klawisze 1–4 wybierają tryb, strzałki przesuwają zaznaczenie.
 -->
 <script lang="ts">
   import Check from '@lucide/svelte/icons/check';
@@ -12,16 +13,26 @@
   import { useApp } from '../../state/context';
 
   interface Props {
-    /** Poziom obowiązujący teraz (rozmowa albo globalny). */
-    current: AutonomyLevel;
     /** Zamyka menu po wyborze albo przejściu do Ustawień. */
     onclose: () => void;
   }
-  let { current, onclose }: Props = $props();
+  let { onclose }: Props = $props();
 
   const app = useApp();
   const { t, tk } = app.i18n;
+  const session = $derived(app.sessions.active);
+  const current = $derived<AutonomyLevel>(app.autonomy.global ?? session?.autonomy ?? 'L3');
+  // Rozmowa z własnym poziomem (Ustawienia → Uprawnienia) — menu zmienia tryb globalny.
+  const own = $derived(
+    session && app.autonomy.global && session.autonomy !== app.autonomy.global
+      ? session.autonomy
+      : null,
+  );
   const items = $derived(modeItems(current));
+  // Świeży odczyt przy otwarciu — zgoda mogła przyjść z okna Brokera, gdy menu było zamknięte.
+  $effect(() => {
+    void app.autonomy.load(app.client.permissions);
+  });
   let list = $state<HTMLDivElement | null>(null);
 
   $effect(() => {
@@ -35,15 +46,27 @@
     try {
       await requestMode(level, {
         request: (l) => app.client.permissions.requestLevel(l, null),
-        readGlobal: async () => (await app.client.permissions.get(null)).global,
-        notify: (event, l) => {
-          const name = tk(`mode.${l}.name`);
-          const kind = event === 'requested' ? 'info' : 'success';
-          app.toasts.show({ kind, message: t(`mode.${event}`, { mode: name }) });
-        },
+        readGlobal: () => app.autonomy.load(app.client.permissions),
+        notify: (event, l) => void report(event, l),
       });
     } catch (error) {
       showError(app.toasts, error);
+    }
+  }
+
+  /** Komunikat po zmianie — sukces dopiero po odczycie z Brokera, że poziom obowiązuje. */
+  async function report(event: 'applied' | 'requested' | 'raised', level: AutonomyLevel) {
+    const mode = tk(`mode.${level}.name`);
+    if (event === 'requested') {
+      app.toasts.show({ kind: 'info', message: t('mode.requested', { mode }) });
+      return;
+    }
+    const now = event === 'raised' ? level : await app.autonomy.load(app.client.permissions);
+    if (now === level || now === null) {
+      app.toasts.show({ kind: 'success', message: t(`mode.${event}`, { mode }) });
+    } else {
+      const current = tk(`mode.${now}.name`);
+      app.toasts.show({ kind: 'error', message: t('mode.notApplied', { mode, current }) });
     }
   }
 
@@ -99,6 +122,7 @@
       </button>
     {/each}
   </div>
+  {#if own}<p class="note own">{t('mode.sessionOwn', { mode: tk(`mode.${own}.name`) })}</p>{/if}
   <p class="note">{t('mode.note')}</p>
   <button type="button" class="more" onclick={settings}>{t('mode.more')}</button>
 </div>
@@ -178,6 +202,12 @@
   }
   .note {
     margin: var(--alfa-space-1) var(--alfa-space-2) 0;
+  }
+  .note.own {
+    padding: var(--alfa-space-2);
+    border-radius: var(--alfa-radius-control);
+    background: color-mix(in srgb, var(--alfa-color-warning) 12%, transparent);
+    color: var(--alfa-color-text);
   }
   .more {
     align-self: flex-start;

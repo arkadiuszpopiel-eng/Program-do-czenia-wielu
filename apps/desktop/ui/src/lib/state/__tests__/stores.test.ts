@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { session } from '../../api/fake/fixtures';
 import { LayoutState } from '../layout.svelte';
 import { SessionsState, groupSessions } from '../sessions.svelte';
@@ -80,21 +80,56 @@ describe('LayoutState', () => {
     expect(l.placement('s1')).toEqual({ left: 'hidden', right: 'hidden' });
   });
 
-  it('laptop (1280 px): prawy panel dokuje się obok rozmowy, Sesje zwijają się do paska ikon', () => {
+  it('laptop (1280 px): jeden panel obok rozmowy, drugi za znacznikiem (bez paska ikon)', () => {
     const l = new LayoutState();
     l.width = 1280;
-    l.update('s1', { left_open: true, right_open: true });
-    expect(l.placement('s1')).toEqual({ left: 'rail', right: 'docked' });
-    // Rozwinięcie paska nie może być martwym przyciskiem: zamyka prawy panel.
-    l.expandLeft('s1');
+    l.update('s1', { right_open: true });
+    expect(l.placement('s1')).toEqual({ left: 'hidden', right: 'docked' });
+    // Przycisk Sesji nie może być martwy: pokazanie listy zamyka prawy panel.
+    l.toggleLeft('s1');
     expect(l.placement('s1')).toEqual({ left: 'docked', right: 'hidden' });
-    // Pasek zwinięty ręcznie rozwija się bez ruszania prawego panelu (szerokie okno).
+    // Szerokie okno: oba obok siebie; schowane Sesje są wspólne dla wszystkich rozmów.
     l.width = 1600;
     l.update('s1', { right_open: true });
-    l.setLeftCollapsed(true);
-    l.expandLeft('s1');
-    expect(l.leftCollapsed).toBe(false);
     expect(l.placement('s1')).toEqual({ left: 'docked', right: 'docked' });
+    l.toggleLeft('s1');
+    expect(l.leftCollapsed).toBe(true);
+    expect(l.placement('s2').left).toBe('hidden');
+    l.toggleLeft('s2');
+    expect(l.placement('s1')).toEqual({ left: 'docked', right: 'docked' });
+  });
+
+  it('wysunięty panel: przełącznik go dokuje, a wąskie okno ma osobną szufladę Sesji', () => {
+    const l = new LayoutState();
+    l.width = 1600;
+    l.update('s1', { left_open: false });
+    l.peek = 'left';
+    expect(l.placement('s1').left).toBe('peek');
+    l.toggleLeft('s1');
+    expect(l.peek).toBeNull();
+    expect(l.placement('s1').left).toBe('docked');
+    // Szuflada na wąskim oknie nie zmienia stanu szerokiego okna.
+    l.width = 900;
+    expect(l.placement('s1').left).toBe('hidden');
+    l.toggleLeft('s1');
+    expect(l.placement('s1').left).toBe('drawer');
+    expect(l.leftCollapsed).toBe(false);
+  });
+
+  it('menu Ustawień: schowanie zapamiętane, przypięcie kończy wysunięcie', () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => void store.set(k, v),
+    });
+    const l = new LayoutState();
+    l.setSettingsNav(true);
+    expect(new LayoutState().settingsNavHidden).toBe(true);
+    l.settingsPeek = true;
+    l.setSettingsNav(false);
+    expect(l.settingsPeek).toBe(false);
+    expect(new LayoutState().settingsNavHidden).toBe(false);
+    vi.unstubAllGlobals();
   });
 
   it('odczyt i zapis preferencji', () => {

@@ -33,6 +33,8 @@ export const plSettings = {
   'settings.nav.collapseAll': 'Zwiń wszystkie grupy',
   'settings.nav.expandAll': 'Rozwiń wszystkie grupy',
   'settings.nav.clear': 'Wyczyść szukanie',
+  'settings.nav.hide': 'Schowaj menu Ustawień (Ctrl+B)',
+  'settings.nav.edge': 'Menu Ustawień — najedź, aby wysunąć; kliknij, aby przypiąć',
   'settings.nav.none': 'Żadna strona nie pasuje.',
   'settings.nav.current': 'Sekcja: {page}. Pokaż listę sekcji',
   'settings.nav.version': 'Alfa {version}',

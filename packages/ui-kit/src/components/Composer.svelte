@@ -161,14 +161,17 @@
     position: relative;
     container-type: inline-size;
   }
-  /* Jeden wiersz o wysokości kontrolki (--row): spinacz, pole, chipy, mikrofon i „Wyślij” mają
-     wspólny środek; przy kilku liniach tekstu kontrolki zostają na dole (właściciel 27.10:
-     „wyrównanie i symetria”). Odstęp od ramki taki sam z każdej strony. */
+  /* Tekst ma cały górny wiersz, a kontrolki (wysokość --row) schodzą niżej — spinacz po lewej,
+     wybory i stan, mikrofon i „Wyślij” po prawej, jak w aplikacjach Claude i ChatGPT. Od 29.10 tak
+     przy każdej szerokości: stan Alfy (profil, tryb, koszt) siedzi w pasku pisania i w jednym
+     wierszu ściskał pole do kilku słów. Odstęp od ramki taki sam z każdej strony. */
   .composer {
     --row: var(--alfa-size-control);
     display: flex;
-    align-items: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 6px;
+    row-gap: 2px;
     padding: 6px;
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-card);
@@ -181,9 +184,13 @@
     outline-offset: 1px;
   }
   .field {
-    flex: 1;
+    flex: 1 1 100%;
+    order: -1;
     min-width: 0;
     display: flex;
+  }
+  .field + :global(*) {
+    margin-left: auto;
   }
   textarea {
     flex: 1;
@@ -214,27 +221,16 @@
     width: var(--row);
     height: var(--row);
   }
-  /* Wąskie pole (np. obok panelu prawego): tekst ma cały górny wiersz, a kontrolki schodzą niżej —
-     spinacz po lewej, wybory, mikrofon i „Wyślij” po prawej (jak w aplikacjach Claude i ChatGPT);
-     podpowiedź nie łamie się wtedy na dwie linie. */
-  @container (max-width: 640px) {
-    .composer {
-      flex-wrap: wrap;
-      row-gap: 2px;
-    }
-    .field {
-      flex-basis: 100%;
-      order: -1;
-    }
-    .field + :global(*) {
-      margin-left: auto;
-    }
-  }
-  /* Telefon: wybory mają własny, ostatni wiersz, a spinacz, mikrofon i „Wyślij” zostają razem. */
+  /* Telefon: wybory mają własny, ostatni wiersz (gdy się nie mieszczą — w dwóch liniach), a
+     spinacz, mikrofon i „Wyślij” zostają razem. */
   @container (max-width: 420px) {
     .chips {
       order: 1;
       flex-basis: 100%;
+      flex-wrap: wrap;
+      height: auto;
+      min-height: var(--row);
+      row-gap: 2px;
       margin-left: 0;
     }
     .chips + :global(*) {

@@ -157,27 +157,27 @@ describe('ucięcie źródła do limitu bajtów', () => {
 });
 
 describe('kanwa obok rozmowy', () => {
-  const left = { width: 264, rail: 48 };
+  const left = 264;
   const chat = (body: number, l: number, r: number, w: number) => body - l - r - w;
 
-  it('szerokie okno 1440 z oboma panelami: lewy zwija się do paska, rozmowa ≥ 480', () => {
+  it('szerokie okno 1440 z oboma panelami: lewy się chowa, rozmowa ≥ 480', () => {
     const dock = canvasDock(1440, left, 460);
     expect(dock).not.toBeNull();
-    expect(dock?.railLeft).toBe(true);
+    expect(dock?.hideLeft).toBe(true);
     expect(dock?.hideRight).toBe(false);
-    expect(chat(1440, 48, 460, dock?.width ?? 0)).toBeGreaterThanOrEqual(CANVAS_CHAT_MIN);
+    expect(chat(1440, 0, 460, dock?.width ?? 0)).toBeGreaterThanOrEqual(CANVAS_CHAT_MIN);
   });
 
   it('1600 z oboma panelami mieści się bez zwijania', () => {
     const dock = canvasDock(1600, left, 460);
-    expect(dock).toMatchObject({ railLeft: false, hideRight: false });
+    expect(dock).toMatchObject({ hideLeft: false, hideRight: false });
     expect(chat(1600, 264, 460, dock?.width ?? 0)).toBeGreaterThanOrEqual(CANVAS_CHAT_MIN);
   });
 
   it('średnie okno z prawym panelem: prawy chowa się na czas kanwy', () => {
-    const dock = canvasDock(1100, { width: 48, rail: 48 }, 360);
+    const dock = canvasDock(1100, null, 360);
     expect(dock?.hideRight).toBe(true);
-    expect(chat(1100, 48, 0, dock?.width ?? 0)).toBeGreaterThanOrEqual(CANVAS_CHAT_MIN);
+    expect(chat(1100, 0, 0, dock?.width ?? 0)).toBeGreaterThanOrEqual(CANVAS_CHAT_MIN);
   });
 
   it('duże okno bez paneli: kanwa najwyżej 760 px; za ciasno — arkusz', () => {

@@ -100,7 +100,8 @@ test('zaznaczony tekst odpowiedzi: tylko „Kopiuj”; puste miejsce: żadnego m
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await open(page);
-  const prose = page.locator('.alfa-prose p').first();
+  // Ostatni akapit — lista wiadomości jest wirtualna, pierwszy (poza oknem) bywa odmontowany.
+  const prose = page.locator('.alfa-prose p').last();
   await prose.selectText();
   await prose.click({ button: 'right' });
   await expect(menu(page).getByRole('menuitem')).toHaveCount(1);

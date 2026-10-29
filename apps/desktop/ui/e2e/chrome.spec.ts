@@ -179,7 +179,9 @@ test('karty graficzne: każda z rolą — główna i do lekkich zadań', async (
 // Zgłoszenie właściciela (2026-10-09): obsada, mikrofon i stan w belce „też popraw solidnie”.
 for (const skin of SKINS) {
   for (const theme of THEMES) {
-    test(`belka: obsada, mikrofon i stan z objaśnieniem — ${skin}/${theme}`, async ({ page }) => {
+    test(`belka i pasek pisania: obsada, mikrofon i stan z objaśnieniem — ${skin}/${theme}`, async ({
+      page,
+    }) => {
       await open(page, `?style=${skin}&theme=${theme}`);
       const cast = page.getByRole('group', { name: 'Obsada agentek' });
       await expect(cast.getByRole('button')).toHaveCount(4);
@@ -188,15 +190,17 @@ for (const skin of SKINS) {
         await expect(cast.getByRole('button', { name: new RegExp(`^${name} · `) })).toBeVisible();
       }
 
-      // Stan: połączenie + profil + tryb pracy; klik otwiera objaśnienie, w którym profil zmienia się od razu.
-      const state = page.getByRole('button', {
+      // Stan w pasku pisania (29.10): połączenie + profil + tryb pracy; klik otwiera objaśnienie,
+      // w którym profil zmienia się od razu. W belce nie ma już ciemnej kapsuły.
+      await expect(page.locator('header.titlebar .cluster')).toHaveCount(0);
+      const state = page.locator('form.composer').getByRole('button', {
         name: /^Stan: połączono, profil Hybryda, tryb pracy Automatycznie \(L3\)/,
       });
       await state.click();
       const details = page.getByRole('dialog', { name: 'Stan Alfy' });
       await expect(details).toContainText('Proste rzeczy liczy ten komputer');
       await expect(details).toContainText(/Automatycznie \(L3\)/);
-      await expectReadable(page, 'header.titlebar');
+      await expectReadable(page, 'form.composer');
       // Profil zmienia się na miejscu (właściciel 27.10: bez przenoszenia do Ustawień).
       const local = details.getByRole('radio', { name: 'Lokalny' });
       await local.click();
@@ -216,7 +220,7 @@ for (const skin of SKINS) {
       // Koszt ma własną część i własne okienko.
       await page.getByRole('button', { name: /^Koszt sesji / }).click();
       await expect(page.getByRole('dialog', { name: 'Koszty i kontekst' })).toBeVisible();
-      await expectReadable(page, 'header.titlebar');
+      await expectReadable(page, 'form.composer');
       await page.keyboard.press('Escape');
 
       // Mikrofon: włączony ma wypełniony stan i słupki poziomu.

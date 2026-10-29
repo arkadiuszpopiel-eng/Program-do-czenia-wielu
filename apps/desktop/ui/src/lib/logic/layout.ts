@@ -1,13 +1,16 @@
 // Responsywność okna (PLAN §14.2) i ograniczenia szerokości paneli.
 
 export type LayoutMode = 'wide' | 'medium' | 'narrow' | 'compact';
-/** `peek` — panel wysunięty chwilowo nad rozmową (najechanie na znacznik przy krawędzi okna). */
-export type PanelPlacement = 'docked' | 'rail' | 'drawer' | 'sheet' | 'peek' | 'hidden';
+/**
+ * `peek` — panel wysunięty chwilowo nad rozmową (najechanie na znacznik przy krawędzi okna).
+ * Paska ikon już nie ma (właściciel 29.10: panele „w pełni chowane i wysuwane”) — schowany panel
+ * zostawia tylko znacznik przy krawędzi.
+ */
+export type PanelPlacement = 'docked' | 'drawer' | 'sheet' | 'peek' | 'hidden';
 export type PanelSide = 'left' | 'right';
 
 export const LEFT_MIN = 240;
 export const LEFT_MAX = 320;
-export const LEFT_RAIL = 48;
 export const RIGHT_MIN = 300;
 export const RIGHT_MAX = 520;
 /** Domyślna szerokość prawego panelu i szerokość na dużym oknie (mieści wszystkie karty w jednym wierszu). */
@@ -32,8 +35,8 @@ export interface PanelLayout {
 
 /**
  * - ≥ 1440: oba panele zadokowane;
- * - 1100–1440: prawy zadokowany; lewy zadokowany, a gdy otwarte są oba — zwinięty do paska ikon,
- *   żeby prawy panel nie zasłaniał rozmowy (laptop 1080p przy 150 % to 1280 px);
+ * - 1100–1440: zadokowany jeden panel; gdy otwarte są oba, lewy chowa się za znacznik przy krawędzi
+ *   (wysuwa się nad rozmowę), żeby rozmowa nie była za wąska (laptop 1080p przy 150 % to 1280 px);
  * - 720–1100: oba jako szuflady nad treścią;
  * - < 720: arkusze pełnoekranowe (najwyżej jeden naraz — prawy wygrywa jako ostatnio otwarty).
  */
@@ -51,7 +54,7 @@ export function resolvePanels(
       return { left: hide(leftOpen, 'docked'), right: hide(rightOpen, 'docked') };
     case 'medium':
       return {
-        left: hide(leftOpen, rightOpen ? 'rail' : 'docked'),
+        left: hide(leftOpen && !rightOpen, 'docked'),
         right: hide(rightOpen, 'docked'),
       };
     case 'narrow':

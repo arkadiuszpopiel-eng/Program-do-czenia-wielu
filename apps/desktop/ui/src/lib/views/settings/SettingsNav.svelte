@@ -3,7 +3,8 @@
   w miejscu, przewija się tylko lista. Grupy z ikonami stron można zwijać (stan zapamiętany),
   bieżąca strona ma znacznik przy krawędzi i sama wjeżdża w pole widzenia. Podczas szukania lista
   pokazuje tylko strony z trafieniami i ich liczbę. Strzałki, Home i End chodzą po liście.
-  W wąskim oknie lista chowa się pod przyciskiem z nazwą bieżącej strony.
+  W wąskim oknie lista chowa się pod przyciskiem z nazwą bieżącej strony. Całe menu można schować
+  za znacznik przy krawędzi (29.10) — wtedy wysuwa się nad stronę po najechaniu.
 -->
 <script lang="ts">
   import { Button, IconButton } from '@alfa/ui-kit';
@@ -11,6 +12,7 @@
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import ChevronsDownUp from '@lucide/svelte/icons/chevrons-down-up';
   import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
+  import PanelRightClose from '@lucide/svelte/icons/panel-right-close';
   import Search from '@lucide/svelte/icons/search';
   import X from '@lucide/svelte/icons/x';
   import { untrack } from 'svelte';
@@ -29,8 +31,10 @@
     /** Trafienia wyszukiwarki per strona (puste, gdy nic nie wpisano). */
     hits: ReadonlyMap<string, number>;
     onopen: (id: string) => void;
+    /** Chowa menu (zadokowane); w wysuniętym menu przycisku nie ma — przypina je „Przypnij”. */
+    onhide?: () => void;
   }
-  let { groups, current, query = $bindable(), hits, onopen }: Props = $props();
+  let { groups, current, query = $bindable(), hits, onopen, onhide }: Props = $props();
 
   const app = useApp();
   const { t } = app.i18n;
@@ -124,6 +128,16 @@
           <ChevronsDownUp size={15} strokeWidth={1.5} />
         {/if}
       </IconButton>
+      {#if onhide}
+        <IconButton
+          label={t('settings.nav.hide')}
+          size="sm"
+          onclick={onhide}
+          aria-keyshortcuts="Control+B"
+        >
+          <PanelRightClose size={15} strokeWidth={1.5} />
+        </IconButton>
+      {/if}
     </div>
     <div class="search">
       <Search size={14} strokeWidth={1.5} aria-hidden="true" />
@@ -218,8 +232,11 @@
   .title {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: var(--alfa-space-1);
     padding-left: var(--alfa-space-2);
+  }
+  .h1 {
+    flex: 1;
   }
   .h1 {
     margin: 0;

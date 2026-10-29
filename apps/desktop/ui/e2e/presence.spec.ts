@@ -48,7 +48,7 @@ for (const skin of SKINS) {
         let worst = '';
         // Kapsuły, przyciski i awatary (bez przycisków okna, które sięgają do krawędzi belki).
         const parts = bar.querySelectorAll(
-          '.brand, .crumbs, .cast, .gui, .mic, .cluster, .icon-btn, .avatar',
+          '.brand, .crumbs, .cast, .gui, .mic, .badge, .icon-btn, .avatar',
         );
         for (const el of parts) {
           const box = el.getBoundingClientRect();

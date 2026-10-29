@@ -56,4 +56,8 @@ export const plBroker = {
   'mode.applied': 'Tryb pracy: {mode}.',
   'mode.requested': 'Potwierdź „{mode}” w oknie Brokera — wystarczy raz.',
   'mode.raised': 'Tryb pracy: {mode} — zatwierdzony i zapamiętany.',
+  'mode.notApplied': 'Broker nie przyjął trybu „{mode}” — obowiązuje „{current}”.',
+  'mode.sessionOwn':
+    'Ta rozmowa ma własny tryb: {mode}. Wybór tutaj zmienia tryb pozostałych rozmów; tryb tej rozmowy zmienisz w Uprawnieniach.',
+  'mode.badge': 'Włączona Pełna automatyka — agentki działają bez pytań. Kliknij, aby zmienić tryb',
 } as const satisfies Record<string, Message>;

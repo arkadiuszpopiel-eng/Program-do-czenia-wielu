@@ -36,6 +36,8 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'settings.nav.collapseAll': 'Collapse all groups',
   'settings.nav.expandAll': 'Expand all groups',
   'settings.nav.clear': 'Clear search',
+  'settings.nav.hide': 'Hide the Settings menu (Ctrl+B)',
+  'settings.nav.edge': 'Settings menu — hover to slide out; click to pin',
   'settings.nav.none': 'No page matches.',
   'settings.nav.current': 'Section: {page}. Show the section list',
   'settings.nav.version': 'Alfa {version}',

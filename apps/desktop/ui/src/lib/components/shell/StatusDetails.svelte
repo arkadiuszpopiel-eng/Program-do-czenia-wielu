@@ -1,5 +1,5 @@
 <!--
-  Objaśnienie stanu z paska tytułu: połączenie (i kolejka wiadomości bez sieci), profil modeli,
+  Objaśnienie stanu z paska pisania (żeton profilu): połączenie (i kolejka wiadomości bez sieci), profil modeli,
   tryb pracy — po ludzku. Profil zmienia się tu na miejscu, tryb — w menu „Tryb pracy”
   (właściciel 27.10: klik, który tylko przenosi do Ustawień, „nie ma sensu”).
 -->
@@ -39,7 +39,7 @@
     const group = (event.currentTarget as HTMLElement).parentElement;
     group?.querySelector<HTMLElement>(`[data-profile="${next}"]`)?.focus();
   }
-  const level = $derived(session?.autonomy ?? 'L3');
+  const level = $derived(session?.autonomy ?? app.autonomy.global ?? 'L3');
   const offline = $derived(app.system?.online === false);
   const queued = $derived(app.system?.queued_messages ?? 0);
 

@@ -191,26 +191,21 @@ const CANVAS_SHARE = 0.45;
 export interface CanvasDock {
   /** Szerokość kanwy (px). */
   readonly width: number;
-  /** Lewy panel zwinięty do paska ikon, dopóki kanwa jest otwarta. */
-  readonly railLeft: boolean;
+  /** Lewy panel schowany (znacznik przy krawędzi), dopóki kanwa jest otwarta. */
+  readonly hideLeft: boolean;
   /** Prawy panel schowany, dopóki kanwa jest otwarta. */
   readonly hideRight: boolean;
 }
 
 /**
  * Kanwa obok rozmowy: szerokość z miejsca po zadokowanych panelach, przy zachowaniu kolumny
- * rozmowy ≥ `CANVAS_CHAT_MIN`. Gdy miejsca brak — najpierw lewy panel zwija się do paska ikon,
- * potem prawy się chowa; `null` — kanwa nie mieści się obok rozmowy (arkusz nad treścią).
+ * rozmowy ≥ `CANVAS_CHAT_MIN`. Gdy miejsca brak — najpierw lewy panel się chowa, potem prawy; `null` — kanwa nie mieści się obok rozmowy (arkusz nad treścią).
  */
-export function canvasDock(
-  body: number,
-  left: { readonly width: number; readonly rail: number } | null,
-  right: number,
-): CanvasDock | null {
+export function canvasDock(body: number, left: number | null, right: number): CanvasDock | null {
   const attempts = [
-    { leftWidth: left?.width ?? 0, railLeft: false, hideRight: false },
-    { leftWidth: left?.rail ?? 0, railLeft: left !== null, hideRight: false },
-    { leftWidth: left?.rail ?? 0, railLeft: left !== null, hideRight: right > 0 },
+    { leftWidth: left ?? 0, hideLeft: false, hideRight: false },
+    { leftWidth: 0, hideLeft: left !== null, hideRight: false },
+    { leftWidth: 0, hideLeft: left !== null, hideRight: right > 0 },
   ];
   for (const a of attempts) {
     const free = body - a.leftWidth - (a.hideRight ? 0 : right);
@@ -219,7 +214,7 @@ export function canvasDock(
       free - CANVAS_CHAT_MIN,
       Math.max(CANVAS_DOCK_MIN, Math.round(free * CANVAS_SHARE)),
     );
-    if (width >= CANVAS_DOCK_MIN) return { width, railLeft: a.railLeft, hideRight: a.hideRight };
+    if (width >= CANVAS_DOCK_MIN) return { width, hideLeft: a.hideLeft, hideRight: a.hideRight };
   }
   return null;
 }

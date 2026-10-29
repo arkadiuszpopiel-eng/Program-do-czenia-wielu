@@ -12,6 +12,65 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.76 — 2026-10-29
+
+Pulpit główny dopracowany według uwag właściciela z 29.10: wszystkie panele chowają się w całości i płynnie
+wysuwają, przełączanie trybu pracy naprawdę działa i widać je od razu, a ciemna kapsuła stanu przeszła z belki do
+paska pisania.
+
+### Nowe
+
+- Panele Sesje i prawy chowają się w całości — przyciskiem w nagłówku panelu, Ctrl+B albo Ctrl+\ — bez paska
+  ikon. Przy krawędzi okna świeci cienki znacznik; najechanie wysuwa panel nad rozmowę, a kliknięcie znacznika albo
+  „Przypnij panel” dokuje go z powrotem.
+- Menu Ustawień też się chowa (przycisk obok tytułu albo Ctrl+B) i wysuwa z prawej krawędzi; wybór zostaje
+  zapamiętany.
+- Pasek pisania pokazuje stan Alfy: profil modeli z kropką połączenia, tryb pracy i koszt sesji. Każdy żeton
+  otwiera swoje okienko nad paskiem.
+- Gdy włączona jest Pełna automatyka, w belce świeci bursztynowy znak „Pełna automatyka” — także w Ustawieniach;
+  kliknięcie otwiera menu trybów.
+
+### Zmiany
+
+- Belka nie ma już ciemnej kapsuły stanu; zostały w niej wskaźniki na żywo (sterowanie, mikrofon) i przełączniki
+  paneli.
+- Panele wjeżdżają i wyjeżdżają płynnie (przy ograniczonym ruchu albo wyłączonych animacjach — od razu).
+- Pasek pisania ma zawsze dwa wiersze: tekst na całą szerokość, pod nim spinacz, wybory, stan, mikrofon i
+  „Wyślij”. W wąskim polu (obok obu paneli) żetony Pipeline'ów, profilu i trybu zwijają się do ikon, a na
+  telefonie przechodzą do własnego wiersza.
+- Okienka przy pasku pisania otwierają się w górę, z łagodnym wejściem.
+- Znacznik schowanego panelu w spoczynku to sama świecąca kreska — strzałka pojawia się dopiero po najechaniu.
+- Bez otwartej rozmowy panel prawy startuje schowany — ekran startowy nie ma pustej kolumny.
+- W średnim oknie (ok. 1280 px) pokazanie Sesji chowa panel prawy za znacznik, więc przycisk w belce zawsze coś
+  robi.
+
+### Poprawki
+
+- [poważne] Zmiana trybu pracy nie działała: menu po przełączeniu nadal zaznaczało poprzedni tryb, choć komunikat
+  mówił o zmianie. Teraz menu czyta tryb z rdzenia, po zmianie sprawdza go jeszcze raz i mówi wprost, gdy zmiana
+  się nie udała; rozmowa z własnym trybem ma o tym notkę w menu.
+- Profil modeli z paska pisania i z okienka stanu to jedno ustawienie (wcześniej dwa niezależne wybory, które
+  mogły się różnić).
+- Znacznik menu Ustawień nie nachodzi na wysuniętą listę stron.
+
+### Testy
+
+- Nowy test przeglądarki `panels-slide`: chowanie, wysuwanie i przypinanie paneli w trzech stylach i dwóch
+  motywach, średnie okno, płynność przejścia, tryb pracy bez otwartej rozmowy, znak Pełnej automatyki (z axe).
+- Testy belki i paska pisania przepisane pod stan w pasku pisania (profil, tryb i koszt od 360 do 1920 px bez
+  nachodzenia, „Wyślij” zawsze przy prawej krawędzi); testy jednostkowe układu paneli i zapamiętania menu
+  Ustawień.
+- Test prawdziwego okna: tryb zaznaczony w menu zgadza się z trybem w rdzeniu, Sesje chowane przyciskiem i
+  przypinane, obniżenie trybu z paska pisania dociera do rdzenia (`zz-mode`).
+- Dwa testy przeglądu klikały pierwszą wiadomość, którą wirtualna lista po wczytaniu odmontowuje — teraz
+  ostatnią, widoczną.
+
+### Przyczyna błędu
+
+- Interfejs znał tylko tryb otwartej rozmowy. Bez rozmowy menu zawsze pokazywało domyślne „Automatycznie”, a
+  zmiany trybu ogólnego (zapisywanej w rdzeniu) nigdzie nie odczytywał — komunikat mówił o zmianie, której widok
+  nie pokazywał.
+
 ## 0.0.75 — 2026-10-28
 
 Porządki interfejsu według uwag właściciela z 27.10: tryb pracy wybierany prosto z belki, okno Brokera bez

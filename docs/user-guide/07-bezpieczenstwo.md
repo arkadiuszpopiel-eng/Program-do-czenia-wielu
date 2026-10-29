@@ -16,9 +16,11 @@ dziennika Audytu, którego nie da się po cichu poprawić.
 | L3 Automatycznie (domyślny)    | Działa sama w Twoim profilu i we wskazanych aplikacjach; pyta przy rzeczach nieodwracalnych poza zakresem, operacjach administracyjnych, destrukcji zleconej głosem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).                                                         |
 | L4 Pełna automatyka            | Bez pytań o zakres, odwracalność i operacje administracyjne; wybrana raz zostaje po restarcie. Twarde blokady Jądra obowiązują zawsze; pyta tylko, gdy polecenie głosowe może nie być Twoje (obcy albo niepewnie rozpoznany głos) i przy wysyłce danych na zewnątrz po kontakcie sesji z niezaufaną treścią (np. plik, mail, strona, ekran, wynik polecenia, schowek). |
 
-**Menu „Tryb pracy” w pasku tytułu** (tarcza z nazwą trybu): cztery tryby z opisem, klawisze `1`–`4` wybierają
+**Menu „Tryb pracy” w pasku pisania** (tarcza z nazwą trybu; przy Pełnej automatyce także bursztynowy znak w
+pasku tytułu): cztery tryby z opisem, klawisze `1`–`4` wybierają
 tryb, `Esc` zamyka menu. To samo otworzysz z palety (`Ctrl+K` → „Tryb pracy”) i z okienka stanu (kropka
-połączenia → „Zmień tryb pracy”). Pełne ustawienia, także L2 i zmiana tylko dla jednej sesji, są w **Ustawienia →
+połączenia → „Zmień tryb pracy”). Menu pokazuje tryb ogólny zapisany w Alfie; po zmianie sprawdza go jeszcze raz
+i mówi wprost, gdy zmiana się nie udała. Gdy otwarta rozmowa ma własny tryb, menu mówi to w notce. Pełne ustawienia, także L2 i zmiana tylko dla jednej sesji, są w **Ustawienia →
 Uprawnienia i bezpieczeństwo**. **Obniżenie** działa od razu. **Podniesienie** potwierdza się wyłącznie w oknie
 Brokera, jeden raz, bez odliczania (gdy okna nie ma — patrz niżej — kończy się odmową). Agentka nigdy nie podniesie
 poziomu sama.

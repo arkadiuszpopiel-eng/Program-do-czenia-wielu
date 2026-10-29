@@ -1,20 +1,17 @@
 <!--
-  Powłoka okna głównego (PLAN §14.1–14.2): pasek tytułu, panel Sesje (zadokowany / pasek ikon /
-  szuflada / arkusz), kolumna rozmowy albo Ustawienia, panel prawy, toasty, ogłoszenia aria-live
+  Powłoka okna głównego (PLAN §14.1–14.2): pasek tytułu, panel Sesje (zadokowany / szuflada /
+  arkusz / wysunięty), kolumna rozmowy albo Ustawienia, panel prawy, toasty, ogłoszenia aria-live
   i nakładki ładowane leniwie (paleta, ściągawka). Tryb skupienia chowa wszystko poza rozmową.
+  Panele wjeżdżają i wyjeżdżają płynnie (właściciel 29.10: „systemy wysuwane, dopracowane”).
 -->
 <script lang="ts">
   import { untrack } from 'svelte';
+  import { cubicOut } from 'svelte/easing';
+  import { fade, fly, slide } from 'svelte/transition';
   import { ResizeHandle } from '@alfa/ui-kit';
   import { canvasDock } from '../../logic/canvas';
-  import {
-    LEFT_MAX,
-    LEFT_MIN,
-    LEFT_RAIL,
-    RIGHT_MAX,
-    RIGHT_MIN,
-    dockedRightWidth,
-  } from '../../logic/layout';
+  import { LEFT_MAX, LEFT_MIN, RIGHT_MAX, RIGHT_MIN, dockedRightWidth } from '../../logic/layout';
+  import { panelMs } from '../../logic/motion';
   import { useApp } from '../../state/context';
   import ConversationView from '../conversation/ConversationView.svelte';
   import { focusTrap } from './focus-trap';
@@ -27,7 +24,6 @@
   import { teachDialog } from '../../state/teach-dialog.svelte';
   import RightPanel from './RightPanel.svelte';
   import SessionsPanel from './SessionsPanel.svelte';
-  import SessionsRail from './SessionsRail.svelte';
   import TitleBar from './TitleBar.svelte';
   import ToastHost from './ToastHost.svelte';
 
@@ -39,20 +35,14 @@
   const baseLeft = $derived(inSettings ? 'hidden' : place.left);
   const baseRight = $derived(inSettings ? 'hidden' : place.right);
   const rightWidth = $derived(dockedRightWidth(app.layout.rightWidth, app.layout.mode));
-  const baseRail = $derived(
-    baseLeft === 'rail' || (baseLeft === 'docked' && app.layout.leftCollapsed),
-  );
   // Kanwa (C2.8): obok rozmowy na szerokim i średnim oknie — szerokość z miejsca po panelach,
-  // rozmowa zachowuje ≥ 480 px (lewy panel zwija się do paska, a w razie potrzeby prawy się
-  // chowa, dopóki kanwa jest otwarta); gdy się nie mieści albo okno jest wąskie — arkusz.
+  // rozmowa zachowuje ≥ 480 px (lewy panel się chowa, a w razie potrzeby i prawy, dopóki kanwa
+  // jest otwarta); gdy się nie mieści albo okno jest wąskie — arkusz.
   const canvasOpen = $derived(canvas.item !== null && !inSettings);
   let bodyWidth = $state(0);
   const dock = $derived.by(() => {
     if (!canvasOpen || (app.layout.mode !== 'wide' && app.layout.mode !== 'medium')) return null;
-    const leftDock =
-      baseRail || baseLeft === 'docked'
-        ? { width: baseRail ? LEFT_RAIL : app.layout.leftWidth, rail: LEFT_RAIL }
-        : null;
+    const leftDock = baseLeft === 'docked' ? app.layout.leftWidth : null;
     const body = bodyWidth || window.innerWidth;
     return canvasDock(body, leftDock, baseRight === 'docked' ? rightWidth : 0);
   });
@@ -60,11 +50,19 @@
   // Arkusz kanwy jest jedynym oknem modalnym: szuflady paneli chowają się, dopóki jest otwarty.
   const overlay = (p: string) => p === 'drawer' || p === 'sheet';
   const sheetOpen = $derived(canvasOpen && !canvasDocked);
-  const left = $derived(sheetOpen && overlay(baseLeft) ? 'hidden' : baseLeft);
+  const left = $derived((sheetOpen && overlay(baseLeft)) || dock?.hideLeft ? 'hidden' : baseLeft);
   const right = $derived(
     (sheetOpen && overlay(baseRight)) || dock?.hideRight ? 'hidden' : baseRight,
   );
-  const rail = $derived(baseRail || (left === 'docked' && dock?.railLeft === true));
+  // Wysuwanie paneli: szerokość od zera (zadokowane) albo wjazd zza krawędzi (szuflady).
+  const dockMotion = () => ({ axis: 'x' as const, duration: panelMs(), easing: cubicOut });
+  const drawerMotion = (side: 'left' | 'right') => ({
+    x: side === 'left' ? -360 : 360,
+    opacity: 1,
+    duration: panelMs(),
+    easing: cubicOut,
+  });
+  const scrimMotion = () => ({ duration: panelMs() });
   // „Dopasowana”: kolumna rośnie z oknem — od wąskiej (72 znaki) do ok. 110 znaków, potem margines.
   const COLUMNS: Record<string, string> = {
     auto: 'clamp(var(--alfa-size-reading-column), 68%, 1000px)',
@@ -125,11 +123,9 @@
     <TitleBar />
   </div>
   <div class="body" bind:clientWidth={bodyWidth}>
-    {#if rail}
-      <SessionsRail />
-    {:else if left === 'docked'}
-      <aside class="left" style:width="{app.layout.leftWidth}px">
-        <SessionsPanel />
+    {#if left === 'docked'}
+      <aside class="left" style:width="{app.layout.leftWidth}px" transition:slide={dockMotion()}>
+        <div class="dock-inner" style:width="{app.layout.leftWidth}px"><SessionsPanel /></div>
         <ResizeHandle
           value={app.layout.leftWidth}
           min={LEFT_MIN}
@@ -160,7 +156,7 @@
       />
     {/if}
     {#if right === 'docked'}
-      <aside class="right" style:width="{rightWidth}px">
+      <aside class="right" style:width="{rightWidth}px" transition:slide={dockMotion()}>
         <ResizeHandle
           value={rightWidth}
           min={RIGHT_MIN}
@@ -169,16 +165,23 @@
           label={t('panel.resize')}
           onchange={(w) => app.layout.setRightWidth(w)}
         />
-        <RightPanel />
+        <div class="dock-inner" style:width="{rightWidth}px"><RightPanel /></div>
       </aside>
     {/if}
   </div>
 
   {#if left === 'drawer' || left === 'sheet'}
-    <button type="button" class="scrim" tabindex="-1" aria-hidden="true" onclick={closeLeft}
+    <button
+      type="button"
+      class="scrim"
+      tabindex="-1"
+      aria-hidden="true"
+      onclick={closeLeft}
+      transition:fade={scrimMotion()}
     ></button>
     <div
       class="drawer from-left {left}"
+      transition:fly={drawerMotion('left')}
       role="dialog"
       aria-modal="true"
       aria-label={t('sessions.title')}
@@ -188,10 +191,17 @@
     </div>
   {/if}
   {#if right === 'drawer' || right === 'sheet'}
-    <button type="button" class="scrim" tabindex="-1" aria-hidden="true" onclick={closeRight}
+    <button
+      type="button"
+      class="scrim"
+      tabindex="-1"
+      aria-hidden="true"
+      onclick={closeRight}
+      transition:fade={scrimMotion()}
     ></button>
     <div
       class="drawer from-right {right}"
+      transition:fly={drawerMotion('right')}
       role="dialog"
       aria-modal="true"
       aria-label={t('panel.label')}
@@ -284,6 +294,16 @@
   .left {
     border-right: 1px solid var(--alfa-color-border);
   }
+  /* Treść panelu ma stałą szerokość — przy wysuwaniu nie przelewa się, tylko wjeżdża. */
+  .dock-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+  .left .dock-inner {
+    margin-left: auto;
+  }
   .center {
     flex: 1;
     min-width: 0;
@@ -304,7 +324,6 @@
     z-index: 40;
     border: 0;
     background: var(--alfa-color-scrim);
-    animation: fade var(--alfa-duration-panel) var(--alfa-ease-out);
   }
   .drawer {
     position: fixed;
@@ -320,36 +339,17 @@
   .from-left {
     left: 0;
     border-right: 1px solid var(--alfa-color-border);
-    animation: slide-left var(--alfa-duration-panel) var(--alfa-ease-out);
   }
   .from-right {
     right: 0;
     max-width: 92vw;
     border-left: 1px solid var(--alfa-color-border);
-    animation: slide-right var(--alfa-duration-panel) var(--alfa-ease-out);
   }
   .drawer.sheet {
     left: 0;
     right: 0;
     width: 100%;
     max-width: none;
-  }
-  @keyframes fade {
-    from {
-      opacity: 0;
-    }
-  }
-  @keyframes slide-left {
-    from {
-      transform: translateX(-24px);
-      opacity: 0;
-    }
-  }
-  @keyframes slide-right {
-    from {
-      transform: translateX(24px);
-      opacity: 0;
-    }
   }
   /* Tryb skupienia: pasek tytułu wysuwa się dopiero po najechaniu na górną krawędź / fokusie. */
   .focus .titlebar-wrap {

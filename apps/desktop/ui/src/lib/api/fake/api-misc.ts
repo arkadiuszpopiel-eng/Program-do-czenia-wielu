@@ -155,14 +155,19 @@ export function filesApi(core: FakeCore): AlfaClient['files'] {
 
 export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
   // Jak Broker: obniżenie działa od razu (`applied`), podniesienie czeka w oknie Brokera.
-  let global: AutonomyLevel = 'L3';
+  // Poziom startowy z adresu (`?autonomy=L4` — podgląd znaku „Pełna automatyka” w belce).
+  const start = new URLSearchParams(globalThis.location?.search ?? '').get('autonomy');
+  let global: AutonomyLevel = ORDER.find((l) => l === start) ?? 'L3';
   // Sesje z własnym poziomem; pozostałe pokazują poziom globalny (jak `session_autonomy` w rdzeniu).
   const own = new Set<string>();
+  if (global !== 'L3')
+    for (const s of core.sessions) core.updateSession(s.id, { autonomy: global });
   return {
     get: (sid) =>
       core.reply({
         global,
-        session: sid ? (core.session(sid)?.autonomy ?? null) : null,
+        // Jak rdzeń: poziom sesji tylko wtedy, gdy ustawiono jej własny.
+        session: sid && own.has(sid) ? (core.session(sid)?.autonomy ?? null) : null,
         hello_enabled: false,
       }),
     requestLevel: (level, sid) => {

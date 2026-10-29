@@ -1,5 +1,6 @@
-// Noc 27/28.10 (0.0.75) w PRAWDZIWYM oknie (WebView2, CSP): menu „Tryb pracy” z belki, panele
-// chowane ze znacznikami (przełącznik z palety, wysunięcie po najechaniu) i słownik w dwóch
+// Noc 27/28.10 (0.0.75) i 29.10 (0.0.76) w PRAWDZIWYM oknie (WebView2, CSP): menu „Tryb pracy”
+// z paska pisania (zaznaczony tryb = tryb z rdzenia), panele chowane w całości ze znacznikami
+// (przycisk w nagłówku, przełącznik z palety, wysunięcie po najechaniu, przypięcie) i słownik w dwóch
 // częściach — okna leniwe (każda sekcja Ustawień, panele) nie pokazują surowych kluczy tekstów.
 import type { Page } from '@playwright/test';
 import { plRest } from '../src/lib/i18n/pl-rest';
@@ -34,16 +35,23 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
   if (await back.isVisible()) await back.click();
   await expect(main.locator('#alfa-composer')).toBeVisible({ timeout: 30_000 });
 
-  // Menu „Tryb pracy” z belki w każdym stylu i motywie: cztery tryby, Esc zamyka bez zmiany.
+  // Menu „Tryb pracy” z paska pisania w każdym stylu i motywie: cztery tryby, zaznaczony ten sam co
+  // na żetonie (tryb czytany z rdzenia — 29.10 menu pokazywało stary), Esc zamyka bez zmiany.
   const menu = main.getByRole('menu', { name: 'Tryb pracy' });
+  const composer = main.locator('form.composer');
+  await expect(main.locator('header.titlebar .cluster')).toHaveCount(0);
   await inEverySkin(main, async (skin, theme) => {
-    await main.getByRole('button', { name: /^Tryb pracy: / }).click();
+    const chip = composer.getByRole('button', { name: /^Tryb pracy: / });
+    const label = (await chip.getAttribute('aria-label')) ?? '';
+    const mode = /^Tryb pracy: ([^.]+)\./.exec(label)?.[1] ?? '?';
+    await chip.click();
     await expect(menu.getByRole('menuitemradio')).toHaveCount(4);
+    await expect(menu.getByRole('menuitemradio', { checked: true })).toContainText(mode);
     await shot(alfa, `42a-menu-trybu-${skin}-${theme}`);
     await main.keyboard.press('Escape');
     await expect(menu).toHaveCount(0);
-    // Okienko stanu z belki i menu adresatki z paska pisania (okienka nad rozmową).
-    await main.getByRole('button', { name: /^Stan: / }).click();
+    // Okienko stanu i menu adresatki z paska pisania (okienka nad rozmową).
+    await composer.getByRole('button', { name: /^Stan: / }).click();
     const details = main.getByRole('dialog', { name: 'Stan Alfy' });
     await expect(details).toBeVisible();
     await shot(alfa, `42d-okienko-stanu-${skin}-${theme}`);
@@ -59,6 +67,20 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
     await main.keyboard.press('Escape');
     await expect(models).toHaveCount(0);
   });
+
+  // Sesje chowane w całości przyciskiem w nagłówku: znacznik, wysunięcie, „Przypnij panel”.
+  const sessions = main.getByRole('navigation', { name: 'Sesje' });
+  await main.getByRole('button', { name: 'Schowaj panel Sesje (Ctrl+B)' }).click();
+  await expect(sessions).toHaveCount(0);
+  const leftEdge = main.locator('.edge-tab.left');
+  await expect(leftEdge).toBeVisible();
+  await leftEdge.hover();
+  const pinned = main.getByRole('complementary', { name: 'Sesje' });
+  await expect(pinned).toBeVisible();
+  await shot(alfa, '43a-sesje-wysuniete');
+  await pinned.getByRole('button', { name: 'Przypnij panel' }).click();
+  await expect(sessions).toBeVisible();
+  await expect(leftEdge).toHaveCount(0);
 
   // Panele chowane: przełącznik z palety, znacznik przy krawędzi, wysunięcie po najechaniu.
   const toggle = async () => {

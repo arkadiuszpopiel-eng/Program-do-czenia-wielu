@@ -117,13 +117,9 @@ export function runCommand(app: AppState, id: string): void {
       break;
     case 'search.everywhere':
       app.view = 'chat';
+      // Pole szukania jest w liście sesji: pokazanie listy na średnim i wąskim oknie zamyka
+      // prawy panel (oba się nie mieszczą), a przy panelach chowanych — wysuwa listę.
       app.layout.update(sid, { left_open: true });
-      // Pole szukania jest w pełnej liście sesji. Na średnim oknie z otwartym prawym panelem
-      // lista jest zwinięta do paska ikon, a na wąskim — schowana: rozwinięcie zamyka wtedy
-      // prawy panel (oba się nie mieszczą). Bez tego skrót i przycisk „Szukaj” nic nie robiły.
-      app.layout.expandLeft(sid);
-      if (app.layout.placement(sid).left === 'hidden')
-        app.layout.update(sid, { right_open: false });
       focusById('alfa-sessions-search');
       break;
     case 'search.conversation':
@@ -163,8 +159,11 @@ export function runCommand(app: AppState, id: string): void {
       break;
     }
     case 'panel.sessions':
-      if (app.layout.leftCollapsed) app.layout.setLeftCollapsed(false);
-      else app.layout.toggleLeft(sid);
+      // W Ustawieniach Ctrl+B chowa i pokazuje ich menu (tam panelu Sesje nie ma); w bardzo wąskim
+      // oknie menu stoi nad stroną i się nie chowa — bez cichej zmiany zapamiętanego wyboru.
+      if (app.view !== 'settings') app.layout.toggleLeft(sid);
+      else if (app.layout.mode !== 'compact')
+        app.layout.setSettingsNav(!app.layout.settingsNavHidden);
       break;
     case 'panel.right':
       app.layout.toggleRight(sid);
@@ -204,9 +203,9 @@ export function runCommand(app: AppState, id: string): void {
       app.openSettings('providers');
       break;
     case 'action.autonomy': {
-      // Menu „Tryb pracy” w belce (właściciel 27.10); w Ustawieniach albo przy schowanym
-      // przycisku (bardzo wąskie okno) — strona Uprawnienia.
-      const anchor = document.querySelector<HTMLElement>('.cluster .seg.mode');
+      // Menu „Tryb pracy” w pasku pisania (właściciel 29.10); w Ustawieniach albo przy schowanym
+      // przycisku — strona Uprawnienia.
+      const anchor = document.querySelector<HTMLElement>('.composer [data-level]');
       if (app.view === 'chat' && anchor?.checkVisibility())
         requestAnimationFrame(() => anchor.click());
       else app.openSettings('permissions');
@@ -263,6 +262,10 @@ export function escapeChain(app: AppState): boolean {
   if (app.palette.open || app.cheatsheetOpen) return false;
   if (app.findOpen) {
     app.findOpen = false;
+    return true;
+  }
+  if (app.view === 'settings' && app.layout.settingsPeek) {
+    app.layout.settingsPeek = false;
     return true;
   }
   if (app.view === 'settings') {

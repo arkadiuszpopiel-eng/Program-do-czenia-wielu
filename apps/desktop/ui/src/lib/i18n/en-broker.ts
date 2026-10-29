@@ -58,4 +58,8 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'mode.applied': 'Work mode: {mode}.',
   'mode.requested': 'Confirm "{mode}" in the Broker window — once is enough.',
   'mode.raised': 'Work mode: {mode} — approved and remembered.',
+  'mode.notApplied': 'The Broker did not accept "{mode}" — "{current}" is in effect.',
+  'mode.sessionOwn':
+    'This conversation has its own mode: {mode}. The choice here changes the other conversations; change this one in Permissions.',
+  'mode.badge': 'Full automation is on — agents act without asking. Click to change the work mode',
 };

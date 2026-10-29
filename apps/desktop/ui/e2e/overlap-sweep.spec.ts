@@ -64,28 +64,31 @@ for (const style of STYLES) {
       expect(errors, 'błędy w konsoli').toEqual([]);
     });
 
-    test(`profile modelu: wybór działa, menu bez nachodzenia — ${style} ${theme}`, async ({
+    // Profil wybiera się w okienku stanu z paska pisania (29.10 — kapsuła z belki przeniesiona).
+    test(`profile modelu: wybór działa, okienko bez nachodzenia — ${style} ${theme}`, async ({
       page,
     }) => {
       const errors = watchConsole(page);
       await openApp(page, { theme, path: `/?style=${style}` });
       await waitForChat(page);
       const found: string[] = [];
+      const composer = page.locator('form.composer');
+      const details = page.getByRole('dialog', { name: 'Stan Alfy' });
       for (const profile of ['Lokalny', 'Chmura', 'Hybryda']) {
-        await page.getByRole('button', { name: /^Profil modelu: / }).click();
-        const menu = page.getByRole('menu');
-        await expect(menu).toBeVisible();
-        await defects(page, `menu profilu (przed: ${profile})`, found);
-        await menu.getByRole('menuitemcheckbox', { name: profile }).click();
-        await expect(page.getByRole('menu')).toHaveCount(0);
-        const button = page.getByRole('button', { name: `Profil modelu: ${profile}` });
-        await expect(button, `wybrany profil ${profile}`).toBeVisible();
-        await button.click();
-        await expect(
-          page.getByRole('menu').getByRole('menuitemcheckbox', { name: profile }),
-          `${profile} zaznaczony w menu`,
-        ).toHaveAttribute('aria-checked', 'true');
+        await composer.getByRole('button', { name: /^Stan: / }).click();
+        await expect(details).toBeVisible();
+        await defects(page, `okienko profilu (przed: ${profile})`, found);
+        await details.getByRole('radio', { name: profile }).click();
+        await expect(details.getByRole('radio', { name: profile })).toHaveAttribute(
+          'aria-checked',
+          'true',
+        );
         await page.keyboard.press('Escape');
+        await expect(details).toHaveCount(0);
+        await expect(
+          composer.getByRole('button', { name: new RegExp(`profil ${profile}`) }),
+          `wybrany profil ${profile} w pasku pisania`,
+        ).toBeVisible();
         await defects(page, `po wyborze ${profile}`, found);
       }
       expect(found, 'nachodzenie przy profilach').toEqual([]);
@@ -94,27 +97,36 @@ for (const style of STYLES) {
   }
 }
 
-// Bez kapsuły sterowania ekranem belka ma miejsce na słowa także w 1280–1400 px (laptop 1366 px):
-// profil i nazwa trybu zamiast samego „L3”, bez nachodzenia na obsadę.
+// Stan w pasku pisania (29.10): profil, tryb pracy i koszt widoczne na każdej szerokości okna, bez
+// nachodzenia na pole i przyciski; w wąskim polu żetony zwijają słowa do ikon, a „Wyślij” zostaje
+// przy prawej krawędzi wiersza kontrolek.
 for (const style of STYLES) {
-  test(`belka bez kapsuły sterowania: słowa od 1280 px — ${style}`, async ({ page }) => {
+  test(`pasek pisania: stan ze słowami od 360 do 1920 px — ${style}`, async ({ page }) => {
     await page.setViewportSize({ width: 1600, height: 860 });
     await openApp(page, { path: `/?style=${style}` });
     await waitForChat(page);
-    await page.keyboard.press('Alt+5');
-    await page.getByRole('button', { name: 'Zatrzymaj sterowanie' }).click();
-    await page.getByRole('button', { name: 'Oddaj sterowanie' }).first().click();
-    await expect(page.getByText('Sterujesz Ty', { exact: true })).toHaveCount(0);
-    await expect(page.locator('.live-group .gui, .live-group .cam')).toHaveCount(0);
     const found: string[] = [];
-    for (const width of [1400, 1366, 1280]) {
+    const composer = page.locator('form.composer');
+    await expect(composer.locator('[data-level] .word'), 'nazwa trybu przy 1600 px').toBeVisible();
+    for (const width of [1920, 1440, 1400, 1280, 1000, 800, 480, 360]) {
       await page.setViewportSize({ width, height: 860 });
-      await expect(page.locator('.cluster .mode-name'), `${width} px`).toBeVisible();
-      await expect(page.locator('.cluster .word'), `${width} px`).toBeVisible();
-      await defects(page, `belka ${width} px`, found);
+      for (const name of [/^Stan: /, /^Tryb pracy: /, /^Koszt sesji /]) {
+        await expect(
+          composer.getByRole('button', { name }),
+          `${name} przy ${width} px`,
+        ).toBeVisible();
+      }
+      // „Wyślij” zawsze w wierszu kontrolek przy prawej krawędzi (wąskie pole zwija słowa żetonów).
+      const [box, send] = await Promise.all([
+        composer.boundingBox(),
+        composer.getByRole('button', { name: 'Wyślij' }).boundingBox(),
+      ]);
+      expect(
+        box!.x + box!.width - (send!.x + send!.width),
+        `„Wyślij” przy ${width} px`,
+      ).toBeLessThanOrEqual(12);
+      await defects(page, `pasek pisania ${width} px`, found);
     }
-    await page.setViewportSize({ width: 1279, height: 860 });
-    await expect(page.locator('.cluster .mode-short')).toBeVisible();
     expect(found).toEqual([]);
   });
 }

@@ -1,15 +1,16 @@
 <!--
-  Panele chowane (właściciel 27.10: „mają się chować, wysuwać i mieć znaczniki, że tam są”).
-  Przy krawędzi schowanego panelu świeci znacznik; krótkie najechanie wysuwa panel nad rozmowę,
-  zjechanie myszą chowa go (chyba że ma fokus albo otwarte menu), tak samo kliknięcie obok i Esc.
-  „Przypnij panel” dokuje go z powrotem (i wyłącza ustawienie „Panele chowają się same”).
+  Panele chowane (właściciel 27.10: „mają się chować, wysuwać i mieć znaczniki, że tam są”; 29.10:
+  „w pełni chowane i wysuwane”). Przy krawędzi schowanego panelu świeci znacznik; krótkie najechanie
+  wysuwa panel nad rozmowę (`PeekLayer`), kliknięcie dokuje go. Esc i klik obok chowają wysunięty
+  panel, „Przypnij panel” dokuje go (i wyłącza ustawienie „Panele chowają się same”).
 -->
 <script lang="ts">
   import { untrack } from 'svelte';
-  import Pin from '@lucide/svelte/icons/pin';
   import type { PanelPlacement, PanelSide } from '../../logic/layout';
+  import { panelMs, skipPanelMotion } from '../../logic/motion';
   import { useApp } from '../../state/context';
   import EdgeTab from './EdgeTab.svelte';
+  import PeekLayer from './PeekLayer.svelte';
   import RightPanel from './RightPanel.svelte';
   import SessionsPanel from './SessionsPanel.svelte';
 
@@ -34,9 +35,7 @@
     if (!show) untrack(() => (app.layout.peek = null));
   });
 
-  let peekEl = $state<HTMLElement | null>(null);
   let showTimer: number | undefined;
-  let hideTimer: number | undefined;
   const enter = (s: PanelSide) => {
     window.clearTimeout(showTimer);
     if (app.layout.peekable) showTimer = window.setTimeout(() => (app.layout.peek = s), 160);
@@ -45,7 +44,7 @@
   $effect(() => () => window.clearTimeout(showTimer));
 
   // Klawiatura: znacznik otwarty Enterem przenosi fokus do panelu, a po schowaniu wraca na znacznik.
-  let focusIn = false;
+  let focusIn = $state(false);
   let focusedSide: PanelSide | null = null;
   const fromTab = (s: PanelSide, open: () => void) => {
     focusIn = true;
@@ -53,70 +52,35 @@
     if (!app.layout.peek) focusIn = false;
     focusedSide = s;
   };
-  $effect(() => {
-    if (!side || !peekEl || !focusIn) return;
-    focusIn = false;
-    peekEl.querySelector<HTMLElement>('button, [href], input, [tabindex="0"]')?.focus();
-  });
+  // Panel wyjeżdża jeszcze chwilę po schowaniu (fokus bywa wtedy w nim), a zadokowany zastępuje
+  // znacznik — fokus wraca na znacznik, a gdy go już nie ma, do pierwszej kontrolki panelu.
   $effect(() => {
     if (side || !focusedSide) return;
     const s = focusedSide;
     focusedSide = null;
-    if (document.activeElement === document.body)
-      requestAnimationFrame(() => document.querySelector<HTMLElement>(`.edge-tab.${s}`)?.focus());
+    focusIn = false;
+    const active = document.activeElement;
+    if (active && active !== document.body && !active.closest('.peek')) return;
+    window.setTimeout(() => {
+      const now = document.activeElement;
+      if (now && now !== document.body && !now.closest('.peek')) return;
+      const target =
+        document.querySelector<HTMLElement>(`.edge-tab.${s}`) ??
+        document.querySelector<HTMLElement>(`aside.${s} button, aside.${s} input`);
+      target?.focus();
+    }, panelMs() + 20);
   });
-  // Panel zostaje, gdy w nim piszesz albo gdy otwarte jest menu (np. menu sesji).
-  // Ukryta lista palety (Ctrl+K) stale jest w drzewie — liczą się tylko widoczne menu.
-  const busy = () =>
-    peekEl?.querySelector('input:focus, textarea:focus, :focus-visible') ||
-    [...document.querySelectorAll('[role="menu"], [role="listbox"]')].some((el) =>
-      el.checkVisibility(),
-    );
-  const cancelHide = () => {
-    window.clearTimeout(hideTimer);
-    hideTimer = undefined;
-  };
-  const scheduleHide = () => {
-    if (hideTimer !== undefined) return;
-    hideTimer = window.setTimeout(() => {
-      hideTimer = undefined;
-      if (!busy()) app.layout.peek = null;
-    }, 450);
-  };
   const pin = (s: PanelSide) => {
     // Najpierw stan układu (synchronicznie), żeby `update` nie wysunął panelu z powrotem.
     if (app.layout.autohide) {
       app.layout.autohide = false;
       void app.setSetting('ui.panels_autohide', false);
     }
+    // Wysunięty panel zostaje na miejscu jako zadokowany — bez drugiego wjazdu.
+    skipPanelMotion();
     app.layout.peek = null;
     app.layout.update(sid, s === 'left' ? { left_open: true } : { right_open: true });
   };
-  // Panel wysuwa się pod kursorem, więc „mouseleave” nie zawsze przychodzi — liczy się ruch
-  // wskaźnika: poza panelem przez 450 ms chowa go, powrót anuluje.
-  $effect(() => {
-    if (!app.layout.peek) return;
-    const move = (e: PointerEvent) => {
-      const target = e.target as Element | null;
-      if (peekEl?.contains(target) || target?.closest('[role="menu"], [role="listbox"]'))
-        cancelHide();
-      else scheduleHide();
-    };
-    const down = (e: PointerEvent) => {
-      const target = e.target as Element | null;
-      if (peekEl?.contains(target)) return;
-      if (target?.closest('.edge-tab, .titlebar, [role="menu"], [role="listbox"], [role="dialog"]'))
-        return;
-      app.layout.peek = null;
-    };
-    window.addEventListener('pointermove', move, true);
-    window.addEventListener('pointerdown', down, true);
-    return () => {
-      window.removeEventListener('pointermove', move, true);
-      window.removeEventListener('pointerdown', down, true);
-      cancelHide();
-    };
-  });
 </script>
 
 {#if show && left === 'hidden'}
@@ -138,87 +102,17 @@
   />
 {/if}
 {#if show && side}
-  <div
-    bind:this={peekEl}
-    class="peek from-{side}"
-    role="complementary"
-    data-layer
-    aria-label={side === 'left' ? t('sessions.title') : t('panel.label')}
-    style:width="{side === 'left' ? app.layout.leftWidth : rightWidth}px"
-  >
-    <div class="body">
-      {#if side === 'left'}<SessionsPanel floating />{:else}<RightPanel />{/if}
-    </div>
-    <button type="button" class="pin" onclick={() => pin(side)}>
-      <Pin size={14} strokeWidth={1.5} aria-hidden="true" />
-      {t('edge.pin')}
-    </button>
-  </div>
+  {@const s = side}
+  {#key s}
+    <PeekLayer
+      side={s}
+      width={s === 'left' ? app.layout.leftWidth : rightWidth}
+      label={s === 'left' ? t('sessions.title') : t('panel.label')}
+      focusOnOpen={focusIn}
+      onclose={() => (app.layout.peek = null)}
+      onpin={() => pin(s)}
+    >
+      {#if s === 'left'}<SessionsPanel floating />{:else}<RightPanel />{/if}
+    </PeekLayer>
+  {/key}
 {/if}
-
-<style>
-  .peek {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 30;
-    display: flex;
-    flex-direction: column;
-    max-width: calc(100% - 48px);
-    /* Kryjące tło warstwy nad treścią (w stylu „glass” powierzchnia jest półprzezroczysta). */
-    background: var(--alfa-color-overlay, var(--alfa-color-surface));
-    box-shadow: var(--alfa-shadow-3);
-  }
-  .from-left {
-    left: 0;
-    border-right: 1px solid var(--alfa-color-border);
-    animation: slide-left var(--alfa-duration-panel) var(--alfa-ease-out);
-  }
-  .from-right {
-    right: 0;
-    border-left: 1px solid var(--alfa-color-border);
-    animation: slide-right var(--alfa-duration-panel) var(--alfa-ease-out);
-  }
-  .body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    min-height: 0;
-  }
-  .pin {
-    display: flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    gap: var(--alfa-space-2);
-    min-height: var(--alfa-size-control);
-    margin: var(--alfa-space-2);
-    border: 1px solid var(--alfa-color-border);
-    border-radius: var(--alfa-radius-control);
-    background: transparent;
-    color: var(--alfa-color-text-muted);
-    font: inherit;
-    font-size: var(--alfa-font-size-sm);
-    cursor: pointer;
-  }
-  .pin:hover {
-    background: var(--alfa-color-surface2);
-    color: var(--alfa-color-text);
-  }
-  .pin:focus-visible {
-    outline: 2px solid var(--alfa-color-focus);
-    outline-offset: 2px;
-  }
-  @keyframes slide-left {
-    from {
-      transform: translateX(-24px);
-      opacity: 0;
-    }
-  }
-  @keyframes slide-right {
-    from {
-      transform: translateX(24px);
-      opacity: 0;
-    }
-  }
-</style>

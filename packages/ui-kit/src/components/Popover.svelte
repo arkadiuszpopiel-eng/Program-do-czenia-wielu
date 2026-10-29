@@ -1,4 +1,7 @@
-<!-- Niemodalna nakładka przy przycisku (np. szczegóły kosztów): Esc i klik poza nią zamykają. -->
+<!--
+  Niemodalna nakładka przy przycisku (np. szczegóły kosztów): Esc i klik poza nią zamykają. Przy
+  przycisku nisko w oknie (pasek pisania) otwiera się w górę, jak `Menu`.
+-->
 <script lang="ts" module>
   export interface PopoverTriggerProps {
     'aria-expanded': boolean;
@@ -10,6 +13,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { tick } from 'svelte';
+  import { uiZoom } from '../zoom';
 
   interface Props {
     label: string;
@@ -32,6 +36,14 @@
   const panelId = $props.id();
   let anchor = $state<HTMLElement | null>(null);
   let panel = $state<HTMLElement | null>(null);
+  let upward = $state(false);
+
+  // Kierunek liczony przy każdym otwarciu (także z zewnątrz, np. `bind:open`).
+  $effect.pre(() => {
+    if (!open || !anchor) return;
+    // Wymiary elementów są w jednostkach po skali interfejsu, okno — w pikselach okna.
+    upward = anchor.getBoundingClientRect().bottom > (window.innerHeight / uiZoom()) * 0.6;
+  });
 
   async function toggle() {
     open = !open;
@@ -66,6 +78,7 @@
   {#if open}
     <div
       class="popover {align}"
+      class:upward
       role="dialog"
       aria-label={label}
       id={panelId}
@@ -96,6 +109,21 @@
     box-shadow: var(--alfa-shadow-3);
     color: var(--alfa-color-text);
     font-size: var(--alfa-font-size-sm);
+  }
+  .popover {
+    transform-origin: top;
+    animation: pop var(--alfa-duration-fast) var(--alfa-ease-out);
+  }
+  .popover.upward {
+    top: auto;
+    bottom: calc(100% + 6px);
+    transform-origin: bottom;
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.98);
+    }
   }
   .popover:focus {
     outline: none;

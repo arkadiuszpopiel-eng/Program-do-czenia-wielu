@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
   import { Panel } from '@alfa/ui-kit';
+  import PanelRightClose from '@lucide/svelte/icons/panel-right-close';
   import type { PanelId } from '../../api/types-system';
   import { useApp } from '../../state/context';
   import Lazy from './Lazy.svelte';
@@ -43,6 +44,7 @@
   tabsLabel={t('panel.label')}
   hideHeader
 >
+  {#snippet closeIcon()}<PanelRightClose size={16} strokeWidth={1.5} />{/snippet}
   {#if !app.activeId}
     <p class="muted">{t('sessions.empty')}</p>
   {:else if current === 'agents'}

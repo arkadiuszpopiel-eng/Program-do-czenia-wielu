@@ -68,7 +68,7 @@ test('obsada nie nachodzi na stan mikrofonu i pozostałe wskaźniki', async ({ p
   for (const width of [1280, 1000, 800]) {
     await page.setViewportSize({ width, height: 800 });
     const cast = await page.getByRole('group', { name: 'Obsada' }).boundingBox();
-    for (const selector of ['.mic', '.cluster', '.gui', '.cam']) {
+    for (const selector of ['.mic', '.badge', '.gui', '.cam']) {
       const indicator = page.locator(`header.titlebar ${selector}`);
       if (await indicator.count()) {
         const box = await indicator.boundingBox();

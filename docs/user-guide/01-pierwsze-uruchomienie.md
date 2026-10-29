@@ -38,15 +38,18 @@ Na końcu kliknij **Zaczynamy**.
 
 - **Pasek tytułu** w trzech strefach — po lewej przełącznik panelu Sesje i nazwa sesji (kliknij albo `F2`, żeby
   zmienić); na środku awatary agentek α β γ δ (ta, która mówi, porusza ustami, a z ust wylatują litery właśnie
-  pisanej odpowiedzi); po prawej stan: połączenie i profil modeli (kliknij — profil zmienisz od razu), **Tryb pracy**
-  (menu z czterema trybami, zobacz [Bezpieczeństwo](07-bezpieczenstwo.md)) i koszt sesji, potem wskaźnik mikrofonu
-  i przycisk ustawień.
-- **Panel Sesje** po lewej — lista rozmów (`Ctrl+B` chowa i pokazuje).
-- **Panele chowane:** schowany panel zostawia przy krawędzi świecący znacznik; najechanie wysuwa panel nad
-  rozmowę, zjechanie myszą, kliknięcie obok albo `Esc` go chowa, a **Przypnij panel** dokuje go z powrotem.
-  Z klawiatury: `Tab` do znacznika i `Enter`. Żeby oba panele chowały się same, włącz **Wygląd → Panele chowają
-  się same** albo wpisz w palecie „Chowaj panele”.
-- **Rozmowa** na środku i pole wiadomości na dole.
+  pisanej odpowiedzi); po prawej wskaźniki na żywo (sterowanie ekranem, kamera, mikrofon), przełącznik panelu
+  prawego i przycisk ustawień. Gdy włączona jest **Pełna automatyka**, świeci tu też bursztynowy znak trybu
+  (kliknij — otworzy menu trybów).
+- **Panel Sesje** po lewej — lista rozmów (`Ctrl+B` albo przycisk w nagłówku panelu chowa go w całości).
+- **Panele chowane:** schowany panel znika cały, a przy krawędzi okna zostaje cienki świecący znacznik; najechanie
+  wysuwa panel nad rozmowę, zjechanie myszą, kliknięcie obok albo `Esc` go chowa, a kliknięcie znacznika albo
+  **Przypnij panel** dokuje go z powrotem. Z klawiatury: `Tab` do znacznika i `Enter`. Żeby oba panele chowały
+  się same, włącz **Wygląd → Panele chowają się same** albo wpisz w palecie „Chowaj panele”. W Ustawieniach tak
+  samo chowa się menu stron (przycisk obok tytułu „Ustawienia” albo `Ctrl+B`).
+- **Rozmowa** na środku i pole wiadomości na dole. W pasku pisania obok Pipeline'ów i trybu Auto są żetony
+  stanu: profil modeli z kropką połączenia (kliknij — profil zmienisz od razu), **Tryb pracy** (menu z czterema
+  trybami, zobacz [Bezpieczeństwo](07-bezpieczenstwo.md)) i koszt sesji.
 - **Panel prawy** (`Ctrl+\`) z kartami: Agentki (`Alt+1`), Oś czasu (`Alt+2`), Pliki (`Alt+3`), Pamięć (`Alt+4`),
   Ekran (`Alt+5`), Głos (`Alt+6` — **jeszcze niedostępny**, ustawienia głosu są w Ustawieniach) i Zadania (`Alt+7`).
 - **Tryb skupienia** (`F11`) chowa wszystko poza rozmową; `Esc` albo `F11` przywraca widok. Tryb zostaje

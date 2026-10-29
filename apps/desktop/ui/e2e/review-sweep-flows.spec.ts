@@ -191,7 +191,8 @@ for (const style of STYLES) {
         for (const defect of await layoutDefects(page)) found.push(`${label}: ${defect}`);
       };
       // Prawy przycisk na wiadomości przypina jej pasek akcji (kopiuj, ponów…); drugi — odpina.
-      const message = page.locator('.message, article').first();
+      // Ostatnia wiadomość — lista jest wirtualna, pierwsza (poza oknem) bywa odmontowana.
+      const message = page.locator('article.msg').last();
       await message.click({ button: 'right', position: { x: 12, y: 12 } });
       await expect(message).toHaveClass(/pinned/);
       await check('wiadomość z przypiętym paskiem akcji');

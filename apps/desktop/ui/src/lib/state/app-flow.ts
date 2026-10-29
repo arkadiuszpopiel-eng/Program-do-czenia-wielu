@@ -44,6 +44,7 @@ export async function start(app: AppState): Promise<void> {
   void app.client.cameras.state().then((c) => (app.cameras = c), logFailure('cameras'));
   void app.updates.load(app.client.updates);
   void app.broker.load(app.client.broker);
+  void app.autonomy.load(app.client.permissions);
   // Ładowane po starcie (budżet rozmiaru okna głównego): sygnał i dziennik rozruchu.
   void import('./boot.svelte').then((m) => m.watchBoot(app), logFailure('boot'));
   const first = boot.active_session_id ?? list.find((s) => !s.archived)?.id ?? null;

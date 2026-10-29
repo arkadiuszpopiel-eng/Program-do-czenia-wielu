@@ -1,14 +1,15 @@
 <!--
   Pasek tytułu (36 px, PLAN §14.2): znak i nazwa programu, przełącznik panelu Sesje, ścieżka projekt ▸ sesja (klik = zmień
-  nazwę), obsada α β γ δ z pierścieniem koloru (świeci mówiąca / pracująca), stan (profil · L · koszt),
-  panel prawy, ustawienia. Puste obszary to region przeciągania okna (Tauri); natywne przyciski
+  nazwę), obsada α β γ δ z pierścieniem koloru (świeci mówiąca / pracująca), wskaźniki na żywo
+  (ekran, kamera, mikrofon), znak „Pełna automatyka”, panel prawy, ustawienia. Stan (profil, tryb
+  pracy, koszt) jest w pasku pisania (właściciel 29.10). Puste obszary to region przeciągania okna (Tauri); natywne przyciski
   okna (`WindowControls`) rysuje interfejs — okno nie ma belki systemowej. Wzdłuż dolnej krawędzi
   biegnie pasek LED (`TitleLed`).
 -->
 <script lang="ts">
   import type { Component } from 'svelte';
   import { IconButton } from '@alfa/ui-kit';
-  import Menu from '@lucide/svelte/icons/menu';
+  import PanelLeft from '@lucide/svelte/icons/panel-left';
   import Settings from '@lucide/svelte/icons/settings';
   import PanelRight from '@lucide/svelte/icons/panel-right';
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -16,7 +17,7 @@
   import AlfaMark from './AlfaMark.svelte';
   import CastStrip from './CastStrip.svelte';
   import MicIndicator from './MicIndicator.svelte';
-  import StatusCluster from './StatusCluster.svelte';
+  import ModeBadge from './ModeBadge.svelte';
   import TitleLed from './TitleLed.svelte';
   import WindowControls from './WindowControls.svelte';
 
@@ -89,13 +90,10 @@
         label={place.left === 'hidden' ? t('titlebar.showSessions') : t('titlebar.hideSessions')}
         size="sm"
         pressed={place.left !== 'hidden'}
-        onclick={() =>
-          app.layout.leftCollapsed && !app.layout.autohide
-            ? app.layout.setLeftCollapsed(false)
-            : app.layout.toggleLeft(app.activeId)}
+        onclick={() => app.layout.toggleLeft(app.activeId)}
         aria-keyshortcuts="Control+B"
       >
-        <Menu size={16} strokeWidth={1.5} />
+        <PanelLeft size={16} strokeWidth={1.5} />
       </IconButton>
     {/if}
     {#if renaming && session}
@@ -138,7 +136,7 @@
       {#if live}<live.gui /><live.camera />{/if}
       <MicIndicator />
     </div>
-    <StatusCluster />
+    <ModeBadge />
     <div class="group tools">
       {#if app.view !== 'settings'}
         <IconButton
@@ -255,54 +253,12 @@
       display: block;
     }
   }
-  /* Tryb pracy skrótem „L3” jak reszta kapsuły bez słów: pełna nazwa przesuwała stan pod obsadę
-     na środku (axe: target-size). Nazwa — w etykiecie przycisku. Do 1279 px zawsze, do 1400 px tylko
-     przy kapsule sterowania ekranem albo kamery (bez niej słowa mieszczą się, np. na 1366 px). */
-  @media (min-width: 721px) and (max-width: 1279px) {
-    .titlebar :global(.cluster .word),
-    .titlebar :global(.cluster .mode-name) {
-      display: none;
-    }
-    .titlebar :global(.cluster .mode-short) {
-      display: inline;
-    }
-  }
-  @media (min-width: 1280px) and (max-width: 1400px) {
-    .titlebar:has(.live-group :global(.gui)) :global(.cluster .word),
-    .titlebar:has(.live-group :global(.gui)) :global(.cluster .mode-name),
-    .titlebar:has(.live-group :global(.cam)) :global(.cluster .word),
-    .titlebar:has(.live-group :global(.cam)) :global(.cluster .mode-name) {
-      display: none;
-    }
-    .titlebar:has(.live-group :global(.gui)) :global(.cluster .mode-short),
-    .titlebar:has(.live-group :global(.cam)) :global(.cluster .mode-short) {
-      display: inline;
-    }
-  }
   @media (min-width: 721px) and (max-width: 1100px) {
     .titlebar,
     .zone {
       gap: var(--alfa-space-1);
     }
-    .titlebar :global(.cluster > .anchor:last-child),
-    .titlebar :global(.cluster .rule),
     .titlebar :global(.mic .text) {
-      display: none;
-    }
-    /* Segment trybu pracy węższy — kapsuła sterowania ekranem nie wchodzi pod obsadę. */
-    .titlebar :global(.cluster .seg.mode) {
-      padding: 0 2px;
-    }
-  }
-  @media (min-width: 721px) and (max-width: 900px) {
-    .titlebar :global(.cluster) {
-      display: none;
-    }
-    .titlebar :global(.cluster .seg) {
-      padding: 0 var(--alfa-space-1);
-    }
-    .titlebar :global(.cluster .state .ico),
-    .titlebar :global(.cluster .level svg) {
       display: none;
     }
   }

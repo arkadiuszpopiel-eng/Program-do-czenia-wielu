@@ -25,6 +25,8 @@
     tabsLabel?: string;
     /** Ukryj nagłówek z tytułem (np. gdy karty same nazywają panel). */
     hideHeader?: boolean;
+    /** Ikona przycisku zamknięcia (domyślnie ×; np. „schowaj panel”). */
+    closeIcon?: Snippet;
   }
 
   let {
@@ -39,6 +41,7 @@
     closeLabel,
     tabsLabel,
     hideHeader = false,
+    closeIcon,
   }: Props = $props();
 
   const tablistId = $props.id();
@@ -73,7 +76,7 @@
       {#if actions}{@render actions()}{/if}
       {#if onclose}
         <IconButton label={closeLabel ?? `Zamknij panel ${title}`} size="sm" onclick={onclose}>
-          <X size={16} strokeWidth={1.5} />
+          {#if closeIcon}{@render closeIcon()}{:else}<X size={16} strokeWidth={1.5} />{/if}
         </IconButton>
       {/if}
     </div>

@@ -1,12 +1,23 @@
 <!--
-  Composer rozmowy: szkic per sesja, @agentka i /komendy z podpowiedziami (listbox), chipy agentki
-  i profilu modelu, historia Ctrl+↑/↓, ↑ w pustym polu = edytuj ostatnią, Stop w trakcie strumienia.
+  Composer rozmowy: szkic per sesja, @agentka i /komendy z podpowiedziami (listbox), chip agentki
+  i stan (profil z połączeniem, tryb pracy, koszt — `ComposerStatus`), historia Ctrl+↑/↓, ↑ w pustym
+  polu = edytuj ostatnią, Stop w trakcie strumienia.
   Załączniki: spinacz, wklejenie (czyta rdzeń), przeciągnięcie, zdjęcie z kamery — artefakty sesji.
 -->
 <script lang="ts">
-  import { Chip, Composer, Menu, MicButton, agentIds, agents, type AgentId, type MenuItem } from '@alfa/ui-kit';
+  import {
+    Chip,
+    Composer,
+    Menu,
+    MicButton,
+    agentIds,
+    agents,
+    type AgentId,
+    type MenuItem,
+  } from '@alfa/ui-kit';
+  import Workflow from '@lucide/svelte/icons/workflow';
   import CameraSnapButton from './CameraSnapButton.svelte';
-  import type { ModelProfile } from '../../api/types';
+  import ComposerStatus from './ComposerStatus.svelte';
   import {
     SentHistory,
     addressedAgent,
@@ -19,6 +30,7 @@
   import { useApp } from '../../state/context';
   import { openPipelines } from '../../state/board-dialog.svelte';
   import { runCommand } from '../../state/commands';
+  import { currentProfile } from '../../state/profile';
   import type { ConversationState } from '../../state/conversation.svelte';
   import { AttachmentsState } from '../../state/attachments.svelte';
   import ComposerHint from './ComposerHint.svelte';
@@ -53,7 +65,6 @@
   let trigger = $state<Trigger | null>(null);
   let active = $state(0);
   let chosenAgent = $state<AgentId | null>(null);
-  let profile = $state<ModelProfile | null>(null);
   let profileMenuOpen = $state(false);
 
   const att = new AttachmentsState(app);
@@ -70,12 +81,8 @@
   const draft = $derived(app.activeId ? (app.sessions.drafts[app.activeId] ?? '') : '');
   const setDraft = (text: string): void => app.setDraft(text);
 
-  const effectiveProfile = $derived<ModelProfile>(
-    profile ??
-      (app.system?.profile === 'local'
-        ? 'local'
-        : (app.str('models.default_profile', 'hybrid') as ModelProfile)),
-  );
+  // Profil wybrany w pasku pisania jest ustawieniem (ten sam wszędzie) — rdzeń bierze go domyślnie.
+  const effectiveProfile = $derived(currentProfile(app));
   const agentList = agentIds.map((id) => ({ id, name: agents[id].name }));
 
   const suggestions = $derived.by((): Suggestion[] => {
@@ -202,7 +209,7 @@
     if (!conv) await app.newSession();
     const target = conv ?? app.conversation;
     if (!target) return;
-    await target.send(text, chosenAgent ?? addressedAgent(text, agentList), profile, files);
+    await target.send(text, chosenAgent ?? addressedAgent(text, agentList), null, files);
     att.sent(files);
   }
 
@@ -247,15 +254,6 @@
       onSelect: () => (chosenAgent = id),
     })),
   ]);
-  const profileItems = $derived<MenuItem[]>(
-    (['local', 'hybrid', 'cloud'] as const).map((p) => ({
-      id: p,
-      label: t(`profile.${p}`),
-      checked: effectiveProfile === p,
-      disabled: p !== 'local' && app.system?.keys_configured === false,
-      onSelect: () => (profile = p),
-    })),
-  );
   const micLabels = $derived({
     off: { label: t('mic.off'), hint: t('mic.hint.off') },
     listening: { label: t('mic.listening'), hint: t('mic.hint.on') },
@@ -313,7 +311,11 @@
     onstop={() => void conv?.stop()}
   >
     {#snippet above()}
-      {#if att.items.length > 0}<Lazy load={loadAttachments} props={{ att, profile: effectiveProfile, turns: conv?.path ?? [] }} label={t('common.loading')} />{/if}
+      {#if att.items.length > 0}<Lazy
+          load={loadAttachments}
+          props={{ att, profile: effectiveProfile, turns: conv?.path ?? [] }}
+          label={t('common.loading')}
+        />{/if}
       <p class="alfa-visually-hidden" role="status">{att.status}</p>
       {#if open}
         <ComposerSuggest
@@ -327,7 +329,10 @@
     {/snippet}
     {#snippet chips()}
       <CameraSnapButton {att} />
-      <Chip size="sm" onclick={() => openPipelines()} label={t('sessions.pipelines')}>{t('sessions.pipelinesBtn')}</Chip>
+      <Chip size="sm" onclick={() => openPipelines()} label={t('sessions.pipelines')}>
+        {#snippet icon()}<Workflow size={13} strokeWidth={1.75} />{/snippet}
+        <span class="short">{t('sessions.pipelinesBtn')}</span>
+      </Chip>
       <Menu
         items={agentItems}
         label={t('composer.agent', {
@@ -349,22 +354,7 @@
           </Chip>
         {/snippet}
       </Menu>
-      <Menu
-        items={profileItems}
-        label={t('composer.profile', { profile: t(`profile.${effectiveProfile}`) })}
-        bind:open={profileMenuOpen}
-      >
-        {#snippet trigger(props)}
-          <Chip
-            {...props}
-            size="sm"
-            onclick={props.onclick}
-            label={t('composer.profile', { profile: t(`profile.${effectiveProfile}`) })}
-          >
-            {t(`profile.${effectiveProfile}`)} ▾
-          </Chip>
-        {/snippet}
-      </Menu>
+      <ComposerStatus bind:profileOpen={profileMenuOpen} />
     {/snippet}
     {#snippet trailing()}
       <MicButton state={app.micState} showLabel={false} onclick={toggleMic} labels={micLabels} />
@@ -374,6 +364,13 @@
 </div>
 
 <style>
+  /* Wąskie pole (obok obu paneli): Pipeline'y jako sama ikona, żeby kontrolki mieściły się w
+     jednym wierszu pod tekstem (na telefonie wybory mają własny wiersz — wtedy znów ze słowem). */
+  @container (421px <= width <= 640px) {
+    .short {
+      display: none;
+    }
+  }
   .composer-area {
     position: relative;
     display: flex;

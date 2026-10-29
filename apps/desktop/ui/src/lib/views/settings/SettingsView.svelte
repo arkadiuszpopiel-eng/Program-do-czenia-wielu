@@ -1,9 +1,15 @@
 <!--
   Ustawienia (PLAN §15, makieta 11): nawigacja (`SettingsNav`) + strona. Każde ustawienie ma opis,
-  domyślną, zakres i reset. Strony z późniejszych fal pokazują, co się na nich pojawi.
+  domyślną, zakres i reset. Strony z późniejszych fal pokazują, co się na nich pojawi. Menu można
+  schować (Ctrl+B) — zostaje znacznik przy krawędzi, a menu wysuwa się nad stronę (29.10).
 -->
 <script lang="ts">
   import { Button, EmptyState } from '@alfa/ui-kit';
+  import { cubicOut } from 'svelte/easing';
+  import { slide } from 'svelte/transition';
+  import { panelMs, skipPanelMotion } from '../../logic/motion';
+  import EdgeTab from '../../components/shell/EdgeTab.svelte';
+  import PeekLayer from '../../components/shell/PeekLayer.svelte';
   import Hourglass from '@lucide/svelte/icons/hourglass';
   import type { SettingsPageDef } from '../../api/types-system';
   import LoadFailed from '../../components/shell/LoadFailed.svelte';
@@ -93,18 +99,73 @@
   const rest = $derived(
     !page || page.custom === 'cameras'
       ? []
-      : page.settings.filter((def) => (page.custom !== 'voice' || !isSpeechTuning(def)) && !/^agents\.(alfa|beta|gama|delta)\./.test(def.key)),
+      : page.settings.filter(
+          (def) =>
+            (page.custom !== 'voice' || !isSpeechTuning(def)) &&
+            !/^agents\.(alfa|beta|gama|delta)\./.test(def.key),
+        ),
   );
 
   function open(id: string) {
     query = '';
     app.settingsPage = id;
+    app.layout.settingsPeek = false;
     requestAnimationFrame(() => document.getElementById('settings-page-title')?.focus());
+  }
+
+  // W bardzo wąskim oknie menu stoi nad stroną i się nie chowa.
+  const navHidden = $derived(app.layout.settingsNavHidden && app.layout.mode !== 'compact');
+  const NAV_WIDTH = 272;
+  let peekTimer: number | undefined;
+  const enterTab = () => {
+    window.clearTimeout(peekTimer);
+    peekTimer = window.setTimeout(() => (app.layout.settingsPeek = true), 160);
+  };
+  // Wyjście z Ustawień w trakcie wysunięcia — przy następnym otwarciu menu nie wyjeżdża samo.
+  $effect(() => () => {
+    window.clearTimeout(peekTimer);
+    app.layout.settingsPeek = false;
+  });
+  function pinNav() {
+    skipPanelMotion();
+    app.layout.setSettingsNav(false);
   }
 </script>
 
 <div class="settings">
-  <SettingsNav {groups} current={page?.id} bind:query {hits} onopen={open} />
+  {#if !navHidden}
+    <div class="nav-dock" transition:slide={{ axis: 'x', duration: panelMs(), easing: cubicOut }}>
+      <SettingsNav
+        {groups}
+        current={page?.id}
+        bind:query
+        {hits}
+        onopen={open}
+        onhide={app.layout.mode === 'compact' ? undefined : () => app.layout.setSettingsNav(true)}
+      />
+    </div>
+  {:else}
+    <!-- Znacznik znika, gdy menu jest wysunięte — uchwyt nie nachodzi na listę stron. -->
+    {#if !app.layout.settingsPeek}
+      <EdgeTab
+        side="right"
+        label={t('settings.nav.edge')}
+        onenter={enterTab}
+        onleave={() => window.clearTimeout(peekTimer)}
+        onclick={pinNav}
+      />
+    {:else}
+      <PeekLayer
+        side="right"
+        width={NAV_WIDTH}
+        label={t('settings.title')}
+        onclose={() => (app.layout.settingsPeek = false)}
+        onpin={pinNav}
+      >
+        <SettingsNav {groups} current={page?.id} bind:query {hits} onopen={open} />
+      </PeekLayer>
+    {/if}
+  {/if}
   <section class="content" aria-labelledby="settings-page-title">
     <div class="page">
       {#if loaded.status === 'failed'}
@@ -191,10 +252,22 @@
 
 <style>
   .settings {
+    position: relative;
     display: flex;
     flex-direction: row-reverse;
     height: 100%;
     min-height: 0;
+  }
+  .nav-dock {
+    display: flex;
+    flex: none;
+    min-height: 0;
+  }
+  /* Wysunięte menu wypełnia warstwę (bez własnej krawędzi — ma ją warstwa). */
+  .settings :global(.peek .nav) {
+    flex: 1;
+    width: 100%;
+    border-left: 0;
   }
   .content {
     flex: 1;
@@ -235,6 +308,11 @@
   @media (max-width: 720px) {
     .settings {
       flex-direction: column;
+    }
+    .nav-dock {
+      flex-direction: column;
+      width: 100%;
+      max-height: 70%;
     }
     .content {
       padding: var(--alfa-space-4);
