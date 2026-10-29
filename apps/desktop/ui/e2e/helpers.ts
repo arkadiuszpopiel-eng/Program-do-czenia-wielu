@@ -33,6 +33,9 @@ export async function pickOption(select: Locator, value: string) {
  */
 export async function waitForChat(page: Page, timeout = 30_000) {
   await expect(page.locator('#alfa-composer')).toBeVisible({ timeout });
+  // Ekran rozruchu wygasza się jeszcze chwilę nad gotową treścią — przeglądy nachodzenia
+  // łapały go jako „Wczytuję rozmowy…” na wiadomości (verify 0.0.78).
+  await expect(page.locator('#alfa-boot')).toHaveCount(0, { timeout });
 }
 
 /** 0 naruszeń critical/serious (kryterium F1, ACC-F1-ui-shell-02). */
