@@ -1,10 +1,11 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-22**, wersja programu **0.0.72** („0.0.71B”, wgrana do `Alfa-uruchomiona` 22.10 ok. 14:35 — bez okna
-konsoli i portu CDP, zamknięta do czasu otwarcia skrótem „Alfa”), gałąź `ccr-af4b63c6-3fyzaj`
-(514 commitów lokalnych ponad `origin`, niewypchnięte).
-0.0.72 = 0.0.71 (raport 37) + raport 38: start bez okna konsoli, dziennik rozruchu w programie z sygnałem „Rozruch OK /
-z uwagami / z problemem”, watchdog bez fałszywego błędu i bez utraty skrótu przy restarcie Brokera.
+Stan na **2026-10-30**, wersja programu **0.0.78** (noc 29/30.10, raport [`44`](44-raport-2026-10-30-noc.md); wgrywana
+do `Alfa-uruchomiona` bez uruchamiania — otwiera ją właściciel skrótem „Alfa”), gałąź `ccr-af4b63c6-3fyzaj`
+(commity lokalne, niewypchnięte). 0.0.73–0.0.77: przegląd zmian z 23–24.10, silnik NextGO.Gray, tryb pracy w belce,
+porządki interfejsu, styl Junior i czytane zdanie (raporty 39–42, CHANGELOG). 0.0.78: C2.3 zrobione — narzędzia
+modelu lokalnego sprawdzone na prawdziwym Bieliku 4.5B (F3 0/35 → 11/35 po poprawkach, `tool_request` zielony),
+C2.8 — historia wersji artefaktu w kanwie.
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 

@@ -2,7 +2,7 @@
 # Moduł Jądra: zmiany wymagają przeglądu człowieka (AGENTS.md). Launcher `alfa.exe` to binarium tego pakietu.
 # `net.egress(update-feed)` = wyłącznie adres wydań wbudowany w wydanie (`ALFA_UPDATE_FEED`, https://); bez telemetrii.
 id = "updater"
-version = "0.0.77"
+version = "0.0.78"
 kind = "service"
 provides = ["updater-contract@1"]
 requires = ["core-bus-contract@1"]

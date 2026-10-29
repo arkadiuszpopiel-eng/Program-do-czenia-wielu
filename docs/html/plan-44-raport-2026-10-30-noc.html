@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78 — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/44-raport-2026-10-30-noc.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html" aria-current="page">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#1-polecenia-wlasciciela-punkt-po-punkcie">1. Polecenia właściciela — punkt po punkcie</a></li><li><a href="#2-c2-3-narzedzia-lokalnego-modelu-na-prawdziwym-bieliku-4-5b">2. C2.3 — narzędzia lokalnego modelu na prawdziwym Bieliku 4.5B</a></li><li><a href="#3-c2-8-historia-wersji-artefaktu-w-kanwie">3. C2.8 — historia wersji artefaktu w kanwie</a></li><li><a href="#4-sprawdzenie">4. Sprawdzenie</a></li><li><a href="#5-czego-nie-sprawdzilam">5. Czego nie sprawdziłam</a></li><li><a href="#6-wgranie-i-kopia">6. Wgranie i kopia</a></li></ul></aside><article><h1 id="raport-z-nocy-29-30-10-narzedzia-na-prawdziwym-bieliku-historia-wersji-kanwy-wersja-0-0-78">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</h1>
+<p>Właściciel 29.10 wieczorem polecił: „pracuj automatycznie do 4:30, wykonuj poprawki i plan, potem kopia na F:
+i koniec pracy — do 5:10 maksymalnie ma być już stop”. Wcześniej tego wieczoru: podnieść stałą zgodę na pobrania
+do 5 GB, posprzątać stare kompilacje (katalog zajmował 166 GB) i pobierać na E:, nie na C:. Ten raport mówi, co
+zrobiłam, gdzie to zobaczyć i czego nie sprawdziłam.</p>
+<h2 id="1-polecenia-wlasciciela-punkt-po-punkcie">1. Polecenia właściciela — punkt po punkcie</h2>
+<div class="tbl"><table><thead><tr><th>Polecenie</th><th>Co zrobiłam</th></tr></thead><tbody><tr><td>Zgoda na pobrania do 5 GB</td><td>zapisana w pamięci projektu i w <code>memory/decisions.md</code> (29.10); powyżej 5 GB pytam z rzeczywistym rozmiarem</td></tr>
+<tr><td>Sprzątanie starych kompilacji (166 GB)</td><td>katalog <code>alfa</code> 166 → 23 GB, na E: 205 GB wolnego; zostały tylko budowy potrzebne (kopia właściciela, ostatni verify)</td></tr>
+<tr><td>Pobierać na E:, nie na C:</td><td>próba silników na żywo pobiera do <code>E:\…\alfa-live-2026-10-29</code> (poza repozytorium), katalog usuwam po próbie</td></tr>
+<tr><td>Kolejne dwa etapy: C2.3 i C2.8</td><td>C2.8 zrobione; C2.3 — format JSON potwierdzony na prawdziwym modelu, skuteczność zadań 0/35 → 11/35 (szczegóły w §2)</td></tr>
+<tr><td>Praca do 4:30, potem kopia na F:, stop 5:10</td><td>wersja 0.0.78 zbudowana i sprawdzona <code>verify wersja</code>, wgrana bez uruchamiania, kopia na F: (§6)</td></tr></tbody></table></div>
+<h2 id="2-c2-3-narzedzia-lokalnego-modelu-na-prawdziwym-bieliku-4-5b">2. C2.3 — narzędzia lokalnego modelu na prawdziwym Bieliku 4.5B</h2>
+<p>Pomiar: laptop (RTX 4050 6 GB), <code>llama-server</code> b11559 z CUDA, Bielik 4.5B v3.0 Q8_0, zestaw F3 (35 zadań:
+24 plikowe, 11 powłoki) przez prawdziwy <code>agent-runtime</code>, narzędzia aplikacji i Brokera (<code>eval_tools.rs --ignored</code>).</p>
+<div class="tbl"><table><thead><tr><th>Przebieg</th><th>Wynik</th><th><code>fs</code></th><th><code>shell</code></th><th>Co zmieniło się przed przebiegiem</th></tr></thead><tbody><tr><td>v1 (koperta 0.0.64)</td><td><strong>0/35</strong></td><td>0/24</td><td>0/11</td><td>—</td></tr>
+<tr><td>v2</td><td><strong>5/35</strong></td><td>5/24</td><td>0/11</td><td>wywołanie jako wybór na początku koperty; samoweryfikacja zwraca odpowiedź; backend stały</td></tr>
+<tr><td>v3</td><td><strong>11/35</strong></td><td>9/24</td><td>2/11</td><td>ścieżki względne w prompcie; Windows PowerShell bez PS 7; podpowiedź przy powtórzeniu</td></tr></tbody></table></div>
+<p>Przyczyny znalezione w śladach przebiegów (zdarzenia <code>RunEvent</code> każdego kroku) i poprawki — wszystkie ogólne,
+działają dla każdego modelu, nie tylko w ewaluacji:</p>
+<ol>
+<li><strong>Wywołanie wpisane jako tekst</strong> (v1): koperta <code>{&quot;response&quot;, &quot;tool_call&quot;?}</code> zaczynała się od <code>response</code>, więc
+model pisał tam <code>fs_write(...)</code> jako zdanie i kończył. Teraz schemat to <code>anyOf</code>: obiekt z wymaganym
+<code>tool_call</code> na początku albo sama odpowiedź — model najpierw wybiera, czy wywołuje
+(<code>providers-local-impl/src/schema.rs</code>, <code>envelope.rs</code>).</li>
+<li><strong>Samoweryfikacja w kółko</strong> (v1): model dopisywał wywołanie do „WERYFIKACJA: OK”, runtime je wykonywał
+i weryfikował dalej aż do wykrycia pętli. Teraz werdykt kończy weryfikację, a doklejone wywołania nie są
+wykonywane ani zapisywane. Wynikiem jest sprawdzana odpowiedź, nie tekst werdyktu (<code>verified_answer</code>).</li>
+<li><strong>Serwer liczył na procesorze</strong>: bez profilu urządzenia stały wybór CUDA/Vulkan był ignorowany
+(<code>placement.rs</code>) — to samo dotyczy aplikacji, gdy profil się nie wczyta.</li>
+<li><strong>Literówki w ścieżkach</strong> (v2): model przepisywał długą ścieżkę bezwzględną z błędem („Tepm” zamiast
+„Temp”) i zapisywał pliki poza katalogiem zadania. Prompt każe teraz podawać pliki ścieżką względną
+(narzędzia i tak rozwiązują ją względem katalogu roboczego). W v3 zdarzyło się to jeszcze raz (fs-02).</li>
+<li><strong>Brak PowerShell 7</strong> (v2, cała powłoka 0/11): domyślna powłoka <code>pwsh</code> nie istnieje na tym laptopie,
+każde polecenie kończyło się „nie znaleziono ścieżki”. <code>ShellToolsConfig::detected()</code> wybiera wtedy Windows
+PowerShell — w aplikacji też, więc u właściciela bez PS 7 agentki dotąd nie mogły uruchomić żadnego polecenia.</li>
+<li><strong>To samo wywołanie po gotowej odpowiedzi</strong> (v2): model dopisywał ponownie ten sam odczyt aż do wykrycia
+pętli. Wynik powtórzonego wywołania dostaje teraz podpowiedź „jeśli masz odpowiedź, podaj ją bez narzędzia”
+(wywołanie nadal się wykonuje, więc odpytywanie stanu działa).</li>
+</ol>
+<p>Co dalej ogranicza wynik (bez poprawek — to model albo decyzja człowieka):</p>
+<ul>
+<li><strong>Rachunki i przetwarzanie treści</strong> przez model 4,5B: zła suma CSV (100 zamiast 200), pusta deduplikacja,
+zamiana nazwisk tylko w części pliku, JSON w JSON-ie rozjeżdżający się do limitu tokenów (fs-13 w v2).</li>
+<li><strong>Odpowiedź „zrobione” przed wykonaniem</strong>: pole <code>response</code> po wywołaniu opisuje wynik, którego jeszcze nie
+ma („plik został zapisany”). Plan w osi czasu brzmi więc jak raport. Do rozważenia: osobne pole „plan” albo
+pokazywanie tego tekstu dopiero po wyniku narzędzia.</li>
+<li><strong>Fałszywa odmowa mnożenia w PowerShellu</strong> (sh-09): <code>Echo ((17 * 23)) &gt; iloczyn.txt</code> — samodzielny <code>*</code>
+analizator powłoki traktuje jak wzorzec ścieżki, który mógłby objąć <code>.ssh</code>, i odmawia („ścieżka
+poświadczeń”). To świadomie ostrożna reguła deny-listy — <strong>nie zmieniałam jej</strong>; propozycja do przeglądu
+człowieka: nie traktować <code>*</code> jako wzorca, gdy stoi między liczbami albo wewnątrz <code>( … )</code> w PowerShellu.</li>
+<li><strong>fs-23 (trwałe usunięcie)</strong>: Broker wstrzymał trwałe usunięcie do zgody właściciela (dobrze), po czym model
+przeniósł plik do Kosza (odwracalne) i napisał, że trwałe usunięcie wymaga zgody. Zestaw oczekuje braku
+zmian w pliku. Czy przeniesienie do Kosza po wstrzymaniu to dopuszczalna „inna droga”, czy obejście —
+decyzja do ADR/zestawu (zestaw zamraża człowiek).</li>
+<li><strong>Próg F3-07</strong> (ADR 14) nie jest jeszcze ustalony — 11/35 to pomiar, nie ocena.</li>
+</ul>
+<p><strong>Próba silników na żywo</strong> (<code>app-models/tests/live_catalog.rs</code>, katalog <code>builtin()</code>, pobieranie jak kliknięcie
+w UI, na E: poza repozytorium): wszystkie 9 pozycji pobrane i zainstalowane (llama-server CPU/Vulkan/CUDA,
+Bielik 4.5B, whisper CPU/CUDA + small, Piper + głos), 0 problemów. Bielik 4.5B na procesorze: pierwszy token
+9,4 s, 5,3 tok/s, polskie litery poprawne; <strong><code>tool_request</code> — wywołanie narzędzia wykonane</strong> (26,9 s). Piper →
+whisper (CUDA): „Dzień dobry. Jestem Alfa.”, WER 0. Katalog próby (7 GB) usunięty po teście. Tym samym C2.3 jest
+zrobione (format wywołań potwierdzony na prawdziwym modelu); skuteczność zadań to osobne kryterium F3-07.</p>
+<p>Uruchomienie pomiaru: <code>evals/F3/tools/README.md</code> (nowe zmienne <code>ALFA_EVAL_BACKEND</code>, <code>ALFA_EVAL_GPU_LAYERS</code>,
+<code>ALFA_EVAL_TRACE</code>, <code>ALFA_EVAL_IDS</code>).</p>
+<h2 id="3-c2-8-historia-wersji-artefaktu-w-kanwie">3. C2.8 — historia wersji artefaktu w kanwie</h2>
+<p>Gdy Alfa poprawia w rozmowie ten sam artefakt (ten sam rodzaj i tytuł), kanwa pokazuje przełącznik
+„Wersja N z M” i kartę „Zmiany”: wiersze dodane i usunięte względem poprzedniej wersji, z trzema wierszami
+kontekstu i zwiniętymi długimi ciągami bez zmian (powyżej 2000 wierszy — komunikat zamiast porównania). Znaczniki
++/− mają opisy dla czytnika ekranu, zawinięty wiersz zaczyna się pod tekstem. Gdzie zobaczyć: dowolna rozmowa,
+w której Alfa dwa razy pisze ten sam dokument → przycisk kanwy przy drugiej odpowiedzi. Artefakty interaktywne
+(uruchamiane) są poza zakresem — decyzja właściciela.</p>
+<h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
+<ul>
+<li>Interfejs: vitest 530/530, svelte-check i eslint bez uwag, e2e kanwy 35/35 (wszystkie style × motywy, axe,
+kontrast), budżet startu JS+CSS 38,9 / 40 KB.</li>
+<li>Rust: testy <code>providers-local-impl</code>, <code>agent-runtime-impl</code>, <code>tools-shell-contract</code>, <code>app-agents</code> zielone; clippy
+<code>-D warnings</code> czysty.</li>
+</ul>
+<h2 id="5-czego-nie-sprawdzilam">5. Czego nie sprawdziłam</h2>
+<ul>
+<li><strong>Historii wersji kanwy w prawdziwym oknie programu</strong> — sprawdzona w przeglądarce testowej (Edge) na atrapie.</li>
+<li><strong>Bielika 1.5B, innych kwantyzacji i Vulkana (iGPU) z nową kopertą</strong> — mierzyłam tylko 4.5B Q8_0 na CUDA.</li>
+<li><strong>Agentek z powłoką w Alfie właściciela</strong> — wykrywanie PowerShella sprawdzone testem i w ewaluacji (2 zadania
+powłoki przeszły na Windows PowerShell), nie w działającej kopii właściciela.</li>
+</ul>
+<h2 id="6-wgranie-i-kopia">6. Wgranie i kopia</h2>
+</article>
+<footer>Źródło: <code>docs/plan/44-raport-2026-10-30-noc.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

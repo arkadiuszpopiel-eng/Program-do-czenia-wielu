@@ -12,6 +12,38 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.78 — 2026-10-30
+
+Kanwa pamięta wersje artefaktu i pokazuje, co się zmieniło. Model lokalny lepiej radzi sobie z narzędziami —
+pierwszy pomiar na prawdziwym Bieliku 4.5B wykazał kilka błędów, które ta wersja poprawia.
+
+### Nowe
+
+- Kanwa pokazuje historię wersji artefaktu: gdy Alfa poprawia ten sam dokument, kod albo stronę, przełącznik
+  „Wersja N z M” pozwala wrócić do wcześniejszej, a karta „Zmiany” pokazuje wiersze dodane i usunięte względem
+  poprzedniej wersji.
+
+### Poprawki
+
+- [poważne] Model lokalny z narzędziami: wywołanie narzędzia jest teraz wyborem na początku odpowiedzi — wcześniej
+  Bielik wpisywał je jako zwykły tekst i nic się nie wykonywało (w pomiarze żadne z 35 zadań nie przeszło).
+- [poważne] Samoweryfikacja kończy się odpowiedzią dla Ciebie, a nie tekstem „WERYFIKACJA: OK”; wywołanie
+  narzędzia doklejone do werdyktu nie zapętla już sprawdzania.
+- [poważne] Polecenia powłoki działają na komputerze bez PowerShell 7 — Alfa używa wtedy Windows PowerShell
+  zamiast kończyć każde polecenie błędem „nie znaleziono ścieżki”.
+- Agentki podają pliki w katalogu roboczym ścieżką względną — lekki model przepisujący długą ścieżkę robił
+  literówki i zapisywał pliki w złym miejscu.
+- Powtórzone wywołanie z tymi samymi argumentami dostaje podpowiedź, żeby zakończyć, zamiast kręcić się aż do
+  wykrycia pętli.
+- Wybrana na stałe karta graficzna (CUDA/Vulkan) działa także bez profilu urządzenia — wcześniej serwer modelu
+  liczył wtedy na procesorze.
+
+### Testy
+
+- Historia wersji kanwy: testy jednostkowe porównania wierszy i e2e we wszystkich stylach i motywach (axe,
+  kontrast). Pomiar F3 na Bieliku 4.5B (llama-server b11559, CUDA): przed poprawkami 0/35, po nich 11/35;
+  test wykrywania powłoki i podpowiedzi przy powtórzonym wywołaniu.
+
 ## 0.0.77 — 2026-10-29
 
 Alfa dla dzieci krok dalej: styl „Junior”, czytane zdanie podświetlone w rytm głosu i uproszczony ekran.
