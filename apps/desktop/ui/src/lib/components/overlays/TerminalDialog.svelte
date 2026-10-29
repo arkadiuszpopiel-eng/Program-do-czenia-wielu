@@ -142,7 +142,9 @@
       app.work.bridgeChecked = card;
       const r = loginResult(card);
       const plan = r.withPlan ? t('conn.loginResult.planSuffix', { plan: r.vars.plan ?? '' }) : '';
+      // Jeden wynik na most: kolejne „Gotowe” odświeża komunikat zamiast dokładać następny.
       app.toasts.show({
+        key: `bridge-login:${bridge}`,
         kind: r.kind,
         message: tk(r.key, { ...r.vars, plan }),
         actionLabel: t('conn.openPage'),

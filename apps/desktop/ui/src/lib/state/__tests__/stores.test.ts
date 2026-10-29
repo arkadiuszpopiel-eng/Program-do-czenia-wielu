@@ -204,4 +204,18 @@ describe('ToastState', () => {
     toasts.act(c);
     expect(undone).toBe(1);
   });
+
+  it('toast z tym samym kluczem zastępuje poprzedni (bez stosu jednakowych komunikatów)', () => {
+    const timers = new Timers();
+    const toasts = new ToastState(timers);
+    const other = toasts.show({ kind: 'info', message: 'inny' });
+    const first = toasts.show({ kind: 'success', message: 'zalogowano', key: 'bridge-login:a' });
+    toasts.show({ kind: 'success', message: 'zalogowano', key: 'bridge-login:a' });
+    const last = toasts.show({ kind: 'success', message: 'zalogowano', key: 'bridge-login:a' });
+    const b = toasts.show({ kind: 'success', message: 'drugi most', key: 'bridge-login:b' });
+    expect(toasts.items.map((t) => t.id)).toEqual([other, last, b]);
+    // Zastąpiony toast nie zostawia odliczania, które zdjęłoby go „po czasie”.
+    expect(timers.tasks.size).toBe(3);
+    expect(toasts.items.some((t) => t.id === first)).toBe(false);
+  });
 });

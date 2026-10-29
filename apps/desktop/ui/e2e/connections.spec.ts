@@ -63,6 +63,16 @@ test('po „Gotowe” w oknie logowania Alfa sama sprawdza konto i mówi, czy mo
   await expect(dialog).toBeHidden();
   const toast = page.getByText(/zalogowano \(plan Max\) — Alfa może zlecać zadania/);
   await expect(toast).toBeVisible();
+  // Kolejne otwarcia i „Gotowe” odświeżają jeden komunikat zamiast dokładać następne
+  // (e2e-app 2026-10-29: trzy jednakowe toasty naraz na zrzucie 43b).
+  for (let i = 0; i < 2; i += 1) {
+    await card.getByRole('button', { name: 'Zaloguj się' }).click();
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: 'Gotowe' }).click();
+    await expect(dialog).toBeHidden();
+  }
+  await expect(toast).toHaveCount(1);
+  await expect(toast).toBeVisible();
   await page.getByRole('button', { name: 'Stan połączeń' }).last().click();
   await expect(page.getByRole('heading', { name: 'Stan połączeń', level: 2 })).toBeVisible();
 

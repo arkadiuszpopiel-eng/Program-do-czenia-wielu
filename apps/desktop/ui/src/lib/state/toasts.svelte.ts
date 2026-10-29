@@ -9,6 +9,12 @@ export interface ToastItem {
   readonly actionLabel?: string;
   readonly onAction?: () => void;
   readonly timeoutMs: number;
+  /**
+   * Klucz komunikatu: nowy toast z tym samym kluczem zastępuje poprzedni zamiast stawać obok
+   * (np. wynik sprawdzenia logowania mostu po każdym „Gotowe” — trzy jednakowe toasty, e2e-app
+   * 2026-10-29).
+   */
+  readonly key?: string;
 }
 
 export interface ToastTimers {
@@ -31,6 +37,9 @@ export class ToastState {
   show(toast: Omit<ToastItem, 'id' | 'timeoutMs'> & { timeoutMs?: number }): number {
     const id = this.nextId++;
     const item: ToastItem = { timeoutMs: 5000, ...toast, id };
+    const key = item.key;
+    if (key !== undefined)
+      for (const old of this.items.filter((t) => t.key === key)) this.dismiss(old.id);
     this.items = [...this.items.slice(-3), item];
     this.arm(item);
     return id;
