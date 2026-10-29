@@ -43,6 +43,7 @@ pub fn qwen_asr() -> ItemSpec {
         ],
         install: Install::Files,
         confirmed: true,
+        targets: Vec::new(),
         note: note(
             "Dokładne rozpoznawanie mowy po polsku na karcie graficznej (ok. 0,3–0,5 s na zdanie). Wymaga silnika llama-server z tego katalogu; gdy zawiedzie, rozpoznaje Whisper.",
             "Accurate Polish speech recognition on the GPU (about 0.3–0.5 s per sentence). Requires the llama-server engine from this catalogue; if it fails, Whisper takes over.",

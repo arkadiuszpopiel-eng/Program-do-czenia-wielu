@@ -142,6 +142,7 @@ pub fn supertonic() -> ItemSpec {
             .collect(),
         install: Install::Files,
         confirmed: true,
+        targets: Vec::new(),
         note: note(
             "Naturalny głos po polsku, działa na procesorze (ok. 1 s na zdanie). Cztery agentki mówią czterema różnymi barwami. Wymaga sidecara alfa-supertonic (jest w programie).",
             "Natural Polish voice, runs on the CPU (about 1 s per sentence). The four agents speak with four different timbres. Requires the alfa-supertonic sidecar (shipped with the app).",

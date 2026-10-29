@@ -15,7 +15,7 @@ use agent_backends_contract::{
 use agent_backends_impl::{BackendDeps, BridgeBackend, BridgeConfig, GitWorkspace};
 use app_api::AppError;
 use app_api::dto::{BridgeAccount, BridgeCard, BridgeLogin};
-use app_api::ports::ShellPort;
+use app_api::ports::{ShellPort, default_terminal_shell};
 use compliance_contract::{ChangeOrigin, Compliance, RouteId, RouteMode, RouteOrigin};
 use core_bus_contract::EventBus;
 use core_config_contract::{ConfigKey, ConfigLayer, ConfigStore, Origin, Scope};
@@ -295,8 +295,10 @@ impl BridgesApp {
     /// `bridges_open_login`: terminal w katalogu domowym; polecenie wpisuje użytkownik.
     pub fn open_login(&self, bridge: &str) -> Result<BridgeLogin, AppError> {
         let kind = Self::kind(bridge)?;
-        let shell = if cfg!(windows) { "pwsh" } else { "cmd" };
-        let opened = self.p.shell.open_terminal(&self.p.home, shell);
+        let opened = self
+            .p
+            .shell
+            .open_terminal(&self.p.home, default_terminal_shell());
         if let Err(e) = &opened {
             tracing::info!(error = %e.message, "terminal logowania niedostępny — polecenie do skopiowania");
         }

@@ -189,11 +189,10 @@ async fn compliance_cards_schedule_consent_and_login_command() {
         .unwrap();
     assert_eq!(login.command, "claude /login");
     assert!(login.opened);
-    assert!(
-        h.shell
-            .calls()
-            .iter()
-            .any(|c| c.starts_with("open_terminal:"))
-    );
+    // Powłoka istniejąca na tym systemie (B.9: poza Windows nie `cmd`).
+    let shell = app_core::ports::default_terminal_shell();
+    assert_eq!(shell, if cfg!(windows) { "pwsh" } else { "sh" });
+    let prefix = format!("open_terminal:{shell}:");
+    assert!(h.shell.calls().iter().any(|c| c.starts_with(&prefix)));
     assert!(h.core.bridges_open_login("nieznany".into()).await.is_err());
 }

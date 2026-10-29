@@ -11,6 +11,7 @@
 
 use app_api::dto::ModelItemKind;
 
+use crate::catalog::Target;
 use crate::catalog::{FileSpec, Install, ItemSpec, Root, exe, note};
 
 #[path = "data_speech.rs"]
@@ -66,7 +67,14 @@ pub(super) fn item(
         install,
         confirmed,
         note: note(pl, en),
+        targets: Vec::new(),
     }
+}
+
+/// Pozycja z binarką zbudowaną pod Windows x64 (archiwa `win`/`x64` wydań).
+fn windows_x64(mut spec: ItemSpec) -> ItemSpec {
+    spec.targets = vec![Target::WINDOWS_X64];
+    spec
 }
 
 fn llama(backend: &str, asset: &str, (size, sha256): (u64, &str)) -> ItemSpec {
@@ -174,10 +182,10 @@ fn whisper_cuda() -> ItemSpec {
 
 fn sidecars() -> Vec<ItemSpec> {
     vec![
-        llama("vulkan", "vulkan", LLAMA_VULKAN_ZIP),
-        llama_cuda(),
-        llama("cpu", "cpu", LLAMA_CPU_ZIP),
-        item(
+        windows_x64(llama("vulkan", "vulkan", LLAMA_VULKAN_ZIP)),
+        windows_x64(llama_cuda()),
+        windows_x64(llama("cpu", "cpu", LLAMA_CPU_ZIP)),
+        windows_x64(item(
             "sidecar-whisper-cpu",
             ModelItemKind::Sidecar,
             &format!("whisper-server (CPU, whisper.cpp {WHISPER_TAG})"),
@@ -201,9 +209,9 @@ fn sidecars() -> Vec<ItemSpec> {
                 "Serwer STT (127.0.0.1), wymagany także przy wersji CUDA (zapas). Wersji Vulkan nie ma w wydaniach (sprawdzone do v1.9.5, 2026-10-17) — na kartach AMD i Intel mowę rozpoznaje Qwen3-ASR.",
                 "STT server (127.0.0.1), required also with the CUDA build (fallback). There is no Vulkan build in the releases (checked up to v1.9.5, 2026-10-17) — on AMD and Intel GPUs Qwen3-ASR recognises speech.",
             ),
-        ),
-        whisper_cuda(),
-        item(
+        )),
+        windows_x64(whisper_cuda()),
+        windows_x64(item(
             "sidecar-piper",
             ModelItemKind::Sidecar,
             "piper (2023.11.14-2)",
@@ -226,7 +234,7 @@ fn sidecars() -> Vec<ItemSpec> {
                 "Silnik TTS Piper (z espeak-ng-data). Repozytorium zarchiwizowane — następca OHF-Voice/piper1-gpl (GPL).",
                 "Piper TTS engine (with espeak-ng-data). Repository archived — successor OHF-Voice/piper1-gpl (GPL).",
             ),
-        ),
+        )),
         item(
             "sidecar-pocket-tts",
             ModelItemKind::Sidecar,

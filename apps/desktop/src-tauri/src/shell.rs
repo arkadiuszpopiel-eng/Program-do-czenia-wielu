@@ -57,6 +57,8 @@ fn shell_exe(shell: &str) -> Result<&'static str, AppError> {
         "pwsh" => Ok("pwsh.exe"),
         "powershell" => Ok("powershell.exe"),
         "cmd" => Ok("cmd.exe"),
+        // Poza Windows (`default_terminal_shell`); otwarcie terminala czeka tam na port platformy.
+        "sh" => Ok("sh"),
         other => Err(AppError::invalid(format!("Nieznana powłoka „{other}”."))),
     }
 }

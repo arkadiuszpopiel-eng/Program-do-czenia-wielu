@@ -83,6 +83,13 @@ i MiniLM (ONNX + tokenizer), whisper `large-v3-turbo-q5_0` / `small-q5_1`, Piper
 głosu), WeSpeaker ResNet34 (warunki VoxCeleb; okno 200 ramek), `llama-server` (wydanie `b6710` — numer do
 przypięcia, układ ZIP), `whisper-server` 1.8.1 (`Release/`), `piper` 2023.11.14-2. Pocket TTS — instalacja ręczna.
 
+**System / architektura (B.6, 2026-10-29):** `ItemSpec::targets` — lista par system/procesor
+(`catalog::target::Target`), pod które zbudowano pliki pozycji. Binarki silników (`llama-server` Vulkan/CUDA/CPU,
+`whisper-server` CPU/CUDA, `piper`, ONNX Runtime CPU i DirectML, DirectML) mają `Windows x64`; modele, wagi
+i pozycje ręczne mają listę pustą (każdy system). `builtin()` pomija pozycje, które nie działają na tym komputerze
+(nieznany system — zostają tylko pozycje bez celu), a pakiety pomijają brakujące identyfikatory. Test pilnuje,
+że każda pobierana binarka ma cel. Nowy system albo ARM64 = nowe wiersze z własnym archiwum i sumą.
+
 ## Testy
 
 `crates/app-models/tests/`: `download.rs` (lokalny serwer HTTP: pobranie z postępem, zerwanie → `Range`, anulowanie

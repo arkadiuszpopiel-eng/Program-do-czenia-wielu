@@ -60,6 +60,7 @@ pub fn spec(
         install,
         confirmed: false,
         note: LocalizedText::new("test", "test"),
+        targets: Vec::new(),
     }
 }
 

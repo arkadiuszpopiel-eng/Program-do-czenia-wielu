@@ -9,6 +9,10 @@ use app_api::AppPaths;
 use app_api::dto::{LocalizedText, ModelItemKind};
 use lib_embed::EmbedManifest;
 
+pub mod target;
+
+pub use target::Target;
+
 const MIB: u64 = 1024 * 1024;
 
 /// Korzeń katalogu docelowego.
@@ -115,6 +119,8 @@ pub struct ItemSpec {
     pub confirmed: bool,
     /// Opis dla UI (PL/EN).
     pub note: LocalizedText,
+    /// Systemy i procesory, pod które zbudowano pliki (pusta lista — każdy: modele i wagi).
+    pub targets: Vec<Target>,
 }
 
 /// Pliki towarzyszące (tekst licencji wag) — pobierane z pozycją, nie liczą się do jej stanu.
@@ -135,6 +141,11 @@ pub fn exe(name: &str) -> String {
 }
 
 impl ItemSpec {
+    /// Czy pozycja działa na komputerze `host` ([`target::runs_on`]).
+    pub fn runs_on(&self, host: Option<Target>) -> bool {
+        target::runs_on(&self.targets, host)
+    }
+
     /// Katalog docelowy na tej maszynie.
     pub fn target(&self, paths: &AppPaths) -> PathBuf {
         let root = match self.root {
@@ -252,6 +263,7 @@ pub fn builtin() -> Vec<ItemSpec> {
             // Potwierdzenie adresu, rozmiaru i licencji przez człowieka — nie wynika z przypiętego
             // hasha (Bielik: Regulamin bielik.ai i licencja modelu bazowego czekają na właściciela).
             confirmed: false,
+            targets: Vec::new(),
             note: note(
                 "Lokalny model rozmowy (llama.cpp). Wymaga sidecara llama-server.",
                 "Local chat model (llama.cpp). Requires the llama-server sidecar.",
@@ -261,6 +273,9 @@ pub fn builtin() -> Vec<ItemSpec> {
     }
     out.extend(lib_embed::CATALOG.iter().map(embed_item));
     out.extend(crate::data::voice_and_sidecars());
+    // Binarki zbudowane pod inny system albo procesor nie trafiają do katalogu (B.6).
+    let host = Target::host();
+    out.retain(|i| i.runs_on(host));
     out
 }
 
@@ -284,6 +299,7 @@ pub fn embed_item(entry: &lib_embed::CatalogEntry) -> ItemSpec {
         install: Install::Embed(Box::new(template)),
         // Jak wyżej: sumy przypięte (2026-10-21), potwierdzenie przez człowieka osobno.
         confirmed: false,
+        targets: Vec::new(),
         note: note(
             &format!(
                 "Embedder wyszukiwania semantycznego (pamięć F7): {}",
@@ -334,5 +350,22 @@ mod tests {
         assert!(vad.confirmed && vad.pinned() && vad.downloadable());
         let pocket = items.iter().find(|i| i.id == "sidecar-pocket-tts").unwrap();
         assert!(!pocket.downloadable());
+    }
+
+    /// B.6: każda pobierana binarka ma wpisany system i procesor (nowa bez celu nie przejdzie),
+    /// modele są wspólne, a katalog zawiera tylko pozycje działające na tym komputerze.
+    #[test]
+    fn binaries_are_bound_to_a_target_and_catalog_fits_the_host() {
+        let host = Target::host();
+        for item in builtin() {
+            assert!(item.runs_on(host), "{}", item.id);
+            let binary = item.kind == ModelItemKind::Sidecar && item.downloadable();
+            assert_eq!(binary, !item.targets.is_empty(), "{}", item.id);
+        }
+        if host == Some(Target::WINDOWS_X64) {
+            let ids: Vec<String> = builtin().into_iter().map(|i| i.id).collect();
+            assert!(ids.iter().any(|i| i == "sidecar-whisper-cpu"));
+            assert!(ids.iter().any(|i| i == "onnxruntime-cpu"));
+        }
     }
 }

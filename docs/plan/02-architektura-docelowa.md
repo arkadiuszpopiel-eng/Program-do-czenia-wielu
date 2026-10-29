@@ -167,7 +167,8 @@ Szkice SPEC: [`../modules/README.md`](../modules/README.md), sekcja „Planowane
 - Magazyn sekretów i kluczy dla Linuksa i Androida.
 - Semantyka ścieżek, powłok i tożsamości w kontraktach Brokera.
 - Nowy rodzaj dowodu zgody (obszar pod przeglądem człowieka).
-- Wymiar system / architektura w katalogu silników i modeli (`app-models/src/data.rs` zna tylko Windows x64).
+- ~~Wymiar system / architektura w katalogu silników i modeli~~ — zrobione w B.6 (2026-10-29): `ItemSpec::targets`,
+  katalog pomija binarki spoza tego komputera; wiersze dla Linuksa i ARM64 dojdą z ich archiwami i sumami.
 - Zmienne środowiskowe wpisane na sztywno w binarkach Jądra, watchdoga i aktualizatora.
 - Układ interfejsu na szerokość telefonu (dziś minimum okna to 400 × 500 px).
 

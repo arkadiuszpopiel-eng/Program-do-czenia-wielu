@@ -12,6 +12,7 @@ use crate::dto::{
 };
 use crate::error::AppError;
 use crate::ids;
+use crate::ports::default_terminal_shell;
 
 impl AppCore {
     /// `agents_list`.
@@ -135,7 +136,10 @@ impl AppCore {
             .cwd
             .clone()
             .ok_or_else(|| AppError::invalid("Brak katalogu polecenia."))?;
-        let shell_kind = intent.shell.clone().unwrap_or_else(|| "pwsh".into());
+        let shell_kind = intent
+            .shell
+            .clone()
+            .unwrap_or_else(|| default_terminal_shell().into());
         let shell = self.inner.shell.clone();
         let dir = cwd.clone();
         tokio::task::spawn_blocking(move || shell.open_terminal(Path::new(&dir), &shell_kind))

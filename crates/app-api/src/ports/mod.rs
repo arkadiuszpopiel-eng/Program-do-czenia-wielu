@@ -17,7 +17,7 @@ pub use modules::{
     ApprovalOutcome, ApprovalWindow, AutonomyView, BrokerPort, BrokerUnavailable, KillOrigin,
     NEEDS_BROKER_WINDOW, NoApprovalWindow, TransferPort, TransferUnavailable,
 };
-pub use shell::{HeadlessShell, ShellPort};
+pub use shell::{HeadlessShell, ShellPort, default_terminal_shell};
 pub use voice::{
     VOICE_PREVIEW_TEXT, VoiceChat, VoiceChunk, VoicePort, VoiceTurn, VoiceTurnOrigin, VoiceTurnRef,
     VoiceUnavailable, voice_unavailable_reason,

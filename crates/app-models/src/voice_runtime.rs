@@ -4,6 +4,7 @@
 
 use app_api::dto::ModelItemKind;
 
+use crate::catalog::Target;
 use crate::catalog::{FileSpec, Install, ItemSpec, Pick, Root, note};
 
 /// Przypięta wersja repozytorium `pipecat-ai/smart-turn-v3`.
@@ -38,6 +39,7 @@ pub fn smart_turn() -> ItemSpec {
         }],
         install: Install::Files,
         confirmed: true,
+        targets: Vec::new(),
         note: note(
             "Rozpoznaje po brzmieniu, czy skończyłeś mówić — Alfa nie wchodzi w słowo w połowie zdania i nie czeka niepotrzebnie po jego końcu. Liczy na procesorze (ok. 25 ms). Wymaga biblioteki ONNX Runtime z tego katalogu.",
             "Tells from the sound whether you have finished speaking — Alfa does not cut in mid-sentence and does not wait needlessly after it. Runs on the CPU (about 25 ms). Requires the ONNX Runtime library from this catalogue.",
@@ -88,6 +90,7 @@ pub fn onnxruntime() -> ItemSpec {
             },
         ]),
         confirmed: true,
+        targets: vec![Target::WINDOWS_X64],
         note: note(
             "Biblioteka obliczeń dla głosu Supertonic i dla wykrywania końca wypowiedzi. Działa tylko w osobnych procesach pobocznych, nie w samym programie.",
             "Compute library for the Supertonic voice and end-of-turn detection. Runs only in separate helper processes, not in the app itself.",
@@ -152,6 +155,7 @@ pub fn onnxruntime_directml() -> ItemSpec {
             },
         ]),
         confirmed: true,
+        targets: vec![Target::WINDOWS_X64],
         note: note(
             "Biblioteka obliczeń, która pozwala głosowi Supertonic liczyć na karcie graficznej (NVIDIA, AMD, Intel) przez DirectML. Wymaga też pozycji „DirectML”. Na RX 9070 XT zdanie powstaje w ok. 0,6 s zamiast ok. 1 s na procesorze; zajmuje ok. 540 MB pamięci karty, dlatego Alfa używa jej sama tylko na karcie z własną pamięcią ≥ 12 GB (osobnej albo zintegrowanej z taką rezerwą w BIOS-ie).",
             "Compute library that lets the Supertonic voice run on the graphics card (NVIDIA, AMD, Intel) through DirectML. Also needs the “DirectML” item. On an RX 9070 XT a sentence takes about 0.6 s instead of about 1 s on the CPU; it uses about 540 MB of GPU memory, so Alfa uses it automatically only on a card with its own ≥ 12 GB of memory (discrete, or integrated with such a BIOS reservation).",
@@ -203,6 +207,7 @@ pub fn directml() -> ItemSpec {
         // Licencja Microsoftu dopuszcza zbieranie danych diagnostycznych przez bibliotekę — do
         // potwierdzenia przez człowieka (jak biblioteki NVIDIA w wersji CUDA).
         confirmed: false,
+        targets: vec![Target::WINDOWS_X64],
         note: note(
             "Biblioteka Microsoftu do obliczeń na karcie graficznej (DirectX 12), potrzebna wersji DirectML biblioteki ONNX Runtime. Pobieranie ma ok. 200 MB, na dysku zostaje ok. 19 MB. Licencja Microsoftu pozwala rozpowszechniać ją z aplikacją, ale dopuszcza zbieranie przez nią danych diagnostycznych (§2a) — dlatego pozycja czeka na potwierdzenie.",
             "Microsoft library for GPU compute (DirectX 12), needed by the DirectML build of ONNX Runtime. The download is about 200 MB, about 19 MB stays on disk. Microsoft's licence allows shipping it with an app but lets it collect diagnostic data (§2a) — so the item awaits confirmation.",

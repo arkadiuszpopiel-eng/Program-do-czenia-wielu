@@ -9,6 +9,12 @@ use crate::error::AppError;
 
 const SHELL: &str = "shell-integration";
 
+/// Powłoka terminala, gdy nikt nie wskazał innej: PowerShell na Windows, `sh` (POSIX) gdzie indziej —
+/// `cmd` istnieje tylko na Windows.
+pub fn default_terminal_shell() -> &'static str {
+    if cfg!(windows) { "pwsh" } else { "sh" }
+}
+
 /// Powłoka (Tauri): okna, natywne dialogi i akcje systemowe wykonywane jako użytkownik.
 /// Metody dialogów blokują wątek — rdzeń woła je przez `spawn_blocking`.
 pub trait ShellPort: Send + Sync {
@@ -48,7 +54,7 @@ pub trait ShellPort: Send + Sync {
     ) -> Result<Option<PathBuf>, AppError> {
         Err(AppError::unavailable("Okno zapisu pliku", SHELL))
     }
-    /// „Uruchom w terminalu": otwiera terminal (`shell`: `pwsh`, `powershell`, `cmd`) w katalogu
+    /// „Uruchom w terminalu": otwiera terminal (`shell`: `pwsh`, `powershell`, `cmd`, poza Windows `sh`) w katalogu
     /// `cwd` **bez wykonywania** polecenia — właściciel wkleja je i uruchamia sam.
     fn open_terminal(&self, _cwd: &Path, _shell: &str) -> Result<(), AppError> {
         Err(AppError::unavailable("Otwarcie terminala", SHELL))
