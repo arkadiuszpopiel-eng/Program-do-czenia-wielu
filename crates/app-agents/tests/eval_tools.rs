@@ -170,8 +170,12 @@ async fn measure_on_local_model() {
     let sidecar = Sidecar::new(config, Arc::new(TokioLauncher::default()), None, None).unwrap();
     let provider: Arc<dyn ModelProvider> = Arc::new(LocalProvider::new(models, sidecar));
     let dir = tempfile::tempdir().unwrap();
+    // Pełna ścieżka zamiast krótkiej nazwy 8.3 z %TEMP% (`SPOPIE~1`) — katalog roboczy jak
+    // w aplikacji; model przepisujący `~1` robił literówki, których u właściciela nie ma.
+    let real = std::fs::canonicalize(dir.path()).unwrap();
+    let real = PathBuf::from(real.to_string_lossy().trim_start_matches(r"\\?\"));
     let exec: Arc<dyn ExecPort> = Arc::new(platform_windows_impl::WindowsPlatform::default());
-    let env = env(dir.path(), exec);
+    let env = env(&real, exec);
     let set = load(&env);
     let only = var("ALFA_EVAL_ONLY");
     let ids = var("ALFA_EVAL_IDS");
@@ -180,7 +184,7 @@ async fn measure_on_local_model() {
         trace: var("ALFA_EVAL_TRACE").is_some(),
         ..EvalOptions::default()
     };
-    let root = dir.path().join("zadania");
+    let root = real.join("zadania");
     let mut results = Vec::new();
     for task in &set.tasks {
         let kind = serde_json::to_value(task.kind).unwrap();

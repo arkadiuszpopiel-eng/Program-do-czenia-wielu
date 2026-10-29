@@ -107,6 +107,11 @@ async fn tools_go_in_a_schema_envelope_and_come_back_as_a_call() {
         "albo sama odpowiedź"
     );
     assert!(body.get("tools").is_none() && body.get("tool_choice").is_none());
+    assert_eq!(
+        body["temperature"],
+        json!(0.2),
+        "niska temperatura dla narzędzi"
+    );
     let system = body["messages"][0]["content"].as_str().unwrap();
     assert!(system.starts_with("Jesteś Alfa.") && system.contains("- pogoda:"));
     assert_eq!(
@@ -127,7 +132,14 @@ async fn plain_answer_streams_out_of_the_envelope() {
     let env = Env::new();
     let scenario = chunks(&["{\"response\": \"Dzień ", "dobry!\\nCo ", "słychać?\"}"]);
     let p = env.provider("ok", Some(&scenario));
-    let events = run(&p, with_tools("Cześć")).await;
+    let mut req = with_tools("Cześć");
+    req.params.temperature = Some(0.7);
+    let events = run(&p, req).await;
+    let sent = last_body(&env)["temperature"].as_f64().unwrap();
+    assert!(
+        (sent - 0.7).abs() < 1e-6,
+        "ustawienie właściciela wygrywa: {sent}"
+    );
     assert_eq!(text(&events), "Dzień dobry!\nCo słychać?");
     assert!(call(&events).is_none());
     assert_eq!(stop(&events), Some(StopReason::EndTurn));

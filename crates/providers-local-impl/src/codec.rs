@@ -14,6 +14,9 @@ use crate::leak::LeakGuard;
 use crate::manifest::ModelEntry;
 use crate::window;
 
+/// Temperatura żądań z narzędziami, gdy właściciel jej nie ustawił.
+pub const TOOL_TEMPERATURE: f64 = 0.2;
+
 /// Kodek jednego modelu lokalnego.
 pub struct LlamaCodec {
     caps: ModelCapabilities,
@@ -82,6 +85,10 @@ impl WireCodec for LlamaCodec {
             let mut body = chat::build_body(&wire, &self.caps, &self.profile, &options)?;
             if let Some(obj) = body.as_object_mut() {
                 obj.insert("response_format".into(), format);
+                // Bez ustawienia właściciela serwer losuje z temperaturą 0,8: lekki model przekręcał
+                // nazwy plików i ścieżki w argumentach („diari.txt” zamiast „dziennik.txt”, F3).
+                obj.entry("temperature")
+                    .or_insert(serde_json::Value::from(TOOL_TEMPERATURE));
             }
             body
         } else {
