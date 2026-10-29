@@ -69,9 +69,15 @@ i roli **Dziecko** z [`18`](18-wielu-uzytkownikow.md) (etap U) i na dostępie zd
 **Wyjście z etapu K:** dziecko rozmawia i uczy się głosem w stylu „Junior” bez dostępu do systemu i chmury;
 rodzic w telefonie widzi raport dnia, dostaje alert w ciągu minuty i może przerwać sesję jednym dotknięciem.
 
-## Otwarte pytania do właściciela
+## Decyzje właściciela (K.0, 2026-10-29)
 
-1. Jakie przedziały wieku? (Propozycja: 6–9, 10–12, 13–15; poniżej 6 lat tylko z rodzicem przy komputerze.)
-2. Czy rodzic domyślnie czyta pełne rozmowy, czy tylko tematy i alerty? (Propozycja: tematy i alerty.)
-3. Czy dzieci mogą korzystać z chmury, jeśli rodzic zgodzi się raz dla konta? (Propozycja: tak, z listą dostawców.)
-4. Czy odznaki mają być wspólne dla rodzeństwa (ranking), czy tylko osobiste? (Propozycja: tylko osobiste.)
+Właściciel przyjął wszystkie propozycje („Wykonaj!”); szczegóły i konsekwencje: [ADR 0029](../ADR/0029-konta-dzieci.md).
+
+1. **Przedziały wieku:** 6–9, 10–12, 13–15; poniżej 6 lat tylko z rodzicem przy komputerze (bez konta dziecka).
+2. **Podgląd rodzica:** domyślnie tematy i alerty; pełna treść tylko po jawnym włączeniu, ze znakiem dla dziecka.
+3. **Chmura:** jedna zgoda rodzica na konto, z listą dostawców z umową przetwarzania danych dzieci; odwoływalna.
+4. **Odznaki:** tylko osobiste, bez rankingu rodzeństwa.
+
+**Co dalej:** K.1, K.2, K.6, K.7 czekają na etap U (najpierw podpis ADR 0027 — U.0). K.3 idzie od razu:
+wyróżnianie czytanego zdania wprowadzone 29.10 ([43](43-czytane-zdanie.md), faza 1); styl „Junior”, wolniejsze
+tempo mowy i dźwięki potwierdzeń — kolejna seria.

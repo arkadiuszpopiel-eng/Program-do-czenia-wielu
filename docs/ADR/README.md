@@ -32,5 +32,6 @@ Każda decyzja techniczna z `docs/PLAN.md` §1.2 ma swój ADR. Decyzje są odwra
 | [0026](0026-glos-z-chmury-jako-opcja.md) | Głos agentek z chmury jako opcja obok głosu lokalnego (domyślnie wyłączony, nigdy w sesji prywatnej) | **Proponowany** |
 | [0027](0027-wielu-uzytkownikow-konta-i-role.md) | Wielu użytkowników: konta, logowanie i role | **Proponowany** |
 | [0028](0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md) | DirectML dla głosu Supertonic (opcjonalnie, karta ≥ 12 GB) i Qwen3-ASR przez Vulkan na kartach AMD/Intel | **Proponowany** |
+| [0029](0029-konta-dzieci.md) | Konta dzieci: przedziały wieku, podgląd rodzica, zgoda na chmurę, odznaki osobiste | **Przyjęty** |
 
 Statusy: **Zaakceptowany** — obowiązuje; dopisek „(spike …)" oznacza, że wartości liczbowe lub wykonalność potwierdza wskazany spike w F0 bez zmiany kierunku. **Tymczasowy** — kierunek przyjęty, ale ADR wraca do przeglądu po wskazanym spike'u. **Proponowany** — projekt przygotowany przez sesję AI; nie obowiązuje do podpisu właściciela.
