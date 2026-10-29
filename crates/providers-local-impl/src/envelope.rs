@@ -32,7 +32,8 @@ const FORMAT: &str = r#"## Format odpowiedzi
 Odpowiadasz zawsze jednym obiektem JSON i niczym poza nim:
 - wywołanie narzędzia: {"tool_call": {"name": "…", "parameters": {…}}, "response": "…"} — zacznij od "tool_call";
 - odpowiedź bez narzędzia: {"response": "…"}.
-- "response" — tekst dla użytkownika: odpowiedź albo krótki komentarz (może być pusty). Nigdy nie wpisuj wywołania do "response".
+- "response" przy wywołaniu — krótko, co teraz robisz („Odczytuję plik.”); wyniku jeszcze nie znasz, więc nie pisz, że coś zostało zrobione.
+- "response" bez wywołania — odpowiedź dla użytkownika. Nigdy nie wpisuj wywołania do "response".
 "#;
 
 /// Zasady pola `tool_call`, gdy wywołanie jest opcjonalne.
