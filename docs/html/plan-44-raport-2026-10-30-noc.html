@@ -405,9 +405,14 @@ w której Alfa dwa razy pisze ten sam dokument → przycisk kanwy przy drugiej o
 (uruchamiane) są poza zakresem — decyzja właściciela.</p>
 <h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
 <ul>
-<li><strong><code>verify wersja</code> na <code>7659cca2</code> (0.0.78, laptop, 21:45–22:41):</strong> 18 z 19 etapów zielonych — Rust 3273
+<li><p><strong>Ostateczny <code>verify wersja</code> na <code>55dcfaff</code> (30.10, 0:04–0:43): ZIELONY 19/19</strong> — Rust 3273 / 0 / 41
+pominiętych, interfejs 530, przeglądarka 747/747, aplikacja 52 (pokrycie łącza 260 z 281, 92,5 %), lintery,
+typy, audyt, SBOM. Niżej — pierwszy bieg na <code>7659cca2</code> i poprawki po nim.</p>
+</li>
+<li><p><strong><code>verify wersja</code> na <code>7659cca2</code> (0.0.78, laptop, 21:45–22:41):</strong> 18 z 19 etapów zielonych — Rust 3273
 zielonych / 0 czerwonych / 41 pominiętych (1065 programów testowych), interfejs 530, aplikacja 52 (pokrycie łącza
-260 z 281, 92,5 %), formatowanie, lintery, typy, graf zależności, audyt, SBOM. Czerwona „przeglądarka” (745/747):<ul>
+260 z 281, 92,5 %), formatowanie, lintery, typy, graf zależności, audyt, SBOM. Czerwona „przeglądarka” (745/747):</p>
+<ul>
 <li>czas otwarcia palety — mediana 8,7 ms (próg 50 ms), jedna z 7 prób 317 ms przy obciążonej maszynie; przy
 powtórzeniach zielony;</li>
 <li>przegląd nachodzenia (glass light) złapał wygaszający się ekran rozruchu („Wczytuję rozmowy…”) nad gotową
@@ -415,10 +420,12 @@ treścią — to zamierzone wygaszenie, a nie błąd okna; pomocnik testów czek
 (<code>31671787</code>).</li>
 </ul>
 </li>
-<li><strong>Pełny zestaw przeglądarkowy po poprawce:</strong> 746/747 — jedna niestabilność axe <code>target-size</code> (pola wyboru
-w oknie obowiązków, Next dark) pod obciążeniem całego zestawu; 40/40 przy czterokrotnym powtórzeniu pliku.</li>
-<li>Interfejs przed wersją: vitest 530/530, svelte-check i eslint bez uwag, e2e kanwy 35/35 (wszystkie style ×
-motywy, axe, kontrast), budżet startu JS+CSS 38,9 / 40 KB. Rust: clippy <code>-D warnings</code> czysty.</li>
+<li><p><strong>Pełny zestaw przeglądarkowy po poprawce:</strong> 746/747 — jedna niestabilność axe <code>target-size</code> (pola wyboru
+w oknie obowiązków, Next dark) pod obciążeniem całego zestawu; 40/40 przy czterokrotnym powtórzeniu pliku.</p>
+</li>
+<li><p>Interfejs przed wersją: vitest 530/530, svelte-check i eslint bez uwag, e2e kanwy 35/35 (wszystkie style ×
+motywy, axe, kontrast), budżet startu JS+CSS 38,9 / 40 KB. Rust: clippy <code>-D warnings</code> czysty.</p>
+</li>
 </ul>
 <h2 id="co-dalej-propozycja-planu">Co dalej — propozycja planu</h2>
 <p>Kolejność według wpływu na właściciela (każdy punkt kończy się pomiarem albo testem prawdziwej aplikacji):</p>
@@ -443,13 +450,19 @@ przeglądu człowieka, więc tylko projekt i gałąź do przeglądu.</li>
 <li><strong>Bielika 1.5B, innych kwantyzacji i Vulkana (iGPU) z nową kopertą</strong> — mierzyłam tylko 4.5B Q8_0 na CUDA.</li>
 <li><strong>Agentek z powłoką w Alfie właściciela</strong> — wykrywanie PowerShella sprawdzone testem i w ewaluacji (2 zadania
 powłoki przeszły na Windows PowerShell), nie w działającej kopii właściciela.</li>
+<li><strong>Alfy właściciela po wgraniu</strong> — wgrałam bez uruchamiania (<code>--no-start</code>); pierwsze uruchomienie skrótem „Alfa”
+należy do właściciela.</li>
+<li><strong>Testów sprzętowych</strong> (<code>verify sprzet</code>: mikrofon, głośnik, kamera) — w nocy bez dźwięku. Model na karcie
+sprawdziłam pomiarem F3 (CUDA) i próbą silników na żywo (CPU, whisper na CUDA, Piper zapisany do pliku).</li>
+<li><strong>Niskiej temperatury z modelami w chmurze</strong> — dotyczy tylko modelu lokalnego (<code>providers-local-impl</code>).</li>
 </ul>
 <h2 id="6-wgranie-i-kopia">6. Wgranie i kopia</h2>
 <ul>
-<li><strong>Wgranie:</strong> <code>scripts/deploy-owner.sh --no-start</code> — 29.10 o 23:02 z <code>31671787</code> (kod <code>7659cca2</code> + poprawka
-pomocnika testów); kopia właściciela <code>Alfa-uruchomiona</code>, wersja programu 0.0.78 (sprawdzona we właściwościach
-pliku), build bez flagi portu CDP (kontrola skryptu wgrania), skróty na pulpicie i w menu Start odświeżone. Alfy
-nie uruchamiałam — otwiera ją właściciel skrótem „Alfa” (po starcie pokaże „Co nowego” dla 0.0.78).</li>
+<li><strong>Wgranie:</strong> <code>scripts/deploy-owner.sh --no-start</code> — pierwsze 29.10 o 23:02 z <code>31671787</code>, <strong>ostateczne 30.10
+o 0:45 z <code>55dcfaff</code></strong> (0.0.78 z niską temperaturą przy narzędziach i zapowiedzią działania); kopia właściciela
+<code>Alfa-uruchomiona</code>, wersja programu 0.0.78 (sprawdzona we właściwościach pliku), build bez flagi portu CDP
+(kontrola skryptu wgrania), skróty na pulpicie i w menu Start odświeżone. Alfy nie uruchamiałam — otwiera ją
+właściciel skrótem „Alfa” (po starcie pokaże „Co nowego” dla 0.0.78).</li>
 </ul>
 </article>
 <footer>Źródło: <code>docs/plan/44-raport-2026-10-30-noc.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
