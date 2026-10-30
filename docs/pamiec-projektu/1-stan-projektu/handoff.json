@@ -6,7 +6,7 @@
     "session_id": "526ab23b-611a-489a-a8a3-7c1153e69825",
     "updated": "2026-10-30T01:00:00+01:00"
   },
-  "current_state": "Laptop. Wersja 0.0.78 wgrana 30.10 0:45 z 55dcfaff (deploy-owner --no-start); verify wersja na 55dcfaff zielone 19/19 (Rust 3273/0/41, interfejs 530, przeglądarka 747, aplikacja 52). Commity lokalne, bez wypchnięcia. Raport alfa/docs/plan/44-raport-2026-10-30-noc.md. Kopia na F:\\Kopie zapasowe programów Spopielony\\Alfa po 4:30 (backup.sh).",
+  "current_state": "Laptop. Wersja 0.0.78 wgrana 30.10 0:45 z 55dcfaff (deploy-owner --no-start); verify wersja na 55dcfaff zielone 19/19 (Rust 3273/0/41, interfejs 530, przeglądarka 747, aplikacja 52). Commity lokalne, bez wypchnięcia. Raport alfa/docs/plan/44-raport-2026-10-30-noc.md. Kopia F:/Kopie zapasowe programów Spopielony/Alfa/kopia-2026-10-30_0430 (bdb474fe, 402 MB, SHA-256 6359/0 błędów); raport 44 uzupełniony w 7bd75021.",
   "session_goal": "Właściciel 29.10 (/goal): pracuj automatycznie do 4:30 (poprawki i plan), potem kopia na F:, koniec pracy najpóźniej 5:10. Wcześniej: C2.3 i C2.8, zgoda na pobrania 5 GB, sprzątanie kompilacji, pobierać na E:.",
   "in_progress": [
     "Do decyzji człowieka (raport 44 §2 i „Co dalej”): `*` w analizatorze powłoki, Kosz po wstrzymanym trwałym usunięciu (fs-23), próg F3-07, gałęzie do-przegladu-broker-2026-10-28 i do-przegladu-pelny-dostep, odpowiedzi K.0."
@@ -36,7 +36,7 @@
     "key_paths": {
       "repo": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa (jedyna kopia)",
       "narzedzia": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa-narzedzia (zawsze . .\\scripts\\portable-env.ps1)",
-      "kopie": "F:/Alfa/kopia-<data> (scripts/backup.sh; Seagate Backup Plus; ostatnia: kopia-2026-10-22_0351 — 0.0.70, stan 6919ef29)",
+      "kopie": "F:/Kopie zapasowe programów Spopielony/Alfa/kopia-<data> (scripts/backup.sh; Seagate Backup Plus; ostatnia: kopia-2026-10-30_0430 — 0.0.78, stan bdb474fe)",
       "plan": "alfa/docs/plan/03-roadmapa.md (C5.1 zrobione, P4)",
       "raport": "alfa/docs/plan/34-raport-2026-10-21-0068.md (wcześniej 33 — 0.0.67)",
       "adr": "alfa/docs/ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md",
