@@ -139,7 +139,9 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             let hit = unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) };
             if hit.0 == HTCLIENT as isize {
                 let header = with_ui(|ui| ui.measured.as_ref().map(|m| m.header.bottom)).flatten();
-                return header.and_then(|h| caption_hit(hwnd, lparam, h)).unwrap_or(hit);
+                return header
+                    .and_then(|h| caption_hit(hwnd, lparam, h))
+                    .unwrap_or(hit);
             }
             return hit;
         }

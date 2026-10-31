@@ -10,8 +10,8 @@ use windows::Win32::Graphics::Gdi::{
     DeleteDC, DeleteObject, GdiFlush, SelectObject,
 };
 
-use super::layout::measure;
 use super::button::ButtonState;
+use super::layout::measure;
 use super::paint::Look;
 use super::state::kind;
 use super::theme::palette_of;

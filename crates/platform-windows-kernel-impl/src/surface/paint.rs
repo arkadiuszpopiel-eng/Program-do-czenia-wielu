@@ -333,5 +333,4 @@ impl Look {
         };
         text(hdc, f.chip, risk, label, tr, LINE);
     }
-
 }

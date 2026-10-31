@@ -13,9 +13,9 @@ mod paint;
 #[cfg(windows)]
 mod pointer;
 #[cfg(windows)]
-mod shapes;
-#[cfg(windows)]
 mod preview;
+#[cfg(windows)]
+mod shapes;
 #[cfg(windows)]
 mod state;
 #[cfg(windows)]

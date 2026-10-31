@@ -43,4 +43,3 @@ pub(super) fn caption_hit(hwnd: HWND, lparam: LPARAM, header: i32) -> Option<LRE
     let _ = unsafe { ScreenToClient(hwnd, &raw mut pt) };
     (pt.y >= 0 && pt.y < header).then_some(LRESULT(HTCAPTION as isize))
 }
-

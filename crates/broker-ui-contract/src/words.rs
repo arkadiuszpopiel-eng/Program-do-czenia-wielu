@@ -143,14 +143,18 @@ pub fn reason_pl(rule: RuleId) -> &'static str {
         }
         RuleId::MutationNeedsYes => "W tym trybie każda zmiana czeka na Twoje „tak”.",
         RuleId::RiskyAtL2 => "W tym trybie usuwanie, wysyłka i instalacja czekają na Twoją zgodę.",
-        RuleId::TaintedHighRisk => "Sesja widziała niezaufaną treść, a to działanie jest ryzykowne.",
+        RuleId::TaintedHighRisk => {
+            "Sesja widziała niezaufaną treść, a to działanie jest ryzykowne."
+        }
         RuleId::UntrustedSource => "Polecenie pochodzi z niezaufanej treści, nie od Ciebie.",
         RuleId::IrreversibleOutside => {
             "Tego nie da się cofnąć, a działanie wychodzi poza katalog tej rozmowy."
         }
         RuleId::CriticalRisk => "Ryzyko jest krytyczne.",
         RuleId::EgressNotAllowlisted => "Tej strony nie ma na liście zaufanych adresów.",
-        RuleId::GuiOutsideApps => "Tego programu nie ma na liście aplikacji, którymi agentki sterują.",
+        RuleId::GuiOutsideApps => {
+            "Tego programu nie ma na liście aplikacji, którymi agentki sterują."
+        }
     }
 }
 

@@ -17,8 +17,8 @@ use windows::Win32::UI::HiDpi::GetDpiForWindow;
 use windows::Win32::UI::WindowsAndMessaging::*;
 
 use super::EventQueue;
-use super::layout::{CLOSE_ID, HELP_ID, Measured, measure};
 use super::button::{ButtonState, Kind};
+use super::layout::{CLOSE_ID, HELP_ID, Measured, measure};
 use super::paint::{DrawItem, Look, ODS_FOCUS, ODS_SELECTED};
 
 pub(super) struct Ui {
@@ -60,7 +60,11 @@ pub(super) fn paint(ui: &Ui, hwnd: HWND) {
 /// Rodzaj przycisku o identyfikatorze `id`: główny jest pierwszy przycisk decyzji poza
 /// bezpiecznym (fokus startowy — „Odmów”).
 pub(super) fn kind(view: &SurfaceView, help_open: bool, id: u16) -> Kind {
-    let primary = view.buttons.iter().find(|b| b.id != view.initial_focus).map(|b| b.id);
+    let primary = view
+        .buttons
+        .iter()
+        .find(|b| b.id != view.initial_focus)
+        .map(|b| b.id);
     match id {
         HELP_ID => Kind::Help(help_open),
         CLOSE_ID => Kind::Close,
@@ -93,7 +97,12 @@ pub(super) fn draw_item(ui: &Ui, dis: &DrawItem) {
         let mem = CreateCompatibleDC(Some(dis.hdc));
         let bmp = CreateCompatibleBitmap(dis.hdc, w, h);
         let old = SelectObject(mem, bmp.into());
-        let local = RECT { left: 0, top: 0, right: w, bottom: h };
+        let local = RECT {
+            left: 0,
+            top: 0,
+            right: w,
+            bottom: h,
+        };
         ui.look.button(mem, local, label, &st);
         let _ = BitBlt(dis.hdc, r.left, r.top, w, h, Some(mem), 0, 0, SRCCOPY);
         SelectObject(mem, old);
@@ -154,7 +163,13 @@ pub(super) fn arrange(ui: &mut Ui, center: bool) {
     ui.look.refresh(dpi);
     ui.look.tone = view.tone;
     ui.look.frame(hwnd);
-    let m = measure(hdc, &ui.look.fonts, view, ui.help_open, area.bottom - area.top);
+    let m = measure(
+        hdc,
+        &ui.look.fonts,
+        view,
+        ui.help_open,
+        area.bottom - area.top,
+    );
     // SAFETY: kontekst pobrany wyżej.
     let _ = unsafe { ReleaseDC(Some(hwnd), hdc) };
     let ids = m.controls();
