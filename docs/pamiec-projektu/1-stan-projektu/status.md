@@ -6,7 +6,7 @@
 
 ## Aktualny cel
 
-**Bieżący (2026-10-31):** wersja **0.0.79** (raport 46), wgrana do Alfa-uruchomiona 31.10 ok. 11:19 z `ad95c3ec` (deploy-owner --no-start; otwiera właściciel skrótem „Alfa”). verify wersja na `ad95c3ec` 18/19 — czerwony tylko `audyt-npm` (minimatch/deepmerge w narzędziach programisty, do decyzji). Kopia na F: NIE zrobiona — dysk F: niepodłączony. Gałęzie do przeglądu: `do-przegladu-broker-2026-10-28`, `do-przegladu-pelny-dostep`, `do-przegladu-testy-pelny-dostep`.
+**Bieżący (2026-10-31):** wersja **0.0.79** (raport 46), wgrana do Alfa-uruchomiona 31.10 ok. 11:19 z `ad95c3ec` (deploy-owner --no-start; otwiera właściciel skrótem „Alfa”). verify wersja na `ad95c3ec` 18/19; `audyt-npm` naprawiony potem (minimatch 11.0.3, `2ef398ca`). Instancja testowa na L4 sprawdzona w prawdziwym oknie z gałęzi `do-przegladu-testy-pelny-dostep` (z-pelny-dostep i z-katalog zielone); plan prac w HTML: `alfa/docs/plan-prac.html` (`node scripts/plan-prac.mjs`). Kopia na F: NIE zrobiona — dysk F: niepodłączony. Gałęzie do przeglądu: `do-przegladu-broker-2026-10-28`, `do-przegladu-pelny-dostep`, `do-przegladu-testy-pelny-dostep`.
 
 Tory stałe: (1) domknięcie MVP na Windows — etap A planu v6 (= `alfa/docs/KONTYNUACJA.md`, etapy 0–3);
 (2) plan v6 prowadzony na bieżąco w `alfa/docs/plan/` (MD) i `alfa/docs/html/` (HTML, generowany).

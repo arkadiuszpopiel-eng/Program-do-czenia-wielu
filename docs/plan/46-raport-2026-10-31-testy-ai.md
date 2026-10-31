@@ -47,24 +47,34 @@ profilu właściciela ani rejestru). Broker w procesie czyta ten plik dopiero po
 `standing_level_from_the_broker_dir_is_restored` zielony, clippy i fmt czyste). Do czasu przeglądu i scalenia
 plik w profilu testowym nic nie zmienia, a test `e2e-app/z-pelny-dostep` jest pomijany bez `ALFA_TEST_AUTONOMY`.
 
+**Sprawdzone w prawdziwym oknie (31.10 ok. 12:10):** powłoka zbudowana z gałęzi (przeniesionej na `112c421c`,
+osobny katalog `alfa-testy-pelny-dostep`), `ALFA_TEST_AUTONOMY=L4`:
+
+- `e2e-app/z-pelny-dostep` — instancja testowa startuje z poziomem L4 („Pełna automatyka”) bez okna zgód: zielony;
+- `e2e-app/z-katalog` (każde ustawienie zapisane, odczytane i przywrócone) na L4: zielony.
+
+Pierwsza próba wykryła błąd w moim podłączeniu: `run.ps1` wymaga świeżego profilu i odmawiał startu, bo plik
+poziomu leżał już w `Local\Alfa`. Poprawka na głównej gałęzi (`112c421c`): strażnik pomija wyłącznie ten jeden
+plik, każdy inny plik danych Alfy nadal zatrzymuje bieg.
+
 ## 4. Sprawdzenie
 
-`verify wersja` na `ad95c3ec`: **18 z 19 zielonych** — Rust 3306/0/41, interfejs 535, przeglądarka 754,
+`verify wersja` na `ad95c3ec`: **18 z 19 zielonych** (dziewiętnasty, `audyt-npm`, naprawiony po przebiegu — niżej): Rust 3306/0/41, interfejs 535, przeglądarka 754,
 prawdziwa aplikacja 53 (pokrycie łącza 92,5 %), katalog, dokumenty, zależności, SBOM.
 
 - Pierwszy przebieg (`0fef03bc`) wykrył nową podatność **wasmtime 36.0.19 (RUSTSEC-2026-0424)** — podbiłam
   łatkę w linii LTS 36.0.20 (`docs/vendor/wasmtime.md` na to pozwala), `cargo deny` zielony, wtyczki 23/23.
-- **Czerwony `audyt-npm` — do decyzji właściciela:** `minimatch` < 11.0.1 (DoS przy wzorcach glob) w `eslint`
-  i `typescript-eslint` oraz `deepmerge` (niska, bez poprawki) we wtyczce Svelte dla Vite. Wszystko to narzędzia
-  programisty — nie trafiają do programu. Poprawka istnieje tylko w `minimatch` 11, a `eslint` 9 woła
-  `require("minimatch")` jak funkcję, więc wymuszenie wersji zepsułoby lint. Do wyboru: wyjątek w audycie
-  (`auditConfig.ignoreGhsas`) do czasu nowego `eslint` albo podbicie `eslint` (ADR).
+- **`audyt-npm` naprawiony po przebiegu (`2ef398ca`):** `minimatch` < 11.0.1 (DoS przy wzorcach glob) pod
+  `eslint` i `typescript-eslint` — narzędzia programisty, nie trafiają do programu. Poprawka jest tylko w 11.x;
+  wszyscy użytkownicy (`eslint`, `@eslint/config-array`, `@eslint/eslintrc`, `typescript-estree`) sięgają po klasę
+  `Minimatch` albo funkcję `minimatch`, które 11.x eksportuje tak samo, więc nadpisanie w `pnpm-workspace.yaml`
+  jest bezpieczne. Sprawdzone: `pnpm lint` zielony (eslint wykrywa błąd w pliku próbnym i pomija wykluczone
+  katalogi), `svelte-check` 0/0, `pnpm audit --audit-level moderate` czysty. Zostaje `deepmerge` (niska, bez
+  poprawki, poniżej progu bramki).
 - Przegląd ustawień w prawdziwym oknie (`e2e-app/z-katalog`, 8:25) i przegląd palety (Edge) — zielone.
 
 ## 5. Czego nie sprawdziłam
 
-- **Instancji testowej na „Pełnej automatyce” w prawdziwym oknie** — wymaga zbudowania powłoki z gałęzi do
-  przeglądu; zmiana w Brokerze czeka na decyzję właściciela (przegląd człowieka).
 - **Alfy właściciela po wgraniu** — pierwsze uruchomienie skrótem „Alfa” należy do właściciela.
 - **Kopii zapasowej na F:** — dysk F: nie jest podłączony do laptopa (brak sprzętu). Kopię robi
   `scripts/backup.sh "/f/Kopie zapasowe programów Spopielony/Alfa"` po podłączeniu dysku.
@@ -76,6 +86,6 @@ skróty „Alfa” na pulpicie i w menu Start odświeżone). Program otwiera wł
 
 ## 7. Do decyzji właściciela
 
-1. Przegląd i scalenie gałęzi `do-przegladu-testy-pelny-dostep` (Broker czyta poziom z profilu instancji testowej).
-2. `audyt-npm`: wyjątek dla `minimatch`/`deepmerge` w narzędziach programisty albo podbicie `eslint`.
-3. Spacja „przytrzymaj, aby mówić”: podłączyć czy usunąć ze skrótów.
+1. Przegląd i scalenie gałęzi `do-przegladu-testy-pelny-dostep` (Broker czyta poziom z profilu instancji testowej;
+   działanie sprawdzone w prawdziwym oknie — §3). Do scalenia instancja testowa w `verify` działa na poziomie domyślnym.
+2. Spacja „przytrzymaj, aby mówić”: podłączyć czy usunąć ze skrótów.

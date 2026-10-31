@@ -353,23 +353,32 @@ profilu właściciela ani rejestru). Broker w procesie czyta ten plik dopiero po
 <code>do-przegladu-testy-pelny-dostep</code> (<code>crates/app-broker/src/inproc.rs</code>, test
 <code>standing_level_from_the_broker_dir_is_restored</code> zielony, clippy i fmt czyste). Do czasu przeglądu i scalenia
 plik w profilu testowym nic nie zmienia, a test <code>e2e-app/z-pelny-dostep</code> jest pomijany bez <code>ALFA_TEST_AUTONOMY</code>.</p>
+<p><strong>Sprawdzone w prawdziwym oknie (31.10 ok. 12:10):</strong> powłoka zbudowana z gałęzi (przeniesionej na <code>112c421c</code>,
+osobny katalog <code>alfa-testy-pelny-dostep</code>), <code>ALFA_TEST_AUTONOMY=L4</code>:</p>
+<ul>
+<li><code>e2e-app/z-pelny-dostep</code> — instancja testowa startuje z poziomem L4 („Pełna automatyka”) bez okna zgód: zielony;</li>
+<li><code>e2e-app/z-katalog</code> (każde ustawienie zapisane, odczytane i przywrócone) na L4: zielony.</li>
+</ul>
+<p>Pierwsza próba wykryła błąd w moim podłączeniu: <code>run.ps1</code> wymaga świeżego profilu i odmawiał startu, bo plik
+poziomu leżał już w <code>Local\Alfa</code>. Poprawka na głównej gałęzi (<code>112c421c</code>): strażnik pomija wyłącznie ten jeden
+plik, każdy inny plik danych Alfy nadal zatrzymuje bieg.</p>
 <h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
-<p><code>verify wersja</code> na <code>ad95c3ec</code>: <strong>18 z 19 zielonych</strong> — Rust 3306/0/41, interfejs 535, przeglądarka 754,
+<p><code>verify wersja</code> na <code>ad95c3ec</code>: <strong>18 z 19 zielonych</strong> (dziewiętnasty, <code>audyt-npm</code>, naprawiony po przebiegu — niżej): Rust 3306/0/41, interfejs 535, przeglądarka 754,
 prawdziwa aplikacja 53 (pokrycie łącza 92,5 %), katalog, dokumenty, zależności, SBOM.</p>
 <ul>
 <li>Pierwszy przebieg (<code>0fef03bc</code>) wykrył nową podatność <strong>wasmtime 36.0.19 (RUSTSEC-2026-0424)</strong> — podbiłam
 łatkę w linii LTS 36.0.20 (<code>docs/vendor/wasmtime.md</code> na to pozwala), <code>cargo deny</code> zielony, wtyczki 23/23.</li>
-<li><strong>Czerwony <code>audyt-npm</code> — do decyzji właściciela:</strong> <code>minimatch</code> &lt; 11.0.1 (DoS przy wzorcach glob) w <code>eslint</code>
-i <code>typescript-eslint</code> oraz <code>deepmerge</code> (niska, bez poprawki) we wtyczce Svelte dla Vite. Wszystko to narzędzia
-programisty — nie trafiają do programu. Poprawka istnieje tylko w <code>minimatch</code> 11, a <code>eslint</code> 9 woła
-<code>require(&quot;minimatch&quot;)</code> jak funkcję, więc wymuszenie wersji zepsułoby lint. Do wyboru: wyjątek w audycie
-(<code>auditConfig.ignoreGhsas</code>) do czasu nowego <code>eslint</code> albo podbicie <code>eslint</code> (ADR).</li>
+<li><strong><code>audyt-npm</code> naprawiony po przebiegu (<code>2ef398ca</code>):</strong> <code>minimatch</code> &lt; 11.0.1 (DoS przy wzorcach glob) pod
+<code>eslint</code> i <code>typescript-eslint</code> — narzędzia programisty, nie trafiają do programu. Poprawka jest tylko w 11.x;
+wszyscy użytkownicy (<code>eslint</code>, <code>@eslint/config-array</code>, <code>@eslint/eslintrc</code>, <code>typescript-estree</code>) sięgają po klasę
+<code>Minimatch</code> albo funkcję <code>minimatch</code>, które 11.x eksportuje tak samo, więc nadpisanie w <code>pnpm-workspace.yaml</code>
+jest bezpieczne. Sprawdzone: <code>pnpm lint</code> zielony (eslint wykrywa błąd w pliku próbnym i pomija wykluczone
+katalogi), <code>svelte-check</code> 0/0, <code>pnpm audit --audit-level moderate</code> czysty. Zostaje <code>deepmerge</code> (niska, bez
+poprawki, poniżej progu bramki).</li>
 <li>Przegląd ustawień w prawdziwym oknie (<code>e2e-app/z-katalog</code>, 8:25) i przegląd palety (Edge) — zielone.</li>
 </ul>
 <h2 id="5-czego-nie-sprawdzilam">5. Czego nie sprawdziłam</h2>
 <ul>
-<li><strong>Instancji testowej na „Pełnej automatyce” w prawdziwym oknie</strong> — wymaga zbudowania powłoki z gałęzi do
-przeglądu; zmiana w Brokerze czeka na decyzję właściciela (przegląd człowieka).</li>
 <li><strong>Alfy właściciela po wgraniu</strong> — pierwsze uruchomienie skrótem „Alfa” należy do właściciela.</li>
 <li><strong>Kopii zapasowej na F:</strong> — dysk F: nie jest podłączony do laptopa (brak sprzętu). Kopię robi
 <code>scripts/backup.sh &quot;/f/Kopie zapasowe programów Spopielony/Alfa&quot;</code> po podłączeniu dysku.</li>
@@ -379,8 +388,8 @@ przeglądu; zmiana w Brokerze czeka na decyzję właściciela (przegląd człowi
 skróty „Alfa” na pulpicie i w menu Start odświeżone). Program otwiera właściciel skrótem.</p>
 <h2 id="7-do-decyzji-wlasciciela">7. Do decyzji właściciela</h2>
 <ol>
-<li>Przegląd i scalenie gałęzi <code>do-przegladu-testy-pelny-dostep</code> (Broker czyta poziom z profilu instancji testowej).</li>
-<li><code>audyt-npm</code>: wyjątek dla <code>minimatch</code>/<code>deepmerge</code> w narzędziach programisty albo podbicie <code>eslint</code>.</li>
+<li>Przegląd i scalenie gałęzi <code>do-przegladu-testy-pelny-dostep</code> (Broker czyta poziom z profilu instancji testowej;
+działanie sprawdzone w prawdziwym oknie — §3). Do scalenia instancja testowa w <code>verify</code> działa na poziomie domyślnym.</li>
 <li>Spacja „przytrzymaj, aby mówić”: podłączyć czy usunąć ze skrótów.</li>
 </ol>
 </article>

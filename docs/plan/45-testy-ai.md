@@ -161,6 +161,6 @@ Nowa funkcja (dowolna sesja): bramka sama zatrzyma `verify`, dopóki funkcja nie
 | Bramka „nowa funkcja bez testu” w `verify szybki` i `wersja`      | zrobione 31.10                                                                                          |
 | Przegląd ogólny poleceń palety                                    | zrobione 31.10: każde polecenie (4 części) zielone na Edge                                              |
 | Przegląd ogólny ustawień na prawdziwym rdzeniu                    | zrobione 31.10: każde ustawienie zielone w prawdziwym oknie (8:25, raport 46)                                                                    |
-| Instancja testowa na „Pełnej automatyce”                          | gałąź do przeglądu właściciela                                                                          |
-| Spłata długu                                                      | w toku — kolejne sesje testujące (`--kolejka`)                                                          |
+| Instancja testowa na „Pełnej automatyce”                          | gałąź do przeglądu; w prawdziwym oknie 31.10 na L4 zielone (`z-pelny-dostep`, `z-katalog`) |
+| Spłata długu                                                      | 31 → 6 (31.10, raport 46); zostały klawisze — `--kolejka` |
 | Przegląd ogólny zdarzeń i narzędzi                                | do zrobienia: narzędzia — wywołanie każdego na atrapach portów z poprawnymi argumentami ze schematu    |
