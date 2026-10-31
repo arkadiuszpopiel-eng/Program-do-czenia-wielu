@@ -7,8 +7,8 @@ use risk_classifier_contract::{AutonomyLevel, Reversibility, RiskLevel};
 use safety_broker_contract::{ApprovalId, ApprovalRequest, ApprovalSubject, Capability, Holder};
 
 use crate::words::{
-    asked_at_pl, mode_name_pl, mode_note_pl, origin_pl, place_pl, policy_pl, reversible_pl,
-    target_pl, verb,
+    mode_name_pl, mode_note_pl, origin_pl, place_pl, policy_pl, reversible_pl, target_pl, verb,
+    why_pl,
 };
 use serde::{Deserialize, Serialize};
 
@@ -190,7 +190,13 @@ impl ApprovalCard {
                 ));
                 details.push(("Kto".into(), persona.name.clone()));
                 details.push(("Rodzaj".into(), verb(capability).into()));
-                details.push(("Gdzie".into(), place_pl(capability)));
+                // „Gdzie” tylko, gdy mówi coś więcej niż „Co dokładnie” (ta sama ścieżka
+                // drugi raz, tylko małymi literami, była w oknie zbędnym powtórzeniem).
+                let place = place_pl(capability);
+                let said = what.as_deref().unwrap_or_default().to_lowercase();
+                if !said.contains(&place.to_lowercase()) {
+                    details.push(("Gdzie".into(), place));
+                }
                 technical = Some(v(tool));
                 if req.grantable {
                     let until_ms = now_ms.saturating_add(opts.grant_ms.min(GRANT_MAX_MS));
@@ -199,12 +205,9 @@ impl ApprovalCard {
                         until_ms,
                     });
                 }
-                let short = what.filter(|w| w.chars().count() <= 90);
-                format!(
-                    "{} prosi o zgodę: {}",
-                    persona.name,
-                    short.unwrap_or_else(|| verb(capability).into())
-                )
+                // Tytuł mówi rodzaj działania, konkret stoi raz — w polu „Co dokładnie”
+                // (wcześniej krótki konkret stał w tytule i w polu dwa razy).
+                format!("{} prosi o zgodę: {}", persona.name, verb(capability))
             }
             ApprovalSubject::Plan { title, steps } => {
                 plan = steps
@@ -275,24 +278,19 @@ impl ApprovalCard {
         };
         if mode_change.is_none() {
             let risk_line = format!(
-                "{} — {}",
+                "{} · {}",
                 req.risk.label_pl(),
                 reversible_pl(req.reversible)
             );
             details.push(("Ryzyko".into(), risk_line));
         }
         details.push(("Źródło polecenia".into(), origin_pl(&req.origin).into()));
-        if req.tainted {
-            details.push(("Uwaga".into(), "sesja widziała niezaufaną treść".into()));
-        }
+        // Niezaufana treść w sesji — plakietka w nagłówku okna (bez osobnego wiersza „Uwaga”).
         // Zmiana trybu: bez „Dlaczego pytam” (powtarzało wiersz „Tryb”). Bez odliczania na żadnej
         // karcie — tekst w oknie nie odświeża się co sekundę, więc licznik kłamał; prośba nadal
         // wygasa u Sędziego, a okno wtedy ją wycofuje (właściciel 27.10 i 31.10).
         if mode_change.is_none() {
-            let mut why = v(&req.explanation);
-            if let Some(level) = req.autonomy {
-                why = format!("{why} {}", asked_at_pl(level));
-            }
+            let why = why_pl(&req.rules, &req.explanation, req.autonomy);
             details.push(("Dlaczego pytam".into(), why));
         }
         if let Some(tool) = technical {

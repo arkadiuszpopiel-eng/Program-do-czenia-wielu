@@ -53,8 +53,8 @@ fn action_card_says_exactly_what_where_why_and_offers_scope() {
     let card = ApprovalCard::from_request(&req, 1_000, CardOptions::default());
     assert_eq!(card.persona.name, "Delta");
     assert_eq!(
-        card.title,
-        "Delta prosi o zgodę: pobranie strony https://x.example.org/cennik"
+        card.title, "Delta prosi o zgodę: połączenie z internetem",
+        "konkret tylko w „Co dokładnie”"
     );
     let keys: Vec<&str> = card.details.iter().map(|(k, _)| k.as_str()).collect();
     assert_eq!(
@@ -66,7 +66,6 @@ fn action_card_says_exactly_what_where_why_and_offers_scope() {
             "Gdzie",
             "Ryzyko",
             "Źródło polecenia",
-            "Uwaga",
             "Dlaczego pytam",
             "Narzędzie (techn.)"
         ],
@@ -78,10 +77,10 @@ fn action_card_says_exactly_what_where_why_and_offers_scope() {
     );
     assert_eq!(detail(&card, "Rodzaj"), "połączenie z internetem");
     assert_eq!(detail(&card, "Gdzie"), "strona x.example.org");
-    assert_eq!(detail(&card, "Ryzyko"), "wysokie — NIE da się cofnąć");
+    assert_eq!(detail(&card, "Ryzyko"), "wysokie · nie da się cofnąć");
     assert_eq!(
         detail(&card, "Dlaczego pytam"),
-        "Usuwamgpj.exe 14 plików z Pobranych Tryb pracy: „Automatycznie”. Na „Pełnej automatyce” to okno się nie pokazuje."
+        "Usuwamgpj.exe 14 plików z Pobranych Tryb pracy: „Automatycznie”."
     );
     assert_eq!(detail(&card, "Narzędzie (techn.)"), "tools-net.fetch");
     // Bez opisu od narzędzia — rodzaj działania zamiast konkretu.

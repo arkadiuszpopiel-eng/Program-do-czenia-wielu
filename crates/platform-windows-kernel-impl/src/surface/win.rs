@@ -1,7 +1,10 @@
-//! Okno Sędziego Cieni (Win32) na własnym wątku z pętlą komunikatów: cały tekst rysowany w
-//! `WM_PAINT` (moduł `paint`, układ z `layout` mierzony prawdziwą czcionką), jedyne kontrolki to
-//! przyciski BUTTON rysowane samodzielnie bez przycisku domyślnego (`Enter` → `IDOK`, ignorowany)
-//! i „?” w kółku (`IDHELP`, też F1) rozwijający opis Sędziego. `IsDialogMessageW` (Tab/Spacja/Esc),
+//! Okno Sędziego Cieni (Win32) na własnym wątku z pętlą komunikatów: bez systemowej belki
+//! (`WM_NCCALCSIZE` → całe okno to obszar klienta; cień i zaokrąglone rogi zostają z DWM,
+//! przeciąganie za nagłówek przez `HTCAPTION`), cały tekst rysowany w `WM_PAINT` (moduł `paint`,
+//! układ z `layout` mierzony prawdziwą czcionką), jedyne kontrolki to przyciski BUTTON rysowane
+//! samodzielnie bez przycisku domyślnego (`Enter` → `IDOK`, ignorowany), „?” (`IDHELP`, też F1)
+//! rozwijający opis Sędziego i ✕ (`IDCANCEL` — jak Esc, odmowa). Podświetlenie przycisku pod
+//! kursorem: `WM_MOUSEMOVE` z pętli komunikatów i zegar sprawdzający zejście kursora. `IsDialogMessageW` (Tab/Spacja/Esc),
 //! topmost, bez aktywacji poza `take_focus` (wtedy próba przejęcia fokusu; zawsze miganie).
 //! Próbki wejścia — moduł `input`.
 
@@ -23,9 +26,10 @@ use windows::core::{PCWSTR, w};
 use super::input::{
     begin_dispatch, decision_sample, end_dispatch, install_hooks, occluded, remove_hooks,
 };
-use super::layout::HELP_ID;
+use super::layout::{CLOSE_ID, HELP_ID};
 use super::paint::{DrawItem, Look, WINDOW_NAME};
-use super::state::{FRAME, Ui, arrange, draw_item, paint};
+use super::pointer::{caption_hit, control_of, hover_now};
+use super::state::{FRAME, Ui, arrange, draw_item, paint, redraw};
 use super::theme::palette;
 use super::thread::{Request, WM_REQUEST};
 use super::{EventQueue, now_ms};
@@ -34,6 +38,10 @@ use crate::win::{pcwstr, wide};
 const CLASS: PCWSTR = w!("AlfaBrokerUi");
 /// Nazwa dostępna przycisku „?” (czytnik ekranu, podpowiedź).
 const HELP_LABEL: &str = "Co to jest Sędzia Cieni? (F1)";
+/// Nazwa dostępna ✕ w nagłówku.
+const CLOSE_LABEL: &str = "Odmów i zamknij (Esc)";
+/// Zegar sprawdzający, czy kursor zszedł z podświetlonego przycisku.
+const HOVER_TIMER: usize = 7;
 
 thread_local! {
     static UI: RefCell<Option<Ui>> = const { RefCell::new(None) };
@@ -59,6 +67,26 @@ fn toggle_help() {
         ui.help_open = !ui.help_open;
         arrange(ui, false);
     });
+}
+
+/// Podświetla przycisk pod kursorem (albo żaden); zegar pilnuje zejścia kursora z przycisku.
+fn set_hover(dialog: HWND, id: Option<u16>) {
+    with_ui(|ui| {
+        if ui.hover != id {
+            let old = std::mem::replace(&mut ui.hover, id);
+            for i in [old, id].into_iter().flatten() {
+                redraw(ui, i);
+            }
+        }
+    });
+    // SAFETY: zegar naszego okna.
+    unsafe {
+        if id.is_some() {
+            let _ = SetTimer(Some(dialog), HOVER_TIMER, 60, None);
+        } else {
+            let _ = KillTimer(Some(dialog), HOVER_TIMER);
+        }
+    }
 }
 
 unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
@@ -102,6 +130,20 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
             with_ui(|ui| ui.hwnd = None);
         }
         WM_ERASEBKGND => return LRESULT(1),
+        // Bez ramki systemowej: całe okno to obszar klienta (cień i rogi rysuje DWM).
+        WM_NCCALCSIZE => {}
+        // SAFETY: domyślna obsługa bez rysowania ramki (`lParam = -1`), stan aktywności zostaje.
+        WM_NCACTIVATE => return unsafe { DefWindowProcW(hwnd, msg, wparam, LPARAM(-1)) },
+        WM_NCHITTEST => {
+            // SAFETY: domyślna obsługa; w nagłówku zamiast obszaru klienta — belka tytułu.
+            let hit = unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) };
+            if hit.0 == HTCLIENT as isize {
+                let header = with_ui(|ui| ui.measured.as_ref().map(|m| m.header.bottom)).flatten();
+                return header.and_then(|h| caption_hit(hwnd, lparam, h)).unwrap_or(hit);
+            }
+            return hit;
+        }
+        WM_TIMER if wparam.0 == HOVER_TIMER => set_hover(hwnd, hover_now(hwnd)),
         WM_PAINT => {
             if with_ui(|ui| paint(ui, hwnd)).is_none() {
                 // SAFETY: domyślna obsługa (stan okna zajęty w trakcie układania).
@@ -159,7 +201,13 @@ fn create(
 fn layout(ui: &mut Ui, view: &SurfaceView) -> Option<HWND> {
     let hwnd = match ui.hwnd {
         Some(h) => h,
-        None => create(ui, None, (CLASS, WINDOW_NAME, FRAME, 0), (0, 0, 100, 100))?,
+        None => {
+            let h = create(ui, None, (CLASS, WINDOW_NAME, FRAME, 0), (0, 0, 100, 100))?;
+            let flags = SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE;
+            // SAFETY: nasze okno — ponowne przeliczenie ramki (bez belki systemowej).
+            let _ = unsafe { SetWindowPos(h, None, 0, 0, 0, 0, flags) };
+            h
+        }
     };
     ui.hwnd = Some(hwnd);
     for c in ui.controls.drain(..) {
@@ -171,7 +219,7 @@ fn layout(ui: &mut Ui, view: &SurfaceView) -> Option<HWND> {
     let button = WS_CHILD | WS_VISIBLE | WS_TABSTOP | owner;
     let none = (0, 0, 1, 1);
     ui.focus = None;
-    // Kolejność Tab: decyzje, potem „?”.
+    // Kolejność Tab: decyzje, potem „?” i ✕.
     for b in &view.buttons {
         let c = create(ui, Some(hwnd), (w!("BUTTON"), &b.label, button, b.id), none);
         if b.id == view.initial_focus {
@@ -188,8 +236,12 @@ fn layout(ui: &mut Ui, view: &SurfaceView) -> Option<HWND> {
         );
         ui.controls.extend(c);
     }
+    let close = (w!("BUTTON"), CLOSE_LABEL, button, CLOSE_ID);
+    let c = create(ui, Some(hwnd), close, none);
+    ui.controls.extend(c);
     ui.view = Some(view.clone());
     ui.help_open = false;
+    ui.hover = None;
     let caption = wide(format!("{WINDOW_NAME} — {}", view.title));
     // SAFETY: nasze okno; tytuł żyje przez wywołanie.
     let _ = unsafe { SetWindowTextW(hwnd, pcwstr(&caption)) };
@@ -276,6 +328,7 @@ pub(super) fn run(inbox: &Receiver<Request>, events: Arc<EventQueue>, ready: &Sy
         view: None,
         measured: None,
         help_open: false,
+        hover: None,
         focus: None,
         module,
     };
@@ -291,6 +344,9 @@ pub(super) fn run(inbox: &Receiver<Request>, events: Arc<EventQueue>, ready: &Sy
             continue;
         }
         let dialog = with_ui(|ui| ui.hwnd).flatten();
+        if let (WM_MOUSEMOVE, Some(d)) = (msg.message, dialog) {
+            set_hover(d, control_of(d, msg.hwnd));
+        }
         if is_help_key(&msg, dialog) {
             toggle_help();
             continue;

@@ -53,7 +53,8 @@ pub struct SurfaceButton {
 pub struct SurfaceView {
     /// Tytuł (pasek i nagłówek).
     pub title: String,
-    /// Plakietka ryzyka (tekst z ikoną, np. „⚠ Ryzyko: wysokie”).
+    /// Plakietki w nagłówku oddzielone „ · ” (np. „Ryzyko wysokie · zlecone głosem”); pierwsza
+    /// w kolorze ryzyka, ikonę ryzyka rysuje okno według `tone`.
     pub badge: String,
     /// Kolor plakietki.
     pub tone: SurfaceTone,

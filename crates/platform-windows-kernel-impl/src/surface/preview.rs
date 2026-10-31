@@ -11,7 +11,9 @@ use windows::Win32::Graphics::Gdi::{
 };
 
 use super::layout::measure;
-use super::paint::{ButtonState, Look};
+use super::button::ButtonState;
+use super::paint::Look;
+use super::state::kind;
 use super::theme::palette_of;
 
 /// Bitmapa 32-bitowa (BGRA, wiersze od góry) jako plik BMP.
@@ -78,28 +80,19 @@ pub(super) fn render(
         };
         let old = SelectObject(mem, dib.into());
         look.paint(mem, view, &m);
-        for (id, r) in &m.buttons {
+        for (id, r) in m.controls() {
             let label = view
                 .buttons
                 .iter()
-                .find(|b| b.id == *id)
+                .find(|b| b.id == id)
                 .map_or("", |b| b.label.as_str());
             let st = ButtonState {
                 pressed: false,
-                focused: *id == view.initial_focus,
-                safe: *id == view.initial_focus,
-                help: None,
+                focused: id == view.initial_focus,
+                hover: false,
+                kind: kind(view, help_open, id),
             };
-            look.button(mem, *r, label, &st);
-        }
-        if let Some(r) = m.help_button {
-            let st = ButtonState {
-                pressed: false,
-                focused: false,
-                safe: false,
-                help: Some(help_open),
-            };
-            look.button(mem, r, "", &st);
+            look.button(mem, r, label, &st);
         }
         let _ = GdiFlush();
         let len = usize::try_from(w * h * 4).unwrap_or(0);

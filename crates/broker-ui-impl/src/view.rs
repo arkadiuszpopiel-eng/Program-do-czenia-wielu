@@ -46,25 +46,13 @@ fn tone(risk: RiskLevel) -> SurfaceTone {
     }
 }
 
-fn icon(risk: RiskLevel) -> &'static str {
-    match risk {
-        RiskLevel::Low => "●",
-        RiskLevel::Medium => "▲",
-        RiskLevel::High => "⚠",
-        RiskLevel::Critical => "⛔",
-    }
-}
-
 /// Widok karty z wierszem stanu; zakres „zawsze” w godzinach od chwili `now_ms`.
 pub fn view_of(card: &ApprovalCard, status: &str, now_ms: u64) -> SurfaceView {
-    let mut badge = match card.mode_change {
-        Some(_) => format!(
-            "{} Tryb pracy · ryzyko {}",
-            icon(card.risk),
-            card.risk.label_pl()
-        ),
-        None => format!("{} Ryzyko: {}", icon(card.risk), card.risk.label_pl()),
-    };
+    // Plakietki oddzielone „ · ”: pierwsza w kolorze ryzyka (ikonę rysuje okno według tonu).
+    let mut badge = format!("Ryzyko {}", card.risk.label_pl());
+    if card.mode_change.is_some() {
+        badge.push_str(" · zmiana trybu pracy");
+    }
     if card.voice_origin {
         badge.push_str(" · zlecone głosem");
     }

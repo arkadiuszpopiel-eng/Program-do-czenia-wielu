@@ -2,7 +2,7 @@
 //! program) zamiast technicznego zapisu zdolności, źródło polecenia, odwracalność, tryby pracy
 //! i opis „Co to jest Sędzia Cieni?” pod przyciskiem „?”.
 
-use risk_classifier_contract::{AutonomyLevel, CommandOrigin, Reversibility};
+use risk_classifier_contract::{AutonomyLevel, CommandOrigin, Reversibility, RuleId};
 use safety_broker_contract::{AdminOp, AutonomyTarget, Capability, KernelPolicy, ServiceAction};
 
 use crate::card::sanitize;
@@ -97,7 +97,7 @@ pub fn reversible_pl(r: Reversibility) -> &'static str {
     match r {
         Reversibility::Yes => "da się cofnąć (dziennik cofania)",
         Reversibility::Scoped => "da się cofnąć w zakresie (migawka przed wykonaniem)",
-        Reversibility::No => "NIE da się cofnąć",
+        Reversibility::No => "nie da się cofnąć",
     }
 }
 
@@ -125,12 +125,52 @@ pub fn mode_note_pl(l: AutonomyLevel) -> &'static str {
     }
 }
 
-/// Dopisek do „Dlaczego pytam”: tryb, przy którym padło pytanie.
-pub fn asked_at_pl(l: AutonomyLevel) -> String {
-    format!(
-        "Tryb pracy: „{}”. Na „Pełnej automatyce” to okno się nie pokazuje.",
-        mode_name_pl(l)
-    )
+/// Powód pytania po ludzku (zamiast skrótów klasyfikatora, przegląd właściciela 31.10).
+pub fn reason_pl(rule: RuleId) -> &'static str {
+    match rule {
+        RuleId::KernelBlock => "To obszar chroniony przez Jądro Alfy.",
+        RuleId::VoiceDestructive => {
+            "Polecenie głosowe zmienia coś bez możliwości cofnięcia — potwierdź kliknięciem."
+        }
+        RuleId::VoiceLowConfidence => "Rozpoznanie mowy było niepewne.",
+        RuleId::VoiceUnverifiedRisky => "Głos nie został rozpoznany jako Twój.",
+        RuleId::AdminConsent => "To operacja administratora komputera.",
+        RuleId::Trifecta => {
+            "Agentka ma dostęp do Twoich danych, czytała niezaufaną treść i chce coś wysłać."
+        }
+        RuleId::TaintedEgress => {
+            "Po kontakcie z niezaufaną treścią (strona, mail, plik) agentka chce wysłać dane na zewnątrz."
+        }
+        RuleId::MutationNeedsYes => "W tym trybie każda zmiana czeka na Twoje „tak”.",
+        RuleId::RiskyAtL2 => "W tym trybie usuwanie, wysyłka i instalacja czekają na Twoją zgodę.",
+        RuleId::TaintedHighRisk => "Sesja widziała niezaufaną treść, a to działanie jest ryzykowne.",
+        RuleId::UntrustedSource => "Polecenie pochodzi z niezaufanej treści, nie od Ciebie.",
+        RuleId::IrreversibleOutside => {
+            "Tego nie da się cofnąć, a działanie wychodzi poza katalog tej rozmowy."
+        }
+        RuleId::CriticalRisk => "Ryzyko jest krytyczne.",
+        RuleId::EgressNotAllowlisted => "Tej strony nie ma na liście zaufanych adresów.",
+        RuleId::GuiOutsideApps => "Tego programu nie ma na liście aplikacji, którymi agentki sterują.",
+    }
+}
+
+/// „Dlaczego pytam”: powody z reguł (bez powtórzeń; bez reguł — opis od klasyfikatora) i tryb,
+/// przy którym padło pytanie.
+pub fn why_pl(rules: &[RuleId], explanation: &str, level: Option<AutonomyLevel>) -> String {
+    let mut parts: Vec<String> = Vec::new();
+    for r in rules {
+        let text = reason_pl(*r).to_owned();
+        if !parts.contains(&text) {
+            parts.push(text);
+        }
+    }
+    if parts.is_empty() && !explanation.is_empty() {
+        parts.push(sanitize(explanation, 400));
+    }
+    if let Some(l) = level {
+        parts.push(format!("Tryb pracy: „{}”.", mode_name_pl(l)));
+    }
+    parts.join(" ")
 }
 
 /// Cel zmiany trybu.

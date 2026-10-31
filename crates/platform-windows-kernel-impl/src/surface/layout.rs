@@ -1,7 +1,9 @@
 //! Układ okna Sędziego Cieni mierzony prawdziwą czcionką (`DrawTextW` + `DT_CALCRECT`): wysokość
 //! każdego tekstu wynika z łamania wierszy w danej szerokości, a długie słowa bez spacji (ścieżki,
-//! adresy) łamią się w środku (`DT_EDITCONTROL`) — nic nie wychodzi poza kartę i nic się nie
-//! nakłada (przegląd właściciela 31.10: „okno niedokładne”). Ten sam układ rysuje okno i podgląd.
+//! adresy) łamią się w środku (`DT_EDITCONTROL`) — nic nie wychodzi poza okno i nic się nie
+//! nakłada. Okno bez systemowej belki (przegląd właściciela 31.10: „ramka ma być elegancka”):
+//! nagłówek z tarczą, „?” i ✕, plakietki, tytuł, wyróżnione „Co dokładnie”, siatka szczegółów,
+//! podpowiedź i stopka z przyciskami. Ten sam układ rysuje okno i podgląd.
 
 #![allow(unsafe_code)]
 
@@ -20,34 +22,67 @@ pub(super) const WRAP: DRAW_TEXT_FORMAT =
 
 /// Identyfikator przycisku „?” (`IDHELP`; poniżej przycisków decyzji — nigdy nie jest decyzją).
 pub(super) const HELP_ID: u16 = 9;
+/// Identyfikator ✕ w nagłówku (`IDCANCEL` — to samo co Esc: odmowa).
+pub(super) const CLOSE_ID: u16 = 2;
+/// Etykieta wyróżnionego pierwszego wiersza szczegółów.
+pub(super) const LEAD_LABEL: &str = "Co dokładnie";
 
 /// Szerokość okna przy 96 DPI.
-const WIDTH: i32 = 640;
-/// Kolumna etykiet przy 96 DPI.
-const LABEL_WIDTH: i32 = 150;
+const WIDTH: i32 = 600;
+/// Wysokość nagłówka (pole przeciągania okna).
+const HEADER: i32 = 48;
+/// Margines treści z lewej i prawej.
+const PAD: i32 = 24;
+/// Kolumna etykiet siatki.
+const LABEL_WIDTH: i32 = 128;
+/// Wysokość przycisku decyzji (bez obwódki fokusu).
+const BUTTON: i32 = 36;
+/// Miejsce na obwódkę fokusu wokół przycisku (kontrolka jest o tyle większa z każdej strony).
+pub(super) const RING: i32 = 3;
 /// Najwyższa wartość jednego wiersza szczegółów (w liniach) — dłuższe są przycinane.
 const MAX_VALUE_LINES: i32 = 8;
 
-/// Wiersz szczegółów: etykieta, wartość, czy wyróżniony („Co dokładnie”).
+/// Piksele przy danym DPI.
+pub(super) fn px(dpi: u32, v: i32) -> i32 {
+    v * i32::try_from(dpi.clamp(96, 960)).unwrap_or(96) / 96
+}
+
+/// Wiersz siatki: etykieta, wartość i numer szczegółu w widoku.
 pub(super) struct Row {
     pub label: RECT,
     pub value: RECT,
-    pub strong: bool,
+    pub detail: usize,
 }
 
-/// Zmierzony układ (piksele obszaru klienta).
+/// Plakietka nad tytułem (pierwsza — ryzyko, w jego kolorze i z ikoną).
+pub(super) struct Chip {
+    pub rect: RECT,
+    pub text: String,
+    pub first: bool,
+}
+
+/// Wyróżniony pierwszy szczegół („Co dokładnie”) w osobnym polu.
+pub(super) struct Lead {
+    pub panel: RECT,
+    pub label: RECT,
+    pub value: RECT,
+}
+
+/// Zmierzony układ (piksele okna = obszar klienta; okno nie ma ramki systemowej).
 pub(super) struct Measured {
     pub client: (i32, i32),
-    pub card: RECT,
     pub header: RECT,
+    pub brand: RECT,
     pub help_button: Option<RECT>,
+    pub close_button: RECT,
+    pub chips: Vec<Chip>,
     pub title: RECT,
-    pub badge: RECT,
     pub help: Option<RECT>,
-    pub rule_top: i32,
+    pub lead: Option<Lead>,
     pub rows: Vec<Row>,
-    pub rule_bottom: i32,
     pub status: RECT,
+    pub footer: RECT,
+    /// Kontrolki przycisków decyzji (z miejscem na obwódkę fokusu).
     pub buttons: Vec<(u16, RECT)>,
 }
 
@@ -87,8 +122,87 @@ pub(super) fn text_box(
     (r.right - r.left, r.bottom - r.top)
 }
 
-/// Układa okno dla widoku: karta z nagłówkiem („Sędzia Cieni” + „?”), tytuł, plakietka ryzyka,
-/// pomoc (gdy otwarta), siatka „etykieta / wartość”, podpowiedź i przyciski w stopce.
+/// Plakietki z `badge` (oddzielone „ · ”), łamane do kolejnego wiersza; zwraca dół ostatniej.
+fn chips(hdc: HDC, fonts: &Fonts, badge: &str, x: i32, y: i32, inner: i32) -> (Vec<Chip>, i32) {
+    let s = |v: i32| px(fonts.dpi, v);
+    let (h, mut cx, mut cy) = (s(24), x, y);
+    let mut out: Vec<Chip> = Vec::new();
+    for (i, part) in badge
+        .split(" · ")
+        .filter(|p| !p.trim().is_empty())
+        .enumerate()
+    {
+        let tw = text_box(hdc, fonts.chip, part, inner, DT_SINGLELINE).0;
+        let icon = if i == 0 { s(12) + s(6) } else { 0 };
+        let w = (tw + icon + 2 * s(10)).min(inner);
+        if cx > x && cx + w > x + inner {
+            cx = x;
+            cy += h + s(6);
+        }
+        out.push(Chip {
+            rect: rect(cx, cy, w, h),
+            text: part.trim().to_owned(),
+            first: i == 0,
+        });
+        cx += w + s(6);
+    }
+    let bottom = out.last().map_or(y, |c| c.rect.bottom);
+    (out, bottom)
+}
+
+/// Przyciski decyzji w stopce: bezpieczny (fokus startowy — „Odmów”) przy lewej krawędzi,
+/// pozostałe przy prawej w kolejności widoku; gdy się nie mieszczą — jeden pod drugim na całą
+/// szerokość (napis nigdy nie jest ucięty). Prostokąty kontrolek z miejscem na obwódkę.
+fn buttons(
+    hdc: HDC,
+    fonts: &Fonts,
+    view: &SurfaceView,
+    x: i32,
+    y: i32,
+    inner: i32,
+) -> Vec<(u16, RECT)> {
+    let s = |v: i32| px(fonts.dpi, v);
+    let (gap, bh, ring) = (s(8), s(BUTTON), s(RING));
+    let widths: Vec<i32> = view
+        .buttons
+        .iter()
+        .map(|b| {
+            (text_box(hdc, fonts.button, &b.label, inner, DT_SINGLELINE).0 + 2 * s(16)).max(s(96))
+        })
+        .collect();
+    let n = i32::try_from(widths.len()).unwrap_or(1).max(1);
+    let grow = |r: RECT| RECT {
+        left: r.left - ring,
+        top: r.top - ring,
+        right: r.right + ring,
+        bottom: r.bottom + ring,
+    };
+    if widths.iter().sum::<i32>() + (n - 1) * gap + s(24) > inner {
+        return view
+            .buttons
+            .iter()
+            .zip(0..)
+            .map(|(b, i)| (b.id, grow(rect(x, y + i * (bh + gap), inner, bh))))
+            .collect();
+    }
+    let mut right = x + inner;
+    let mut out: Vec<(u16, RECT)> = Vec::new();
+    for (b, w) in view.buttons.iter().zip(&widths).rev() {
+        let left = if b.id == view.initial_focus {
+            x
+        } else {
+            right - w
+        };
+        if b.id != view.initial_focus {
+            right -= w + gap;
+        }
+        out.push((b.id, grow(rect(left, y, *w, bh))));
+    }
+    out.reverse();
+    out
+}
+
+/// Układa okno dla widoku (opis w nagłówku modułu).
 pub(super) fn measure(
     hdc: HDC,
     fonts: &Fonts,
@@ -96,116 +210,95 @@ pub(super) fn measure(
     help_open: bool,
     max_height: i32,
 ) -> Measured {
-    let dpi = fonts.dpi;
-    let dpi_i = i32::try_from(dpi.clamp(96, 960)).unwrap_or(96);
-    let s = |v: i32| v * dpi_i / 96;
+    let s = |v: i32| px(fonts.dpi, v);
     let w = s(WIDTH);
-    let (margin, pad, stripe) = (s(12), s(20), s(4));
-    let card_w = w - 2 * margin;
-    let x = margin + stripe + pad;
-    let inner = card_w - stripe - 2 * pad;
-    let mut y = margin + s(14);
-    let header = rect(x, y, inner - s(36), s(28));
-    let help_button = (!view.help.is_empty()).then(|| rect(x + inner - s(28), y, s(28), s(28)));
-    y += s(28) + s(6);
+    let (x, inner) = (s(PAD), w - 2 * s(PAD));
+    let header = rect(0, 0, w, s(HEADER));
+    let icon = s(36);
+    let close_button = rect(w - s(8) - icon, s(6), icon, icon);
+    let help_button =
+        (!view.help.is_empty()).then(|| rect(close_button.left - s(2) - icon, s(6), icon, icon));
+    let brand_right = help_button.map_or(close_button.left, |r| r.left) - s(8);
+    let brand = rect(s(20), 0, brand_right - s(20), s(HEADER));
+    let (chips, mut y) = chips(hdc, fonts, &view.badge, x, s(HEADER + 4), inner);
+    y += if chips.is_empty() { 0 } else { s(14) };
     let title = rect(
         x,
         y,
         inner,
         text_height(hdc, fonts.title, &view.title, inner),
     );
-    y += title.bottom - title.top + s(10);
-    let (bw, bh) = text_box(hdc, fonts.badge, &view.badge, inner, DT_SINGLELINE);
-    let badge = rect(x, y, (bw + s(24)).min(inner), bh + s(10));
-    y += badge.bottom - badge.top + s(14);
+    y = title.bottom + s(16);
     let help = (help_open && !view.help.is_empty()).then(|| {
-        let h = text_height(hdc, fonts.body, &view.help, inner - s(28)) + s(24);
+        let h = text_height(hdc, fonts.body, &view.help, inner - s(30 + 28)) + s(28);
         let r = rect(x, y, inner, h);
-        y += h + s(14);
+        y += h + s(16);
         r
     });
-    let rule_top = y;
-    y += s(14);
+    let lead = view
+        .details
+        .first()
+        .filter(|(k, _)| k == LEAD_LABEL)
+        .map(|(k, v)| {
+            let (lw, vw) = (inner - s(32), inner - s(32));
+            let lh = text_height(hdc, fonts.lead_label, k, lw);
+            let line = text_height(hdc, fonts.lead, "Ag", vw);
+            let vh = text_height(hdc, fonts.lead, v, vw).min(line * MAX_VALUE_LINES);
+            let label = rect(x + s(16), y + s(12), lw, lh);
+            let value = rect(x + s(16), label.bottom + s(4), vw, vh);
+            let panel = rect(x, y, inner, value.bottom + s(13) - y);
+            y = panel.bottom + s(16);
+            Lead {
+                panel,
+                label,
+                value,
+            }
+        });
     let label_w = s(LABEL_WIDTH);
-    let value_x = x + label_w + s(14);
-    let value_w = inner - label_w - s(14);
+    let value_x = x + label_w + s(12);
+    let value_w = inner - label_w - s(12);
     let line = text_height(hdc, fonts.body, "Ag", value_w);
-    let rows = view
+    let skip = usize::from(lead.is_some());
+    let rows: Vec<Row> = view
         .details
         .iter()
         .enumerate()
+        .skip(skip)
         .map(|(i, (k, v))| {
-            let strong = i == 0 && k == "Co dokładnie";
-            let font = if strong { fonts.strong } else { fonts.body };
-            let vh = text_height(hdc, font, v, value_w).min(line * MAX_VALUE_LINES);
-            let lh = text_height(hdc, fonts.label, k, label_w);
-            let h = vh.max(lh);
+            let vh = text_height(hdc, fonts.body, v, value_w).min(line * MAX_VALUE_LINES);
+            let h = vh.max(text_height(hdc, fonts.label, k, label_w));
             let row = Row {
-                label: rect(x, y, label_w, h),
+                label: rect(x, y + s(1), label_w, h),
                 value: rect(value_x, y, value_w, h),
-                strong,
+                detail: i,
             };
             y += h + s(10);
             row
         })
         .collect();
-    let rule_bottom = y + s(2);
-    y += s(16);
+    y += if rows.is_empty() { 0 } else { s(6) };
     let status = rect(
         x,
         y,
         inner,
         text_height(hdc, fonts.hint, &view.status, inner),
     );
-    y += status.bottom - status.top + s(16);
-    // Przyciski w jednym rzędzie, szerokie według napisów; gdy się nie mieszczą — jeden pod
-    // drugim na całą szerokość (napis nigdy nie jest ucięty). Kolejność bez zmian: „Odmów” pierwsza.
-    let gap = s(10);
-    let bh = s(40);
-    let widths: Vec<i32> = view
-        .buttons
-        .iter()
-        .map(|b| text_box(hdc, fonts.button, &b.label, inner, DT_SINGLELINE).0 + s(36))
-        .collect();
-    let n = i32::try_from(widths.len()).unwrap_or(1).max(1);
-    let used: i32 = widths.iter().sum::<i32>() + (n - 1) * gap;
-    let buttons = if used <= inner {
-        let extra = (inner - used) / n;
-        let mut bx = x;
-        view.buttons
-            .iter()
-            .zip(&widths)
-            .map(|(b, bw)| {
-                let r = rect(bx, y, bw + extra, bh);
-                bx += bw + extra + gap;
-                (b.id, r)
-            })
-            .collect::<Vec<_>>()
-    } else {
-        view.buttons
-            .iter()
-            .zip(0..)
-            .map(|(b, i)| (b.id, rect(x, y + i * (bh + gap), inner, bh)))
-            .collect()
-    };
-    y = buttons.last().map_or(y, |(_, r)| r.bottom) + pad;
+    let top = status.bottom + s(20);
+    let buttons = buttons(hdc, fonts, view, x, top + s(16), inner);
+    let bottom = buttons.last().map_or(top, |(_, r)| r.bottom - s(RING)) + s(16);
     let mut m = Measured {
-        client: (w, y + margin),
-        card: RECT {
-            left: margin,
-            top: margin,
-            right: margin + card_w,
-            bottom: y,
-        },
+        client: (w, bottom),
         header,
+        brand,
         help_button,
+        close_button,
+        chips,
         title,
-        badge,
         help,
-        rule_top,
+        lead,
         rows,
-        rule_bottom,
         status,
+        footer: rect(0, top, w, bottom - top),
         buttons,
     };
     m.fit(max_height.max(s(320)), s(10));
@@ -232,24 +325,26 @@ impl Measured {
             return;
         }
         self.shift(over, false);
-        let floor = self.rule_bottom - gap;
+        let floor = self.status.top - gap;
         self.rows.retain(|r| r.value.bottom <= floor);
     }
 
-    /// Przesuwa w górę stopkę (podpowiedź, przyciski, dolną linię) i — gdy `body` — także
-    /// górną linię i wiersze szczegółów.
+    /// Przesuwa w górę stopkę i podpowiedź, a gdy `body` — także „Co dokładnie” i siatkę.
     fn shift(&mut self, by: i32, body: bool) {
         let up = |r: &mut RECT| {
             r.top -= by;
             r.bottom -= by;
         };
         self.client.1 -= by;
-        self.card.bottom -= by;
-        self.rule_bottom -= by;
         up(&mut self.status);
+        up(&mut self.footer);
         self.buttons.iter_mut().for_each(|(_, r)| up(r));
         if body {
-            self.rule_top -= by;
+            if let Some(l) = self.lead.as_mut() {
+                up(&mut l.panel);
+                up(&mut l.label);
+                up(&mut l.value);
+            }
             for row in &mut self.rows {
                 up(&mut row.label);
                 up(&mut row.value);
@@ -257,7 +352,15 @@ impl Measured {
         }
     }
 
-    /// Prostokąt przycisku jako `PixelRect` (x, y, szerokość, wysokość).
+    /// Wszystkie kontrolki: decyzje, „?” i ✕ (identyfikator, prostokąt).
+    pub(super) fn controls(&self) -> Vec<(u16, RECT)> {
+        let mut all = self.buttons.clone();
+        all.extend(self.help_button.map(|r| (HELP_ID, r)));
+        all.push((CLOSE_ID, self.close_button));
+        all
+    }
+
+    /// Prostokąt jako `PixelRect` (x, y, szerokość, wysokość).
     pub(super) fn pixel(r: &RECT) -> PixelRect {
         (r.left, r.top, r.right - r.left, r.bottom - r.top)
     }

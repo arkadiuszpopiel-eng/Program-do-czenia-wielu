@@ -1,5 +1,6 @@
-//! Stan okna Sędziego Cieni (bieżąca karta, układ, pomoc pod „?”), malowanie w `WM_PAINT`
-//! i `WM_DRAWITEM` oraz rozmiar i położenie okna na ekranie.
+//! Stan okna Sędziego Cieni (bieżąca karta, układ, pomoc pod „?”, przycisk pod kursorem),
+//! malowanie w `WM_PAINT` i `WM_DRAWITEM` (oba przez bitmapę w pamięci — bez migotania przy
+//! najechaniu) oraz rozmiar i położenie okna na ekranie (okno bez ramki: rozmiar = obszar klienta).
 
 #![allow(unsafe_code)]
 
@@ -12,12 +13,13 @@ use windows::Win32::Graphics::Gdi::{
     BeginPaint, BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject,
     EndPaint, GetDC, InvalidateRect, PAINTSTRUCT, ReleaseDC, SRCCOPY, SelectObject,
 };
-use windows::Win32::UI::HiDpi::{AdjustWindowRectExForDpi, GetDpiForWindow};
+use windows::Win32::UI::HiDpi::GetDpiForWindow;
 use windows::Win32::UI::WindowsAndMessaging::*;
 
 use super::EventQueue;
-use super::layout::{HELP_ID, Measured, measure};
-use super::paint::{ButtonState, DrawItem, Look, ODS_FOCUS, ODS_SELECTED};
+use super::layout::{CLOSE_ID, HELP_ID, Measured, measure};
+use super::button::{ButtonState, Kind};
+use super::paint::{DrawItem, Look, ODS_FOCUS, ODS_SELECTED};
 
 pub(super) struct Ui {
     pub events: Arc<EventQueue>,
@@ -28,6 +30,8 @@ pub(super) struct Ui {
     pub view: Option<SurfaceView>,
     pub measured: Option<Measured>,
     pub help_open: bool,
+    /// Przycisk pod kursorem (podświetlenie).
+    pub hover: Option<u16>,
     pub focus: Option<HWND>,
     pub module: Option<HINSTANCE>,
 }
@@ -53,7 +57,19 @@ pub(super) fn paint(ui: &Ui, hwnd: HWND) {
     }
 }
 
-/// `WM_DRAWITEM`: przycisk decyzji albo „?”.
+/// Rodzaj przycisku o identyfikatorze `id`: główny jest pierwszy przycisk decyzji poza
+/// bezpiecznym (fokus startowy — „Odmów”).
+pub(super) fn kind(view: &SurfaceView, help_open: bool, id: u16) -> Kind {
+    let primary = view.buttons.iter().find(|b| b.id != view.initial_focus).map(|b| b.id);
+    match id {
+        HELP_ID => Kind::Help(help_open),
+        CLOSE_ID => Kind::Close,
+        _ if Some(id) == primary => Kind::Primary,
+        _ => Kind::Secondary,
+    }
+}
+
+/// `WM_DRAWITEM`: przycisk decyzji, „?” albo ✕ (przez bitmapę w pamięci).
 pub(super) fn draw_item(ui: &Ui, dis: &DrawItem) {
     let Ok(id) = u16::try_from(dis.ctl_id) else {
         return;
@@ -67,10 +83,34 @@ pub(super) fn draw_item(ui: &Ui, dis: &DrawItem) {
     let st = ButtonState {
         pressed: (dis.item_state & ODS_SELECTED) != 0,
         focused: (dis.item_state & ODS_FOCUS) != 0,
-        safe: id == view.initial_focus,
-        help: (id == HELP_ID).then_some(ui.help_open),
+        hover: ui.hover == Some(id),
+        kind: kind(view, ui.help_open, id),
     };
-    ui.look.button(dis.hdc, dis.rc_item, label, &st);
+    let r = dis.rc_item;
+    let (w, h) = (r.right - r.left, r.bottom - r.top);
+    // SAFETY: bitmapa w pamięci tylko na czas rysowania, zwalniana przed powrotem.
+    unsafe {
+        let mem = CreateCompatibleDC(Some(dis.hdc));
+        let bmp = CreateCompatibleBitmap(dis.hdc, w, h);
+        let old = SelectObject(mem, bmp.into());
+        let local = RECT { left: 0, top: 0, right: w, bottom: h };
+        ui.look.button(mem, local, label, &st);
+        let _ = BitBlt(dis.hdc, r.left, r.top, w, h, Some(mem), 0, 0, SRCCOPY);
+        SelectObject(mem, old);
+        let _ = DeleteObject(bmp.into());
+        let _ = DeleteDC(mem);
+    }
+}
+
+/// Odświeża przycisk o identyfikatorze `id` (zmiana podświetlenia).
+pub(super) fn redraw(ui: &Ui, id: u16) {
+    let Some(hwnd) = ui.hwnd else { return };
+    // SAFETY: kontrolka naszego okna (albo brak — wtedy nic).
+    unsafe {
+        if let Ok(c) = GetDlgItem(Some(hwnd), i32::from(id)) {
+            let _ = InvalidateRect(Some(c), None, false);
+        }
+    }
 }
 
 pub(super) const FRAME: WINDOW_STYLE =
@@ -114,29 +154,10 @@ pub(super) fn arrange(ui: &mut Ui, center: bool) {
     ui.look.refresh(dpi);
     ui.look.tone = view.tone;
     ui.look.frame(hwnd);
-    let mut frame = RECT::default();
-    // SAFETY: rozmiar ramki dla DPI do zmiennej lokalnej.
-    let _ = unsafe {
-        AdjustWindowRectExForDpi(
-            &raw mut frame,
-            FRAME,
-            false,
-            WS_EX_TOPMOST | WS_EX_DLGMODALFRAME,
-            dpi,
-        )
-    };
-    let chrome_h = frame.bottom - frame.top;
-    let m = measure(
-        hdc,
-        &ui.look.fonts,
-        view,
-        ui.help_open,
-        area.bottom - area.top - chrome_h,
-    );
+    let m = measure(hdc, &ui.look.fonts, view, ui.help_open, area.bottom - area.top);
     // SAFETY: kontekst pobrany wyżej.
     let _ = unsafe { ReleaseDC(Some(hwnd), hdc) };
-    let mut ids = m.buttons.clone();
-    ids.extend(m.help_button.map(|r| (HELP_ID, r)));
+    let ids = m.controls();
     for c in &ui.controls {
         // SAFETY: nasza kontrolka.
         let id = u16::try_from(unsafe { GetDlgCtrlID(*c) }).unwrap_or(0);
@@ -146,8 +167,7 @@ pub(super) fn arrange(ui: &mut Ui, center: bool) {
             let _ = unsafe { MoveWindow(*c, x, y, w, h, true) };
         }
     }
-    let w = m.client.0 + frame.right - frame.left;
-    let h = m.client.1 + chrome_h;
+    let (w, h) = m.client;
     let mut now = RECT::default();
     // SAFETY: położenie naszego okna.
     let _ = unsafe { GetWindowRect(hwnd, &raw mut now) };

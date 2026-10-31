@@ -3,11 +3,17 @@
 //! `broker-ui`. Poza Windows: `Unsupported`.
 
 #[cfg(windows)]
+mod button;
+#[cfg(windows)]
 mod input;
 #[cfg(windows)]
 mod layout;
 #[cfg(windows)]
 mod paint;
+#[cfg(windows)]
+mod pointer;
+#[cfg(windows)]
+mod shapes;
 #[cfg(windows)]
 mod preview;
 #[cfg(windows)]

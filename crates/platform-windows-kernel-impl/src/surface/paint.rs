@@ -1,10 +1,9 @@
-//! Wygląd okna Sędziego Cieni w systemie wyglądu Alfy (`packages/ui-kit`, karta `ApprovalCard`):
-//! tło okna i karta z obramowaniem i paskiem ryzyka po lewej, nagłówek „Sędzia Cieni” z „?”
-//! w kółku, plakietka ryzyka na tle w kolorze ryzyka, siatka „etykieta / wartość” (pierwszy wiersz
-//! „Co dokładnie” pogrubiony), kolory z tokenów `--alfa-color-*` w motywie jasnym i ciemnym,
-//! Segoe UI Variable skalowane z DPI, przyciski jak `Button` z ramką fokusu. Cały tekst rysowany
-//! tutaj (bez kontrolek STATIC), w układzie zmierzonym przez `layout`. Tylko wygląd: wejście
-//! i decyzje zostają w `win`/`input`.
+//! Wygląd okna Sędziego Cieni w systemie wyglądu Alfy (`packages/ui-kit`): okno bez systemowej
+//! belki, z cieniem i zaokrąglonymi rogami DWM i cienką linią w kolorze ryzyka u góry; nagłówek
+//! z tarczą, „?” i ✕ (ikony Segoe Fluent Icons), plakietki-pigułki, tytuł Segoe UI Variable
+//! Display, wyróżnione pole „Co dokładnie”, siatka „etykieta / wartość” i stopka z przyciskami
+//! (główny wypełniony, pozostałe obrysowane; najechanie, wciśnięcie, obwódka fokusu). Kształty
+//! wygładzane przez GDI+ (`shapes`). Tylko wygląd: wejście i decyzje zostają w `win`/`input`.
 
 #![allow(unsafe_code)]
 
@@ -13,21 +12,20 @@ use std::ffi::c_void;
 use platform_contract::{SurfaceTone, SurfaceView};
 use windows::Win32::Foundation::{COLORREF, HWND, RECT};
 use windows::Win32::Graphics::Dwm::{
-    DWMWA_USE_IMMERSIVE_DARK_MODE, DWMWA_WINDOW_CORNER_PREFERENCE, DWMWCP_ROUND,
-    DwmSetWindowAttribute,
+    DWMWA_BORDER_COLOR, DWMWA_USE_IMMERSIVE_DARK_MODE, DWMWA_WINDOW_CORNER_PREFERENCE,
+    DWMWCP_ROUND, DwmSetWindowAttribute,
 };
 use windows::Win32::Graphics::Gdi::{
-    CLEARTYPE_QUALITY, CLIP_DEFAULT_PRECIS, CreateFontW, CreatePen, CreateSolidBrush,
-    DEFAULT_CHARSET, DRAW_TEXT_FORMAT, DT_CENTER, DT_SINGLELINE, DT_VCENTER, DeleteObject,
-    DrawTextW, Ellipse, FW_NORMAL, FW_SEMIBOLD, FillRect, GetStockObject, HDC, HFONT, NULL_BRUSH,
-    OUT_DEFAULT_PRECIS, PS_SOLID, RoundRect, SelectObject, SetBkMode, SetTextColor, TRANSPARENT,
+    CLEARTYPE_QUALITY, CLIP_DEFAULT_PRECIS, CreateFontW, DEFAULT_CHARSET, DeleteObject, FW_NORMAL,
+    FW_SEMIBOLD, HDC, HFONT, OUT_DEFAULT_PRECIS,
 };
-use windows::core::w;
+use windows::core::{PCWSTR, w};
 
-use super::layout::{Measured, WRAP};
+use super::layout::{LEAD_LABEL, Measured, WRAP, px};
+use super::shapes::{CENTER, LINE, fill, glyph, mix, round_rect, text};
 use super::theme::{Palette, palette};
 
-/// Nazwa okna w nagłówku i na pasku tytułu (właściciel 31.10).
+/// Nazwa okna w nagłówku i na pasku zadań (właściciel 31.10).
 pub(super) const WINDOW_NAME: &str = "Sędzia Cieni";
 
 /// `DRAWITEMSTRUCT` (winuser.h) — bez feature `Win32_UI_Controls`; układ jak w dokumentacji Windows.
@@ -38,7 +36,7 @@ pub(super) struct DrawItem {
     item_id: u32,
     item_action: u32,
     pub item_state: u32,
-    hwnd_item: HWND,
+    pub hwnd_item: HWND,
     pub hdc: HDC,
     pub rc_item: RECT,
     item_data: usize,
@@ -49,63 +47,7 @@ pub(super) const ODS_SELECTED: u32 = 0x0001;
 /// `ODS_FOCUS` — przycisk ma fokus klawiatury.
 pub(super) const ODS_FOCUS: u32 = 0x0010;
 
-fn fill(hdc: HDC, rect: &RECT, color: COLORREF) {
-    // SAFETY: pędzel GDI tego wątku, zwalniany zaraz po wypełnieniu.
-    unsafe {
-        let b = CreateSolidBrush(color);
-        FillRect(hdc, rect, b);
-        let _ = DeleteObject(b.into());
-    }
-}
-
-/// Zaokrąglony prostokąt albo koło (`radius = 0` → `Ellipse`): wypełnienie i obrys.
-fn shape(hdc: HDC, r: RECT, radius: Option<i32>, body: Option<COLORREF>, line: COLORREF, w: i32) {
-    // SAFETY: obiekty GDI wybrane na czas rysowania, przywrócone i zwolnione przed powrotem.
-    unsafe {
-        let pen = CreatePen(PS_SOLID, w, line);
-        let brush = body.map(|c| CreateSolidBrush(c));
-        let old_pen = SelectObject(hdc, pen.into());
-        let old_brush = match brush {
-            Some(b) => SelectObject(hdc, b.into()),
-            None => SelectObject(hdc, GetStockObject(NULL_BRUSH)),
-        };
-        let _ = match radius {
-            Some(rad) => RoundRect(hdc, r.left, r.top, r.right, r.bottom, rad, rad),
-            None => Ellipse(hdc, r.left, r.top, r.right, r.bottom),
-        };
-        SelectObject(hdc, old_pen);
-        SelectObject(hdc, old_brush);
-        let _ = DeleteObject(pen.into());
-        if let Some(b) = brush {
-            let _ = DeleteObject(b.into());
-        }
-    }
-}
-
-/// Tekst w prostokącie (format jak przy pomiarze).
-fn text(hdc: HDC, font: HFONT, color: COLORREF, s: &str, mut r: RECT, format: DRAW_TEXT_FORMAT) {
-    let mut buf: Vec<u16> = s.encode_utf16().collect();
-    if buf.is_empty() {
-        return;
-    }
-    // SAFETY: tekst w kontekście na czas rysowania; czcionka przywracana.
-    unsafe {
-        let old = SelectObject(hdc, font.into());
-        SetTextColor(hdc, color);
-        SetBkMode(hdc, TRANSPARENT);
-        let _ = DrawTextW(hdc, &mut buf, &raw mut r, format);
-        SelectObject(hdc, old);
-    }
-}
-
-/// Mieszanie koloru `a` z `b` (`t` z 0–100: udział `a`).
-fn mix(a: COLORREF, b: COLORREF, t: u32) -> COLORREF {
-    let ch = |c: COLORREF, shift: u32| (c.0 >> shift) & 0xFF;
-    let m = |shift: u32| (ch(a, shift) * t + ch(b, shift) * (100 - t)) / 100;
-    COLORREF(m(0) | (m(8) << 8) | (m(16) << 16))
-}
-
-fn font(px: i32, weight: u32) -> HFONT {
+fn font(px: i32, weight: u32, face: PCWSTR) -> HFONT {
     let weight = i32::try_from(weight).unwrap_or(400);
     let (charset, out, clip) = (DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS);
     // SAFETY: czcionka systemowa (bez fontów webowych); zwalniana w `Fonts::drop`.
@@ -124,7 +66,7 @@ fn font(px: i32, weight: u32) -> HFONT {
             clip,
             CLEARTYPE_QUALITY,
             0,
-            w!("Segoe UI Variable Text"),
+            face,
         )
     }
 }
@@ -132,35 +74,49 @@ fn font(px: i32, weight: u32) -> HFONT {
 /// Czcionki w rozmiarach tokenów (`--alfa-font-size-*`) dla danego DPI.
 pub(super) struct Fonts {
     pub dpi: u32,
-    /// Tytuł: 20 px, półgruby (`xl`).
+    /// Tytuł: 20 px, półgruby, krój „Display”.
     pub title: HFONT,
-    /// Nagłówek okna i plakietka: 13 px, półgruby (`sm`).
-    pub badge: HFONT,
-    /// Treść: 14 px (`md`).
+    /// Nazwa „Sędzia Cieni” w nagłówku i plakietki: 12 px, półgruby.
+    pub chip: HFONT,
+    /// Treść: 14 px.
     pub body: HFONT,
-    /// Treść wyróżniona („Co dokładnie”): 14 px, półgruby.
-    pub strong: HFONT,
+    /// Etykieta pola „Co dokładnie”: 12 px, półgruby.
+    pub lead_label: HFONT,
+    /// Wartość pola „Co dokładnie”: 15 px, półgruby.
+    pub lead: HFONT,
     /// Etykiety siatki: 13 px.
     pub label: HFONT,
-    /// Podpowiedź: 12 px (`xs`).
+    /// Podpowiedź: 12 px.
     pub hint: HFONT,
-    /// Przyciski: 14 px, półgruby (`Button`).
+    /// Przyciski: 14 px, półgruby.
     pub button: HFONT,
+    /// Ikony 16 px (Segoe Fluent Icons).
+    pub icon: HFONT,
+    /// Ikony 12 px (plakietka ryzyka).
+    pub icon_small: HFONT,
 }
 
 impl Fonts {
     pub(super) fn new(dpi: u32) -> Self {
-        let dpi_i = i32::try_from(dpi.clamp(96, 960)).unwrap_or(96);
-        let s = |px: i32| px * dpi_i / 96;
+        let s = |v: i32| px(dpi, v);
+        let (text, display, icons) = (
+            w!("Segoe UI Variable Text"),
+            w!("Segoe UI Variable Display"),
+            w!("Segoe Fluent Icons"),
+        );
+        let (semi, normal) = (FW_SEMIBOLD.0, FW_NORMAL.0);
         Self {
             dpi,
-            title: font(s(20), FW_SEMIBOLD.0),
-            badge: font(s(13), FW_SEMIBOLD.0),
-            body: font(s(14), FW_NORMAL.0),
-            strong: font(s(14), FW_SEMIBOLD.0),
-            label: font(s(13), FW_NORMAL.0),
-            hint: font(s(12), FW_NORMAL.0),
-            button: font(s(14), FW_SEMIBOLD.0),
+            title: font(s(20), semi, display),
+            chip: font(s(12), semi, text),
+            body: font(s(14), normal, text),
+            lead_label: font(s(12), semi, text),
+            lead: font(s(15), semi, text),
+            label: font(s(13), normal, text),
+            hint: font(s(12), normal, text),
+            button: font(s(14), semi, text),
+            icon: font(s(16), normal, icons),
+            icon_small: font(s(12), normal, icons),
         }
     }
 }
@@ -169,12 +125,15 @@ impl Drop for Fonts {
     fn drop(&mut self) {
         let all = [
             self.title,
-            self.badge,
+            self.chip,
             self.body,
-            self.strong,
+            self.lead_label,
+            self.lead,
             self.label,
             self.hint,
             self.button,
+            self.icon,
+            self.icon_small,
         ];
         for f in all {
             // SAFETY: czcionki tego wątku, niewybrane już w żadnym kontekście.
@@ -183,184 +142,196 @@ impl Drop for Fonts {
     }
 }
 
-/// Stan przycisku do narysowania.
-pub(super) struct ButtonState {
-    pub pressed: bool,
-    pub focused: bool,
-    /// Przycisk bezpieczny (odmowa) — drugorzędny.
-    pub safe: bool,
-    /// „?” — koło; `on` = pomoc otwarta.
-    pub help: Option<bool>,
-}
-
 /// Wygląd okna: motyw, czcionki dla DPI, kolor ryzyka.
 pub(super) struct Look {
     pub palette: Palette,
     pub fonts: Fonts,
     pub tone: SurfaceTone,
-    scale: i32,
+}
+
+/// Prostokąt pomniejszony o `by` z każdej strony.
+pub(super) fn inset(r: RECT, by: i32) -> RECT {
+    RECT {
+        left: r.left + by,
+        top: r.top + by,
+        right: r.right - by,
+        bottom: r.bottom - by,
+    }
+}
+
+pub(super) const fn rgb(v: u32) -> COLORREF {
+    COLORREF(((v >> 16) & 0xFF) | (v & 0xFF00) | ((v & 0xFF) << 16))
 }
 
 impl Look {
     pub(super) fn new(dpi: u32, palette: Palette) -> Self {
-        let mut look = Self {
+        Self {
             palette,
             fonts: Fonts::new(dpi),
             tone: SurfaceTone::Neutral,
-            scale: 1,
-        };
-        look.set_dpi(dpi);
-        look
+        }
     }
 
     /// Motyw systemu (mógł się zmienić) i czcionki dla DPI.
     pub(super) fn refresh(&mut self, dpi: u32) {
         self.palette = palette();
-        self.set_dpi(dpi);
-    }
-
-    fn set_dpi(&mut self, dpi: u32) {
         if self.fonts.dpi != dpi {
             self.fonts = Fonts::new(dpi);
         }
-        self.scale = i32::try_from(dpi.clamp(96, 960) / 96).unwrap_or(1).max(1);
     }
 
-    /// Ciemny pasek tytułu i zaokrąglone rogi (DWM); błąd (starszy system) pomijamy.
-    pub(super) fn frame(&self, hwnd: HWND) {
-        let dark = i32::from(self.palette.dark);
-        let round = DWMWCP_ROUND;
-        // SAFETY: atrybuty DWM naszego okna z wartości lokalnych.
-        unsafe {
-            let _ = DwmSetWindowAttribute(
-                hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE,
-                (&raw const dark).cast::<c_void>(),
-                4,
-            );
-            let _ = DwmSetWindowAttribute(
-                hwnd,
-                DWMWA_WINDOW_CORNER_PREFERENCE,
-                (&raw const round).cast::<c_void>(),
-                4,
-            );
+    pub(super) fn s(&self, v: i32) -> i32 {
+        px(self.fonts.dpi, v)
+    }
+
+    pub(super) fn danger(&self) -> bool {
+        matches!(self.tone, SurfaceTone::High | SurfaceTone::Critical)
+    }
+
+    /// Tło stopki z przyciskami (o ton od tła okna).
+    pub(super) fn footer(&self) -> COLORREF {
+        let p = &self.palette;
+        if p.dark {
+            p.bg
+        } else {
+            mix(p.surface2, p.surface, 55)
         }
     }
 
-    /// Całe okno poza przyciskami: tło, karta, pasek ryzyka, nagłówek, tytuł, plakietka, pomoc,
-    /// siatka szczegółów i podpowiedź.
+    /// Ciemny motyw ramki, zaokrąglone rogi i kolor krawędzi okna (DWM); błąd (starszy system)
+    /// pomijamy — okno działa dalej, tylko bez tych ozdób.
+    pub(super) fn frame(&self, hwnd: HWND) {
+        let p = &self.palette;
+        let dark = i32::from(p.dark);
+        let round = DWMWCP_ROUND;
+        let edge = if p.dark {
+            mix(p.text, p.surface, 16)
+        } else {
+            mix(p.text, p.surface, 18)
+        };
+        // SAFETY: atrybuty DWM naszego okna z wartości lokalnych.
+        unsafe {
+            let set = |attr, ptr: *const c_void| DwmSetWindowAttribute(hwnd, attr, ptr, 4);
+            let _ = set(DWMWA_USE_IMMERSIVE_DARK_MODE, (&raw const dark).cast());
+            let _ = set(DWMWA_WINDOW_CORNER_PREFERENCE, (&raw const round).cast());
+            let _ = set(DWMWA_BORDER_COLOR, (&raw const edge).cast());
+        }
+    }
+
+    /// Całe okno poza przyciskami.
     pub(super) fn paint(&self, hdc: HDC, view: &SurfaceView, m: &Measured) {
-        let (p, s, f) = (&self.palette, self.scale, &self.fonts);
+        let (p, f) = (&self.palette, &self.fonts);
+        let s = |v: i32| self.s(v);
         let risk = p.risk(self.tone);
-        let client = RECT {
+        let all = RECT {
             left: 0,
             top: 0,
             right: m.client.0,
             bottom: m.client.1,
         };
-        fill(hdc, &client, p.bg);
-        shape(hdc, m.card, Some(2 * 10 * s), Some(p.surface), p.border, s);
-        let stripe = RECT {
-            left: m.card.left + s,
-            top: m.card.top + 10 * s,
-            right: m.card.left + 5 * s,
-            bottom: m.card.bottom - 10 * s,
-        };
-        fill(hdc, &stripe, risk);
-        let header = WINDOW_NAME.to_uppercase();
-        let one = DRAW_TEXT_FORMAT(DT_SINGLELINE.0 | DT_VCENTER.0);
-        text(hdc, f.badge, p.muted, &header, m.header, one);
-        text(hdc, f.title, p.text, &view.title, m.title, WRAP);
-        shape(
+        fill(hdc, &all, p.surface);
+        fill(
             hdc,
-            m.badge,
-            Some(m.badge.bottom - m.badge.top),
-            Some(mix(risk, p.surface, 14)),
-            mix(risk, p.surface, 45),
-            s,
+            &RECT {
+                bottom: s(3),
+                ..all
+            },
+            risk,
         );
-        let center = DRAW_TEXT_FORMAT(DT_SINGLELINE.0 | DT_VCENTER.0 | DT_CENTER.0);
-        text(hdc, f.badge, risk, &view.badge, m.badge, center);
-        if let Some(h) = m.help {
-            shape(hdc, h, Some(2 * 8 * s), Some(p.surface2), p.border, s);
-            let inner = RECT {
-                left: h.left + 14 * s,
-                top: h.top + 12 * s,
-                right: h.right - 14 * s,
-                bottom: h.bottom - 12 * s,
-            };
-            text(hdc, f.body, p.text, &view.help, inner, WRAP);
-        }
-        let rule = |y: i32| {
-            let r = RECT {
-                left: m.title.left,
-                top: y,
-                right: m.title.right,
-                bottom: y + s,
-            };
-            fill(hdc, &r, p.border);
+        let shield = RECT {
+            right: m.brand.left + s(18),
+            ..m.brand
         };
-        rule(m.rule_top);
-        for (row, (k, v)) in m.rows.iter().zip(&view.details) {
-            text(hdc, f.label, p.muted, k, row.label, WRAP);
-            let font = if row.strong { f.strong } else { f.body };
-            text(hdc, font, p.text, v, row.value, WRAP);
+        text(hdc, f.icon, risk, glyph::SHIELD, shield, CENTER);
+        let name = RECT {
+            left: m.brand.left + s(26),
+            ..m.brand
+        };
+        text(hdc, f.chip, p.muted, WINDOW_NAME, name, LINE);
+        for chip in &m.chips {
+            self.chip(hdc, chip.rect, &chip.text, chip.first);
         }
-        rule(m.rule_bottom);
+        text(hdc, f.title, p.text, &view.title, m.title, WRAP);
+        if let Some(h) = m.help {
+            round_rect(hdc, &h, s(8), Some(p.surface2), None);
+            let icon = RECT {
+                left: h.left + s(14),
+                top: h.top + s(13),
+                right: h.left + s(34),
+                bottom: h.top + s(33),
+            };
+            text(hdc, f.icon, p.focus, glyph::INFO, icon, CENTER);
+            let body = RECT {
+                left: h.left + s(44),
+                top: h.top + s(14),
+                right: h.right - s(14),
+                bottom: h.bottom - s(14),
+            };
+            text(hdc, f.body, p.text, &view.help, body, WRAP);
+        }
+        if let Some(l) = &m.lead {
+            let tint = if p.dark { 10 } else { 6 };
+            let edge = if p.dark { 34 } else { 24 };
+            round_rect(
+                hdc,
+                &l.panel,
+                s(8),
+                Some(mix(risk, p.surface, tint)),
+                Some((mix(risk, p.surface, edge), s(1))),
+            );
+            text(hdc, f.lead_label, p.muted, LEAD_LABEL, l.label, WRAP);
+            let value = view.details.first().map_or("", |(_, v)| v.as_str());
+            text(hdc, f.lead, p.text, value, l.value, WRAP);
+        }
+        for row in &m.rows {
+            if let Some((k, v)) = view.details.get(row.detail) {
+                text(hdc, f.label, p.muted, k, row.label, WRAP);
+                text(hdc, f.body, p.text, v, row.value, WRAP);
+            }
+        }
         text(hdc, f.hint, p.subtle, &view.status, m.status, WRAP);
+        fill(hdc, &m.footer, self.footer());
+        fill(
+            hdc,
+            &RECT {
+                bottom: m.footer.top + s(1).max(1),
+                ..m.footer
+            },
+            p.border,
+        );
     }
 
-    /// Przycisk jak `Button` z `ui-kit` (albo „?” w kółku) z ramką fokusu na zewnątrz.
-    pub(super) fn button(&self, hdc: HDC, r: RECT, label: &str, st: &ButtonState) {
-        let (p, s) = (&self.palette, self.scale);
-        fill(hdc, &r, p.surface);
-        if let Some(on) = st.help {
-            if st.focused {
-                shape(hdc, r, None, None, p.focus, 2 * s);
-            }
-            let inner = RECT {
-                left: r.left + 3 * s,
-                top: r.top + 3 * s,
-                right: r.right - 3 * s,
-                bottom: r.bottom - 3 * s,
-            };
-            let (body, ink) = if on {
-                (p.text, p.surface)
-            } else {
-                (p.surface, p.muted)
-            };
-            shape(
-                hdc,
-                inner,
-                None,
-                Some(body),
-                if on { p.text } else { p.border },
-                s,
-            );
-            let center = DRAW_TEXT_FORMAT(DT_SINGLELINE.0 | DT_VCENTER.0 | DT_CENTER.0);
-            text(hdc, self.fonts.button, ink, "?", inner, center);
+    /// Plakietka-pigułka: pierwsza w kolorze ryzyka z ikoną, pozostałe stonowane.
+    fn chip(&self, hdc: HDC, r: RECT, label: &str, first: bool) {
+        let (p, f) = (&self.palette, &self.fonts);
+        let s = |v: i32| self.s(v);
+        let h = r.bottom - r.top;
+        if !first {
+            round_rect(hdc, &r, h / 2, Some(p.surface2), None);
+            text(hdc, f.chip, p.muted, label, inset(r, 0), CENTER);
             return;
         }
-        let danger = matches!(self.tone, SurfaceTone::High | SurfaceTone::Critical);
-        let (body, line, ink) = if st.safe {
-            let body = if st.pressed { p.surface2 } else { p.surface };
-            (body, p.border, p.text)
-        } else if danger {
-            (p.error, p.error, p.on_accent)
-        } else {
-            (p.text, p.text, if p.dark { p.bg } else { p.on_accent })
+        let risk = p.risk(self.tone);
+        let tint = if p.dark { 18 } else { 11 };
+        round_rect(hdc, &r, h / 2, Some(mix(risk, p.surface, tint)), None);
+        let icon = match self.tone {
+            SurfaceTone::Neutral => glyph::INFO,
+            SurfaceTone::Low => glyph::OK,
+            SurfaceTone::Medium | SurfaceTone::High => glyph::WARNING,
+            SurfaceTone::Critical => glyph::STOP,
         };
-        let inner = RECT {
-            left: r.left + 3 * s,
-            top: r.top + 3 * s,
-            right: r.right - 3 * s,
-            bottom: r.bottom - 3 * s,
+        let ir = RECT {
+            left: r.left + s(10),
+            right: r.left + s(22),
+            ..r
         };
-        if st.focused {
-            shape(hdc, r, Some(2 * 9 * s), None, p.focus, 2 * s);
-        }
-        shape(hdc, inner, Some(2 * 6 * s), Some(body), line, s);
-        let center = DRAW_TEXT_FORMAT(DT_SINGLELINE.0 | DT_VCENTER.0 | DT_CENTER.0);
-        text(hdc, self.fonts.button, ink, label, inner, center);
+        text(hdc, f.icon_small, risk, icon, ir, CENTER);
+        let tr = RECT {
+            left: r.left + s(28),
+            right: r.right - s(10),
+            ..r
+        };
+        text(hdc, f.chip, risk, label, tr, LINE);
     }
+
 }

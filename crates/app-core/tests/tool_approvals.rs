@@ -251,6 +251,7 @@ async fn waiting_tools_run_after_owner_approval_in_broker_window() {
             p.name, p.expect, p.args
         ));
     }
+    full_automation_shows_no_window(&rig, &tools, &browser, &mut lines, &mut problems).await;
     write_report(&lines, &problems);
     drop(rig);
     drop(broker.lock().unwrap().take());
@@ -259,6 +260,70 @@ async fn waiting_tools_run_after_owner_approval_in_broker_window() {
         "narzędzia po zgodzie:\n{}",
         problems.join("\n")
     );
+}
+
+/// Część 2 (decyzja właściciela 31.10): sesja przeglądarki podniesiona do „Pełnej automatyki”
+/// jedną kartą zmiany trybu, potem te same działania na stronie po obcej treści — każde ma się
+/// wykonać od razu, bez żadnego okna (limit zgody 15 s: karta skończyłaby się odmową).
+async fn full_automation_shows_no_window(
+    rig: &tool_rig::fakes::Rig,
+    tools: &[Arc<dyn Tool>],
+    browser: &str,
+    lines: &mut Vec<String>,
+    problems: &mut Vec<String>,
+) {
+    eprintln!("→ podniesienie sesji przeglądarki do L4 — kliknij „Włącz: Pełna automatyka”…");
+    rig.core
+        .permissions_request_level(AutonomyLevel::L4, Some(browser.to_owned()))
+        .await
+        .unwrap();
+    let deadline = Instant::now() + OWNER;
+    loop {
+        let state = rig
+            .core
+            .permissions_get(Some(browser.to_owned()))
+            .await
+            .unwrap();
+        if state.session == Some(AutonomyLevel::L4) {
+            break;
+        }
+        if Instant::now() > deadline {
+            problems.push("L4: zmiana trybu nie zatwierdzona w 3 min".into());
+            return;
+        }
+        tokio::time::sleep(Duration::from_millis(500)).await;
+    }
+    eprintln!("  L4 włączone — teraz NIE powinno pokazać się żadne okno:");
+    let steps = [
+        ("browser_click", json!({ "node": 1 })),
+        (
+            "browser_type",
+            json!({ "node": 2, "text": "pełna automatyka" }),
+        ),
+        ("browser_select", json!({ "node": 3, "value": "Polska" })),
+        ("browser_key", json!({ "key": "enter" })),
+    ];
+    for (name, args) in steps {
+        let tool = tools
+            .iter()
+            .find(|t| t.manifest().name == name)
+            .unwrap()
+            .clone();
+        let mut ctx = ToolCtx::new(Holder::agent(browser, "delta"))
+            .with_workdir(&rig.workdir.to_string_lossy());
+        ctx.approval_timeout = Duration::from_secs(15);
+        let started = Instant::now();
+        let out = call(tool, args.clone(), ctx).await;
+        let (class, ms) = (report::class(&out.status), started.elapsed().as_millis());
+        let text = first_line(&out.text);
+        eprintln!("  {name} (L4): {class} po {ms} ms");
+        if class != "ok" || ms > 5_000 {
+            problems.push(format!("{name} (L4): {class} po {ms} ms — {text}"));
+        }
+        lines.push(format!(
+            "| `{name}` | L4 | {class} | ok, bez okna | 0 | `{args}` | {text} |"
+        ));
+    }
 }
 
 async fn call(
