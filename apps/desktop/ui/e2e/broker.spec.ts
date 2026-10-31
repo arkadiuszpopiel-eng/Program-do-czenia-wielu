@@ -13,7 +13,9 @@ async function openPermissions(page: Page) {
     .getByRole('button', { name })
     .click();
   await expect(page.getByRole('heading', { name, level: 2 })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Sędzia Cieni (Jądro bezpieczeństwa)' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Sędzia Cieni (Jądro bezpieczeństwa)' }),
+  ).toBeVisible();
 }
 
 for (const theme of ['light', 'dark'] as const) {
@@ -39,7 +41,9 @@ for (const theme of ['light', 'dark'] as const) {
       await openApp(page, { theme, scenario: 'broker-portable' });
       await waitForChat(page);
       await openPermissions(page);
-      await expect(page.getByText('Tryb przenośny — Sędzia Cieni bez osobnego konta')).toBeVisible();
+      await expect(
+        page.getByText('Tryb przenośny — Sędzia Cieni bez osobnego konta'),
+      ).toBeVisible();
       await expect(page.getByText(/słabsza izolacja/)).toBeVisible();
       await expect(page.getByText(/Izolacja: słabsza/)).toBeVisible();
       await expect(page.getByText(/Instaluje ją raz administrator/)).toBeVisible();
@@ -54,14 +58,18 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(alert).toContainText('Połączenie z Sędzią Cieni zerwane');
       await expect(alert).toContainText('wszystko, co wymaga zgody, jest odrzucane');
       await expect(region.getByRole('button', { name: 'Ukryj komunikat' })).toHaveCount(0);
-      await expect(page.getByText(/Sędzia Cieni jest niedostępny — tej prośby nie da się/)).toBeVisible();
+      await expect(
+        page.getByText(/Sędzia Cieni jest niedostępny — tej prośby nie da się/),
+      ).toBeVisible();
       // Opis z przyczyną pada raz (wcześniej baner powtarzał to samo zdanie), a karta nie udaje,
       // że okno Brokera da się otworzyć.
       // Liczymy wystąpienia w tekście, nie elementy — zdanie powtórzone w jednym akapicie też jest błędem.
       const repeats = ((await alert.innerText()).match(/bezpieczny stan/gi) ?? []).length;
       expect(repeats, 'zdanie o bezpiecznym stanie pada raz').toBe(1);
       await expect(alert).toContainText('proces Sędziego Cieni zakończył działanie');
-      await expect(page.getByRole('button', { name: /Otwórz w oknie Sędziego Cieni/ })).toHaveCount(0);
+      await expect(page.getByRole('button', { name: /Otwórz w oknie Sędziego Cieni/ })).toHaveCount(
+        0,
+      );
       await expectAccessible(page, `Sędzia Cieni zerwany ${theme}`);
       await region.getByRole('button', { name: 'Szczegóły' }).click();
       await expect(page.getByText('· Połączenie zerwane — bezpieczny stan')).toBeVisible();
@@ -93,5 +101,34 @@ for (const theme of ['light', 'dark'] as const) {
       await waitForChat(page);
       await expect(region).toHaveCount(0);
     });
+  });
+}
+// Zgody „zawsze w tym zakresie” (31.10): czas wybiera właściciel w oknie Sędziego Cieni, tu tylko
+// lista i „Odwołaj” (odwołanie zawęża, więc działa od razu). Atrapa ma zgodę na 3 h i do odwołania.
+for (const theme of ['light', 'dark'] as const) {
+  test(`zgody „zawsze w tym zakresie”: lista i odwołanie — ${theme}`, async ({ page }) => {
+    await openApp(page, { theme });
+    await waitForChat(page);
+    await openPermissions(page);
+    const card = page.getByRole('region', {
+      name: 'Zgody „zawsze w tym zakresie”',
+    });
+    await expect(card.getByText('połączenie z internetem: strona example.com')).toBeVisible();
+    await expect(card.getByText(/^Delta · do /)).toBeVisible();
+    await expect(card.getByText('Wszystkie agentki w sesji · do odwołania')).toBeVisible();
+    await expectAccessible(page, `zgody ${theme}`);
+    // Nadawanie zgód — wyłącznie okno Sędziego: w karcie nie ma żadnego „Zezwól”.
+    await expect(card.getByRole('button', { name: /Zezwól|Nadaj/ })).toHaveCount(0);
+    await card
+      .getByRole('button', {
+        name: 'Odwołaj zgodę: połączenie z internetem: strona example.com',
+      })
+      .click();
+    await expect(page.getByText('Zgoda odwołana — Sędzia Cieni znów zapyta.')).toBeVisible();
+    await expect(card.getByText('połączenie z internetem: strona example.com')).toHaveCount(0);
+    await card.getByRole('button', { name: /^Odwołaj zgodę: odczyt plików/ }).click();
+    await expect(
+      card.getByText('Brak zgód — o każde takie działanie Sędzia Cieni zapyta.'),
+    ).toBeVisible();
   });
 }
