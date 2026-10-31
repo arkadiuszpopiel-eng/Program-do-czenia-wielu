@@ -202,6 +202,14 @@ podsumowanie trafia do raportu verify.
   testy `tools-browser-impl`), trwałe usunięcie i terminal czekają na potwierdzenie z założenia,
   `engine_height` — atrapa silnika bez terenu, `mcp_call` — brak serwerów MCP w profilu testowym.
   5/5 prób straży odrzuconych. Test kontrolny pilnuje, że każda usterka jest zgłaszana.
+- **Z ręczną zgodą właściciela** (`app-core/tests/tool_approvals.rs`, `#[ignore]`): ten sam rdzeń
+  z atrapami, ale z prawdziwym Brokerem poza procesem (`alfa-broker --console`, własny potok, dane
+  w katalogu tymczasowym) i jego oknem zgód; właściciel zatwierdza karty, AI ocenia wyniki
+  (`target/verify/narzedzia/zgody.md`). Uruchomienie: `cargo build -p app-safety --bins`, potem
+  `cargo test -p app-core --test tool_approvals -- --ignored --nocapture`. **31.10: 9/9 zgodnie
+  z oczekiwaniem** — 7 działań przeglądarki `ok` po zgodzie (z kliknięciem odnośnika przed `back`),
+  trwałe usunięcie na L3 bez karty (nic nie usunięto, intencja potwierdzenia), na L2 karta → plik
+  usunięty w atrapie. Terminal, `engine_height` i `mcp_call` nie czekają na zgodę — zostają w §6.5.
 
 ### 6.6 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)
 

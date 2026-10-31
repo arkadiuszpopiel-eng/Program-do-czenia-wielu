@@ -489,6 +489,14 @@ obcej treści czeka na zgodę właściciela (rdzeń testowy nie ma okna Brokera 
 testy <code>tools-browser-impl</code>), trwałe usunięcie i terminal czekają na potwierdzenie z założenia,
 <code>engine_height</code> — atrapa silnika bez terenu, <code>mcp_call</code> — brak serwerów MCP w profilu testowym.
 5/5 prób straży odrzuconych. Test kontrolny pilnuje, że każda usterka jest zgłaszana.</li>
+<li><strong>Z ręczną zgodą właściciela</strong> (<code>app-core/tests/tool_approvals.rs</code>, <code>#[ignore]</code>): ten sam rdzeń
+z atrapami, ale z prawdziwym Brokerem poza procesem (<code>alfa-broker --console</code>, własny potok, dane
+w katalogu tymczasowym) i jego oknem zgód; właściciel zatwierdza karty, AI ocenia wyniki
+(<code>target/verify/narzedzia/zgody.md</code>). Uruchomienie: <code>cargo build -p app-safety --bins</code>, potem
+<code>cargo test -p app-core --test tool_approvals -- --ignored --nocapture</code>. <strong>31.10: 9/9 zgodnie
+z oczekiwaniem</strong> — 7 działań przeglądarki <code>ok</code> po zgodzie (z kliknięciem odnośnika przed <code>back</code>),
+trwałe usunięcie na L3 bez karty (nic nie usunięto, intencja potwierdzenia), na L2 karta → plik
+usunięty w atrapie. Terminal, <code>engine_height</code> i <code>mcp_call</code> nie czekają na zgodę — zostają w §6.5.</li>
 </ul>
 <h3 id="6-6-czego-ai-nie-testuje-samo-trzy-powody-z-dokumentu-24-3">6.6 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)</h3>
 <p>Kamera (sprzętowo odłączona), ocena zmysłami właściciela (czy głos się podoba, czy wygląd jest ładny),

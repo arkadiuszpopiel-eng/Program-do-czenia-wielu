@@ -166,6 +166,14 @@ Druga linia.",
 
 /// Buduje rdzeń: pliki katalogu roboczego w atrapie FS i na dysku, poziom L4 w profilu testu.
 pub async fn rig() -> Rig {
+    rig_with(None).await
+}
+
+/// Broker poza procesem dla rdzenia diagnostyki (katalog główny testu = profil właściciela).
+pub type KernelFor<'a> = &'a dyn Fn(&Path) -> app_broker::RemoteKernel;
+
+/// Jak [`rig`]; `kernel` — Broker poza procesem z oknem zgód zamiast Brokera w procesie.
+pub async fn rig_with(kernel: Option<KernelFor<'_>>) -> Rig {
     let dir = tempfile::tempdir().unwrap();
     let paths = AppPaths::under(dir.path());
     let workdir = paths.user_root.join("Praca");
@@ -216,6 +224,7 @@ pub async fn rig() -> Rig {
     opts.pty = Some(Arc::new(FakePty::default()));
     opts.diag_probe = Some(Arc::new(pc_diag_fake::FakeProbe::default()));
     opts.approval_timeout = Some(Duration::from_millis(300));
+    opts.kernel = kernel.map(|k| k(dir.path()));
     // Model z obsługą obrazów (lokalny) dla `vision_describe` — odpowiedź ze skryptu.
     let script = Script::text(FAKE_MODEL, &["Biały piksel na białym tle."]);
     let vision = FakeProvider::new("diag-wizja").with_default_script(script);

@@ -142,6 +142,9 @@ tools-net-fake = { path = "../tools-net-fake" }
 tools-engine-fake = { path = "../tools-engine-fake" }
 tools-system-contract = { path = "../tools-system-contract" }
 jsonschema = { version = "0.58.3", default-features = false }
+# Broker poza procesem z oknem zgód dla `tests/tool_approvals.rs` (ręczna zgoda właściciela).
+app-safety = { path = "../app-safety" }
+platform-windows-kernel-impl = { path = "../platform-windows-kernel-impl" }
 base64 = "0.22.1"
 flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 providers-fake = { path = "../providers-fake" }
