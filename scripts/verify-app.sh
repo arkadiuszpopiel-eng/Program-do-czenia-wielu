@@ -68,5 +68,15 @@ sed 's/\x1b\[[0-9;]*m//g' "$OUT/smoke.log" | grep -E "^\s+[0-9]+ (passed|failed|
 node scripts/ipc-coverage.mjs "$OUT/out" --json "$OUT/ipc-coverage.json" --min "${ALFA_IPC_MIN:-70}" >"$OUT/ipc-coverage.log" 2>&1
 coverage=$?
 head -3 "$OUT/ipc-coverage.log"
+# Pełne uprawnienia testów AI (docs/plan/45 §6.2): ten sam program na „Pełnej automatyce” — poziom
+# z profilu i przegląd każdego ustawienia na L4 (świeży profil tymczasowy dla każdego pliku).
+l4=0
+if [ -z "${ALFA_TEST_AUTONOMY:-}" ]; then
+  for spec in z-pelny-dostep z-katalog; do
+    ALFA_TEST_AUTONOMY=L4 ALFA_APP_SPEC="$spec" bash scripts/verify-app.sh --no-build >"$OUT/l4-$spec.log" 2>&1 || l4=1
+    echo "Pełna automatyka (L4), $spec: $(tail -1 "$OUT/l4-$spec.log" | sed 's/^ *//')"
+  done
+fi
 [ "$smoke" -eq 0 ] || exit "$smoke"
+[ "$l4" -eq 0 ] || exit 1
 exit "$coverage"

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Poziom autonomii instancji testowej (docs/plan/45 §6.2): `ALFA_TEST_AUTONOMY=L4` zakłada w profilu
 # TYMCZASOWYM plik zapamiętanego poziomu Brokera (`broker-dev/autonomy-standing.json`) — tak, jakby
-# właściciel raz zatwierdził „Pełną automatykę” w tym profilu. Broker w procesie czyta plik od gałęzi
-# `do-przegladu-testy-pelny-dostep` (przegląd człowieka); wcześniej plik jest pomijany. Profil
-# właściciela nigdy nie jest dotykany: funkcja odmawia katalogu spoza `target/`.
+# właściciel raz zatwierdził „Pełną automatykę” w tym profilu. Broker w procesie czyta plik przy starcie
+# (`app-broker/src/inproc.rs`, scalone po przeglądzie właściciela 31.10). Profil właściciela nigdy nie
+# jest dotykany: funkcja odmawia katalogu spoza `target/`.
 #
 #   source scripts/trial/test-autonomy.sh; seed_test_autonomy "<profil>/Local"
 seed_test_autonomy() {

@@ -116,7 +116,7 @@ Granice (zostają mimo „pełnych uprawnień”, bo chronią właściciela, nie
 i jej profil są nietykalne (`Alfa-uruchomiona`, `%LOCALAPPDATA%\Alfa`, klucze w Menedżerze poświadczeń),
 nigdy `taskkill /IM alfa-desktop.exe`; wspólne z kontem Windows ustawienia systemu (autostart, skróty globalne
 zajęte przez jego Alfę) nie są zmieniane; żadnej wysyłki na zewnątrz (poczta, wiadomości) z kont właściciela;
-mosty CLI (`claude`, `codex`) uruchamia tylko człowiek; kod Brokera i polityk — tylko na gałęzi do przeglądu.
+mosty CLI (`claude`, `codex`) uruchamia tylko człowiek; kod Brokera i polityk — tylko na gałęzi do przeglądu (scalenie po zgodzie właściciela).
 
 ### 6.2 Instancja testowa — „Pełna automatyka” bez okna zgód
 
@@ -124,7 +124,7 @@ Instancja testowa używa Brokera **w procesie** (budowa testowa nie ma obok prog
 zgód odrzuca każdą prośbę: podniesienie do „Pełnej automatyki” (L4) jest niemożliwe, więc funkcje działające
 tylko na L4 (operacje administratora, niepewne polecenia głosowe, pełny dostęp agentek) były nietestowalne.
 
-Rozwiązanie bez obchodzenia zgód (gałąź `do-przegladu-testy-pelny-dostep`, **czeka na przegląd właściciela**):
+Rozwiązanie bez obchodzenia zgód (przegląd i zgoda właściciela 31.10, scalone w `b5f7787c`):
 
 1. Broker w procesie czyta ten sam plik zapamiętanego poziomu co Broker poza procesem
    (`broker-dev/autonomy-standing.json`, decyzja właściciela 27.10 „Pełna automatyka wybierana raz”) —
@@ -134,6 +134,12 @@ Rozwiązanie bez obchodzenia zgód (gałąź `do-przegladu-testy-pelny-dostep`, 
 3. Kod produkcyjny Brokera, okna zgód i dowodu fizycznego wejścia — bez zmian. Prośby, o które Broker pyta także
    na L4 (wysyłka po kontakcie z obcą treścią), dalej są odrzucane w instancji testowej — ich ścieżkę sprawdzają
    testy Brokera na atrapie okna (`safety-broker-*`, `broker-ui-*`).
+4. `verify wersja` (etap „aplikacja”) po pełnym biegu uruchamia ten sam program jeszcze dwa razy na L4,
+   każdy raz na świeżym profilu: `z-pelny-dostep` (poziom z profilu) i `z-katalog` (każde ustawienie zapisane,
+   odczytane i przywrócone). Czerwony przebieg L4 = czerwony etap. Ręcznie:
+   `ALFA_TEST_AUTONOMY=L4 ALFA_APP_SPEC=<plik> bash scripts/verify-app.sh --no-build`.
+5. Broker w procesie działa tylko w budowach deweloperskich i testowych; wydanie bez osobnego Brokera przechodzi
+   w bezpieczny stan (`apps/desktop/src-tauri/src/kernel.rs`), więc plik nie podnosi poziomu w Alfie właściciela.
 
 ### 6.3 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)
 
@@ -161,6 +167,6 @@ Nowa funkcja (dowolna sesja): bramka sama zatrzyma `verify`, dopóki funkcja nie
 | Bramka „nowa funkcja bez testu” w `verify szybki` i `wersja`      | zrobione 31.10                                                                                          |
 | Przegląd ogólny poleceń palety                                    | zrobione 31.10: każde polecenie (4 części) zielone na Edge                                              |
 | Przegląd ogólny ustawień na prawdziwym rdzeniu                    | zrobione 31.10: każde ustawienie zielone w prawdziwym oknie (8:25, raport 46)                                                                    |
-| Instancja testowa na „Pełnej automatyce”                          | gałąź do przeglądu; w prawdziwym oknie 31.10 na L4 zielone (`z-pelny-dostep`, `z-katalog`) |
+| Instancja testowa na „Pełnej automatyce”                          | zrobione 31.10: scalone po przeglądzie właściciela; przebieg L4 w każdym `verify wersja` |
 | Spłata długu                                                      | 31 → 6 (31.10, raport 46); zostały klawisze — `--kolejka` |
 | Przegląd ogólny zdarzeń i narzędzi                                | do zrobienia: narzędzia — wywołanie każdego na atrapach portów z poprawnymi argumentami ze schematu    |
