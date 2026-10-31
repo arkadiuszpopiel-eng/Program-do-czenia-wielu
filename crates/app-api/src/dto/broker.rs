@@ -92,3 +92,19 @@ impl BrokerStatusView {
         }
     }
 }
+
+/// Zgoda „zawsze w tym zakresie” w panelu uprawnień (komenda `permissions_grants`); odwołanie —
+/// `permissions_revoke_grant` (zawsze bez okna Sędziego: tylko zawęża uprawnienia).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct GrantView {
+    /// Numer zgody w Sędzim Cieni.
+    pub id: String,
+    pub session_id: String,
+    /// Agentka (brak — cała sesja).
+    pub agent: Option<String>,
+    /// Zakres po ludzku („połączenie z internetem: strona x.example.org”).
+    pub scope: String,
+    pub granted_at_ms: u64,
+    /// Do kiedy; `None` — do odwołania.
+    pub until_ms: Option<u64>,
+}

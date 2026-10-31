@@ -19,6 +19,7 @@ mod approvals;
 mod broker;
 mod decide;
 mod engine;
+mod grants;
 mod keys;
 mod kill;
 mod standing;

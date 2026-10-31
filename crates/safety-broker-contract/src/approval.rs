@@ -1,5 +1,6 @@
 //! Prośby o zatwierdzenie, wyzwania dla Broker-UI i decyzje właściciela (PLAN §8.2, §14.6).
 
+use core_bus_contract::{AgentId, SessionId};
 use risk_classifier_contract::{AutonomyLevel, CommandOrigin, Reversibility, RiskLevel, RuleId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -111,18 +112,41 @@ pub struct ApprovalChallenge {
     pub nonce: Nonce,
 }
 
+/// Termin zgody „do odwołania” (właściciel 31.10: czas zgody wybiera użytkownik — 1 h, 3 h,
+/// doba albo do odwołania w panelu uprawnień).
+pub const UNTIL_REVOKED: u64 = u64::MAX;
+
+/// Zgoda „zawsze w tym zakresie” widziana w panelu uprawnień (lista i odwołanie przez jądro).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+pub struct GrantInfo {
+    /// Numer zgody (do odwołania).
+    pub id: u64,
+    /// Sesja.
+    pub session: SessionId,
+    /// Agentka (brak — cała sesja).
+    pub agent: Option<AgentId>,
+    /// Zakres.
+    pub scope: Capability,
+    /// Kiedy udzielona (ms).
+    pub granted_at_ms: u64,
+    /// Do kiedy (ms); [`UNTIL_REVOKED`] — do odwołania.
+    pub until_ms: u64,
+}
+
 /// Decyzja właściciela.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "decision", rename_all = "snake_case")]
 pub enum ApprovalDecision {
     /// Zezwól raz.
     Allow,
-    /// „Zawsze zezwalaj w tym zakresie” do terminu — nigdy nie eskaluje do L4: nie zmienia
-    /// poziomu i nie pokrywa reguł „każdego poziomu” (głos, taint, trifecta, admin, Jądro).
+    /// „Zawsze zezwalaj w tym zakresie” na czas wybrany przez właściciela (1 h, 3 h, doba)
+    /// albo do odwołania — nigdy nie eskaluje do L4: nie zmienia poziomu i nie pokrywa reguł
+    /// „każdego poziomu” (głos, taint, trifecta, admin, Jądro).
     AllowInScope {
         /// Zakres (ta sama rodzina co prośba).
         scope: Capability,
-        /// Do kiedy (ms); Broker przycina do limitu polityki.
+        /// Do kiedy (ms); Broker przycina do limitu polityki. [`UNTIL_REVOKED`] — bez terminu,
+        /// aż właściciel odwoła zgodę w Ustawieniach → Uprawnienia (albo STOP).
         until_ms: u64,
     },
     /// Odmów.

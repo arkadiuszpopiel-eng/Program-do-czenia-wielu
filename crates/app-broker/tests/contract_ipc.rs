@@ -132,6 +132,14 @@ impl Broker for Remote {
     fn metrics(&self) -> BrokerMetrics {
         self.broker.metrics()
     }
+
+    fn grants(&self) -> Vec<safety_broker_contract::GrantInfo> {
+        self.broker.grants()
+    }
+
+    async fn revoke_grant(&self, id: u64) -> Result<bool, BrokerError> {
+        self.broker.revoke_grant(id).await
+    }
 }
 
 #[async_trait]

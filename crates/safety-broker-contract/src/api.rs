@@ -11,7 +11,7 @@ use crate::action::{
     ActionRequest, AttenuateRequest, AutonomyChangeRequest, BrokerError, BrokerMetrics,
     ChangeOrigin, Decision, PlanDecision, PlanRequest, SessionSecurity, TaintSource,
 };
-use crate::approval::{ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalStatus};
+use crate::approval::{ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalStatus, GrantInfo};
 use crate::capability::Capability;
 use crate::policy::KernelPolicy;
 use crate::proof::PhysicalInputProof;
@@ -39,6 +39,8 @@ pub const EVENT_POLICY_CHANGED: &str = "broker.policy.changed";
 pub const EVENT_SESSION_TAINTED: &str = "broker.session.tainted";
 /// Audyt: rotacja klucza MAC.
 pub const EVENT_KEY_ROTATED: &str = "broker.key.rotated";
+/// Audyt: odwołano zgodę „zawsze w tym zakresie” (panel uprawnień).
+pub const EVENT_GRANT_REVOKED: &str = "broker.grant.revoked";
 /// Audyt: początek nowego łańcucha (przejęcie strumienia od `pre-broker`).
 pub const EVENT_CHAIN_STARTED: &str = "broker.audit.chain_started";
 
@@ -130,6 +132,19 @@ pub trait Broker: Send + Sync {
 
     /// Metryki (pytania/godz. itp.).
     fn metrics(&self) -> BrokerMetrics;
+
+    /// Obowiązujące zgody „zawsze w tym zakresie” (panel uprawnień; wygasłe pominięte).
+    /// Domyślnie pusto — implementacje bez zgód (atrapy, opakowania) nic nie pokazują.
+    fn grants(&self) -> Vec<GrantInfo> {
+        Vec::new()
+    }
+
+    /// Odwołanie zgody (zawsze bezpieczne — tylko zawęża uprawnienia; wpis w Audycie);
+    /// `Ok(false)` — nie ma takiej zgody.
+    async fn revoke_grant(&self, id: u64) -> Result<bool, BrokerError> {
+        let _ = id;
+        Ok(false)
+    }
 }
 
 /// Kanał zatwierdzeń — WYŁĄCZNIE Broker-UI (w IPC tylko rola `BrokerUi`).

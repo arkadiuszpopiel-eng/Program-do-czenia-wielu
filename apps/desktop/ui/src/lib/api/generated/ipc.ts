@@ -1514,6 +1514,23 @@ export interface GpuView {
   readonly vram_mb: number;
 }
 
+/**
+ * Zgoda „zawsze w tym zakresie” w panelu uprawnień (komenda `permissions_grants`); odwołanie —
+ * `permissions_revoke_grant` (zawsze bez okna Sędziego: tylko zawęża uprawnienia).
+ */
+export interface GrantView {
+  /** Agentka (brak — cała sesja). */
+  readonly agent: string | null;
+  readonly granted_at_ms: number;
+  /** Numer zgody w Sędzim Cieni. */
+  readonly id: string;
+  /** Zakres po ludzku („połączenie z internetem: strona x.example.org”). */
+  readonly scope: string;
+  readonly session_id: string;
+  /** Do kiedy; `None` — do odwołania. */
+  readonly until_ms: number | null;
+}
+
 /** Akcja GUI agentki (bez treści wpisywanej — tylko rodzaj, cel i wynik). */
 export interface GuiAction {
   readonly agent: string;
@@ -4504,6 +4521,10 @@ export interface IpcCommands {
     readonly args: { readonly sessionId: string | null };
     readonly result: PermissionsState;
   };
+  readonly permissions_grants: {
+    readonly args: Readonly<Record<string, never>>;
+    readonly result: readonly GrantView[];
+  };
   readonly permissions_open_approval: {
     readonly args: { readonly approvalId: string };
     readonly result: BrokerIntentResult;
@@ -4511,6 +4532,10 @@ export interface IpcCommands {
   readonly permissions_request_level: {
     readonly args: { readonly level: AutonomyLevel; readonly sessionId: string | null };
     readonly result: BrokerIntentResult;
+  };
+  readonly permissions_revoke_grant: {
+    readonly args: { readonly grantId: string };
+    readonly result: boolean;
   };
   readonly pipelines_list: {
     readonly args: Readonly<Record<string, never>>;

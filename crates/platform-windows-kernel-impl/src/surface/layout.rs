@@ -14,6 +14,7 @@ use windows::Win32::Graphics::Gdi::{
     DrawTextW, HDC, HFONT, SelectObject,
 };
 
+use super::footer::footer;
 use super::paint::Fonts;
 
 /// Format tekstu wielowierszowego (ten sam przy mierzeniu i rysowaniu).
@@ -35,8 +36,6 @@ const HEADER: i32 = 48;
 const PAD: i32 = 24;
 /// Kolumna etykiet siatki.
 const LABEL_WIDTH: i32 = 128;
-/// Wysokość przycisku decyzji (bez obwódki fokusu).
-const BUTTON: i32 = 36;
 /// Miejsce na obwódkę fokusu wokół przycisku (kontrolka jest o tyle większa z każdej strony).
 pub(super) const RING: i32 = 3;
 /// Najwyższa wartość jednego wiersza szczegółów (w liniach) — dłuższe są przycinane.
@@ -82,11 +81,13 @@ pub(super) struct Measured {
     pub rows: Vec<Row>,
     pub status: RECT,
     pub footer: RECT,
+    /// Etykieta rzędu wyboru („Zawsze w tym zakresie:”).
+    pub choice_label: Option<RECT>,
     /// Kontrolki przycisków decyzji (z miejscem na obwódkę fokusu).
     pub buttons: Vec<(u16, RECT)>,
 }
 
-fn rect(x: i32, y: i32, w: i32, h: i32) -> RECT {
+pub(super) fn rect(x: i32, y: i32, w: i32, h: i32) -> RECT {
     RECT {
         left: x,
         top: y,
@@ -148,58 +149,6 @@ fn chips(hdc: HDC, fonts: &Fonts, badge: &str, x: i32, y: i32, inner: i32) -> (V
     }
     let bottom = out.last().map_or(y, |c| c.rect.bottom);
     (out, bottom)
-}
-
-/// Przyciski decyzji w stopce: bezpieczny (fokus startowy — „Odmów”) przy lewej krawędzi,
-/// pozostałe przy prawej w kolejności widoku; gdy się nie mieszczą — jeden pod drugim na całą
-/// szerokość (napis nigdy nie jest ucięty). Prostokąty kontrolek z miejscem na obwódkę.
-fn buttons(
-    hdc: HDC,
-    fonts: &Fonts,
-    view: &SurfaceView,
-    x: i32,
-    y: i32,
-    inner: i32,
-) -> Vec<(u16, RECT)> {
-    let s = |v: i32| px(fonts.dpi, v);
-    let (gap, bh, ring) = (s(8), s(BUTTON), s(RING));
-    let widths: Vec<i32> = view
-        .buttons
-        .iter()
-        .map(|b| {
-            (text_box(hdc, fonts.button, &b.label, inner, DT_SINGLELINE).0 + 2 * s(16)).max(s(96))
-        })
-        .collect();
-    let n = i32::try_from(widths.len()).unwrap_or(1).max(1);
-    let grow = |r: RECT| RECT {
-        left: r.left - ring,
-        top: r.top - ring,
-        right: r.right + ring,
-        bottom: r.bottom + ring,
-    };
-    if widths.iter().sum::<i32>() + (n - 1) * gap + s(24) > inner {
-        return view
-            .buttons
-            .iter()
-            .zip(0..)
-            .map(|(b, i)| (b.id, grow(rect(x, y + i * (bh + gap), inner, bh))))
-            .collect();
-    }
-    let mut right = x + inner;
-    let mut out: Vec<(u16, RECT)> = Vec::new();
-    for (b, w) in view.buttons.iter().zip(&widths).rev() {
-        let left = if b.id == view.initial_focus {
-            x
-        } else {
-            right - w
-        };
-        if b.id != view.initial_focus {
-            right -= w + gap;
-        }
-        out.push((b.id, grow(rect(left, y, *w, bh))));
-    }
-    out.reverse();
-    out
 }
 
 /// Układa okno dla widoku (opis w nagłówku modułu).
@@ -284,8 +233,8 @@ pub(super) fn measure(
         text_height(hdc, fonts.hint, &view.status, inner),
     );
     let top = status.bottom + s(20);
-    let buttons = buttons(hdc, fonts, view, x, top + s(16), inner);
-    let bottom = buttons.last().map_or(top, |(_, r)| r.bottom - s(RING)) + s(16);
+    let foot = footer(hdc, fonts, view, x, top + s(16), inner);
+    let (buttons, choice_label, bottom) = (foot.buttons, foot.choice_label, foot.bottom + s(16));
     let mut m = Measured {
         client: (w, bottom),
         header,
@@ -299,6 +248,7 @@ pub(super) fn measure(
         rows,
         status,
         footer: rect(0, top, w, bottom - top),
+        choice_label,
         buttons,
     };
     m.fit(max_height.max(s(320)), s(10));
@@ -338,6 +288,9 @@ impl Measured {
         self.client.1 -= by;
         up(&mut self.status);
         up(&mut self.footer);
+        if let Some(r) = self.choice_label.as_mut() {
+            up(r);
+        }
         self.buttons.iter_mut().for_each(|(_, r)| up(r));
         if body {
             if let Some(l) = self.lead.as_mut() {

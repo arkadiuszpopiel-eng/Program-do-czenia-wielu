@@ -915,6 +915,7 @@ dependencies = [
  "app-memory",
  "async-trait",
  "base64 0.22.1",
+ "broker-ui-contract",
  "camera-hub-contract",
  "chrono",
  "compliance-contract",

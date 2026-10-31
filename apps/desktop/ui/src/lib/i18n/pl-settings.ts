@@ -185,7 +185,8 @@ export const plSettings = {
   'perm.scope.session': 'Tylko ta sesja',
   'perm.kept':
     'Nawet przy pełnej automatyce zostają: kill-switch (Ctrl+Shift+F12), dziennik cofania, audyt i twarde blokady Jądra.',
-  'perm.hello': 'Windows Hello przy podnoszeniu do L4: {state}. Zmienisz to w oknie Sędziego Cieni.',
+  'perm.hello':
+    'Windows Hello przy podnoszeniu do L4: {state}. Zmienisz to w oknie Sędziego Cieni.',
 
   'dev.machine': 'Ta maszyna',
   'dev.os': 'System',

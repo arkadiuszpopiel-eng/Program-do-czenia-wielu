@@ -69,7 +69,7 @@ import type {
 import type { BuilderApi, GuiApi, HealthApi, SkillsApi, TerminalApi } from './client-work';
 import type { CamerasApi } from './types-cameras';
 import type { UpdatesApi } from './client-updates';
-import type { BrokerApi } from './client-broker';
+import type { BrokerApi, GrantsApi } from './client-broker';
 import type { VoiceFeaturesApi } from './client-voice';
 import type { PluginsApi } from './client-plugins';
 import type { McpApi } from './client-mcp';
@@ -203,7 +203,7 @@ export interface FilesApi {
 export type { AccountsApi, TransferApi } from './client-hub';
 import type { AccountsApi, TransferApi } from './client-hub';
 
-export interface PermissionsApi {
+export interface PermissionsApi extends GrantsApi {
   get(sessionId: string | null): Promise<PermissionsState>;
   /** Intencja: zmiana poziomu autonomii — potwierdzenie wyłącznie w oknie Brokera. */
   requestLevel(level: AutonomyLevel, sessionId: string | null): Promise<BrokerIntentResult>;

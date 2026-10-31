@@ -29,7 +29,8 @@ export const plBroker = {
     'Łączenie z Sędzią Cieni… do czasu połączenia prośby o zgodę są odrzucane.',
   'broker.banner.watchdog':
     'Watchdog nie działa — STOP WSZYSTKIEGO (Ctrl+Shift+F12) obsługuje awaryjnie aplikacja.',
-  'broker.banner.dev': 'Tryb deweloperski: Sędzia Cieni w procesie aplikacji, bez okna zatwierdzeń.',
+  'broker.banner.dev':
+    'Tryb deweloperski: Sędzia Cieni w procesie aplikacji, bez okna zatwierdzeń.',
   'broker.banner.unknown':
     'Nie udało się odczytać stanu Sędziego Cieni — nie wiadomo, czy okno zatwierdzeń działa. Sprawdź Szczegóły albo uruchom Alfę ponownie.',
   'broker.banner.details': 'Szczegóły',
@@ -60,4 +61,14 @@ export const plBroker = {
   'mode.sessionOwn':
     'Ta rozmowa ma własny tryb: {mode}. Wybór tutaj zmienia tryb pozostałych rozmów; tryb tej rozmowy zmienisz w Uprawnieniach.',
   'mode.badge': 'Włączona Pełna automatyka — agentki działają bez pytań. Kliknij, aby zmienić tryb',
+  'broker.grants.title': 'Zgody „zawsze w tym zakresie”',
+  'broker.grants.intro':
+    'Udzielasz ich w oknie Sędziego Cieni i sam wybierasz czas: 1 h, 3 h, doba albo do odwołania. Zgoda dotyczy tylko jednej sesji i jednego rodzaju działań; nie zmienia trybu pracy. Odwołanie działa od razu, a STOP (Ctrl+Shift+F12) kasuje wszystkie zgody.',
+  'broker.grants.empty': 'Brak zgód — o każde takie działanie Sędzia Cieni zapyta.',
+  'broker.grants.until': 'do {when}',
+  'broker.grants.untilRevoked': 'do odwołania',
+  'broker.grants.allAgents': 'Wszystkie agentki w sesji',
+  'broker.grants.revoke': 'Odwołaj',
+  'broker.grants.revokeLabel': 'Odwołaj zgodę: {scope}',
+  'broker.grants.revoked': 'Zgoda odwołana — Sędzia Cieni znów zapyta.',
 } as const satisfies Record<string, Message>;

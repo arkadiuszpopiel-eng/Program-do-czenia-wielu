@@ -7,11 +7,13 @@ use safety_broker_contract::{
     ApprovalDecision, ApprovalId, ApprovalSubject, AutonomyChangeRequest, AutonomyEntry,
     AutonomyTarget, BrokerError, ChangeOrigin, EVENT_AUTONOMY_CHANGED, EVENT_KERNEL_BLOCK,
     EVENT_POLICY_CHANGED, EVENT_TOKEN_ISSUED, HelloRequirement, Holder, KernelGuard, KernelPolicy,
+    UNTIL_REVOKED,
 };
 use serde_json::json;
 
 use crate::approvals::Meta;
 use crate::engine::BrokerEngine;
+use crate::grants::next_id;
 use crate::state::{ApprovedPlan, Grant, PendStatus, PendingAction, State};
 
 fn system_holder() -> Holder {
@@ -78,13 +80,26 @@ impl BrokerEngine {
                 self.audit(EVENT_TOKEN_ISSUED, Some(&req.holder), payload)?;
                 Self::register(st, &token);
                 if let ApprovalDecision::AllowInScope { scope, until_ms } = decision {
+                    // Termin przycinany do limitu polityki; „do odwołania” zostaje bez terminu
+                    // (wybór właściciela w oknie — odwołanie w panelu uprawnień albo STOP).
                     let max = now.saturating_add(st.policy().grant_max_ms);
+                    let until_ms = if until_ms == UNTIL_REVOKED {
+                        UNTIL_REVOKED
+                    } else {
+                        until_ms.min(max)
+                    };
+                    let id = next_id(st);
                     st.grants.push(Grant {
+                        id,
                         session: req.holder.session.clone(),
                         agent: req.holder.agent.clone(),
                         cap: scope,
-                        until_ms: until_ms.min(max),
+                        granted_at_ms: now,
+                        until_ms,
                     });
+                    if until_ms == UNTIL_REVOKED {
+                        self.persist_grants(st);
+                    }
                 }
                 Ok(PendStatus::Approved(Some(Box::new(token))))
             }

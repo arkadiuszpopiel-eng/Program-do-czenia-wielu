@@ -299,6 +299,9 @@ impl Look {
             },
             p.border,
         );
+        if let (Some(r), Some(c)) = (m.choice_label, &view.choice) {
+            text(hdc, f.label, p.muted, &c.label, r, LINE);
+        }
     }
 
     /// Plakietka-pigułka: pierwsza w kolorze ryzyka z ikoną, pozostałe stonowane.

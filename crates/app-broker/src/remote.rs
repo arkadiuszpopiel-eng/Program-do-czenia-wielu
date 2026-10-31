@@ -21,8 +21,8 @@ use safety_broker_contract::ipc::{Request, Response, UserChannel};
 use safety_broker_contract::{
     ActionRequest, ApprovalId, ApprovalStatus, AttenuateRequest, AutonomyChangeRequest,
     AutonomyTarget, Broker, BrokerError, BrokerMetrics, CapToken, Capability, ChangeOrigin,
-    Decision, Holder, KernelPolicy, PlanDecision, PlanRequest, SessionSecurity, TaintSource,
-    TokenId, event_kind,
+    Decision, GrantInfo, Holder, KernelPolicy, PlanDecision, PlanRequest, SessionSecurity,
+    TaintSource, TokenId, event_kind,
 };
 use serde_json::json;
 use watchdog_contract::{
@@ -30,41 +30,11 @@ use watchdog_contract::{
     ProcessRole,
 };
 
-use crate::link::{BrokerLink, LinkError};
+use crate::answer::{answer, count, ok};
+use crate::link::BrokerLink;
 
 /// Limit odpowiedzi Brokera na kill-switch (lokalne drzewa i audio są zatrzymane wcześniej).
 pub const KILL_TIMEOUT: Duration = Duration::from_millis(500);
-
-fn unavailable(e: &LinkError) -> BrokerError {
-    BrokerError::AuditUnavailable(format!("Sędzia Cieni niedostępny — {e}"))
-}
-
-fn unexpected() -> BrokerError {
-    BrokerError::InvalidRequest("nieoczekiwana odpowiedź Sędziego Cieni".into())
-}
-
-/// Odpowiedź → wynik: błąd łącza = Broker niedostępny (fail-closed), `Error` = błąd Brokera.
-fn answer<T>(
-    r: Result<Response, LinkError>,
-    pick: impl FnOnce(Response) -> Option<T>,
-) -> Result<T, BrokerError> {
-    match r {
-        Err(e) => Err(unavailable(&e)),
-        Ok(Response::Error(e)) => Err(e),
-        Ok(other) => pick(other).ok_or_else(unexpected),
-    }
-}
-
-fn count(r: Response) -> Option<usize> {
-    match r {
-        Response::Count(n) => Some(usize::try_from(n).unwrap_or(usize::MAX)),
-        _ => None,
-    }
-}
-
-fn ok(r: Response) -> Option<()> {
-    matches!(r, Response::Ok).then_some(())
-}
 
 /// Stan sesji, gdy Broker jest niedostępny: najostrzejszy (taint + dane prywatne).
 fn fail_closed_security() -> SessionSecurity {
@@ -293,6 +263,21 @@ impl Broker for RemoteBroker {
             Ok(Response::Metrics(m)) => m,
             _ => BrokerMetrics::default(),
         }
+    }
+
+    fn grants(&self) -> Vec<GrantInfo> {
+        match self.link.call(Request::Grants) {
+            Ok(Response::Grants(g)) => g,
+            _ => Vec::new(),
+        }
+    }
+
+    async fn revoke_grant(&self, id: u64) -> Result<bool, BrokerError> {
+        let req = Request::RevokeGrant { id };
+        answer(self.link.call_async(req).await, |r| match r {
+            Response::Revoked(done) => Some(done),
+            _ => None,
+        })
     }
 }
 

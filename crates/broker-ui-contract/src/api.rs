@@ -196,8 +196,6 @@ impl HelloPort for NoHello {
 /// Konfiguracja `[broker_ui]`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UiConfig {
-    /// Czas „zawsze w tym zakresie” w godzinach (1–24).
-    pub grant_hours: u8,
     /// Windows Hello włączone.
     pub hello_enabled: bool,
     /// Co ile ms pytać Brokera o prośby.
@@ -207,16 +205,8 @@ pub struct UiConfig {
 impl Default for UiConfig {
     fn default() -> Self {
         Self {
-            grant_hours: 8,
             hello_enabled: false,
             poll_ms: 250,
         }
-    }
-}
-
-impl UiConfig {
-    /// Czas „zawsze w tym zakresie” w ms (przycięty do 1–24 h).
-    pub fn grant_ms(&self) -> u64 {
-        u64::from(self.grant_hours.clamp(1, 24)) * 60 * 60 * 1000
     }
 }

@@ -38,7 +38,7 @@ fn channel_commands_are_listed_once() {
     for c in app_api::CHANNEL_COMMANDS {
         assert_eq!(app_api::COMMANDS.iter().filter(|x| *x == c).count(), 1);
     }
-    assert_eq!(app_api::COMMANDS.len(), 282);
+    assert_eq!(app_api::COMMANDS.len(), 284);
 }
 
 #[test]

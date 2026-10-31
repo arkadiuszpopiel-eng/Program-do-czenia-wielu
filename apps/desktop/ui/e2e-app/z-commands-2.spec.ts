@@ -134,6 +134,7 @@ test('eksport, paczki, kopie, załączniki i propozycje: odmowa przed oknem syst
     ['attachments_remove', { sessionId: 'brak-sesji', attachmentId: 'brak' }],
     ['attachments_add_dropped', { sessionId: 'brak-sesji' }],
     ['permissions_open_approval', { approvalId: 'brak' }],
+    ['permissions_revoke_grant', { grantId: 'brak' }],
     ['skills_propose', { skill: {} }],
     ['plugins_propose', { manifest: {}, wasmB64: 'AAAA' }],
   ];
@@ -142,6 +143,8 @@ test('eksport, paczki, kopie, załączniki i propozycje: odmowa przed oknem syst
       await refused(main, command, args);
     });
   }
+  // Lista zgód „zawsze w tym zakresie”: świeży profil testowy — lista albo opisana odmowa.
+  await settled(main, 'permissions_grants', {});
   // Wyłączenie mikrofonu rozmowy: bez silników głosu odmowa, z nimi — mikrofon wyłączony.
   await settled(main, 'voice_set_mic_enabled', { enabled: false });
 });

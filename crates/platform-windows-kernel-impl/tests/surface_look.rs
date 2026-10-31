@@ -43,6 +43,7 @@ fn broker_window_look_preview() {
         initial_focus: 100,
         take_focus: true,
         help: "Sędzia Cieni pilnuje działań agentek.".into(),
+        choice: None,
     };
     s.present(&view).unwrap();
     std::thread::sleep(Duration::from_millis(700));

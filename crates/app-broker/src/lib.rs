@@ -13,6 +13,7 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod answer;
 pub mod children;
 pub mod inproc;
 pub mod kernel;

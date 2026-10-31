@@ -143,7 +143,7 @@ Egzekucja: klasyfikator ryzyka + polityka taint w Jądrze. Sesja `tainted` (B) z
 | **L3 Bardzo wysoka (domyślny)** | nieodwracalne poza zakresem; działania na podstawie niezaufanej treści | |
 | **L4 Maks** | nic poza twardymi blokadami (§7); okno Sędziego Cieni się nie pokazuje (31.10) | **kill-switch < 200 ms, dziennik cofania, audyt (best effort), tokeny zdolności z TTL, potomek ≤ rodzic, deny-listy §1.3, tagi prywatności, budżety kosztów, klasyfikator ryzyka (twarde blokady) i taint w dzienniku** |
 
-Podniesienie do L4: jeden przełącznik w Ustawieniach (globalnie / sesja / agentka / na czas), potwierdzany fizycznym wejściem w oknie Sędziego Cieni, opcjonalnie Windows Hello. Agentka i treść ze strony nie mogą go wykonać. „Zawsze zezwalaj w tym zakresie" nie eskaluje do L4.
+Podniesienie do L4: jeden przełącznik w Ustawieniach (globalnie / sesja / agentka / na czas), potwierdzany fizycznym wejściem w oknie Sędziego Cieni, opcjonalnie Windows Hello. Agentka i treść ze strony nie mogą go wykonać. „Zawsze zezwalaj w tym zakresie" nie eskaluje do L4. Czas takiej zgody wybiera właściciel w oknie (1 h, 3 h, 24 h albo do odwołania, 31.10); zgody do odwołania przetrwają restart (plik w prywatnym katalogu Brokera, poza zasięgiem agentek), są widoczne i odwoływalne w Ustawienia → Uprawnienia, a STOP kasuje je wszystkie.
 
 ## 9. Zgodność tras abonamentowych jako wymaganie bezpieczeństwa
 

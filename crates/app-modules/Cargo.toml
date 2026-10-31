@@ -13,6 +13,7 @@ repository.workspace = true
 # `app-core` (jedno miejsce kompozycji: `AppOptions` → `parts`).
 [dependencies]
 platform-contract = { path = "../platform-contract" }
+broker-ui-contract = { path = "../broker-ui-contract" }
 cost-meter-contract = { path = "../cost-meter-contract" }
 cost-meter-impl = { path = "../cost-meter-impl" }
 app-memory = { path = "../app-memory" }

@@ -5467,6 +5467,52 @@
       ],
       "type": "object"
     },
+    "GrantView": {
+      "description": "Zgoda „zawsze w tym zakresie” w panelu uprawnień (komenda `permissions_grants`); odwołanie —\n`permissions_revoke_grant` (zawsze bez okna Sędziego: tylko zawęża uprawnienia).",
+      "properties": {
+        "agent": {
+          "description": "Agentka (brak — cała sesja).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "granted_at_ms": {
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "id": {
+          "description": "Numer zgody w Sędzim Cieni.",
+          "type": "string"
+        },
+        "scope": {
+          "description": "Zakres po ludzku („połączenie z internetem: strona x.example.org”).",
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "until_ms": {
+          "description": "Do kiedy; `None` — do odwołania.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "session_id",
+        "agent",
+        "scope",
+        "granted_at_ms",
+        "until_ms"
+      ],
+      "type": "object"
+    },
     "GuiAction": {
       "description": "Akcja GUI agentki (bez treści wpisywanej — tylko rodzaj, cel i wynik).",
       "properties": {
@@ -16278,6 +16324,15 @@
         "$ref": "#/$defs/PermissionsState"
       }
     },
+    "permissions_grants": {
+      "args": [],
+      "result": {
+        "items": {
+          "$ref": "#/$defs/GrantView"
+        },
+        "type": "array"
+      }
+    },
     "permissions_open_approval": {
       "args": [
         {
@@ -16311,6 +16366,19 @@
       ],
       "result": {
         "$ref": "#/$defs/BrokerIntentResult"
+      }
+    },
+    "permissions_revoke_grant": {
+      "args": [
+        {
+          "name": "grant_id",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "result": {
+        "type": "boolean"
       }
     },
     "pipelines_list": {

@@ -12,7 +12,7 @@ use risk_classifier_contract::{
 };
 use safety_broker_contract::{
     ApprovalId, ApprovalRequest, ApprovalSubject, AutonomyTarget, Capability, Holder, HostPattern,
-    KernelPolicy, PlanStepSummary,
+    KernelPolicy, PlanStepSummary, UNTIL_REVOKED,
 };
 
 fn request(subject: ApprovalSubject) -> ApprovalRequest {
@@ -95,17 +95,35 @@ fn action_card_says_exactly_what_where_why_and_offers_scope() {
     assert!(card.tainted && !card.voice_origin && card.read_aloud.is_none());
     assert_eq!(card.options[0], DecisionOption::Deny, "odmowa pierwsza");
     assert_eq!(card.options[1], DecisionOption::AllowOnce);
-    let DecisionOption::AllowInScope { scope, until_ms } = &card.options[2] else {
-        panic!("brak opcji zakresu")
-    };
-    assert_eq!(scope, &egress());
-    assert_eq!(*until_ms, 1_000 + 8 * 3_600_000);
+    // Czas zgody wybiera właściciel: 1 h, 3 h, doba i „do odwołania” (właściciel 31.10).
+    let until: Vec<u64> = card.options[2..]
+        .iter()
+        .map(|o| match o {
+            DecisionOption::AllowInScope { scope, until_ms } => {
+                assert_eq!(scope, &egress(), "zakres = zdolność prośby");
+                *until_ms
+            }
+            other => panic!("oczekiwano zakresu, jest {other:?}"),
+        })
+        .collect();
+    assert_eq!(
+        until,
+        [
+            1_000 + 3_600_000,
+            1_000 + 3 * 3_600_000,
+            1_000 + GRANT_MAX_MS,
+            UNTIL_REVOKED
+        ]
+    );
     let long = CardOptions {
-        grant_ms: 7 * GRANT_MAX_MS,
+        grant_choices_ms: vec![7 * GRANT_MAX_MS],
+        until_revoked: false,
     };
     let card = ApprovalCard::from_request(&req, 1_000, long);
+    assert_eq!(card.options.len(), 3, "bez „do odwołania”, gdy wyłączone");
     assert!(
-        matches!(card.options[2], DecisionOption::AllowInScope { until_ms, .. } if until_ms == 1_000 + GRANT_MAX_MS)
+        matches!(card.options[2], DecisionOption::AllowInScope { until_ms, .. } if until_ms == 1_000 + GRANT_MAX_MS),
+        "termin przycięty do doby"
     );
     let mut not_grantable = req.clone();
     not_grantable.grantable = false;

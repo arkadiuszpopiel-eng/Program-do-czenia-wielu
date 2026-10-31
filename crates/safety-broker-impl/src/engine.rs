@@ -14,6 +14,7 @@ use safety_broker_contract::{
 use watchdog_contract::{Clock, JobTable};
 
 use crate::audit::AuditSink;
+use crate::grants::{GRANTS_FILE, GrantStore};
 use crate::keys::{KeyMode, KeyRing, mac};
 use crate::standing::StandingStore;
 use crate::state::{State, TokenMeta};
@@ -41,6 +42,8 @@ pub struct BrokerEngine {
     pub(crate) env: PathEnv,
     /// Zapamiętany poziom globalny (`None` — bez zapisu, np. Broker w procesie testów).
     pub(crate) standing: Option<StandingStore>,
+    /// Zgody „do odwołania” (`None` — bez zapisu, jak `standing`).
+    pub(crate) grant_store: Option<GrantStore>,
 }
 
 /// Maksymalne długości pól podmiotu.
@@ -70,6 +73,7 @@ impl BrokerEngine {
             classifier: None,
             env: config.env,
             standing: None,
+            grant_store: None,
         })
     }
 
@@ -89,8 +93,12 @@ impl BrokerEngine {
 
     /// Zapamiętany poziom globalny w pliku `path` (prywatny katalog danych Brokera): wczytany
     /// przy starcie — poziom zatwierdzony kiedyś przez właściciela obowiązuje bez nowej karty.
+    /// W tym samym katalogu leżą zgody „do odwołania” ([`GRANTS_FILE`]).
     #[must_use]
     pub fn with_standing_level(mut self, path: std::path::PathBuf) -> Self {
+        let grants = GrantStore::new(path.with_file_name(GRANTS_FILE));
+        self.restore_grants(&grants);
+        self.grant_store = Some(grants);
         let store = StandingStore::new(path);
         if let Some(level) = store.load() {
             let entry = AutonomyEntry {

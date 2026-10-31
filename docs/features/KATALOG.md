@@ -4,15 +4,15 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 [45-testy-ai.md](../plan/45-testy-ai.md). Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).
 
-**Razem: 601 funkcji, z testem 601 (100 %), w długu 0.**
+**Razem: 603 funkcji, z testem 603 (100 %), w długu 0.**
 
 | Rodzaj | Funkcji | Z testem | rdzeń | interfejs | przeglądarka | aplikacja | eval | przegląd ogólny |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Polecenia rdzenia | 281 | 281 (100 %) | 204 | 3 | 2 | 250 | 1 | 0 |
+| Polecenia rdzenia | 283 | 283 (100 %) | 206 | 3 | 2 | 252 | 1 | 0 |
 | Polecenia palety i skróty | 62 | 62 (100 %) | 2 | 7 | 9 | 3 | 0 | 50 |
 | Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 12 | 0 | 38 |
 | Ustawienia | 98 | 98 (100 %) | 14 | 12 | 7 | 9 | 2 | 98 |
-| Narzędzia agentek | 81 | 81 (100 %) | 79 | 1 | 1 | 3 | 52 | 81 |
+| Narzędzia agentek | 81 | 81 (100 %) | 81 | 1 | 1 | 3 | 52 | 81 |
 | Zdarzenia rdzenia | 41 | 41 (100 %) | 35 | 25 | 5 | 1 | 1 | 41 |
 
 ## Polecenia rdzenia
@@ -167,8 +167,10 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `modules_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `modules_set_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_get` | rdzeń, aplikacja, bieg aplikacji |  |
+| `permissions_grants` | rdzeń, aplikacja |  |
 | `permissions_open_approval` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_request_level` | rdzeń, aplikacja, bieg aplikacji |  |
+| `permissions_revoke_grant` | rdzeń, aplikacja |  |
 | `pipelines_list` | rdzeń |  |
 | `pipelines_remove` | rdzeń |  |
 | `pipelines_save` | rdzeń |  |
@@ -551,12 +553,12 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `engine_transaction` | rdzeń, przegląd ogólny |  |
 | `fs_copy` | rdzeń, eval, przegląd ogólny |  |
 | `fs_delete` | rdzeń, przeglądarka, eval, przegląd ogólny |  |
-| `fs_delete_permanent` | eval, przegląd ogólny |  |
+| `fs_delete_permanent` | rdzeń, eval, przegląd ogólny |  |
 | `fs_list` | rdzeń, eval, przegląd ogólny |  |
 | `fs_mkdir` | rdzeń, eval, przegląd ogólny |  |
 | `fs_move` | rdzeń, eval, przegląd ogólny |  |
 | `fs_read` | rdzeń, eval, przegląd ogólny |  |
-| `fs_rename` | eval, przegląd ogólny |  |
+| `fs_rename` | rdzeń, eval, przegląd ogólny |  |
 | `fs_search` | rdzeń, eval, przegląd ogólny |  |
 | `fs_stat` | rdzeń, eval, przegląd ogólny |  |
 | `fs_write` | rdzeń, interfejs, aplikacja, eval, przegląd ogólny |  |

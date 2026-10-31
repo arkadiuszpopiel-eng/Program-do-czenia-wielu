@@ -194,6 +194,10 @@ async fn autonomy_changes_go_through_broker() {
         .permissions_open_approval(opened.request_id)
         .await
         .unwrap();
+    // Panel uprawnień: bez zgód lista pusta; nieznana zgoda — `false`, zły numer — błąd.
+    assert!(with_ui.permissions_grants().await.unwrap().is_empty());
+    assert!(!with_ui.permissions_revoke_grant("7".into()).await.unwrap());
+    assert!(with_ui.permissions_revoke_grant("x".into()).await.is_err());
 }
 
 /// Build produkcyjny bez izolowanego Brokera (przegląd CX-b): `AppOptions::kernel` =

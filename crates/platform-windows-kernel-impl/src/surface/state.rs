@@ -60,15 +60,21 @@ pub(super) fn paint(ui: &Ui, hwnd: HWND) {
 /// Rodzaj przycisku o identyfikatorze `id`: główny jest pierwszy przycisk decyzji poza
 /// bezpiecznym (fokus startowy — „Odmów”).
 pub(super) fn kind(view: &SurfaceView, help_open: bool, id: u16) -> Kind {
+    let picked = view
+        .choice
+        .as_ref()
+        .map(|c| c.buttons.as_slice())
+        .unwrap_or_default();
     let primary = view
         .buttons
         .iter()
-        .find(|b| b.id != view.initial_focus)
+        .find(|b| b.id != view.initial_focus && !picked.contains(&b.id))
         .map(|b| b.id);
     match id {
         HELP_ID => Kind::Help(help_open),
         CLOSE_ID => Kind::Close,
         _ if Some(id) == primary => Kind::Primary,
+        _ if picked.contains(&id) => Kind::Choice,
         _ => Kind::Secondary,
     }
 }

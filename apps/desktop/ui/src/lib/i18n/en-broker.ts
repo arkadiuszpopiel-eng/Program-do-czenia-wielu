@@ -20,7 +20,8 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'broker.watchdog.off':
     'STOP EVERYTHING (Ctrl+Shift+F12): fallback in the app — the watchdog is not running.',
   'broker.isolation.full': 'Isolation: full (separate account, window protected by UIPI).',
-  'broker.isolation.weak': 'Isolation: weaker — the Shadow Judge and its window run under your account.',
+  'broker.isolation.weak':
+    'Isolation: weaker — the Shadow Judge and its window run under your account.',
   'broker.service.hint':
     'The Shadow Judge service under a separate Windows account gives full isolation. An administrator installs it once (a single UAC prompt) — see the "Security" guide.',
   'broker.banner.lost':
@@ -62,4 +63,14 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'mode.sessionOwn':
     'This conversation has its own mode: {mode}. The choice here changes the other conversations; change this one in Permissions.',
   'mode.badge': 'Full automation is on — agents act without asking. Click to change the work mode',
+  'broker.grants.title': '“Always in this scope” permissions',
+  'broker.grants.intro':
+    'You grant them in the Shadow Judge window and choose how long: 1 h, 3 h, a day or until revoked. A permission covers one session and one kind of action; it does not change the work mode. Revoking takes effect at once, and STOP (Ctrl+Shift+F12) clears all permissions.',
+  'broker.grants.empty': 'No permissions — the Shadow Judge will ask about every such action.',
+  'broker.grants.until': 'until {when}',
+  'broker.grants.untilRevoked': 'until revoked',
+  'broker.grants.allAgents': 'All agents in the session',
+  'broker.grants.revoke': 'Revoke',
+  'broker.grants.revokeLabel': 'Revoke permission: {scope}',
+  'broker.grants.revoked': 'Permission revoked — the Shadow Judge will ask again.',
 };

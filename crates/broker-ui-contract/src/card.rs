@@ -4,7 +4,9 @@
 //! szerokości), obcięty do limitu — Broker-UI niczego nie renderuje jako HTML/markdown.
 
 use risk_classifier_contract::{AutonomyLevel, Reversibility, RiskLevel};
-use safety_broker_contract::{ApprovalId, ApprovalRequest, ApprovalSubject, Capability, Holder};
+use safety_broker_contract::{
+    ApprovalId, ApprovalRequest, ApprovalSubject, Capability, Holder, UNTIL_REVOKED,
+};
 
 use crate::words::{
     mode_name_pl, mode_note_pl, origin_pl, place_pl, policy_pl, reversible_pl, target_pl, verb,
@@ -12,8 +14,11 @@ use crate::words::{
 };
 use serde::{Deserialize, Serialize};
 
-/// Najdłuższy „zawsze zezwalaj w tym zakresie” (24 h, PLAN §14.6).
+/// Najdłuższy „zawsze zezwalaj w tym zakresie” z terminem (24 h, PLAN §14.6); dłużej — tylko
+/// „do odwołania” (`UNTIL_REVOKED`), odwoływane w panelu uprawnień.
 pub const GRANT_MAX_MS: u64 = 24 * 60 * 60 * 1000;
+/// Czasy zgody „zawsze w tym zakresie” do wyboru w oknie (właściciel 31.10: 1 h, 3 h, doba).
+pub const GRANT_CHOICES_MS: [u64; 3] = [3_600_000, 3 * 3_600_000, GRANT_MAX_MS];
 /// Limit znaków jednej wartości na karcie.
 pub const MAX_VALUE_CHARS: usize = 300;
 /// Ile kroków planu pokazujemy wprost (reszta jako „… i jeszcze N”).
@@ -32,11 +37,12 @@ pub struct PersonaDisplay {
 pub enum DecisionOption {
     /// „Tylko teraz”.
     AllowOnce,
-    /// „Zawsze w tym zakresie” do terminu (≤ 24 h; nigdy nie eskaluje do L4).
+    /// „Zawsze w tym zakresie” do terminu (≤ 24 h) albo do odwołania (`UNTIL_REVOKED`);
+    /// nigdy nie eskaluje do L4.
     AllowInScope {
         /// Zakres = zdolność prośby (UI nie poszerza zakresu).
         scope: Capability,
-        /// Do kiedy (ms).
+        /// Do kiedy (ms); `UNTIL_REVOKED` — do odwołania.
         until_ms: u64,
     },
     /// „Odmów”.
@@ -150,17 +156,21 @@ pub fn persona_of(holder: &Holder) -> PersonaDisplay {
     PersonaDisplay { name }
 }
 
-/// Opcje karty.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+/// Opcje karty: czasy zgody „zawsze w tym zakresie” (po jednym przycisku) i czy pokazać
+/// „do odwołania”.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CardOptions {
-    /// Czas „zawsze w tym zakresie” (przycinany do [`GRANT_MAX_MS`]).
-    pub grant_ms: u64,
+    /// Czasy z terminem (przycinane do [`GRANT_MAX_MS`]; najwyżej trzy).
+    pub grant_choices_ms: Vec<u64>,
+    /// Przycisk „Do odwołania”.
+    pub until_revoked: bool,
 }
 
 impl Default for CardOptions {
     fn default() -> Self {
         Self {
-            grant_ms: 8 * 60 * 60 * 1000,
+            grant_choices_ms: GRANT_CHOICES_MS.to_vec(),
+            until_revoked: true,
         }
     }
 }
@@ -199,11 +209,23 @@ impl ApprovalCard {
                 }
                 technical = Some(v(tool));
                 if req.grantable {
-                    let until_ms = now_ms.saturating_add(opts.grant_ms.min(GRANT_MAX_MS));
-                    options.push(DecisionOption::AllowInScope {
-                        scope: capability.clone(),
-                        until_ms,
-                    });
+                    // Czas wybiera właściciel: po przycisku na każdy termin i „do odwołania”.
+                    let mut until: Vec<u64> = opts
+                        .grant_choices_ms
+                        .iter()
+                        .take(3)
+                        .map(|ms| now_ms.saturating_add((*ms).min(GRANT_MAX_MS)))
+                        .collect();
+                    until.dedup();
+                    if opts.until_revoked {
+                        until.push(UNTIL_REVOKED);
+                    }
+                    options.extend(until.into_iter().map(|until_ms| {
+                        DecisionOption::AllowInScope {
+                            scope: capability.clone(),
+                            until_ms,
+                        }
+                    }));
                 }
                 // Tytuł mówi rodzaj działania, konkret stoi raz — w polu „Co dokładnie”
                 // (wcześniej krótki konkret stał w tytule i w polu dwa razy).

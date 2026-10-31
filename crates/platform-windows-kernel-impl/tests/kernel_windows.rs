@@ -106,6 +106,7 @@ fn send_input_into_broker_window_is_always_flagged_injected() {
         initial_focus: 100,
         take_focus: true,
         help: String::new(),
+        choice: None,
     };
     s.present(&view).unwrap();
     std::thread::sleep(Duration::from_millis(800));

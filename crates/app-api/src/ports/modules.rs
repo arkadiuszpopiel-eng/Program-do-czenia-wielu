@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use sessions_contract::SessionId;
 
 use crate::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerStatusView, ExportRequest, ExportResult,
+    AutonomyLevel, BrokerIntentResult, BrokerStatusView, ExportRequest, ExportResult, GrantView,
     ImportRequest, ImportResult, InspectResult, SecretInput,
 };
 use crate::error::AppError;
@@ -110,6 +110,14 @@ pub trait BrokerPort: Send + Sync {
     ) -> Result<BrokerIntentResult, AppError>;
     /// Przeniesienie do karty zatwierdzenia w oknie Brokera.
     async fn open_approval(&self, approval: &str) -> Result<BrokerIntentResult, AppError>;
+    /// Zgody „zawsze w tym zakresie” (panel uprawnień); Broker niepodłączony — pusto.
+    async fn grants(&self) -> Vec<GrantView> {
+        Vec::new()
+    }
+    /// Odwołanie zgody (tylko zawęża uprawnienia — bez okna Sędziego); `false` — nie ma takiej.
+    async fn revoke_grant(&self, _grant: &str) -> Result<bool, AppError> {
+        Ok(false)
+    }
     /// Stan prośby o zmianę poziomu; `None` — Broker nieosiągalny albo stan nieznany (strażnik
     /// autonomii spróbuje później i niczego nie przyjmuje).
     async fn approval_outcome(&self, _approval: &str) -> Option<ApprovalOutcome> {

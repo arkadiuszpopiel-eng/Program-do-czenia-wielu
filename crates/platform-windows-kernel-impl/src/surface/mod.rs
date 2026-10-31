@@ -5,6 +5,8 @@
 #[cfg(windows)]
 mod button;
 #[cfg(windows)]
+mod footer;
+#[cfg(windows)]
 mod input;
 #[cfg(windows)]
 mod layout;

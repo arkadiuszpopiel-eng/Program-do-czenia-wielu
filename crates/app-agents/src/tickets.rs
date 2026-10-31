@@ -12,8 +12,8 @@ use core_bus_contract::{AgentId, SessionId};
 use risk_classifier_contract::{AutonomyLevel, Reversibility, RiskLevel};
 use safety_broker_contract::{
     ActionRequest, ApprovalId, ApprovalStatus, AttenuateRequest, AutonomyChangeRequest, Broker,
-    BrokerError, BrokerMetrics, CapToken, Capability, ChangeOrigin, Decision, Holder, KernelPolicy,
-    PlanDecision, PlanRequest, SessionSecurity, TaintSource, TokenId,
+    BrokerError, BrokerMetrics, CapToken, Capability, ChangeOrigin, Decision, GrantInfo, Holder,
+    KernelPolicy, PlanDecision, PlanRequest, SessionSecurity, TaintSource, TokenId,
 };
 
 /// Ile ostatnich próśb pamiętać.
@@ -168,5 +168,13 @@ impl Broker for TicketLog {
 
     fn metrics(&self) -> BrokerMetrics {
         self.inner.metrics()
+    }
+
+    fn grants(&self) -> Vec<GrantInfo> {
+        self.inner.grants()
+    }
+
+    async fn revoke_grant(&self, id: u64) -> Result<bool, BrokerError> {
+        self.inner.revoke_grant(id).await
     }
 }

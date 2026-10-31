@@ -56,9 +56,13 @@ pub(crate) struct Pending {
 
 /// „Zawsze zezwalaj w tym zakresie”.
 pub(crate) struct Grant {
+    /// Numer (panel uprawnień — odwołanie).
+    pub id: u64,
     pub session: SessionId,
     pub agent: Option<AgentId>,
     pub cap: Capability,
+    pub granted_at_ms: u64,
+    /// Termin; `UNTIL_REVOKED` — do odwołania.
     pub until_ms: u64,
 }
 
@@ -128,6 +132,7 @@ pub(crate) struct State {
     pub approvals: BTreeMap<ApprovalId, Pending>,
     pub next_approval: u64,
     pub grants: Vec<Grant>,
+    pub next_grant: u64,
     pub plans: Vec<ApprovedPlan>,
     pub approval_times: VecDeque<u64>,
     pub kernel_blocks: u64,
@@ -146,6 +151,7 @@ impl State {
             approvals: BTreeMap::new(),
             next_approval: 0,
             grants: Vec::new(),
+            next_grant: 0,
             plans: Vec::new(),
             approval_times: VecDeque::new(),
             kernel_blocks: 0,

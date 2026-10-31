@@ -17,6 +17,8 @@ pub(super) enum Kind {
     Secondary,
     /// Główny („Zezwól tylko teraz”, „Włącz: …”) — wypełniony.
     Primary,
+    /// Przycisk rzędu wyboru (czas zgody) — obrysowany jak drugorzędny.
+    Choice,
     /// „?” w nagłówku; `true` = opis otwarty.
     Help(bool),
     /// ✕ w nagłówku (odmowa).
@@ -54,7 +56,7 @@ impl Look {
                 let toward = if p.dark { rgb(0x000000) } else { rgb(0xFFFFFF) };
                 (step(p.text, toward), None, ink)
             }
-            Kind::Secondary => {
+            Kind::Secondary | Kind::Choice => {
                 let base = if p.dark { p.surface2 } else { p.surface };
                 let edge = mix(p.text, base, if p.dark { 18 } else { 16 });
                 (step(base, p.text), Some(edge), p.text)

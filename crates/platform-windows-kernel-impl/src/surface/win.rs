@@ -223,7 +223,12 @@ fn layout(ui: &mut Ui, view: &SurfaceView) -> Option<HWND> {
     ui.focus = None;
     // Kolejność Tab: decyzje, potem „?” i ✕.
     for b in &view.buttons {
-        let c = create(ui, Some(hwnd), (w!("BUTTON"), &b.label, button, b.id), none);
+        // Nazwa dostępna przycisku rzędu wyboru z etykietą rzędu („Zawsze w tym zakresie: 1 h”).
+        let name = match &view.choice {
+            Some(c) if c.buttons.contains(&b.id) => format!("{} {}", c.label, b.label),
+            _ => b.label.clone(),
+        };
+        let c = create(ui, Some(hwnd), (w!("BUTTON"), &name, button, b.id), none);
         if b.id == view.initial_focus {
             ui.focus = c;
         }
