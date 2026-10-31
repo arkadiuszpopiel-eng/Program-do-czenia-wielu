@@ -32,6 +32,8 @@ AI uruchamia samodzielnie. Narzędzia plikowe podają modelowi krótsze ścieżk
   Zatwierdzenia i historia cofania nadal pokazują pełną ścieżkę.
 - [poważne] Piaskownica wtyczek na wasmtime 36.0.20 — łatka podatności RUSTSEC-2026-0424 (niekontrolowane
   zużycie pamięci przy przekazywaniu zasobów między komponentami wtyczki).
+- Narzędzia programisty: `minimatch` 11.0.3 zamiast podatnych 3.x/10.x pod `eslint` (GHSA-g3hv-75wg-m249) —
+  nie trafia do programu, ale bramka audytu pakietów jest znów zielona.
 
 ### Testy
 
