@@ -376,7 +376,14 @@ osobny katalog <code>alfa-testy-pelny-dostep</code>), <code>ALFA_TEST_AUTONOMY=L
 poziomu leżał już w <code>Local\Alfa</code>. Poprawka na głównej gałęzi (<code>112c421c</code>): strażnik pomija wyłącznie ten jeden
 plik, każdy inny plik danych Alfy nadal zatrzymuje bieg.</p>
 <h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
-<p><strong>Końcowy <code>verify wersja</code> na <code>8c6dde32</code> (po scaleniu i z przebiegiem L4): 19 z 19 zielonych</strong> — Rust 3307/0/41,
+<p><strong>Końcowy <code>verify wersja</code> na <code>ddb13fa0</code> (dług 0, Spacja PTT, klawisze globalne): 19 z 19 zielonych</strong> jednym
+pełnym biegiem, bez osobnych powtórek etapów — Rust 3307/0/41, interfejs 540, przeglądarka 758, prawdziwa
+aplikacja 57 (w tym 4 testy klawiszy globalnych; pokrycie łącza 92,5 %), na L4: <code>z-pelny-dostep</code> 1/1,
+<code>z-katalog</code> 1/1; katalog 601/601, dokumenty, zależności, audyt npm, SBOM. Bieg przed nim (<code>9c0bff97</code>) miał 18 z 19:
+nowy test klawiszy globalnych czekał na pole pisania, a poprzedni plik testów zostawia okno w Ustawieniach —
+test wraca teraz do rozmowy przyciskiem (<code>ddb13fa0</code>).</p>
+<p>Wcześniej, przed spłatą ostatnich sześciu pozycji długu:</p>
+<p><code>verify wersja</code> na <code>8c6dde32</code> (po scaleniu i z przebiegiem L4): 19 z 19 zielonych — Rust 3307/0/41,
 interfejs 535, przeglądarka 754, prawdziwa aplikacja 53 (pokrycie łącza 92,5 %) i na L4: <code>z-pelny-dostep</code> 1/1,
 <code>z-katalog</code> 1/1; katalog, zależności, audyt npm, SBOM. Etap „dokumenty” był czerwony tylko dlatego, że po
 ostatniej edycji dokumentu 45 nie odświeżyłam HTML — po <code>node scripts/docs-html.mjs</code> ten sam etap
@@ -399,7 +406,13 @@ poprawki, poniżej progu bramki).</li>
 <li><strong>Alfy właściciela po wgraniu</strong> — pierwsze uruchomienie skrótem „Alfa” należy do właściciela.</li>
 <li><strong>Kopii zapasowej na F:</strong> — dysk F: nie jest podłączony do laptopa (brak sprzętu). Kopię robi
 <code>scripts/backup.sh &quot;/f/Kopie zapasowe programów Spopielony/Alfa&quot;</code> po podłączeniu dysku.</li>
+<li><strong>Spacji PTT z prawdziwym mikrofonem</strong> — sprawdzona na atrapie głosu i w testach stanu; mówienie do
+mikrofonu z przytrzymaną Spacją ocenia właściciel (zmysły). Wejdzie w następnej wersji — wgrana 0.0.79 jej
+jeszcze nie ma.</li>
 </ul>
+<p>Uwaga: pierwsza wersja testu wklejania (ok. 13:05) zapisywała przykładowy tekst „Pogrubiony tekst” do schowka
+przez przeglądarkę testową — mogła nim zastąpić zawartość schowka systemu. Test przepisany tak, że schowka
+systemu nie dotyka (zdarzenia tworzone w stronie).</p>
 <h2 id="6-wgranie">6. Wgranie</h2>
 <p>0.0.79 wgrana 31.10 ok. 11:19 do <code>Alfa-uruchomiona</code> (<code>deploy-owner.sh --no-start</code>, Alfa nie była uruchomiona;
 skróty „Alfa” na pulpicie i w menu Start odświeżone). Program otwiera właściciel skrótem.</p>

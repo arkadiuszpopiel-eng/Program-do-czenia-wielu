@@ -73,7 +73,16 @@ plik, każdy inny plik danych Alfy nadal zatrzymuje bieg.
 
 ## 4. Sprawdzenie
 
-**Końcowy `verify wersja` na `8c6dde32` (po scaleniu i z przebiegiem L4): 19 z 19 zielonych** — Rust 3307/0/41,
+**Końcowy `verify wersja` na `ddb13fa0` (dług 0, Spacja PTT, klawisze globalne): 19 z 19 zielonych** jednym
+pełnym biegiem, bez osobnych powtórek etapów — Rust 3307/0/41, interfejs 540, przeglądarka 758, prawdziwa
+aplikacja 57 (w tym 4 testy klawiszy globalnych; pokrycie łącza 92,5 %), na L4: `z-pelny-dostep` 1/1,
+`z-katalog` 1/1; katalog 601/601, dokumenty, zależności, audyt npm, SBOM. Bieg przed nim (`9c0bff97`) miał 18 z 19:
+nowy test klawiszy globalnych czekał na pole pisania, a poprzedni plik testów zostawia okno w Ustawieniach —
+test wraca teraz do rozmowy przyciskiem (`ddb13fa0`).
+
+Wcześniej, przed spłatą ostatnich sześciu pozycji długu:
+
+`verify wersja` na `8c6dde32` (po scaleniu i z przebiegiem L4): 19 z 19 zielonych — Rust 3307/0/41,
 interfejs 535, przeglądarka 754, prawdziwa aplikacja 53 (pokrycie łącza 92,5 %) i na L4: `z-pelny-dostep` 1/1,
 `z-katalog` 1/1; katalog, zależności, audyt npm, SBOM. Etap „dokumenty” był czerwony tylko dlatego, że po
 ostatniej edycji dokumentu 45 nie odświeżyłam HTML — po `node scripts/docs-html.mjs` ten sam etap
@@ -97,6 +106,13 @@ Wcześniejsze przebiegi:
 - **Alfy właściciela po wgraniu** — pierwsze uruchomienie skrótem „Alfa” należy do właściciela.
 - **Kopii zapasowej na F:** — dysk F: nie jest podłączony do laptopa (brak sprzętu). Kopię robi
   `scripts/backup.sh "/f/Kopie zapasowe programów Spopielony/Alfa"` po podłączeniu dysku.
+- **Spacji PTT z prawdziwym mikrofonem** — sprawdzona na atrapie głosu i w testach stanu; mówienie do
+  mikrofonu z przytrzymaną Spacją ocenia właściciel (zmysły). Wejdzie w następnej wersji — wgrana 0.0.79 jej
+  jeszcze nie ma.
+
+Uwaga: pierwsza wersja testu wklejania (ok. 13:05) zapisywała przykładowy tekst „Pogrubiony tekst” do schowka
+przez przeglądarkę testową — mogła nim zastąpić zawartość schowka systemu. Test przepisany tak, że schowka
+systemu nie dotyka (zdarzenia tworzone w stronie).
 
 ## 6. Wgranie
 

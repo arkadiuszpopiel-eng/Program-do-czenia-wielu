@@ -6,17 +6,14 @@
     "session_id": "1d67eb46-2bd8-4b76-bbc9-6a5dcd27cf28",
     "updated": "2026-10-31T14:30:00+01:00"
   },
-  "current_state": "Laptop. Wersja 0.0.79 wgrana 31.10 ok. 11:19 z ad95c3ec (deploy-owner --no-start); verify wersja 18/19 (Rust 3306/0/41, interfejs 535, przeglądarka 754, aplikacja 53, 92,5 %); czerwony tylko audyt-npm (narzędzia programisty). Raport alfa/docs/plan/46-raport-2026-10-31-testy-ai.md, system testów AI: alfa/docs/plan/45-testy-ai.md. Kopia na F: niezrobiona — dysk F: niepodłączony (scripts/backup.sh \"/f/Kopie zapasowe programów Spopielony/Alfa\" po podłączeniu). Po wgraniu: audyt npm naprawiony (minimatch 11.0.3), zmiana Brokera scalona po przeglądzie właściciela (b5f7787c), verify wersja 8c6dde32 19/19 z przebiegiem L4; plan prac HTML: alfa/docs/plan-prac.html.",
+  "current_state": "0.0.79 wgrana (11:19). Po niej: dług katalogu 0 (601/601), Spacja PTT podłączona, testy klawiszy globalnych przez e2e_global_shortcut; verify wersja na ddb13fa0 19/19. Wszystko zatwierdzone lokalnie, bez push.",
   "session_goal": "Właściciel 31.10 (/goal): kontynuuj kolejne etapy; opracuj system pełnego automatycznego testowania przez AI każdej funkcji obecnej i przyszłej z pełnymi uprawnieniami dla testów AI.",
   "in_progress": [
     "Do decyzji człowieka (raport 46 §7): Spacja PTT niepodłączona. Nadal z raportu 44: `*` w analizatorze powłoki, fs-23, próg F3-07, gałęzie broker-2026-10-28 i pelny-dostep, K.0.",
     "Dług katalogu: 6 klawiszy (node scripts/features.mjs --kolejka). Przegląd ogólny narzędzi i zdarzeń — do zrobienia (docs/plan/45 §8)."
   ],
   "blocking_issues": [
-    "Dysk E: (ADATA na USB) daje ponowienia we/wy i resety mostka przy dużym obciążeniu; 17.10 20:31 awaria PC (brak pamięci + resety USB). Ciężkie biegi: CARGO_BUILD_JOBS=6, CARGO_INCREMENTAL=0.",
-    "target\\debug rośnie szybko (17.10: 170 GB w kilka godzin — każda zmiana ustawień kompilacji = nowy komplet plików testowych); verify pomija etapy Rust przy małym miejscu. Sprzątanie: starsze duplikaty *.exe/*.pdb w target/debug/deps + target/debug/incremental (zwolnione 130 GB).",
-    "F: na laptopie to inny dysk („Dane”, pełny) — kopie F:\\Alfa z PC stacjonarnego nieosiągalne; kopia po 0.0.65 na nowym dysku.",
-    "Właściciel uruchamia Alfę TYLKO skrótem „Alfa” (Alfa-uruchomiona). target/shell to build testowy bez Jądra — nie podawać właścicielowi tej ścieżki jako „zbudowanej wersji do uruchomienia”."
+    "Dysk F: niepodłączony — kopia zapasowa niezrobiona"
   ],
   "next_session": [
     "Po decyzji właściciela: przegląd człowieka i scalenie gałęzi do-przegladu-broker-2026-10-28 (do 6407c88f; scalenie = nowa wersja z verify); ewentualnie wdrożenie docs/plan/43 (wyróżnianie czytanego zdania) i zmiana domyślnych paneli chowanych.",
@@ -48,7 +45,7 @@
       "alfa-docs (podgląd HTML)": 5180
     }
   },
-  "test_results": "verify wersja 55dcfaff ZIELONE 19/19; F3 Bielik 4.5B: v1 0/35, v3 11/35, v6 12/35, v7 10/35; live_catalog zielony (tool_request OK).",
+  "test_results": "verify wersja ddb13fa0: 19/19 zielone — Rust 3307/0/41, interfejs 540, przeglądarka 758, aplikacja 57 (92,5 %), L4 z-pelny-dostep 1/1, z-katalog 1/1.",
   "decisions_this_session": [
     "Właściciel 21.10: brak zgód ma być naprawiony „raz na zawsze” — skrót „Alfa” do Alfa-uruchomiona, odświeżany przy każdym wgraniu; skrót instalatora NSIS nie jest nadpisywany.",
     "Właściciel 21.10: usunąć stare kompilacje — zwolnione 229 GB (target/debug/deps, .fingerprint, incremental, shell, trial-profile, release, src-tauri/target).",
@@ -62,10 +59,9 @@
     "Właściciel 21.10 ~20:40: „Zamknij wszystkie otwarte tematy, wykonaj pełną działającą wersję… potem wszystko zapisz i zrób pauzę”; wgranie: „To co napisałem wcześniej ma być zrobione”; /goal do 7:00."
   ],
   "next_steps": [
-    "Ścieżki względne w wynikach narzędzi fs (model kopiuje bezwzględne i myli Temp→Tepm).",
-    "Koperta z polem planu przed wywołaniem (zapowiedź zamiast „zrobione”).",
-    "Pomiar F3 na drugim modelu C2.2 (Qwen3.5-4B / Bielik-Minitron-7B, pobranie ≤5 GB na E:).",
-    "Pole wyboru 24 px w ui-kit (chwiejny axe target-size w oknie obowiązków).",
-    "Etap A na sprzęcie: A.4/A.5/A.6 przy właścicielu."
+    "Następna wersja (0.0.80) przy 10 punktach: wpis CHANGELOG z PTT (Poprawki) i testami",
+    "Przegląd ogólny narzędzi agentek i zdarzeń (doc 45 §8)",
+    "Kopia na F: po podłączeniu dysku (scripts/backup.sh)",
+    "Gałęzie do przeglądu człowieka: do-przegladu-broker-2026-10-28, do-przegladu-pelny-dostep"
   ]
 }
