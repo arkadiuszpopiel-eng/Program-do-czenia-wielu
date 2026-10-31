@@ -12,6 +12,39 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.80 — 2026-10-31
+
+Okno zgód nazywa się teraz Sędzia Cieni: jest nowe, dokładne i nie pokazuje się wcale na Pełnej
+automatyce. Czas zgody „zawsze w tym zakresie” wybierasz sam, a zgody odwołasz w Ustawieniach.
+
+### Nowe
+
+- „Zawsze w tym zakresie” z czasem wybieranym w oknie: 1 h, 3 h, 24 h albo „Do odwołania”. Zgody do
+  odwołania zostają po restarcie programu.
+- Ustawienia → Uprawnienia: lista zgód „zawsze w tym zakresie” (czego dotyczą, której agentki, do kiedy)
+  z przyciskiem „Odwołaj”. Odwołanie działa od razu, a STOP (Ctrl+Shift+F12) kasuje wszystkie zgody.
+- Przytrzymanie Spacji w rozmowie (tryb „Przytrzymaj, aby mówić” w Ustawienia → Głos) włącza mikrofon,
+  puszczenie — wyłącza.
+
+### Poprawki
+
+- [poważne] Pełna automatyka (L4): okno zgód nie pokazuje się pod żadnym pozorem, aż obniżysz tryb — zostają
+  tylko twarde blokady Jądra, STOP i dziennik cofania.
+- Broker nazywa się „Sędzia Cieni” we wszystkich tekstach; „?” w kółku przy nazwie (też F1) wyjaśnia, co robi
+  i do czego się odnosi.
+- Nowe okno Sędziego Cieni: elegancka ramka bez systemowej belki, dopracowane przyciski i tekst, nic nie jest
+  ucinane ani nie nachodzi na siebie. Karta mówi dokładnie, co agentka chce zrobić (plik, strona, element,
+  wpisywany tekst) i gdzie — po ludzku, bez zapisu technicznego; bez zamrożonego licznika „Wygasa za”.
+
+### Testy
+
+- Test prawdziwego okna Sędziego Cieni z kliknięciami właściciela (9 kart, na L4 żadnego okna), podgląd okna
+  w obu motywach i przy 150 %; zgody do odwołania po restarcie, odwołanie i STOP.
+- Diagnostyka narzędzi agentek: każde z 81 narzędzi wywołane na atrapach z poprawnymi argumentami (raport
+  `target/verify/narzedzia/raport.md`), przegląd ogólny odrzucania błędnych argumentów i 118 próbek zdarzeń.
+- Skróty globalne, Esc i wklejanie sprawdzane w instancji testowej bez wstrzykiwania klawiszy w sesję Windows.
+- Kopia zapasowa w trybie `--czysta` (sam aktualny kod, bez kompilacji).
+
 ## 0.0.79 — 2026-10-31
 
 Alfa ma spis każdej swojej funkcji i pilnuje, żeby żadna — obecna ani przyszła — nie weszła bez testu, który

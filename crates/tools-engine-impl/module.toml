@@ -2,7 +2,7 @@
 # Zdolności z tokenu Brokera: `fs.read(katalog silnika)` — stan i dokumentacja, `shell.exec(katalog silnika)` —
 # uruchomienie serwera i podgląd, `gui.control(engine-server)` — wywołania JSON-RPC serwera.
 id = "tools-engine"
-version = "0.0.79"
+version = "0.0.80"
 kind = "tool"
 provides = ["tools-engine-contract@1"]
 requires = ["tools-common-contract@1", "platform-contract@1", "safety-broker-contract@1"]

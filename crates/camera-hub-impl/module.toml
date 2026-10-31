@@ -1,7 +1,7 @@
 # Manifest modułu camera-hub (docs/modules/camera-hub/SPEC.md, plan v6 grupa C3).
 # Schemat: packages/schemas/module-manifest.v1.json
 id = "camera-hub"
-version = "0.0.79"
+version = "0.0.80"
 kind = "service"
 provides = ["camera-hub-contract@1"]
 requires = ["platform-contract@1"]
