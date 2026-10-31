@@ -13,13 +13,17 @@
     Plik w UTF-8 z BOM: bez BOM Windows PowerShell 5.1 psuje polskie znaki w napisach.
 .EXAMPLE
     pwsh -NoProfile -File apps\desktop\ui\e2e-app\run.ps1
+.EXAMPLE
+    pwsh -NoProfile -File apps\desktop\ui\e2e-app\run.ps1 -Spec z-katalog
 #>
 [CmdletBinding()]
 param(
     [string]$Exe,
     [string]$OutDir,
     [int]$Port = 9222,
-    [int]$StartTimeoutSec = 180
+    [int]$StartTimeoutSec = 180,
+    # Wybrane pliki testów (np. `z-katalog`) — sesja testująca uruchamia tylko to, co zmieniła.
+    [string[]]$Spec = @()
 )
 
 $ErrorActionPreference = 'Stop'
@@ -166,7 +170,7 @@ try {
     $env:ALFA_E2E_OUT = $OutDir
     Push-Location $UiDir
     try {
-        & pnpm exec playwright test -c playwright.app.config.ts
+        & pnpm exec playwright test -c playwright.app.config.ts @Spec
         $exitCode = $LASTEXITCODE
     } finally {
         Pop-Location

@@ -69,6 +69,8 @@ const cargoEnv = {
 };
 const pkgArgs = packages.flatMap((p) => ['-p', p]);
 const SHELL = 'apps/desktop/src-tauri/Cargo.toml';
+/** Bramka katalogu funkcji (docs/plan/45): nowa funkcja bez testu = etap czerwony. */
+const katalog = (f) => ['katalog', 'Katalog funkcji', `node scripts/features.mjs ${f}`, root, 0];
 
 /** Etap: `id`, opis, polecenie (`sh -c` w Git Bash), katalog, minimalne wolne miejsce w GB. */
 const STAGES = {
@@ -100,6 +102,7 @@ const STAGES = {
       : []),
     ['typy', 'Kontrola typów interfejsu', 'pnpm check', ui, 0],
     ['interfejs', 'Testy interfejsu', 'npx vitest run', ui, 0],
+    katalog('--sprawdz'),
   ],
   wersja: [
     [
@@ -117,6 +120,7 @@ const STAGES = {
       0,
     ],
     ['graf', 'Graf zależności modułów', 'bash scripts/check-deps.sh', root, 0],
+    katalog(''),
     [
       'linter',
       'Linter całego projektu',

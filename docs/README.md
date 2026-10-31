@@ -29,6 +29,7 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 | --- | --- |
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Mikrojądro, magistrala, moduły, procesy, przepływy |
 | [`CATALOG.md`](CATALOG.md) | Generowany katalog wszystkich crate'ów i modułów: grupa, fala, rodzaj, rozmiar, testy, SPEC, niespójności (`node scripts/catalog.mjs`) |
+| [`features/KATALOG.md`](features/KATALOG.md) | Generowany katalog każdej funkcji programu (polecenia rdzenia, paleta, strony i ustawienia, narzędzia agentek, zdarzenia) z testami, które jej dotykają; dług funkcji bez testu (`node scripts/features.mjs`, opis: [`plan/45-testy-ai.md`](plan/45-testy-ai.md)) |
 | [`modules/`](modules/README.md) | Jednostronicowe specyfikacje modułów (`<moduł>/SPEC.md`) i ich indeks |
 | [`ADR/`](ADR/README.md) | Rejestr decyzji architektonicznych 0001–0016 oraz projekty 0017–0027 do planu v6 (czekają na podpis właściciela) |
 | [`VOICE.md`](VOICE.md) | Voice Suite: potok, profile A–D, barge-in |
@@ -63,7 +64,7 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 - Nowy dokument trafia do istniejącej kategorii powyżej i dostaje wiersz w tej mapie.
 - Liczby o kodzie (crate'y, linie, testy) bierzemy z `CATALOG.md`, nie przepisujemy ręcznie.
 - Stan kryteriów zmienia się tylko w `STATUS.md`; inne dokumenty do niego odsyłają.
-- Pliki generowane (`CATALOG.md`, `html/`, schematy, tokeny) nie są edytowane ręcznie.
+- Pliki generowane (`CATALOG.md`, `features/KATALOG.md`, `html/`, schematy, tokeny) nie są edytowane ręcznie.
 - Po zakończonym zadaniu: stan w `plan/03-roadmapa.md` (i w `STATUS.md`, jeśli zamyka kryterium). Po zakończonym
   etapie: `plan/00-stan-wykonania.md`, wyższa wersja z wpisem w `CHANGELOG.md`, potem `node scripts/docs-html.mjs`.
 - Pamięć projektu (stan prac, zasady ustalone z właścicielem, dziennik sesji) ma kopię w

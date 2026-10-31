@@ -141,6 +141,20 @@ impl AppCore {
         &self.inner.chat
     }
 
+    /// Nazwy narzędzi agentek złożonych w tym rdzeniu (posortowane; puste bez Brokera albo
+    /// dziennika cofania) — katalog funkcji testów (`docs/plan/45-testy-ai.md`).
+    pub fn agent_tool_names(&self) -> Vec<String> {
+        let mut names = self
+            .inner
+            .agents
+            .as_ref()
+            .map(|a| a.tools.names())
+            .unwrap_or_default();
+        names.sort();
+        names.dedup();
+        names
+    }
+
     /// Broker Jądra narzędzi agentek (w procesie albo poza nim; `None` = niepodłączony) — stan
     /// bezpieczeństwa sesji (skażenie) i decyzje; dla powłoki i testów.
     pub fn kernel_broker(&self) -> Option<Arc<dyn safety_broker_contract::Broker>> {

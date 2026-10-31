@@ -4,10 +4,12 @@
 # (działa z osobnej kopii — `scripts/deploy-owner.sh`). Na końcu pokrycie poleceń rdzenia.
 #
 #   scripts/verify-app.sh [--no-build]
+#   ALFA_APP_SPEC=z-katalog scripts/verify-app.sh --no-build   # tylko wybrane pliki testów
 # Wynik: target/verify/app/{shell-build.log,smoke.log,out/,ipc-coverage.json}
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OUT="$ROOT/target/verify/app"
+# Wybrane pliki (ALFA_APP_SPEC): osobny katalog wyniku — ślad pełnego biegu i bramka pokrycia zostają.
+OUT="$ROOT/target/verify/app${ALFA_APP_SPEC:+-wybrane}"
 PORT="${ALFA_TRIAL_PORT:-9333}"
 cd "$ROOT"
 source scripts/portable-env.sh >/dev/null 2>&1
@@ -52,14 +54,16 @@ if [ "${1:-}" != "--no-build" ]; then
 fi
 PROFILE="$OUT/profil-$(date +%H%M%S)"
 mkdir -p "$PROFILE/Roaming" "$PROFILE/Local"
+source scripts/trial/test-autonomy.sh && seed_test_autonomy "$PROFILE/Local" || exit 2
 rm -f "$OUT/out/ipc-seen.txt"
 APPDATA="$(cygpath -w "$PROFILE/Roaming")" LOCALAPPDATA="$(cygpath -w "$PROFILE/Local")" \
   powershell -NoProfile -ExecutionPolicy Bypass -File apps/desktop/ui/e2e-app/run.ps1 \
   -Exe "$(cygpath -w "$ROOT/target/shell/debug/alfa-desktop.exe")" \
-  -OutDir "$(cygpath -w "$OUT/out")" -Port "$PORT" >"$OUT/smoke.log" 2>&1
+  -OutDir "$(cygpath -w "$OUT/out")" -Port "$PORT" ${ALFA_APP_SPEC:+-Spec "$ALFA_APP_SPEC"} >"$OUT/smoke.log" 2>&1
 smoke=$?
 echo "test prawdziwej aplikacji: kod $smoke"
 sed 's/\x1b\[[0-9;]*m//g' "$OUT/smoke.log" | grep -E "^\s+[0-9]+ (passed|failed|flaky)|^\s+x\s" | cut -c1-170
+[ -z "${ALFA_APP_SPEC:-}" ] || exit "$smoke"
 # Bramka pokrycia łącza (audyt A-09): spadek poniżej progu = błąd biegu, nie tylko liczba w raporcie.
 node scripts/ipc-coverage.mjs "$OUT/out" --json "$OUT/ipc-coverage.json" --min "${ALFA_IPC_MIN:-70}" >"$OUT/ipc-coverage.log" 2>&1
 coverage=$?

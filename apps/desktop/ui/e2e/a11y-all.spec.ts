@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { expectAccessible, openApp, waitForChat } from './helpers';
 
+// katalog-przeglad: strona
 // Dostępność każdej strony ustawień i każdego panelu w obu motywach (WCAG 2.2 AA: 0 naruszeń
 // critical/serious) — uzupełnienie `a11y.spec.ts`, które sprawdza wybrane ekrany szczegółowo.
 

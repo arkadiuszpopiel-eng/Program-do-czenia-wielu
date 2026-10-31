@@ -31,6 +31,7 @@ start)
   fi
   rm -rf "$PROFILE/Roaming"
   mkdir -p "$PROFILE/Roaming" "$PROFILE/Local/Alfa/models" "$PROFILE/Local/Alfa/sidecars"
+  source "$ROOT/scripts/trial/test-autonomy.sh" && seed_test_autonomy "$PROFILE/Local" || exit 2
   if [ "${2:-}" = "--model" ]; then
     for f in Bielik-4.5B-v3.0-Instruct.Q8_0.gguf Bielik-4.5B-v3.0-Instruct.Q8_0.gguf.sha256; do
       [ -f "$PROFILE/Local/Alfa/models/$f" ] || cp "$OWNER/models/$f" "$PROFILE/Local/Alfa/models/$f"
