@@ -1,6 +1,6 @@
 # wasmtime (piaskownica wtyczek Wasm) — `plugin-runtime-impl`
 
-- **`wasmtime` =36.0.18** (z 36.0.16 2026-10-14: RUSTSEC-2026-0363) (Apache-2.0 WITH LLVM-exception) — **linia LTS 36.x** (wsparcie do ~VIII 2027),
+- **`wasmtime` =36.0.20** (z 36.0.19 2026-10-31: RUSTSEC-2026-0424 — niesprawdzone zużycie pamięci przy przekazywaniu pożyczonych zasobów między komponentami; wcześniej z 36.0.16 2026-10-14: RUSTSEC-2026-0363) (Apache-2.0 WITH LLVM-exception) — **linia LTS 36.x** (wsparcie do ~VIII 2027),
   MSRV 1.86 ≤ toolchain 1.94. Nowsze linie odpadają: 47.x ma **niezałatane RUSTSEC-2026-0315/0316**
   (paliwo przy `call_ref`/wyjątkach, alokacja przy podnoszeniu rekordów), 48.x/49.x wymagają Rust 1.95/1.96.
   Przy podbijaniu: tylko patch w 36.x albo nowe LTS po zmianie toolchainu (ADR), zawsze `cargo deny check`.

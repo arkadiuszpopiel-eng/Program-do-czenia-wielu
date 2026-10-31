@@ -30,6 +30,8 @@ AI uruchamia samodzielnie. Narzędzia plikowe podają modelowi krótsze ścieżk
 - Narzędzia plikowe podają modelowi pliki z katalogu roboczego ścieżką względną (lista, odczyt, wyszukiwanie,
   zapis, przeniesienie, kopia, Kosz) — model lokalny przepisywał długie ścieżki z literówkami („Tepm”).
   Zatwierdzenia i historia cofania nadal pokazują pełną ścieżkę.
+- [poważne] Piaskownica wtyczek na wasmtime 36.0.20 — łatka podatności RUSTSEC-2026-0424 (niekontrolowane
+  zużycie pamięci przy przekazywaniu zasobów między komponentami wtyczki).
 
 ### Testy
 
