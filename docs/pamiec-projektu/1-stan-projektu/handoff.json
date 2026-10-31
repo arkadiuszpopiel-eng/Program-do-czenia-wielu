@@ -4,13 +4,13 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "1d67eb46-2bd8-4b76-bbc9-6a5dcd27cf28",
-    "updated": "2026-10-31T14:30:00+01:00"
+    "updated": "2026-10-31T17:30:00+01:00"
   },
-  "current_state": "0.0.79 wgrana (11:19). Po niej: dług katalogu 0 (601/601), Spacja PTT podłączona, testy klawiszy globalnych przez e2e_global_shortcut; verify wersja na ddb13fa0 19/19. Wszystko zatwierdzone lokalnie, bez push.",
+  "current_state": "0.0.79 wgrana (11:19). Po niej lokalnie (bez push): dług katalogu 0, PTT, klawisze globalne, przegląd narzędzi i zdarzeń (baaff6ae), diagnostyka narzędzi na atrapach (99d82423, doc 45 §6.5) — verify szybki app-core+app-agents zielony.",
   "session_goal": "Właściciel 31.10 (/goal): kontynuuj kolejne etapy; opracuj system pełnego automatycznego testowania przez AI każdej funkcji obecnej i przyszłej z pełnymi uprawnieniami dla testów AI.",
   "in_progress": [
     "Do decyzji człowieka (raport 46 §7): Spacja PTT niepodłączona. Nadal z raportu 44: `*` w analizatorze powłoki, fs-23, próg F3-07, gałęzie broker-2026-10-28 i pelny-dostep, K.0.",
-    "Dług katalogu: 6 klawiszy (node scripts/features.mjs --kolejka). Przegląd ogólny narzędzi i zdarzeń — do zrobienia (docs/plan/45 §8)."
+    "Diagnostyka narzędzi: przy nowym narzędziu przejrzeć target/verify/narzedzia/raport.md i odświeżyć wzorzec (ALFA_TOOL_DIAG_UPDATE=1). Nie pokryte wykonaniem: 5 działań przeglądarki po obcej treści (zgoda w oknie Brokera), mcp_call (brak serwera MCP w profilu testowym)."
   ],
   "blocking_issues": [
     "Dysk F: niepodłączony — kopia zapasowa niezrobiona"
