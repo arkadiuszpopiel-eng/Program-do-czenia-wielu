@@ -39,6 +39,9 @@ pub fn path_env_for(user_root: &Path) -> (String, PathEnv) {
     }
 }
 
+/// Plik zapamiętanego poziomu globalnego w katalogu danych Brokera (ten sam co poza procesem).
+pub const STANDING_FILE: &str = "autonomy-standing.json";
+
 /// Katalog danych Brokera w trybie deweloperskim.
 pub fn dev_dir(local: &Path) -> PathBuf {
     local.join("broker-dev")
@@ -80,8 +83,13 @@ pub fn engine(d: InprocDeps<'_>) -> Result<Arc<BrokerEngine>, String> {
         env,
         key_mode: KeyMode::Random,
     };
+    // Zapamiętany poziom globalny jak w Brokerze poza procesem (`app-safety::broker::build_engine`,
+    // decyzja właściciela 27.10). W trybie w procesie nie ma okna zgód, więc plik zakłada tylko
+    // przygotowanie profilu instancji testowej (`ALFA_TEST_AUTONOMY`, docs/plan/45 §6.2); katalog
+    // `broker-dev` jest ścieżką Jądra (polityka bazowa wyżej) — agentki go nie zapiszą.
     let mut engine = BrokerEngine::new(config, clock, Arc::new(audit), d.processes)
         .map_err(|e| e.to_string())?
+        .with_standing_level(dir.join(STANDING_FILE))
         .with_bus(d.bus);
     if let Some(c) = d.classifier {
         engine = engine.with_classifier(c);
@@ -92,4 +100,38 @@ pub fn engine(d: InprocDeps<'_>) -> Result<Arc<BrokerEngine>, String> {
 /// Broker w procesie jako [`KernelBroker`].
 pub fn kernel(d: InprocDeps<'_>) -> Result<KernelBroker, String> {
     engine(d).map(KernelBroker::in_process)
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use core_bus_contract::SessionId;
+    use safety_broker_contract::{AutonomyLevel, Broker};
+
+    use super::*;
+
+    fn deps<'a>(user_root: &'a Path, local: &'a Path) -> InprocDeps<'a> {
+        InprocDeps {
+            user_root,
+            local,
+            processes: Arc::new(platform_fake::FakeProcesses::default()),
+            bus: Arc::new(core_bus_fake::FakeBus::default()),
+            classifier: None,
+        }
+    }
+
+    #[test]
+    fn standing_level_from_the_broker_dir_is_restored() {
+        let tmp = tempfile::tempdir().expect("tempdir");
+        let local = tmp.path().join("Local").join("Alfa");
+        let user_root = tmp.path().join("profil").join("Alfa");
+        let session = SessionId::new("s1");
+        let fresh = engine(deps(&user_root, &local)).expect("silnik");
+        assert_eq!(fresh.autonomy(&session, None), AutonomyLevel::default());
+        drop(fresh);
+        std::fs::write(dev_dir(&local).join(STANDING_FILE), r#"{"level":"L4"}"#).expect("plik");
+        let restored = engine(deps(&user_root, &local)).expect("silnik");
+        assert_eq!(restored.autonomy(&session, None), AutonomyLevel::L4);
+    }
 }
