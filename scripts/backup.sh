@@ -187,7 +187,7 @@ if [ "$CLEAN" -eq 1 ]; then
       */) SKIP_DIRS+=("$(cygpath -w "$ROOT/${path%/}")") ;;
       ?*) SKIP_FILES+=("$(cygpath -w "$ROOT/$path")") ;;
     esac
-  done < <("${GIT[@]}" status --ignored --porcelain --directory 2>/dev/null | sed -n 's/^!! //p' | tr -d '"')
+  done < <("${GIT[@]}" status --ignored --porcelain 2>/dev/null | sed -n 's/^!! //p' | tr -d '"')
   echo "kopia czysta: pomijam zbudowany program i $((${#SKIP_DIRS[@]} + ${#SKIP_FILES[@]})) ścieżek ignorowanych przez git"
 fi
 copy_dir() {
