@@ -28,6 +28,7 @@ fn request(subject: ApprovalSubject) -> ApprovalRequest {
         grantable: true,
         hello_required: false,
         rules: Vec::new(),
+        autonomy: Some(AutonomyLevel::L3),
         explanation: "Usuwam\u{202E}gpj.exe\u{200B} 14 plików\n\tz Pobranych".into(),
         created_at_ms: 1_000,
         expires_at_ms: 601_000,
@@ -43,21 +44,55 @@ fn detail<'a>(card: &'a ApprovalCard, key: &str) -> &'a str {
 }
 
 #[test]
-fn action_card_has_who_what_scope_risk_and_scoped_option() {
+fn action_card_says_exactly_what_where_why_and_offers_scope() {
     let req = request(ApprovalSubject::Action {
         capability: egress(),
         tool: "tools-net.fetch".into(),
+        summary: Some("pobranie strony https://x.example.org/cennik".into()),
     });
     let card = ApprovalCard::from_request(&req, 1_000, CardOptions::default());
     assert_eq!(card.persona.name, "Delta");
-    assert_eq!(card.title, "Delta prosi o zgodę: wysłanie danych do sieci");
-    assert_eq!(detail(&card, "Zakres"), "net.egress(x.example.org)");
-    assert_eq!(detail(&card, "Ryzyko"), "wysokie — NIE — nieodwracalne");
-    assert_eq!(detail(&card, "Wygasa za"), "10 min");
+    assert_eq!(
+        card.title,
+        "Delta prosi o zgodę: pobranie strony https://x.example.org/cennik"
+    );
+    let keys: Vec<&str> = card.details.iter().map(|(k, _)| k.as_str()).collect();
+    assert_eq!(
+        keys,
+        [
+            "Co dokładnie",
+            "Kto",
+            "Rodzaj",
+            "Gdzie",
+            "Ryzyko",
+            "Źródło polecenia",
+            "Uwaga",
+            "Dlaczego pytam",
+            "Narzędzie (techn.)"
+        ],
+        "konkret na górze, nazwa techniczna na dole, bez licznika czasu"
+    );
+    assert_eq!(
+        detail(&card, "Co dokładnie"),
+        "pobranie strony https://x.example.org/cennik"
+    );
+    assert_eq!(detail(&card, "Rodzaj"), "połączenie z internetem");
+    assert_eq!(detail(&card, "Gdzie"), "strona x.example.org");
+    assert_eq!(detail(&card, "Ryzyko"), "wysokie — NIE da się cofnąć");
     assert_eq!(
         detail(&card, "Dlaczego pytam"),
-        "Usuwamgpj.exe 14 plików z Pobranych"
+        "Usuwamgpj.exe 14 plików z Pobranych Tryb pracy: „Automatycznie”. Na „Pełnej automatyce” to okno się nie pokazuje."
     );
+    assert_eq!(detail(&card, "Narzędzie (techn.)"), "tools-net.fetch");
+    // Bez opisu od narzędzia — rodzaj działania zamiast konkretu.
+    let bare = request(ApprovalSubject::Action {
+        capability: egress(),
+        tool: "tools-net.fetch".into(),
+        summary: None,
+    });
+    let plain = ApprovalCard::from_request(&bare, 1_000, CardOptions::default());
+    assert_eq!(plain.title, "Delta prosi o zgodę: połączenie z internetem");
+    assert_eq!(detail(&plain, "Co dokładnie"), "połączenie z internetem");
     assert!(card.tainted && !card.voice_origin && card.read_aloud.is_none());
     assert_eq!(card.options[0], DecisionOption::Deny, "odmowa pierwsza");
     assert_eq!(card.options[1], DecisionOption::AllowOnce);
@@ -111,7 +146,7 @@ fn voice_plan_autonomy_and_policy_cards() {
         card.read_aloud
             .as_deref()
             .unwrap()
-            .contains("Potwierdź w oknie Brokera")
+            .contains("Potwierdź w oknie Sędziego Cieni")
     );
     assert_eq!(card.options.len(), 2, "plan: bez „zawsze”");
 
@@ -126,7 +161,7 @@ fn voice_plan_autonomy_and_policy_cards() {
     });
     let card = ApprovalCard::from_request(&auto, 1_000, CardOptions::default());
     assert_eq!(card.title, "Zmiana trybu pracy: Pełna automatyka");
-    assert_eq!(detail(&card, "Dotyczy"), "agentka delta w sesji s1");
+    assert_eq!(detail(&card, "Dotyczy"), "agentka Delta w sesji s1");
     assert_eq!(detail(&card, "Tryb"), "Automatycznie → Pełna automatyka");
     assert_eq!(detail(&card, "Na czas"), "1 min 30 s");
     assert!(detail(&card, "Zawsze zostaje").contains("Ctrl+Shift+F12"));

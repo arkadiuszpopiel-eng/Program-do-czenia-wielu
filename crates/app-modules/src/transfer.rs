@@ -110,7 +110,7 @@ fn warning_text(w: &Warning) -> String {
     match w {
         Warning::UnknownEntry { path } => format!("Pominięto nieznany wpis „{path}”."),
         Warning::KernelKeysSkipped { name, keys } => format!(
-            "„{name}”: pominięto klucze polityk Jądra ({}) — zmienia je tylko Broker.",
+            "„{name}”: pominięto klucze polityk Jądra ({}) — zmienia je tylko Sędzia Cieni.",
             keys.join(", ")
         ),
         Warning::MachineOverlaySkipped { name } => {

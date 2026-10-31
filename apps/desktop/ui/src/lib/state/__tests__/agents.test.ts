@@ -58,7 +58,7 @@ describe('Agentka z narzędziami: Replay, „Cofnij", steering, katalog roboczy'
     await expect(client.agents.steer('s-api', 'za późno')).rejects.toThrow(/nie wykonuje/);
   });
 
-  it('Replay sesji z zatwierdzeniem: krok czeka, karta bez okna Brokera ma wyjaśnienie', async () => {
+  it('Replay sesji z zatwierdzeniem: krok czeka, karta bez okna Sędziego Cieni ma wyjaśnienie', async () => {
     const { client } = setupApp();
     const [seed] = await client.agents.runs('s-q3');
     expect(seed?.run.state).toBe('waiting_approval');

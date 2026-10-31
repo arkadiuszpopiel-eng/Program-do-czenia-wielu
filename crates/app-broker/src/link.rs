@@ -45,7 +45,7 @@ pub fn verify_server(
     match check {
         ServerCheck::Pid(expected) if pid == *expected => Ok(()),
         ServerCheck::Pid(expected) => Err(format!(
-            "serwer potoku to proces {pid}, a nie uruchomiony Broker {expected} — możliwe podstawienie"
+            "serwer potoku to proces {pid}, a nie uruchomiony Sędzia Cieni {expected} — możliwe podstawienie"
         )),
         ServerCheck::Service { user } => {
             let peer = identity
@@ -82,8 +82,8 @@ pub enum LinkError {
 impl std::fmt::Display for LinkError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Lost(why) => write!(f, "brak połączenia z Brokerem: {why}"),
-            Self::Timeout(ms) => write!(f, "Broker nie odpowiedział w ciągu {ms} ms"),
+            Self::Lost(why) => write!(f, "brak połączenia z Sędzią Cieni: {why}"),
+            Self::Timeout(ms) => write!(f, "Sędzia Cieni nie odpowiedział w ciągu {ms} ms"),
             Self::Rejected(why) => write!(f, "połączenie odrzucone: {why}"),
         }
     }
@@ -246,7 +246,7 @@ impl BrokerLink {
         for request in replay {
             match client.call(request) {
                 Ok(Response::Error(e)) => {
-                    tracing::warn!(error = %e, "odtworzenie stanu w Brokerze odrzucone");
+                    tracing::warn!(error = %e, "odtworzenie stanu u Sędziego Cieni odrzucone");
                 }
                 Ok(_) => {}
                 Err(e) => {
@@ -308,7 +308,7 @@ impl BrokerLink {
         }
         cur.jobs = None;
         drop(cur);
-        tracing::error!(powod = why, "łącze z Brokerem zerwane — bezpieczny stan");
+        tracing::error!(powod = why, "łącze z Sędzią zerwane — bezpieczny stan");
         self.status.set_link(LinkState::Lost(why.to_owned()));
     }
 
@@ -343,7 +343,7 @@ impl BrokerLink {
         match rx.recv_timeout(limit) {
             Ok(answer) => answer,
             Err(RecvTimeoutError::Timeout) => {
-                self.mark_lost(generation, "Broker nie odpowiada w limicie czasu");
+                self.mark_lost(generation, "Sędzia Cieni nie odpowiada w limicie czasu");
                 Err(LinkError::Timeout(millis(limit)))
             }
             Err(RecvTimeoutError::Disconnected) => {
@@ -370,7 +370,7 @@ impl BrokerLink {
             Ok(Ok(answer)) => answer,
             Ok(Err(_)) => Err(LinkError::Lost("połączenie zamknięte".into())),
             Err(_) => {
-                self.mark_lost(generation, "Broker nie odpowiada w limicie czasu");
+                self.mark_lost(generation, "Sędzia Cieni nie odpowiada w limicie czasu");
                 Err(LinkError::Timeout(millis(limit)))
             }
         }

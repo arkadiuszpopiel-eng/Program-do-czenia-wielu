@@ -40,7 +40,7 @@ describe('atrapa: panel Ekran (computer use)', () => {
     expect(released.taken_over).toBe(false);
   });
 
-  it('podgląd pulpitu: intencja → okno Brokera; nieznana sesja → błąd', async () => {
+  it('podgląd pulpitu: intencja → okno Sędziego Cieni; nieznana sesja → błąd', async () => {
     const { client } = setup();
     expect((await client.gui.desktopGrant('s-q3', 'delta')).status).toBe('opened_broker');
     await expect(client.gui.desktopGrant('nie-ma', 'delta')).rejects.toThrow('Nieznana sesja');
@@ -150,12 +150,12 @@ describe('atrapa: Kreator agentek', () => {
 });
 
 describe('atrapa: Zdrowie systemu', () => {
-  it('propozycja naprawy → zgoda → naprawa z „Cofnij" → cofnięcie; Jądro tylko przez Brokera', async () => {
+  it('propozycja naprawy → zgoda → naprawa z „Cofnij" → cofnięcie; Jądro tylko przez Sędziego Cieni', async () => {
     const { client, events } = setup();
     const view = await client.health.report();
     expect(view.overall).toBe('degraded');
     expect(view.pending.map((p) => p.kernel)).toEqual([false, true]);
-    await expect(client.health.approve(3)).rejects.toThrow('Brokera');
+    await expect(client.health.approve(3)).rejects.toThrow('Sędziego Cieni');
     const after = await client.health.approve(1);
     const repair = after.repaired[0];
     expect(repair?.undoable).toBe(true);

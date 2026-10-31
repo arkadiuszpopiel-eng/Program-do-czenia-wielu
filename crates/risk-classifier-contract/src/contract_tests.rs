@@ -60,36 +60,38 @@ pub fn kernel_rules_block_everywhere<C: RiskClassifier + ?Sized>(c: &C) {
     }
 }
 
-/// Egress z sesji `tainted` pyta także na L4; destrukcja głosem pyta do L3 (na L4 — bez pytania,
-/// decyzja właściciela 27.10).
-pub fn l4_still_asks<C: RiskClassifier + ?Sized>(c: &C) {
+/// Na „Pełnej automatyce” (L4) nic nie pyta — okno zgód nie pokazuje się wcale (decyzja
+/// właściciela 31.10); te same akcje pytają do L3. Twarda blokada Jądra działa dalej.
+pub fn l4_never_asks<C: RiskClassifier + ?Sized>(c: &C) {
     let voice_delete = ActionFacts::new("tools-fs.delete", ActionClass::Write)
         .destructive(Destructiveness::Recoverable)
         .origin(CommandOrigin::UserVoice {
             confidence: SttConfidence::from_permille(990),
             speaker_verified: true,
         });
-    assert!(matches!(
-        c.evaluate(&voice_delete, AutonomyLevel::L3).verdict,
-        Verdict::Ask {
-            non_voice: true,
-            grantable: false
-        }
-    ));
-    assert_eq!(
-        c.evaluate(&voice_delete, AutonomyLevel::L4).verdict,
-        Verdict::Proceed
-    );
+    let stranger = ActionFacts::new("tools-fs.delete", ActionClass::Write)
+        .destructive(Destructiveness::Permanent)
+        .origin(CommandOrigin::UserVoice {
+            confidence: SttConfidence::from_permille(100),
+            speaker_verified: false,
+        });
     let tainted_egress = ActionFacts::new("tools-net.post", ActionClass::Egress)
         .egress("example.com", true)
         .tainted();
-    assert!(matches!(
-        c.evaluate(&tainted_egress, AutonomyLevel::L4).verdict,
-        Verdict::Ask {
-            grantable: false,
-            ..
-        }
-    ));
+    for f in [&voice_delete, &stranger, &tainted_egress] {
+        assert!(
+            matches!(
+                c.evaluate(f, AutonomyLevel::L3).verdict,
+                Verdict::Ask { .. }
+            ),
+            "L3 pyta: {f:?}"
+        );
+        assert_eq!(
+            c.evaluate(f, AutonomyLevel::L4).verdict,
+            Verdict::Proceed,
+            "L4 bez pytania: {f:?}"
+        );
+    }
 }
 
 /// Wyższy poziom nigdy nie pyta o więcej niż niższy.
@@ -114,7 +116,7 @@ pub fn rules_exposed<C: RiskClassifier + ?Sized>(c: &C) {
 pub fn run_all<C: RiskClassifier + ?Sized>(c: &C) {
     deterministic(c);
     kernel_rules_block_everywhere(c);
-    l4_still_asks(c);
+    l4_never_asks(c);
     monotonic_in_autonomy(c);
     rules_exposed(c);
 }

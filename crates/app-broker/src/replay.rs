@@ -54,7 +54,7 @@ impl Journal {
         if !e.taint.contains_key(session) && e.taint.len() >= MAX_ENTRIES {
             tracing::error!(
                 sesja = %session,
-                "dziennik skażenia pełny — skażenie tej sesji nie przetrwa restartu Brokera"
+                "dziennik skażenia pełny — skażenie tej sesji nie przetrwa restartu Sędziego Cieni"
             );
             return;
         }

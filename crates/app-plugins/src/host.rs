@@ -144,7 +144,8 @@ impl PluginHost for AlfaPluginHost {
         let Some(needed) = op.capability()? else {
             return Ok(Value::Null);
         };
-        let token = token.ok_or_else(|| HostError::Denied("operacja bez tokenu Brokera".into()))?;
+        let token =
+            token.ok_or_else(|| HostError::Denied("operacja bez tokenu Sędziego Cieni".into()))?;
         self.broker
             .verify(token, &needed, holder)
             .map_err(|e| HostError::Denied(e.to_string()))?;

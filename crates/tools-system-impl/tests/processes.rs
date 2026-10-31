@@ -26,7 +26,7 @@ async fn list_marks_protected_and_is_untrusted() {
     let out = h.tool("system_processes").call(json!({}), &ctx()).await;
     assert!(out.is_ok(), "{}", out.text);
     assert!(out.untrusted.is_some());
-    assert!(h.tainted(), "taint zgłoszony Brokerowi");
+    assert!(h.tainted(), "taint zgłoszony Sędziemu Cieni");
     let procs = out.data["processes"].as_array().unwrap();
     let protected = |pid: u32| {
         procs

@@ -37,7 +37,7 @@ test('F1 otwiera instrukcję; wyszukiwanie w Ustawieniach pokazuje trafienia z i
   await open(page);
   await page.keyboard.press('F1');
   await expect(page.getByRole('heading', { name: 'Instrukcja', level: 2 })).toBeVisible();
-  await page.getByRole('searchbox', { name: 'Szukaj ustawień' }).fill('Broker');
+  await page.getByRole('searchbox', { name: 'Szukaj ustawień' }).fill('Sędzia Cieni');
   const hits = page.getByRole('region', { name: 'W instrukcji' });
   await expect(hits).toBeVisible();
   await hits.getByRole('button').first().click();
@@ -162,7 +162,7 @@ for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
       await expect(page.getByRole('alert')).toBeVisible();
       await expectAccessible(page, `json ${skin} ${theme}`);
       await expectReadable(page, `json ${skin} ${theme}`);
-      await page.getByRole('searchbox', { name: 'Szukaj ustawień' }).fill('Broker');
+      await page.getByRole('searchbox', { name: 'Szukaj ustawień' }).fill('Sędzia Cieni');
       await expect(page.getByRole('region', { name: 'W instrukcji' })).toBeVisible();
       await expectAccessible(page, `ustawienia-instrukcja ${skin} ${theme}`);
       await expectReadable(page, `ustawienia-instrukcja ${skin} ${theme}`);

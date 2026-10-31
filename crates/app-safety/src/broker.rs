@@ -137,8 +137,12 @@ pub fn launcher_for(config: &ServiceConfig) -> Arc<dyn SessionLauncherPort> {
 /// Uruchamia usługę do zatrzymania (`stop`); wspólne dla trybu usługi i konsoli.
 pub fn run(config: ServiceConfig, stop: &StopSignal) -> Result<(), String> {
     if config.dev_mode {
-        eprintln!("[alfa-broker] TRYB DEWELOPERSKI — bez osobnego konta i bez UIPI dla Broker-UI");
-        tracing::warn!("tryb deweloperski Brokera — bez osobnego konta i bez UIPI dla Broker-UI");
+        eprintln!(
+            "[alfa-broker] TRYB DEWELOPERSKI — bez osobnego konta i bez UIPI dla okna Sędziego Cieni"
+        );
+        tracing::warn!(
+            "tryb deweloperski Sędziego Cieni — bez osobnego konta i bez UIPI dla okna Sędziego Cieni"
+        );
     }
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)

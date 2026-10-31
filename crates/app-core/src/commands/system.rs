@@ -102,9 +102,9 @@ impl AppCore {
         let gap = match self.inner.broker.kill_all(origin).await {
             Ok(gap) => gap,
             Err(e) => {
-                tracing::error!(error = %e, "kill-switch Brokera nie powiódł się");
+                tracing::error!(error = %e, "kill-switch Sędziego Cieni nie powiódł się");
                 Some(format!(
-                    "kill-switch Brokera nie powiódł się: {}",
+                    "kill-switch Sędziego Cieni nie powiódł się: {}",
                     e.message
                 ))
             }

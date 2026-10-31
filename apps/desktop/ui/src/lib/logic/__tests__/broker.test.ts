@@ -11,7 +11,7 @@ const service: BrokerStatusView = {
   detail: null,
 };
 
-describe('baner Brokera', () => {
+describe('baner Sędziego Cieni', () => {
   it('stan nieodczytany — baner „nieznany”, którego nie da się ukryć (audyt A-12)', () => {
     expect(brokerBanner(null, [], true)).toBe('unknown');
     expect(brokerBanner(null, ['unknown'], true)).toBe('unknown');
@@ -26,7 +26,7 @@ describe('baner Brokera', () => {
     expect(safeState(null)).toBe(false);
   });
 
-  it('zerwanie i brak Brokera to bezpieczny stan, którego nie da się ukryć', () => {
+  it('zerwanie i brak Sędziego Cieni to bezpieczny stan, którego nie da się ukryć', () => {
     const lost = { ...service, state: 'lost' as const, approval_window: false };
     expect(brokerBanner(lost, ['lost'])).toBe('lost');
     expect(safeState(lost)).toBe(true);

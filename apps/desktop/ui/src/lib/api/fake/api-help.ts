@@ -21,7 +21,7 @@ const PAGES: readonly HelpPage[] = [
     id: 'bezpieczenstwo',
     title: 'Bezpieczeństwo',
     html_sanitized:
-      '<h1>Bezpieczeństwo</h1><h2>Okno Brokera</h2><p>Każde ryzykowne działanie agentki wymaga Twojej zgody w oknie Brokera.</p>',
+      '<h1>Bezpieczeństwo</h1><h2>Okno Sędziego Cieni</h2><p>Sędzia Cieni pilnuje działań agentek: każde ryzykowne działanie wymaga Twojej zgody w jego oknie.</p>',
   },
 ];
 

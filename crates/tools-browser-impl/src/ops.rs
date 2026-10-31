@@ -15,6 +15,7 @@ use tools_browser_contract::{
 use tools_common_contract::{
     Authorization, BrokerGate, DenialReason, ToolCtx, ToolErrorKind, ToolImage, ToolManifest,
     ToolOutcome, action_request, base_facts, parse_args, report_untrusted, text, tool_event,
+    with_summary,
 };
 
 use crate::out::{blocking, browser_failure, fail, page_out, page_text};
@@ -71,7 +72,7 @@ impl Core {
         }
         let requests = caps
             .iter()
-            .map(|c| action_request(ctx, c.clone(), base_facts(m, ctx)))
+            .map(|c| action_request(ctx, c.clone(), with_summary(base_facts(m, ctx), action)))
             .collect();
         let auths = self
             .gate
@@ -134,7 +135,7 @@ impl Core {
         m: &ToolManifest,
     ) -> Step<ToolOutcome> {
         let a: OpenArgs = parse_args(args)?;
-        let action = "otwarcie strony";
+        let action = &format!("otwarcie strony {}", a.url);
         let host = check_navigation_url(&a.url).map_err(|e| browser_failure(&e, action))?;
         let mut hosts = vec![host.clone()];
         for raw in &a.extra_hosts {
@@ -282,10 +283,10 @@ impl Core {
             (a.node, None, false)
         };
         let b = self.current(ctx)?;
-        let action = if typed {
-            "wpisanie na stronie"
-        } else {
-            "kliknięcie na stronie"
+        // Konkret dla okna Sędziego Cieni: który element, jaki tekst, na jakiej stronie.
+        let action = &match &text_in {
+            Some(t) => format!("wpisanie „{t}” w element nr {node} na stronie {}", b.url()),
+            None => format!("kliknięcie elementu nr {node} na stronie {}", b.url()),
         };
         let host = Self::page_host(&b)?;
         let auths = self

@@ -235,14 +235,14 @@ test('powiększenie Ctrl+=: strona ma wysokość okna, pole pisania zostaje wido
   expect(m.bottom, 'dół pola pisania').toBeLessThanOrEqual(m.inner);
 });
 
-test('Broker w procesie (build debug): baner i stan w Ustawieniach', async ({ alfa }) => {
+test('Sędzia Cieni w procesie (build debug): baner i stan w Ustawieniach', async ({ alfa }) => {
   const { main } = alfa;
   await toChat(main);
-  await expect(main.getByRole('region', { name: 'Stan Brokera' })).toContainText(
-    'Tryb deweloperski: Broker w procesie aplikacji, bez okna zatwierdzeń.',
+  await expect(main.getByRole('region', { name: 'Stan Sędziego Cieni' })).toContainText(
+    'Tryb deweloperski: Sędzia Cieni w procesie aplikacji, bez okna zatwierdzeń.',
   );
   await openSettings(main, 'Uprawnienia i bezpieczeństwo');
-  await expect(main.getByText('Broker w procesie aplikacji (tryb deweloperski)')).toBeVisible();
+  await expect(main.getByText('Sędzia Cieni w procesie aplikacji (tryb deweloperski)')).toBeVisible();
   await expect(main.getByText(/awaryjnie w aplikacji — watchdog nie działa/)).toBeVisible();
   await expect(main.getByText(/Izolacja: słabsza/)).toBeVisible();
   await shot(alfa, '05-broker');

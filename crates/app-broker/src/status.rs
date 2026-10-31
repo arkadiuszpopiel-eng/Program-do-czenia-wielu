@@ -37,11 +37,11 @@ pub struct KernelStatus {
 fn lost_text(reason: &str) -> LocalizedText {
     LocalizedText::new(
         format!(
-            "Połączenie z Brokerem zerwane ({reason}). Bezpieczny stan: wszystko, co wymaga zgody, \
+            "Połączenie z Sędzią Cieni zerwane ({reason}). Bezpieczny stan: wszystko, co wymaga zgody, \
              jest odrzucane; Alfa ponawia połączenie."
         ),
         format!(
-            "Connection to the Broker lost ({reason}). Safe state: everything that needs approval \
+            "Connection to the Shadow Judge lost ({reason}). Safe state: everything that needs approval \
              is denied; Alfa keeps reconnecting."
         ),
     )
@@ -50,12 +50,12 @@ fn lost_text(reason: &str) -> LocalizedText {
 fn unavailable_text(reason: &str) -> LocalizedText {
     LocalizedText::new(
         format!(
-            "Brak izolowanego Brokera ({reason}). Bezpieczny stan: agentki nie wykonają niczego, \
-             co wymaga zgody. Zainstaluj Alfę ponownie (binarki Jądra) albo usługę Brokera."
+            "Brak izolowanego Sędziego Cieni ({reason}). Bezpieczny stan: agentki nie wykonają niczego, \
+             co wymaga zgody. Zainstaluj Alfę ponownie (binarki Jądra) albo usługę Sędziego Cieni."
         ),
         format!(
-            "No isolated Broker ({reason}). Safe state: agents will not do anything that needs \
-             approval. Reinstall Alfa (kernel binaries) or the Broker service."
+            "No isolated Shadow Judge ({reason}). Safe state: agents will not do anything that needs \
+             approval. Reinstall Alfa (kernel binaries) or the Shadow Judge service."
         ),
     )
 }
@@ -64,24 +64,24 @@ fn connected_text(mode: BrokerMode, window: bool) -> Option<LocalizedText> {
     match mode {
         // Audyt A-12: o oknie z wysoką integralnością tylko wtedy, gdy okno naprawdę działa.
         BrokerMode::Service if !window => Some(LocalizedText::new(
-            "Połączono z usługą Brokera (osobne konto Windows), ale okno zatwierdzeń nie działa — \
+            "Połączono z usługą Sędziego Cieni (osobne konto Windows), ale okno zatwierdzeń nie działa — \
              prośby o zgodę są odrzucane.",
-            "Connected to the Broker service (separate Windows account), but the approval window \
+            "Connected to the Shadow Judge service (separate Windows account), but the approval window \
              is not running — approval requests are denied.",
         )),
         BrokerMode::Service => Some(LocalizedText::new(
-            "Połączono z usługą Brokera: osobne konto Windows, okno zatwierdzeń z wysoką \
+            "Połączono z usługą Sędziego Cieni: osobne konto Windows, okno zatwierdzeń z wysoką \
              integralnością (UIPI).",
-            "Connected to the Broker service: separate Windows account, approval window with \
+            "Connected to the Shadow Judge service: separate Windows account, approval window with \
              high integrity (UIPI).",
         )),
         BrokerMode::Portable => Some(LocalizedText::new(
-            "Tryb przenośny: Broker działa jako proces Alfy na Twoim koncie — bez osobnego konta \
+            "Tryb przenośny: Sędzia Cieni działa jako proces Alfy na Twoim koncie — bez osobnego konta \
              Windows i bez ochrony UIPI okna zatwierdzeń (słabsza izolacja). Pełną izolację daje \
-             usługa Brokera.",
-            "Portable mode: the Broker runs as an Alfa process under your account — no separate \
+             usługa Sędziego Cieni.",
+            "Portable mode: the Shadow Judge runs as an Alfa process under your account — no separate \
              Windows account and no UIPI protection of the approval window (weaker isolation). \
-             The Broker service gives full isolation.",
+             The Shadow Judge service gives full isolation.",
         )),
         BrokerMode::InProcess | BrokerMode::Unavailable => None,
     }
@@ -93,8 +93,8 @@ fn render(p: &Parts) -> BrokerStatusView {
         LinkState::Connecting => (
             BrokerLinkState::Connecting,
             Some(LocalizedText::new(
-                "Łączenie z Brokerem… do czasu połączenia prośby o zgodę są odrzucane.",
-                "Connecting to the Broker… approval requests are denied until connected.",
+                "Łączenie z Sędzią Cieni… do czasu połączenia prośby o zgodę są odrzucane.",
+                "Connecting to the Shadow Judge… approval requests are denied until connected.",
             )),
         ),
         LinkState::Lost(reason) if p.mode == BrokerMode::Unavailable => {
@@ -188,9 +188,9 @@ impl KernelStatus {
     pub fn health(&self) -> HealthStatus {
         match self.link() {
             LinkState::Connected => HealthStatus::Healthy,
-            LinkState::Connecting => HealthStatus::Degraded("łączenie z Brokerem".into()),
+            LinkState::Connecting => HealthStatus::Degraded("łączenie z Sędzią Cieni".into()),
             LinkState::Lost(reason) => {
-                HealthStatus::Unhealthy(format!("połączenie z Brokerem zerwane: {reason}"))
+                HealthStatus::Unhealthy(format!("połączenie z Sędzią Cieni zerwane: {reason}"))
             }
         }
     }

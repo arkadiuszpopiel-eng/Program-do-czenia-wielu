@@ -1,7 +1,7 @@
 //! Prośby o zatwierdzenie: otwarcie (wyzwanie z nonce), stan dla proszącego, rozstrzygnięcie
 //! dowodem fizycznego wejścia (wyłącznie kanał Broker-UI).
 
-use risk_classifier_contract::{CommandOrigin, Reversibility, RiskLevel, RuleId};
+use risk_classifier_contract::{AutonomyLevel, CommandOrigin, Reversibility, RiskLevel, RuleId};
 use safety_broker_contract::{
     ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalRequest, ApprovalStatus,
     ApprovalSubject, ApprovalTicket, BrokerError, EVENT_APPROVAL_DECIDED, EVENT_APPROVAL_REQUESTED,
@@ -25,6 +25,7 @@ pub(crate) struct Meta {
     pub hello_required: bool,
     pub rules: Vec<RuleId>,
     pub explanation: String,
+    pub autonomy: Option<AutonomyLevel>,
 }
 
 fn same_requester(a: &Holder, b: &Holder) -> bool {
@@ -56,6 +57,7 @@ impl BrokerEngine {
             hello_required: meta.hello_required,
             rules: meta.rules,
             explanation: meta.explanation,
+            autonomy: meta.autonomy,
             created_at_ms: now,
             expires_at_ms: now.saturating_add(st.policy().approval_ttl_ms),
         };

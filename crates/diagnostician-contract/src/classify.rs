@@ -146,7 +146,7 @@ fn map(signal: &Signal, cfg: &ClassifierConfig) -> Option<(FailureKind, String, 
                 Symptom::KernelConfigChanged => (
                     FailureKind::KernelConfigTampered,
                     1,
-                    "polityka Jądra zmieniona poza Brokerem".into(),
+                    "polityka Jądra zmieniona poza Sędzią Cieni".into(),
                 ),
                 Symptom::DbCorrupt => {
                     (FailureKind::SessionDbCorrupted, 1, "baza uszkodzona".into())

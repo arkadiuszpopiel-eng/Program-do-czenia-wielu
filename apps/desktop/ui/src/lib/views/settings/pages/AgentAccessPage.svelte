@@ -65,8 +65,8 @@
   </h3>
   <p>
     {en
-      ? 'Choose what this agent can use. Broker autonomy, the working folder and system permissions still apply. Changes take effect on the next task.'
-      : 'Wybierz, z czego może korzystać ta agentka. Obowiązują poziom autonomii Brokera, katalog roboczy i uprawnienia systemu. Zmiany działają od następnego zadania.'}
+      ? 'Choose what this agent can use. Sędzia Cieni autonomy, the working folder and system permissions still apply. Changes take effect on the next task.'
+      : 'Wybierz, z czego może korzystać ta agentka. Obowiązują poziom autonomii Sędziego Cieni, katalog roboczy i uprawnienia systemu. Zmiany działają od następnego zadania.'}
   </p>
   <label for="agent-access-profile">{en ? 'Access profile' : 'Profil dostępu'}</label>
   <Select
@@ -111,7 +111,7 @@
       }}>{en ? 'Session roles and working folder' : 'Role w sesji i katalog roboczy'}</Button
     >
     <Button variant="ghost" onclick={() => app.openSettings('permissions')}
-      >{en ? 'Broker and autonomy' : 'Broker i autonomia'}</Button
+      >{en ? 'Sędzia Cieni and autonomy' : 'Sędzia Cieni i autonomia'}</Button
     >
     <Button variant="ghost" onclick={() => void app.resetSetting(`${prefix}access`)}
       >{en ? 'Reset profile' : 'Przywróć profil'}</Button

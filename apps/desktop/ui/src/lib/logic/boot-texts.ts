@@ -15,8 +15,8 @@ export const BOOT_TEXTS = {
   showLog: { pl: 'Pokaż dziennik', en: 'Show log' },
   title: { pl: 'Dziennik rozruchu', en: 'Startup log' },
   intro: {
-    pl: 'Wpisy dziennika od startu programu do końca rozruchu (procesy Jądra, Broker, watchdog, moduły, głos). Treści rozmów tu nie ma, sekrety są zamazane. Pełny zapis jest w pliku dziennika.',
-    en: 'Log entries from program start until startup ends (kernel processes, Broker, watchdog, modules, voice). No conversation content; secrets are masked. The full record is in the log file.',
+    pl: 'Wpisy dziennika od startu programu do końca rozruchu (procesy Jądra, Sędzia Cieni, watchdog, moduły, głos). Treści rozmów tu nie ma, sekrety są zamazane. Pełny zapis jest w pliku dziennika.',
+    en: 'Log entries from program start until startup ends (kernel processes, Shadow Judge, watchdog, modules, voice). No conversation content; secrets are masked. The full record is in the log file.',
   },
   'verdict.ok': { pl: 'Rozruch OK', en: 'Startup OK' },
   'verdict.warnings': { pl: 'Rozruch z uwagami', en: 'Startup with notes' },

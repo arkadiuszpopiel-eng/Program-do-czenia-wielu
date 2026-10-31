@@ -17,9 +17,9 @@ przygotować samodzielnie, w tekście są oznaczenia:
 | **Jeszcze niedostępne** | Funkcja jest zaplanowana albo gotowa „pod spodem”, ale aplikacja jej jeszcze nie pokazuje.          |
 
 Najważniejsze ograniczenie: na prawdziwym laptopie sprawdzone są dotąd uruchomienie, okna, ustawienia i skalowanie
-interfejsu (2026-10-09). Rozmowa z modelem lokalnym, głos (mikrofon, karta graficzna) i okno Brokera jako usługa
+interfejsu (2026-10-09). Rozmowa z modelem lokalnym, głos (mikrofon, karta graficzna) i okno Sędziego Cieni jako usługa
 Windows **nie były jeszcze testowane na sprzęcie**. Zanim zaczniesz codziennie z niej korzystać, przejdź
-[Pierwszy test na Twoim PC](11-pierwszy-test-na-pc.md). Okno zatwierdzeń prowadzi osobny proces Brokera — szczegóły:
+[Pierwszy test na Twoim PC](11-pierwszy-test-na-pc.md). Okno zatwierdzeń prowadzi osobny proces Sędziego Cieni — szczegóły:
 [Bezpieczeństwo](07-bezpieczenstwo.md).
 
 ## Spis treści

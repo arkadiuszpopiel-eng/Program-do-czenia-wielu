@@ -92,7 +92,7 @@ describe('Arena — kolejność odpowiedzi', () => {
   });
 
   it('błąd startu i błąd tury nie blokują drugiej odpowiedzi', () => {
-    expect(arenaStep(slots({ error: 'Broker' }, {}), statuses({}), false)).toEqual({
+    expect(arenaStep(slots({ error: 'Sędzia Cieni' }, {}), statuses({}), false)).toEqual({
       kind: 'start',
       index: 1,
     });

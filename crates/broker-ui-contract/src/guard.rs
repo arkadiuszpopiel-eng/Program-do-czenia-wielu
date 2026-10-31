@@ -21,7 +21,7 @@ pub enum RejectReason {
     #[error("nierozpoznane urządzenie wejścia")]
     UnknownDevice,
     /// Okno nie jest na pierwszym planie.
-    #[error("okno Brokera nie jest aktywne")]
+    #[error("okno Sędziego Cieni nie jest aktywne")]
     NotForeground,
     /// Okno za krótko na pierwszym planie.
     #[error("okno dopiero stało się aktywne ({elapsed_ms} ms) — kliknij ponownie")]
@@ -30,7 +30,7 @@ pub enum RejectReason {
         elapsed_ms: u64,
     },
     /// Okno zasłonięte innym oknem.
-    #[error("okno Brokera jest zasłonięte innym oknem")]
+    #[error("okno Sędziego Cieni jest zasłonięte innym oknem")]
     Occluded,
     /// Wejście sprzed pokazania karty.
     #[error("wejście sprzed pokazania karty")]

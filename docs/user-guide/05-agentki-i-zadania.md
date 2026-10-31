@@ -29,11 +29,11 @@ W trakcie pracy:
 - **kapsuła aktywności** nad polem wiadomości pokazuje, kto pracuje i na którym kroku („krok 3/7”), z przyciskiem
   **Stop**;
 - wiadomość wysłana w trakcie trafia do agentki — uwzględni ją w następnym kroku;
-- każda zmiana pliku przechodzi przez Brokera i dziennik cofania: po działaniu pojawia się toast **Cofnij** (8 s),
+- każda zmiana pliku przechodzi przez Sędziego Cieni i dziennik cofania: po działaniu pojawia się toast **Cofnij** (8 s),
   a pod odpowiedzią karta „N kroków można cofnąć”;
 - polecenie, którego Alfa sama nie uruchomi, dostaje kartę **Uruchom w terminalu**: „Kopiuj polecenie” i „Otwórz
   terminal” — uruchamiasz je Ty;
-- karta **„czeka na zatwierdzenie”**: w tej wersji okna Brokera nie ma, więc po upływie czasu agentka dostaje
+- karta **„czeka na zatwierdzenie”**: w tej wersji okna Sędziego Cieni nie ma, więc po upływie czasu agentka dostaje
   odmowę i szuka innej drogi.
 
 Limity zadania ustawisz w **Ustawienia → Agentki**: liczba kroków (domyślnie 40), czas (15 min), koszt, czas

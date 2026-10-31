@@ -254,7 +254,7 @@ impl AppCore {
         }
         tracing::info!(
             ?level,
-            "przyjęto podniesienie poziomu zatwierdzone w oknie Brokera"
+            "przyjęto podniesienie poziomu zatwierdzone w oknie Sędziego Cieni"
         );
         match session {
             Some(id) => self.announce_session(id).await,

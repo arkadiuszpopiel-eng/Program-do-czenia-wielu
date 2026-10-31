@@ -211,7 +211,7 @@ async fn flows_contract_over_ipc() {
     let (b, c) = fresh();
     flows::voice_destruction_asks_below_l4(&b, &c).await;
     let (b, c) = fresh();
-    flows::tainted_egress_asks_on_l4(&b, &c).await;
+    flows::tainted_egress_asks_up_to_l3_only(&b, &c).await;
     let (b, c) = fresh();
     flows::raise_requires_valid_proof(&b, &c).await;
     let (b, c) = fresh();
@@ -241,7 +241,10 @@ async fn agent_origin_level_change_is_refused_by_core_relay() {
             Err(BrokerError::KernelBlock(KernelRule::SelfEscalation))
         );
     }
-    assert!(b.pending().is_empty(), "żadnej prośby w Broker-UI");
+    assert!(
+        b.pending().is_empty(),
+        "żadnej prośby w oknie Sędziego Cieni"
+    );
     assert_eq!(b.autonomy(&s1, None), AutonomyLevel::L3);
     let owner = AutonomyChangeRequest {
         target,

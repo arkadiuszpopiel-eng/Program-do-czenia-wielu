@@ -85,7 +85,7 @@ impl AppCore {
                 // Otwarcie skażonej sesji (np. po restarcie) — stan dla Brokera od razu; tura i tak
                 // sprawdza to ponownie (fail-closed), więc tu tylko ostrzeżenie.
                 if let Err(e) = self.chat().sync_taint(&id).await {
-                    tracing::warn!(error = %e, "zgłoszenie skażenia sesji Brokerowi nie powiodło się");
+                    tracing::warn!(error = %e, "zgłoszenie skażenia sesji Sędziemu Cieni nie powiodło się");
                 }
                 Some(id.to_string().into())
             }

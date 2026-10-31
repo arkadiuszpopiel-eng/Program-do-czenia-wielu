@@ -63,10 +63,21 @@ pub fn tool_event(name: &str, level: Level, payload: serde_json::Value, ctx: &To
 }
 
 /// Fakty bazowe z manifestu i kontekstu (narzędzie uzupełnia destrukcyjność, polecenie…).
+/// Opis dla okna zgód: nazwa narzędzia dla UI; narzędzie podmienia ją konkretem ([`with_summary`]).
 pub fn base_facts(manifest: &ToolManifest, ctx: &ToolCtx) -> DeclaredFacts {
     let mut facts = DeclaredFacts::new(&manifest.id);
     facts.reversible = manifest.reversible;
     facts.untrusted_input_in_args = ctx.untrusted_args;
+    facts.summary = Some(manifest.title.clone());
+    facts
+}
+
+/// Fakty z opisem „co dokładnie” dla okna Sędziego Cieni (np. „trwałe usunięcie „a.txt””).
+#[must_use]
+pub fn with_summary(mut facts: DeclaredFacts, action: &str) -> DeclaredFacts {
+    if !action.trim().is_empty() {
+        facts.summary = Some(action.to_owned());
+    }
     facts
 }
 

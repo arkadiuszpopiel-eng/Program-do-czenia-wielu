@@ -36,7 +36,7 @@ export const plWork = {
   'gui.noShot': 'Brak zrzutu — agentka nie oglądała jeszcze ekranu.',
   'gui.blackFrame': 'Zrzut jest czarny — okno chroni się przed przechwytywaniem.',
   'gui.masking':
-    'Okna Alfy i Brokera, aplikacje z listy zakazanych i pola haseł są zamaskowane; zrzut jest tylko w pamięci.',
+    'Okna Alfy i Sędziego Cieni, aplikacje z listy zakazanych i pola haseł są zamaskowane; zrzut jest tylko w pamięci.',
   'gui.actions': 'Co robi agentka',
   'gui.noActions': 'Brak akcji na ekranie.',
   'gui.status.running': 'w toku',
@@ -46,19 +46,19 @@ export const plWork = {
   'gui.status.cancelled': 'anulowano',
   'gui.grantTitle': 'Podgląd pulpitu',
   'gui.grantDesc':
-    '„Zawsze zezwalaj na podgląd pulpitu" na 24 godziny — zgodę wydajesz w oknie Brokera, nie tutaj.',
+    '„Zawsze zezwalaj na podgląd pulpitu" na 24 godziny — zgodę wydajesz w oknie Sędziego Cieni, nie tutaj.',
   'gui.grantAgent': 'Agentka',
   'gui.grant': 'Zezwól na podgląd pulpitu…',
-  'gui.grantBroker': 'Otworzono okno Brokera — tam zdecydujesz o podglądzie pulpitu.',
+  'gui.grantBroker': 'Otworzono okno Sędziego Cieni — tam zdecydujesz o podglądzie pulpitu.',
   'gui.grantApplied': '{name} ma już zgodę na podgląd pulpitu.',
   'pc.title': 'Sterowanie komputerem',
   'pc.intro':
     'Agentki z rolą „Wykonawczyni" mogą obsługiwać okna aplikacji: czytać ich strukturę, klikać, pisać i robić zrzuty ekranu.',
   'pc.guard':
-    'Agentki nigdy nie sterują oknami Alfy, Brokera ani watchdoga — strażnik okien blokuje je zawsze.',
+    'Agentki nigdy nie sterują oknami Alfy, Sędziego Cieni ani watchdoga — strażnik okien blokuje je zawsze.',
   'pc.protect': 'Okna Alfy są niewidoczne na zrzutach ekranu (ochrona treści systemu Windows).',
   'pc.tools':
-    'Każda akcja przechodzi przez Brokera; ryzykowne czekają na Twoją zgodę. Przejęcie myszy lub „Zatrzymaj" wstrzymuje agentki.',
+    'Każda akcja przechodzi przez Sędziego Cieni; ryzykowne czekają na Twoją zgodę. Przejęcie myszy lub „Zatrzymaj" wstrzymuje agentki.',
   'pc.openScreen': 'Otwórz panel Ekran',
   'pc.grantSession': 'Dotyczy bieżącej sesji: {title}',
   'pc.grantNoSession': 'Otwórz sesję, aby poprosić o podgląd pulpitu dla jej agentek.',

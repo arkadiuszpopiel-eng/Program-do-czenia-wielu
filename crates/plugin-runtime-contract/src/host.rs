@@ -61,7 +61,7 @@ pub enum HostError {
     #[error("dane operacji hosta przekraczają limit ({0} B)")]
     TooLarge(usize),
     /// Odmowa Brokera (Jądro, właściciel, wygaśnięcie, token).
-    #[error("odmowa Brokera: {0}")]
+    #[error("odmowa Sędziego Cieni: {0}")]
     Denied(String),
     /// Błąd wykonania (we/wy, sieć).
     #[error("błąd operacji: {0}")]

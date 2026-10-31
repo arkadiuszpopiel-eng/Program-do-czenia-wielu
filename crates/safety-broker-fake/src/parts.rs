@@ -92,7 +92,7 @@ impl FakeProcesses {
 impl ProcessPort for FakeProcesses {
     fn spawn(&self, _: ProcessSpec) -> Result<ProcessHandle, PlatformError> {
         Err(PlatformError::Unsupported(
-            "atrapa Brokera nie uruchamia procesów".into(),
+            "atrapa Sędziego Cieni nie uruchamia procesów".into(),
         ))
     }
 

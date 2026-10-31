@@ -20,6 +20,8 @@ pub const MIN_BUTTON_ID: u16 = 100;
 pub const MAX_TEXT_CHARS: usize = 600;
 /// Limit liczby wierszy szczegółów.
 pub const MAX_DETAILS: usize = 16;
+/// Limit tekstu pomocy pod „?” (znaki).
+pub const MAX_HELP_CHARS: usize = 1_200;
 
 /// Ton (kolor) plakietki ryzyka — zawsze razem z tekstem i ikoną.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -66,6 +68,9 @@ pub struct SurfaceView {
     /// Czy okno może przejąć fokus (alertdialog przy wysokim ryzyku); inaczej pokazuje się bez
     /// aktywacji i sygnalizuje miganiem (nie kradnie fokusu w trakcie pisania).
     pub take_focus: bool,
+    /// Pomoc pod przyciskiem „?” (co to za okno i do czego się odnosi); pusta — bez „?”.
+    #[serde(default)]
+    pub help: String,
 }
 
 impl SurfaceView {
@@ -87,6 +92,9 @@ impl SurfaceView {
         }
         if self.details.len() > MAX_DETAILS {
             return bad("za dużo wierszy szczegółów");
+        }
+        if self.help.chars().count() > MAX_HELP_CHARS || self.help.chars().any(char::is_control) {
+            return bad("pomoc za długa albo ze znakami sterującymi");
         }
         let texts = [&self.title, &self.badge, &self.status]
             .into_iter()
@@ -272,6 +280,7 @@ mod tests {
             ],
             initial_focus: 100,
             take_focus: false,
+            help: String::new(),
         }
     }
 

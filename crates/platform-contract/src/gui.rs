@@ -285,7 +285,7 @@ impl TargetGuard {
                 image_file_name(image)
             };
             return Err(GuiError::ProtectedTarget(format!(
-                "{what}: okno procesu {shown} (PID {pid}) — Alfa, Broker albo proces nieznany; \
+                "{what}: okno procesu {shown} (PID {pid}) — Alfa, Sędzia Cieni albo proces nieznany; \
                  agentka nie steruje nim ani go nie odczytuje"
             )));
         }

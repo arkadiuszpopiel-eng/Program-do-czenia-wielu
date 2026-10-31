@@ -134,7 +134,7 @@ Skrypt `scripts/install-on-drive.ps1` instaluje i konfiguruje wszystko na dysku 
 | `C:` (nie da się/nie wolno przenieść) | Windows SDK i Instalator Visual Studio, WebView2, dane Alfy `%LOCALAPPDATA%\Alfa` (modele ok. 8 GB) |
 
 Oba katalogi na `D:` dostają uprawnienia tylko dla Ciebie, systemu i administratorów (na drugim dysku Windows domyślnie
-pozwala zmieniać pliki każdemu zalogowanemu użytkownikowi). **Dane Alfy zostają na `C:` celowo:** Broker chroni pliki
+pozwala zmieniać pliki każdemu zalogowanemu użytkownikowi). **Dane Alfy zostają na `C:` celowo:** Sędzia Cieni chroni pliki
 Alfy (wersje, sidecary, konfigurację) według ich ścieżki; przeniesione dowiązaniem na `D:` byłyby dla agentek osiągalne
 drugą ścieżką, spoza tej ochrony. Na `C:` potrzeba ok. **15 GB** wolnego miejsca, na `D:` — ok. **60 GB**.
 
@@ -244,7 +244,7 @@ potrzebne** — wystarczy sterownik karty (skrypt pokaże je jako `[INFO]`).
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-dev.ps1 -Build
 ```
 
-Kolejno: zależności interfejsu (`pnpm install`), interfejs, procesy Jądra bezpieczeństwa (Broker, okno zatwierdzeń,
+Kolejno: zależności interfejsu (`pnpm install`), interfejs, procesy Jądra bezpieczeństwa (Sędzia Cieni, okno zatwierdzeń,
 watchdog) i powłoka Alfy. Pierwsza budowa trwa **20–60 minut**, kolejne — kilka minut. Przewijające się napisy
 `Compiling …` są normalne. Na końcu tabela **Podsumowanie** — każdy krok powinien mieć `OK`.
 
@@ -295,8 +295,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\setup-dev.ps1 -Run
 ```
 
 To samo, co `cargo tauri dev` z `apps/desktop/README.md`. Pierwszy start dokompilowuje powłokę (1–5 minut), potem
-otwiera się okno Alfy. Terminal zostaw otwarty. W tym trybie Broker działa w procesie aplikacji — u góry rozmowy
-zobaczysz baner „Tryb deweloperski: Broker w procesie aplikacji, bez okna zatwierdzeń.” To oczekiwane; pełnego Brokera
+otwiera się okno Alfy. Terminal zostaw otwarty. W tym trybie Sędzia Cieni działa w procesie aplikacji — u góry rozmowy
+zobaczysz baner „Tryb deweloperski: Sędzia Cieni w procesie aplikacji, bez okna zatwierdzeń.” To oczekiwane; pełnego Sędziego Cieni
 sprawdzisz w części 10. Zamknięcie okna chowa Alfę do zasobnika; całkiem wyłączysz ją: ikona Alfy w zasobniku →
 **Wyjście** (albo `Ctrl+C` w Terminalu).
 
@@ -434,7 +434,7 @@ mniej więcej trwało.
 | 9.5 „mhm” nie przerywa, „stop” zatrzymuje                      |                      |               |
 | 9.6 Na głośnikach Alfa nie przerywa sama sobie                 |                      |               |
 
-## 10. Instalator NSIS i Broker poza aplikacją
+## 10. Instalator NSIS i Sędzia Cieni poza aplikacją
 
 **Budowa i instalacja.** Wyłącz Alfę z trybu deweloperskiego (zasobnik → **Wyjście**), potem:
 
@@ -449,30 +449,30 @@ to**. Instalacja nie pyta o administratora (trafia do `%LOCALAPPDATA%\Alfa`). Al
 modele z trybu deweloperskiego są widoczne (te same katalogi danych). Aktualizacje są w tej kompilacji wyłączone —
 to oczekiwane.
 
-**Tryb przenośny Brokera.** Wersja z instalatora uruchamia Brokera jako osobny proces. **Ustawienia → Uprawnienia
-i bezpieczeństwo** pokazuje: „Tryb przenośny — Broker bez osobnego konta”, „Połączono”, „Okno zatwierdzeń: działa”,
+**Tryb przenośny Sędziego Cieni.** Wersja z instalatora uruchamia Sędziego Cieni jako osobny proces. **Ustawienia → Uprawnienia
+i bezpieczeństwo** pokazuje: „Tryb przenośny — Sędzia Cieni bez osobnego konta”, „Połączono”, „Okno zatwierdzeń: działa”,
 „STOP WSZYSTKIEGO (Ctrl+Shift+F12): obsługuje watchdog, poza aplikacją” i „Izolacja: słabsza” (w tym trybie
 oczekiwane). Test okna zatwierdzeń — na tej samej stronie zmień poziom autonomii z L3 na **L4**:
 
-1. Otwiera się osobne, małe **okno Brokera**. Naciśnij `Enter` — nic się nie dzieje (`Enter` niczego nie zatwierdza).
+1. Otwiera się osobne, małe **okno Sędziego Cieni**. Naciśnij `Enter` — nic się nie dzieje (`Enter` niczego nie zatwierdza).
 2. Naciśnij `Esc` — odmowa, poziom zostaje L3.
-3. Zmień znowu na L4 i w oknie Brokera kliknij **Zezwól tylko teraz** — poziom L4.
+3. Zmień znowu na L4 i w oknie Sędziego Cieni kliknij **Zezwól tylko teraz** — poziom L4.
 4. Wróć na L3 — obniżenie działa od razu, bez okna.
 
 Potem powtórz część 8 (STOP) — teraz skrót obsługuje osobny proces watchdog.
 
-**Usługa Brokera (pełna izolacja).** Usługa na osobnym koncie Windows wymaga jednorazowej zgody administratora (UAC)
+**Usługa Sędziego Cieni (pełna izolacja).** Usługa na osobnym koncie Windows wymaga jednorazowej zgody administratora (UAC)
 i pliku konfiguracji przygotowanego dla Twojego komputera (bramka ludzka #10). **Nie instaluj jej samodzielnie** —
-sesja AI przygotuje osobną instrukcję. Po instalacji Ustawienia pokażą „Usługa Brokera na osobnym koncie Windows”
+sesja AI przygotuje osobną instrukcję. Po instalacji Ustawienia pokażą „Usługa Sędziego Cieni na osobnym koncie Windows”
 i „Izolacja: pełna”.
 
 | Punkt                                                                         | Desktop (Vulkan/AMD) | Laptop (CUDA) |
 | ----------------------------------------------------------------------------- | -------------------- | ------------- |
 | 10.1 Instalator zbudowany (czas), Alfa zainstalowana i startuje z menu Start  |                      |               |
 | 10.2 Ustawienia: tryb przenośny, połączono, okno zatwierdzeń, watchdog        |                      |               |
-| 10.3 Okno Brokera: `Enter` nic nie robi, `Esc` odmawia, kliknięcie zatwierdza |                      |               |
+| 10.3 Okno Sędziego Cieni: `Enter` nic nie robi, `Esc` odmawia, kliknięcie zatwierdza |                      |               |
 | 10.4 STOP (`Ctrl+Shift+F12`) obsłużony przez watchdog                         |                      |               |
-| 10.5 Usługa Brokera                                                           | ⏭                    | ⏭             |
+| 10.5 Usługa Sędziego Cieni                                                           | ⏭                    | ⏭             |
 
 ## 11. Eksport i import `.alfa` (F1-10)
 

@@ -52,8 +52,8 @@ impl DenialReason {
                 "prośba o zgodę wygasła albo została unieważniona".into()
             }
             Self::ApprovalTimeout { .. } => "brak decyzji właściciela w wyznaczonym czasie".into(),
-            Self::TokenRejected => "Broker odrzucił token zdolności".into(),
-            Self::AuditUnavailable => "audyt niedostępny — Broker nie wydaje zgód".into(),
+            Self::TokenRejected => "Sędzia Cieni odrzucił token zdolności".into(),
+            Self::AuditUnavailable => "audyt niedostępny — Sędzia Cieni nie wydaje zgód".into(),
             Self::Policy => "zasady narzędzia nie pozwalają na tę akcję".into(),
         }
     }

@@ -40,7 +40,7 @@ for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
         'Pytaj o wszystko',
       );
       await menu.getByRole('menuitemradio', { name: /Pełna automatyka/ }).click();
-      await expect(page.getByText('Potwierdź „Pełna automatyka” w oknie Brokera')).toBeVisible();
+      await expect(page.getByText('Potwierdź „Pełna automatyka” w oknie Sędziego Cieni')).toBeVisible();
       await expect(lowered).toBeVisible();
 
       // Escape zamyka menu bez zmiany.

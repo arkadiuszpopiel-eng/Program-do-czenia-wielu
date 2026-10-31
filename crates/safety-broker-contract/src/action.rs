@@ -32,6 +32,10 @@ pub struct DeclaredFacts {
     pub touches_private_data: bool,
     /// Pełne polecenie powłoki (dla `shell.exec` — sprawdzane regułami Jądra).
     pub command: Option<String>,
+    /// Co dokładnie narzędzie zrobi — zwykły tekst dla okna zgód („trwałe usunięcie „a.txt””).
+    /// Tylko do pokazania właścicielowi; o decyzji rozstrzygają zdolność i fakty powyżej.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub summary: Option<String>,
 }
 
 impl DeclaredFacts {
@@ -46,6 +50,7 @@ impl DeclaredFacts {
             untrusted_input_in_args: false,
             touches_private_data: false,
             command: None,
+            summary: None,
         }
     }
 }

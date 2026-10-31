@@ -36,11 +36,11 @@ use crate::link::{BrokerLink, LinkError};
 pub const KILL_TIMEOUT: Duration = Duration::from_millis(500);
 
 fn unavailable(e: &LinkError) -> BrokerError {
-    BrokerError::AuditUnavailable(format!("Broker niedostępny — {e}"))
+    BrokerError::AuditUnavailable(format!("Sędzia Cieni niedostępny — {e}"))
 }
 
 fn unexpected() -> BrokerError {
-    BrokerError::InvalidRequest("nieoczekiwana odpowiedź Brokera".into())
+    BrokerError::InvalidRequest("nieoczekiwana odpowiedź Sędziego Cieni".into())
 }
 
 /// Odpowiedź → wynik: błąd łącza = Broker niedostępny (fail-closed), `Error` = błąd Brokera.
@@ -356,11 +356,11 @@ impl KillSwitch for RemoteKill {
         {
             Ok(Response::Killed(r)) => (r.tokens_revoked, r.audited),
             Ok(other) => {
-                tracing::error!(odpowiedz = ?other, "kill-switch: nieoczekiwana odpowiedź Brokera");
+                tracing::error!(odpowiedz = ?other, "kill-switch: nieoczekiwana odpowiedź Sędziego Cieni");
                 (0, false)
             }
             Err(e) => {
-                tracing::error!(error = %e, "kill-switch: Broker niedostępny (tokeny wygasną same)");
+                tracing::error!(error = %e, "kill-switch: Sędzia Cieni niedostępny (tokeny wygasną same)");
                 (0, false)
             }
         };

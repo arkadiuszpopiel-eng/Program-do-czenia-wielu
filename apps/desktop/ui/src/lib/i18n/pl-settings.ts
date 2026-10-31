@@ -161,7 +161,7 @@ export const plSettings = {
 
   'perm.title': 'Poziom autonomii',
   'perm.intro':
-    'Jak bardzo agentka działa sama. Podniesienie potwierdzasz raz w oknie Brokera — zostaje także po restarcie, aż sam obniżysz. Agentka nie może sama podnieść sobie poziomu.',
+    'Jak bardzo agentka działa sama. Podniesienie potwierdzasz raz w oknie Sędziego Cieni — zostaje także po restarcie, aż sam obniżysz. Agentka nie może sama podnieść sobie poziomu.',
   'perm.L0.name': 'Tylko podgląd',
   'perm.L0.desc': 'Agentka tylko czyta i podpowiada, nic nie zmienia.',
   'perm.L1.name': 'Pytaj o wszystko',
@@ -174,18 +174,18 @@ export const plSettings = {
     'Działa sama w całym Twoim profilu i we wskazanych aplikacjach; pyta tylko przy rzeczach nieodwracalnych poza zakresem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).',
   'perm.L4.name': 'Pełna automatyka',
   'perm.L4.desc':
-    'Działa sama bez pytań — także operacje administratora i polecenia Twoim głosem. Pyta tylko przed wysłaniem danych na zewnątrz po kontakcie sesji z niezaufaną treścią (np. plik, mail, strona, ekran, wynik polecenia, schowek) i gdy polecenie głosowe mogło nie pochodzić od Ciebie (obcy głos albo niepewne rozpoznanie). Twarde blokady Jądra obowiązują zawsze. Wybierasz raz — zostaje po restarcie.',
+    'Działa sama i o nic nie pyta — okno Sędziego Cieni nie pokazuje się wcale, aż obniżysz poziom. Także operacje administratora, polecenia głosowe i wysyłka danych po kontakcie z niezaufaną treścią (plik, mail, strona) idą bez pytania — ukryte polecenie w obcej treści może więc skłonić agentkę do wysłania danych. Twarde blokady Jądra, Ctrl+Shift+F12 i dziennik obowiązują zawsze. Wybierasz raz — zostaje po restarcie.',
   'perm.current': 'obecny',
   'perm.request': 'Zmień na {level}',
   'perm.applied': 'Poziom zmieniony na {level} — obniżenie nie wymaga potwierdzenia.',
-  'perm.requested': 'Otworzono okno Brokera — potwierdź tam zmianę na {level}.',
-  'perm.raised': 'Poziom zmieniony na {level} — zatwierdzony w oknie Brokera.',
+  'perm.requested': 'Otworzono okno Sędziego Cieni — potwierdź tam zmianę na {level}.',
+  'perm.raised': 'Poziom zmieniony na {level} — zatwierdzony w oknie Sędziego Cieni.',
   'perm.scope': 'Zakres zmiany',
   'perm.scope.global': 'Globalnie',
   'perm.scope.session': 'Tylko ta sesja',
   'perm.kept':
     'Nawet przy pełnej automatyce zostają: kill-switch (Ctrl+Shift+F12), dziennik cofania, audyt i twarde blokady Jądra.',
-  'perm.hello': 'Windows Hello przy podnoszeniu do L4: {state}. Zmienisz to w oknie Brokera.',
+  'perm.hello': 'Windows Hello przy podnoszeniu do L4: {state}. Zmienisz to w oknie Sędziego Cieni.',
 
   'dev.machine': 'Ta maszyna',
   'dev.os': 'System',
@@ -375,7 +375,7 @@ export const plSettings = {
   'ob.bundle.later': 'Inny pakiet wybierzesz później w Ustawieniach → Modele lokalne i silniki.',
   'ob.autonomy.title': 'Jak bardzo agentki działają same?',
   'ob.autonomy.desc':
-    'Zaczynamy od L3. Zmienisz to jednym przełącznikiem w Ustawieniach, a każdą zmianę potwierdzisz w oknie Brokera.',
+    'Zaczynamy od L3. Zmienisz to jednym przełącznikiem w Ustawieniach, a każdą zmianę potwierdzisz w oknie Sędziego Cieni.',
   'ob.corpus.title': 'Nagranie korpusu (opcjonalne)',
   'ob.corpus.desc':
     'Kilka minut Twojego głosu poprawi rozpoznawanie mowy. Nagrania nie opuszczają komputera.',

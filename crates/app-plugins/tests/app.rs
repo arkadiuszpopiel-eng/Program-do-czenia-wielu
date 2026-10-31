@@ -172,10 +172,14 @@ async fn inspect_and_bad_input_are_readable_errors() {
 
 #[tokio::test]
 async fn unavailable_without_broker_or_journal() {
-    let app = app_plugins::PluginsApp::unavailable("brak Brokera");
+    let app = app_plugins::PluginsApp::unavailable("brak Sędziego Cieni");
     let view = app.list().unwrap();
     assert!(!view.available);
-    assert!(view.unavailable_reason.unwrap().contains("brak Brokera"));
+    assert!(
+        view.unavailable_reason
+            .unwrap()
+            .contains("brak Sędziego Cieni")
+    );
     let e = app.propose(json!({}), "").await.unwrap_err();
     assert_eq!(e.code, ErrorCode::Unavailable);
     assert!(app.tools().is_empty());

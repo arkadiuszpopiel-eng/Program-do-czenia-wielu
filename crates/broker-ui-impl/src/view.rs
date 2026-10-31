@@ -2,7 +2,7 @@
 //! kolor ryzyka zawsze z ikoną i tekstem; przy wysokim ryzyku okno może przejąć fokus
 //! (alertdialog), inaczej pokazuje się bez kradzieży fokusu.
 
-use broker_ui_contract::{ApprovalCard, DecisionOption, mode_name_pl, time_left_pl};
+use broker_ui_contract::{ApprovalCard, DecisionOption, JUDGE_HELP, mode_name_pl};
 use platform_contract::{SurfaceButton, SurfaceTone, SurfaceView};
 use risk_classifier_contract::RiskLevel;
 use safety_broker_contract::ApprovalDecision;
@@ -55,7 +55,7 @@ fn icon(risk: RiskLevel) -> &'static str {
     }
 }
 
-/// Widok karty z wierszem stanu; „Wygasa za” liczone na chwilę `now_ms`.
+/// Widok karty z wierszem stanu; zakres „zawsze” w godzinach od chwili `now_ms`.
 pub fn view_of(card: &ApprovalCard, status: &str, now_ms: u64) -> SurfaceView {
     let mut badge = match card.mode_change {
         Some(_) => format!(
@@ -71,19 +71,7 @@ pub fn view_of(card: &ApprovalCard, status: &str, now_ms: u64) -> SurfaceView {
     if card.tainted {
         badge.push_str(" · niezaufana treść w sesji");
     }
-    let left = time_left_pl(card.expires_at_ms.saturating_sub(now_ms));
-    let details = card
-        .details
-        .iter()
-        .map(|(k, v)| {
-            let v = if k == "Wygasa za" {
-                left.clone()
-            } else {
-                v.clone()
-            };
-            (k.clone(), v)
-        })
-        .collect();
+    let details = card.details.clone();
     let hello = if card.hello_required {
         " (Windows Hello)"
     } else {
@@ -108,7 +96,8 @@ pub fn view_of(card: &ApprovalCard, status: &str, now_ms: u64) -> SurfaceView {
         })
         .collect();
     let status = if status.is_empty() {
-        "Tab — następny przycisk, Spacja — naciśnij. Enter niczego nie zatwierdza.".to_owned()
+        "Tab — następny przycisk, Spacja — naciśnij, Enter niczego nie zatwierdza, F1 — pomoc."
+            .to_owned()
     } else {
         status.to_owned()
     };
@@ -121,5 +110,6 @@ pub fn view_of(card: &ApprovalCard, status: &str, now_ms: u64) -> SurfaceView {
         buttons,
         initial_focus: BTN_DENY,
         take_focus: card.risk >= RiskLevel::High,
+        help: JUDGE_HELP.to_owned(),
     }
 }

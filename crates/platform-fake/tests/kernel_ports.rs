@@ -101,6 +101,7 @@ fn view() -> SurfaceView {
         }],
         initial_focus: 100,
         take_focus: false,
+        help: String::new(),
     }
 }
 

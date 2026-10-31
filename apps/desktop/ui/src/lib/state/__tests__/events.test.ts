@@ -63,7 +63,7 @@ describe('Zdarzenia rdzenia → stan UI', () => {
     expect((await client.models.localList())[0]?.installed).toBe(true);
   });
 
-  it('poziom autonomii: obniżenie od razu (applied), podniesienie — okno Brokera', async () => {
+  it('poziom autonomii: obniżenie od razu (applied), podniesienie — okno Sędziego Cieni', async () => {
     const { client } = setupApp();
     const lowered = await client.permissions.requestLevel('L1', null);
     expect(lowered.status).toBe('applied');

@@ -155,7 +155,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
 
   'perm.title': 'Autonomy level',
   'perm.intro':
-    'How much an agent acts on her own. You confirm a raise once in the Broker window — it stays after a restart until you lower it. An agent cannot raise her own level.',
+    'How much an agent acts on her own. You confirm a raise once in the Shadow Judge window — it stays after a restart until you lower it. An agent cannot raise her own level.',
   'perm.L0.name': 'Preview only',
   'perm.L0.desc': 'The agent only reads and suggests; she changes nothing.',
   'perm.L1.name': 'Ask about everything',
@@ -168,18 +168,18 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
     'Works on her own across your profile and selected apps; asks only for irreversible things outside the scope or when acting on untrusted content (mail, web page, file).',
   'perm.L4.name': 'Full automation',
   'perm.L4.desc':
-    'Works on her own without asking — administrative operations and commands in your voice included. Asks only before sending data out after the session touched untrusted content (e.g. file, mail, web page, screen, command output, clipboard) and when a voice command may not be yours (another voice or uncertain recognition). The Kernel’s hard blocks always apply. Choose once — it stays after a restart.',
+    'Works on her own and never asks — the Shadow Judge window does not show at all until you lower the level. Administrative operations, voice commands and sending data out after untrusted content (file, mail, web page) also go without asking, so a hidden instruction in foreign content could make an agent send data out. The Kernel’s hard blocks, Ctrl+Shift+F12 and the journal always apply. Choose once — it stays after a restart.',
   'perm.current': 'current',
   'perm.request': 'Change to {level}',
   'perm.applied': 'Level changed to {level} — lowering needs no confirmation.',
-  'perm.requested': 'The Broker window is open — confirm the change to {level} there.',
-  'perm.raised': 'Level changed to {level} — approved in the Broker window.',
+  'perm.requested': 'The Shadow Judge window is open — confirm the change to {level} there.',
+  'perm.raised': 'Level changed to {level} — approved in the Shadow Judge window.',
   'perm.scope': 'Scope of change',
   'perm.scope.global': 'Globally',
   'perm.scope.session': 'This session only',
   'perm.kept':
     'Even with full automation these stay: kill switch (Ctrl+Shift+F12), undo journal, audit and the Kernel’s hard blocks.',
-  'perm.hello': 'Windows Hello when raising to L4: {state}. Change it in the Broker window.',
+  'perm.hello': 'Windows Hello when raising to L4: {state}. Change it in the Shadow Judge window.',
 
   'dev.machine': 'This machine',
   'dev.os': 'System',
@@ -353,7 +353,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'ob.bundle.later': 'You can pick another bundle later in Settings → Local models and engines.',
   'ob.autonomy.title': 'How much should the agents act on their own?',
   'ob.autonomy.desc':
-    'We start at L3. You change it with one switch in Settings and confirm each change in the Broker window.',
+    'We start at L3. You change it with one switch in Settings and confirm each change in the Shadow Judge window.',
   'ob.corpus.title': 'Corpus recording (optional)',
   'ob.corpus.desc':
     'A few minutes of your voice improve speech recognition. Recordings never leave the computer. Recording arrives in wave 2.',

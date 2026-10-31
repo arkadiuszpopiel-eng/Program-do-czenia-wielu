@@ -196,7 +196,7 @@ pub trait ApprovalWindow: Send + Sync {
 
 /// Komunikat trybu deweloperskiego bez Broker-UI — mówi, co uruchomić zamiast tej kopii (2026-10-21:
 /// właściciel uruchomił ręcznie build testowy z `target/shell` i nie wiedział, czemu L4 jest odrzucane).
-pub const NEEDS_BROKER_WINDOW: &str = "Ta zmiana wymaga potwierdzenia w oknie Brokera, a ta kopia \
+pub const NEEDS_BROKER_WINDOW: &str = "Ta zmiana wymaga potwierdzenia w oknie Sędziego Cieni, a ta kopia \
      Alfy (build testowy, bez programów Jądra alfa-broker i alfa-broker-ui obok) go nie ma — prośba \
      odrzucona. Uruchom Alfę skrótem „Alfa” na pulpicie albo w menu Start (folder Alfa-uruchomiona).";
 

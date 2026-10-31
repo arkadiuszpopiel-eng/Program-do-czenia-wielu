@@ -1,4 +1,4 @@
-//! Kolory okna Broker-UI — wartości tokenów `packages/ui-kit/src/tokens.css` (`--alfa-color-*`)
+//! Kolory okna Sędziego Cieni — wartości tokenów `packages/ui-kit/src/tokens.css` (`--alfa-color-*`)
 //! w motywie jasnym i ciemnym; motyw według ustawienia Windows (`AppsUseLightTheme`).
 
 #![allow(unsafe_code)]
@@ -75,6 +75,11 @@ impl Palette {
             SurfaceTone::High | SurfaceTone::Critical => self.error,
         }
     }
+}
+
+/// Motyw jasny albo ciemny (podgląd okna w pliku).
+pub(super) fn palette_of(dark: bool) -> Palette {
+    if dark { DARK } else { LIGHT }
 }
 
 /// Motyw aplikacji według ustawień Windows (`AppsUseLightTheme`; błąd odczytu — jasny).

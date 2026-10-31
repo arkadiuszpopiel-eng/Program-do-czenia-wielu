@@ -41,7 +41,7 @@ fn every_platform_protected_image_is_a_broker_kernel_process() {
         let app = AppSelector::parse(image).unwrap();
         assert!(
             policy.is_protected_process(&app),
-            "{image}: chroniony przez strażnika celów platformy, a nie przez Brokera"
+            "{image}: chroniony przez strażnika celów platformy, a nie przez Sędziego Cieni"
         );
     }
 }

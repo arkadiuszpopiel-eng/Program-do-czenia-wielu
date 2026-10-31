@@ -68,7 +68,7 @@ export const plConnections = {
   'conn.local.none': 'Brak modelu na komputerze — Alfa działa tylko z kontami API.',
   'conn.voice.name': 'Silniki głosu',
   'conn.voice.none': 'Brak silników głosu — rozmowa głosowa nie zadziała.',
-  'conn.broker.name': 'Broker (strażnik zgód)',
+  'conn.broker.name': 'Sędzia Cieni (strażnik zgód)',
   'conn.broker.service': 'Działa jako usługa systemu, osobno od aplikacji.',
   'conn.broker.portable': 'Działa obok aplikacji (wersja przenośna).',
   'conn.broker.in_process':

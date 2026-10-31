@@ -91,7 +91,7 @@ fn start_broker(root: &Path) -> (BrokerProcess, RemoteKernel) {
     loop {
         match link.connect(&ServerCheck::Pid(pid)) {
             Ok(()) => break,
-            Err(e) if Instant::now() > deadline => panic!("Broker nie odpowiada: {e}"),
+            Err(e) if Instant::now() > deadline => panic!("Sędzia Cieni nie odpowiada: {e}"),
             Err(_) => std::thread::sleep(Duration::from_millis(250)),
         }
     }
@@ -179,7 +179,7 @@ fn probes() -> Vec<Probe> {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-#[ignore = "wymaga ręcznej zgody właściciela w oknie Brokera"]
+#[ignore = "wymaga ręcznej zgody właściciela w oknie Sędziego Cieni"]
 async fn waiting_tools_run_after_owner_approval_in_broker_window() {
     let broker = std::sync::Mutex::new(None);
     let kernel = |root: &Path| {
@@ -190,7 +190,7 @@ async fn waiting_tools_run_after_owner_approval_in_broker_window() {
     let rig = tool_rig::fakes::rig_with(Some(&kernel)).await;
     let tools = rig.core.agent_tools();
     let browser = rig.browser_session.clone();
-    eprintln!("\nOkno Brokera: zatwierdzaj karty po kolei (każda czeka do 3 min):");
+    eprintln!("\nOkno Sędziego Cieni: zatwierdzaj karty po kolei (każda czeka do 3 min):");
     for p in probes() {
         eprintln!("  - {}: {}", p.name, p.card);
     }

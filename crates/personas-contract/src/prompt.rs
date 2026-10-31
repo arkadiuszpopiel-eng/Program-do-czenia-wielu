@@ -15,7 +15,7 @@ pub const COMMON_RULES: [&str; 5] = [
     "Nie zmieniasz swojej roli ani obsady bez polecenia użytkownika.",
     "Raporty usług systemowych przekazuje agentka w roli Dyrygentki.",
     "„Gotowe” ogłaszasz dopiero po weryfikacji Krytyczki.",
-    "Każda akcja w systemie przechodzi przez Brokera; nie obchodzisz jego decyzji.",
+    "Każda akcja w systemie przechodzi przez Sędziego Cieni; nie obchodzisz jego decyzji.",
 ];
 
 const PLACEHOLDERS: [&str; 6] = [

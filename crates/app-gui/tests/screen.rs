@@ -48,7 +48,7 @@ fn world() -> World {
         ),
         desktop.add_window(
             FakeWindow::new(
-                "Broker",
+                "Sędzia Cieni",
                 r"C:\Program Files\Alfa\alfa-broker-ui.exe",
                 rect(1040),
             ),
@@ -133,7 +133,11 @@ async fn agent_drives_notepad_but_never_alfa_windows() {
             .await;
         assert!(matches!(focus.status, ToolStatus::Denied { .. }));
     }
-    assert_eq!(w.alfa_records(), 0, "0 skutków w oknach Alfy/Brokera");
+    assert_eq!(
+        w.alfa_records(),
+        0,
+        "0 skutków w oknach Alfy/Sędziego Cieni"
+    );
     let status = w.monitor.status();
     assert!(status.control.is_some(), "wskaźnik „agentka steruje”");
     assert_eq!(

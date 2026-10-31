@@ -12,7 +12,7 @@
     <Button variant="ghost" onclick={()=>app.openSettings('agents')}>{en?'Continuation settings':'Ustawienia przedłużania'}</Button>
   </div>
 </section>
-<ConfirmDialog bind:open={confirm} title={en?'Approve continuation?':'Zgoda na dalszą pracę?'} description={en?'Continue from the local checkpoint with another configured allowance. Model and tool usage may generate additional cost. Broker approvals are still required.':'Wznowię zapisane zadanie z kolejną pulą według ustawień. Dalsze wywołania modeli i narzędzi mogą zwiększyć koszt. Zgody Brokera nadal obowiązują.'} confirmLabel={en?'Approve and resume':'Zgadzam się — wznów'} cancelLabel={en?'Keep paused':'Pozostaw wstrzymane'} onconfirm={oncontinue}/>
+<ConfirmDialog bind:open={confirm} title={en?'Approve continuation?':'Zgoda na dalszą pracę?'} description={en?'Continue from the local checkpoint with another configured allowance. Model and tool usage may generate additional cost. Sędzia Cieni approvals are still required.':'Wznowię zapisane zadanie z kolejną pulą według ustawień. Dalsze wywołania modeli i narzędzi mogą zwiększyć koszt. Zgody Sędziego Cieni nadal obowiązują.'} confirmLabel={en?'Approve and resume':'Zgadzam się — wznów'} cancelLabel={en?'Keep paused':'Pozostaw wstrzymane'} onconfirm={oncontinue}/>
 <style>
  .saved{display:grid;gap:var(--alfa-space-2);padding:var(--alfa-space-3);border:1px solid var(--alfa-color-border);border-radius:var(--alfa-radius-card);background:var(--alfa-color-surface);}
  p{color:var(--alfa-color-text-muted);font-size:var(--alfa-font-size-sm);}.actions{display:flex;gap:var(--alfa-space-2);flex-wrap:wrap;}

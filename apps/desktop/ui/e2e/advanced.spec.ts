@@ -36,7 +36,7 @@ test('sprawdzenie, odmowa Jądra, zapis, cofnięcie, warstwy, flaga', async ({ p
 
   await editor.fill('[kernel]\nautonomy_max = "L4"\n');
   await save.click();
-  await expect(page.getByRole('alert').filter({ hasText: 'Brokera' })).toBeVisible();
+  await expect(page.getByRole('alert').filter({ hasText: 'Sędziego Cieni' })).toBeVisible();
   await page.getByRole('button', { name: 'Cofnij zmiany' }).click();
   await expect(editor).toHaveValue(/theme = "auto"/);
   await expect(save).toBeDisabled();

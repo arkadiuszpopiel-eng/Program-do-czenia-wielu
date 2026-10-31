@@ -76,7 +76,7 @@ impl ChaosReport {
     /// Tabela Markdown.
     pub fn to_markdown(&self) -> String {
         let mut out = String::from(
-            "| Awaria | Rodzaj | Wykryta | Zgoda | Naprawiona | Cofalna | Broker | Karta F8-06 |\n|---|---|---|---|---|---|---|---|\n",
+            "| Awaria | Rodzaj | Wykryta | Zgoda | Naprawiona | Cofalna | Sędzia Cieni | Karta F8-06 |\n|---|---|---|---|---|---|---|---|\n",
         );
         let yn = |b: bool| if b { "tak" } else { "**NIE**" };
         for r in &self.results {

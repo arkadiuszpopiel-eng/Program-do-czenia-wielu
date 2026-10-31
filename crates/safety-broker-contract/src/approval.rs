@@ -37,6 +37,9 @@ pub enum ApprovalSubject {
         capability: Capability,
         /// Narzędzie.
         tool: String,
+        /// Co dokładnie narzędzie zrobi (z faktów narzędzia; zwykły tekst).
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        summary: Option<String>,
     },
     /// „Plan do zatwierdzenia” — wiele akcji jednym zatwierdzeniem (§14.6).
     Plan {
@@ -90,6 +93,9 @@ pub struct ApprovalRequest {
     pub rules: Vec<RuleId>,
     /// Wyjaśnienie (po polsku).
     pub explanation: String,
+    /// Tryb pracy, przy którym padło pytanie (okno mówi, czemu pyta; na L4 okna nie ma).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub autonomy: Option<AutonomyLevel>,
     /// Utworzono (ms).
     pub created_at_ms: u64,
     /// Wygasa (ms).

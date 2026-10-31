@@ -88,8 +88,8 @@ export const SETTINGS_PART_B: readonly SettingsPageDef[] = [
         'diagnostician.autonomy',
         L('Samodzielność Diagnosty', 'Diagnostician autonomy'),
         L(
-          'Co Diagnosta naprawia sam (z „Cofnij”), a co tylko proponuje. Naprawy Jądra zawsze zatwierdzasz w oknie Brokera. Zmiana działa od następnego uruchomienia.',
-          'What the Diagnostician fixes on its own (with Undo) and what it only proposes. Kernel repairs always need approval in the Broker window. Takes effect after the next start.',
+          'Co Diagnosta naprawia sam (z „Cofnij”), a co tylko proponuje. Naprawy Jądra zawsze zatwierdzasz w oknie Sędziego Cieni. Zmiana działa od następnego uruchomienia.',
+          'What the Diagnostician fixes on its own (with Undo) and what it only proposes. Kernel repairs always need approval in the Shadow Judge window. Takes effect after the next start.',
         ),
         [
           ['propose_only', L('Tylko proponuje', 'Propose only')],

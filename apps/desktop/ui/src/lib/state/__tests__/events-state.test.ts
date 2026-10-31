@@ -59,7 +59,7 @@ describe('Zdarzenia stanu → okno główne', () => {
     expect(app.system?.queued_messages).toBe(3);
   });
 
-  it('BrokerStatus: nowy widok Brokera zastępuje migawkę i zdejmuje błąd odczytu', async () => {
+  it('BrokerStatus: nowy widok Sędziego Cieni zastępuje migawkę i zdejmuje błąd odczytu', async () => {
     const { app, emit } = await started();
     const view = app.broker.view;
     expect(view).not.toBeNull();

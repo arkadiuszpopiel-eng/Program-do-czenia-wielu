@@ -67,7 +67,7 @@ fn broker_error(e: BrokerError) -> AppError {
         BrokerError::UnknownApproval(_) | BrokerError::UnknownSession(_) => ErrorCode::NotFound,
         _ => ErrorCode::InvalidInput,
     };
-    AppError::new(code, format!("Broker: {e}"))
+    AppError::new(code, format!("Sędzia Cieni: {e}"))
 }
 
 fn undo_error(e: UndoError) -> AppError {
@@ -230,7 +230,7 @@ impl BrokerPort for InprocBroker {
                     tracing::warn!(error = %e, "unieważnienie nieużytego tokenu nie powiodło się");
                 }
                 Err(AppError::unavailable(
-                    "Uruchomienie kodu w terminalu (Broker zezwolił)",
+                    "Uruchomienie kodu w terminalu (Sędzia Cieni zezwolił)",
                     "tools-shell",
                 ))
             }
@@ -240,7 +240,7 @@ impl BrokerPort for InprocBroker {
             ))),
             Decision::Deny(DenyReason::AuditUnavailable) => Err(AppError::new(
                 ErrorCode::Unavailable,
-                "Audyt niedostępny — Broker nie wydaje zgód (bezpieczna odmowa).",
+                "Audyt niedostępny — Sędzia Cieni nie wydaje zgód (bezpieczna odmowa).",
             )),
         }
     }
@@ -286,7 +286,7 @@ impl BrokerPort for InprocBroker {
             tokeny = report.tokens_revoked,
             procesy = report.jobs_killed,
             audyt = report.audited,
-            "kill-switch Brokera"
+            "kill-switch Sędziego Cieni"
         );
         Ok(kill_gap(&report))
     }
@@ -297,7 +297,7 @@ pub fn kill_gap(report: &watchdog_contract::KillReport) -> Option<String> {
     let mut gaps = Vec::new();
     if !report.audited {
         gaps.push(
-            "Broker nie potwierdził zatrzymania — uprawnienia agentek wygasną same,              a zapis w dzienniku audytu nie powstał"
+            "Sędzia Cieni nie potwierdził zatrzymania — uprawnienia agentek wygasną same,              a zapis w dzienniku audytu nie powstał"
                 .to_owned(),
         );
     }
@@ -341,12 +341,12 @@ mod tests {
     fn kill_gap_names_what_was_not_confirmed() {
         assert_eq!(kill_gap(&report(true, 0)), None);
         let broker = kill_gap(&report(false, 0)).unwrap_or_default();
-        assert!(broker.contains("Broker nie potwierdził"), "{broker}");
+        assert!(broker.contains("Sędzia Cieni nie potwierdził"), "{broker}");
         let jobs = kill_gap(&report(true, 2)).unwrap_or_default();
         assert_eq!(jobs, "nie udało się zatrzymać procesów: 2");
         let both = kill_gap(&report(false, 1)).unwrap_or_default();
         assert!(
-            both.contains("Broker") && both.contains("procesów: 1"),
+            both.contains("Sędzia Cieni") && both.contains("procesów: 1"),
             "{both}"
         );
     }

@@ -282,17 +282,17 @@ impl KernelRule {
         match self {
             Self::AuditDisable => "wyłączenie lub czyszczenie audytu jest zablokowane przez Jądro",
             Self::KillSwitchDisable => {
-                "wyłączenie watchdoga, kill-switcha lub Brokera jest zablokowane przez Jądro"
+                "wyłączenie watchdoga, kill-switcha lub Sędziego Cieni jest zablokowane przez Jądro"
             }
             Self::SystemDiskFormat => "formatowanie dysku systemowego jest zablokowane przez Jądro",
             Self::SystemRootDeletion => "usuwanie katalogu Windows jest zablokowane przez Jądro",
             Self::BootloaderModification => "modyfikacja bootloadera jest zablokowana przez Jądro",
             Self::KernelPolicyChange => {
-                "polityki Jądra zmienia wyłącznie właściciel w oknie Brokera"
+                "polityki Jądra zmienia wyłącznie właściciel w oknie Sędziego Cieni"
             }
             Self::SelfEscalation => "agentka nie może podnieść własnego poziomu autonomii",
             Self::GuiControlOfKernelProcess => {
-                "sterowanie oknami Alfy, Brokera i watchdoga jest zablokowane przez Jądro"
+                "sterowanie oknami Alfy, Sędziego Cieni i watchdoga jest zablokowane przez Jądro"
             }
             Self::CredentialDenylist => {
                 "dostęp do poświadczeń (CLI, przeglądarki, Credential Manager) jest zablokowany"

@@ -32,7 +32,7 @@ impl ChatEngine {
                 AppError::new(
                     ErrorCode::Unavailable,
                     format!(
-                        "Broker nie przyjął oznaczenia sesji jako zawierającej treść niezaufaną \
+                        "Sędzia Cieni nie przyjął oznaczenia sesji jako zawierającej treść niezaufaną \
                          (załączniki) — odpowiedź wstrzymana: {e}"
                     ),
                 )

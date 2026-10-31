@@ -1,6 +1,6 @@
-# Bezpieczeństwo: poziomy, Broker, kill-switch, cofanie
+# Bezpieczeństwo: poziomy, Sędzia Cieni, kill-switch, cofanie
 
-Nad wszystkim, co robią agentki, czuwa **Broker** — część Alfy, której agentki nie mogą zmienić. Każde działanie
+Nad wszystkim, co robią agentki, czuwa **Sędzia Cieni** — część Alfy, której agentki nie mogą zmienić. Każde działanie
 (odczyt pliku, polecenie, kliknięcie w oknie) dostaje od niego jednorazową zgodę albo odmowę, a decyzja trafia do
 dziennika Audytu, którego nie da się po cichu poprawić.
 
@@ -14,7 +14,7 @@ dziennika Audytu, którego nie da się po cichu poprawić.
 | L1 Pytaj o wszystko            | Każda zmiana wymaga Twojego „tak”.                                                                                                                                                                                                                                                                 |
 | L2 Pytaj o ryzykowne           | Drobiazgi robi sama; pyta przy usuwaniu, wysyłaniu danych na zewnątrz i instalacji (tylko w Ustawieniach).                                                                                                                                                                                         |
 | L3 Automatycznie (domyślny)    | Działa sama w Twoim profilu i we wskazanych aplikacjach; pyta przy rzeczach nieodwracalnych poza zakresem, operacjach administracyjnych, destrukcji zleconej głosem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).                                                         |
-| L4 Pełna automatyka            | Bez pytań o zakres, odwracalność i operacje administracyjne; wybrana raz zostaje po restarcie. Twarde blokady Jądra obowiązują zawsze; pyta tylko, gdy polecenie głosowe może nie być Twoje (obcy albo niepewnie rozpoznany głos) i przy wysyłce danych na zewnątrz po kontakcie sesji z niezaufaną treścią (np. plik, mail, strona, ekran, wynik polecenia, schowek). |
+| L4 Pełna automatyka            | Bez żadnych pytań — okno Sędziego Cieni nie pokazuje się wcale, aż obniżysz tryb (decyzja z 31.10). Wybrana raz zostaje po restarcie. Obowiązują tylko twarde blokady Jądra, STOP (`Ctrl+Shift+F12`) i dziennik. Uwaga: także wysyłka danych po kontakcie z niezaufaną treścią (strona, mail, plik) i polecenia obcym głosem przechodzą bez pytania. |
 
 **Menu „Tryb pracy” w pasku pisania** (tarcza z nazwą trybu; przy Pełnej automatyce także bursztynowy znak w
 pasku tytułu): cztery tryby z opisem, klawisze `1`–`4` wybierają
@@ -22,7 +22,7 @@ tryb, `Esc` zamyka menu. To samo otworzysz z palety (`Ctrl+K` → „Tryb pracy�
 połączenia → „Zmień tryb pracy”). Menu pokazuje tryb ogólny zapisany w Alfie; po zmianie sprawdza go jeszcze raz
 i mówi wprost, gdy zmiana się nie udała. Gdy otwarta rozmowa ma własny tryb, menu mówi to w notce. Pełne ustawienia, także L2 i zmiana tylko dla jednej sesji, są w **Ustawienia →
 Uprawnienia i bezpieczeństwo**. **Obniżenie** działa od razu. **Podniesienie** potwierdza się wyłącznie w oknie
-Brokera, jeden raz, bez odliczania (gdy okna nie ma — patrz niżej — kończy się odmową). Agentka nigdy nie podniesie
+Sędziego Cieni, jeden raz, bez odliczania (gdy okna nie ma — patrz niżej — kończy się odmową). Agentka nigdy nie podniesie
 poziomu sama.
 
 ## Czego nie da się zrobić na żadnym poziomie (także L4)
@@ -31,27 +31,31 @@ poziomu sama.
 - zapisywać w plikach samej Alfy (`%APPDATA%\Alfa`, `%LOCALAPPDATA%\Alfa`) ani usuwać katalogów systemu,
 - czytać miejsc z hasłami i tokenami: `.ssh`, `.aws`, `.gnupg`, tokeny narzędzi CLI (`.claude`, `.codex`), profile
   i ciasteczka przeglądarek, Menedżer poświadczeń,
-- sterować oknami Alfy, okna Brokera i watchdoga,
+- sterować oknami Alfy, okna Sędziego Cieni i watchdoga,
 - obsługiwać strony i aplikacje dostawców AI (np. `claude.ai`) w Twoim imieniu.
 
-Zawsze, na każdym poziomie, Alfa pyta, gdy: zleciłeś głosem coś nieodwracalnego (potwierdzasz kliknięciem, nie głosem)
-albo agentka chce wysłać dane na zewnątrz po przeczytaniu niezaufanej treści.
+Na poziomach L0–L3 Alfa pyta zawsze, gdy: zleciłeś głosem coś nieodwracalnego (potwierdzasz kliknięciem, nie głosem)
+albo agentka chce wysłać dane na zewnątrz po przeczytaniu niezaufanej treści. Na „Pełnej automatyce” (L4) nie pyta
+o nic — zostają tylko blokady z listy wyżej.
 
-## Okno Brokera
+## Okno Sędziego Cieni
 
-Zatwierdzenia nigdy nie dzieją się w oknie rozmowy ani w powiadomieniu. Służy do tego osobne, małe okno Brokera,
+Zatwierdzenia nigdy nie dzieją się w oknie rozmowy ani w powiadomieniu. Służy do tego osobne, małe okno Sędziego Cieni,
 którego programy (także agentki) nie potrafią „kliknąć” za Ciebie: `Enter` niczego nie zatwierdza (`Tab` i `Spacja`
-albo kliknięcie), `Esc` oznacza odmowę. W rozmowie widzisz kartę „czeka na zatwierdzenie” z opisem: co, dlaczego,
+albo kliknięcie), `Esc` oznacza odmowę. Na górze okna jest „?” w kółku (albo `F1`) — rozwija opis, czym jest Sędzia
+Cieni i jak ma się do trybu pracy. Okno pokazuje najpierw, **co dokładnie** agentka chce zrobić (np. „trwałe usunięcie
+pliku C:\…aport.xlsx”), potem kto, gdzie, ryzyko, źródło polecenia i dlaczego pyta (z trybem pracy). Na „Pełnej
+automatyce” okno się nie pokazuje. W rozmowie widzisz kartę „czeka na zatwierdzenie” z opisem: co, dlaczego,
 czy da się cofnąć, poziom ryzyka.
 
-Przycisk na karcie tylko przenosi Cię do okna Brokera — zatwierdzasz zawsze tam. Okno Brokera uruchamia sam Broker.
-Stan Brokera widzisz w **Ustawienia → Uprawnienia i bezpieczeństwo**:
+Przycisk na karcie tylko przenosi Cię do okna Sędziego Cieni — zatwierdzasz zawsze tam. Okno uruchamia sam Sędzia Cieni.
+Stan Sędziego Cieni widzisz w **Ustawienia → Uprawnienia i bezpieczeństwo**:
 
-- **Usługa Brokera** (osobne konto Windows) — pełna izolacja: okna Brokera nie „kliknie” żaden zwykły program.
+- **Usługa Sędziego Cieni** (osobne konto Windows) — pełna izolacja: okna Sędziego Cieni nie „kliknie” żaden zwykły program.
   Usługę instaluje raz administrator komputera (jednorazowe potwierdzenie UAC) wg instrukcji wydania.
-- **Tryb przenośny** — Broker działa jako proces Alfy na Twoim koncie. Wszystko działa tak samo, ale izolacja jest
-  słabsza (Audyt i okno Brokera bez ochrony osobnego konta) — Alfa oznacza to wprost.
-- **Połączenie zerwane / brak Brokera** — czerwony baner w rozmowie. To **bezpieczny stan**: wszystko, co wymaga zgody,
+- **Tryb przenośny** — Sędzia Cieni działa jako proces Alfy na Twoim koncie. Wszystko działa tak samo, ale izolacja jest
+  słabsza (Audyt i okno Sędziego Cieni bez ochrony osobnego konta) — Alfa oznacza to wprost.
+- **Połączenie zerwane / brak Sędziego Cieni** — czerwony baner w rozmowie. To **bezpieczny stan**: wszystko, co wymaga zgody,
   jest odrzucane, a karta w rozmowie mówi, że prośba zostanie odrzucona. Alfa sama ponawia połączenie.
 
 ## STOP WSZYSTKIEGO (kill-switch)
@@ -68,7 +72,7 @@ Tego skrótu nie można zmienić ani wyłączyć. Zwykłe „Stop” w kapsule a
 
 ## Cofanie
 
-- Pliki usuwane przez agentkę trafiają do **Kosza**. Trwałe usunięcie wymaga potwierdzenia w oknie Brokera
+- Pliki usuwane przez agentkę trafiają do **Kosza**. Trwałe usunięcie wymaga potwierdzenia w oknie Sędziego Cieni
   (w tej wersji niedostępne).
 - Po każdym działaniu, które da się odwrócić, pojawia się toast **Cofnij** (8 s), a pod odpowiedzią karta z krokami
   do cofnięcia. Starsze kroki cofniesz w **Oś czasu → Replay → Cofnij krok**.
@@ -80,16 +84,16 @@ Tego skrótu nie można zmienić ani wyłączyć. Zwykłe „Stop” w kapsule a
 Agentka z rolą **Wykonawczyni** może obsługiwać okna aplikacji: czytać ich strukturę, klikać, pisać, robić zrzuty.
 
 - **Panel Ekran** (`Alt+5`): kto steruje i czym, lista akcji (bez wpisywanego tekstu), ostatni zrzut ekranu agentki.
-  Na zrzucie zamaskowane są okna Alfy i Brokera, menedżery haseł i pola haseł; zrzut jest tylko w pamięci.
+  Na zrzucie zamaskowane są okna Alfy i Sędziego Cieni, menedżery haseł i pola haseł; zrzut jest tylko w pamięci.
 - **Zatrzymaj sterowanie** przerywa akcje agentek; **Oddaj sterowanie** pozwala im wrócić. Ruch myszy lub klawiatura
   w trakcie działania agentki też ją przerywa — Twoje wejście ma pierwszeństwo.
 - W pasku tytułu widać „Delta steruje ekranem” z przyciskiem „Zatrzymaj”.
-- Agentki nie widzą okien Alfy ani okna Brokera — na ich zrzutach te okna są zawsze zamaskowane. Twoje zrzuty
+- Agentki nie widzą okien Alfy ani okna Sędziego Cieni — na ich zrzutach te okna są zawsze zamaskowane. Twoje zrzuty
   (Wycinek, `PrintScreen`) obejmują okna Alfy normalnie; jeśli chcesz je ukrywać (np. przy udostępnianiu ekranu),
   włącz **Ustawienia → Uprawnienia i bezpieczeństwo → Ukrywaj okna Alfy na zrzutach i nagraniach ekranu**
   (działa po ponownym uruchomieniu Alfy).
 - **Ustawienia → Komputer**: zasady, przejście do panelu Ekran, prośba „Zezwól na podgląd pulpitu” (24 h, przez okno
-  Brokera — w tej wersji niedostępna).
+  Sędziego Cieni — w tej wersji niedostępna).
 - Okna programów uruchomionych jako administrator — **jeszcze niedostępne** (wymagają osobnego pomocnika).
 
 ## Gdzie trafiają dane

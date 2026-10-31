@@ -36,7 +36,7 @@ export const enWork: Record<keyof typeof plWork, Message> = {
   'gui.noShot': 'No screenshot — the agent has not looked at the screen yet.',
   'gui.blackFrame': 'The screenshot is black — the window protects itself from capture.',
   'gui.masking':
-    'Alfa and Broker windows, deny-listed apps and password fields are masked; the screenshot stays in memory only.',
+    'Alfa and Shadow Judge windows, deny-listed apps and password fields are masked; the screenshot stays in memory only.',
   'gui.actions': 'What the agent does',
   'gui.noActions': 'No screen actions.',
   'gui.status.running': 'running',
@@ -46,19 +46,19 @@ export const enWork: Record<keyof typeof plWork, Message> = {
   'gui.status.cancelled': 'cancelled',
   'gui.grantTitle': 'Desktop preview',
   'gui.grantDesc':
-    '"Always allow desktop preview" for 24 hours — you grant it in the Broker window, not here.',
+    '"Always allow desktop preview" for 24 hours — you grant it in the Shadow Judge window, not here.',
   'gui.grantAgent': 'Agent',
   'gui.grant': 'Allow desktop preview…',
-  'gui.grantBroker': 'The Broker window is open — decide about the desktop preview there.',
+  'gui.grantBroker': 'The Shadow Judge window is open — decide about the desktop preview there.',
   'gui.grantApplied': '{name} already has desktop preview consent.',
   'pc.title': 'Computer control',
   'pc.intro':
     'Agents with the Operator role can work with app windows: read their structure, click, type and take screenshots.',
   'pc.guard':
-    'Agents never control Alfa, Broker or watchdog windows — the window guard always blocks them.',
+    'Agents never control Alfa, Shadow Judge or watchdog windows — the window guard always blocks them.',
   'pc.protect': 'Alfa windows are invisible in screenshots (Windows content protection).',
   'pc.tools':
-    'Every action goes through the Broker; risky ones wait for your consent. Taking over the mouse or Stop pauses the agents.',
+    'Every action goes through the Shadow Judge; risky ones wait for your consent. Taking over the mouse or Stop pauses the agents.',
   'pc.openScreen': 'Open the Screen panel',
   'pc.grantSession': 'Applies to the current session: {title}',
   'pc.grantNoSession': 'Open a session to request desktop preview for its agents.',

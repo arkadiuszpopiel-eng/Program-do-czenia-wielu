@@ -1396,8 +1396,8 @@
      "en": "Allow automatic step extensions"
     },
     "description": {
-     "pl": "Postęp jest zapisywany lokalnie. Wyłączone: zadanie czeka na Twoją zgodę na dalszą pracę. Przedłużenie nie zatwierdza działań Brokera i nie zwiększa limitu kosztów.",
-     "en": "Progress is saved locally. Off: the task waits for your permission to continue. Extensions do not approve Broker actions or raise cost limits."
+     "pl": "Postęp jest zapisywany lokalnie. Wyłączone: zadanie czeka na Twoją zgodę na dalszą pracę. Przedłużenie nie zatwierdza działań Sędziego Cieni i nie zwiększa limitu kosztów.",
+     "en": "Progress is saved locally. Off: the task waits for your permission to continue. Extensions do not approve Shadow Judge actions or raise cost limits."
     },
     "default": false,
     "scope": "global",
@@ -1432,8 +1432,8 @@
      "en": "Allow automatic active-time extensions"
     },
     "description": {
-     "pl": "Postęp jest zapisywany lokalnie. Wyłączone: zadanie czeka na Twoją zgodę na dalszą pracę. Przedłużenie nie zatwierdza działań Brokera i nie zwiększa limitu kosztów.",
-     "en": "Progress is saved locally. Off: the task waits for your permission to continue. Extensions do not approve Broker actions or raise cost limits."
+     "pl": "Postęp jest zapisywany lokalnie. Wyłączone: zadanie czeka na Twoją zgodę na dalszą pracę. Przedłużenie nie zatwierdza działań Sędziego Cieni i nie zwiększa limitu kosztów.",
+     "en": "Progress is saved locally. Off: the task waits for your permission to continue. Extensions do not approve Shadow Judge actions or raise cost limits."
     },
     "default": false,
     "scope": "global",
@@ -1488,8 +1488,8 @@
      "en": "Automatically extend approval waiting"
     },
     "description": {
-     "pl": "Postęp jest zapisywany lokalnie. Wyłączone: zadanie czeka na Twoją zgodę na dalszą pracę. Przedłużenie nie zatwierdza działań Brokera i nie zwiększa limitu kosztów.",
-     "en": "Progress is saved locally. Off: the task waits for your permission to continue. Extensions do not approve Broker actions or raise cost limits."
+     "pl": "Postęp jest zapisywany lokalnie. Wyłączone: zadanie czeka na Twoją zgodę na dalszą pracę. Przedłużenie nie zatwierdza działań Sędziego Cieni i nie zwiększa limitu kosztów.",
+     "en": "Progress is saved locally. Off: the task waits for your permission to continue. Extensions do not approve Shadow Judge actions or raise cost limits."
     },
     "default": false,
     "scope": "global",
@@ -1540,8 +1540,8 @@
      "en": "Alfa — Access profile"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": "full",
     "scope": "global",
@@ -1593,8 +1593,8 @@
      "en": "Alfa — Tool groups"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": "",
     "scope": "global",
@@ -1609,8 +1609,8 @@
      "en": "Alfa — Custom profile: read only"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": false,
     "scope": "global",
@@ -1625,8 +1625,8 @@
      "en": "Beta — Access profile"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": "roles",
     "scope": "global",
@@ -1678,8 +1678,8 @@
      "en": "Beta — Tool groups"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": "",
     "scope": "global",
@@ -1694,8 +1694,8 @@
      "en": "Beta — Custom profile: read only"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": false,
     "scope": "global",
@@ -1710,8 +1710,8 @@
      "en": "Gama — Access profile"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": "roles",
     "scope": "global",
@@ -1763,8 +1763,8 @@
      "en": "Gama — Tool groups"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": "",
     "scope": "global",
@@ -1779,8 +1779,8 @@
      "en": "Gama — Custom profile: read only"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": false,
     "scope": "global",
@@ -1795,8 +1795,8 @@
      "en": "Delta — Access profile"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": "roles",
     "scope": "global",
@@ -1848,8 +1848,8 @@
      "en": "Delta — Tool groups"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": "",
     "scope": "global",
@@ -1864,8 +1864,8 @@
      "en": "Delta — Custom profile: read only"
     },
     "description": {
-     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Brokera. Zmiana obowiązuje od następnego zadania.",
-     "en": "Agent tool access. Every action remains subject to the Broker. Applies to the next task."
+     "pl": "Dostęp agentki do narzędzi. Każda akcja nadal podlega decyzji Sędziego Cieni. Zmiana obowiązuje od następnego zadania.",
+     "en": "Agent tool access. Every action remains subject to the Shadow Judge. Applies to the next task."
     },
     "default": false,
     "scope": "global",
@@ -1985,8 +1985,8 @@
      "en": "Show the developer mode banner"
     },
     "description": {
-     "pl": "Baner „Tryb deweloperski: Broker w procesie aplikacji” to tylko informacja. Wyłącz, żeby nie pokazywał się przy każdym uruchomieniu — tryb pracy się nie zmienia. Banery bezpiecznego stanu (brak Brokera, zerwane połączenie) pokazują się zawsze.",
-     "en": "The “Developer mode: Broker inside the app process” banner is information only. Turn off so it no longer shows on every start — the mode itself does not change. Safe-state banners (no Broker, lost connection) always show."
+     "pl": "Baner „Tryb deweloperski: Sędzia Cieni w procesie aplikacji” to tylko informacja. Wyłącz, żeby nie pokazywał się przy każdym uruchomieniu — tryb pracy się nie zmienia. Banery bezpiecznego stanu (brak Sędziego Cieni, zerwane połączenie) pokazują się zawsze.",
+     "en": "The “Developer mode: Shadow Judge inside the app process” banner is information only. Turn off so it no longer shows on every start — the mode itself does not change. Safe-state banners (no Shadow Judge, lost connection) always show."
     },
     "control": {
      "kind": "toggle"
@@ -2292,8 +2292,8 @@
      "en": "Diagnostician autonomy"
     },
     "description": {
-     "pl": "Co Diagnosta naprawia sam (z „Cofnij”), a co tylko proponuje. Naprawy Jądra zawsze zatwierdzasz w oknie Brokera. Zmiana działa od następnego uruchomienia.",
-     "en": "What the Diagnostician fixes on its own (with Undo) and what it only proposes. Kernel repairs always need approval in the Broker window. Takes effect after the next start."
+     "pl": "Co Diagnosta naprawia sam (z „Cofnij”), a co tylko proponuje. Naprawy Jądra zawsze zatwierdzasz w oknie Sędziego Cieni. Zmiana działa od następnego uruchomienia.",
+     "en": "What the Diagnostician fixes on its own (with Undo) and what it only proposes. Kernel repairs always need approval in the Shadow Judge window. Takes effect after the next start."
     },
     "default": "auto_low_risk",
     "scope": "global",

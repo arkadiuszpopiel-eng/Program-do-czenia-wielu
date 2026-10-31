@@ -1,7 +1,7 @@
-//! Kontrakt Broker-UI (docs/modules/broker-ui/SPEC.md, PLAN §8.2, ADR 3, THREAT_MODEL S11).
+//! Kontrakt Broker-UI — okno „Sędzia Cieni” (docs/modules/broker-ui/SPEC.md, PLAN §8.2, ADR 3, THREAT_MODEL S11).
 //!
 //! Model prezentacji prośby ([`ApprovalCard`]: kto, co, zakres, ryzyko, odwracalność, plan,
-//! „tylko teraz / zawsze w tym zakresie ≤ 24 h”, czas do wygaśnięcia), reguły przyjęcia wejścia
+//! „tylko teraz / zawsze w tym zakresie ≤ 24 h”, tryb, przy którym padło pytanie), reguły przyjęcia wejścia
 //! jako dowodu fizycznego ([`check_input`]: wejście niewstrzyknięte, okno na pierwszym planie
 //! ≥ 500 ms, niezasłonięte) oraz traity [`BrokerUi`], [`BrokerLink`], [`HelloPort`].
 //! `PhysicalInputProof` powstaje wyłącznie w `broker-ui-impl` (i w atrapie testowej).
@@ -11,6 +11,7 @@
 mod api;
 mod card;
 mod guard;
+mod words;
 
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
@@ -22,6 +23,7 @@ pub use api::{
 };
 pub use card::{
     ApprovalCard, CardOptions, DecisionOption, GRANT_MAX_MS, MAX_PLAN_LINES, MAX_VALUE_CHARS,
-    PersonaDisplay, PlanLine, mode_name_pl, persona_of, sanitize, time_left_pl,
+    PersonaDisplay, PlanLine, persona_of, sanitize, time_left_pl,
 };
 pub use guard::{ForegroundTracker, MIN_FOREGROUND_MS, RejectReason, check_input, source_for};
+pub use words::{JUDGE_HELP, JUDGE_NAME, mode_name_pl, place_pl};

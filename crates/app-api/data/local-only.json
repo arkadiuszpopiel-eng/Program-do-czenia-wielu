@@ -59,7 +59,7 @@
     },
     "permissions_open_approval": {
       "reason": "host_desktop",
-      "remote": { "planned": "D.5", "how": "dowód zgody z urządzenia sparowanego zamiast okna Brokera na hoście" }
+      "remote": { "planned": "D.5", "how": "dowód zgody z urządzenia sparowanego zamiast okna Sędziego Cieni na hoście" }
     },
     "projects_pick_dir": {
       "reason": "system_dialog",

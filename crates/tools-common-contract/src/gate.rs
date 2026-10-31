@@ -34,7 +34,7 @@ pub enum GateError {
     #[error("anulowano")]
     Cancelled,
     /// Błąd Brokera (żądanie, IPC).
-    #[error("Broker: {0}")]
+    #[error("Sędzia Cieni: {0}")]
     Broker(BrokerError),
 }
 
@@ -46,7 +46,7 @@ impl GateError {
             Self::Cancelled => ToolOutcome::cancelled(action),
             Self::Broker(e) => ToolOutcome::failed(
                 ToolErrorKind::Internal,
-                format!("Nie wykonano: {action} — błąd Brokera: {e}."),
+                format!("Nie wykonano: {action} — błąd Sędziego Cieni: {e}."),
             ),
         }
     }

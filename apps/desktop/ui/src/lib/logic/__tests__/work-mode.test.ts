@@ -17,7 +17,7 @@ describe('tryb pracy z paska tytułu', () => {
     expect(modeItems(null)).toEqual(['L0', 'L1', 'L3', 'L4']);
   });
 
-  it('obniżenie działa od razu, bez czekania na okno Brokera', async () => {
+  it('obniżenie działa od razu, bez czekania na okno Sędziego Cieni', async () => {
     const notify = vi.fn();
     const readGlobal = vi.fn(() => Promise.resolve<AutonomyLevel | null>('L1'));
     await requestMode('L1', {
@@ -30,7 +30,7 @@ describe('tryb pracy z paska tytułu', () => {
     expect(readGlobal).not.toHaveBeenCalled();
   });
 
-  it('podniesienie czeka na zgodę w oknie Brokera i zgłasza zapamiętany tryb raz', async () => {
+  it('podniesienie czeka na zgodę w oknie Sędziego Cieni i zgłasza zapamiętany tryb raz', async () => {
     let global: AutonomyLevel = 'L3';
     const notify = vi.fn();
     const request = vi.fn(() =>

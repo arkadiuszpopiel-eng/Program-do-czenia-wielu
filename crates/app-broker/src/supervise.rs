@@ -117,7 +117,7 @@ impl Supervisor {
         self.connected_at = None;
         let check = match &self.target {
             Target::Broken(why) => {
-                self.fail(format!("usługa Brokera: {why}"), false);
+                self.fail(format!("usługa Sędziego Cieni: {why}"), false);
                 return self.timing.heartbeat.max(self.timing.retry);
             }
             Target::Service(check) => check.clone(),
@@ -148,8 +148,8 @@ impl Supervisor {
             && !child.running()
         {
             let why = self.log.get().map_or_else(
-                || "proces Brokera zakończył działanie".to_owned(),
-                |l| format!("proces Brokera zakończył działanie: {l}"),
+                || "proces Sędziego Cieni zakończył działanie".to_owned(),
+                |l| format!("proces Sędziego Cieni zakończył działanie: {l}"),
             );
             self.link.disconnect(&why);
             return Duration::ZERO;
@@ -167,7 +167,7 @@ impl Supervisor {
             self.last_beat = Some(Instant::now());
             // Błąd strumienia albo limit czasu oznacza łącze jako zerwane w samym łączu.
             if let Err(e) = self.link.call(Request::Metrics) {
-                tracing::warn!(error = %e, "heartbeat Brokera nieudany");
+                tracing::warn!(error = %e, "heartbeat Sędziego Cieni nieudany");
             }
         }
         self.timing.heartbeat
@@ -183,17 +183,17 @@ impl Supervisor {
             self.child = None;
             self.next_launch = Some(Instant::now() + self.backoff);
             self.backoff = (self.backoff * 2).min(MAX_RELAUNCH);
-            return Err(format!("proces Brokera zakończył działanie ({why})"));
+            return Err(format!("proces Sędziego Cieni zakończył działanie ({why})"));
         }
         if self.next_launch.is_some_and(|t| Instant::now() < t) {
-            return Err("Broker zostanie uruchomiony ponownie za chwilę".into());
+            return Err("Sędzia Cieni zostanie uruchomiony ponownie za chwilę".into());
         }
         let Target::Portable { spec, spawner } = &self.target else {
-            return Err("brak procesu Brokera do uruchomienia".into());
+            return Err("brak procesu Sędziego Cieni do uruchomienia".into());
         };
         let mut child = spawner
             .spawn(spec)
-            .map_err(|e| format!("uruchomienie Brokera nieudane: {e}"))?;
+            .map_err(|e| format!("uruchomienie Sędziego Cieni nieudane: {e}"))?;
         self.log = LastLine::default();
         if let Some(err) = child.take_stderr() {
             pump_lines("broker", err, self.log.clone(), |line| {

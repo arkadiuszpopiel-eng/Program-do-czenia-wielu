@@ -296,7 +296,7 @@ pub fn app_kernel(
         }
         std::thread::sleep(Duration::from_millis(10));
     }
-    panic!("aplikacja nie połączyła się z Brokerem: {last:?}");
+    panic!("aplikacja nie połączyła się z Sędzią Cieni: {last:?}");
 }
 
 /// Czeka na warunek (wątki usługi i Broker-UI działają naprawdę równolegle).

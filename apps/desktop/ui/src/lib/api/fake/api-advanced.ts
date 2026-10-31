@@ -42,7 +42,7 @@ export class FakeAdvanced {
     fakeCheck(text);
     if (/^\s*\[kernel/m.test(text)) {
       throw new Error(
-        'Konfiguracja odrzucona, plik przywrócony: plik zmienia politykę Jądra z pominięciem Brokera.',
+        'Konfiguracja odrzucona, plik przywrócony: plik zmienia politykę Jądra z pominięciem Sędziego Cieni.',
       );
     }
     this.files = { ...this.files, [layer]: text };

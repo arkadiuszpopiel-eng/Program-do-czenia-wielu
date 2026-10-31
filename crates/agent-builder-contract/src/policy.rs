@@ -62,10 +62,12 @@ pub enum BuildError {
 }
 
 /// Znaczniki uprawnień Jądra w identyfikatorach (grupy, role, narzędzia).
-pub const KERNEL_MARKERS: [&str; 27] = [
+pub const KERNEL_MARKERS: [&str; 28] = [
     "kernel",
     "jadr",
     "broker",
+    // „Sędzia Cieni” — nazwa Brokera w interfejsie od 31.10 (po `fold`).
+    "sedzi",
     "audit",
     "audyt",
     "watchdog",
@@ -93,7 +95,7 @@ pub const KERNEL_MARKERS: [&str; 27] = [
 ];
 
 /// Frazy (po `fold`) poleceń obejścia zabezpieczeń w promptach i opisach.
-pub const PROMPT_PHRASES: [&str; 31] = [
+pub const PROMPT_PHRASES: [&str; 35] = [
     "jadr",
     "podnies poziom",
     "podnies autonomi",
@@ -105,6 +107,10 @@ pub const PROMPT_PHRASES: [&str; 31] = [
     "omin broker",
     "ignoruj broker",
     "bez brokera",
+    "omijaj sedzi",
+    "omin sedzi",
+    "ignoruj sedzi",
+    "bez sedziego",
     "zatwierdzaj sama",
     "zatwierdz sama",
     "sama zatwierdz",

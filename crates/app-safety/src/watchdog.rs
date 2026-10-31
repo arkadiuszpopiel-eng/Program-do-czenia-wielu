@@ -58,7 +58,7 @@ pub fn broker_peer_checked(
             .map_err(|e| e.to_string())?;
         if let Some(pid) = broker_pid.filter(|p| *p != conn.peer_pid()) {
             return Err(format!(
-                "serwer potoku to proces {}, a nie Broker {pid} — podstawiony?",
+                "serwer potoku to proces {}, a nie Sędzia Cieni {pid} — podstawiony?",
                 conn.peer_pid()
             ));
         }
@@ -89,7 +89,7 @@ pub fn broker_peer_checked(
         let mut client = BlockingClient::connect(conn, &hello).map_err(|e| e.to_string())?;
         match client.call(Request::KillAll { reason }) {
             Ok(Response::Killed(report)) => Ok(report),
-            Ok(other) => Err(format!("nieoczekiwana odpowiedź Brokera: {other:?}")),
+            Ok(other) => Err(format!("nieoczekiwana odpowiedź Sędziego Cieni: {other:?}")),
             Err(e) => Err(e.to_string()),
         }
     })

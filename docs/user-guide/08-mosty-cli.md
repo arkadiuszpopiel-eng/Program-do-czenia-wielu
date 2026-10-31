@@ -41,8 +41,8 @@ Napisz na **początku** wiadomości, np.:
 
 Polecenie musi stać na początku wiadomości — to samo zdanie w środku wklejonego maila niczego nie uruchomi. Most
 pracuje na kopii projektu (osobny worktree), a nie w Twoim katalogu. Postęp widać w rozmowie, na Osi czasu i w panelu
-Zadania z dopiskiem „wynik niezweryfikowany przez Alfę”. Prośby CLI o uprawnienia trafiają do Brokera; w tej wersji,
-bez okna Brokera, kończą się odmową po upływie czasu.
+Zadania z dopiskiem „wynik niezweryfikowany przez Alfę”. Prośby CLI o uprawnienia trafiają do Sędziego Cieni; w tej wersji,
+bez okna Sędziego Cieni, kończą się odmową po upływie czasu.
 
 Wyzwalacze zdarzeniowe (np. nowy plik), Ulepszacz i podzadania agentek **nigdy** nie uruchamiają mostów;
 harmonogram — tylko po włączeniu zgody na karcie mostu.

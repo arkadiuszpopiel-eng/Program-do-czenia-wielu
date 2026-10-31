@@ -155,7 +155,7 @@ async fn unanswered_request_expires() {
     let r = rig(Script::Ignore);
     let task = tokio::spawn(fetch(r.gate(), r.executed.clone()));
     let engine = r.service.engine.clone();
-    common::wait_until("prośba w Brokerze", || !engine.pending().is_empty());
+    common::wait_until("prośba u Sędziego Cieni", || !engine.pending().is_empty());
     r.service.clock.advance(test_policy().approval_ttl_ms + 1);
     let err = task.await.unwrap().unwrap_err();
     assert!(
@@ -170,7 +170,7 @@ async fn broken_link_is_a_safe_state_until_reconnected() {
     let r = rig(Script::Ignore);
     let task = tokio::spawn(fetch(r.gate(), r.executed.clone()));
     let engine = r.service.engine.clone();
-    common::wait_until("prośba w Brokerze", || !engine.pending().is_empty());
+    common::wait_until("prośba u Sędziego Cieni", || !engine.pending().is_empty());
     r.breaker.break_all();
     // Czekające narzędzie: odmowa (Broker niedostępny), nie wisi do limitu.
     let err = task.await.unwrap().unwrap_err();
@@ -323,7 +323,7 @@ async fn autonomy_approval_outcome_follows_the_owner_in_broker_ui() {
             Some(ApprovalOutcome::Pending)
         );
         r.ui.set_script(script);
-        common::wait_until("decyzja właściciela w Broker-UI", || {
+        common::wait_until("decyzja właściciela w oknie Sędziego Cieni", || {
             approval_outcome(&*broker, &id) != Some(ApprovalOutcome::Pending)
         });
         assert_eq!(approval_outcome(&*broker, &id), Some(want));

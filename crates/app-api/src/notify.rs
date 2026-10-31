@@ -44,7 +44,7 @@ pub fn native_notice(event: &AlfaEvent) -> Option<NativeNotice> {
         )),
         AlfaEvent::ApprovalPending { session_id, .. } => Some(notice(
             "Alfa — czeka na zatwierdzenie",
-            "Otwórz okno Brokera, aby zdecydować.".to_owned(),
+            "Otwórz okno Sędziego Cieni, aby zdecydować.".to_owned(),
             Some(session_id),
         )),
         AlfaEvent::Toast {

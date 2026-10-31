@@ -28,7 +28,7 @@ fn autonomy_note(level: AutonomyLevel) -> String {
         .map(|r| r.description_pl)
         .collect();
     format!(
-        "{at:?} — Broker pyta właściciela o zgodę, gdy: {}; twarde blokady Jądra obowiązują zawsze",
+        "{at:?} — Sędzia Cieni pyta właściciela o zgodę, gdy: {}; twarde blokady Jądra obowiązują zawsze",
         asks.join("; ")
     )
 }
@@ -71,7 +71,7 @@ pub(crate) fn crew_note(
     let roles_summary = crew_roles_summary(core, session, agent);
     let mut note = format!(
         "W tej rozmowie na komputerze użytkownika działa: {names} — pliki, programy, polecenia, \
-         system, mysz i klawiatura, przez Brokera. Obsada sesji: {roles_summary}. Gdy prośba \
+         system, mysz i klawiatura, przez Sędziego Cieni. Obsada sesji: {roles_summary}. Gdy prośba \
          wymaga wykonania planu, pracy w repozytorium, zmian w kodzie lub plikach, uruchomienia \
          testów, analizy albo zredagowania dokumentu — NIGDY nie odsyłaj użytkownika, żeby sam \
          napisał do innej agentki ani zmieniał adresatkę (nawet jeśli we wcześniejszych turach \
@@ -89,7 +89,7 @@ pub(crate) fn crew_note(
         note.push_str(&format!(
             " Poziom autonomii tej rozmowy: {}. Mówiąc o zgodach, trzymaj się tego opisu: nie \
              zapowiadaj zgody na każdą akcję, ale też nie obiecuj, że jej nie będzie — o każdej \
-             akcji decyduje Broker.",
+             akcji decyduje Sędzia Cieni.",
             autonomy_note(level)
         ));
     }

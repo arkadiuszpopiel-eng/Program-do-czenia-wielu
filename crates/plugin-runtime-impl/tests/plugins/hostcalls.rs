@@ -66,9 +66,9 @@ fn denial_cases() -> Vec<Case> {
     let notes = || vec![fs_read_tree(NOTES)];
     let not_declared = "nie zadeklarowała";
     let bad = "niepoprawne argumenty";
-    let broker = "odmowa Brokera";
+    let broker = "odmowa Sędziego Cieni";
     let mut scripted = case(
-        "Broker: blokada skryptowana",
+        "Sędzia Cieni: blokada skryptowana",
         "fs.read-text",
         notes(),
         json!({"path": NOTE_A}),
@@ -305,7 +305,7 @@ async fn owner_denial_reaches_plugin_as_error() {
         .call(json!({"path": NOTE_A}), &c)
         .await;
     assert!(
-        out.text.contains("odmowa Brokera") && out.text.contains("odmówił"),
+        out.text.contains("odmowa Sędziego Cieni") && out.text.contains("odmówił"),
         "{}",
         out.text
     );

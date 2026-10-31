@@ -42,7 +42,7 @@ async fn lowered_levels_come_back_when_a_late_broker_starts_with_defaults() {
     tokio::time::sleep(Duration::from_millis(300)).await;
     assert!(
         late.requests.lock().unwrap().is_empty(),
-        "Broker nieosiągalny — nic nie wysłano"
+        "Sędzia Cieni nieosiągalny — nic nie wysłano"
     );
     late.ready.store(true, Ordering::SeqCst);
     let mut waited = Duration::ZERO;

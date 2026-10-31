@@ -139,7 +139,7 @@ impl Built {
         });
         let plugins = d.stack.map(|s| s.tools.plugins()).unwrap_or_else(|| {
             Arc::new(app_plugins::PluginsApp::unavailable(
-                "brak Brokera albo dziennika cofania",
+                "brak Sędziego Cieni albo dziennika cofania",
             ))
         });
         let embed = self.search.clone().map(|search| app_models::EmbedDeps {

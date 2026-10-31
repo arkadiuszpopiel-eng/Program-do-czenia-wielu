@@ -122,9 +122,16 @@ impl BrokerEngine {
                 if by_grant {
                     return self.issue_for(&mut st, &req, &verdict, "grant", now);
                 }
+                let summary = req.facts.summary.clone().or_else(|| {
+                    req.facts
+                        .command
+                        .as_ref()
+                        .map(|c| format!("polecenie: {c}"))
+                });
                 let subject = ApprovalSubject::Action {
                     capability: req.capability.clone(),
                     tool: req.facts.tool.clone(),
+                    summary,
                 };
                 let meta = crate::approvals::Meta {
                     holder: req.holder.clone(),
@@ -137,6 +144,7 @@ impl BrokerEngine {
                     hello_required: false,
                     rules: verdict.rules.clone(),
                     explanation: verdict.explanation.clone(),
+                    autonomy: Some(level),
                 };
                 let action = PendingAction::Action(Box::new(req));
                 match self.open_approval(&mut st, subject, meta, action, now) {
@@ -229,6 +237,7 @@ impl BrokerEngine {
             hello_required: false,
             explanation: format!("Plan „{}”: kroków wymagających zgody: {asked}.", plan.title),
             rules: meta_rules,
+            autonomy: Some(level),
         };
         let action = PendingAction::Plan {
             holder: plan.holder,

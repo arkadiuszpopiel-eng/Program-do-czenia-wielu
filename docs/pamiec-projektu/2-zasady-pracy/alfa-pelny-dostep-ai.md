@@ -29,3 +29,10 @@ pokrewna Trifecta też zostaje) — operacje administratora i niepewne polecenia
 zostaje; (3) tryb **globalny** dla wszystkich rozmów; (4) menu 4 trybów: „Tylko podgląd” (L0), „Pytaj o wszystko”
 (L1), „Automatycznie” (L3, domyślny), „Pełna automatyka” (L4). Bez trybów „Akceptuj edycje” i „Najpierw plan”.
 Kod Brokera/polityk: osobna gałąź do przeglądu właściciela.
+
+**Decyzja 2026-10-31 (zastępuje pkt 2 z 27.10):** na „Pełnej automatyce” (L4) okno zgód **nie pokazuje się pod
+żadnym pozorem, aż właściciel obniży poziom** — także wysyłka po obcej treści (TaintedEgress, Trifecta) i obcy/niepewny
+głos idą bez pytania („Zrób bez pytania”, wybrane świadomie po opisie ryzyka wycieku przez ukryte polecenia).
+Zostają tylko twarde blokady Jądra (odmowa bez okna), STOP Ctrl+Shift+F12 i dziennik. Ten sam dzień: Broker ma się
+w UI nazywać **„Sędzia Cieni”** z „?” w kółku (opis, co robi i do czego się odnosi); okno Brokera właściciel ocenia
+jako „tragiczne i niedokładne” i irytuje go, że zgłaszał to wiele razy — poprawiać gruntownie, nie punktowo.

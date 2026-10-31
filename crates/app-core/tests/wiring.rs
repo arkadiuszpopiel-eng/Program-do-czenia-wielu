@@ -104,7 +104,7 @@ async fn kill_switch_cancels_running_generations_quickly() {
         std::fs::read_to_string(h.dir.path().join("local/broker-dev/audit.ndjson")).unwrap();
     assert!(
         audit.contains("broker.kill_switch"),
-        "kill-switch Brokera w Audycie"
+        "kill-switch Sędziego Cieni w Audycie"
     );
 }
 

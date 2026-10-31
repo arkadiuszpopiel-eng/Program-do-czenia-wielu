@@ -51,7 +51,7 @@ use win_pipe as pipe;
 #[cfg(windows)]
 use win_sec as os;
 
-pub use surface::WinApprovalSurface;
+pub use surface::{WinApprovalSurface, render_preview};
 
 /// Bezstanowe porty Jądra Windows: potoki, tożsamość procesów, katalogi prywatne, MMCSS, dysk,
 /// host usługi.

@@ -70,7 +70,7 @@ export const enConnections: Record<keyof typeof plConnections, Message> = {
   'conn.local.none': 'No model on this computer — Alfa works only with API accounts.',
   'conn.voice.name': 'Voice engines',
   'conn.voice.none': 'No voice engines — voice conversation will not work.',
-  'conn.broker.name': 'Broker (consent guard)',
+  'conn.broker.name': 'Shadow Judge (consent guard)',
   'conn.broker.service': 'Runs as a system service, separate from the app.',
   'conn.broker.portable': 'Runs next to the app (portable version).',
   'conn.broker.in_process': 'Runs inside the app — development build only, weaker protection.',
