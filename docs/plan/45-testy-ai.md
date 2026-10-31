@@ -154,6 +154,23 @@ sięga do innych programów. Poza budową testową polecenie odmawia. Test: `e2e
 Niesprawdzone tym sposobem zostaje tylko dostarczenie komunikatu klawisza przez Windows do wtyczki
 (`tauri-plugin-global-shortcut`).
 
+### 6.4 Przegląd ogólny narzędzi agentek i zdarzeń
+
+- **Narzędzia** (`crates/app-core/tests/tool_sweep.rs`): każde narzędzie rdzenia, także dodane później
+  (lista z `AppCore::agent_tools`, ta sama co spis `narzedzia.txt`), musi mieć poprawną nazwę dla modelu
+  (`[a-z][a-z0-9_]`, do 64 znaków, bez powtórzeń), tytuł i opis, grupy ról i zamknięty schemat argumentów
+  (`additionalProperties: false`, każdy wymagany argument opisany), a nieznany argument, brak wymaganych
+  i argumenty niebędące obiektem odrzuca jako `InvalidArgs`, zanim cokolwiek zrobi. Rdzeń na atrapach pulpitu,
+  schowka i wykonania poleceń. Wywołań z poprawnymi argumentami przegląd nie robi: część narzędzi
+  w rdzeniu testowym sięga do prawdziwego Windows (przeglądarka, Office, usługi), a właściciel pracuje
+  na tej samej maszynie — działanie sprawdzają testy modułów. Test kontrolny (narzędzie przyjmujące
+  wszystko) pilnuje, że przegląd każde z tych uchybień zgłasza.
+- **Zdarzenia** (`state/__tests__/events-sweep.test.ts`): każda próbka zdarzenia z fixture'ów rdzenia (118,
+  wszystkie 40 typów; `dto_roundtrip` wymaga próbki dla każdego nowego typu) trafia do okna głównego bez
+  wyjątku i bez odrzuconej obietnicy, a każdy typ ma obsługę w `applyEvent` albo w strumieniu rozmowy.
+- Oba przeglądy nie zastępują testu działania w bramce katalogu (narzędzia i zdarzenia wymagają testu
+  rdzenia albo interfejsu) — pilnują wspólnych reguł dla wszystkich pozycji naraz.
+
 ### 6.3 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)
 
 Kamera (sprzętowo odłączona), ocena zmysłami właściciela (czy głos się podoba, czy wygląd jest ładny),
@@ -183,4 +200,4 @@ Nowa funkcja (dowolna sesja): bramka sama zatrzyma `verify`, dopóki funkcja nie
 | Instancja testowa na „Pełnej automatyce”                          | zrobione 31.10: scalone po przeglądzie właściciela; przebieg L4 w każdym `verify wersja` |
 | Skróty globalne w instancji testowej (§6.3)                       | zrobione 31.10: `e2e_global_shortcut` (tylko budowa testowa), 4 testy zielone |
 | Spłata długu                                                      | 31 → 0 (31.10, raport 46): 601 z 601 funkcji z testem |
-| Przegląd ogólny zdarzeń i narzędzi                                | do zrobienia: narzędzia — wywołanie każdego na atrapach portów z poprawnymi argumentami ze schematu    |
+| Przegląd ogólny zdarzeń i narzędzi (§6.4)                         | zrobione 31.10: manifest i odrzucanie błędnych argumentów każdego narzędzia; każda próbka zdarzenia w oknie |

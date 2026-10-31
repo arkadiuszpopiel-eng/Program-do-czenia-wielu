@@ -155,6 +155,17 @@ impl AppCore {
         names
     }
 
+    /// Narzędzia agentek (z narzędziami aktywnych wtyczek) — przegląd ogólny wszystkich narzędzi
+    /// w testach (`tests/tool_sweep.rs`), bez przebiegu agentki.
+    #[doc(hidden)]
+    pub fn agent_tools(&self) -> Vec<Arc<dyn tools_common_contract::Tool>> {
+        self.inner
+            .agents
+            .as_ref()
+            .map(|a| a.tools.all())
+            .unwrap_or_default()
+    }
+
     /// Broker Jądra narzędzi agentek (w procesie albo poza nim; `None` = niepodłączony) — stan
     /// bezpieczeństwa sesji (skażenie) i decyzje; dla powłoki i testów.
     pub fn kernel_broker(&self) -> Option<Arc<dyn safety_broker_contract::Broker>> {

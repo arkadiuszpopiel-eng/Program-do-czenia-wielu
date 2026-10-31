@@ -122,3 +122,9 @@ skróty „Alfa” na pulpicie i w menu Start odświeżone). Program otwiera wł
 ## 7. Do decyzji właściciela
 
 1. Spacja „przytrzymaj, aby mówić” — podłączyłam (§2); jeśli wolisz ją usunąć ze skrótów i ustawień, daj znać.
+
+## 8. Kolejny krok (31.10, po wgraniu i resecie)
+
+Przegląd ogólny narzędzi agentek i zdarzeń ([45 §6.4](45-testy-ai.md)): każde narzędzie (także przyszłe) ma
+sprawdzony manifest i odrzuca błędne argumenty przed działaniem; każda ze 118 próbek zdarzeń (40 typów) trafia
+do okna bez błędu. Oba zielone od razu — nie znalazły uchybień; test kontrolny potwierdza, że przegląd je łapie.

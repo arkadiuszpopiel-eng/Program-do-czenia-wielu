@@ -60,7 +60,7 @@
   ],
   "next_steps": [
     "Następna wersja (0.0.80) przy 10 punktach: wpis CHANGELOG z PTT (Poprawki) i testami",
-    "Przegląd ogólny narzędzi agentek i zdarzeń (doc 45 §8)",
+    "Wywołania narzędzi z poprawnymi argumentami w przeglądzie ogólnym wymagają atrap wszystkich portów (przeglądarka, Office, usługi) w rdzeniu testowym — do rozważenia",
     "Kopia na F: po podłączeniu dysku (scripts/backup.sh)",
     "Gałęzie do przeglądu człowieka: do-przegladu-broker-2026-10-28, do-przegladu-pelny-dostep"
   ]

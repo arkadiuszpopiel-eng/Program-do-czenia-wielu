@@ -442,6 +442,23 @@ pierwszym planie — polecenie najpierw daje fokus oknu instancji testowej i odm
 sięga do innych programów. Poza budową testową polecenie odmawia. Test: <code>e2e-app/zy-skroty-globalne</code>.
 Niesprawdzone tym sposobem zostaje tylko dostarczenie komunikatu klawisza przez Windows do wtyczki
 (<code>tauri-plugin-global-shortcut</code>).</p>
+<h3 id="6-4-przeglad-ogolny-narzedzi-agentek-i-zdarzen">6.4 Przegląd ogólny narzędzi agentek i zdarzeń</h3>
+<ul>
+<li><strong>Narzędzia</strong> (<code>crates/app-core/tests/tool_sweep.rs</code>): każde narzędzie rdzenia, także dodane później
+(lista z <code>AppCore::agent_tools</code>, ta sama co spis <code>narzedzia.txt</code>), musi mieć poprawną nazwę dla modelu
+(<code>[a-z][a-z0-9_]</code>, do 64 znaków, bez powtórzeń), tytuł i opis, grupy ról i zamknięty schemat argumentów
+(<code>additionalProperties: false</code>, każdy wymagany argument opisany), a nieznany argument, brak wymaganych
+i argumenty niebędące obiektem odrzuca jako <code>InvalidArgs</code>, zanim cokolwiek zrobi. Rdzeń na atrapach pulpitu,
+schowka i wykonania poleceń. Wywołań z poprawnymi argumentami przegląd nie robi: część narzędzi
+w rdzeniu testowym sięga do prawdziwego Windows (przeglądarka, Office, usługi), a właściciel pracuje
+na tej samej maszynie — działanie sprawdzają testy modułów. Test kontrolny (narzędzie przyjmujące
+wszystko) pilnuje, że przegląd każde z tych uchybień zgłasza.</li>
+<li><strong>Zdarzenia</strong> (<code>state/__tests__/events-sweep.test.ts</code>): każda próbka zdarzenia z fixture&#39;ów rdzenia (118,
+wszystkie 40 typów; <code>dto_roundtrip</code> wymaga próbki dla każdego nowego typu) trafia do okna głównego bez
+wyjątku i bez odrzuconej obietnicy, a każdy typ ma obsługę w <code>applyEvent</code> albo w strumieniu rozmowy.</li>
+<li>Oba przeglądy nie zastępują testu działania w bramce katalogu (narzędzia i zdarzenia wymagają testu
+rdzenia albo interfejsu) — pilnują wspólnych reguł dla wszystkich pozycji naraz.</li>
+</ul>
 <h3 id="6-3-czego-ai-nie-testuje-samo-trzy-powody-z-dokumentu-24-3">6.3 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)</h3>
 <p>Kamera (sprzętowo odłączona), ocena zmysłami właściciela (czy głos się podoba, czy wygląd jest ładny),
 decyzje bezpieczeństwa (testy „do decyzji człowieka”).</p>
@@ -465,7 +482,7 @@ rdzenia <strong>i</strong> scenariusz w prawdziwym oknie (<code>e2e-app</code>).
 <tr><td>Instancja testowa na „Pełnej automatyce”</td><td>zrobione 31.10: scalone po przeglądzie właściciela; przebieg L4 w każdym <code>verify wersja</code></td></tr>
 <tr><td>Skróty globalne w instancji testowej (§6.3)</td><td>zrobione 31.10: <code>e2e_global_shortcut</code> (tylko budowa testowa), 4 testy zielone</td></tr>
 <tr><td>Spłata długu</td><td>31 → 0 (31.10, raport 46): 601 z 601 funkcji z testem</td></tr>
-<tr><td>Przegląd ogólny zdarzeń i narzędzi</td><td>do zrobienia: narzędzia — wywołanie każdego na atrapach portów z poprawnymi argumentami ze schematu</td></tr></tbody></table></div>
+<tr><td>Przegląd ogólny zdarzeń i narzędzi (§6.4)</td><td>zrobione 31.10: manifest i odrzucanie błędnych argumentów każdego narzędzia; każda próbka zdarzenia w oknie</td></tr></tbody></table></div>
 </article>
 <footer>Źródło: <code>docs/plan/45-testy-ai.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>

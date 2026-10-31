@@ -12,8 +12,8 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | Polecenia palety i skróty | 62 | 62 (100 %) | 2 | 7 | 9 | 3 | 0 | 50 |
 | Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 12 | 0 | 38 |
 | Ustawienia | 98 | 98 (100 %) | 14 | 12 | 7 | 9 | 2 | 98 |
-| Narzędzia agentek | 81 | 81 (100 %) | 79 | 1 | 1 | 3 | 52 | 0 |
-| Zdarzenia rdzenia | 41 | 41 (100 %) | 35 | 25 | 5 | 1 | 1 | 0 |
+| Narzędzia agentek | 81 | 81 (100 %) | 79 | 1 | 1 | 3 | 52 | 81 |
+| Zdarzenia rdzenia | 41 | 41 (100 %) | 35 | 25 | 5 | 1 | 1 | 41 |
 
 ## Polecenia rdzenia
 
@@ -518,131 +518,131 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 
 | Funkcja | Testy | Uwagi |
 | --- | --- | --- |
-| `browser_click` | rdzeń, eval |  |
-| `browser_close` | rdzeń, eval |  |
-| `browser_console` | rdzeń |  |
-| `browser_key` | rdzeń |  |
-| `browser_nav` | rdzeń |  |
-| `browser_open` | rdzeń, eval |  |
-| `browser_read` | rdzeń, eval |  |
-| `browser_screenshot` | rdzeń, eval |  |
-| `browser_scroll` | rdzeń |  |
-| `browser_select` | rdzeń |  |
-| `browser_type` | rdzeń, eval |  |
-| `browser_wait` | rdzeń |  |
-| `clipboard_read` | rdzeń, eval |  |
-| `clipboard_write` | rdzeń, eval |  |
-| `dev_git` | rdzeń |  |
-| `dev_test` | rdzeń |  |
-| `engine_capture` | rdzeń |  |
-| `engine_docs` | rdzeń |  |
-| `engine_height` | rdzeń |  |
-| `engine_inspect` | rdzeń |  |
-| `engine_preview` | rdzeń |  |
-| `engine_raycast` | rdzeń |  |
-| `engine_rollback` | rdzeń |  |
-| `engine_select` | rdzeń |  |
-| `engine_shader` | rdzeń |  |
-| `engine_start` | rdzeń |  |
-| `engine_status` | rdzeń |  |
-| `engine_step` | rdzeń |  |
-| `engine_stop` | rdzeń |  |
-| `engine_stream` | rdzeń |  |
-| `engine_transaction` | rdzeń |  |
-| `fs_copy` | rdzeń, eval |  |
-| `fs_delete` | rdzeń, przeglądarka, eval |  |
-| `fs_delete_permanent` | eval |  |
-| `fs_list` | rdzeń, eval |  |
-| `fs_mkdir` | rdzeń, eval |  |
-| `fs_move` | rdzeń, eval |  |
-| `fs_read` | rdzeń, eval |  |
-| `fs_rename` | eval |  |
-| `fs_search` | rdzeń, eval |  |
-| `fs_stat` | rdzeń, eval |  |
-| `fs_write` | rdzeń, interfejs, aplikacja, eval |  |
-| `input_click` | rdzeń, eval |  |
-| `input_keys` | rdzeń, eval |  |
-| `input_scroll` | rdzeń, eval |  |
-| `input_type_text` | rdzeń, eval |  |
-| `mcp_call` | rdzeń |  |
-| `mcp_tools` | rdzeń, aplikacja |  |
-| `media_convert` | rdzeń, eval |  |
-| `media_info` | rdzeń, eval |  |
-| `media_play` | rdzeń, eval |  |
-| `memory_recall` | rdzeń |  |
-| `memory_remember` | rdzeń |  |
-| `net_download` | rdzeń, eval |  |
-| `net_fetch` | rdzeń, eval |  |
-| `office_edit` | rdzeń, eval |  |
-| `office_read` | rdzeń, eval |  |
-| `screen_capture` | rdzeń, eval |  |
-| `shell_run` | rdzeń, eval |  |
-| `shell_terminal` | rdzeń, eval |  |
-| `system_diagnostics` | rdzeń |  |
-| `system_env` | rdzeń, eval |  |
-| `system_env_set` | rdzeń, eval |  |
-| `system_events` | rdzeń, eval |  |
-| `system_process_info` | rdzeń, eval |  |
-| `system_process_kill` | rdzeń, eval |  |
-| `system_processes` | rdzeń, eval |  |
-| `system_service_control` | rdzeń, eval |  |
-| `system_services` | rdzeń, eval |  |
-| `system_software` | rdzeń |  |
-| `system_status` | rdzeń, aplikacja, eval |  |
-| `uia_act` | rdzeń, eval |  |
-| `uia_find` | rdzeń, eval |  |
-| `uia_read_text` | rdzeń, eval |  |
-| `uia_tree` | rdzeń, eval |  |
-| `vision_describe` | rdzeń, eval |  |
-| `vision_ocr` | rdzeń, eval |  |
-| `window_focus` | rdzeń, eval |  |
-| `window_list` | rdzeń, eval |  |
-| `window_move` | rdzeń, eval |  |
-| `window_state` | rdzeń, eval |  |
+| `browser_click` | rdzeń, eval, przegląd ogólny |  |
+| `browser_close` | rdzeń, eval, przegląd ogólny |  |
+| `browser_console` | rdzeń, przegląd ogólny |  |
+| `browser_key` | rdzeń, przegląd ogólny |  |
+| `browser_nav` | rdzeń, przegląd ogólny |  |
+| `browser_open` | rdzeń, eval, przegląd ogólny |  |
+| `browser_read` | rdzeń, eval, przegląd ogólny |  |
+| `browser_screenshot` | rdzeń, eval, przegląd ogólny |  |
+| `browser_scroll` | rdzeń, przegląd ogólny |  |
+| `browser_select` | rdzeń, przegląd ogólny |  |
+| `browser_type` | rdzeń, eval, przegląd ogólny |  |
+| `browser_wait` | rdzeń, przegląd ogólny |  |
+| `clipboard_read` | rdzeń, eval, przegląd ogólny |  |
+| `clipboard_write` | rdzeń, eval, przegląd ogólny |  |
+| `dev_git` | rdzeń, przegląd ogólny |  |
+| `dev_test` | rdzeń, przegląd ogólny |  |
+| `engine_capture` | rdzeń, przegląd ogólny |  |
+| `engine_docs` | rdzeń, przegląd ogólny |  |
+| `engine_height` | rdzeń, przegląd ogólny |  |
+| `engine_inspect` | rdzeń, przegląd ogólny |  |
+| `engine_preview` | rdzeń, przegląd ogólny |  |
+| `engine_raycast` | rdzeń, przegląd ogólny |  |
+| `engine_rollback` | rdzeń, przegląd ogólny |  |
+| `engine_select` | rdzeń, przegląd ogólny |  |
+| `engine_shader` | rdzeń, przegląd ogólny |  |
+| `engine_start` | rdzeń, przegląd ogólny |  |
+| `engine_status` | rdzeń, przegląd ogólny |  |
+| `engine_step` | rdzeń, przegląd ogólny |  |
+| `engine_stop` | rdzeń, przegląd ogólny |  |
+| `engine_stream` | rdzeń, przegląd ogólny |  |
+| `engine_transaction` | rdzeń, przegląd ogólny |  |
+| `fs_copy` | rdzeń, eval, przegląd ogólny |  |
+| `fs_delete` | rdzeń, przeglądarka, eval, przegląd ogólny |  |
+| `fs_delete_permanent` | eval, przegląd ogólny |  |
+| `fs_list` | rdzeń, eval, przegląd ogólny |  |
+| `fs_mkdir` | rdzeń, eval, przegląd ogólny |  |
+| `fs_move` | rdzeń, eval, przegląd ogólny |  |
+| `fs_read` | rdzeń, eval, przegląd ogólny |  |
+| `fs_rename` | eval, przegląd ogólny |  |
+| `fs_search` | rdzeń, eval, przegląd ogólny |  |
+| `fs_stat` | rdzeń, eval, przegląd ogólny |  |
+| `fs_write` | rdzeń, interfejs, aplikacja, eval, przegląd ogólny |  |
+| `input_click` | rdzeń, eval, przegląd ogólny |  |
+| `input_keys` | rdzeń, eval, przegląd ogólny |  |
+| `input_scroll` | rdzeń, eval, przegląd ogólny |  |
+| `input_type_text` | rdzeń, eval, przegląd ogólny |  |
+| `mcp_call` | rdzeń, przegląd ogólny |  |
+| `mcp_tools` | rdzeń, aplikacja, przegląd ogólny |  |
+| `media_convert` | rdzeń, eval, przegląd ogólny |  |
+| `media_info` | rdzeń, eval, przegląd ogólny |  |
+| `media_play` | rdzeń, eval, przegląd ogólny |  |
+| `memory_recall` | rdzeń, przegląd ogólny |  |
+| `memory_remember` | rdzeń, przegląd ogólny |  |
+| `net_download` | rdzeń, eval, przegląd ogólny |  |
+| `net_fetch` | rdzeń, eval, przegląd ogólny |  |
+| `office_edit` | rdzeń, eval, przegląd ogólny |  |
+| `office_read` | rdzeń, eval, przegląd ogólny |  |
+| `screen_capture` | rdzeń, eval, przegląd ogólny |  |
+| `shell_run` | rdzeń, eval, przegląd ogólny |  |
+| `shell_terminal` | rdzeń, eval, przegląd ogólny |  |
+| `system_diagnostics` | rdzeń, przegląd ogólny |  |
+| `system_env` | rdzeń, eval, przegląd ogólny |  |
+| `system_env_set` | rdzeń, eval, przegląd ogólny |  |
+| `system_events` | rdzeń, eval, przegląd ogólny |  |
+| `system_process_info` | rdzeń, eval, przegląd ogólny |  |
+| `system_process_kill` | rdzeń, eval, przegląd ogólny |  |
+| `system_processes` | rdzeń, eval, przegląd ogólny |  |
+| `system_service_control` | rdzeń, eval, przegląd ogólny |  |
+| `system_services` | rdzeń, eval, przegląd ogólny |  |
+| `system_software` | rdzeń, przegląd ogólny |  |
+| `system_status` | rdzeń, aplikacja, eval, przegląd ogólny |  |
+| `uia_act` | rdzeń, eval, przegląd ogólny |  |
+| `uia_find` | rdzeń, eval, przegląd ogólny |  |
+| `uia_read_text` | rdzeń, eval, przegląd ogólny |  |
+| `uia_tree` | rdzeń, eval, przegląd ogólny |  |
+| `vision_describe` | rdzeń, eval, przegląd ogólny |  |
+| `vision_ocr` | rdzeń, eval, przegląd ogólny |  |
+| `window_focus` | rdzeń, eval, przegląd ogólny |  |
+| `window_list` | rdzeń, eval, przegląd ogólny |  |
+| `window_move` | rdzeń, eval, przegląd ogólny |  |
+| `window_state` | rdzeń, eval, przegląd ogólny |  |
 
 ## Zdarzenia rdzenia
 
 | Funkcja | Testy | Uwagi |
 | --- | --- | --- |
-| `TurnAppended` | rdzeń, przeglądarka |  |
-| `TurnStatus` | rdzeń, interfejs |  |
-| `TextDelta` | rdzeń, interfejs, przeglądarka |  |
-| `ThinkingDelta` | rdzeń |  |
-| `ToolCall` | rdzeń |  |
-| `ApprovalPending` | rdzeń |  |
-| `Usage` | rdzeń, interfejs |  |
-| `Stop` | rdzeń, interfejs, przeglądarka, eval |  |
-| `Error` | rdzeń, interfejs, przeglądarka, aplikacja |  |
-| `SessionUpdated` | rdzeń |  |
-| `SessionRemoved` | rdzeń, interfejs |  |
-| `AgentsChanged` | interfejs |  |
-| `ActivityChanged` | rdzeń |  |
-| `CostsChanged` | interfejs |  |
-| `SystemStatusChanged` | interfejs |  |
-| `TimelineAppended` | rdzeń |  |
-| `AccountChanged` | rdzeń |  |
-| `MicLevel` | rdzeń |  |
-| `SpeechLevel` | rdzeń |  |
-| `SpeechSegment` | rdzeń, przeglądarka |  |
-| `VoicePill` | rdzeń |  |
-| `Toast` | rdzeń |  |
-| `OpenSession` | rdzeń, interfejs |  |
-| `AgentRunUpdated` | rdzeń, interfejs |  |
-| `AgentStep` | rdzeń, interfejs |  |
-| `VoiceStatusChanged` | rdzeń |  |
-| `LocalModelProgress` | interfejs |  |
-| `MemoryChanged` | rdzeń, interfejs |  |
-| `TaskUpdated` | rdzeń, interfejs |  |
-| `TriggerFired` | rdzeń |  |
-| `MarshalReportReady` | interfejs |  |
-| `GuiActivity` | rdzeń, interfejs |  |
-| `SkillsChanged` | rdzeń, interfejs |  |
-| `HealthChanged` | rdzeń, interfejs |  |
-| `UpdateStatus` | rdzeń, interfejs |  |
-| `BrokerStatus` | interfejs |  |
-| `VoiceFeaturesChanged` | rdzeń, interfejs |  |
-| `ModelProgress` | rdzeń, interfejs |  |
-| `ModelChanged` | rdzeń, interfejs |  |
-| `ReindexStatus` | rdzeń, interfejs |  |
-| `CamerasChanged` | rdzeń |  |
+| `TurnAppended` | rdzeń, przeglądarka, przegląd ogólny |  |
+| `TurnStatus` | rdzeń, interfejs, przegląd ogólny |  |
+| `TextDelta` | rdzeń, interfejs, przeglądarka, przegląd ogólny |  |
+| `ThinkingDelta` | rdzeń, przegląd ogólny |  |
+| `ToolCall` | rdzeń, przegląd ogólny |  |
+| `ApprovalPending` | rdzeń, przegląd ogólny |  |
+| `Usage` | rdzeń, interfejs, przegląd ogólny |  |
+| `Stop` | rdzeń, interfejs, przeglądarka, eval, przegląd ogólny |  |
+| `Error` | rdzeń, interfejs, przeglądarka, aplikacja, przegląd ogólny |  |
+| `SessionUpdated` | rdzeń, przegląd ogólny |  |
+| `SessionRemoved` | rdzeń, interfejs, przegląd ogólny |  |
+| `AgentsChanged` | interfejs, przegląd ogólny |  |
+| `ActivityChanged` | rdzeń, przegląd ogólny |  |
+| `CostsChanged` | interfejs, przegląd ogólny |  |
+| `SystemStatusChanged` | interfejs, przegląd ogólny |  |
+| `TimelineAppended` | rdzeń, przegląd ogólny |  |
+| `AccountChanged` | rdzeń, przegląd ogólny |  |
+| `MicLevel` | rdzeń, przegląd ogólny |  |
+| `SpeechLevel` | rdzeń, przegląd ogólny |  |
+| `SpeechSegment` | rdzeń, przeglądarka, przegląd ogólny |  |
+| `VoicePill` | rdzeń, przegląd ogólny |  |
+| `Toast` | rdzeń, przegląd ogólny |  |
+| `OpenSession` | rdzeń, interfejs, przegląd ogólny |  |
+| `AgentRunUpdated` | rdzeń, interfejs, przegląd ogólny |  |
+| `AgentStep` | rdzeń, interfejs, przegląd ogólny |  |
+| `VoiceStatusChanged` | rdzeń, przegląd ogólny |  |
+| `LocalModelProgress` | interfejs, przegląd ogólny |  |
+| `MemoryChanged` | rdzeń, interfejs, przegląd ogólny |  |
+| `TaskUpdated` | rdzeń, interfejs, przegląd ogólny |  |
+| `TriggerFired` | rdzeń, przegląd ogólny |  |
+| `MarshalReportReady` | interfejs, przegląd ogólny |  |
+| `GuiActivity` | rdzeń, interfejs, przegląd ogólny |  |
+| `SkillsChanged` | rdzeń, interfejs, przegląd ogólny |  |
+| `HealthChanged` | rdzeń, interfejs, przegląd ogólny |  |
+| `UpdateStatus` | rdzeń, interfejs, przegląd ogólny |  |
+| `BrokerStatus` | interfejs, przegląd ogólny |  |
+| `VoiceFeaturesChanged` | rdzeń, interfejs, przegląd ogólny |  |
+| `ModelProgress` | rdzeń, interfejs, przegląd ogólny |  |
+| `ModelChanged` | rdzeń, interfejs, przegląd ogólny |  |
+| `ReindexStatus` | rdzeń, interfejs, przegląd ogólny |  |
+| `CamerasChanged` | rdzeń, przegląd ogólny |  |
 
