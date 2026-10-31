@@ -20,7 +20,9 @@ moduł niczego nie naprawia ani nie zmienia w systemie.
   parametrów, porównanie z poprzednim wynikiem (spadek ≥ 30% / wzrost opóźnień ≥ 50% →
   ostrzeżenie); `bugcheck` — kod BSOD → nazwa i przyczyna; `report::markdown`.
 - `DiagProbe` — odczyt parametrów (Windows: `platform-windows-diag-impl`, PowerShell/CIM,
-  `-EncodedCommand`, bez okna, limit 90 s; atrapa: `pc-diag-fake`).
+  `-EncodedCommand`, bez okna, limit 90 s; części wypisywane od razu wierszami JSON — po limicie zapis
+  powstaje z części odczytanych, brakujące są lukami „nie zdążyło w limicie” (`stream.rs`, 01.11);
+  karty sieciowe z `Win32_NetworkAdapter` — `Get-NetAdapter` wisiał > 80 s; atrapa: `pc-diag-fake`).
 
 ## Testy (`crates/pc-diag-impl`)
 - Procesor: mieszanie 64-bitowe przez 1,5 s, jeden wątek i wszystkie (skalowanie).

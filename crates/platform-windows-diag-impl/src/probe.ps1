@@ -1,16 +1,22 @@
 # Sonda parametrów komputera (pc-diag). Tylko odczyt. Każda część osobno: błąd części trafia do
-# `gaps` (klucz części + komunikat), reszta zapisu powstaje dalej. Wynik: jeden JSON na stdout.
+# luki (klucz części + komunikat), reszta zapisu powstaje dalej. Wynik: wiersz JSON na część.
 # Bez adresów IP/MAC i bez pełnych numerów seryjnych (tylko ostatnie 4 znaki).
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
-$r = [ordered]@{ gaps = @() }
-function Part($name, [scriptblock]$body) {
-  try { & $body } catch { $script:r.gaps += @{ part = $name; error = $_.Exception.Message }; $null }
+# Każda część trafia na wyjście od razu (`{"k":…,"v":…}`): gdy któraś zawiśnie ponad limit, Alfa
+# zatrzymuje sondę i składa zapis z części już odczytanych (`stream.rs`), brakujące — jako luki.
+function Emit($key, $value) {
+  [Console]::Out.WriteLine((@{ k = $key; v = $value } | ConvertTo-Json -Depth 7 -Compress))
+  [Console]::Out.Flush()
+}
+function Part($key, $name, [scriptblock]$body) {
+  $v = try { & $body } catch { Emit 'gap' @{ part = $name; error = $_.Exception.Message }; $null }
+  Emit $key $v
 }
 function Tail($s) { if ($s) { $t = "$s".Trim(); if ($t.Length -gt 4) { $t.Substring($t.Length - 4) } else { $t } } }
 
-$r.system = Part 'system' {
+Part 'system' 'system' {
   $o = Get-CimInstance Win32_OperatingSystem
   $cs = Get-CimInstance Win32_ComputerSystem
   $b = Get-CimInstance Win32_BIOS
@@ -19,7 +25,7 @@ $r.system = Part 'system' {
      total_kb = [int64]$o.TotalVisibleMemorySize; free_kb = [int64]$o.FreePhysicalMemory
      maker = $cs.Manufacturer; model = $cs.Model; bios = $b.SMBIOSBIOSVersion }
 }
-$r.cpu = Part 'cpu' {
+Part 'cpu' 'cpu' {
   $all = @(Get-CimInstance Win32_Processor)
   $c = $all[0]
   @{ name = "$($c.Name)".Trim()
@@ -28,15 +34,15 @@ $r.cpu = Part 'cpu' {
      max = $c.MaxClockSpeed; cur = $c.CurrentClockSpeed; load = $c.LoadPercentage
      l2 = $c.L2CacheSize; l3 = $c.L3CacheSize; virt = $c.VirtualizationFirmwareEnabled }
 }
-$r.modules = Part 'memory_modules' {
+Part 'modules' 'memory_modules' {
   @(Get-CimInstance Win32_PhysicalMemory | ForEach-Object {
     @{ slot = $_.DeviceLocator; cap = [int64]$_.Capacity; speed = $_.ConfiguredClockSpeed
        maker = $_.Manufacturer; part = "$($_.PartNumber)".Trim() } })
 }
-$r.pagefile = Part 'pagefile' {
+Part 'pagefile' 'pagefile' {
   @(Get-CimInstance Win32_PageFileUsage | ForEach-Object { @{ size = $_.AllocatedBaseSize; used = $_.CurrentUsage } })
 }
-$r.disks = Part 'disks' {
+Part 'disks' 'disks' {
   @(Get-PhysicalDisk | ForEach-Object {
     $d = $_
     $rel = try { $d | Get-StorageReliabilityCounter -ErrorAction Stop } catch { $null }
@@ -50,13 +56,13 @@ $r.disks = Part 'disks' {
        hours = $rel.PowerOnHours; rerr = $rel.ReadErrorsTotal; werr = $rel.WriteErrorsTotal
        letters = $letters } })
 }
-$r.volumes = Part 'volumes' {
+Part 'volumes' 'volumes' {
   $sys = $env:SystemDrive
   @(Get-CimInstance Win32_LogicalDisk -Filter 'DriveType=2 OR DriveType=3' | ForEach-Object {
     @{ letter = $_.DeviceID; label = $_.VolumeName; fs = $_.FileSystem; size = [int64]$_.Size
        free = [int64]$_.FreeSpace; system = ($_.DeviceID -eq $sys) } })
 }
-$r.gpus = Part 'gpus' {
+Part 'gpus' 'gpus' {
   $vram = @{}
   $cls = 'HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}'
   Get-ChildItem $cls -ErrorAction SilentlyContinue | ForEach-Object {
@@ -69,7 +75,7 @@ $r.gpus = Part 'gpus' {
     @{ name = $_.Name; drv = $_.DriverVersion; date = $date; ram = [int64]$_.AdapterRAM
        reg = $vram[$_.Name]; status = $_.Status } })
 }
-$r.net = Part 'network' {
+Part 'net' 'network' {
   # Win32_NetworkAdapter zamiast Get-NetAdapter: ten drugi potrafi wisieć ponad limit sondy
   # (31.10 na laptopie właściciela > 80 s). Prędkość tylko połączonej karty (rozłączona podaje
   # wartość maksymalną zamiast zera).
@@ -78,7 +84,7 @@ $r.net = Part 'network' {
     @{ name = "$($_.NetConnectionID)"; desc = $_.Name; up = $up
        bps = $(if ($up -and $_.Speed) { [int64]$_.Speed } else { 0 }); media = "$($_.AdapterType)" } })
 }
-$r.battery = Part 'battery' {
+Part 'battery' 'battery' {
   $b = @(Get-CimInstance Win32_Battery)
   if ($b.Count -gt 0) {
     $wmi = { param($c, $p) try { (Get-CimInstance -Namespace root\wmi $c -ErrorAction Stop | Select-Object -First 1).$p } catch { $null } }
@@ -88,12 +94,12 @@ $r.battery = Part 'battery' {
        cycles = (& $wmi 'BatteryCycleCount' 'CycleCount') }
   }
 }
-$r.thermal = Part 'thermal' {
+Part 'thermal' 'thermal' {
   @(Get-CimInstance Win32_PerfFormattedData_Counters_ThermalZoneInformation | ForEach-Object {
     $k = if ($_.HighPrecisionTemperature) { $_.HighPrecisionTemperature / 10 } else { $_.Temperature }
     @{ name = $_.Name; c = [math]::Round($k - 273.15, 1) } })
 }
-$r.events = Part 'events' {
+Part 'events' 'events' {
   # Jeden dostawca na zapytanie: brak dostawcy w systemie (np. USBSTOR) pomija tylko jego.
   $since = (Get-Date).AddDays(-7)
   $bad = @(1, 2, 3)
@@ -121,4 +127,4 @@ $r.events = Part 'events' {
   if ($failed -eq $filters.Count) { throw 'dziennik zdarzeń niedostępny' }
   $out
 }
-$r | ConvertTo-Json -Depth 6 -Compress
+Emit 'done' $true

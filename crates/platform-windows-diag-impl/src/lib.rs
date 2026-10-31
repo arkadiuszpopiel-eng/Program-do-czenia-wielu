@@ -1,11 +1,13 @@
 //! Sonda parametrów komputera `pc-diag` na Windows ([`WinDiagProbe`]): skrypt PowerShell
 //! (`probe.ps1`, przekazany jako `-EncodedCommand`) bez okna konsoli i bez profilu użytkownika,
-//! limit czasu z zabiciem procesu, wynik JSON parsowany w [`parse`]. Poza Windows sonda zwraca
+//! limit czasu z zabiciem procesu, części wypisywane wierszami JSON i składane w [`stream`] (po limicie —
+//! z częściami odczytanymi do tej pory), zapis parsowany w [`parse`]. Poza Windows sonda zwraca
 //! [`DiagError::Unsupported`].
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 pub mod parse;
+pub mod stream;
 
 use std::io::Read;
 use std::process::{Command, Stdio};
@@ -52,7 +54,8 @@ impl WinDiagProbe {
         Self { timeout }
     }
 
-    fn run(&self) -> Result<String, DiagError> {
+    /// Wyjście sondy i informacja, czy została zatrzymana po limicie czasu.
+    fn run(&self) -> Result<(String, bool), DiagError> {
         let mut cmd = Command::new(powershell());
         cmd.args([
             "-NoLogo",
@@ -84,16 +87,16 @@ impl WinDiagProbe {
             buf
         });
         let start = Instant::now();
+        let mut stopped = false;
         loop {
             match child.try_wait() {
                 Ok(Some(_)) => break,
                 Ok(None) if start.elapsed() > self.timeout => {
+                    // Zabicie zamyka wyjście — wątek odczytu oddaje części wypisane do tej pory.
                     let _ = child.kill();
                     let _ = child.wait();
-                    return Err(DiagError::Probe(format!(
-                        "odczyt trwał dłużej niż {} s",
-                        self.timeout.as_secs()
-                    )));
+                    stopped = true;
+                    break;
                 }
                 Ok(None) => std::thread::sleep(Duration::from_millis(100)),
                 Err(e) => return Err(DiagError::Probe(e.to_string())),
@@ -102,7 +105,7 @@ impl WinDiagProbe {
         let bytes = reader
             .join()
             .map_err(|_| DiagError::Probe("wątek odczytu zakończył się błędem".into()))?;
-        Ok(String::from_utf8_lossy(&bytes).into_owned())
+        Ok((String::from_utf8_lossy(&bytes).into_owned(), stopped))
     }
 }
 
@@ -113,8 +116,10 @@ impl DiagProbe for WinDiagProbe {
                 "zapis parametrów jest dostępny na Windows".into(),
             ));
         }
-        let out = self.run()?;
-        parse::parse(&out, chrono::Utc::now()).map_err(DiagError::Probe)
+        let (out, stopped) = self.run()?;
+        let json = stream::assemble(&out, stopped.then_some(self.timeout.as_secs()))
+            .map_err(DiagError::Probe)?;
+        parse::parse(&json, chrono::Utc::now()).map_err(DiagError::Probe)
     }
 }
 

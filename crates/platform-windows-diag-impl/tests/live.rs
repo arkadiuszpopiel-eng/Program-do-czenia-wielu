@@ -18,3 +18,19 @@ fn live_snapshot() {
         .iter()
         .for_each(|n| eprintln!("OCENA: {n}"));
 }
+
+#[test]
+#[ignore = "czyta prawdziwy system (kilka sekund)"]
+fn live_snapshot_stopped_after_limit_keeps_read_parts() {
+    // Limit krótszy niż cała sonda: zapis powstaje z części odczytanych, reszta — luki (31.10).
+    let s =
+        platform_windows_diag_impl::WinDiagProbe::with_timeout(std::time::Duration::from_secs(3))
+            .snapshot()
+            .unwrap();
+    eprintln!("luki: {:?}", s.gaps);
+    assert!(
+        s.gaps
+            .iter()
+            .any(|g| g.contains("nie zdążyło w limicie 3 s"))
+    );
+}
