@@ -256,6 +256,34 @@ fn same_ignoring_case(a: &Path, b: &Path) -> bool {
     lower(a) == lower(b)
 }
 
+/// Ścieżka w tekście wyniku dla modelu: wewnątrz katalogu roboczego zadania — względna (sam katalog
+/// to „."), poza nim — bez zmian. Model przepisuje ścieżki z wyników do kolejnych wywołań, a długie
+/// bezwzględne przepisywał z literówkami („Tepm”). `data` (UI, cofanie) zostaje bezwzględne.
+pub(crate) fn shown(path: &str, workdir: Option<&str>) -> String {
+    let Some(dir) = workdir.filter(|d| !d.is_empty()) else {
+        return path.to_owned();
+    };
+    let parts = |p: &str| {
+        Path::new(p)
+            .components()
+            .map(|c| c.as_os_str().to_string_lossy().into_owned())
+            .collect::<Vec<_>>()
+    };
+    let (full, base) = (parts(path), parts(dir));
+    let same =
+        |a: &String, b: &String| a == b || (cfg!(windows) && a.to_lowercase() == b.to_lowercase());
+    if base.is_empty()
+        || full.len() < base.len()
+        || !full.iter().zip(&base).all(|(a, b)| same(a, b))
+    {
+        return path.to_owned();
+    }
+    match full[base.len()..].join(std::path::MAIN_SEPARATOR_STR) {
+        rest if rest.is_empty() => ".".to_owned(),
+        rest => rest,
+    }
+}
+
 /// Błąd platformy → wynik dla modelu.
 pub(crate) fn platform_failure(e: &PlatformError, action: &str) -> ToolOutcome {
     let kind = match e {
@@ -313,5 +341,43 @@ mod same_entry_tests {
             &listed,
             Path::new(r"C:\Dane\readme.md")
         ));
+    }
+}
+
+#[cfg(test)]
+mod shown_tests {
+    use super::shown;
+
+    /// Model przepisywał długie ścieżki bezwzględne z wyników z literówkami („Tepm”).
+    #[test]
+    fn paths_inside_the_workdir_are_shown_relative() {
+        let sep = std::path::MAIN_SEPARATOR_STR;
+        let wd = Some("/Users/ala/Documents");
+        assert_eq!(shown("/Users/ala/Documents/notatka.txt", wd), "notatka.txt");
+        assert_eq!(
+            shown("/Users/ala/Documents/a/b.txt", wd),
+            format!("a{sep}b.txt")
+        );
+        assert_eq!(shown("/Users/ala/Documents", wd), ".");
+        assert_eq!(shown("/Users/ala/Documents/", wd), ".");
+        // Poza katalogiem roboczym i przy wspólnym początku nazwy — bez zmian.
+        assert_eq!(
+            shown("/Users/ala/Pulpit/x.txt", wd),
+            "/Users/ala/Pulpit/x.txt"
+        );
+        assert_eq!(
+            shown("/Users/ala/Documents2/x.txt", wd),
+            "/Users/ala/Documents2/x.txt"
+        );
+        assert_eq!(shown("/Users/ala/x.txt", None), "/Users/ala/x.txt");
+        assert_eq!(shown("/Users/ala/x.txt", Some("")), "/Users/ala/x.txt");
+        if cfg!(windows) {
+            let wd = Some(r"C:\Users\Ala\AppData\Local\Temp\zadanie");
+            assert_eq!(
+                shown(r"c:\users\ala\appdata\local\temp\Zadanie\wynik.md", wd),
+                "wynik.md"
+            );
+            assert_eq!(shown(r"D:\inne\plik.md", wd), r"D:\inne\plik.md");
+        }
     }
 }

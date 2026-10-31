@@ -14,7 +14,7 @@ use tools_fs_contract::{
     SearchOutput, StatOutput, glob_match,
 };
 
-use crate::core::{Core, Step, platform_failure};
+use crate::core::{Core, Step, platform_failure, shown};
 
 fn entry(e: &DirEntry) -> Entry {
     Entry {
@@ -91,13 +91,14 @@ impl Core {
             }
         }
         report_untrusted(&self.gate, ctx, TaintSource::File).await;
+        let wd = ctx.workdir.as_deref();
         let lines: Vec<String> = entries
             .iter()
             .map(|e| {
                 if e.is_dir {
-                    format!("[katalog] {}", e.path)
+                    format!("[katalog] {}", shown(&e.path, wd))
                 } else {
-                    format!("{} ({} B)", e.path, e.size)
+                    format!("{} ({} B)", shown(&e.path, wd), e.size)
                 }
             })
             .collect();
@@ -107,7 +108,8 @@ impl Core {
             ""
         };
         let body = format!(
-            "Zawartość „{path}” ({} wpisów):\n{}{more}",
+            "Zawartość „{}” ({} wpisów):\n{}{more}",
+            shown(&path, wd),
             entries.len(),
             lines.join("\n")
         );
@@ -154,15 +156,16 @@ impl Core {
             Some(t) => (text::redact_secrets(&t), false),
             None => (String::new(), true),
         };
+        let shown_path = shown(&path, ctx.workdir.as_deref());
         let body = if binary {
-            format!("Plik „{path}” ({total} B) jest binarny — treść pominięta.")
+            format!("Plik „{shown_path}” ({total} B) jest binarny — treść pominięta.")
         } else {
             let range = if truncated || offset > 0 {
                 format!(", bajty {start}–{end} z {total}")
             } else {
                 String::new()
             };
-            format!("Plik „{path}” ({total} B{range}):\n{content}")
+            format!("Plik „{shown_path}” ({total} B{range}):\n{content}")
         };
         let data = to_value(&ReadOutput {
             path,
@@ -190,10 +193,11 @@ impl Core {
         let kind = self.kind_of(&p);
         let exists = kind.is_some();
         let (is_dir, size) = kind.unwrap_or((false, 0));
+        let shown_path = shown(&path, ctx.workdir.as_deref());
         let body = match (exists, is_dir) {
-            (false, _) => format!("„{path}” nie istnieje."),
-            (true, true) => format!("„{path}” to katalog."),
-            (true, false) => format!("„{path}” to plik, {size} B."),
+            (false, _) => format!("„{shown_path}” nie istnieje."),
+            (true, true) => format!("„{shown_path}” to katalog."),
+            (true, false) => format!("„{shown_path}” to plik, {size} B."),
         };
         let data = to_value(&StatOutput {
             path,
@@ -292,11 +296,12 @@ impl Core {
             }
         }
         report_untrusted(&self.gate, ctx, TaintSource::File).await;
+        let wd = ctx.workdir.as_deref();
         let lines: Vec<String> = hits
             .iter()
             .map(|h| match &h.line {
-                Some(l) => format!("{}: {l}", h.path),
-                None => h.path.clone(),
+                Some(l) => format!("{}: {l}", shown(&h.path, wd)),
+                None => shown(&h.path, wd),
             })
             .collect();
         // Pliki nieprzeszukane (za duże, binarne) nie mogą wyglądać jak „brak trafień".
@@ -305,7 +310,8 @@ impl Core {
             n => format!("\nNie przeszukano treści {n} plików (za duże albo nietekstowe)."),
         };
         let body = format!(
-            "Wyniki w „{root}” ({}{}):\n{}{note}",
+            "Wyniki w „{}” ({}{}):\n{}{note}",
+            shown(&root, wd),
             hits.len(),
             if truncated { ", obcięte limitem" } else { "" },
             lines.join("\n")

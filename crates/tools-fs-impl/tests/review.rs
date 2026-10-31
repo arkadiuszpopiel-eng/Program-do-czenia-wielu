@@ -172,3 +172,39 @@ async fn write_refuses_redaction_markers_taken_from_a_read() {
         .await;
     assert!(plain.is_ok(), "{:?}", plain.status);
 }
+
+/// C2.1 (raport 44): model lokalny przepisywał ścieżki bezwzględne z wyników do kolejnych wywołań
+/// z literówkami. Tekst dla modelu podaje ścieżki w katalogu roboczym względnie, a `data` (UI,
+/// cofanie) zostaje bezwzględne.
+#[tokio::test]
+async fn results_name_workdir_paths_relative_and_keep_data_absolute() {
+    let h = harness(&[
+        ("/Users/ala/Documents/notatka.txt", "treść"),
+        ("/Users/ala/Pulpit/obcy.txt", "x"),
+    ]);
+    let list = h.call(K::List, json!({ "path": "." })).await;
+    assert!(list.is_ok(), "{list:?}");
+    assert!(list.text.starts_with("Zawartość „.”"), "{}", list.text);
+    assert!(list.text.contains("\nnotatka.txt ("), "{}", list.text);
+    assert!(!list.text.contains("/Users/ala/Documents"), "{}", list.text);
+    assert!(
+        list.data["path"].as_str().unwrap().contains("Documents"),
+        "{:?}",
+        list.data
+    );
+    let read = h.call(K::Read, json!({ "path": "notatka.txt" })).await;
+    assert!(read.text.starts_with("Plik „notatka.txt”"), "{}", read.text);
+    let write = h
+        .call(K::Write, json!({ "path": "nowy.txt", "content": "a" }))
+        .await;
+    assert!(
+        write.text.starts_with("Zapisano „nowy.txt”"),
+        "{}",
+        write.text
+    );
+    // Poza katalogiem roboczym ścieżka zostaje pełna — względna wskazywałaby inny plik.
+    let outside = h
+        .call(K::Stat, json!({ "path": "/Users/ala/Pulpit/obcy.txt" }))
+        .await;
+    assert!(outside.text.contains("Pulpit"), "{}", outside.text);
+}

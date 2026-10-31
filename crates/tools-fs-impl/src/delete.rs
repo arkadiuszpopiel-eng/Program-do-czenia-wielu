@@ -8,7 +8,7 @@ use tools_common_contract::{
 };
 use tools_fs_contract::{INTENT_CONFIRM_DELETE_PERMANENT, PathArgs};
 
-use crate::core::{Core, Step};
+use crate::core::{Core, Step, shown};
 use crate::write::out_value;
 
 impl Core {
@@ -39,7 +39,10 @@ impl Core {
                 |step| journal.delete(step, &p),
                 |id| {
                     (
-                        format!("Przeniesiono „{path}” do Kosza. Krok można cofnąć."),
+                        format!(
+                            "Przeniesiono „{}” do Kosza. Krok można cofnąć.",
+                            shown(&path, ctx.workdir.as_deref())
+                        ),
                         out_value(vec![path.clone()], 0, Some(id), false),
                     )
                 },
@@ -90,7 +93,10 @@ impl Core {
                 |step| journal.delete_permanent(step, &p),
                 |id| {
                     (
-                        format!("Usunięto trwale „{path}” (po zatwierdzeniu właściciela)."),
+                        format!(
+                            "Usunięto trwale „{}” (po zatwierdzeniu właściciela).",
+                            shown(&path, ctx.workdir.as_deref())
+                        ),
                         out_value(vec![path.clone()], 0, Some(id), false),
                     )
                 },

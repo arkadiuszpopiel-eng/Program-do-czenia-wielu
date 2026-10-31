@@ -10,7 +10,7 @@ use tools_common_contract::{
 use tools_fs_contract::{FromToArgs, MutationOutput, PathArgs, RenameArgs, WriteArgs, WriteMode};
 use undo_journal_contract::UndoError;
 
-use crate::core::{Core, Step, platform_failure};
+use crate::core::{Core, Step, platform_failure, shown};
 
 /// Nazwa pliku-znacznika do tworzenia pustego katalogu przez `FsPort` (zapis tworzy brakujące
 /// katalogi, cofnięcie je usuwa); znacznik jest usuwany w tym samym kroku dziennika.
@@ -194,7 +194,10 @@ impl Core {
                 |step| journal.write(step, &p, &data),
                 |id| {
                     (
-                        format!("Zapisano „{path}” ({bytes} B). Krok można cofnąć."),
+                        format!(
+                            "Zapisano „{}” ({bytes} B). Krok można cofnąć.",
+                            shown(&path, ctx.workdir.as_deref())
+                        ),
                         out_value(vec![path.clone()], bytes, Some(id), true),
                     )
                 },
@@ -238,7 +241,11 @@ impl Core {
                 |step| journal.move_path(step, &f, &t),
                 |id| {
                     (
-                        format!("Przeniesiono „{from}” → „{to}”. Krok można cofnąć."),
+                        format!(
+                            "Przeniesiono „{}” → „{}”. Krok można cofnąć.",
+                            shown(&from, ctx.workdir.as_deref()),
+                            shown(&to, ctx.workdir.as_deref())
+                        ),
                         out_value(vec![from.clone(), to.clone()], 0, Some(id), true),
                     )
                 },
@@ -315,7 +322,11 @@ impl Core {
                 |step| journal.copy(step, &f, &t),
                 |id| {
                     (
-                        format!("Skopiowano „{from}” → „{to}”. Krok można cofnąć."),
+                        format!(
+                            "Skopiowano „{}” → „{}”. Krok można cofnąć.",
+                            shown(&from, ctx.workdir.as_deref()),
+                            shown(&to, ctx.workdir.as_deref())
+                        ),
                         out_value(vec![from.clone(), to.clone()], 0, Some(id), true),
                     )
                 },
@@ -344,7 +355,10 @@ impl Core {
         if let Some((is_dir, _)) = self.kind_of(&p) {
             let out = if is_dir {
                 ToolOutcome::ok(
-                    format!("Katalog „{path}” już istnieje."),
+                    format!(
+                        "Katalog „{}” już istnieje.",
+                        shown(&path, ctx.workdir.as_deref())
+                    ),
                     out_value(vec![path.clone()], 0, None, true),
                 )
             } else {
@@ -371,7 +385,10 @@ impl Core {
                     " (w tym systemie plików pusty katalog powstaje przy pierwszym zapisie)"
                 };
                 (
-                    format!("Utworzono katalog „{path}”{note}. Krok można cofnąć."),
+                    format!(
+                        "Utworzono katalog „{}”{note}. Krok można cofnąć.",
+                        shown(&path, ctx.workdir.as_deref())
+                    ),
                     out_value(vec![path.clone()], 0, Some(id), exists),
                 )
             })
