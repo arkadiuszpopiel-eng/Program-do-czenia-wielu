@@ -1,5 +1,5 @@
 //! Diagnostyka w aplikacji na atrapie sondy: stan, zapis, testy z kluczy, raport w pliku,
-//! narzędzie agentek przez Brokera (testy dysków niedostępne dla agentki).
+//! narzędzie agentek `system_diagnostics` przez Brokera (testy dysków niedostępne dla agentki).
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -73,6 +73,8 @@ async fn agent_tool_reports_and_respects_broker() {
     broker.script("app-diag.report", ScriptedDecision::Allow);
     let tool = DiagTool::new(a.clone(), BrokerGate::new(broker.clone()));
     tools_common_contract::contract_tests::manifest_is_valid(&tool);
+    // Pod tą nazwą narzędzie zna model (katalog funkcji, docs/features/narzedzia.txt).
+    assert_eq!(tool.manifest().name, "system_diagnostics");
     tools_common_contract::contract_tests::invalid_args_rejected(&tool, "C:\\").await;
     let out = tool.call(json!({}), &ctx()).await;
     assert!(out.is_ok(), "{}", out.text);

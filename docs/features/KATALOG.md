@@ -4,16 +4,16 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 [45-testy-ai.md](../plan/45-testy-ai.md). Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).
 
-**Razem: 601 funkcji, z testem 570 (94.8 %), w długu 31.**
+**Razem: 601 funkcji, z testem 595 (99 %), w długu 6.**
 
 | Rodzaj | Funkcji | Z testem | rdzeń | interfejs | przeglądarka | aplikacja | eval | przegląd ogólny |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Polecenia rdzenia | 281 | 264 (94 %) | 186 | 2 | 2 | 249 | 1 | 0 |
+| Polecenia rdzenia | 281 | 281 (100 %) | 204 | 2 | 2 | 249 | 1 | 0 |
 | Polecenia palety i skróty | 62 | 56 (90.3 %) | 2 | 6 | 6 | 0 | 0 | 50 |
 | Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 12 | 0 | 38 |
 | Ustawienia | 98 | 98 (100 %) | 14 | 11 | 7 | 9 | 2 | 98 |
-| Narzędzia agentek | 81 | 79 (97.5 %) | 77 | 1 | 1 | 3 | 52 | 0 |
-| Zdarzenia rdzenia | 41 | 35 (85.4 %) | 34 | 20 | 5 | 1 | 1 | 0 |
+| Narzędzia agentek | 81 | 81 (100 %) | 79 | 1 | 1 | 3 | 52 | 0 |
+| Zdarzenia rdzenia | 41 | 41 (100 %) | 35 | 25 | 5 | 1 | 1 | 0 |
 
 ## Polecenia rdzenia
 
@@ -27,7 +27,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `accounts_remove` | rdzeń, aplikacja, bieg aplikacji |  |
 | `accounts_rotate` | rdzeń, aplikacja, bieg aplikacji |  |
 | `accounts_set_disabled` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_set_enterprise` | — | **dług** |
+| `accounts_set_enterprise` | rdzeń |  |
 | `accounts_set_limit` | rdzeń, aplikacja, bieg aplikacji |  |
 | `accounts_set_model` | rdzeń, aplikacja, bieg aplikacji |  |
 | `accounts_set_queue` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -76,14 +76,14 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `builder_preview` | rdzeń, aplikacja, bieg aplikacji |  |
 | `builder_propose` | aplikacja, bieg aplikacji |  |
 | `builder_save` | rdzeń, aplikacja, bieg aplikacji |  |
-| `builder_voice_preview` | — | **dług** |
+| `builder_voice_preview` | rdzeń |  |
 | `cameras_frame` | rdzeń, aplikacja, bieg aplikacji |  |
 | `cameras_refresh` | rdzeń, aplikacja, bieg aplikacji |  |
 | `cameras_rename` | rdzeń, aplikacja, bieg aplikacji |  |
 | `cameras_set_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
 | `cameras_set_master` | rdzeń, aplikacja, bieg aplikacji |  |
 | `cameras_state` | rdzeń, aplikacja, bieg aplikacji |  |
-| `canvas_render` | — | **dług** |
+| `canvas_render` | rdzeń |  |
 | `compliance_routes` | aplikacja, bieg aplikacji |  |
 | `config_raw_check` | rdzeń, aplikacja, bieg aplikacji |  |
 | `config_raw_get` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -148,8 +148,8 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `memory_scopes` | rdzeń, aplikacja, bieg aplikacji |  |
 | `memory_set_pinned` | aplikacja, bieg aplikacji |  |
 | `memory_status` | aplikacja, bieg aplikacji |  |
-| `memory_teach` | — | **dług** |
-| `memory_teach_pick_file` | — | **dług** |
+| `memory_teach` | rdzeń |  |
+| `memory_teach_pick_file` | rdzeń |  |
 | `memory_undo` | aplikacja, bieg aplikacji |  |
 | `models_bundle_download` | aplikacja, bieg aplikacji |  |
 | `models_bundle_verify` | aplikacja, bieg aplikacji |  |
@@ -180,12 +180,12 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `plugins_propose` | rdzeń, aplikacja, bieg aplikacji |  |
 | `plugins_reject` | aplikacja, bieg aplikacji |  |
 | `plugins_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `pricing_apply` | — | **dług** |
-| `pricing_get` | bieg aplikacji | **dług** |
-| `projects_list` | — | **dług** |
+| `pricing_apply` | rdzeń |  |
+| `pricing_get` | rdzeń, bieg aplikacji |  |
+| `projects_list` | rdzeń |  |
 | `projects_pick_dir` | rdzeń |  |
-| `projects_remove` | — | **dług** |
-| `projects_rename` | — | **dług** |
+| `projects_remove` | rdzeń |  |
+| `projects_rename` | rdzeń |  |
 | `projects_save` | rdzeń |  |
 | `prompt_templates_get` | rdzeń, aplikacja, bieg aplikacji |  |
 | `prompt_templates_set` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -201,7 +201,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `search_reindex_cancel` | rdzeń, aplikacja, bieg aplikacji |  |
 | `search_reindex_start` | aplikacja, bieg aplikacji |  |
 | `search_reindex_status` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_cards` | — | **dług** |
+| `sessions_cards` | rdzeń |  |
 | `sessions_choose_workdir` | rdzeń, aplikacja, bieg aplikacji |  |
 | `sessions_create` | rdzeń, aplikacja, bieg aplikacji |  |
 | `sessions_duplicate_as_template` | aplikacja, bieg aplikacji |  |
@@ -226,15 +226,15 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `settings_values` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_approve` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_disable` | aplikacja, bieg aplikacji |  |
-| `skills_export` | — | **dług** |
-| `skills_import` | — | **dług** |
+| `skills_export` | rdzeń |  |
+| `skills_import` | rdzeń |  |
 | `skills_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_propose` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_reject` | aplikacja, bieg aplikacji |  |
 | `skills_release` | aplikacja, bieg aplikacji |  |
 | `skills_review` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_run` | rdzeń, aplikacja, bieg aplikacji |  |
-| `system_clipboard_text` | bieg aplikacji | **dług** |
+| `system_clipboard_text` | rdzeń, bieg aplikacji |  |
 | `system_retry_queue` | rdzeń, aplikacja, bieg aplikacji |  |
 | `system_status` | rdzeń, aplikacja, eval, bieg aplikacji |  |
 | `tasks_cancel` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -260,7 +260,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `triggers_preview_cron` | rdzeń, aplikacja, bieg aplikacji |  |
 | `triggers_remove` | aplikacja, bieg aplikacji |  |
 | `triggers_set_enabled` | aplikacja, bieg aplikacji |  |
-| `turns_arena_answer` | — | **dług** |
+| `turns_arena_answer` | rdzeń |  |
 | `turns_continue` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_edit_and_resend` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_list` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -270,20 +270,20 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `turns_remember` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_run_code` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_save_code` | aplikacja, bieg aplikacji |  |
-| `turns_select_branch` | — | **dług** |
+| `turns_select_branch` | rdzeń |  |
 | `turns_send` | rdzeń, bieg aplikacji |  |
 | `turns_set_hidden` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_stop` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_undo_step` | rdzeń, aplikacja, bieg aplikacji |  |
 | `updates_about` | aplikacja, bieg aplikacji |  |
 | `updates_cancel` | aplikacja, bieg aplikacji |  |
-| `updates_check` | — | **dług** |
+| `updates_check` | rdzeń |  |
 | `updates_dismiss_whats_new` | aplikacja, bieg aplikacji |  |
 | `updates_download` | aplikacja, bieg aplikacji |  |
 | `updates_history` | aplikacja, bieg aplikacji |  |
 | `updates_restart` | aplikacja, bieg aplikacji |  |
 | `updates_rollback` | aplikacja, bieg aplikacji |  |
-| `updates_status` | aplikacja, bieg aplikacji |  |
+| `updates_status` | rdzeń, aplikacja, bieg aplikacji |  |
 | `updates_whats_new` | aplikacja, bieg aplikacji |  |
 | `voice_devices` | rdzeń, aplikacja, bieg aplikacji |  |
 | `voice_dictation` | aplikacja, bieg aplikacji |  |
@@ -578,7 +578,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `screen_capture` | rdzeń, eval |  |
 | `shell_run` | rdzeń, eval |  |
 | `shell_terminal` | rdzeń, eval |  |
-| `system_diagnostics` | — | **dług** |
+| `system_diagnostics` | rdzeń |  |
 | `system_env` | rdzeń, eval |  |
 | `system_env_set` | rdzeń, eval |  |
 | `system_events` | rdzeń, eval |  |
@@ -587,7 +587,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `system_processes` | rdzeń, eval |  |
 | `system_service_control` | rdzeń, eval |  |
 | `system_services` | rdzeń, eval |  |
-| `system_software` | — | **dług** |
+| `system_software` | rdzeń |  |
 | `system_status` | rdzeń, aplikacja, eval |  |
 | `uia_act` | rdzeń, eval |  |
 | `uia_find` | rdzeń, eval |  |
@@ -615,12 +615,12 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `Error` | rdzeń, interfejs, przeglądarka, aplikacja |  |
 | `SessionUpdated` | rdzeń |  |
 | `SessionRemoved` | rdzeń, interfejs |  |
-| `AgentsChanged` | — | **dług** |
+| `AgentsChanged` | interfejs |  |
 | `ActivityChanged` | rdzeń |  |
-| `CostsChanged` | — | **dług** |
-| `SystemStatusChanged` | — | **dług** |
+| `CostsChanged` | interfejs |  |
+| `SystemStatusChanged` | interfejs |  |
 | `TimelineAppended` | rdzeń |  |
-| `AccountChanged` | — | **dług** |
+| `AccountChanged` | rdzeń |  |
 | `MicLevel` | rdzeń |  |
 | `SpeechLevel` | rdzeń |  |
 | `SpeechSegment` | rdzeń, przeglądarka |  |
@@ -634,12 +634,12 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `MemoryChanged` | rdzeń, interfejs |  |
 | `TaskUpdated` | rdzeń, interfejs |  |
 | `TriggerFired` | rdzeń |  |
-| `MarshalReportReady` | — | **dług** |
+| `MarshalReportReady` | interfejs |  |
 | `GuiActivity` | rdzeń, interfejs |  |
 | `SkillsChanged` | rdzeń, interfejs |  |
 | `HealthChanged` | rdzeń, interfejs |  |
 | `UpdateStatus` | rdzeń, interfejs |  |
-| `BrokerStatus` | — | **dług** |
+| `BrokerStatus` | interfejs |  |
 | `VoiceFeaturesChanged` | rdzeń, interfejs |  |
 | `ModelProgress` | rdzeń, interfejs |  |
 | `ModelChanged` | rdzeń, interfejs |  |
