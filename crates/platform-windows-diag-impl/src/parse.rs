@@ -112,7 +112,14 @@ fn health(text: &str) -> Health {
 
 fn net_kind(media: &str, desc: &str) -> &'static str {
     let m = format!("{media} {desc}").to_ascii_lowercase();
-    if m.contains("802.11") || m.contains("wireless") || m.contains("wi-fi") || m.contains("wifi") {
+    if m.contains("bluetooth") {
+        // Sieć przez Bluetooth: Win32_NetworkAdapter podaje ją jako „Ethernet 802.3”.
+        "other"
+    } else if m.contains("802.11")
+        || m.contains("wireless")
+        || m.contains("wi-fi")
+        || m.contains("wifi")
+    {
         "wifi"
     } else if m.contains("802.3") || m.contains("ethernet") {
         "ethernet"

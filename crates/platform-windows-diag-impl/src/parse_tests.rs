@@ -127,3 +127,21 @@ fn classifies_events() {
     );
     assert_eq!(disk_number("brak"), None);
 }
+
+#[test]
+fn network_kind_from_adapter_type_and_name() {
+    // Win32_NetworkAdapter (31.10): `AdapterType` bywa „Ethernet 802.3” także dla Wi-Fi i Bluetooth.
+    assert_eq!(
+        net_kind("Ethernet 802.3", "Intel(R) Wi-Fi 6E AX211 160MHz"),
+        "wifi"
+    );
+    assert_eq!(
+        net_kind("Ethernet 802.3", "Realtek PCIe GbE Family Controller"),
+        "ethernet"
+    );
+    assert_eq!(
+        net_kind("Ethernet 802.3", "Bluetooth Device (Personal Area Network)"),
+        "other"
+    );
+    assert_eq!(net_kind("", "Karta nieznana"), "other");
+}

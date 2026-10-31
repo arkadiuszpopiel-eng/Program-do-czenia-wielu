@@ -70,9 +70,13 @@ $r.gpus = Part 'gpus' {
        reg = $vram[$_.Name]; status = $_.Status } })
 }
 $r.net = Part 'network' {
-  @(Get-NetAdapter -Physical | ForEach-Object {
-    @{ name = $_.Name; desc = $_.InterfaceDescription; up = ($_.Status -eq 'Up')
-       bps = [int64]$_.Speed; media = "$($_.PhysicalMediaType)" } })
+  # Win32_NetworkAdapter zamiast Get-NetAdapter: ten drugi potrafi wisieć ponad limit sondy
+  # (31.10 na laptopie właściciela > 80 s). Prędkość tylko połączonej karty (rozłączona podaje
+  # wartość maksymalną zamiast zera).
+  @(Get-CimInstance Win32_NetworkAdapter -Filter 'PhysicalAdapter=TRUE' | ForEach-Object {
+    $up = ($_.NetConnectionStatus -eq 2)
+    @{ name = "$($_.NetConnectionID)"; desc = $_.Name; up = $up
+       bps = $(if ($up -and $_.Speed) { [int64]$_.Speed } else { 0 }); media = "$($_.AdapterType)" } })
 }
 $r.battery = Part 'battery' {
   $b = @(Get-CimInstance Win32_Battery)

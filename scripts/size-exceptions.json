@@ -30,7 +30,7 @@
       "reason": "atrapa huba kont"
     },
     "crates/app-core/tests/dto_roundtrip.rs": {
-      "max": 406,
+      "max": 408,
       "reason": "test — tabela wszystkich komend"
     },
     "crates/providers-local-impl/tests/lifecycle.rs": {

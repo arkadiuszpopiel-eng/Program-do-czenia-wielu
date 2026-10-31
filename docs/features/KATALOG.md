@@ -93,9 +93,9 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `device_gpu_live` | aplikacja, bieg aplikacji |  |
 | `device_measure` | rdzeń, bieg aplikacji |  |
 | `device_profile` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_cancel` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_export` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_run` | rdzeń, aplikacja, bieg aplikacji |  |
+| `diag_cancel` | rdzeń, aplikacja |  |
+| `diag_export` | rdzeń, aplikacja |  |
+| `diag_run` | rdzeń, aplikacja |  |
 | `diag_runs` | rdzeń, aplikacja, bieg aplikacji |  |
 | `diag_snapshot` | rdzeń, aplikacja, bieg aplikacji |  |
 | `diag_state` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -167,10 +167,10 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `modules_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `modules_set_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_get` | rdzeń, aplikacja, bieg aplikacji |  |
-| `permissions_grants` | rdzeń, aplikacja |  |
+| `permissions_grants` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_open_approval` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_request_level` | rdzeń, aplikacja, bieg aplikacji |  |
-| `permissions_revoke_grant` | rdzeń, aplikacja |  |
+| `permissions_revoke_grant` | rdzeń, aplikacja, bieg aplikacji |  |
 | `pipelines_list` | rdzeń |  |
 | `pipelines_remove` | rdzeń |  |
 | `pipelines_save` | rdzeń |  |
