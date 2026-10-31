@@ -58,13 +58,16 @@ async function press(page: Page, keys: string): Promise<void> {
 }
 
 /**
- * Obszar powiadomień jest w widoku programu — przy samodzielnym biegu tego pliku (świeży profil)
+ * Widok rozmowy (obszar powiadomień jest w widoku programu): z Ustawień, w których zostawia okno
+ * poprzedni plik testów, powrót przyciskiem; przy samodzielnym biegu tego pliku (świeży profil)
  * wprowadzenie kończone poleceniem rdzenia i okno wczytane ponownie.
  */
 async function programView(page: Page): Promise<void> {
   const composer = page.locator('#alfa-composer');
   const onboarding = page.getByRole('heading', { name: 'Witaj w Alfie' });
-  await expect(composer.or(onboarding).first()).toBeVisible({ timeout: 30_000 });
+  const back = page.getByRole('button', { name: 'Wróć do rozmowy' });
+  await expect(composer.or(onboarding).or(back).first()).toBeVisible({ timeout: 30_000 });
+  if (await back.isVisible()) await back.click();
   if (await onboarding.isVisible()) {
     await call(page, 'app_complete_onboarding');
     await page.reload();
