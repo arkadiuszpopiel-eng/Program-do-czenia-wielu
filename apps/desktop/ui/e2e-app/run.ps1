@@ -128,7 +128,11 @@ try {
     if (-not (Test-Path $Exe)) { throw "Brak $Exe — zbuduj powłokę: cargo build --features `"e2e tauri/custom-protocol`"" }
     $Exe = (Resolve-Path $Exe).Path
     $alfaLocal = Join-Path $env:LOCALAPPDATA 'Alfa'
-    if ($env:CI -ne 'true' -and (Test-Path $alfaLocal)) {
+    # Świeży profil może mieć tylko poziom Brokera założony przez `seed_test_autonomy` (docs/plan/45 §6.2).
+    $seed = Join-Path $alfaLocal 'broker-dev\autonomy-standing.json'
+    $dirty = (Test-Path $alfaLocal) -and
+        $null -ne (Get-ChildItem -Recurse -File $alfaLocal | Where-Object { $_.FullName -ne $seed } | Select-Object -First 1)
+    if ($env:CI -ne 'true' -and $dirty) {
         throw "Istnieje $alfaLocal — ten test tworzy dane Alfy i przechodzi wprowadzenie; uruchamiaj go tylko na świeżym profilu (runner CI)."
     }
     if ($null -ne (Get-Cdp 'version')) { throw "Port $Port już odpowiada — inna przeglądarka/WebView2 z debugowaniem; zamknij ją." }
