@@ -45,7 +45,9 @@ impl ChatEngine {
             UndoKind::Clipboard => ("Cofnięcie zapisu schowka", "tools-clipboard"),
             UndoKind::System => ("Cofnięcie zapisu zmiennej", "tools-system"),
             UndoKind::Journal => {
-                return Err(AppError::invalid("Krok dziennika cofania cofa Broker."));
+                return Err(AppError::invalid(
+                    "Krok dziennika cofania cofa Sędzia Cieni.",
+                ));
             }
         };
         if !self.owns_undo(session, kind, id) {

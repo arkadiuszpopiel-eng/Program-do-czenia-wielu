@@ -52,16 +52,16 @@ export const enAgents: Record<keyof typeof plAgents, Message> = {
   'intent.copied': 'Command copied.',
   'intent.copyFailed': 'Could not copy — select the command manually.',
   'msg.copyFailed': 'Could not copy to the clipboard — select the text manually.',
-  'intent.deleteHint': 'Permanent deletion is confirmed only in the Broker window.',
+  'intent.deleteHint': 'Permanent deletion is confirmed only in the Shadow Judge window.',
   'approval.noWindow':
-    'The Broker window is not running (developer mode) — this request cannot be approved.',
+    'The Shadow Judge window is not running (developer mode) — this request cannot be approved.',
   'approval.noWindowExpires':
     'The agent waits until {time}; then it is denied and picks another way.',
   'approval.noWindowDeny': 'After the time limit the agent is denied and picks another way.',
   'conv.heardPrefix': 'Interrupted — heard: “{text}”',
   'workdir.title': 'Agents’ working folder',
   'workdir.on':
-    'Agents in the Operator/Coder role work on files and commands in this folder (through the Broker, with undo).',
+    'Agents in the Operator/Coder role work on files and commands in this folder (through the Shadow Judge, with undo).',
   'workdir.off':
     'No folder — agents answer without tools. Pick a folder to let them work on files.',
   'workdir.pick': 'Pick a folder…',

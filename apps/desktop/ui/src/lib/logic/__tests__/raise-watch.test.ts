@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AutonomyLevel } from '../../api/types';
 import { watchRaise } from '../raise-watch';
 
-describe('czekanie na podniesienie zatwierdzone w oknie Brokera', () => {
+describe('czekanie na podniesienie zatwierdzone w oknie Sędziego Cieni', () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -10,7 +10,7 @@ describe('czekanie na podniesienie zatwierdzone w oknie Brokera', () => {
     vi.useRealTimers();
   });
 
-  it('zgłasza zmianę, gdy Broker przyjmie poziom z prośby, i przestaje pytać', async () => {
+  it('zgłasza zmianę, gdy Sędzia Cieni przyjmie poziom z prośby, i przestaje pytać', async () => {
     let level: AutonomyLevel = 'L3';
     const read = vi.fn(() => Promise.resolve<AutonomyLevel | null>(level));
     const onApplied = vi.fn();

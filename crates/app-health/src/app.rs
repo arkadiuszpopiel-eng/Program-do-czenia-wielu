@@ -103,7 +103,7 @@ fn diag_error(e: DiagError) -> AppError {
     match e {
         DiagError::Unknown(_) => AppError::not_found(format!("Diagnosta: {e}")),
         DiagError::KernelAreaRequiresBroker(_) => AppError::forbidden(format!(
-            "Diagnosta: {e}. Okno Brokera (Broker-UI) nie jest uruchomione w tym trybie."
+            "Diagnosta: {e}. Okno Sędziego Cieni nie jest uruchomione w tym trybie."
         )),
         _ => AppError::invalid(format!("Diagnosta: {e}")),
     }

@@ -152,7 +152,7 @@ async fn portable_mode_starts_kernel_processes_and_recovers_from_broker_crash() 
         procs.view().state == BrokerLinkState::Connected && fake.brokers.lock().unwrap().len() == 2
     });
     let second = fake.brokers.lock().unwrap()[1].pid;
-    assert_ne!(second, first_pid, "nowy proces Brokera");
+    assert_ne!(second, first_pid, "nowy proces Sędziego Cieni");
     assert_eq!(kernel.broker.autonomy(&s1, None), AutonomyLevel::L3);
 
     // Audyt A-05: watchdog dostaje tożsamość nowego Brokera (stary — zakończony).
@@ -161,7 +161,7 @@ async fn portable_mode_starts_kernel_processes_and_recovers_from_broker_crash() 
             .file_name()
             .is_some_and(|n| n.to_string_lossy().contains("alfa-watchdog"))
     };
-    common::wait_until("watchdog z nowym numerem Brokera", || {
+    common::wait_until("watchdog z nowym numerem Sędziego Cieni", || {
         fake.specs().iter().filter(is_watchdog).count() == 2 && procs.view().watchdog
     });
     let specs = fake.specs();
@@ -189,10 +189,7 @@ async fn portable_mode_starts_kernel_processes_and_recovers_from_broker_crash() 
     let killed = fake.killed.clone();
     drop(procs);
     let killed = killed.lock().unwrap().clone();
-    assert!(
-        killed.contains(&second),
-        "Broker zamknięty z aplikacją: {killed:?}"
-    );
+    assert!(killed.contains(&second), "Sędzia zamknięty: {killed:?}");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -226,7 +223,7 @@ async fn service_mode_checks_the_server_and_never_falls_back_to_portable() {
     );
     assert!(
         fake.specs().is_empty(),
-        "usługa — aplikacja nie uruchamia Brokera"
+        "usługa — bez uruchamiania Sędziego"
     );
     drop(procs);
 
@@ -287,7 +284,7 @@ fn no_kernel_binaries_means_in_process_and_unavailable_is_fail_closed() {
     let fake = FakeSystem::new(sys.clone());
     match KernelProcesses::start(setup(dir.path(), &sys, fake, None)) {
         KernelStart::InProcess(why) => assert!(why.contains("alfa-broker"), "{why}"),
-        KernelStart::Remote(_) => panic!("bez binarek nie ma Brokera poza procesem"),
+        KernelStart::Remote(_) => panic!("bez binarek nie ma Sędziego Cieni poza procesem"),
     }
     let none = RemoteKernel::unavailable("brak binarek Jądra");
     let view = none.status().view();
@@ -295,7 +292,8 @@ fn no_kernel_binaries_means_in_process_and_unavailable_is_fail_closed() {
         (view.mode, view.state),
         (BrokerMode::Unavailable, BrokerLinkState::Lost)
     );
-    assert!(view.detail.unwrap().pl.contains("Brak izolowanego Brokera"));
+    let detail = view.detail.unwrap().pl;
+    assert!(detail.contains("Brak izolowanego Sędziego Cieni"));
     let kernel = none.bind(Arc::new(safety_broker_fake::FakeProcesses::default()), None);
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()

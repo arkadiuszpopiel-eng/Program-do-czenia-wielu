@@ -208,7 +208,7 @@ async fn approval_round_trip_over_unix_sockets_0600() {
     let Decision::NeedsApproval(ticket) = broker.decide(egress.clone()).await.unwrap() else {
         panic!("oczekiwano prośby");
     };
-    common::wait_until("zatwierdzenie w Broker-UI", || {
+    common::wait_until("zatwierdzenie w oknie Sędziego Cieni", || {
         matches!(
             broker.approval_status(ticket.id, &delta()),
             Ok(ApprovalStatus::Approved { .. })
@@ -218,7 +218,7 @@ async fn approval_round_trip_over_unix_sockets_0600() {
     let Decision::NeedsApproval(second) = broker.decide(egress).await.unwrap() else {
         panic!("oczekiwano prośby");
     };
-    common::wait_until("odmowa w Broker-UI", || {
+    common::wait_until("odmowa w oknie Sędziego Cieni", || {
         broker.approval_status(second.id, &delta()) == Ok(ApprovalStatus::Denied)
     });
 

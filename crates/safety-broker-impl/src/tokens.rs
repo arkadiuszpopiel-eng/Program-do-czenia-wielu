@@ -19,7 +19,7 @@ impl BrokerEngine {
     ) -> Result<(), BrokerError> {
         let reject = |why: &str| Err(BrokerError::TokenRejected(why.to_owned()));
         if t.boot != st.keys.boot() {
-            return reject("token z innego uruchomienia Brokera");
+            return reject("token z innego uruchomienia Sędziego Cieni");
         }
         if !st.keys.verify(t.key_epoch, &t.signing_bytes(), &t.mac, now) {
             return reject("niezgodny MAC");

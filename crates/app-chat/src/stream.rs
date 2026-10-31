@@ -166,7 +166,7 @@ pub(crate) async fn prepare(
         ));
     }
     if !supports_tools && !crew.is_empty() {
-        request.system.get_or_insert_with(String::new).push_str("\nW bieżącej kolejce modeli nie ma obsługi narzędzi. Nie zapowiadaj delegacji ani wykonanego przeglądu. Wyjaśnij, że potrzebny jest model obsługujący narzędzia; to nie jest brak uprawnień Brokera.");
+        request.system.get_or_insert_with(String::new).push_str("\nW bieżącej kolejce modeli nie ma obsługi narzędzi. Nie zapowiadaj delegacji ani wykonanego przeglądu. Wyjaśnij, że potrzebny jest model obsługujący narzędzia; to nie jest brak uprawnień Sędziego Cieni.");
     }
     if !choice.routed {
         budget_gate(core, &choice, &request).await?;

@@ -65,7 +65,7 @@ where
     assert_eq!(
         out.repaired.len(),
         2,
-        "Broker wykonuje także przy ProposeOnly: {out:?}"
+        "Sędzia Cieni wykonuje także przy ProposeOnly: {out:?}"
     );
     assert!(broker.seen().iter().all(|p| p.kernel_area));
     assert!(

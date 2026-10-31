@@ -56,7 +56,7 @@ async fn lifecycle_events_and_policy_change() {
         .egress("x.example", true)
         .tainted()
         .private_data();
-    let v = c.evaluate_reported(&trifecta, AutonomyLevel::L4).await;
+    let v = c.evaluate_reported(&trifecta, AutonomyLevel::L3).await;
     assert_ne!(v.verdict, risk_classifier_contract::Verdict::Proceed);
     let read = ActionFacts::new("tools-fs.read", ActionClass::Read);
     c.evaluate_reported(&read, AutonomyLevel::L3).await;

@@ -35,7 +35,7 @@ fn guard() -> KernelGuard {
 }
 
 #[test]
-#[ignore = "propozycja PT-25 dla Brokera (Jądro) — wymaga decyzji i przeglądu człowieka"]
+#[ignore = "propozycja PT-25 dla Sędziego Cieni (Jądro) — wymaga decyzji i przeglądu człowieka"]
 fn gui_control_of_password_managers_is_a_kernel_block() {
     let g = guard();
     for app in SENSITIVE_APPS.into_iter().chain([

@@ -1,4 +1,4 @@
-//! Podgląd wyglądu okna Broker-UI na prawdziwym pulpicie (self-hosted, `#[ignore]`): okno wysokiego
+//! Podgląd wyglądu okna Sędziego Cieni na prawdziwym pulpicie (self-hosted, `#[ignore]`): okno wysokiego
 //! ryzyka przez `ALFA_LOOK_MS` ms (domyślnie 6 s) — do zrzutu ekranu przy przeglądzie wyglądu.
 //! Niczego nie klika; okno znika samo.
 
@@ -28,7 +28,6 @@ fn broker_window_look_preview() {
             detail("Zmiana", "L3 „Automatycznie” → L4 „Pełna automatyka”"),
             detail("Ryzyko", "wysokie — tak (dziennik cofania)"),
             detail("Źródło polecenia", "Ty (tekst)"),
-            detail("Wygasa za", "9 min 59 s"),
         ],
         status: "Tab — następny przycisk, Spacja — naciśnij. Enter niczego nie zatwierdza.".into(),
         buttons: vec![
@@ -43,13 +42,15 @@ fn broker_window_look_preview() {
         ],
         initial_focus: 100,
         take_focus: true,
+        help: "Sędzia Cieni pilnuje działań agentek.".into(),
+        choice: None,
     };
     s.present(&view).unwrap();
     std::thread::sleep(Duration::from_millis(700));
     // Położenie okna (ekran) dla skryptu zrzutu — `ALFA_LOOK_RECT` = plik docelowy.
     if let Ok(path) = std::env::var("ALFA_LOOK_RECT") {
         let mut r = RECT::default();
-        // SAFETY: zapytania o okno klasy Broker-UI tego procesu (tylko odczyt).
+        // SAFETY: zapytania o okno klasy Sędziego Cieni tego procesu (tylko odczyt).
         unsafe {
             if let Ok(h) = FindWindowW(w!("AlfaBrokerUi"), None) {
                 let _ = GetWindowRect(h, &raw mut r);

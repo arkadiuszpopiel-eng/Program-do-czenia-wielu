@@ -57,7 +57,7 @@
       },
       {
         id: 'permissions',
-        label: en ? 'Broker and autonomy' : 'Broker i autonomia',
+        label: en ? 'Shadow Judge and autonomy' : 'Sędzia Cieni i autonomia',
         separatorBefore: true,
         onSelect: () => app.openSettings('permissions'),
       },

@@ -52,7 +52,7 @@ impl Read for Conn {
         if self.broken.load(Ordering::SeqCst) {
             return Err(io::Error::new(
                 io::ErrorKind::BrokenPipe,
-                "Broker przestał działać",
+                "Sędzia Cieni przestał działać",
             ));
         }
         Ok(n)
@@ -64,7 +64,7 @@ impl Write for Conn {
         if self.broken.load(Ordering::SeqCst) {
             return Err(io::Error::new(
                 io::ErrorKind::BrokenPipe,
-                "Broker przestał działać",
+                "Sędzia Cieni przestał działać",
             ));
         }
         self.inner.write(data)

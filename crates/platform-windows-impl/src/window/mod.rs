@@ -94,7 +94,7 @@ impl WindowGuard {
     fn ensure_allowed(&self, pid: u32, name: &str, id: WindowId) -> Result<(), PlatformError> {
         if self.is_protected(pid, name) {
             return Err(PlatformError::PermissionDenied(format!(
-                "okno {} należy do chronionego procesu {name} (Alfa/Broker)",
+                "okno {} należy do chronionego procesu {name} (Alfa/Sędzia Cieni)",
                 id.0
             )));
         }

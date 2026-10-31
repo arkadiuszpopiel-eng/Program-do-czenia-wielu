@@ -136,7 +136,7 @@ test('Szybkie pytanie bez modelu: tura w sesji szybkich pytań, odmowy dla celó
   await refused(main, 'gui_desktop_grant', { sessionId, agent: '../nie-agentka' });
 });
 
-test('okna, terminal, kamera, Broker i schowek: odmowa przed skutkiem dla złych celów', async ({
+test('okna, terminal, kamera, Sędzia Cieni i schowek: odmowa przed skutkiem dla złych celów', async ({
   alfa,
 }) => {
   const { main } = alfa;

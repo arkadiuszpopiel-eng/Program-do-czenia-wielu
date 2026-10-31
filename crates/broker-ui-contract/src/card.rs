@@ -3,14 +3,22 @@
 //! Cały tekst jest czystym tekstem po sanityzacji (bez znaków sterujących, bidi i zerowej
 //! szerokości), obcięty do limitu — Broker-UI niczego nie renderuje jako HTML/markdown.
 
-use risk_classifier_contract::{AutonomyLevel, CommandOrigin, Reversibility, RiskLevel};
+use risk_classifier_contract::{AutonomyLevel, Reversibility, RiskLevel};
 use safety_broker_contract::{
-    ApprovalId, ApprovalRequest, ApprovalSubject, AutonomyTarget, Capability, Holder, KernelPolicy,
+    ApprovalId, ApprovalRequest, ApprovalSubject, Capability, Holder, UNTIL_REVOKED,
+};
+
+use crate::words::{
+    mode_name_pl, mode_note_pl, origin_pl, place_pl, policy_pl, reversible_pl, target_pl, verb,
+    why_pl,
 };
 use serde::{Deserialize, Serialize};
 
-/// Najdłuższy „zawsze zezwalaj w tym zakresie” (24 h, PLAN §14.6).
+/// Najdłuższy „zawsze zezwalaj w tym zakresie” z terminem (24 h, PLAN §14.6); dłużej — tylko
+/// „do odwołania” (`UNTIL_REVOKED`), odwoływane w panelu uprawnień.
 pub const GRANT_MAX_MS: u64 = 24 * 60 * 60 * 1000;
+/// Czasy zgody „zawsze w tym zakresie” do wyboru w oknie (właściciel 31.10: 1 h, 3 h, doba).
+pub const GRANT_CHOICES_MS: [u64; 3] = [3_600_000, 3 * 3_600_000, GRANT_MAX_MS];
 /// Limit znaków jednej wartości na karcie.
 pub const MAX_VALUE_CHARS: usize = 300;
 /// Ile kroków planu pokazujemy wprost (reszta jako „… i jeszcze N”).
@@ -29,11 +37,12 @@ pub struct PersonaDisplay {
 pub enum DecisionOption {
     /// „Tylko teraz”.
     AllowOnce,
-    /// „Zawsze w tym zakresie” do terminu (≤ 24 h; nigdy nie eskaluje do L4).
+    /// „Zawsze w tym zakresie” do terminu (≤ 24 h) albo do odwołania (`UNTIL_REVOKED`);
+    /// nigdy nie eskaluje do L4.
     AllowInScope {
         /// Zakres = zdolność prośby (UI nie poszerza zakresu).
         scope: Capability,
-        /// Do kiedy (ms).
+        /// Do kiedy (ms); `UNTIL_REVOKED` — do odwołania.
         until_ms: u64,
     },
     /// „Odmów”.
@@ -147,95 +156,21 @@ pub fn persona_of(holder: &Holder) -> PersonaDisplay {
     PersonaDisplay { name }
 }
 
-fn verb(cap: &Capability) -> &'static str {
-    match cap {
-        Capability::FsRead(_) => "odczyt plików",
-        Capability::FsWrite(_) => "zmiana lub usunięcie plików",
-        Capability::ShellExec(_) => "polecenie powłoki",
-        Capability::GuiControl(_) => "sterowanie aplikacją",
-        Capability::NetEgress(_) => "wysłanie danych do sieci",
-        Capability::SecretsRead(_) => "odczyt sekretu",
-        Capability::SystemAdmin(_) => "operacja administratora",
-    }
-}
-
-fn origin_pl(o: &CommandOrigin) -> &'static str {
-    match o {
-        CommandOrigin::UserText => "Ty (tekst)",
-        CommandOrigin::UserVoice { .. } => "Ty (głos) — potwierdź kliknięciem lub klawiszem",
-        CommandOrigin::Agent => "agentka (z własnej inicjatywy)",
-        CommandOrigin::UntrustedContent => "NIEZAUFANA TREŚĆ (strona, mail, plik, dźwięk)",
-    }
-}
-
-fn reversible_pl(r: Reversibility) -> &'static str {
-    match r {
-        Reversibility::Yes => "tak (dziennik cofania)",
-        Reversibility::Scoped => "w zakresie (migawka przed wykonaniem)",
-        Reversibility::No => "NIE — nieodwracalne",
-    }
-}
-
-/// Nazwa trybu pracy taka jak w menu „Tryb pracy” w pasku Alfy.
-pub fn mode_name_pl(l: AutonomyLevel) -> &'static str {
-    match l {
-        AutonomyLevel::L0 => "Tylko podgląd",
-        AutonomyLevel::L1 => "Pytaj o wszystko",
-        AutonomyLevel::L2 => "Pytaj o ryzykowne",
-        AutonomyLevel::L3 => "Automatycznie",
-        AutonomyLevel::L4 => "Pełna automatyka",
-    }
-}
-
-/// Co zmienia tryb — jedno zdanie do okna zgody.
-fn mode_note_pl(l: AutonomyLevel) -> &'static str {
-    match l {
-        AutonomyLevel::L0 => "agentki tylko czytają i podpowiadają, nic nie zmieniają",
-        AutonomyLevel::L1 => "każda zmiana czeka na Twoje „tak”",
-        AutonomyLevel::L2 => "drobne rzeczy same; pytają przy usuwaniu, wysyłce i instalacji",
-        AutonomyLevel::L3 => "pracują same; pytają przy nieodwracalnych i po niezaufanej treści",
-        AutonomyLevel::L4 => {
-            "pracują same bez pytania; pytają tylko o wysyłkę po niezaufanej treści i obce polecenia głosowe"
-        }
-    }
-}
-
-fn target_pl(t: &AutonomyTarget) -> String {
-    let name = |a: &str| sanitize(a, 40);
-    match t {
-        AutonomyTarget::Global => "cała aplikacja".into(),
-        AutonomyTarget::Session { session } => format!("sesja {}", name(session.as_str())),
-        AutonomyTarget::Agent { agent } => format!("agentka {}", name(agent.as_str())),
-        AutonomyTarget::SessionAgent { session, agent } => format!(
-            "agentka {} w sesji {}",
-            name(agent.as_str()),
-            name(session.as_str())
-        ),
-    }
-}
-
-fn policy_pl(p: &KernelPolicy) -> String {
-    format!(
-        "TTL tokenu {} min (maks. {} min), egress: {} hostów, aplikacje: {}, Hello dla: {:?}",
-        p.token_ttl_default_ms / 60_000,
-        p.token_ttl_max_ms / 60_000,
-        p.egress_allowlist.len(),
-        p.allowed_apps.len(),
-        p.hello_required_for
-    )
-}
-
-/// Opcje karty.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+/// Opcje karty: czasy zgody „zawsze w tym zakresie” (po jednym przycisku) i czy pokazać
+/// „do odwołania”.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CardOptions {
-    /// Czas „zawsze w tym zakresie” (przycinany do [`GRANT_MAX_MS`]).
-    pub grant_ms: u64,
+    /// Czasy z terminem (przycinane do [`GRANT_MAX_MS`]; najwyżej trzy).
+    pub grant_choices_ms: Vec<u64>,
+    /// Przycisk „Do odwołania”.
+    pub until_revoked: bool,
 }
 
 impl Default for CardOptions {
     fn default() -> Self {
         Self {
-            grant_ms: 8 * 60 * 60 * 1000,
+            grant_choices_ms: GRANT_CHOICES_MS.to_vec(),
+            until_revoked: true,
         }
     }
 }
@@ -248,18 +183,52 @@ impl ApprovalCard {
         let mut details = vec![("Kto".to_owned(), persona.name.clone())];
         let mut plan = Vec::new();
         let mut options = vec![DecisionOption::Deny, DecisionOption::AllowOnce];
+        let mut technical = None;
         let title = match &req.subject {
-            ApprovalSubject::Action { capability, tool } => {
-                details.push(("Co".into(), verb(capability).into()));
-                details.push(("Narzędzie".into(), v(tool)));
-                details.push(("Zakres".into(), v(&capability.to_string())));
-                if req.grantable {
-                    let until_ms = now_ms.saturating_add(opts.grant_ms.min(GRANT_MAX_MS));
-                    options.push(DecisionOption::AllowInScope {
-                        scope: capability.clone(),
-                        until_ms,
-                    });
+            ApprovalSubject::Action {
+                capability,
+                tool,
+                summary,
+            } => {
+                // Najpierw konkret od narzędzia („trwałe usunięcie „a.txt””), potem rodzaj
+                // i miejsce po ludzku; nazwa techniczna narzędzia na końcu karty.
+                let what = summary.as_deref().map(v).filter(|s| !s.is_empty());
+                details.clear();
+                details.push((
+                    "Co dokładnie".into(),
+                    what.clone().unwrap_or_else(|| verb(capability).into()),
+                ));
+                details.push(("Kto".into(), persona.name.clone()));
+                details.push(("Rodzaj".into(), verb(capability).into()));
+                // „Gdzie” tylko, gdy mówi coś więcej niż „Co dokładnie” (ta sama ścieżka
+                // drugi raz, tylko małymi literami, była w oknie zbędnym powtórzeniem).
+                let place = place_pl(capability);
+                let said = what.as_deref().unwrap_or_default().to_lowercase();
+                if !said.contains(&place.to_lowercase()) {
+                    details.push(("Gdzie".into(), place));
                 }
+                technical = Some(v(tool));
+                if req.grantable {
+                    // Czas wybiera właściciel: po przycisku na każdy termin i „do odwołania”.
+                    let mut until: Vec<u64> = opts
+                        .grant_choices_ms
+                        .iter()
+                        .take(3)
+                        .map(|ms| now_ms.saturating_add((*ms).min(GRANT_MAX_MS)))
+                        .collect();
+                    until.dedup();
+                    if opts.until_revoked {
+                        until.push(UNTIL_REVOKED);
+                    }
+                    options.extend(until.into_iter().map(|until_ms| {
+                        DecisionOption::AllowInScope {
+                            scope: capability.clone(),
+                            until_ms,
+                        }
+                    }));
+                }
+                // Tytuł mówi rodzaj działania, konkret stoi raz — w polu „Co dokładnie”
+                // (wcześniej krótki konkret stał w tytule i w polu dwa razy).
                 format!("{} prosi o zgodę: {}", persona.name, verb(capability))
             }
             ApprovalSubject::Plan { title, steps } => {
@@ -271,11 +240,13 @@ impl ApprovalCard {
                         risk: s.risk,
                     })
                     .collect();
-                for (i, s) in plan.iter().take(MAX_PLAN_LINES).enumerate() {
+                // Miejsce po ludzku zamiast zapisu zdolności (`fs.write(c:\…\**)`).
+                for (i, s) in steps.iter().take(MAX_PLAN_LINES).enumerate() {
                     let line = format!(
-                        "{} — {} (ryzyko {})",
-                        s.description,
-                        s.capability,
+                        "{} — {}: {} (ryzyko {})",
+                        v(&s.description),
+                        verb(&s.capability),
+                        place_pl(&s.capability),
                         s.risk.label_pl()
                     );
                     details.push((format!("Krok {}", i + 1), v(&line)));
@@ -329,26 +300,27 @@ impl ApprovalCard {
         };
         if mode_change.is_none() {
             let risk_line = format!(
-                "{} — {}",
+                "{} · {}",
                 req.risk.label_pl(),
                 reversible_pl(req.reversible)
             );
             details.push(("Ryzyko".into(), risk_line));
         }
         details.push(("Źródło polecenia".into(), origin_pl(&req.origin).into()));
-        if req.tainted {
-            details.push(("Uwaga".into(), "sesja widziała niezaufaną treść".into()));
-        }
-        // Zmiana trybu: bez „Dlaczego pytam” (powtarzało wiersz „Tryb”) i bez odliczania — prośba
-        // nadal wygasa w Brokerze, ale okno nie pogania (właściciel 27.10: „stare okno z limitem”).
+        // Niezaufana treść w sesji — plakietka w nagłówku okna (bez osobnego wiersza „Uwaga”).
+        // Zmiana trybu: bez „Dlaczego pytam” (powtarzało wiersz „Tryb”). Bez odliczania na żadnej
+        // karcie — tekst w oknie nie odświeża się co sekundę, więc licznik kłamał; prośba nadal
+        // wygasa u Sędziego, a okno wtedy ją wycofuje (właściciel 27.10 i 31.10).
         if mode_change.is_none() {
-            details.push(("Dlaczego pytam".into(), v(&req.explanation)));
-            let left = time_left_pl(req.expires_at_ms.saturating_sub(now_ms));
-            details.push(("Wygasa za".into(), left));
+            let why = why_pl(&req.rules, &req.explanation, req.autonomy);
+            details.push(("Dlaczego pytam".into(), why));
+        }
+        if let Some(tool) = technical {
+            details.push(("Narzędzie (techn.)".into(), tool));
         }
         let read_aloud = req.origin.is_voice().then(|| {
             format!(
-                "{}. Potwierdź w oknie Brokera kliknięciem.",
+                "{}. Potwierdź w oknie Sędziego Cieni kliknięciem.",
                 sanitize(&title, 200)
             )
         });

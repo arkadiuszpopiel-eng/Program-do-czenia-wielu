@@ -7,8 +7,11 @@
 #
 #   scripts/backup.sh <katalog_docelowy>            kopia, np. scripts/backup.sh /g/Alfa
 #   ALFA_BACKUP_DIR=/g/Alfa scripts/backup.sh       cel ze zmiennej, gdy nie podano argumentu
+#   scripts/backup.sh --czysta <katalog_docelowy>   kopia czysta (właściciel 31.10): tylko aktualny kod — pliki
+#                                                   śledzone i nowe nieignorowane, bez zbudowanego programu
+#                                                   i bez plików ignorowanych przez git (dist, wyniki testów…)
 #   scripts/backup.sh --dry-run <katalog_docelowy>  tylko sprawdzenia — niczego nie tworzy ani nie zapisuje
-#   scripts/backup.sh --help                        ten opis
+#   scripts/backup.sh --help                       ten opis
 #
 # Celu domyślnego nie ma: 2026-10-18 litera F: na laptopie wskazywała inny, pełny dysk niż na PC.
 # Przed zapisem skrypt sprawdza: dysk celu istnieje (litera dysku, bez ścieżek sieciowych \\serwer),
@@ -27,10 +30,12 @@ usage() { # nagłówek tego pliku bez znaków komentarza
 }
 
 DRY_RUN=0
+CLEAN=0
 BASE=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --dry-run) DRY_RUN=1 ;;
+    --czysta) CLEAN=1 ;;
     -h | --help) usage; exit 0 ;;
     -*) echo "nieznana opcja: $1 (scripts/backup.sh --help)" >&2; exit 2 ;;
     *)
@@ -53,13 +58,14 @@ HOME_MEM="${ALFA_ASSISTANT_MEMORY:-$(cygpath -u "${USERPROFILE:-$HOME}")/.claude
 # Kopiowane katalogi: <źródło>|<nazwa w kopii>. Ta sama lista służy do szacunku rozmiaru i do kopii.
 DIRS=(
   "$ROOT|alfa"
-  "$PROJECT/Alfa-uruchomiona|Alfa-uruchomiona"
   "$PROJECT/memory|memory"
   "$PROJECT/.remember|.remember"
   "$PROJECT/PLAN|PLAN"
   "$PROJECT/audyt-2026-10-14|audyt-2026-10-14"
   "$HOME_MEM|pamiec-claude"
 )
+# Zbudowany program — tylko w zwykłej kopii (kopia czysta to sam kod i dokumenty).
+[ "$CLEAN" -eq 1 ] || DIRS+=("$PROJECT/Alfa-uruchomiona|Alfa-uruchomiona")
 FILES=("$PROJECT/PLAN-KONTYNUACJI.md")
 # Dysk przeniesiony z innej instalacji Windows ma pliki innego właściciela (SID) i git odmawia pracy
 # („dubious ownership”) — wyjątek tylko dla tych poleceń, bez zmiany konfiguracji (2026-10-17: bez niego
@@ -172,12 +178,28 @@ fi
 "${GIT[@]}" status --short >"$DST/niezatwierdzone-zmiany.txt" || fail "niezatwierdzone-zmiany.txt"
 
 # 2. Źródła i katalogi projektu (robocopy: kody < 8 = sukces)
+# Kopia czysta: wszystko, co git ignoruje w repozytorium (wyniki budowania i testów, logi), pełnymi ścieżkami.
+SKIP_DIRS=()
+SKIP_FILES=()
+if [ "$CLEAN" -eq 1 ]; then
+  while IFS= read -r path; do
+    case "$path" in
+      */) SKIP_DIRS+=("$(cygpath -w "$ROOT/${path%/}")") ;;
+      ?*) SKIP_FILES+=("$(cygpath -w "$ROOT/$path")") ;;
+    esac
+  done < <("${GIT[@]}" status --ignored --porcelain 2>/dev/null | sed -n 's/^!! //p' | tr -d '"')
+  echo "kopia czysta: pomijam zbudowany program i $((${#SKIP_DIRS[@]} + ${#SKIP_FILES[@]})) ścieżek ignorowanych przez git"
+fi
 copy_dir() {
-  local src="$1" name="$2"
+  local src="$1" name="$2" extra=()
   [ -d "$src" ] || return 0
+  if [ "$src" = "$ROOT" ]; then
+    [ "${#SKIP_DIRS[@]}" -eq 0 ] || extra+=(/XD "${SKIP_DIRS[@]}")
+    [ "${#SKIP_FILES[@]}" -eq 0 ] || extra+=(/XF "${SKIP_FILES[@]}")
+  fi
   # MSYS_NO_PATHCONV: Git Bash zamieniał przełączniki /E, /R:1 na ścieżki (robocopy kod 16, 2026-10-16).
   MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*' robocopy "$(cygpath -w "$src")" "$(cygpath -w "$DST/$name")" \
-    /E /R:1 /W:1 /XD target node_modules .git /NFL /NDL /NJH /NJS /NP >/dev/null
+    /E /R:1 /W:1 /XD target node_modules .git "${extra[@]}" /NFL /NDL /NJH /NJS /NP >/dev/null
   local code=$?
   if [ "$code" -lt 8 ]; then echo "$name: ok"; else fail "$name" "robocopy $code"; fi
 }
@@ -187,6 +209,8 @@ for f in "${FILES[@]}"; do
 done
 
 # 3. Sumy i instrukcja odtworzenia
+BUILT='`Alfa-uruchomiona/` — zbudowany program; uruchomienie: `alfa-desktop.exe`.'
+[ "$CLEAN" -eq 0 ] || BUILT='kopia czysta — bez zbudowanego programu i plików ignorowanych przez git (program buduje się ze źródeł).'
 (cd "$DST" && find . -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 -r sha256sum >SHA256SUMS.txt) \
   || fail "SHA256SUMS.txt"
 cat >"$DST/ODTWORZENIE.md" <<EOF || fail "ODTWORZENIE.md"
@@ -196,7 +220,7 @@ cat >"$DST/ODTWORZENIE.md" <<EOF || fail "ODTWORZENIE.md"
   \`git clone alfa.bundle alfa\`, potem \`git checkout <gałąź>\` (ostatni commit: \`ostatni-commit.txt\`).
 - \`alfa/\` — kopia katalogu roboczego bez \`target\` i \`node_modules\` (odtworzenie zależności:
   \`pnpm install\` i budowa według \`docs/KONTYNUACJA.md\`).
-- \`Alfa-uruchomiona/\` — zbudowany program; uruchomienie: \`alfa-desktop.exe\`.
+- $BUILT
 - \`memory/\`, \`.remember/\`, \`pamiec-claude/\` — pamięć projektu i notatki sesji.
 - \`SHA256SUMS.txt\` — sumy kontrolne: \`sha256sum -c SHA256SUMS.txt\`.
 EOF

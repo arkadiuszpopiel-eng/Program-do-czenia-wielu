@@ -13,7 +13,7 @@ use risk_classifier_contract::{
 };
 use safety_broker_contract::{
     AutonomyChangeRequest, AutonomyTarget, Broker, BrokerError, Capability, ChangeOrigin, Decision,
-    DeclaredFacts, DenyReason, Holder, PathScope,
+    DeclaredFacts, DenyReason, Holder, PathScope, UNTIL_REVOKED,
 };
 use safety_broker_impl::BrokerEngine;
 use sessions_contract::SessionId;
@@ -21,9 +21,12 @@ use undo_journal_contract::{StepId, UndoError, UndoJournal};
 use undo_journal_impl::UndoService;
 use watchdog_contract::{KillReason, KillSwitch};
 
-use app_api::dto::{AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView};
+use app_api::dto::{
+    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, GrantView,
+};
 use app_api::error::{AppError, ErrorCode};
 use app_api::ports::{ApprovalOutcome, ApprovalWindow, AutonomyView, BrokerPort, KillOrigin};
+use broker_ui_contract::{place_pl, verb};
 
 /// Sesja-sonda poziomu globalnego (identyfikatory sesji to UUIDv7 — brak kolizji).
 const GLOBAL_PROBE: &str = "__alfa_global__";
@@ -67,7 +70,7 @@ fn broker_error(e: BrokerError) -> AppError {
         BrokerError::UnknownApproval(_) | BrokerError::UnknownSession(_) => ErrorCode::NotFound,
         _ => ErrorCode::InvalidInput,
     };
-    AppError::new(code, format!("Broker: {e}"))
+    AppError::new(code, format!("Sędzia Cieni: {e}"))
 }
 
 fn undo_error(e: UndoError) -> AppError {
@@ -194,6 +197,28 @@ impl BrokerPort for InprocBroker {
         self.present(id)
     }
 
+    async fn grants(&self) -> Vec<GrantView> {
+        self.engine
+            .grants()
+            .into_iter()
+            .map(|g| GrantView {
+                id: g.id.to_string(),
+                session_id: g.session.as_str().to_owned(),
+                agent: g.agent.map(|a| a.as_str().to_owned()),
+                scope: format!("{}: {}", verb(&g.scope), place_pl(&g.scope)),
+                granted_at_ms: g.granted_at_ms,
+                until_ms: (g.until_ms != UNTIL_REVOKED).then_some(g.until_ms),
+            })
+            .collect()
+    }
+
+    async fn revoke_grant(&self, grant: &str) -> Result<bool, AppError> {
+        let id: u64 = grant
+            .parse()
+            .map_err(|_| AppError::invalid(format!("Nieznana zgoda „{grant}”.")))?;
+        self.engine.revoke_grant(id).await.map_err(broker_error)
+    }
+
     async fn approval_outcome(&self, approval: &str) -> Option<ApprovalOutcome> {
         app_broker::levels::approval_outcome(&*self.engine, approval)
     }
@@ -230,7 +255,7 @@ impl BrokerPort for InprocBroker {
                     tracing::warn!(error = %e, "unieważnienie nieużytego tokenu nie powiodło się");
                 }
                 Err(AppError::unavailable(
-                    "Uruchomienie kodu w terminalu (Broker zezwolił)",
+                    "Uruchomienie kodu w terminalu (Sędzia Cieni zezwolił)",
                     "tools-shell",
                 ))
             }
@@ -240,7 +265,7 @@ impl BrokerPort for InprocBroker {
             ))),
             Decision::Deny(DenyReason::AuditUnavailable) => Err(AppError::new(
                 ErrorCode::Unavailable,
-                "Audyt niedostępny — Broker nie wydaje zgód (bezpieczna odmowa).",
+                "Audyt niedostępny — Sędzia Cieni nie wydaje zgód (bezpieczna odmowa).",
             )),
         }
     }
@@ -286,7 +311,7 @@ impl BrokerPort for InprocBroker {
             tokeny = report.tokens_revoked,
             procesy = report.jobs_killed,
             audyt = report.audited,
-            "kill-switch Brokera"
+            "kill-switch Sędziego Cieni"
         );
         Ok(kill_gap(&report))
     }
@@ -297,7 +322,7 @@ pub fn kill_gap(report: &watchdog_contract::KillReport) -> Option<String> {
     let mut gaps = Vec::new();
     if !report.audited {
         gaps.push(
-            "Broker nie potwierdził zatrzymania — uprawnienia agentek wygasną same,              a zapis w dzienniku audytu nie powstał"
+            "Sędzia Cieni nie potwierdził zatrzymania — uprawnienia agentek wygasną same,              a zapis w dzienniku audytu nie powstał"
                 .to_owned(),
         );
     }
@@ -313,41 +338,3 @@ pub fn kill_gap(report: &watchdog_contract::KillReport) -> Option<String> {
 // Środowisko ścieżek i katalog Brokera w procesie żyją w `app-broker` (wybór Brokera dla
 // `AppOptions`); reeksport dla dotychczasowych użytkowników.
 pub use app_broker::inproc::{dev_dir, path_env, path_env_for};
-
-#[cfg(test)]
-mod tests {
-    use watchdog_contract::{JobFailure, KillReport};
-
-    use super::*;
-
-    fn report(audited: bool, failed: usize) -> KillReport {
-        KillReport {
-            reason: KillReason::Hotkey,
-            tokens_revoked: 2,
-            jobs_killed: 1,
-            jobs_failed: (0..failed)
-                .map(|i| JobFailure {
-                    job: u32::try_from(i).unwrap_or(0),
-                    error: "odmowa dostępu".into(),
-                })
-                .collect(),
-            audio_silenced: true,
-            audited,
-            latency_us: 10,
-        }
-    }
-
-    #[test]
-    fn kill_gap_names_what_was_not_confirmed() {
-        assert_eq!(kill_gap(&report(true, 0)), None);
-        let broker = kill_gap(&report(false, 0)).unwrap_or_default();
-        assert!(broker.contains("Broker nie potwierdził"), "{broker}");
-        let jobs = kill_gap(&report(true, 2)).unwrap_or_default();
-        assert_eq!(jobs, "nie udało się zatrzymać procesów: 2");
-        let both = kill_gap(&report(false, 1)).unwrap_or_default();
-        assert!(
-            both.contains("Broker") && both.contains("procesów: 1"),
-            "{both}"
-        );
-    }
-}

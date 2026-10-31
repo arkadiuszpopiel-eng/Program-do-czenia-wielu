@@ -76,7 +76,7 @@ pub(crate) async fn session_of(deps: &ExecDeps, d: &Dispatch) -> Result<SessionI
     deps.host
         .sync_taint(&session)
         .await
-        .map_err(|e| fail(format!("skażenie sesji dla Brokera: {e}"), true))?;
+        .map_err(|e| fail(format!("skażenie sesji dla Sędziego Cieni: {e}"), true))?;
     Ok(session)
 }
 
@@ -162,7 +162,7 @@ pub(crate) async fn run(
 ) -> WorkerResult {
     let Some(kit) = deps.kit.clone() else {
         return fail(
-            "Narzędzia agentek niepodłączone (Broker albo dziennik cofania).",
+            "Narzędzia agentek niepodłączone (Sędzia Cieni albo dziennik cofania).",
             false,
         );
     };

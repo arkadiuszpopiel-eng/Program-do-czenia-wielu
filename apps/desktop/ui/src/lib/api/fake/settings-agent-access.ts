@@ -9,8 +9,8 @@ export const AGENT_ACCESS_SETTINGS: readonly SettingDef[] = [
 ].flatMap((id) => {
   const name = id[0]!.toUpperCase() + id.slice(1);
   const desc = L(
-    'Dostęp do narzędzi podlega decyzjom Brokera. Zmiana od następnego zadania.',
-    'Tool access is subject to the Broker. Applies to the next task.',
+    'Dostęp do narzędzi podlega decyzjom Sędziego Cieni. Zmiana od następnego zadania.',
+    'Tool access is subject to the Shadow Judge. Applies to the next task.',
   );
   return [
     select(

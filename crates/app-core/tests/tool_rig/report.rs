@@ -70,7 +70,7 @@ pub fn defects(e: &Entry) -> Vec<String> {
             "poprawne argumenty ({}) odrzucone jako błędne — popraw przepis albo schemat",
             e.source
         )),
-        "blad:internal" => out.push("błąd wewnętrzny (Broker, dziennik cofania)".into()),
+        "blad:internal" => out.push("błąd wewnętrzny (Sędzia Cieni, dziennik cofania)".into()),
         "brak-odpowiedzi" | "panika" => out.push(e.class.clone()),
         _ => {}
     }

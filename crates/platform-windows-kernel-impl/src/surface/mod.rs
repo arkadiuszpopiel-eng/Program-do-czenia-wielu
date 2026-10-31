@@ -1,11 +1,25 @@
-//! `ApprovalSurfacePort`: natywne okno Broker-UI na dedykowanym wątku z pętlą komunikatów
+//! `ApprovalSurfacePort`: natywne okno Sędziego Cieni na dedykowanym wątku z pętlą komunikatów
 //! (Win32 bez WebView i bez renderowania HTML), zdarzenia w kolejce czytanej przez logikę
 //! `broker-ui`. Poza Windows: `Unsupported`.
 
 #[cfg(windows)]
+mod button;
+#[cfg(windows)]
+mod footer;
+#[cfg(windows)]
 mod input;
 #[cfg(windows)]
+mod layout;
+#[cfg(windows)]
 mod paint;
+#[cfg(windows)]
+mod pointer;
+#[cfg(windows)]
+mod preview;
+#[cfg(windows)]
+mod shapes;
+#[cfg(windows)]
+mod state;
 #[cfg(windows)]
 mod theme;
 #[cfg(windows)]
@@ -90,6 +104,28 @@ impl WinApprovalSurface {
     }
 }
 
+/// Podgląd karty w pliku BMP (obszar klienta okna) — ten sam układ i rysowanie co w oknie, bez
+/// pokazywania czegokolwiek na ekranie. `dark` — motyw ciemny, `dpi` — skala (96 = 100 %),
+/// `help_open` — opis pod „?” rozwinięty, `max_height` — wysokość ekranu w pikselach.
+pub fn render_preview(
+    view: &SurfaceView,
+    dark: bool,
+    dpi: u32,
+    help_open: bool,
+    max_height: i32,
+) -> Result<Vec<u8>, PlatformError> {
+    #[cfg(windows)]
+    let out = preview::render(view, dark, dpi, help_open, max_height);
+    #[cfg(not(windows))]
+    let out = {
+        let _ = (view, dark, dpi, help_open, max_height);
+        Err(PlatformError::Unsupported(
+            "podgląd okna: tylko Windows".into(),
+        ))
+    };
+    out
+}
+
 impl ApprovalSurfacePort for WinApprovalSurface {
     fn present(&self, view: &SurfaceView) -> Result<(), PlatformError> {
         view.validate()?;
@@ -97,7 +133,7 @@ impl ApprovalSurfacePort for WinApprovalSurface {
         let shown = self.send(thread::Request::Present(Box::new(view.clone())));
         #[cfg(not(windows))]
         let shown = Err(PlatformError::Unsupported(
-            "okno Broker-UI: tylko Windows".into(),
+            "okno Sędziego Cieni: tylko Windows".into(),
         ));
         shown
     }

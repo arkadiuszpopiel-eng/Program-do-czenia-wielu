@@ -89,11 +89,11 @@ async fn confirmed_stop_says_stopped() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn unconfirmed_stop_is_reported_as_incomplete() {
-    let (kind, text) = stop_with(Some("Broker nie potwierdził zatrzymania".to_owned())).await;
+    let (kind, text) = stop_with(Some("Sędzia Cieni nie potwierdził zatrzymania".to_owned())).await;
     assert_eq!(kind, ToastKind::Error);
     assert!(text.contains("NIEPEŁNE"), "{text}");
     assert!(
-        text.contains("Broker nie potwierdził zatrzymania"),
+        text.contains("Sędzia Cieni nie potwierdził zatrzymania"),
         "{text}"
     );
     assert!(!text.contains("zatrzymano pracę"), "{text}");

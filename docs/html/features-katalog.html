@@ -322,12 +322,12 @@ blockquote {
 <p>Plik generowany: <code>node scripts/features.mjs</code> (nie edytuj ręcznie). Zasady i system testów:
 <a href="plan-45-testy-ai.html">45-testy-ai.md</a>. Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).</p>
-<p><strong>Razem: 601 funkcji, z testem 601 (100 %), w długu 0.</strong></p>
-<div class="tbl"><table><thead><tr><th>Rodzaj</th><th style="text-align:right">Funkcji</th><th style="text-align:right">Z testem</th><th style="text-align:right">rdzeń</th><th style="text-align:right">interfejs</th><th style="text-align:right">przeglądarka</th><th style="text-align:right">aplikacja</th><th style="text-align:right">eval</th><th style="text-align:right">przegląd ogólny</th></tr></thead><tbody><tr><td>Polecenia rdzenia</td><td style="text-align:right">281</td><td style="text-align:right">281 (100 %)</td><td style="text-align:right">204</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">250</td><td style="text-align:right">1</td><td style="text-align:right">0</td></tr>
+<p><strong>Razem: 603 funkcji, z testem 603 (100 %), w długu 0.</strong></p>
+<div class="tbl"><table><thead><tr><th>Rodzaj</th><th style="text-align:right">Funkcji</th><th style="text-align:right">Z testem</th><th style="text-align:right">rdzeń</th><th style="text-align:right">interfejs</th><th style="text-align:right">przeglądarka</th><th style="text-align:right">aplikacja</th><th style="text-align:right">eval</th><th style="text-align:right">przegląd ogólny</th></tr></thead><tbody><tr><td>Polecenia rdzenia</td><td style="text-align:right">283</td><td style="text-align:right">283 (100 %)</td><td style="text-align:right">206</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">252</td><td style="text-align:right">1</td><td style="text-align:right">0</td></tr>
 <tr><td>Polecenia palety i skróty</td><td style="text-align:right">62</td><td style="text-align:right">62 (100 %)</td><td style="text-align:right">2</td><td style="text-align:right">7</td><td style="text-align:right">9</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">50</td></tr>
 <tr><td>Strony Ustawień</td><td style="text-align:right">38</td><td style="text-align:right">38 (100 %)</td><td style="text-align:right">0</td><td style="text-align:right">3</td><td style="text-align:right">34</td><td style="text-align:right">12</td><td style="text-align:right">0</td><td style="text-align:right">38</td></tr>
 <tr><td>Ustawienia</td><td style="text-align:right">98</td><td style="text-align:right">98 (100 %)</td><td style="text-align:right">14</td><td style="text-align:right">12</td><td style="text-align:right">7</td><td style="text-align:right">9</td><td style="text-align:right">2</td><td style="text-align:right">98</td></tr>
-<tr><td>Narzędzia agentek</td><td style="text-align:right">81</td><td style="text-align:right">81 (100 %)</td><td style="text-align:right">79</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">3</td><td style="text-align:right">52</td><td style="text-align:right">81</td></tr>
+<tr><td>Narzędzia agentek</td><td style="text-align:right">81</td><td style="text-align:right">81 (100 %)</td><td style="text-align:right">81</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">3</td><td style="text-align:right">52</td><td style="text-align:right">81</td></tr>
 <tr><td>Zdarzenia rdzenia</td><td style="text-align:right">41</td><td style="text-align:right">41 (100 %)</td><td style="text-align:right">35</td><td style="text-align:right">25</td><td style="text-align:right">5</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">41</td></tr></tbody></table></div>
 <h2 id="polecenia-rdzenia">Polecenia rdzenia</h2>
 <div class="tbl"><table><thead><tr><th>Funkcja</th><th>Testy</th><th>Uwagi</th></tr></thead><tbody><tr><td><code>accounts_add</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
@@ -478,8 +478,10 @@ blockquote {
 <tr><td><code>modules_list</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>modules_set_enabled</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>permissions_get</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
+<tr><td><code>permissions_grants</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>permissions_open_approval</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>permissions_request_level</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
+<tr><td><code>permissions_revoke_grant</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>pipelines_list</code></td><td>rdzeń</td><td></td></tr>
 <tr><td><code>pipelines_remove</code></td><td>rdzeń</td><td></td></tr>
 <tr><td><code>pipelines_save</code></td><td>rdzeń</td><td></td></tr>
@@ -846,12 +848,12 @@ blockquote {
 <tr><td><code>engine_transaction</code></td><td>rdzeń, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_copy</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_delete</code></td><td>rdzeń, przeglądarka, eval, przegląd ogólny</td><td></td></tr>
-<tr><td><code>fs_delete_permanent</code></td><td>eval, przegląd ogólny</td><td></td></tr>
+<tr><td><code>fs_delete_permanent</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_list</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_mkdir</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_move</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_read</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
-<tr><td><code>fs_rename</code></td><td>eval, przegląd ogólny</td><td></td></tr>
+<tr><td><code>fs_rename</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_search</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_stat</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_write</code></td><td>rdzeń, interfejs, aplikacja, eval, przegląd ogólny</td><td></td></tr>

@@ -1,6 +1,7 @@
 //! Tabela decyzyjna klasyfikatora: 80 przypadków × 5 poziomów autonomii (400 werdyktów).
 //! Kolumna `expect`: werdykt dla L0 L1 L2 L3 L4 — `P` wykonaj, `A` zapytaj, `V` zapytaj
-//! nie-głosem, `B` twarda blokada Jądra.
+//! nie-głosem, `B` twarda blokada Jądra. Na L4 tylko `P` albo `B` — okno zgód nie pokazuje się
+//! wcale (decyzja właściciela 31.10).
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -56,14 +57,14 @@ fn cases() -> Vec<(&'static str, ActionFacts, L, &'static str)> {
         ("egress na allowlistę", eg(true), L::Medium, "AAAPP"),
         ("egress poza allowlistę", eg(false), L::Medium, "AAAAP"),
         ("egress z danymi prywatnymi (czysta sesja)", eg(true).private_data(), L::High, "AAAPP"),
-        ("egress z sesji tainted", eg(true).tainted(), L::High, "AAAAA"),
-        ("wysyłka pliku: trifecta", eg(true).tainted().private_data(), L::Critical, "AAAAA"),
-        ("trifecta przez niezaufane argumenty", eg(true).untrusted_args().private_data(), L::Critical, "AAAAA"),
-        ("wysyłka pliku z tainted poza allowlistę", eg(false).tainted().private_data(), L::Critical, "AAAAA"),
+        ("egress z sesji tainted", eg(true).tainted(), L::High, "AAAAP"),
+        ("wysyłka pliku: trifecta", eg(true).tainted().private_data(), L::Critical, "AAAAP"),
+        ("trifecta przez niezaufane argumenty", eg(true).untrusted_args().private_data(), L::Critical, "AAAAP"),
+        ("wysyłka pliku z tainted poza allowlistę", eg(false).tainted().private_data(), L::Critical, "AAAAP"),
         ("egress do claude.ai", eg(false).kernel(KernelRule::ProviderWebUi), L::Critical, "BBBBB"),
         ("gui.control wskazanej aplikacji", f(C::GuiControl).scope(S::AllowedApp), L::Medium, "AAPPP"),
         ("gui.control spoza wskazanych", f(C::GuiControl).scope(S::Outside), L::Medium, "AAAAP"),
-        ("gui.control Brokera", f(C::GuiControl).kernel(KernelRule::GuiControlOfKernelProcess), L::Critical, "BBBBB"),
+        ("gui.control Sędziego Cieni", f(C::GuiControl).kernel(KernelRule::GuiControlOfKernelProcess), L::Critical, "BBBBB"),
         ("secrets.read", f(C::SecretsRead), L::High, "AAAPP"),
         ("secrets.read w sesji tainted", f(C::SecretsRead).tainted(), L::High, "AAAAP"),
         ("system.admin", f(C::Admin), L::High, "AAAAP"),
@@ -71,19 +72,19 @@ fn cases() -> Vec<(&'static str, ActionFacts, L, &'static str)> {
         ("instalacja programu", f(C::Shell).install().reversible(R::No), L::High, "AAAPP"),
         ("instalacja w sesji tainted", f(C::Shell).install().reversible(R::No).tainted(), L::High, "AAAAP"),
         ("głos: zapis, pewność 0,95, bez weryfikacji", w().origin(voice(950, false)), L::Low, "AAPPP"),
-        ("głos: zapis, pewność 0,55, bez weryfikacji", w().origin(voice(550, false)), L::Medium, "VVVVV"),
-        ("głos: zapis, pewność 0,55, zweryfikowany", w().origin(voice(550, true)), L::Medium, "VVVVV"),
+        ("głos: zapis, pewność 0,55, bez weryfikacji", w().origin(voice(550, false)), L::Medium, "VVVVP"),
+        ("głos: zapis, pewność 0,55, zweryfikowany", w().origin(voice(550, true)), L::Medium, "VVVVP"),
         ("głos: 1 plik do Kosza, zweryfikowany", del(D::Recoverable, 1).origin(voice(950, true)), L::Medium, "VVVVP"),
-        ("głos: 1 plik do Kosza, bez weryfikacji", del(D::Recoverable, 1).origin(voice(950, false)), L::Medium, "VVVVV"),
+        ("głos: 1 plik do Kosza, bez weryfikacji", del(D::Recoverable, 1).origin(voice(950, false)), L::Medium, "VVVVP"),
         ("głos: 14 plików do Kosza", del(D::Recoverable, 14).origin(voice(900, true)), L::Medium, "VVVVP"),
-        ("głos: trwałe usunięcie, pewność 0,55", del(D::Permanent, 1).origin(voice(550, true)), L::Critical, "VVVVV"),
+        ("głos: trwałe usunięcie, pewność 0,55", del(D::Permanent, 1).origin(voice(550, true)), L::Critical, "VVVVP"),
         ("głos: odczyt, pewność 0,40", f(C::Read).origin(voice(400, false)), L::Low, "PPPPP"),
-        ("głos: egress bez weryfikacji", eg(true).origin(voice(950, false)), L::Medium, "VVVVV"),
+        ("głos: egress bez weryfikacji", eg(true).origin(voice(950, false)), L::Medium, "VVVVP"),
         ("głos: egress zweryfikowany", eg(true).origin(voice(950, true)), L::Medium, "AAAPP"),
         ("głos: shell w zakresie, zweryfikowany", sh().origin(voice(900, true)), L::Medium, "AAPPP"),
-        ("głos: shell w zakresie, bez weryfikacji", sh().origin(voice(900, false)), L::Medium, "VVVVV"),
+        ("głos: shell w zakresie, bez weryfikacji", sh().origin(voice(900, false)), L::Medium, "VVVVP"),
         ("głos: pewność równa progowi", w().origin(voice(800, false)), L::Low, "AAPPP"),
-        ("głos: pewność tuż pod progiem", w().origin(voice(799, false)), L::Medium, "VVVVV"),
+        ("głos: pewność tuż pod progiem", w().origin(voice(799, false)), L::Medium, "VVVVP"),
         ("agentka: zapis w zakresie", w().origin(CommandOrigin::Agent), L::Low, "AAPPP"),
         ("agentka: trwałe usunięcie", del(D::Permanent, 1).origin(CommandOrigin::Agent), L::High, "AAAPP"),
         ("niezaufana treść: zapis", w().origin(CommandOrigin::UntrustedContent), L::High, "AAAAP"),
@@ -157,16 +158,22 @@ fn grantability_of_asks() {
             grantable: true
         }
     );
-    // Reguły „każdego poziomu” nigdy nie są pokrywane przez „zawsze zezwalaj”.
+    // Reguły obcej treści nigdy nie są pokrywane przez „zawsze zezwalaj”; na L4 nic nie pyta
+    // (okno zgód nie pokazuje się wcale — decyzja właściciela 31.10).
     let tainted = f(C::Egress).egress("x.example", true).tainted();
     for level in AutonomyLevel::ALL {
-        assert!(matches!(
-            evaluate(&tainted, level, &policy).verdict,
-            Verdict::Ask {
-                grantable: false,
-                ..
-            }
-        ));
+        let verdict = evaluate(&tainted, level, &policy).verdict;
+        if level == AutonomyLevel::L4 {
+            assert_eq!(verdict, Verdict::Proceed);
+        } else {
+            assert!(matches!(
+                verdict,
+                Verdict::Ask {
+                    grantable: false,
+                    ..
+                }
+            ));
+        }
     }
     let untrusted = f(C::Write).origin(CommandOrigin::UntrustedContent);
     assert!(matches!(
@@ -185,7 +192,8 @@ fn stricter_policy_thresholds_change_outcome() {
         bulk_threshold: 10,
     };
     let v = f(C::Write).origin(voice(950, true));
-    assert_eq!(code(&evaluate(&v, AutonomyLevel::L4, &strict).verdict), 'V');
+    assert_eq!(code(&evaluate(&v, AutonomyLevel::L3, &strict).verdict), 'V');
+    assert_eq!(code(&evaluate(&v, AutonomyLevel::L4, &strict).verdict), 'P');
     let bulk = f(C::Write)
         .destructive(D::Permanent)
         .reversible(R::No)

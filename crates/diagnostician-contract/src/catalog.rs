@@ -151,7 +151,7 @@ impl FailureKind {
             Self::UpdatePackageCorrupted => "Uszkodzona paczka aktualizacji",
             Self::ResourceBudgetExceeded => "Moduł przekracza budżet zasobów",
             Self::LogDiskLimit => "Logi osiągnęły limit dysku",
-            Self::KernelConfigTampered => "Polityka Jądra zmieniona poza Brokerem",
+            Self::KernelConfigTampered => "Polityka Jądra zmieniona poza Sędzią Cieni",
         }
     }
 

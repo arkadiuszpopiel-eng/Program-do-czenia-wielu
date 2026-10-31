@@ -63,7 +63,7 @@ fn restart_broker(fake: &FakeSystem, procs: &KernelProcesses) {
     common::wait_until("stan „zerwane”", || {
         status.borrow_and_update().state == BrokerLinkState::Lost
     });
-    common::wait_until("nowy proces Brokera i ponowne połączenie", || {
+    common::wait_until("nowy proces Sędziego Cieni i ponowne połączenie", || {
         procs.view().state == BrokerLinkState::Connected
             && fake.brokers.lock().unwrap().len() == before + 1
     });
@@ -99,12 +99,12 @@ async fn session_taint_survives_broker_restart() {
 
     assert!(
         kernel.broker.session_security(&session).tainted,
-        "nowy Broker musi znać skażenie sesji sprzed restartu"
+        "nowy Sędzia Cieni musi znać skażenie sesji sprzed restartu"
     );
     let after = kernel.broker.decide(egress()).await.unwrap();
     assert!(
         matches!(after, Decision::NeedsApproval(_)),
-        "po restarcie Brokera wysyłka ze skażonej sesji nadal wymaga zgody ({after:?})"
+        "po restarcie Sędziego Cieni wysyłka ze skażonej sesji nadal wymaga zgody ({after:?})"
     );
     // Inna sesja nie zostaje skażona przy odtwarzaniu.
     let other = SessionId::new("czysta");
@@ -131,7 +131,7 @@ async fn owner_lowering_survives_broker_restart() {
         })
         .await
         .unwrap();
-    assert_eq!(lowered, None, "obniżenie bez zgody w Broker-UI");
+    assert_eq!(lowered, None, "obniżenie bez zgody w oknie Sędziego Cieni");
     assert_eq!(kernel.broker.autonomy(&session, None), AutonomyLevel::L0);
 
     restart_broker(&fake, &procs);
@@ -139,7 +139,7 @@ async fn owner_lowering_survives_broker_restart() {
     assert_eq!(
         kernel.broker.autonomy(&session, None),
         AutonomyLevel::L0,
-        "restart Brokera nie może podnieść poziomu obniżonego przez właściciela"
+        "restart Sędziego Cieni nie może podnieść poziomu obniżonego przez właściciela"
     );
 }
 

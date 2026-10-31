@@ -13,56 +13,56 @@ async function openPermissions(page: Page) {
     .getByRole('button', { name })
     .click();
   await expect(page.getByRole('heading', { name, level: 2 })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Broker (Jądro bezpieczeństwa)' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Sędzia Cieni (Jądro bezpieczeństwa)' })).toBeVisible();
 }
 
 for (const theme of ['light', 'dark'] as const) {
-  test.describe(`Broker — motyw ${theme}`, () => {
-    test('usługa: karta przenosi do okna Brokera, stan w Ustawieniach', async ({ page }) => {
+  test.describe(`Sędzia Cieni — motyw ${theme}`, () => {
+    test('usługa: karta przenosi do okna Sędziego Cieni, stan w Ustawieniach', async ({ page }) => {
       await openApp(page, { theme });
       await waitForChat(page);
-      await expect(page.getByRole('region', { name: 'Stan Brokera' })).toHaveCount(0);
-      await expect(page.getByText('Zatwierdzasz tylko w oknie Brokera.')).toBeVisible();
-      await page.getByRole('button', { name: /Otwórz w oknie Brokera/ }).click();
-      await expect(page.getByText('Przeniesiono do okna Brokera')).toBeVisible();
+      await expect(page.getByRole('region', { name: 'Stan Sędziego Cieni' })).toHaveCount(0);
+      await expect(page.getByText('Zatwierdzasz tylko w oknie Sędziego Cieni.')).toBeVisible();
+      await page.getByRole('button', { name: /Otwórz w oknie Sędziego Cieni/ }).click();
+      await expect(page.getByText('Przeniesiono do okna Sędziego Cieni')).toBeVisible();
       // Karta nie ma przycisku zatwierdzenia — tylko przeniesienie.
       await expect(page.getByRole('button', { name: /^Zatwierdź|^Zezwól/ })).toHaveCount(0);
       await openPermissions(page);
-      await expect(page.getByText('Usługa Brokera na osobnym koncie Windows')).toBeVisible();
+      await expect(page.getByText('Usługa Sędziego Cieni na osobnym koncie Windows')).toBeVisible();
       await expect(page.getByText('· Połączono')).toBeVisible();
       await expect(page.getByText(/Izolacja: pełna/)).toBeVisible();
       await expect(page.getByText(/obsługuje watchdog, poza aplikacją/)).toBeVisible();
-      await expectAccessible(page, `Broker usługa ${theme}`);
+      await expectAccessible(page, `Sędzia Cieni usługa ${theme}`);
     });
 
     test('tryb przenośny: jawnie słabsza izolacja', async ({ page }) => {
       await openApp(page, { theme, scenario: 'broker-portable' });
       await waitForChat(page);
       await openPermissions(page);
-      await expect(page.getByText('Tryb przenośny — Broker bez osobnego konta')).toBeVisible();
+      await expect(page.getByText('Tryb przenośny — Sędzia Cieni bez osobnego konta')).toBeVisible();
       await expect(page.getByText(/słabsza izolacja/)).toBeVisible();
       await expect(page.getByText(/Izolacja: słabsza/)).toBeVisible();
       await expect(page.getByText(/Instaluje ją raz administrator/)).toBeVisible();
-      await expectAccessible(page, `Broker przenośny ${theme}`);
+      await expectAccessible(page, `Sędzia Cieni przenośny ${theme}`);
     });
 
     test('zerwanie łącza: baner bezpiecznego stanu, karta nie przenosi', async ({ page }) => {
       await openApp(page, { theme, scenario: 'broker-lost' });
       await waitForChat(page);
-      const region = page.getByRole('region', { name: 'Stan Brokera' });
+      const region = page.getByRole('region', { name: 'Stan Sędziego Cieni' });
       const alert = region.getByRole('alert');
-      await expect(alert).toContainText('Połączenie z Brokerem zerwane');
+      await expect(alert).toContainText('Połączenie z Sędzią Cieni zerwane');
       await expect(alert).toContainText('wszystko, co wymaga zgody, jest odrzucane');
       await expect(region.getByRole('button', { name: 'Ukryj komunikat' })).toHaveCount(0);
-      await expect(page.getByText(/Broker jest niedostępny — tej prośby nie da się/)).toBeVisible();
+      await expect(page.getByText(/Sędzia Cieni jest niedostępny — tej prośby nie da się/)).toBeVisible();
       // Opis z przyczyną pada raz (wcześniej baner powtarzał to samo zdanie), a karta nie udaje,
       // że okno Brokera da się otworzyć.
       // Liczymy wystąpienia w tekście, nie elementy — zdanie powtórzone w jednym akapicie też jest błędem.
       const repeats = ((await alert.innerText()).match(/bezpieczny stan/gi) ?? []).length;
       expect(repeats, 'zdanie o bezpiecznym stanie pada raz').toBe(1);
-      await expect(alert).toContainText('proces Brokera zakończył działanie');
-      await expect(page.getByRole('button', { name: /Otwórz w oknie Brokera/ })).toHaveCount(0);
-      await expectAccessible(page, `Broker zerwany ${theme}`);
+      await expect(alert).toContainText('proces Sędziego Cieni zakończył działanie');
+      await expect(page.getByRole('button', { name: /Otwórz w oknie Sędziego Cieni/ })).toHaveCount(0);
+      await expectAccessible(page, `Sędzia Cieni zerwany ${theme}`);
       await region.getByRole('button', { name: 'Szczegóły' }).click();
       await expect(page.getByText('· Połączenie zerwane — bezpieczny stan')).toBeVisible();
       await expect(page.getByText(/Okno zatwierdzeń: niedostępne/)).toBeVisible();
@@ -71,9 +71,9 @@ for (const theme of ['light', 'dark'] as const) {
     test('bez watchdoga: baner awaryjnego kill-switcha do ukrycia', async ({ page }) => {
       await openApp(page, { theme, scenario: 'broker-no-watchdog' });
       await waitForChat(page);
-      const region = page.getByRole('region', { name: 'Stan Brokera' });
+      const region = page.getByRole('region', { name: 'Stan Sędziego Cieni' });
       await expect(region).toContainText('Watchdog nie działa');
-      await expectAccessible(page, `Broker bez watchdoga ${theme}`);
+      await expectAccessible(page, `Sędzia Cieni bez watchdoga ${theme}`);
       await region.getByRole('button', { name: 'Ukryj komunikat' }).click();
       await expect(region).toHaveCount(0);
     });
@@ -81,12 +81,12 @@ for (const theme of ['light', 'dark'] as const) {
     test('tryb deweloperski: baner informacyjny wyłączany w Ustawieniach', async ({ page }) => {
       await openApp(page, { theme, scenario: 'broker-dev' });
       await waitForChat(page);
-      const region = page.getByRole('region', { name: 'Stan Brokera' });
+      const region = page.getByRole('region', { name: 'Stan Sędziego Cieni' });
       await expect(region).toContainText('Tryb deweloperski');
       await openPermissions(page);
       const toggle = page.getByRole('switch', { name: 'Pokazuj baner trybu deweloperskiego' });
       await expect(toggle).toBeChecked();
-      await expectAccessible(page, `Broker dev — ustawienie ${theme}`);
+      await expectAccessible(page, `Sędzia Cieni dev — ustawienie ${theme}`);
       await toggle.click();
       await expect(toggle).not.toBeChecked();
       await page.getByRole('button', { name: 'Wróć do rozmowy' }).click();

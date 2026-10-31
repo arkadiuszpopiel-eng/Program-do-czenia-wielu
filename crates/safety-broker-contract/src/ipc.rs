@@ -16,7 +16,7 @@ use crate::action::{
     ActionRequest, AttenuateRequest, BrokerError, BrokerMetrics, Decision, PlanDecision,
     PlanRequest, SessionSecurity, TaintSource,
 };
-use crate::approval::{ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalStatus};
+use crate::approval::{ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalStatus, GrantInfo};
 use crate::autonomy::AutonomyTarget;
 use crate::capability::Capability;
 use crate::policy::KernelPolicy;
@@ -189,6 +189,13 @@ pub enum Request {
     RequestPolicy(Box<KernelPolicy>),
     /// `Broker::metrics`.
     Metrics,
+    /// `Broker::grants` — tylko jądro (panel uprawnień).
+    Grants,
+    /// `Broker::revoke_grant` — tylko jądro (panel uprawnień).
+    RevokeGrant {
+        /// Numer zgody.
+        id: u64,
+    },
     /// `ApprovalChannel::pending` — tylko Broker-UI.
     PendingApprovals,
     /// `ApprovalChannel::resolve` — tylko Broker-UI.
@@ -226,7 +233,7 @@ impl Request {
             Self::SessionSecurity { .. } | Self::Autonomy { .. } => {
                 matches!(role, Core | Agent | BrokerUi)
             }
-            Self::RevokeHolder { .. } => role == Core,
+            Self::RevokeHolder { .. } | Self::Grants | Self::RevokeGrant { .. } => role == Core,
             Self::Metrics => matches!(role, Core | BrokerUi | Watchdog),
             Self::PendingApprovals | Self::Resolve { .. } => role == BrokerUi,
             Self::KillAll { .. } => matches!(role, Core | BrokerUi | Watchdog),
@@ -261,6 +268,10 @@ pub enum Response {
     Metrics(BrokerMetrics),
     /// Oczekujące wyzwania.
     Pending(Vec<ApprovalChallenge>),
+    /// Zgody „zawsze w tym zakresie”.
+    Grants(Vec<GrantInfo>),
+    /// Czy odwołano (brak takiej zgody — `false`).
+    Revoked(bool),
     /// Raport kill-switcha.
     Killed(KillReport),
     /// Rekord Audytu (seq, hash).

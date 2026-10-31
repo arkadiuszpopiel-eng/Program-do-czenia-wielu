@@ -7,11 +7,13 @@ use safety_broker_contract::{
     ApprovalDecision, ApprovalId, ApprovalSubject, AutonomyChangeRequest, AutonomyEntry,
     AutonomyTarget, BrokerError, ChangeOrigin, EVENT_AUTONOMY_CHANGED, EVENT_KERNEL_BLOCK,
     EVENT_POLICY_CHANGED, EVENT_TOKEN_ISSUED, HelloRequirement, Holder, KernelGuard, KernelPolicy,
+    UNTIL_REVOKED,
 };
 use serde_json::json;
 
 use crate::approvals::Meta;
 use crate::engine::BrokerEngine;
+use crate::grants::next_id;
 use crate::state::{ApprovedPlan, Grant, PendStatus, PendingAction, State};
 
 fn system_holder() -> Holder {
@@ -78,13 +80,26 @@ impl BrokerEngine {
                 self.audit(EVENT_TOKEN_ISSUED, Some(&req.holder), payload)?;
                 Self::register(st, &token);
                 if let ApprovalDecision::AllowInScope { scope, until_ms } = decision {
+                    // Termin przycinany do limitu polityki; „do odwołania” zostaje bez terminu
+                    // (wybór właściciela w oknie — odwołanie w panelu uprawnień albo STOP).
                     let max = now.saturating_add(st.policy().grant_max_ms);
+                    let until_ms = if until_ms == UNTIL_REVOKED {
+                        UNTIL_REVOKED
+                    } else {
+                        until_ms.min(max)
+                    };
+                    let id = next_id(st);
                     st.grants.push(Grant {
+                        id,
                         session: req.holder.session.clone(),
                         agent: req.holder.agent.clone(),
                         cap: scope,
-                        until_ms: until_ms.min(max),
+                        granted_at_ms: now,
+                        until_ms,
                     });
+                    if until_ms == UNTIL_REVOKED {
+                        self.persist_grants(st);
+                    }
                 }
                 Ok(PendStatus::Approved(Some(Box::new(token))))
             }
@@ -116,6 +131,9 @@ impl BrokerEngine {
                     self.remember_global(level);
                 }
                 st.autonomy.set(target, AutonomyEntry { level, until_ms });
+                if level == AutonomyLevel::L4 {
+                    Self::withdraw_full_auto(st, now);
+                }
                 Ok(PendStatus::Approved(None))
             }
             PendingAction::Policy(policy) => {
@@ -125,6 +143,31 @@ impl BrokerEngine {
                 st.guard = KernelGuard::new(*policy, self.env.clone());
                 Ok(PendStatus::Approved(None))
             }
+        }
+    }
+
+    /// Po przejściu na „Pełną automatykę” okno zgód nie pokazuje się wcale (właściciel 31.10):
+    /// czekające karty działań i planów podmiotów, które teraz mają L4, wygasają od razu —
+    /// ponowione działanie przejdzie bez pytania (twarda blokada Jądra działa dalej).
+    fn withdraw_full_auto(st: &mut State, now: u64) {
+        let full = |st: &State, h: &Holder| {
+            st.autonomy.effective(&h.session, h.agent.as_ref(), now) == AutonomyLevel::L4
+        };
+        let ids: Vec<ApprovalId> = st
+            .approvals
+            .iter()
+            .filter(|(_, p)| matches!(p.status, PendStatus::Pending))
+            .filter(|(_, p)| {
+                matches!(
+                    p.action,
+                    Some(PendingAction::Action(_) | PendingAction::Plan { .. })
+                )
+            })
+            .filter(|(_, p)| full(st, &p.request.holder))
+            .map(|(id, _)| *id)
+            .collect();
+        for id in ids {
+            Self::set_status(st, id, PendStatus::Expired);
         }
     }
 
@@ -220,6 +263,7 @@ impl BrokerEngine {
             hello_required: hello,
             rules: Vec::new(),
             explanation: format!("Zmiana poziomu autonomii: {current} → {}.", req.level),
+            autonomy: None,
         };
         let action = PendingAction::Autonomy {
             target: req.target,
@@ -260,6 +304,7 @@ impl BrokerEngine {
             hello_required: hello,
             rules: Vec::new(),
             explanation: "Zmiana polityk Jądra — sprawdź szczegóły przed zatwierdzeniem.".into(),
+            autonomy: None,
         };
         let subject = ApprovalSubject::Policy {
             policy: Box::new(policy.clone()),

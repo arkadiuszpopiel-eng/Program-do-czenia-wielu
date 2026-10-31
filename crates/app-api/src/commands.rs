@@ -99,6 +99,8 @@ macro_rules! with_commands {
             permissions_get(session_id: Option<String>) -> $crate::dto::PermissionsState;
             permissions_request_level(level: $crate::dto::AutonomyLevel, session_id: Option<String>) -> $crate::dto::BrokerIntentResult;
             permissions_open_approval(approval_id: String) -> $crate::dto::BrokerIntentResult;
+            permissions_grants() -> Vec<$crate::dto::GrantView>;
+            permissions_revoke_grant(grant_id: String) -> bool;
             broker_status() -> $crate::dto::BrokerStatusView;
             models_local_list() -> Vec<$crate::dto::LocalModelInfo>;
             models_local_download(model_id: Option<String>) -> ();

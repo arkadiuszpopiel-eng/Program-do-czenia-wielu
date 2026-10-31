@@ -104,7 +104,7 @@ pub(crate) fn build(b: &mut Builder<'_>) {
     match b.d.kind {
         FailureKind::ModuleStartFailure if is_kernel_module(&m) => {
             b.restart(&m);
-            b.because(Risk::Medium, format!("Moduł Jądra {m} nie startuje — tylko ponowne uruchomienie przez Brokera/watchdoga (nigdy wyłączenie)."));
+            b.because(Risk::Medium, format!("Moduł Jądra {m} nie startuje — tylko ponowne uruchomienie przez Sędziego Cieni/watchdoga (nigdy wyłączenie)."));
             b.human(format!(
                 "Moduł Jądra {m} nie startuje — sprawdź logi; o safe-mode decyduje watchdog."
             ));
@@ -119,7 +119,7 @@ pub(crate) fn build(b: &mut Builder<'_>) {
                     b.because(Risk::Medium, format!("Moduł {m} nie startuje od zmiany konfiguracji — przywracam ustawienia z ostatniej dobrej rewizji (tylko klucze dozwolone Diagnoście)."));
                     if !skipped.is_empty() {
                         b.human(format!(
-                            "Nie przywróciłam ustawień poza zasięgiem Diagnosty ({}) — zmieniasz je tylko Ty (Ustawienia albo Broker-UI).",
+                            "Nie przywróciłam ustawień poza zasięgiem Diagnosty ({}) — zmieniasz je tylko Ty (Ustawienia albo okno Sędziego Cieni).",
                             skipped.join(", ")
                         ));
                     }
@@ -143,7 +143,7 @@ pub(crate) fn build(b: &mut Builder<'_>) {
                 ));
             }
             if b.d.kind == FailureKind::KernelConfigTampered {
-                b.because(Risk::High, format!("Polityka Jądra {t} zmieniona poza Brokerem — przywrócenie podpisanej kopii wymaga Broker-UI."));
+                b.because(Risk::High, format!("Polityka Jądra {t} zmieniona poza Sędzią Cieni — przywrócenie podpisanej kopii wymaga okna Sędziego Cieni."));
             }
         }
         FailureKind::SessionDbCorrupted => {
@@ -345,7 +345,7 @@ pub(crate) fn build(b: &mut Builder<'_>) {
         }
         FailureKind::UpdatePackageCorrupted => {
             b.quarantine(&t);
-            b.because(Risk::Medium, format!("Paczka aktualizacji {t} ma zły podpis/hash — do kwarantanny (Broker), pobranie ponowi updater."));
+            b.because(Risk::Medium, format!("Paczka aktualizacji {t} ma zły podpis/hash — do kwarantanny (Sędzia Cieni), pobranie ponowi updater."));
         }
         FailureKind::ResourceBudgetExceeded => {
             let key = b.key("limit_key", format!("modules.{ms}.lifecycle"));

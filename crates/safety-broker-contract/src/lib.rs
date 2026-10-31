@@ -35,13 +35,13 @@ pub use action::{
 };
 pub use api::{
     AnchorStore, ApprovalChannel, Broker, ChainAnchor, EVENT_APPROVAL_DECIDED,
-    EVENT_APPROVAL_REQUESTED, EVENT_AUTONOMY_CHANGED, EVENT_CHAIN_STARTED, EVENT_KERNEL_BLOCK,
-    EVENT_KEY_ROTATED, EVENT_KILL_SWITCH, EVENT_POLICY_CHANGED, EVENT_SESSION_TAINTED,
-    EVENT_TOKEN_DENIED, EVENT_TOKEN_ISSUED, EVENT_TOKEN_REVOKED,
+    EVENT_APPROVAL_REQUESTED, EVENT_AUTONOMY_CHANGED, EVENT_CHAIN_STARTED, EVENT_GRANT_REVOKED,
+    EVENT_KERNEL_BLOCK, EVENT_KEY_ROTATED, EVENT_KILL_SWITCH, EVENT_POLICY_CHANGED,
+    EVENT_SESSION_TAINTED, EVENT_TOKEN_DENIED, EVENT_TOKEN_ISSUED, EVENT_TOKEN_REVOKED,
 };
 pub use approval::{
     ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalRequest, ApprovalStatus,
-    ApprovalSubject, PlanStepSummary,
+    ApprovalSubject, GrantInfo, PlanStepSummary, UNTIL_REVOKED,
 };
 pub use autonomy::{AutonomyEntry, AutonomyTable, AutonomyTarget};
 pub use capability::Capability;

@@ -78,9 +78,10 @@ pub async fn voice_destruction_asks_below_l4<B: FullBroker>(b: &B, clock: &Manua
     );
 }
 
-/// Sesja `tainted`: egress wymaga potwierdzenia także na L4; taint jest monotoniczny.
-pub async fn tainted_egress_asks_on_l4<B: FullBroker>(b: &B, clock: &ManualClock) {
-    session_l4(b, clock).await;
+/// Sesja `tainted`: egress pyta do L3; na „Pełnej automatyce” (L4) przechodzi bez okna zgód
+/// (decyzja właściciela 31.10), a czekająca karta wygasa przy przejściu na L4. Taint jest
+/// monotoniczny i nie przechodzi na inne sesje.
+pub async fn tainted_egress_asks_up_to_l3_only<B: FullBroker>(b: &B, clock: &ManualClock) {
     let egress = || {
         request(
             &delta(),
@@ -88,13 +89,21 @@ pub async fn tainted_egress_asks_on_l4<B: FullBroker>(b: &B, clock: &ManualClock
             CommandOrigin::Agent,
         )
     };
-    allowed(b.decide(egress()).await);
     let s1 = SessionId::new("s1");
     b.report_untrusted_input(&s1, TaintSource::Web)
         .await
         .unwrap_or_else(|e| panic!("{e}"));
     assert!(b.session_security(&s1).tainted);
-    needs_approval(b.decide(egress()).await);
+    let waiting = needs_approval(b.decide(egress()).await);
+    session_l4(b, clock).await;
+    assert_eq!(
+        b.approval_status(waiting.id, &delta()),
+        Ok(ApprovalStatus::Expired),
+        "karta sprzed L4 wygasa — okno nie zostaje na ekranie"
+    );
+    assert!(b.pending().iter().all(|c| c.request.id != waiting.id));
+    allowed(b.decide(egress()).await);
+    assert!(b.session_security(&s1).tainted, "taint zostaje");
     let other = Holder::agent("s2", "delta");
     let r = request(
         &other,
@@ -267,7 +276,7 @@ where
     let (b, c) = fresh();
     voice_destruction_asks_below_l4(&b, &c).await;
     let (b, c) = fresh();
-    tainted_egress_asks_on_l4(&b, &c).await;
+    tainted_egress_asks_up_to_l3_only(&b, &c).await;
     agent_cannot_raise_own_level(&fresh().0).await;
     let (b, c) = fresh();
     raise_requires_valid_proof(&b, &c).await;

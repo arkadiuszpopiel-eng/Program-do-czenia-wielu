@@ -59,20 +59,20 @@ impl AppCore {
             self.inner.raises.add(scope, level, &result.request_id);
         }
         if result.status == BrokerIntentStatus::Applied {
-            match &session {
-                // Zapamiętany poziom wraca po restarcie (obniżenie nie wymaga zgody).
-                None => {
-                    let value = serde_json::to_value(level).map_err(AppError::internal)?;
-                    self.config_set(keys::AUTONOMY, Some(value), false).await?;
-                }
-                Some(id) => self.remember_session_level(id, level).await?,
-            }
-            match &session {
-                Some(id) => self.announce_session(id).await,
-                None => self.announce_all_sessions().await,
-            }
+            // Zapamiętany poziom wraca po restarcie (obniżenie nie wymaga zgody).
+            self.remember_level(session.as_ref(), level).await?;
         }
         Ok(result)
+    }
+
+    /// `permissions_grants` — zgody „zawsze w tym zakresie” z Sędziego Cieni (panel uprawnień).
+    pub async fn permissions_grants(&self) -> Result<Vec<crate::dto::GrantView>, AppError> {
+        Ok(self.inner.broker.grants().await)
+    }
+
+    /// `permissions_revoke_grant` — odwołanie zgody (tylko zawęża — bez okna Sędziego).
+    pub async fn permissions_revoke_grant(&self, grant_id: String) -> Result<bool, AppError> {
+        self.inner.broker.revoke_grant(&grant_id).await
     }
 
     /// `broker_status` — tryb Brokera, łącze, okno zatwierdzeń, watchdog (`app-broker`).
@@ -107,17 +107,26 @@ impl AppCore {
             .unwrap_or_default()
     }
 
-    /// Zapisuje obniżenie poziomu sesji (wraca po restarcie aplikacji i Brokera).
-    async fn remember_session_level(
+    /// Zapisuje poziom globalny (`None`) albo sesji (wraca po restarcie aplikacji i Brokera)
+    /// i ogłasza go sesjom.
+    async fn remember_level(
         &self,
-        session: &SessionId,
+        session: Option<&SessionId>,
         level: AutonomyLevel,
     ) -> Result<(), AppError> {
+        let Some(session) = session else {
+            let value = serde_json::to_value(level).map_err(AppError::internal)?;
+            self.config_set(keys::AUTONOMY, Some(value), false).await?;
+            self.announce_all_sessions().await;
+            return Ok(());
+        };
         let (_, mut sessions) = self.remembered_levels().await;
         sessions.insert(session.as_str().to_owned(), level);
         let entries = levels::format_session_levels(&sessions);
         let value = serde_json::to_value(entries).map_err(AppError::internal)?;
-        self.config_set(SESSION_LEVELS, Some(value), false).await
+        self.config_set(SESSION_LEVELS, Some(value), false).await?;
+        self.announce_session(session).await;
+        Ok(())
     }
 
     /// Nakłada zapamiętane obniżenia na Brokera, gdy ma on poziom wyższy (np. po jego restarcie
@@ -241,25 +250,14 @@ impl AppCore {
     /// Zatwierdzone podniesienie staje się zapamiętanym poziomem (globalnym albo sesji); `false` —
     /// zapis się nie powiódł (prośba zostaje do następnego przebiegu).
     async fn adopt_raise(&self, session: Option<&SessionId>, level: AutonomyLevel) -> bool {
-        let saved = match session {
-            None => match serde_json::to_value(level) {
-                Ok(value) => self.config_set(keys::AUTONOMY, Some(value), false).await,
-                Err(e) => Err(AppError::internal(e)),
-            },
-            Some(id) => self.remember_session_level(id, level).await,
-        };
-        if let Err(e) = saved {
+        if let Err(e) = self.remember_level(session, level).await {
             tracing::warn!(error = %e, "zapis zatwierdzonego poziomu autonomii nie powiódł się");
             return false;
         }
         tracing::info!(
             ?level,
-            "przyjęto podniesienie poziomu zatwierdzone w oknie Brokera"
+            "przyjęto podniesienie poziomu zatwierdzone w oknie Sędziego Cieni"
         );
-        match session {
-            Some(id) => self.announce_session(id).await,
-            None => self.announce_all_sessions().await,
-        }
         true
     }
 

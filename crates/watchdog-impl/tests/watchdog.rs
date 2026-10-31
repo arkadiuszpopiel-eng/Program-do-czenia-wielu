@@ -307,7 +307,7 @@ async fn kill_switch_kills_trees_and_is_not_blocked_by_hanging_broker() {
     );
     assert!(r.w.jobs().is_empty());
     eprintln!(
-        "kill-switch watchdoga z zawieszonym Brokerem: {elapsed} ms (budżet {} ms)",
+        "kill-switch watchdoga z zawieszonym Sędzią Cieni: {elapsed} ms (budżet {} ms)",
         budget_ms(200)
     );
     assert!(elapsed < budget_ms(200));

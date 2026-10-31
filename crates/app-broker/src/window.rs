@@ -32,12 +32,14 @@ impl ApprovalWindow for RemoteWindow {
             return Ok(());
         }
         let why = match self.status.link() {
-            LinkState::Lost(why) => format!("połączenie z Brokerem zerwane ({why})"),
-            LinkState::Connecting => "trwa łączenie z Brokerem".to_owned(),
-            LinkState::Connected => "okno zatwierdzeń Brokera nie jest uruchomione".to_owned(),
+            LinkState::Lost(why) => format!("połączenie z Sędzią Cieni zerwane ({why})"),
+            LinkState::Connecting => "trwa łączenie z Sędzią Cieni".to_owned(),
+            LinkState::Connected => {
+                "okno zatwierdzeń Sędziego Cieni nie jest uruchomione".to_owned()
+            }
         };
         Err(AppError::forbidden(format!(
-            "Ta prośba wymaga potwierdzenia w oknie Brokera, a {why} — bezpieczny stan: prośba \
+            "Ta prośba wymaga potwierdzenia w oknie Sędziego Cieni, a {why} — bezpieczny stan: prośba \
              zostanie odrzucona."
         )))
     }

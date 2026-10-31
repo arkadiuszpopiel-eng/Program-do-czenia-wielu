@@ -2,6 +2,7 @@
 import { CommandError } from '../command-error';
 import type { AlfaClient } from '../client';
 import type { AutonomyLevel, EventLevel } from '../types';
+import type { GrantView } from '../types-hub';
 import type { FakeChat } from './api-chat';
 import { bootReport } from './api-boot';
 import type { FakeCore } from './core';
@@ -160,6 +161,26 @@ export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
   let global: AutonomyLevel = ORDER.find((l) => l === start) ?? 'L3';
   // Sesje z własnym poziomem; pozostałe pokazują poziom globalny (jak `session_autonomy` w rdzeniu).
   const own = new Set<string>();
+  // Zgody „zawsze w tym zakresie” (jak lista z Sędziego Cieni): jedna z terminem, jedna do odwołania.
+  const sid = core.sessions[0]?.id ?? 's1';
+  let grants: GrantView[] = [
+    {
+      id: '1',
+      session_id: sid,
+      agent: 'delta',
+      scope: 'połączenie z internetem: strona example.com',
+      granted_at_ms: Date.now() - 600_000,
+      until_ms: Date.now() + 3 * 3_600_000,
+    },
+    {
+      id: '2',
+      session_id: sid,
+      agent: null,
+      scope: 'odczyt plików: folder c:\\users\\spopielony\\documents (z podfolderami)',
+      granted_at_ms: Date.now() - 86_400_000,
+      until_ms: null,
+    },
+  ];
   if (global !== 'L3')
     for (const s of core.sessions) core.updateSession(s.id, { autonomy: global });
   return {
@@ -188,6 +209,12 @@ export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
     },
     openApproval: () =>
       core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') }),
+    grants: () => core.reply([...grants]),
+    revokeGrant: (grantId) => {
+      const before = grants.length;
+      grants = grants.filter((g) => g.id !== grantId);
+      return core.reply(grants.length < before);
+    },
   };
 }
 

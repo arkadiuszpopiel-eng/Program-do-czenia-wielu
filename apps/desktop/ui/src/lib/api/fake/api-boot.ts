@@ -32,7 +32,7 @@ const WARNINGS: readonly BootLine[] = [
 const ERRORS: readonly BootLine[] = [
   line(
     'ERROR',
-    'alfa_desktop_lib::boot: poprzedni start Alfy się nie powiódł (program zamknął się przed oknem) powod="Broker nie odpowiedział"',
+    'alfa_desktop_lib::boot: poprzedni start Alfy się nie powiódł (program zamknął się przed oknem) powod="Sędzia Cieni nie odpowiedział"',
   ),
 ];
 

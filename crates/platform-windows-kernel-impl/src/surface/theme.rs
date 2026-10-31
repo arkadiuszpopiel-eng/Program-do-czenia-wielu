@@ -1,4 +1,4 @@
-//! Kolory okna Broker-UI — wartości tokenów `packages/ui-kit/src/tokens.css` (`--alfa-color-*`)
+//! Kolory okna Sędziego Cieni — wartości tokenów `packages/ui-kit/src/tokens.css` (`--alfa-color-*`)
 //! w motywie jasnym i ciemnym; motyw według ustawienia Windows (`AppsUseLightTheme`).
 
 #![allow(unsafe_code)]
@@ -26,7 +26,6 @@ pub(super) struct Palette {
     pub text: COLORREF,
     pub muted: COLORREF,
     pub subtle: COLORREF,
-    pub on_accent: COLORREF,
     pub focus: COLORREF,
     pub success: COLORREF,
     pub warning: COLORREF,
@@ -42,7 +41,6 @@ const LIGHT: Palette = Palette {
     text: hex(0x1A1C22),
     muted: hex(0x5B6070),
     subtle: hex(0x626878),
-    on_accent: hex(0xFFFFFF),
     focus: hex(0x2F5BFF),
     success: hex(0x127436),
     warning: hex(0x8A5A00),
@@ -58,7 +56,6 @@ const DARK: Palette = Palette {
     text: hex(0xEDEEF2),
     muted: hex(0xA7ACBB),
     subtle: hex(0x8A8F9E),
-    on_accent: hex(0x131417),
     focus: hex(0x8FB0FF),
     success: hex(0x4ADE80),
     warning: hex(0xFBBF24),
@@ -75,6 +72,11 @@ impl Palette {
             SurfaceTone::High | SurfaceTone::Critical => self.error,
         }
     }
+}
+
+/// Motyw jasny albo ciemny (podgląd okna w pliku).
+pub(super) fn palette_of(dark: bool) -> Palette {
+    if dark { DARK } else { LIGHT }
 }
 
 /// Motyw aplikacji według ustawień Windows (`AppsUseLightTheme`; błąd odczytu — jasny).

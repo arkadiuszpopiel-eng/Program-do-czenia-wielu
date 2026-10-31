@@ -49,7 +49,7 @@ pub(crate) const CORE: &[&str] = &[
     "shell_run",
     "delegate_task",
 ];
-pub(crate) const QUICK_GUIDE: &str = "\nSzybki dostęp do narzędzi: otrzymujesz pakiet dobrany do celu, a nie cały katalog. Jeśli znasz operację i argumenty, wywołaj ją od razu (albo tool_call z krótką command i args). tools_find służy tylko do znalezienia brakującej definicji; nie ponawiaj wyszukiwania znanej operacji. Znana ścieżka → read/fs_read; nieznana lokalizacja → find/fs_search. Plik edytuj przez write/edit/fs_write, terminal zostaw do testów i poleceń. Nie przeglądaj zainstalowanych programów ani całego dysku, jeżeli zadanie tego nie wymaga. Każde wywołanie nadal podlega profilowi dostępu i Brokerowi.\n";
+pub(crate) const QUICK_GUIDE: &str = "\nSzybki dostęp do narzędzi: otrzymujesz pakiet dobrany do celu, a nie cały katalog. Jeśli znasz operację i argumenty, wywołaj ją od razu (albo tool_call z krótką command i args). tools_find służy tylko do znalezienia brakującej definicji; nie ponawiaj wyszukiwania znanej operacji. Znana ścieżka → read/fs_read; nieznana lokalizacja → find/fs_search. Plik edytuj przez write/edit/fs_write, terminal zostaw do testów i poleceń. Nie przeglądaj zainstalowanych programów ani całego dysku, jeżeli zadanie tego nie wymaga. Każde wywołanie nadal podlega profilowi dostępu i Sędziemu Cieni.\n";
 
 pub(crate) fn alias(command: &str) -> &str {
     match command {

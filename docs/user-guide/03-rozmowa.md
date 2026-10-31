@@ -118,7 +118,7 @@ odpowiedzi powstają po kolei (najpierw model A, potem B) i stają obok siebie z
 
 Każda odpowiedź to nowa wersja (gałąź) pod Twoją wiadomością — wcześniejsze odpowiedzi zostają. **Wybierz tę
 odpowiedź** ustawia jej gałąź jako bieżącą: dalsza rozmowa idzie od niej, a pozostałe wersje przełączysz strzałkami.
-Obie odpowiedzi liczą się do kosztów i limitów jak zwykłe wiadomości; prywatność sesji, Broker i limity działają
+Obie odpowiedzi liczą się do kosztów i limitów jak zwykłe wiadomości; prywatność sesji, Sędzia Cieni i limity działają
 tak samo. Jeśli wybrany model nie może odpowiedzieć (limit kosztów, sesja tylko lokalna, awaria), przy nim pojawia
 się błąd albo dopisek „Odpowiedział model zastępczy”. **Zatrzymaj** przerywa bieżącą odpowiedź i nie uruchamia
 kolejnej. Arena porównuje same modele — bez narzędzi agentek i bez mostów CLI.

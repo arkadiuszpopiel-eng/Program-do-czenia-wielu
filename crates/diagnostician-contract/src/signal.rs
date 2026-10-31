@@ -346,7 +346,7 @@ mod tests {
         ));
         let s = Signal::from_event(&ev(
             "config.invalid",
-            json!({"reason": "zmiana kernel.egress poza Brokerem"}),
+            json!({"reason": "zmiana kernel.egress poza Sędzią Cieni"}),
         ))
         .unwrap();
         assert!(matches!(

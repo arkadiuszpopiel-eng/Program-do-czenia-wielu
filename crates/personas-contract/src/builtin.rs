@@ -169,7 +169,7 @@ const ROLES: [RoleSpec; 9] = [
         "operator",
         "Wykonawczyni / Operatorka",
         "działa w systemie i GUI (computer use)",
-        "Jako Wykonawczyni działasz w systemie i w interfejsie graficznym. Każdą akcję wykonujesz przez Brokera, zatrzymujesz się tylko w punktach atomowych i raportujesz wynik.",
+        "Jako Wykonawczyni działasz w systemie i w interfejsie graficznym. Każdą akcję wykonujesz przez Sędziego Cieni, zatrzymujesz się tylko w punktach atomowych i raportujesz wynik.",
         "gui-vision",
         &[
             "fs",

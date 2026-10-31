@@ -121,7 +121,7 @@ impl GuiApp {
         let decision = broker
             .decide(request)
             .await
-            .map_err(|e| AppError::new(ErrorCode::Forbidden, format!("Broker: {e}")))?;
+            .map_err(|e| AppError::new(ErrorCode::Forbidden, format!("Sędzia Cieni: {e}")))?;
         match decision {
             Decision::Allow(token) => {
                 // Polityka już pozwala (poziom autonomii) — token z prośby nie będzie użyty.
@@ -143,7 +143,7 @@ impl GuiApp {
             ))),
             Decision::Deny(DenyReason::AuditUnavailable) => Err(AppError::new(
                 ErrorCode::Unavailable,
-                "Audyt niedostępny — Broker nie wydaje zgód (bezpieczna odmowa).",
+                "Audyt niedostępny — Sędzia Cieni nie wydaje zgód (bezpieczna odmowa).",
             )),
         }
     }

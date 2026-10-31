@@ -85,7 +85,7 @@ pub use pipe::{
 };
 pub use surface::{
     ApprovalSurfacePort, MAX_BUTTONS, MAX_DETAILS, MAX_TEXT_CHARS, MIN_BUTTON_ID, PixelRect,
-    SurfaceButton, SurfaceEvent, SurfaceLayout, SurfaceTone, SurfaceView,
+    SurfaceButton, SurfaceChoice, SurfaceEvent, SurfaceLayout, SurfaceTone, SurfaceView,
 };
 
 // F6 (computer use) i F4 (terminal): okna v2, UI Automation, wejście syntetyczne, zrzuty

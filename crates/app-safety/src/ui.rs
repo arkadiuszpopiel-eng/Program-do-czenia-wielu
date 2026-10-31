@@ -22,7 +22,9 @@ pub fn read_ticket<R: BufRead>(input: R) -> Result<UiLaunchTicket, String> {
         .read_line(&mut line)
         .map_err(|e| format!("stdin: {e}"))?;
     if line.trim().is_empty() {
-        return Err("brak biletu startowego na stdin (Broker-UI uruchamia usługa Brokera)".into());
+        return Err(
+            "brak biletu startowego na stdin (Broker-UI uruchamia usługa Sędziego Cieni)".into(),
+        );
     }
     serde_json::from_str(line.trim()).map_err(|e| format!("bilet startowy: {e}"))
 }

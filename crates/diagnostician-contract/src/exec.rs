@@ -96,7 +96,7 @@ impl<H: DiagHost> DiagnosticianCore<H> {
         if r.proposal.kernel_area || bad.is_some() || whole_revision {
             self.needs_human(
                 id,
-                "naprawa poza zasięgiem Diagnosty — wymaga Brokera".into(),
+                "naprawa poza zasięgiem Diagnosty — wymaga Sędziego Cieni".into(),
             );
             return self.get(id);
         }
@@ -143,7 +143,7 @@ impl<H: DiagHost> DiagnosticianCore<H> {
                 self.record(id, JournalEvent::KernelPending { ticket })
             }
             KernelOutcome::Denied { reason } => {
-                self.needs_human(id, format!("Broker: {reason}"));
+                self.needs_human(id, format!("Sędzia Cieni: {reason}"));
                 self.get(id)
             }
             KernelOutcome::Executed { receipts } => {
@@ -158,13 +158,16 @@ impl<H: DiagHost> DiagnosticianCore<H> {
                     _ => {
                         let (undo, errors) = match self.kernel.undo(&r.proposal, &receipts).await {
                             KernelOutcome::Executed { receipts } => (receipts, Vec::new()),
-                            other => (Vec::new(), vec![format!("Broker nie cofnął: {other:?}")]),
+                            other => (
+                                Vec::new(),
+                                vec![format!("Sędzia Cieni nie cofnął: {other:?}")],
+                            ),
                         };
                         self.fail(
                             id,
                             undo,
                             errors,
-                            "awaria nie ustąpiła — Broker cofnął kroki".into(),
+                            "awaria nie ustąpiła — Sędzia Cieni cofnął kroki".into(),
                         )
                     }
                 }
@@ -179,7 +182,7 @@ impl<H: DiagHost> DiagnosticianCore<H> {
             let (undo, errors) = if r.consent == Consent::Broker {
                 match self.kernel.undo(&r.proposal, &r.receipts).await {
                     KernelOutcome::Executed { receipts } => (receipts, Vec::new()),
-                    other => (Vec::new(), vec![format!("Broker: {other:?}")]),
+                    other => (Vec::new(), vec![format!("Sędzia Cieni: {other:?}")]),
                 }
             } else {
                 self.revert(&r.receipts).await

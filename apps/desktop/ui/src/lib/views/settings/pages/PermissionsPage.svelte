@@ -12,6 +12,7 @@
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BrokerStatusCard from './BrokerStatusCard.svelte';
+  import GrantsCard from './GrantsCard.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -129,6 +130,7 @@
       {t('perm.hello', { state: t(perms.hello_enabled ? 'common.on' : 'common.off') })}
     </p>
   </section>
+  <GrantsCard />
 {/if}
 
 <style>

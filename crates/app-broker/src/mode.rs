@@ -80,9 +80,9 @@ pub fn detect(exe_dir: &Path, service_config: Option<&Path>) -> Detected {
 
 fn read_service(path: &Path) -> Result<ServiceTarget, String> {
     let text = std::fs::read_to_string(path)
-        .map_err(|e| format!("konfiguracja usługi Brokera {}: {e}", path.display()))?;
+        .map_err(|e| format!("konfiguracja usługi Sędziego Cieni {}: {e}", path.display()))?;
     let config: ServiceConfig = serde_json::from_str(&text)
-        .map_err(|e| format!("konfiguracja usługi Brokera {}: {e}", path.display()))?;
+        .map_err(|e| format!("konfiguracja usługi Sędziego Cieni {}: {e}", path.display()))?;
     config.validate()?;
     Ok(ServiceTarget {
         pipe: config.pipe_name,

@@ -144,7 +144,7 @@ async fn failed_reply_start_keeps_one_saved_message_and_explains() {
     let dir = tempfile::tempdir().unwrap();
     let provider = Arc::new(ScriptedProvider::new(Duration::from_millis(1)));
     let mut opts = options(Some(provider.clone()), Arc::new(HeadlessShell::default()));
-    opts.kernel = Some(RemoteKernel::unavailable("test: Broker niedostępny"));
+    opts.kernel = Some(RemoteKernel::unavailable("test: Sędzia Cieni niedostępny"));
     let core = AppCore::build(AppPaths::under(dir.path()), opts)
         .await
         .unwrap();

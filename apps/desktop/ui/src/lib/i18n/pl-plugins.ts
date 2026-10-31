@@ -4,7 +4,7 @@ import type { Message } from './core';
 export const plPlugins = {
   'plugins.title': 'Wtyczki Wasm',
   'plugins.intro':
-    'Wtyczka działa w piaskownicy bez dostępu do systemu: pliki i sieć wyłącznie przez Brokera, w imieniu agentki, która jej używa, i nigdy ponad jej uprawnienia. Nic nie zostanie zainstalowane bez Twojego kliknięcia na karcie wtyczki.',
+    'Wtyczka działa w piaskownicy bez dostępu do systemu: pliki i sieć wyłącznie przez Sędziego Cieni, w imieniu agentki, która jej używa, i nigdy ponad jej uprawnienia. Nic nie zostanie zainstalowane bez Twojego kliknięcia na karcie wtyczki.',
   'plugins.unavailable': 'Wtyczki są niedostępne: {reason}',
   'plugins.pending': 'Czekają na Twoją decyzję',
   'plugins.pendingEmpty': 'Brak propozycji.',
@@ -56,11 +56,11 @@ export const plPlugins = {
   'plugins.state.rejected': 'odrzucona',
   'plugins.state.superseded': 'zastąpiona nowszą wersją',
   'plugins.sideEffects':
-    'Ta wtyczka może zapisywać pliki albo łączyć się z siecią — każda taka operacja przejdzie przez Brokera.',
+    'Ta wtyczka może zapisywać pliki albo łączyć się z siecią — każda taka operacja przejdzie przez Sędziego Cieni.',
   'plugins.capabilities': 'Co wtyczka może zrobić',
   'plugins.noCapabilities': 'Nic poza obliczeniami: bez plików i bez sieci.',
   'plugins.capabilitiesNote':
-    'To górna granica. Każdą operację i tak ocenia Broker dla agentki, która wywołała wtyczkę.',
+    'To górna granica. Każdą operację i tak ocenia Sędzia Cieni dla agentki, która wywołała wtyczkę.',
   'plugins.cap.fs.read': 'Odczyt plików',
   'plugins.cap.fs.write': 'Zapis plików',
   'plugins.cap.net.egress': 'Połączenia z hostem',

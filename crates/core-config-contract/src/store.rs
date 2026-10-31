@@ -49,7 +49,7 @@ pub struct ConfigChange {
 #[derive(Debug, thiserror::Error, Clone, PartialEq, Eq)]
 pub enum ConfigError {
     /// Klucz oznaczony `kernel_policy` — zmienia go tylko Broker.
-    #[error("klucz `{0}` jest polityką Jądra; zmienia go wyłącznie Broker")]
+    #[error("klucz `{0}` jest polityką Jądra; zmienia go wyłącznie Sędzia Cieni")]
     KernelPolicy(ConfigKey),
     /// Wartość nie przeszła walidacji schematu modułu.
     #[error("wartość klucza `{key}` niezgodna ze schematem: {reason}")]

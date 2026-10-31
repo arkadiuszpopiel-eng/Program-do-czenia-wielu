@@ -163,7 +163,7 @@ async fn core_on(dir: &std::path::Path, secrets: &Arc<MemorySecretStore>) -> Boo
     let mut opts = options(Some(provider), shell.clone());
     opts.secrets = Some(secrets.clone());
     let core = AppCore::build(AppPaths::under(dir), opts).await.unwrap();
-    let broker = core.kernel_broker().expect("Broker w procesie");
+    let broker = core.kernel_broker().expect("Sędzia Cieni w procesie");
     (core, shell, broker)
 }
 

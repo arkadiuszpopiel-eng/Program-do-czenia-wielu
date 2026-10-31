@@ -179,7 +179,7 @@ pub(crate) fn spawn(
         Integrity::Low => Some(low_integrity_token()?),
         Integrity::AppContainer => {
             return Err(PlatformError::Unsupported(
-                "AppContainer dochodzi z Brokerem (F3)".into(),
+                "AppContainer dochodzi z Sędzią Cieni (F3)".into(),
             ));
         }
     };

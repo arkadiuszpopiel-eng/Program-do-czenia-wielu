@@ -3,7 +3,7 @@
 Kontrakt Broker-UI (docs/modules/broker-ui/SPEC.md, PLAN §8.2, ADR 3, THREAT_MODEL S11).
 - **Karta** `ApprovalCard::from_request` — czysta funkcja z `ApprovalRequest`: kto, co, narzędzie, zakres, ryzyko
   z odwracalnością, źródło polecenia, taint, „dlaczego pytam”, czas do wygaśnięcia, plan (≤ 8 kroków + reszta),
-  zmiana autonomii, polityka; opcje „Odmów” / „Zezwól tylko teraz” / „Zawsze w tym zakresie (≤ 24 h)”.
+  zmiana autonomii, polityka; opcje „Odmów” / „Zezwól tylko teraz” / „Zawsze w tym zakresie” (1 h · 3 h · 24 h · do odwołania).
   Tekst przez `sanitize` (sterujące, bidi, zerowej szerokości, obcięcie).
 - **Reguły dowodu** `check_input`: wejście niewstrzyknięte, rozpoznane urządzenie, w oknie ważności, okno
   nieprzerwanie na pierwszym planie ≥ 500 ms (`MIN_FOREGROUND_MS`), niezasłonięte.

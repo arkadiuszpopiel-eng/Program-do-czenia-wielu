@@ -310,7 +310,7 @@ impl Built {
         let mut extra = self.extra;
         let ready = match ports.agents {
             Some(_) => Ok(()),
-            None => Err("brak Brokera albo dziennika cofania".to_owned()),
+            None => Err("brak Sędziego Cieni albo dziennika cofania".to_owned()),
         };
         let _ = extra.agents_ready.set(ready);
         let keep = [self

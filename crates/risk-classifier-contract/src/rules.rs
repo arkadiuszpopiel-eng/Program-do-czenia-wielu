@@ -13,15 +13,15 @@ pub enum RuleId {
     KernelBlock,
     /// Destrukcja zlecona głosem → potwierdzenie nie-głosem (≤ L3; „Pełna automatyka” — decyzja 27.10).
     VoiceDestructive,
-    /// Zmiana stanu zlecona głosem przy niskiej pewności STT (każdy poziom: nie wiadomo, co powiedziano).
+    /// Zmiana stanu zlecona głosem przy niskiej pewności STT (≤ L3; na L4 bez pytania — decyzja 31.10).
     VoiceLowConfidence,
-    /// Ryzykowna akcja głosem bez weryfikacji mówcy (każdy poziom: to może nie być właściciel).
+    /// Ryzykowna akcja głosem bez weryfikacji mówcy (≤ L3; na L4 bez pytania — decyzja 31.10).
     VoiceUnverifiedRisky,
     /// Operacja administracyjna → zgoda per eskalacja (§8.4, ≤ L3; L4 — bez pytania, decyzja 27.10).
     AdminConsent,
-    /// Dane prywatne + niezaufana treść + kanał wyjścia (każdy poziom).
+    /// Dane prywatne + niezaufana treść + kanał wyjścia (≤ L3; na L4 bez pytania — decyzja 31.10).
     Trifecta,
-    /// Egress z sesji `tainted` (każdy poziom, THREAT_MODEL §8).
+    /// Egress z sesji `tainted` (≤ L3, THREAT_MODEL §8; na L4 bez pytania — decyzja 31.10).
     TaintedEgress,
     /// L0/L1: każda zmiana wymaga zgody.
     MutationNeedsYes,
@@ -79,7 +79,9 @@ const fn rule(
     }
 }
 
-/// Tabela reguł w kolejności oceny. Reguły „każdego poziomu” nigdy nie są `grantable`.
+/// Tabela reguł w kolejności oceny. Na „Pełnej automatyce” (L4) działa tylko twarda blokada Jądra —
+/// okno zgód nie pokazuje się wcale, aż właściciel obniży poziom (decyzja właściciela 31.10).
+/// Reguły pilnujące obcej treści i głosu nigdy nie są `grantable`.
 pub const RULES: [RuleDescription; 15] = [
     rule(
         RuleId::KernelBlock,
@@ -97,14 +99,14 @@ pub const RULES: [RuleDescription; 15] = [
     ),
     rule(
         RuleId::VoiceLowConfidence,
-        None,
+        Some(AutonomyLevel::L3),
         false,
         true,
         "niska pewność rozpoznania mowy — potwierdź zmianę kliknięciem lub klawiszem",
     ),
     rule(
         RuleId::VoiceUnverifiedRisky,
-        None,
+        Some(AutonomyLevel::L3),
         false,
         true,
         "ryzykowna akcja głosem bez weryfikacji mówcy wymaga potwierdzenia nie-głosem",
@@ -118,14 +120,14 @@ pub const RULES: [RuleDescription; 15] = [
     ),
     rule(
         RuleId::Trifecta,
-        None,
+        Some(AutonomyLevel::L3),
         false,
         false,
         "dane prywatne + niezaufana treść + wysyłka na zewnątrz wymagają potwierdzenia",
     ),
     rule(
         RuleId::TaintedEgress,
-        None,
+        Some(AutonomyLevel::L3),
         false,
         false,
         "sesja widziała niezaufaną treść — wysyłka na zewnątrz wymaga potwierdzenia",

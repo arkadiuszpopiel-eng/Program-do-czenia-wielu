@@ -18,8 +18,8 @@ const SERVICE: BrokerStatusView = {
   watchdog: true,
   isolated: true,
   detail: {
-    pl: 'Połączono z usługą Brokera: osobne konto Windows, okno zatwierdzeń z wysoką integralnością (UIPI).',
-    en: 'Connected to the Broker service: separate Windows account, approval window with high integrity (UIPI).',
+    pl: 'Połączono z usługą Sędziego Cieni: osobne konto Windows, okno zatwierdzeń z wysoką integralnością (UIPI).',
+    en: 'Connected to the Shadow Judge service: separate Windows account, approval window with high integrity (UIPI).',
   },
 };
 
@@ -30,8 +30,8 @@ const PORTABLE: BrokerStatusView = {
   watchdog: true,
   isolated: false,
   detail: {
-    pl: 'Tryb przenośny: Broker działa jako proces Alfy na Twoim koncie — bez osobnego konta Windows i bez ochrony UIPI okna zatwierdzeń (słabsza izolacja). Pełną izolację daje usługa Brokera.',
-    en: 'Portable mode: the Broker runs as an Alfa process under your account — no separate Windows account and no UIPI protection of the approval window (weaker isolation). The Broker service gives full isolation.',
+    pl: 'Tryb przenośny: Sędzia Cieni działa jako proces Alfy na Twoim koncie — bez osobnego konta Windows i bez ochrony UIPI okna zatwierdzeń (słabsza izolacja). Pełną izolację daje usługa Sędziego Cieni.',
+    en: 'Portable mode: the Shadow Judge runs as an Alfa process under your account — no separate Windows account and no UIPI protection of the approval window (weaker isolation). The Shadow Judge service gives full isolation.',
   },
 };
 
@@ -40,8 +40,8 @@ const LOST: BrokerStatusView = {
   state: 'lost',
   approval_window: false,
   detail: {
-    pl: 'Połączenie z Brokerem zerwane (proces Brokera zakończył działanie). Bezpieczny stan: wszystko, co wymaga zgody, jest odrzucane; Alfa ponawia połączenie.',
-    en: 'Connection to the Broker lost (the Broker process exited). Safe state: everything that needs approval is denied; Alfa keeps reconnecting.',
+    pl: 'Połączenie z Sędzią Cieni zerwane (proces Sędziego Cieni zakończył działanie). Bezpieczny stan: wszystko, co wymaga zgody, jest odrzucane; Alfa ponawia połączenie.',
+    en: 'Connection to the Shadow Judge lost (the Shadow Judge process exited). Safe state: everything that needs approval is denied; Alfa keeps reconnecting.',
   },
 };
 
@@ -52,8 +52,8 @@ const DEV: BrokerStatusView = {
   watchdog: false,
   isolated: false,
   detail: {
-    pl: 'Broker działa w procesie aplikacji bez okna zatwierdzeń (tryb deweloperski): każda prośba o zgodę jest odrzucana. To kopia Alfy bez programów Jądra obok (build testowy) — Alfę z oknem zgód uruchamia skrót „Alfa” na pulpicie albo w menu Start (folder Alfa-uruchomiona).',
-    en: 'The Broker runs inside the app process without the approval window (developer mode): every approval request is denied. This copy of Alfa has no Kernel programs next to it (a test build) — the “Alfa” shortcut on the desktop or in the Start menu (folder Alfa-uruchomiona) starts Alfa with the approval window.',
+    pl: 'Sędzia Cieni działa w procesie aplikacji bez okna zatwierdzeń (tryb deweloperski): każda prośba o zgodę jest odrzucana. To kopia Alfy bez programów Jądra obok (build testowy) — Alfę z oknem zgód uruchamia skrót „Alfa” na pulpicie albo w menu Start (folder Alfa-uruchomiona).',
+    en: 'The Shadow Judge runs inside the app process without the approval window (developer mode): every approval request is denied. This copy of Alfa has no Kernel programs next to it (a test build) — the “Alfa” shortcut on the desktop or in the Start menu (folder Alfa-uruchomiona) starts Alfa with the approval window.',
   },
 };
 
@@ -100,7 +100,7 @@ export class FakeBrokerStatus {
           ? permissions.openApproval(approvalId)
           : Promise.reject(
               new Error(
-                'Ta prośba wymaga potwierdzenia w oknie Brokera, a okno jest niedostępne — bezpieczny stan: prośba zostanie odrzucona.',
+                'Ta prośba wymaga potwierdzenia w oknie Sędziego Cieni, a okno jest niedostępne — bezpieczny stan: prośba zostanie odrzucona.',
               ),
             ),
     };

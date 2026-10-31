@@ -96,12 +96,13 @@ async fn hotkey_triggers_kill_switch_with_debounce() {
     let r = d.on_events(&[press(7, true)]).await.unwrap();
     assert_eq!(r.reason, KillReason::Hotkey);
     assert_eq!(r.jobs_killed, 1);
-    assert_eq!(r.tokens_revoked, 3, "Broker unieważnił tokeny");
+    assert_eq!(r.tokens_revoked, 3, "Sędzia Cieni unieważnił tokeny");
     clock.advance(DEBOUNCE_MS - 1);
     assert!(d.on_events(&[press(7, true)]).await.is_none(), "odbicie");
     clock.advance(1);
     assert!(d.on_events(&[press(7, true)]).await.is_some());
-    let failing: Arc<dyn KillSwitch> = Arc::new(ThreadedPeer::new(|_| Err("brak Brokera".into())));
+    let failing: Arc<dyn KillSwitch> =
+        Arc::new(ThreadedPeer::new(|_| Err("brak Sędziego Cieni".into())));
     let svc = service(vec![failing], clock.clone(), 1);
     let r = svc.kill_all(KillReason::TrayButton).await;
     assert_eq!((r.jobs_killed, r.tokens_revoked), (1, 0));
@@ -124,8 +125,14 @@ async fn hung_broker_does_not_block_kill_switch() {
     let started = Instant::now();
     let r = d.on_events(&[press(1, true)]).await.unwrap();
     let elapsed = started.elapsed().as_millis();
-    eprintln!("kill-switch z zawieszonym Brokerem: {elapsed} ms (budżet {budget_ms} ms)");
-    assert_eq!(r.jobs_killed, 5, "drzewa zabite bez czekania na Brokera");
-    assert_eq!(r.tokens_revoked, 0, "Broker nie odpowiedział w 100 ms");
+    eprintln!("kill-switch z zawieszonym Sędzią Cieni: {elapsed} ms (budżet {budget_ms} ms)");
+    assert_eq!(
+        r.jobs_killed, 5,
+        "drzewa zabite bez czekania na Sędziego Cieni"
+    );
+    assert_eq!(
+        r.tokens_revoked, 0,
+        "Sędzia Cieni nie odpowiedział w 100 ms"
+    );
     assert!(elapsed < budget_ms);
 }

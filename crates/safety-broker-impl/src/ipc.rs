@@ -265,6 +265,8 @@ impl BrokerServer {
                     .map(|id| Response::Approval(Some(id)))
             }
             Request::Metrics => Ok(Response::Metrics(e.metrics())),
+            Request::Grants => Ok(Response::Grants(e.grants())),
+            Request::RevokeGrant { id } => e.revoke_grant(id).await.map(Response::Revoked),
             Request::PendingApprovals => Ok(Response::Pending(e.pending())),
             Request::Resolve {
                 id,

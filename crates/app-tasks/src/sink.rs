@@ -151,7 +151,7 @@ impl ApprovalSink for BrokerSink {
                     updated_input: None,
                 })
             }
-            Err(e) => deny(&format!("Alfa (Broker): {e}")),
+            Err(e) => deny(&format!("Alfa (Sędzia Cieni): {e}")),
         }
     }
 }
@@ -164,7 +164,7 @@ pub struct NoBrokerSink;
 impl ApprovalSink for NoBrokerSink {
     async fn request(&self, _request: PermissionRequest) -> Option<ApprovalDecision> {
         Some(ApprovalDecision::Deny {
-            message: "Alfa: Broker niepodłączony — prośba odrzucona.".into(),
+            message: "Alfa: Sędzia Cieni niepodłączony — prośba odrzucona.".into(),
         })
     }
 }

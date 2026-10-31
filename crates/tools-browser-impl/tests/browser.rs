@@ -179,7 +179,7 @@ async fn egress_only_through_broker_and_untrusted_content() {
     let granted = h.granted();
     for (url, allowed) in h.web.network() {
         if allowed && let Some(host) = url_host(&url) {
-            assert!(granted.contains(&host), "{url} bez zgody Brokera");
+            assert!(granted.contains(&host), "{url} bez zgody Sędziego Cieni");
         }
     }
     assert!(

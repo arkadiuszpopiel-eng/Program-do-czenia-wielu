@@ -96,7 +96,8 @@ async fn stranger_voice_is_rejected_for_risky_actions() {
     let v = a.view().await;
     let check = v.speaker.last_check.unwrap();
     assert_eq!(check.decision, SpeakerDecisionView::Rejected);
-    let verdict = evaluate(&facts(origin), AutonomyLevel::L4, &RiskPolicy::default());
+    let f = facts(origin);
+    let verdict = evaluate(&f, AutonomyLevel::L3, &RiskPolicy::default());
     assert!(
         matches!(
             verdict.verdict,
@@ -107,6 +108,9 @@ async fn stranger_voice_is_rejected_for_risky_actions() {
         ),
         "{verdict:?}"
     );
+    // „Pełna automatyka” (decyzja właściciela 31.10): okno zgód nie pokazuje się wcale.
+    let verdict = evaluate(&f, AutonomyLevel::L4, &RiskPolicy::default());
+    assert_eq!(verdict.verdict, Verdict::Proceed, "{verdict:?}");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
@@ -133,7 +137,7 @@ async fn owner_voice_follows_autonomy_and_destruction_asks_below_full_automation
         }
     ));
     // „Pełna automatyka” (L4): zweryfikowany właściciel, pewne rozpoznanie — bez pytania
-    // (decyzja właściciela 27.10); obcy głos i niska pewność pytają na każdym poziomie.
+    // (decyzja właściciela 27.10); od 31.10 na L4 nie pyta nic poza blokadą Jądra.
     let verdict = evaluate(&delete, AutonomyLevel::L4, &RiskPolicy::default());
     assert_eq!(verdict.verdict, Verdict::Proceed, "{verdict:?}");
 }
@@ -153,7 +157,8 @@ async fn disabling_verification_makes_every_voice_turn_unverified() {
         !origin.speaker_verified,
         "bez weryfikacji — nawet właściciel"
     );
-    let verdict = evaluate(&facts(origin), AutonomyLevel::L4, &RiskPolicy::default());
+    let f = facts(origin);
+    let verdict = evaluate(&f, AutonomyLevel::L3, &RiskPolicy::default());
     assert!(matches!(
         verdict.verdict,
         Verdict::Ask {
@@ -161,4 +166,6 @@ async fn disabling_verification_makes_every_voice_turn_unverified() {
             ..
         }
     ));
+    let verdict = evaluate(&f, AutonomyLevel::L4, &RiskPolicy::default());
+    assert_eq!(verdict.verdict, Verdict::Proceed, "{verdict:?}");
 }

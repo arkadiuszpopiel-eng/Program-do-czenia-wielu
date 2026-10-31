@@ -4,7 +4,9 @@
 
 use std::time::{Duration, Instant};
 
-use platform_apps_contract::{BrowserError, ConsoleLevel, MAX_CONSOLE_ENTRIES, PageInfo};
+use platform_apps_contract::{
+    BrowserError, ConsoleLevel, HistoryNav, MAX_CONSOLE_ENTRIES, PageInfo,
+};
 use safety_broker_contract::TaintSource;
 use tools_browser_contract::{
     ConsoleArgs, ConsoleOut, EVENT_ACT, KeyArgs, NavArgs, ScrollArgs, SelectArgs, WaitArgs, WaitOut,
@@ -40,6 +42,7 @@ impl Core {
     {
         let b = self.current(ctx)?;
         let host = Self::page_host(&b)?;
+        let action = &format!("{action} na stronie {}", b.url());
         let auths = self
             .egress(ctx, m, std::slice::from_ref(&host), action)
             .await?;
@@ -86,10 +89,9 @@ impl Core {
         m: &ToolManifest,
     ) -> Step<ToolOutcome> {
         let a: KeyArgs = parse_args(args)?;
-        self.act_with(ctx, m, "naciśnięcie klawisza na stronie", move |p, id| {
-            p.press_key(id, a.key)
-        })
-        .await
+        let what = format!("naciśnięcie klawisza {:?}", a.key);
+        self.act_with(ctx, m, &what, move |p, id| p.press_key(id, a.key))
+            .await
     }
 
     /// `browser_select`.
@@ -100,7 +102,8 @@ impl Core {
         m: &ToolManifest,
     ) -> Step<ToolOutcome> {
         let a: SelectArgs = parse_args(args)?;
-        self.act_with(ctx, m, "wybór z listy na stronie", move |p, id| {
+        let what = format!("wybór „{}” z listy (element nr {})", a.value, a.node);
+        self.act_with(ctx, m, &what, move |p, id| {
             p.select_option(id, a.node, &a.value)
         })
         .await
@@ -114,10 +117,13 @@ impl Core {
         m: &ToolManifest,
     ) -> Step<ToolOutcome> {
         let a: NavArgs = parse_args(args)?;
-        self.act_with(ctx, m, "nawigacja w historii karty", move |p, id| {
-            p.history(id, a.action)
-        })
-        .await
+        let what = match a.action {
+            HistoryNav::Back => "cofnięcie do poprzedniej strony",
+            HistoryNav::Forward => "przejście do następnej strony",
+            HistoryNav::Reload => "odświeżenie strony",
+        };
+        self.act_with(ctx, m, what, move |p, id| p.history(id, a.action))
+            .await
     }
 
     /// `browser_wait`: sprawdza tekst co 300 ms do limitu albo anulowania.

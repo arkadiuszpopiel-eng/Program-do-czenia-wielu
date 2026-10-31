@@ -120,13 +120,20 @@ proptest! {
     }
 
     #[test]
-    fn tainted_egress_never_proceeds_even_on_l4(f in facts()) {
+    fn tainted_egress_never_proceeds_up_to_l3(f in facts()) {
         let p = RiskPolicy::default();
         if f.tainted && f.is_egress() {
-            for a in AutonomyLevel::ALL {
+            for a in AutonomyLevel::ALL.into_iter().filter(|a| *a != AutonomyLevel::L4) {
                 prop_assert_ne!(evaluate(&f, a, &p).verdict, Verdict::Proceed);
             }
         }
+    }
+
+    #[test]
+    fn l4_only_proceeds_or_hard_blocks(f in facts()) {
+        // „Pełna automatyka”: okno zgód nie pokazuje się wcale (decyzja właściciela 31.10).
+        let v = evaluate(&f, AutonomyLevel::L4, &RiskPolicy::default()).verdict;
+        prop_assert!(matches!(v, Verdict::Proceed | Verdict::HardBlock { .. }), "{:?}", v);
     }
 
     #[test]

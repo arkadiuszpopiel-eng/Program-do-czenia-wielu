@@ -31,7 +31,7 @@ for (const theme of ['light', 'dark'] as const) {
       await page.getByRole('button', { name: 'Oddaj sterowanie' }).first().click();
       await expect(page.getByText('Sterujesz Ty', { exact: true })).toHaveCount(0);
       await page.getByRole('button', { name: 'Zezwól na podgląd pulpitu…' }).click();
-      await expect(page.getByText(/Otworzono okno Brokera/)).toBeVisible();
+      await expect(page.getByText(/Otworzono okno Sędziego Cieni/)).toBeVisible();
     });
 
     test('terminal: logowanie mostu CLI z karty, wejście z klawiatury, zamknięcie', async ({
@@ -132,7 +132,7 @@ for (const theme of ['light', 'dark'] as const) {
       await waitForChat(page);
       await settings(page, 'Zdrowie systemu');
       await expect(page.getByText('Działa z problemami', { exact: false })).toBeVisible();
-      await expect(page.getByText(/wyłącznie w oknie Brokera/)).toBeVisible();
+      await expect(page.getByText(/wyłącznie w oknie Sędziego Cieni/)).toBeVisible();
       await expectAccessible(page, `zdrowie ${theme}`);
       await page
         .getByRole('button', {

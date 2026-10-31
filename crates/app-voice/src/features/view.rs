@@ -31,8 +31,8 @@ pub fn dictation_refusal(reason: DictRefuse) -> LocalizedText {
             "No window in the foreground — switch to the window you want to dictate into.",
         ),
         DictRefuse::ProtectedTarget => text(
-            "To okno jest chronione (Alfa, Broker albo nieznany program) — dyktowanie wyłączone.",
-            "This window is protected (Alfa, Broker or an unknown app) — dictation is off.",
+            "To okno jest chronione (Alfa, Sędzia Cieni albo nieznany program) — dyktowanie wyłączone.",
+            "This window is protected (Alfa, Shadow Judge or an unknown app) — dictation is off.",
         ),
         DictRefuse::ElevatedTarget => text(
             "Na pierwszym planie jest okno administratora — dyktowanie do niego nie działa.",
@@ -53,8 +53,8 @@ pub fn read_refusal(reason: ReadRefuse) -> LocalizedText {
             "No window in the foreground.",
         ),
         ReadRefuse::ProtectedTarget => text(
-            "To okno jest chronione (Alfa, Broker albo nieznany program) — nie czytam go.",
-            "This window is protected (Alfa, Broker or an unknown app) — not reading it.",
+            "To okno jest chronione (Alfa, Sędzia Cieni albo nieznany program) — nie czytam go.",
+            "This window is protected (Alfa, Shadow Judge or an unknown app) — not reading it.",
         ),
         ReadRefuse::PasswordField => {
             text("Pole hasła — nie czytam.", "Password field — not reading.")

@@ -60,7 +60,7 @@ modułów, brak miejsca) i:
 - pokazuje stan ogólny: „Wszystko działa”, „Działa z problemami”, „Awaria modułu” albo „Tryb bezpieczny”;
 - **Sprawdź teraz** — natychmiastowe sprawdzenie;
 - **Propozycje napraw** — każda z ryzykiem, opisem zmian i planem cofnięcia; przyciski **Napraw** i **Odrzuć**.
-  Naprawy dotyczące Jądra zatwierdza się wyłącznie w oknie Brokera;
+  Naprawy dotyczące Jądra zatwierdza się wyłącznie w oknie Sędziego Cieni;
 - **Incydenty**, **Wykonane naprawy** (każdą można **Cofnij**), sprawy **wymagające Twojej decyzji** i tabela modułów;
 - ustawienie **Samodzielność Diagnosty** — co naprawia sam (zawsze z „Cofnij”), a co tylko proponuje (zmiana działa
   od następnego uruchomienia).
@@ -87,7 +87,7 @@ Lista zamrożonych zestawów testowych z kontrolą integralności („zgodna z h
   codziennie i po 10 MB, najwyżej 14 plików na proces; pliki starsze niż 7 dni Alfa usuwa sama.
 - **Zdarzenia** (wywołania modeli, narzędzia, głos, diagnostyka) — podkatalogi `model_calls`, `tools_gui`, `voice`,
   `diagnostics` z plikami `.ndjson`. Tylko te trafiają do eksportu `.alfa`, gdy zaznaczysz **Logi**.
-- **Usługa Brokera** z instalatora pisze swój dziennik w `%LOCALAPPDATA%` konta usługi, nie w Twoim profilu.
+- **Usługa Sędziego Cieni** z instalatora pisze swój dziennik w `%LOCALAPPDATA%` konta usługi, nie w Twoim profilu.
 
 Więcej szczegółów (np. do zgłoszenia błędu): w pliku `%APPDATA%\Alfa\config\shared.toml` dopisz
 

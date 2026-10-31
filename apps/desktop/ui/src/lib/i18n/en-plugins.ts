@@ -5,7 +5,7 @@ import type { plPlugins } from './pl-plugins';
 export const enPlugins: Record<keyof typeof plPlugins, Message> = {
   'plugins.title': 'Wasm plugins',
   'plugins.intro':
-    'A plugin runs in a sandbox with no system access: files and network only through the Broker, on behalf of the agent using it, and never beyond her permissions. Nothing is installed until you click on the plugin card.',
+    'A plugin runs in a sandbox with no system access: files and network only through the Shadow Judge, on behalf of the agent using it, and never beyond her permissions. Nothing is installed until you click on the plugin card.',
   'plugins.unavailable': 'Plugins are unavailable: {reason}',
   'plugins.pending': 'Waiting for your decision',
   'plugins.pendingEmpty': 'No proposals.',
@@ -57,11 +57,11 @@ export const enPlugins: Record<keyof typeof plPlugins, Message> = {
   'plugins.state.rejected': 'rejected',
   'plugins.state.superseded': 'superseded by a newer version',
   'plugins.sideEffects':
-    'This plugin may write files or connect to the network — every such operation goes through the Broker.',
+    'This plugin may write files or connect to the network — every such operation goes through the Shadow Judge.',
   'plugins.capabilities': 'What the plugin can do',
   'plugins.noCapabilities': 'Nothing but computation: no files and no network.',
   'plugins.capabilitiesNote':
-    'This is the upper bound. The Broker still judges every operation for the agent that called the plugin.',
+    'This is the upper bound. The Shadow Judge still judges every operation for the agent that called the plugin.',
   'plugins.cap.fs.read': 'Read files',
   'plugins.cap.fs.write': 'Write files',
   'plugins.cap.net.egress': 'Connect to host',

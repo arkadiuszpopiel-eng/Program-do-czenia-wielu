@@ -217,7 +217,7 @@ export class FakeHealth {
       approve: (repairId) => {
         const p = this.pending.find((x) => x.id === repairId);
         if (!p) return fail(`Nieznana propozycja naprawy ${repairId}.`);
-        if (p.kernel) return fail('Naprawę Jądra zatwierdza wyłącznie okno Brokera.');
+        if (p.kernel) return fail('Naprawę Jądra zatwierdza wyłącznie okno Sędziego Cieni.');
         this.pending = this.pending.filter((x) => x.id !== repairId);
         this.repaired = [
           { id: ++this.seq, title: p.title, diff: p.diff, at: core.isoNow(), undoable: true },

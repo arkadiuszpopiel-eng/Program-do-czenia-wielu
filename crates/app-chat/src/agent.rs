@@ -30,7 +30,9 @@ pub(crate) async fn run(
 ) -> Outcome {
     let started = Instant::now();
     let Some(stack) = core.inner.agents.clone() else {
-        return failed("Narzędzia agentek niepodłączone (Broker albo dziennik cofania).".into());
+        return failed(
+            "Narzędzia agentek niepodłączone (Sędzia Cieni albo dziennik cofania).".into(),
+        );
     };
     let (choice, request) = match crate::stream::prepare(core, req, None).await {
         Ok(x) => x,
@@ -264,7 +266,7 @@ pub(crate) async fn run(
             .filter(|s| s.status == app_api::dto::ToolStatus::Error);
         if let Some(step) = blocked {
             fin.text = format!(
-                "Zatrzymałam zadanie: krok „{}” został zablokowany (odmowa Brokera, Jądra albo brak zgody). Powód jest w krokach zadania; nie próbuję obejść tej blokady.",
+                "Zatrzymałam zadanie: krok „{}” został zablokowany (odmowa Sędziego Cieni, Jądra albo brak zgody). Powód jest w krokach zadania; nie próbuję obejść tej blokady.",
                 step.label
             );
         }

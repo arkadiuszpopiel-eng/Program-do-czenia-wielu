@@ -148,7 +148,7 @@ async fn conductor_knows_who_works_on_the_computer() {
     assert!(
         system
             .unwrap_or_default()
-            .contains("Poziom autonomii tej rozmowy: L1 — Broker pyta właściciela o zgodę"),
+            .contains("Poziom autonomii tej rozmowy: L1 — Sędzia Cieni pyta właściciela o zgodę"),
         "poziom sesji po obniżeniu"
     );
 }

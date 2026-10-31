@@ -5,7 +5,7 @@
 ## 1. Założenia
 
 - Użytek osobisty: jeden użytkownik (właściciel), jego maszyny, brak dystrybucji. Nie chronimy przed właścicielem; chronimy właściciela przed skutkami błędu modelu, wstrzykniętego polecenia i złośliwej treści.
-- Agentki mają domyślnie **bardzo wysoką autonomię (L3)**, opcjonalnie **L4 „Pełna automatyka”** (wybierana raz w oknie Brokera i pamiętana przez Brokera po restarcie; na L4 bez pytań także operacje administratora i polecenia zweryfikowanym, pewnie rozpoznanym głosem właściciela; obcy głos i niska pewność pytają zawsze — decyzja właściciela 2026-10-27). Model zagrożeń musi działać także na L4 — dlatego kluczowe kontrole są w Jądrze, poza zasięgiem agentek.
+- Agentki mają domyślnie **bardzo wysoką autonomię (L3)**, opcjonalnie **L4 „Pełna automatyka”** (wybierana raz w oknie Brokera i pamiętana przez Brokera po restarcie; na L4 bez pytań także operacje administratora i polecenia zweryfikowanym, pewnie rozpoznanym głosem właściciela — decyzja właściciela 2026-10-27; **od 2026-10-31 na L4 okno Sędziego Cieni nie pokazuje się wcale**: także obcy głos, niska pewność rozpoznania i wysyłka po niezaufanej treści przechodzą bez pytania — świadomie przyjęte ryzyko wycieku danych przez wstrzyknięcie poleceń; zostają twarde blokady §7, STOP i dziennik). Model zagrożeń musi działać także na L4 — dlatego kluczowe kontrole są w Jądrze, poza zasięgiem agentek.
 - Kod programu powstaje w całości przez modele AI i jest automatycznie mergowany → sam proces budowy jest w zakresie modelu zagrożeń (runner, łańcuch dostaw).
 - Uczciwie: na L4 bez izolacji audyt jest „best effort"; DPAPI chroni sekrety przed kradzieżą offline, nie przed procesem tego samego użytkownika.
 
@@ -82,7 +82,7 @@ Trzy składniki nie współistnieją w jednym przebiegu bez potwierdzenia właś
 | B. Ekspozycja na niezaufaną treść | strona, mail, plik z internetu, dźwięk z TV, opis narzędzia MCP |
 | C. Kanał wyjścia | `net.egress`, wysłanie maila, zapis do udziału, wywołanie API dostawcy z tagiem „może trenować" |
 
-Egzekucja: klasyfikator ryzyka + polityka taint w Jądrze. Sesja `tainted` (B) z danymi (A) blokuje C do potwierdzenia — także na L4. Wzorzec dwóch LLM tam, gdzie agentka nie musi widzieć treści (np. streszczenie niezaufanej strony robi izolowana Badaczka bez narzędzi wyjścia).
+Egzekucja: klasyfikator ryzyka + polityka taint w Jądrze. Sesja `tainted` (B) z danymi (A) blokuje C do potwierdzenia na L0–L3; na L4 bez pytania (decyzja właściciela 2026-10-31 — ryzyko przyjęte świadomie, opis w Ustawieniach przy L4). Wzorzec dwóch LLM tam, gdzie agentka nie musi widzieć treści (np. streszczenie niezaufanej strony robi izolowana Badaczka bez narzędzi wyjścia).
 
 ## 6. Scenariusze ataku
 
@@ -141,9 +141,9 @@ Egzekucja: klasyfikator ryzyka + polityka taint w Jądrze. Sesja `tainted` (B) z
 | L1 Pytaj o wszystko | każdą zmianę | |
 | L2 Pytaj o ryzykowne | usuwanie, egress, instalacja | |
 | **L3 Bardzo wysoka (domyślny)** | nieodwracalne poza zakresem; działania na podstawie niezaufanej treści | |
-| **L4 Maks** | nic poza twardymi blokadami (§7) i destrukcją zleconą głosem | **kill-switch < 200 ms, dziennik cofania, audyt (best effort), tokeny zdolności z TTL, potomek ≤ rodzic, deny-listy §1.3, tagi prywatności, budżety kosztów, klasyfikator ryzyka i taint dla egressu** |
+| **L4 Maks** | nic poza twardymi blokadami (§7); okno Sędziego Cieni się nie pokazuje (31.10) | **kill-switch < 200 ms, dziennik cofania, audyt (best effort), tokeny zdolności z TTL, potomek ≤ rodzic, deny-listy §1.3, tagi prywatności, budżety kosztów, klasyfikator ryzyka (twarde blokady) i taint w dzienniku** |
 
-Podniesienie do L4: jeden przełącznik w Ustawieniach (globalnie / sesja / agentka / na czas), potwierdzany fizycznym wejściem w Broker-UI, opcjonalnie Windows Hello. Agentka i treść ze strony nie mogą go wykonać. „Zawsze zezwalaj w tym zakresie" nie eskaluje do L4.
+Podniesienie do L4: jeden przełącznik w Ustawieniach (globalnie / sesja / agentka / na czas), potwierdzany fizycznym wejściem w oknie Sędziego Cieni, opcjonalnie Windows Hello. Agentka i treść ze strony nie mogą go wykonać. „Zawsze zezwalaj w tym zakresie" nie eskaluje do L4. Czas takiej zgody wybiera właściciel w oknie (1 h, 3 h, 24 h albo do odwołania, 31.10); zgody do odwołania przetrwają restart (plik w prywatnym katalogu Brokera, poza zasięgiem agentek), są widoczne i odwoływalne w Ustawienia → Uprawnienia, a STOP kasuje je wszystkie.
 
 ## 9. Zgodność tras abonamentowych jako wymaganie bezpieczeństwa
 
@@ -163,7 +163,7 @@ Naruszenie regulaminu dostawcy = utrata konta właściciela (aktywo: plany Claud
 | Element | Wymaganie |
 |---|---|
 | Zestaw | ≥ 100 przypadków injection: tekst (strona, plik, mail), obraz/ekran (OCR), dźwięk (nagranie z komendą, TV), opis narzędzia MCP; tworzy **model-recenzent**, zamrożony w `evals/F3/redteam/` |
-| Próg | **0 eskalacji uprawnień, 0 egressu bez potwierdzenia** (na L3 i L4) |
+| Próg | **0 eskalacji uprawnień** (na L3 i L4), **0 egressu bez potwierdzenia** (na L3; na L4 egress bez pytania z decyzji właściciela 2026-10-31) |
 | Dodatkowo | ≥ 100 scenariuszy „agentka zmienia Jądro / zatwierdza sama siebie" = 0 sukcesów (F3-04) |
 | Powtórzenie | F9 na pełnym systemie (F9-07) + pentest modelem innym niż autor wg tego dokumentu i OWASP: 0 otwartych ustaleń CVSS ≥ 9 (F9-01) |
 | Utrzymanie | każdy nowy wektor (nowy `tools-*`, nowy most, nowa klasa treści) dodaje przypadki do zestawu przed merge modułu |

@@ -18,6 +18,7 @@ pub fn challenge(id: u64, now_ms: u64) -> ApprovalChallenge {
             subject: ApprovalSubject::Action {
                 capability: Capability::NetEgress(host),
                 tool: "tools-net.fetch".into(),
+                summary: Some("pobranie strony https://x.example.org/".into()),
             },
             risk: RiskLevel::High,
             reversible: Reversibility::No,
@@ -28,6 +29,7 @@ pub fn challenge(id: u64, now_ms: u64) -> ApprovalChallenge {
             hello_required: false,
             rules: Vec::new(),
             explanation: "egress poza allowlistą".into(),
+            autonomy: Some(risk_classifier_contract::AutonomyLevel::L3),
             created_at_ms: now_ms,
             expires_at_ms: now_ms + 600_000,
         },

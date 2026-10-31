@@ -123,14 +123,14 @@ pub enum UiError {
     #[error("niepoprawne wyzwanie: {0}")]
     InvalidChallenge(String),
     /// Błąd okna.
-    #[error("okno Brokera: {0}")]
+    #[error("okno Sędziego Cieni: {0}")]
     Surface(String),
     /// Błąd połączenia z Brokerem (stan prośby nieznany — karta nie znika, przegląd Q-9).
-    #[error("połączenie z Brokerem: {0}")]
+    #[error("połączenie z Sędzią Cieni: {0}")]
     Link(String),
     /// Broker jawnie odpowiedział błędem na decyzję (prośba wygasła, rozstrzygnięta, dowód
     /// odrzucony, Audyt niedostępny) — przy odmowie prośba po stronie Brokera już nie czeka.
-    #[error("Broker odrzucił decyzję: {0}")]
+    #[error("Sędzia Cieni odrzucił decyzję: {0}")]
     Rejected(String),
 }
 
@@ -196,8 +196,6 @@ impl HelloPort for NoHello {
 /// Konfiguracja `[broker_ui]`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct UiConfig {
-    /// Czas „zawsze w tym zakresie” w godzinach (1–24).
-    pub grant_hours: u8,
     /// Windows Hello włączone.
     pub hello_enabled: bool,
     /// Co ile ms pytać Brokera o prośby.
@@ -207,16 +205,8 @@ pub struct UiConfig {
 impl Default for UiConfig {
     fn default() -> Self {
         Self {
-            grant_hours: 8,
             hello_enabled: false,
             poll_ms: 250,
         }
-    }
-}
-
-impl UiConfig {
-    /// Czas „zawsze w tym zakresie” w ms (przycięty do 1–24 h).
-    pub fn grant_ms(&self) -> u64 {
-        u64::from(self.grant_hours.clamp(1, 24)) * 60 * 60 * 1000
     }
 }

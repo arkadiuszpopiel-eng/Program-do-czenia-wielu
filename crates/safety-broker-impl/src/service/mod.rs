@@ -97,7 +97,7 @@ pub fn open_audit(
     predecessor: Option<&str>,
 ) -> Result<Arc<BrokerAuditWriter>, String> {
     dirs.ensure_private_dir(data_dir, owner)
-        .map_err(|e| format!("katalog danych Brokera: {e}"))?;
+        .map_err(|e| format!("katalog danych Sędziego Cieni: {e}"))?;
     let anchor = Arc::new(FileAnchorStore::new(data_dir.join("audit-anchor.json")));
     let chain_id = format!("broker-{}", clock.now_ms());
     BrokerAuditWriter::open(

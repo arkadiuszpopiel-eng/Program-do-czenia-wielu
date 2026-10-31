@@ -153,7 +153,7 @@ impl AlfaToolHandler {
         };
         if is_protected_process(&window.process) {
             return Err(ToolCallError::Unauthorized(
-                "okna Alfy i Brokera są chronione".into(),
+                "okna Alfy i Sędziego Cieni są chronione".into(),
             ));
         }
         Ok(match self.ports.windows.focus(WindowId(id)) {

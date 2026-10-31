@@ -25,7 +25,7 @@ pub enum ReloadError {
         reason: String,
     },
     /// Plik zmienia politykę Jądra (`kernel.*`) z pominięciem Brokera.
-    #[error("plik zmienia politykę Jądra `{0}` z pominięciem Brokera")]
+    #[error("plik zmienia politykę Jądra `{0}` z pominięciem Sędziego Cieni")]
     KernelPolicy(ConfigKey),
     /// Wartości z plików naruszają schemat modułu.
     #[error("konfiguracja z plików narusza schemat `{prefix}`: {reason}")]

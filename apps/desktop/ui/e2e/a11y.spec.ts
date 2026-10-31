@@ -6,7 +6,7 @@ for (const theme of ['light', 'dark'] as const) {
     test('rozmowa z wariantami i kartą zatwierdzenia', async ({ page }) => {
       await openApp(page, { theme });
       await waitForChat(page);
-      await expect(page.getByRole('button', { name: /Otwórz w oknie Brokera/ })).toBeVisible();
+      await expect(page.getByRole('button', { name: /Otwórz w oknie Sędziego Cieni/ })).toBeVisible();
       await expectAccessible(page, `rozmowa ${theme}`);
     });
 

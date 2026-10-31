@@ -35,9 +35,7 @@ impl<S: ApprovalSurfacePort> NativeBrokerUi<S> {
         Self {
             surface,
             hello,
-            opts: CardOptions {
-                grant_ms: config.grant_ms(),
-            },
+            opts: CardOptions::default(),
             queue: VecDeque::new(),
             presented: None,
             window_active: false,
@@ -130,7 +128,7 @@ impl<S: ApprovalSurfacePort> BrokerUi for NativeBrokerUi<S> {
             return Ok(());
         }
         self.queue
-            .push_back(CardSession::new(&challenge, now_ms, self.opts));
+            .push_back(CardSession::new(&challenge, now_ms, self.opts.clone()));
         Ok(())
     }
 

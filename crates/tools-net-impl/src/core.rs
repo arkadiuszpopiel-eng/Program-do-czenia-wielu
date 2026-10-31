@@ -14,7 +14,7 @@ use safety_broker_contract::{Capability, DeclaredFacts, HostPattern};
 use tokio::time::Instant;
 use tools_common_contract::{
     Authorization, BrokerGate, DenialReason, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome,
-    action_request, base_facts, tool_event,
+    action_request, base_facts, tool_event, with_summary,
 };
 use tools_net_contract::{
     BodyReader, EVENT_REDIRECT, HttpMethod, HttpPort, HttpRequest, HttpResponse, NetError,
@@ -96,7 +96,10 @@ impl Core {
     ) -> Step<Authorization> {
         let auth = self
             .gate
-            .authorize(action_request(ctx, cap.clone(), facts), ctx)
+            .authorize(
+                action_request(ctx, cap.clone(), with_summary(facts, action)),
+                ctx,
+            )
             .await
             .map_err(|e| Box::new(e.into_outcome(action)))?;
         if let Err(e) = self.gate.verify(&auth, cap, &ctx.holder) {

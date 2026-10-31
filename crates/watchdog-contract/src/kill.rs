@@ -39,7 +39,7 @@ impl fmt::Display for KillReason {
             Self::TrayButton => f.write_str("przycisk w zasobniku"),
             Self::CapsuleButton => f.write_str("przycisk w kapsule"),
             Self::VoiceStop => f.write_str("„stop” głosem"),
-            Self::Broker(why) => write!(f, "Broker: {why}"),
+            Self::Broker(why) => write!(f, "Sędzia Cieni: {why}"),
             Self::Watchdog(why) => write!(f, "watchdog: {why}"),
         }
     }

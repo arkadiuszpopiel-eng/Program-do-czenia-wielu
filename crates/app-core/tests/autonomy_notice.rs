@@ -41,7 +41,11 @@ async fn remembered_raise_missing_after_restart_is_announced_once() {
     broker.approve(&asked.request_id, AutonomyLevel::L4, None);
     assert!(eventually(|| async { announced(&core).await > before }).await);
     passes(&broker, 1).await;
-    assert_eq!(notices(&core).await, 0, "Broker ma zapamiętany poziom");
+    assert_eq!(
+        notices(&core).await,
+        0,
+        "Sędzia Cieni ma zapamiętany poziom"
+    );
     drop(core);
 
     // Restart: nowy Broker na L3, zapamiętane L4 — informacja dopiero przy trzecim przebiegu

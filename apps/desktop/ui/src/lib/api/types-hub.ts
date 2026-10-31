@@ -10,6 +10,7 @@ export type {
   AzureDeployment,
   BrokerIntentResult,
   CollisionResolution,
+  GrantView,
   ComplianceStatus,
   DeviceProfile,
   DryRunItem,

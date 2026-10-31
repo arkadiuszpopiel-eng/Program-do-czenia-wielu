@@ -12,7 +12,7 @@ export const enArena: Record<keyof typeof plArena, Message> = {
   'arena.modelB': 'Model B',
   'arena.same': 'Choose two different models.',
   'arena.costNote':
-    'Both replies count towards costs and limits like ordinary messages; the Broker works as always. Replies are generated one after another.',
+    'Both replies count towards costs and limits like ordinary messages; the Shadow Judge works as always. Replies are generated one after another.',
   'arena.start': 'Compare',
   'arena.busy': 'Wait for the current reply to finish — comparing now would interrupt it.',
   'arena.cancel': 'Cancel',

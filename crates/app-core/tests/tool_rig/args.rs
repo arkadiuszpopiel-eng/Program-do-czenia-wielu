@@ -102,6 +102,8 @@ pub fn recipe(tool: &str, t: &Targets) -> Option<Value> {
     let w = t.window;
     Some(match tool {
         "browser_click" => json!({ "node": 1 }),
+        // Świeża karta nie ma historii — „wstecz” dałoby `not_found`; odświeżenie działa zawsze.
+        "browser_nav" => json!({ "action": "reload" }),
         "browser_type" => json!({ "node": 2, "text": "diagnostyka" }),
         "browser_select" => json!({ "node": 3, "value": "Polska" }),
         "clipboard_write" => json!({ "text": "diagnostyka" }),
@@ -182,7 +184,7 @@ pub fn note(tool: &str) -> Option<&'static str> {
     Some(match tool {
         "browser_click" | "browser_key" | "browser_nav" | "browser_select" | "browser_type" => {
             "działanie na stronie po obcej treści wymaga zgody właściciela także na L4 (rdzeń \
-             testowy nie ma okna Brokera — prośba wygasa); wykonanie sprawdzają testy \
+             testowy nie ma okna Sędziego Cieni — prośba wygasa); wykonanie sprawdzają testy \
              tools-browser-impl"
         }
         "fs_delete_permanent" => "trwałe usunięcie zawsze czeka na potwierdzenie (raport 44)",

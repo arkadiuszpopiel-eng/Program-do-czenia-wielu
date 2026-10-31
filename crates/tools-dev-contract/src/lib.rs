@@ -185,7 +185,7 @@ pub fn manifests() -> Vec<ToolManifest> {
         manifest(
             "dev_test",
             "Uruchom testy",
-            "Uruchamia testy projektu w katalogu roboczym (rodzaj wykrywany z plików: Cargo.toml, package.json, go.mod, *.csproj, pytest) i zwraca podsumowanie: zaliczone, niezaliczone z nazwami, pominięte, czas. `filter` zawęża do testów o nazwie. Wymaga zgody Brokera — testy wykonują kod projektu.",
+            "Uruchamia testy projektu w katalogu roboczym (rodzaj wykrywany z plików: Cargo.toml, package.json, go.mod, *.csproj, pytest) i zwraca podsumowanie: zaliczone, niezaliczone z nazwami, pominięte, czas. `filter` zawęża do testów o nazwie. Wymaga zgody Sędziego Cieni — testy wykonują kod projektu.",
             schema_of::<TestArgs>(),
             schema_of::<TestSummary>(),
             false,

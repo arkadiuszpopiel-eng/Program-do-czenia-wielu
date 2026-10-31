@@ -61,16 +61,16 @@ export const plAgents = {
   'intent.copied': 'Skopiowano polecenie.',
   'intent.copyFailed': 'Nie udało się skopiować — zaznacz polecenie ręcznie.',
   'msg.copyFailed': 'Nie udało się skopiować do schowka — zaznacz tekst ręcznie.',
-  'intent.deleteHint': 'Trwałe usunięcie potwierdzasz wyłącznie w oknie Brokera.',
+  'intent.deleteHint': 'Trwałe usunięcie potwierdzasz wyłącznie w oknie Sędziego Cieni.',
   'approval.noWindow':
-    'Okno Brokera nie działa (tryb deweloperski) — tej prośby nie da się zatwierdzić.',
+    'Okno Sędziego Cieni nie działa (tryb deweloperski) — tej prośby nie da się zatwierdzić.',
   'approval.noWindowExpires':
     'Agentka czeka do {time}; potem dostanie odmowę i wybierze inną drogę.',
   'approval.noWindowDeny': 'Po upływie limitu agentka dostanie odmowę i wybierze inną drogę.',
   'conv.heardPrefix': 'Przerwano — usłyszano: „{text}”',
   'workdir.title': 'Katalog roboczy agentek',
   'workdir.on':
-    'Agentki z rolą Wykonawczyni/Koderki działają na plikach i poleceniach w tym katalogu (przez Brokera, z cofaniem).',
+    'Agentki z rolą Wykonawczyni/Koderki działają na plikach i poleceniach w tym katalogu (przez Sędziego Cieni, z cofaniem).',
   'workdir.off':
     'Brak katalogu — agentki odpowiadają bez narzędzi. Wybierz katalog, aby mogły działać na plikach.',
   'workdir.pick': 'Wybierz katalog…',

@@ -25,6 +25,7 @@ impl BrokerEngine {
         // Nowy klucz bez okna łaski: nawet nieznany rejestrowi token nie przejdzie MAC.
         let _ = st.keys.wipe();
         st.grants.clear();
+        self.persist_grants(&st);
         st.plans.clear();
         for p in st.approvals.values_mut() {
             if matches!(

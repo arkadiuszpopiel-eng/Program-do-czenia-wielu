@@ -36,13 +36,13 @@ fn fallback(why: &str) -> Option<RemoteKernel> {
     if cfg!(debug_assertions) {
         tracing::warn!(
             powod = why,
-            "Broker w procesie Tauri — wyłącznie build deweloperski"
+            "Sędzia Cieni w procesie Tauri — wyłącznie build deweloperski"
         );
         None
     } else {
         tracing::error!(
             powod = why,
-            "brak izolowanego Brokera — bezpieczny stan (fail-closed)"
+            "brak izolowanego Sędziego Cieni — bezpieczny stan (fail-closed)"
         );
         Some(RemoteKernel::unavailable(why))
     }

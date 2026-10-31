@@ -120,7 +120,7 @@ describe('stan połączeń', () => {
     expect(rows[0]?.nameKey).toBe('conn.local.name');
   });
 
-  it('Broker, sieć, mikrofon', () => {
+  it('Sędzia Cieni, sieć, mikrofon', () => {
     const rows = systemRows(
       {
         mode: 'in_process',

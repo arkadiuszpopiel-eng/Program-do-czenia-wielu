@@ -52,16 +52,16 @@ impl BrokerStatusView {
     pub fn in_process(approval_window: bool) -> Self {
         let detail = if approval_window {
             LocalizedText::new(
-                "Broker działa w procesie aplikacji (tryb deweloperski).",
-                "The Broker runs inside the app process (developer mode).",
+                "Sędzia Cieni działa w procesie aplikacji (tryb deweloperski).",
+                "The Shadow Judge runs inside the app process (developer mode).",
             )
         } else {
             LocalizedText::new(
-                "Broker działa w procesie aplikacji bez okna zatwierdzeń (tryb deweloperski): \
+                "Sędzia Cieni działa w procesie aplikacji bez okna zatwierdzeń (tryb deweloperski): \
                  każda prośba o zgodę jest odrzucana. To kopia Alfy bez programów Jądra obok \
                  (build testowy) — Alfę z oknem zgód uruchamia skrót „Alfa” na pulpicie albo \
                  w menu Start (folder Alfa-uruchomiona).",
-                "The Broker runs inside the app process without the approval window (developer \
+                "The Shadow Judge runs inside the app process without the approval window (developer \
                  mode): every approval request is denied. This copy of Alfa has no Kernel \
                  programs next to it (a test build) — the “Alfa” shortcut on the desktop or in \
                  the Start menu (folder Alfa-uruchomiona) starts Alfa with the approval window.",
@@ -86,9 +86,25 @@ impl BrokerStatusView {
             watchdog: false,
             isolated: false,
             detail: Some(LocalizedText::new(
-                "Broker jest niedostępny — agentki nie wykonają niczego, co wymaga zgody.",
-                "The Broker is unavailable — agents will not do anything that needs approval.",
+                "Sędzia Cieni jest niedostępny — agentki nie wykonają niczego, co wymaga zgody.",
+                "The Shadow Judge is unavailable — agents will not do anything that needs approval.",
             )),
         }
     }
+}
+
+/// Zgoda „zawsze w tym zakresie” w panelu uprawnień (komenda `permissions_grants`); odwołanie —
+/// `permissions_revoke_grant` (zawsze bez okna Sędziego: tylko zawęża uprawnienia).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct GrantView {
+    /// Numer zgody w Sędzim Cieni.
+    pub id: String,
+    pub session_id: String,
+    /// Agentka (brak — cała sesja).
+    pub agent: Option<String>,
+    /// Zakres po ludzku („połączenie z internetem: strona x.example.org”).
+    pub scope: String,
+    pub granted_at_ms: u64,
+    /// Do kiedy; `None` — do odwołania.
+    pub until_ms: Option<u64>,
 }

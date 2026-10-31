@@ -110,7 +110,7 @@ fn physical_click_after_500ms_approves_and_token_is_issued() {
     let rep = r.step(true);
     assert_eq!(rep.events, vec![UiEvent::Shown { id }]);
     let view = r.surface.current().unwrap();
-    assert_eq!(view.title, "Delta prosi o zgodę: wysłanie danych do sieci");
+    assert_eq!(view.title, "Delta prosi o zgodę: połączenie z internetem");
     assert_eq!(view.initial_focus, BTN_DENY);
     assert!(view.badge.contains("Ryzyko"));
     assert_eq!(r.ui.status(), UiStatus::Pending { count: 1 });
@@ -193,7 +193,17 @@ fn scoped_grant_and_second_card_waits_its_own_500ms() {
         at_ms: r.clock.now_ms(),
     });
     r.clock.advance(700);
-    r.click(BTN_SCOPED, false);
+    // Czas zgody wybiera właściciel: rząd „Zawsze w tym zakresie:” z czterema przyciskami.
+    let view = r.surface.current().expect("karta w oknie");
+    let choice = view.choice.expect("rząd wyboru czasu");
+    assert_eq!(choice.label, "Zawsze w tym zakresie:");
+    assert_eq!(
+        choice.buttons,
+        [BTN_SCOPED, BTN_SCOPED + 1, BTN_SCOPED + 2, BTN_SCOPED + 3]
+    );
+    let labels: Vec<&str> = view.buttons[2..].iter().map(|b| b.label.as_str()).collect();
+    assert_eq!(labels, ["1 h", "3 h", "24 h", "Do odwołania"]);
+    r.click(BTN_SCOPED + 3, false);
     assert_eq!(r.step(false).resolved, Some(first));
     r.step(true);
     assert_eq!(r.ui.queued(), vec![second]);

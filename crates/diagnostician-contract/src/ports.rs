@@ -107,13 +107,13 @@ pub struct NoBroker;
 impl KernelApprovals for NoBroker {
     async fn execute(&self, _: &Proposal) -> KernelOutcome {
         KernelOutcome::Denied {
-            reason: "Broker niedostępny — naprawa Jądra wymaga Broker-UI".into(),
+            reason: "Sędzia Cieni niedostępny — naprawa Jądra wymaga okna Sędziego Cieni".into(),
         }
     }
 
     async fn undo(&self, _: &Proposal, _: &[RepairStep]) -> KernelOutcome {
         KernelOutcome::Denied {
-            reason: "Broker niedostępny".into(),
+            reason: "Sędzia Cieni niedostępny".into(),
         }
     }
 }
@@ -153,7 +153,7 @@ pub enum DiagError {
         expected: String,
     },
     /// Naprawa obszaru Jądra — zgoda wyłącznie przez Broker-UI.
-    #[error("naprawa {0} dotyczy Jądra — zatwierdza ją wyłącznie Broker-UI")]
+    #[error("naprawa {0} dotyczy Jądra — zatwierdza ją wyłącznie okno Sędziego Cieni")]
     KernelAreaRequiresBroker(String),
     /// Limit napraw.
     #[error("limit napraw: {0}")]

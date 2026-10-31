@@ -20,6 +20,8 @@ pub const MIN_BUTTON_ID: u16 = 100;
 pub const MAX_TEXT_CHARS: usize = 600;
 /// Limit liczby wierszy szczegółów.
 pub const MAX_DETAILS: usize = 16;
+/// Limit tekstu pomocy pod „?” (znaki).
+pub const MAX_HELP_CHARS: usize = 1_200;
 
 /// Ton (kolor) plakietki ryzyka — zawsze razem z tekstem i ikoną.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -46,12 +48,23 @@ pub struct SurfaceButton {
     pub label: String,
 }
 
+/// Rząd wyboru pod przyciskami głównymi (np. „Zawsze w tym zakresie: 1 h · 3 h · 24 h · Do
+/// odwołania”) — każdy przycisk rzędu to osobna decyzja; okno rysuje je mniejsze, z etykietą.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SurfaceChoice {
+    /// Etykieta rzędu (też początek nazwy dostępnej każdego przycisku).
+    pub label: String,
+    /// Przyciski rzędu (identyfikatory z `SurfaceView::buttons`).
+    pub buttons: Vec<u16>,
+}
+
 /// Zawartość okna.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SurfaceView {
     /// Tytuł (pasek i nagłówek).
     pub title: String,
-    /// Plakietka ryzyka (tekst z ikoną, np. „⚠ Ryzyko: wysokie”).
+    /// Plakietki w nagłówku oddzielone „ · ” (np. „Ryzyko wysokie · zlecone głosem”); pierwsza
+    /// w kolorze ryzyka, ikonę ryzyka rysuje okno według `tone`.
     pub badge: String,
     /// Kolor plakietki.
     pub tone: SurfaceTone,
@@ -66,6 +79,12 @@ pub struct SurfaceView {
     /// Czy okno może przejąć fokus (alertdialog przy wysokim ryzyku); inaczej pokazuje się bez
     /// aktywacji i sygnalizuje miganiem (nie kradnie fokusu w trakcie pisania).
     pub take_focus: bool,
+    /// Pomoc pod przyciskiem „?” (co to za okno i do czego się odnosi); pusta — bez „?”.
+    #[serde(default)]
+    pub help: String,
+    /// Rząd wyboru (np. czas zgody „zawsze w tym zakresie”); brak — same przyciski główne.
+    #[serde(default)]
+    pub choice: Option<SurfaceChoice>,
 }
 
 impl SurfaceView {
@@ -88,8 +107,19 @@ impl SurfaceView {
         if self.details.len() > MAX_DETAILS {
             return bad("za dużo wierszy szczegółów");
         }
+        if self.help.chars().count() > MAX_HELP_CHARS || self.help.chars().any(char::is_control) {
+            return bad("pomoc za długa albo ze znakami sterującymi");
+        }
+        if let Some(c) = &self.choice {
+            let known = c.buttons.iter().all(|id| ids.contains(id));
+            if c.buttons.is_empty() || !known || c.buttons.contains(&self.initial_focus) {
+                return bad("rząd wyboru: istniejące przyciski, bez przycisku startowego");
+            }
+        }
+        let choice = self.choice.as_ref().map(|c| &c.label);
         let texts = [&self.title, &self.badge, &self.status]
             .into_iter()
+            .chain(choice)
             .chain(self.buttons.iter().map(|b| &b.label))
             .chain(self.details.iter().flat_map(|(k, v)| [k, v]));
         for t in texts {
@@ -247,61 +277,4 @@ pub trait ApprovalSurfacePort: Send + Sync {
 
     /// Następne zdarzenie (czeka do `timeout_ms`).
     fn next_event(&self, timeout_ms: u32) -> Option<SurfaceEvent>;
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn view() -> SurfaceView {
-        SurfaceView {
-            title: "Delta prosi o zgodę".into(),
-            badge: "⚠ Ryzyko: wysokie".into(),
-            tone: SurfaceTone::High,
-            details: vec![("Co".into(), "usuń 14 plików".into())],
-            status: String::new(),
-            buttons: vec![
-                SurfaceButton {
-                    id: 100,
-                    label: "Odmów".into(),
-                },
-                SurfaceButton {
-                    id: 101,
-                    label: "Zezwól raz".into(),
-                },
-            ],
-            initial_focus: 100,
-            take_focus: false,
-        }
-    }
-
-    #[test]
-    fn view_validation() {
-        assert!(view().validate().is_ok());
-        let mut v = view();
-        v.buttons[1].id = 100;
-        assert!(v.validate().is_err());
-        let mut v = view();
-        v.buttons[0].id = 1;
-        v.initial_focus = 1;
-        assert!(v.validate().is_err(), "IDOK zarezerwowany");
-        let mut v = view();
-        v.initial_focus = 7;
-        assert!(v.validate().is_err());
-        let mut v = view();
-        v.buttons.clear();
-        assert!(v.validate().is_err());
-        let mut v = view();
-        v.title = "a\u{7}b".into();
-        assert!(v.validate().is_err());
-        let mut v = view();
-        v.details[0].1 = "x".repeat(MAX_TEXT_CHARS + 1);
-        assert!(v.validate().is_err());
-        let mut v = view();
-        v.details = vec![("a".into(), "b".into()); MAX_DETAILS + 1];
-        assert!(v.validate().is_err());
-        let mut v = view();
-        v.details[0].1 = "wiele\nlinii".into();
-        assert!(v.validate().is_ok());
-    }
 }

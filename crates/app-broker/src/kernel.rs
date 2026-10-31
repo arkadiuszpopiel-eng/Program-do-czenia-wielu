@@ -207,7 +207,7 @@ impl KernelProcesses {
         }
         if status.link() == LinkState::Connecting {
             status.set_link(LinkState::Lost(format!(
-                "Broker nie odpowiedział w ciągu {} s od startu",
+                "Sędzia Cieni nie odpowiedział w ciągu {} s od startu",
                 setup.timing.first_connect.as_secs()
             )));
         }
@@ -241,7 +241,7 @@ impl KernelProcesses {
                     }
                 }
             })
-            .map_err(|e| tracing::error!(error = %e, "nadzór Brokera nie wystartował"))
+            .map_err(|e| tracing::error!(error = %e, "nadzór Sędziego Cieni nie wystartował"))
             .ok();
         KernelStart::Remote(Self {
             status,
@@ -305,7 +305,7 @@ fn restart_watchdog(starter: &WatchdogStarter, slot: &Mutex<Option<Watchdog>>, p
     }
     tracing::warn!(
         ?pid,
-        "Broker uruchomiony ponownie — watchdog z nową tożsamością Brokera"
+        "Sędzia Cieni uruchomiony ponownie — watchdog z nową tożsamością Sędziego Cieni"
     );
     *slot = start_watchdog(starter, starter.args(pid));
 }

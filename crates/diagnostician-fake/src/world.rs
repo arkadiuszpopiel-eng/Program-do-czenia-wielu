@@ -224,7 +224,7 @@ impl KernelApprovals for ChaosBroker {
     async fn execute(&self, proposal: &Proposal) -> KernelOutcome {
         if !*lock(&self.0.broker_approves) {
             return KernelOutcome::Denied {
-                reason: "odmowa w Broker-UI".into(),
+                reason: "odmowa w oknie Sędziego Cieni".into(),
             };
         }
         let mut receipts = Vec::new();

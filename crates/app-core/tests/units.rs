@@ -68,7 +68,7 @@ mod notify {
             },
         })
         .unwrap();
-        assert!(n.body.contains("Brokera"));
+        assert!(n.body.contains("Sędziego Cieni"));
         assert!(!n.body.to_lowercase().contains("zatwierdź"));
         assert!(
             native_notice(&AlfaEvent::MicLevel {

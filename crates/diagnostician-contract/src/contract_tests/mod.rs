@@ -220,7 +220,7 @@ impl KernelApprovals for ScriptedBroker {
                 ticket: "B-1".into(),
             },
             BrokerMode::Deny => KernelOutcome::Denied {
-                reason: "odmowa w Broker-UI".into(),
+                reason: "odmowa w oknie Sędziego Cieni".into(),
             },
             BrokerMode::Approve => {
                 let mut receipts = Vec::new();
