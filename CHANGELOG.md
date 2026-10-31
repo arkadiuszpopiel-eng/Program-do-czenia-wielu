@@ -12,6 +12,30 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.79 — 2026-10-31
+
+Alfa ma spis każdej swojej funkcji i pilnuje, żeby żadna — obecna ani przyszła — nie weszła bez testu, który
+AI uruchamia samodzielnie. Narzędzia plikowe podają modelowi krótsze ścieżki.
+
+### Nowe
+
+- Katalog funkcji programu: 601 funkcji (polecenia, skróty i akcje palety, strony i ustawienia, narzędzia
+  agentek, zdarzenia) zbierany z kodu przy każdym sprawdzeniu wersji, z informacją, czym każda jest przetestowana
+  (`docs/features/KATALOG.md`). Nowa funkcja bez testu zatrzymuje sprawdzenie wersji.
+- Przeglądy ogólne: każde polecenie palety jest uruchamiane w oknie testowym, a każde ustawienie zmieniane
+  i przywracane w prawdziwej aplikacji — także te, które dopiero zostaną dodane.
+
+### Poprawki
+
+- Narzędzia plikowe podają modelowi pliki z katalogu roboczego ścieżką względną (lista, odczyt, wyszukiwanie,
+  zapis, przeniesienie, kopia, Kosz) — model lokalny przepisywał długie ścieżki z literówkami („Tepm”).
+  Zatwierdzenia i historia cofania nadal pokazują pełną ścieżkę.
+
+### Testy
+
+- Spłata długu katalogu: testy rdzenia dla poleceń bez testu, narzędzia `system_software` i `system_diagnostics`,
+  zdarzenia stanu okna (obsada, koszty, stan systemu, Broker, raport Marszałka), klawisze pola pisania.
+
 ## 0.0.78 — 2026-10-30
 
 Kanwa pamięta wersje artefaktu i pokazuje, co się zmieniło. Model lokalny lepiej radzi sobie z narzędziami —
