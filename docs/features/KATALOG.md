@@ -4,14 +4,14 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 [45-testy-ai.md](../plan/45-testy-ai.md). Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).
 
-**Razem: 601 funkcji, z testem 595 (99 %), w długu 6.**
+**Razem: 601 funkcji, z testem 601 (100 %), w długu 0.**
 
 | Rodzaj | Funkcji | Z testem | rdzeń | interfejs | przeglądarka | aplikacja | eval | przegląd ogólny |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Polecenia rdzenia | 281 | 281 (100 %) | 204 | 2 | 2 | 249 | 1 | 0 |
-| Polecenia palety i skróty | 62 | 56 (90.3 %) | 2 | 6 | 6 | 0 | 0 | 50 |
+| Polecenia rdzenia | 281 | 281 (100 %) | 204 | 3 | 2 | 250 | 1 | 0 |
+| Polecenia palety i skróty | 62 | 62 (100 %) | 2 | 7 | 9 | 3 | 0 | 50 |
 | Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 12 | 0 | 38 |
-| Ustawienia | 98 | 98 (100 %) | 14 | 11 | 7 | 9 | 2 | 98 |
+| Ustawienia | 98 | 98 (100 %) | 14 | 12 | 7 | 9 | 2 | 98 |
 | Narzędzia agentek | 81 | 81 (100 %) | 79 | 1 | 1 | 3 | 52 | 0 |
 | Zdarzenia rdzenia | 41 | 41 (100 %) | 35 | 25 | 5 | 1 | 1 | 0 |
 
@@ -42,7 +42,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `agents_set_roles` | rdzeń, aplikacja, bieg aplikacji |  |
 | `agents_steer` | rdzeń, aplikacja, bieg aplikacji |  |
 | `app_bootstrap` | rdzeń, przeglądarka, aplikacja, bieg aplikacji |  |
-| `app_complete_onboarding` | rdzeń, bieg aplikacji |  |
+| `app_complete_onboarding` | rdzeń, aplikacja, bieg aplikacji |  |
 | `app_open_system_settings` | rdzeń, aplikacja, bieg aplikacji |  |
 | `app_save_layout` | rdzeń, aplikacja, bieg aplikacji |  |
 | `app_set_active_session` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -290,7 +290,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `voice_engines` | aplikacja, bieg aplikacji |  |
 | `voice_features` | aplikacja, bieg aplikacji |  |
 | `voice_preview` | aplikacja, bieg aplikacji |  |
-| `voice_ptt` | aplikacja, bieg aplikacji |  |
+| `voice_ptt` | interfejs, aplikacja, bieg aplikacji |  |
 | `voice_read` | aplikacja, bieg aplikacji |  |
 | `voice_set_mic_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
 | `voice_set_muted` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -335,18 +335,18 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `panel.voice` | przegląd ogólny |  |
 | `panel.tasks` | przegląd ogólny |  |
 | `voice.mic` | rdzeń, przegląd ogólny |  |
-| `voice.ptt` | — | klawisz pola pisania; **dług** |
-| `conversation.escape` | — | klawisz pola pisania; **dług** |
+| `voice.ptt` | interfejs, przeglądarka | klawisz pola pisania |
+| `conversation.escape` | przeglądarka | klawisz pola pisania |
 | `composer.send` | przeglądarka | klawisz pola pisania |
 | `composer.newline` | przeglądarka | klawisz pola pisania |
 | `composer.editLast` | przeglądarka | klawisz pola pisania |
 | `composer.historyPrev` | przeglądarka | klawisz pola pisania |
 | `composer.historyNext` | przeglądarka | klawisz pola pisania |
-| `composer.pastePlain` | — | klawisz pola pisania; **dług** |
+| `composer.pastePlain` | przeglądarka | klawisz pola pisania |
 | `system.quickAsk` | interfejs | skrót globalny |
-| `system.killSwitch` | — | skrót globalny; **dług** |
-| `voice.dictation` | — | skrót globalny; **dług** |
-| `voice.readSelection` | — | skrót globalny; **dług** |
+| `system.killSwitch` | aplikacja | skrót globalny |
+| `voice.dictation` | aplikacja | skrót globalny |
+| `voice.readSelection` | aplikacja | skrót globalny |
 | `action.theme` | przegląd ogólny |  |
 | `action.language` | przeglądarka, przegląd ogólny |  |
 | `action.column` | przegląd ogólny |  |
@@ -450,7 +450,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `voice.talk_max_silence` | przegląd ogólny | Najdłuższe czekanie w ciszy |
 | `voice.talk_stt_engine` | przegląd ogólny | Silnik rozpoznawania mowy |
 | `voice.talk_language` | przegląd ogólny | Język rozpoznawania mowy |
-| `voice.mode` | przegląd ogólny | Włączanie mikrofonu |
+| `voice.mode` | interfejs, przegląd ogólny | Włączanie mikrofonu |
 | `voice.show_pill` | przegląd ogólny | Pigułka głosowa |
 | `agents.max_steps` | rdzeń, interfejs, przegląd ogólny | Limit kroków zadania |
 | `agents.auto_extend_steps` | rdzeń, przeglądarka, przegląd ogólny | Zgoda na automatyczne przedłużanie kroków |

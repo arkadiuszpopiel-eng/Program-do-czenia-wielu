@@ -16,7 +16,7 @@ testów przez AI”. Ten raport mówi, co zrobiłam, gdzie to zobaczyć i czego 
 
 ## 2. Spłata długu i znaleziska
 
-Stan po spłacie: **601 funkcji, 595 z testem (99 %), dług 31 → 6**.
+Stan po spłacie: **601 funkcji, 601 z testem (100 %), dług 31 → 0**.
 
 | Spłacone                                        | Testy                                                                                                                       |
 | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -25,18 +25,22 @@ Stan po spłacie: **601 funkcji, 595 z testem (99 %), dług 31 → 6**.
 | Narzędzie `system_diagnostics`                  | istniejący test `app-diag` sprawdza teraz nazwę, pod którą zna je model                                                     |
 | 5 zdarzeń stanu okna                            | `state/__tests__/events-state.test.ts` (obsada, koszty, stan systemu, Broker, raport Marszałka)                             |
 | Klawisze pola pisania (5)                       | `e2e/composer-keys.spec.ts`                                                                                                 |
+| Esc w rozmowie, wklejanie bez formatu           | `e2e/composer-keys.spec.ts` — kolejność łańcucha Esc (lista podpowiedzi przed zatrzymaniem generowania); Ctrl+Shift+V i tekst z HTML przechodzą do pola bez załącznika (bez sięgania do schowka systemu) |
+| Spacja „przytrzymaj, aby mówić”                 | podłączona (niżej) — `state/__tests__/push-to-talk.test.ts`, `e2e/voice-ptt.spec.ts`                                          |
+| Klawisze globalne (3)                           | `e2e-app/zy-skroty-globalne.spec.ts` na prawdziwej instancji: STOP WSZYSTKIEGO, dyktowanie, czytanie zaznaczenia (opis: [45 §6.3](45-testy-ai.md)) |
 
-Zostały: Spacja „przytrzymaj, aby mówić”, Esc w rozmowie, wklejanie bez formatu (zachowanie samego pola WebView2)
-oraz trzy klawisze globalne (wyłącznik awaryjny, dyktowanie, czytanie zaznaczenia) — rejestruje je powłoka
-w systemie, test wymaga naciśnięcia klawisza poza oknem.
+Znaleziska:
 
-Znaleziska — katalog wskazał funkcje zadeklarowane, których nic nie obsługuje:
-
-- **Spacja „przytrzymaj, aby mówić” (`voice.ptt`) nic nie robi w oknie.** Skrót jest w rejestrze i na stronie
-  Skróty, rdzeń ma polecenie `voice_ptt`, ale żaden kod interfejsu go nie wywołuje. Do decyzji: podłączyć
-  (Spacja poza polem pisania, przytrzymanie) albo usunąć z listy skrótów.
-- **Esc w rozmowie (`conversation.escape`)** zamyka tylko listę podpowiedzi w polu pisania; opis skrótu sugeruje
-  więcej (zatrzymanie, wyjście z edycji). Do sprawdzenia przy przeglądzie skrótów.
+- **Spacja „przytrzymaj, aby mówić” (`voice.ptt`) nic nie robiła w oknie.** Skrót był w rejestrze i na stronie
+  Skróty, a Ustawienia → Głos oferowały „Przytrzymaj, aby mówić (PTT)”, ale żaden kod interfejsu nie wywoływał
+  polecenia rdzenia `voice_ptt`. **Podłączona** (`state/push-to-talk.ts`): w trybie PTT przytrzymanie Spacji
+  w widoku rozmowy poza polem tekstowym i kontrolką włącza mikrofon, puszczenie (albo utrata fokusu okna) —
+  wyłącza; w trybie „Przełącznik” Spacja działa jak dotąd. Wolisz usunąć PTT zamiast tego — to jedna zmiana.
+- **Esc w rozmowie — moje wcześniejsze znalezisko było błędne.** Esc ma pełny łańcuch (`escapeChain`: menu
+  i okna → szuflady → mowa → czytanie → zatrzymanie generowania); patrzyłam tylko na obsługę w polu pisania.
+  Test sprawdza teraz kolejność.
+- **Test klawiszy globalnych w świeżym profilu:** obszar powiadomień istnieje dopiero w widoku programu (po
+  wprowadzeniu) — test kończy wprowadzenie sam, gdy biegnie osobno.
 
 ## 3. Pełne uprawnienia instancji testowej
 
@@ -48,6 +52,11 @@ test `standing_level_from_the_broker_dir_is_restored`). Zmianę przygotowałam n
 scalone w `b5f7787c`, testy `app-broker` i clippy zielone. Broker w procesie działa tylko w budowach
 deweloperskich i testowych — wydanie bez osobnego Brokera przechodzi w bezpieczny stan (`kernel.rs`), więc
 Alfy właściciela to nie dotyczy (wgrana 0.0.79 nie wymaga ponownego wgrania).
+
+Skróty globalne w instancji testowej sprawdza polecenie budowy testowej `e2e_global_shortcut` (tylko cecha
+`e2e`, w programie właściciela odmawia) — bez wstrzykiwania klawiszy w sesję Windows ([45 §6.3](45-testy-ai.md)).
+Pierwsza próba z prawdziwymi klawiszami została przerwana: zrzut pulpitu pokazał, że właściciel pisał w tym
+czasie w innym programie.
 
 Od `8c6dde32` etap „aplikacja” w `verify wersja` po pełnym biegu uruchamia program jeszcze dwa razy na L4
 (świeży profil za każdym razem): `z-pelny-dostep` i `z-katalog`. Czerwony przebieg L4 = czerwony etap.
@@ -96,4 +105,4 @@ skróty „Alfa” na pulpicie i w menu Start odświeżone). Program otwiera wł
 
 ## 7. Do decyzji właściciela
 
-1. Spacja „przytrzymaj, aby mówić”: podłączyć czy usunąć ze skrótów.
+1. Spacja „przytrzymaj, aby mówić” — podłączyłam (§2); jeśli wolisz ją usunąć ze skrótów i ustawień, daj znać.

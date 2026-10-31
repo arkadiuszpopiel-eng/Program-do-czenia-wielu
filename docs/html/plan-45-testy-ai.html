@@ -431,6 +431,17 @@ odczytane i przywrócone). Czerwony przebieg L4 = czerwony etap. Ręcznie:
 <li>Broker w procesie działa tylko w budowach deweloperskich i testowych; wydanie bez osobnego Brokera przechodzi
 w bezpieczny stan (<code>apps/desktop/src-tauri/src/kernel.rs</code>), więc plik nie podnosi poziomu w Alfie właściciela.</li>
 </ol>
+<h3 id="6-3-skroty-globalne-bez-wstrzykiwania-klawiszy">6.3 Skróty globalne bez wstrzykiwania klawiszy</h3>
+<p>Skróty globalne (STOP WSZYSTKIEGO, dyktowanie, czytanie zaznaczenia, Szybkie pytanie) rejestruje powłoka
+w systemie, więc strona ich nie naciśnie. Pierwsza próba naciskała prawdziwe klawisze w sesji Windows — odrzucona
+31.10: właściciel pisał w tym czasie w innym programie, a wstrzyknięte Ctrl/Alt i zmiana pierwszego planu
+weszłyby mu w pracę. Zamiast tego budowa testowa (cecha <code>e2e</code>) ma polecenie powłoki <code>e2e_global_shortcut</code>:
+uruchamia tę samą obsługę naciśnięcia co system (<code>shortcuts.rs</code>, <code>on_pressed</code>) i zwraca, czy skrót jest
+zarejestrowany w systemie przez instancję testową. Dyktowanie i czytanie zaznaczenia działają na oknie na
+pierwszym planie — polecenie najpierw daje fokus oknu instancji testowej i odmawia bez niego, więc nic nie
+sięga do innych programów. Poza budową testową polecenie odmawia. Test: <code>e2e-app/zy-skroty-globalne</code>.
+Niesprawdzone tym sposobem zostaje tylko dostarczenie komunikatu klawisza przez Windows do wtyczki
+(<code>tauri-plugin-global-shortcut</code>).</p>
 <h3 id="6-3-czego-ai-nie-testuje-samo-trzy-powody-z-dokumentu-24-3">6.3 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)</h3>
 <p>Kamera (sprzętowo odłączona), ocena zmysłami właściciela (czy głos się podoba, czy wygląd jest ładny),
 decyzje bezpieczeństwa (testy „do decyzji człowieka”).</p>
@@ -452,7 +463,8 @@ rdzenia <strong>i</strong> scenariusz w prawdziwym oknie (<code>e2e-app</code>).
 <tr><td>Przegląd ogólny poleceń palety</td><td>zrobione 31.10: każde polecenie (4 części) zielone na Edge</td></tr>
 <tr><td>Przegląd ogólny ustawień na prawdziwym rdzeniu</td><td>zrobione 31.10: każde ustawienie zielone w prawdziwym oknie (8:25, raport 46)</td></tr>
 <tr><td>Instancja testowa na „Pełnej automatyce”</td><td>zrobione 31.10: scalone po przeglądzie właściciela; przebieg L4 w każdym <code>verify wersja</code></td></tr>
-<tr><td>Spłata długu</td><td>31 → 6 (31.10, raport 46); zostały klawisze — <code>--kolejka</code></td></tr>
+<tr><td>Skróty globalne w instancji testowej (§6.3)</td><td>zrobione 31.10: <code>e2e_global_shortcut</code> (tylko budowa testowa), 4 testy zielone</td></tr>
+<tr><td>Spłata długu</td><td>31 → 0 (31.10, raport 46): 601 z 601 funkcji z testem</td></tr>
 <tr><td>Przegląd ogólny zdarzeń i narzędzi</td><td>do zrobienia: narzędzia — wywołanie każdego na atrapach portów z poprawnymi argumentami ze schematu</td></tr></tbody></table></div>
 </article>
 <footer>Źródło: <code>docs/plan/45-testy-ai.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>

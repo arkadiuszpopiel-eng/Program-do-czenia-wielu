@@ -329,22 +329,27 @@ testów przez AI”. Ten raport mówi, co zrobiłam, gdzie to zobaczyć i czego 
 <tr><td>Pełne uprawnienia dla testów przez AI</td><td>instancja testowa startuje z zapamiętanym poziomem Brokera z własnego profilu (<code>ALFA_TEST_AUTONOMY=L4</code>) — zmiana w Brokerze przeszła przegląd właściciela i jest scalona (<code>b5f7787c</code>); każde <code>verify wersja</code> sprawdza program także na L4 (§3)</td></tr>
 <tr><td>Kontynuuj kolejne etapy</td><td>ścieżki względne w wynikach narzędzi plikowych (z planu raportu 44, C2.3); spłata długu katalogu (§2)</td></tr></tbody></table></div>
 <h2 id="2-splata-dlugu-i-znaleziska">2. Spłata długu i znaleziska</h2>
-<p>Stan po spłacie: <strong>601 funkcji, 595 z testem (99 %), dług 31 → 6</strong>.</p>
+<p>Stan po spłacie: <strong>601 funkcji, 601 z testem (100 %), dług 31 → 0</strong>.</p>
 <div class="tbl"><table><thead><tr><th>Spłacone</th><th>Testy</th></tr></thead><tbody><tr><td>17 poleceń rdzenia bez testu</td><td><code>crates/app-core/tests/catalog_debt_*.rs</code> — 27 testów zachowania (projekty, arena, gałęzie, karty, nauka pamięci, cennik, ustawienia firmowe, kanwa, schowek-atrapa, aktualizacje bez sieci, odsłuch głosu, umiejętności)</td></tr>
 <tr><td>Narzędzie <code>system_software</code></td><td><code>crates/tools-system-impl/tests/software.rs</code> — filtr rodzaju, pamięć wyniku i <code>refresh</code>, brak wykrywania → „niedostępne”</td></tr>
 <tr><td>Narzędzie <code>system_diagnostics</code></td><td>istniejący test <code>app-diag</code> sprawdza teraz nazwę, pod którą zna je model</td></tr>
 <tr><td>5 zdarzeń stanu okna</td><td><code>state/__tests__/events-state.test.ts</code> (obsada, koszty, stan systemu, Broker, raport Marszałka)</td></tr>
-<tr><td>Klawisze pola pisania (5)</td><td><code>e2e/composer-keys.spec.ts</code></td></tr></tbody></table></div>
-<p>Zostały: Spacja „przytrzymaj, aby mówić”, Esc w rozmowie, wklejanie bez formatu (zachowanie samego pola WebView2)
-oraz trzy klawisze globalne (wyłącznik awaryjny, dyktowanie, czytanie zaznaczenia) — rejestruje je powłoka
-w systemie, test wymaga naciśnięcia klawisza poza oknem.</p>
-<p>Znaleziska — katalog wskazał funkcje zadeklarowane, których nic nie obsługuje:</p>
+<tr><td>Klawisze pola pisania (5)</td><td><code>e2e/composer-keys.spec.ts</code></td></tr>
+<tr><td>Esc w rozmowie, wklejanie bez formatu</td><td><code>e2e/composer-keys.spec.ts</code> — kolejność łańcucha Esc (lista podpowiedzi przed zatrzymaniem generowania); Ctrl+Shift+V i tekst z HTML przechodzą do pola bez załącznika (bez sięgania do schowka systemu)</td></tr>
+<tr><td>Spacja „przytrzymaj, aby mówić”</td><td>podłączona (niżej) — <code>state/__tests__/push-to-talk.test.ts</code>, <code>e2e/voice-ptt.spec.ts</code></td></tr>
+<tr><td>Klawisze globalne (3)</td><td><code>e2e-app/zy-skroty-globalne.spec.ts</code> na prawdziwej instancji: STOP WSZYSTKIEGO, dyktowanie, czytanie zaznaczenia (opis: <a href="plan-45-testy-ai.html">45 §6.3</a>)</td></tr></tbody></table></div>
+<p>Znaleziska:</p>
 <ul>
-<li><strong>Spacja „przytrzymaj, aby mówić” (<code>voice.ptt</code>) nic nie robi w oknie.</strong> Skrót jest w rejestrze i na stronie
-Skróty, rdzeń ma polecenie <code>voice_ptt</code>, ale żaden kod interfejsu go nie wywołuje. Do decyzji: podłączyć
-(Spacja poza polem pisania, przytrzymanie) albo usunąć z listy skrótów.</li>
-<li><strong>Esc w rozmowie (<code>conversation.escape</code>)</strong> zamyka tylko listę podpowiedzi w polu pisania; opis skrótu sugeruje
-więcej (zatrzymanie, wyjście z edycji). Do sprawdzenia przy przeglądzie skrótów.</li>
+<li><strong>Spacja „przytrzymaj, aby mówić” (<code>voice.ptt</code>) nic nie robiła w oknie.</strong> Skrót był w rejestrze i na stronie
+Skróty, a Ustawienia → Głos oferowały „Przytrzymaj, aby mówić (PTT)”, ale żaden kod interfejsu nie wywoływał
+polecenia rdzenia <code>voice_ptt</code>. <strong>Podłączona</strong> (<code>state/push-to-talk.ts</code>): w trybie PTT przytrzymanie Spacji
+w widoku rozmowy poza polem tekstowym i kontrolką włącza mikrofon, puszczenie (albo utrata fokusu okna) —
+wyłącza; w trybie „Przełącznik” Spacja działa jak dotąd. Wolisz usunąć PTT zamiast tego — to jedna zmiana.</li>
+<li><strong>Esc w rozmowie — moje wcześniejsze znalezisko było błędne.</strong> Esc ma pełny łańcuch (<code>escapeChain</code>: menu
+i okna → szuflady → mowa → czytanie → zatrzymanie generowania); patrzyłam tylko na obsługę w polu pisania.
+Test sprawdza teraz kolejność.</li>
+<li><strong>Test klawiszy globalnych w świeżym profilu:</strong> obszar powiadomień istnieje dopiero w widoku programu (po
+wprowadzeniu) — test kończy wprowadzenie sam, gdy biegnie osobno.</li>
 </ul>
 <h2 id="3-pelne-uprawnienia-instancji-testowej">3. Pełne uprawnienia instancji testowej</h2>
 <p>Instancja testowa (<code>scripts/verify-app.sh</code>, profil tymczasowy w <code>target/</code>) dostaje plik zapamiętanego poziomu
@@ -355,6 +360,10 @@ test <code>standing_level_from_the_broker_dir_is_restored</code>). Zmianę przyg
 scalone w <code>b5f7787c</code>, testy <code>app-broker</code> i clippy zielone. Broker w procesie działa tylko w budowach
 deweloperskich i testowych — wydanie bez osobnego Brokera przechodzi w bezpieczny stan (<code>kernel.rs</code>), więc
 Alfy właściciela to nie dotyczy (wgrana 0.0.79 nie wymaga ponownego wgrania).</p>
+<p>Skróty globalne w instancji testowej sprawdza polecenie budowy testowej <code>e2e_global_shortcut</code> (tylko cecha
+<code>e2e</code>, w programie właściciela odmawia) — bez wstrzykiwania klawiszy w sesję Windows (<a href="plan-45-testy-ai.html">45 §6.3</a>).
+Pierwsza próba z prawdziwymi klawiszami została przerwana: zrzut pulpitu pokazał, że właściciel pisał w tym
+czasie w innym programie.</p>
 <p>Od <code>8c6dde32</code> etap „aplikacja” w <code>verify wersja</code> po pełnym biegu uruchamia program jeszcze dwa razy na L4
 (świeży profil za każdym razem): <code>z-pelny-dostep</code> i <code>z-katalog</code>. Czerwony przebieg L4 = czerwony etap.</p>
 <p><strong>Sprawdzone w prawdziwym oknie (31.10 ok. 12:10):</strong> powłoka zbudowana z gałęzi (przeniesionej na <code>112c421c</code>,
@@ -396,7 +405,7 @@ poprawki, poniżej progu bramki).</li>
 skróty „Alfa” na pulpicie i w menu Start odświeżone). Program otwiera właściciel skrótem.</p>
 <h2 id="7-do-decyzji-wlasciciela">7. Do decyzji właściciela</h2>
 <ol>
-<li>Spacja „przytrzymaj, aby mówić”: podłączyć czy usunąć ze skrótów.</li>
+<li>Spacja „przytrzymaj, aby mówić” — podłączyłam (§2); jeśli wolisz ją usunąć ze skrótów i ustawień, daj znać.</li>
 </ol>
 </article>
 <footer>Źródło: <code>docs/plan/46-raport-2026-10-31-testy-ai.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>

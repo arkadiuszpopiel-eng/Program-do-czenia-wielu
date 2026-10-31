@@ -141,6 +141,19 @@ Rozwiązanie bez obchodzenia zgód (przegląd i zgoda właściciela 31.10, scalo
 5. Broker w procesie działa tylko w budowach deweloperskich i testowych; wydanie bez osobnego Brokera przechodzi
    w bezpieczny stan (`apps/desktop/src-tauri/src/kernel.rs`), więc plik nie podnosi poziomu w Alfie właściciela.
 
+### 6.3 Skróty globalne bez wstrzykiwania klawiszy
+
+Skróty globalne (STOP WSZYSTKIEGO, dyktowanie, czytanie zaznaczenia, Szybkie pytanie) rejestruje powłoka
+w systemie, więc strona ich nie naciśnie. Pierwsza próba naciskała prawdziwe klawisze w sesji Windows — odrzucona
+31.10: właściciel pisał w tym czasie w innym programie, a wstrzyknięte Ctrl/Alt i zmiana pierwszego planu
+weszłyby mu w pracę. Zamiast tego budowa testowa (cecha `e2e`) ma polecenie powłoki `e2e_global_shortcut`:
+uruchamia tę samą obsługę naciśnięcia co system (`shortcuts.rs`, `on_pressed`) i zwraca, czy skrót jest
+zarejestrowany w systemie przez instancję testową. Dyktowanie i czytanie zaznaczenia działają na oknie na
+pierwszym planie — polecenie najpierw daje fokus oknu instancji testowej i odmawia bez niego, więc nic nie
+sięga do innych programów. Poza budową testową polecenie odmawia. Test: `e2e-app/zy-skroty-globalne`.
+Niesprawdzone tym sposobem zostaje tylko dostarczenie komunikatu klawisza przez Windows do wtyczki
+(`tauri-plugin-global-shortcut`).
+
 ### 6.3 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)
 
 Kamera (sprzętowo odłączona), ocena zmysłami właściciela (czy głos się podoba, czy wygląd jest ładny),
@@ -168,5 +181,6 @@ Nowa funkcja (dowolna sesja): bramka sama zatrzyma `verify`, dopóki funkcja nie
 | Przegląd ogólny poleceń palety                                    | zrobione 31.10: każde polecenie (4 części) zielone na Edge                                              |
 | Przegląd ogólny ustawień na prawdziwym rdzeniu                    | zrobione 31.10: każde ustawienie zielone w prawdziwym oknie (8:25, raport 46)                                                                    |
 | Instancja testowa na „Pełnej automatyce”                          | zrobione 31.10: scalone po przeglądzie właściciela; przebieg L4 w każdym `verify wersja` |
-| Spłata długu                                                      | 31 → 6 (31.10, raport 46); zostały klawisze — `--kolejka` |
+| Skróty globalne w instancji testowej (§6.3)                       | zrobione 31.10: `e2e_global_shortcut` (tylko budowa testowa), 4 testy zielone |
+| Spłata długu                                                      | 31 → 0 (31.10, raport 46): 601 z 601 funkcji z testem |
 | Przegląd ogólny zdarzeń i narzędzi                                | do zrobienia: narzędzia — wywołanie każdego na atrapach portów z poprawnymi argumentami ze schematu    |

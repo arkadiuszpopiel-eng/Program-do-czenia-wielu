@@ -34,6 +34,8 @@ export async function createClient(): Promise<AlfaClient> {
   // chowanie sprawdzają osobno z `?panels=autohide`.
   const panels = params.get('panels') ?? (navigator.webdriver ? 'docked' : null);
   if (panels) settings['ui.panels_autohide'] = panels === 'autohide';
+  // Włączanie mikrofonu (Spacja PTT): `?mic=ptt`.
+  if (params.get('mic') === 'ptt') settings['voice.mode'] = 'ptt';
   // Uproszczony ekran (K.3): `?simple=1`.
   if (params.get('simple') === '1') settings['ui.simple'] = true;
   // Podgląd stanów obsady: `?cast=speaking,working,waiting_approval,idle`.

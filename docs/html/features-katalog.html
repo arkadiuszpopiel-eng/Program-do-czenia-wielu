@@ -322,11 +322,11 @@ blockquote {
 <p>Plik generowany: <code>node scripts/features.mjs</code> (nie edytuj ręcznie). Zasady i system testów:
 <a href="plan-45-testy-ai.html">45-testy-ai.md</a>. Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).</p>
-<p><strong>Razem: 601 funkcji, z testem 595 (99 %), w długu 6.</strong></p>
-<div class="tbl"><table><thead><tr><th>Rodzaj</th><th style="text-align:right">Funkcji</th><th style="text-align:right">Z testem</th><th style="text-align:right">rdzeń</th><th style="text-align:right">interfejs</th><th style="text-align:right">przeglądarka</th><th style="text-align:right">aplikacja</th><th style="text-align:right">eval</th><th style="text-align:right">przegląd ogólny</th></tr></thead><tbody><tr><td>Polecenia rdzenia</td><td style="text-align:right">281</td><td style="text-align:right">281 (100 %)</td><td style="text-align:right">204</td><td style="text-align:right">2</td><td style="text-align:right">2</td><td style="text-align:right">249</td><td style="text-align:right">1</td><td style="text-align:right">0</td></tr>
-<tr><td>Polecenia palety i skróty</td><td style="text-align:right">62</td><td style="text-align:right">56 (90.3 %)</td><td style="text-align:right">2</td><td style="text-align:right">6</td><td style="text-align:right">6</td><td style="text-align:right">0</td><td style="text-align:right">0</td><td style="text-align:right">50</td></tr>
+<p><strong>Razem: 601 funkcji, z testem 601 (100 %), w długu 0.</strong></p>
+<div class="tbl"><table><thead><tr><th>Rodzaj</th><th style="text-align:right">Funkcji</th><th style="text-align:right">Z testem</th><th style="text-align:right">rdzeń</th><th style="text-align:right">interfejs</th><th style="text-align:right">przeglądarka</th><th style="text-align:right">aplikacja</th><th style="text-align:right">eval</th><th style="text-align:right">przegląd ogólny</th></tr></thead><tbody><tr><td>Polecenia rdzenia</td><td style="text-align:right">281</td><td style="text-align:right">281 (100 %)</td><td style="text-align:right">204</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">250</td><td style="text-align:right">1</td><td style="text-align:right">0</td></tr>
+<tr><td>Polecenia palety i skróty</td><td style="text-align:right">62</td><td style="text-align:right">62 (100 %)</td><td style="text-align:right">2</td><td style="text-align:right">7</td><td style="text-align:right">9</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">50</td></tr>
 <tr><td>Strony Ustawień</td><td style="text-align:right">38</td><td style="text-align:right">38 (100 %)</td><td style="text-align:right">0</td><td style="text-align:right">3</td><td style="text-align:right">34</td><td style="text-align:right">12</td><td style="text-align:right">0</td><td style="text-align:right">38</td></tr>
-<tr><td>Ustawienia</td><td style="text-align:right">98</td><td style="text-align:right">98 (100 %)</td><td style="text-align:right">14</td><td style="text-align:right">11</td><td style="text-align:right">7</td><td style="text-align:right">9</td><td style="text-align:right">2</td><td style="text-align:right">98</td></tr>
+<tr><td>Ustawienia</td><td style="text-align:right">98</td><td style="text-align:right">98 (100 %)</td><td style="text-align:right">14</td><td style="text-align:right">12</td><td style="text-align:right">7</td><td style="text-align:right">9</td><td style="text-align:right">2</td><td style="text-align:right">98</td></tr>
 <tr><td>Narzędzia agentek</td><td style="text-align:right">81</td><td style="text-align:right">81 (100 %)</td><td style="text-align:right">79</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">3</td><td style="text-align:right">52</td><td style="text-align:right">0</td></tr>
 <tr><td>Zdarzenia rdzenia</td><td style="text-align:right">41</td><td style="text-align:right">41 (100 %)</td><td style="text-align:right">35</td><td style="text-align:right">25</td><td style="text-align:right">5</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">0</td></tr></tbody></table></div>
 <h2 id="polecenia-rdzenia">Polecenia rdzenia</h2>
@@ -353,7 +353,7 @@ blockquote {
 <tr><td><code>agents_set_roles</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>agents_steer</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>app_bootstrap</code></td><td>rdzeń, przeglądarka, aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>app_complete_onboarding</code></td><td>rdzeń, bieg aplikacji</td><td></td></tr>
+<tr><td><code>app_complete_onboarding</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>app_open_system_settings</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>app_save_layout</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>app_set_active_session</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
@@ -601,7 +601,7 @@ blockquote {
 <tr><td><code>voice_engines</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>voice_features</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>voice_preview</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>voice_ptt</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
+<tr><td><code>voice_ptt</code></td><td>interfejs, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>voice_read</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>voice_set_mic_enabled</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>voice_set_muted</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
@@ -642,18 +642,18 @@ blockquote {
 <tr><td><code>panel.voice</code></td><td>przegląd ogólny</td><td></td></tr>
 <tr><td><code>panel.tasks</code></td><td>przegląd ogólny</td><td></td></tr>
 <tr><td><code>voice.mic</code></td><td>rdzeń, przegląd ogólny</td><td></td></tr>
-<tr><td><code>voice.ptt</code></td><td>—</td><td>klawisz pola pisania; <strong>dług</strong></td></tr>
-<tr><td><code>conversation.escape</code></td><td>—</td><td>klawisz pola pisania; <strong>dług</strong></td></tr>
+<tr><td><code>voice.ptt</code></td><td>interfejs, przeglądarka</td><td>klawisz pola pisania</td></tr>
+<tr><td><code>conversation.escape</code></td><td>przeglądarka</td><td>klawisz pola pisania</td></tr>
 <tr><td><code>composer.send</code></td><td>przeglądarka</td><td>klawisz pola pisania</td></tr>
 <tr><td><code>composer.newline</code></td><td>przeglądarka</td><td>klawisz pola pisania</td></tr>
 <tr><td><code>composer.editLast</code></td><td>przeglądarka</td><td>klawisz pola pisania</td></tr>
 <tr><td><code>composer.historyPrev</code></td><td>przeglądarka</td><td>klawisz pola pisania</td></tr>
 <tr><td><code>composer.historyNext</code></td><td>przeglądarka</td><td>klawisz pola pisania</td></tr>
-<tr><td><code>composer.pastePlain</code></td><td>—</td><td>klawisz pola pisania; <strong>dług</strong></td></tr>
+<tr><td><code>composer.pastePlain</code></td><td>przeglądarka</td><td>klawisz pola pisania</td></tr>
 <tr><td><code>system.quickAsk</code></td><td>interfejs</td><td>skrót globalny</td></tr>
-<tr><td><code>system.killSwitch</code></td><td>—</td><td>skrót globalny; <strong>dług</strong></td></tr>
-<tr><td><code>voice.dictation</code></td><td>—</td><td>skrót globalny; <strong>dług</strong></td></tr>
-<tr><td><code>voice.readSelection</code></td><td>—</td><td>skrót globalny; <strong>dług</strong></td></tr>
+<tr><td><code>system.killSwitch</code></td><td>aplikacja</td><td>skrót globalny</td></tr>
+<tr><td><code>voice.dictation</code></td><td>aplikacja</td><td>skrót globalny</td></tr>
+<tr><td><code>voice.readSelection</code></td><td>aplikacja</td><td>skrót globalny</td></tr>
 <tr><td><code>action.theme</code></td><td>przegląd ogólny</td><td></td></tr>
 <tr><td><code>action.language</code></td><td>przeglądarka, przegląd ogólny</td><td></td></tr>
 <tr><td><code>action.column</code></td><td>przegląd ogólny</td><td></td></tr>
@@ -749,7 +749,7 @@ blockquote {
 <tr><td><code>voice.talk_max_silence</code></td><td>przegląd ogólny</td><td>Najdłuższe czekanie w ciszy</td></tr>
 <tr><td><code>voice.talk_stt_engine</code></td><td>przegląd ogólny</td><td>Silnik rozpoznawania mowy</td></tr>
 <tr><td><code>voice.talk_language</code></td><td>przegląd ogólny</td><td>Język rozpoznawania mowy</td></tr>
-<tr><td><code>voice.mode</code></td><td>przegląd ogólny</td><td>Włączanie mikrofonu</td></tr>
+<tr><td><code>voice.mode</code></td><td>interfejs, przegląd ogólny</td><td>Włączanie mikrofonu</td></tr>
 <tr><td><code>voice.show_pill</code></td><td>przegląd ogólny</td><td>Pigułka głosowa</td></tr>
 <tr><td><code>agents.max_steps</code></td><td>rdzeń, interfejs, przegląd ogólny</td><td>Limit kroków zadania</td></tr>
 <tr><td><code>agents.auto_extend_steps</code></td><td>rdzeń, przeglądarka, przegląd ogólny</td><td>Zgoda na automatyczne przedłużanie kroków</td></tr>

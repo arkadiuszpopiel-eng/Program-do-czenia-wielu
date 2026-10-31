@@ -16,6 +16,7 @@
   import type { AppState } from './lib/state/app.svelte';
   import { handleKeydown, handleMouseNav } from './lib/state/commands';
   import { provideApp } from './lib/state/context';
+  import { PushToTalk } from './lib/state/push-to-talk';
 
   interface Props {
     app: AppState;
@@ -24,6 +25,7 @@
   const props: Props = $props();
   // Instancja stanu jest stała przez całe życie okna — odczyt raz, poza śledzeniem.
   const app = untrack(() => props.app);
+  const ptt = new PushToTalk(app);
   provideApp(app);
   const { t } = app.i18n;
   const loadOnboarding = () => import('./lib/views/onboarding/OnboardingView.svelte');
@@ -90,7 +92,15 @@
   });
 </script>
 
-<svelte:window onkeydown={(e) => handleKeydown(app, e)} onmouseup={(e) => handleMouseNav(app, e)} />
+<svelte:window
+  onkeydown={(e) => {
+    ptt.down(e);
+    handleKeydown(app, e);
+  }}
+  onkeyup={(e) => ptt.up(e)}
+  onblur={() => ptt.release()}
+  onmouseup={(e) => handleMouseNav(app, e)}
+/>
 
 {#if app.view === 'loading'}
   <div class="boot" data-surface="app" role="status" aria-label={t('app.loading')}></div>

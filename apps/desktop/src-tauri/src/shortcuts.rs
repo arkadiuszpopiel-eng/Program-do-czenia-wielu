@@ -56,26 +56,80 @@ fn voice_shortcut<R: Runtime>(app: &AppHandle<R>, read: bool) {
 pub fn plugin<R: Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri_plugin_global_shortcut::Builder::new()
         .with_handler(|app, shortcut, event| {
-            if event.state() != ShortcutState::Pressed {
-                return;
-            }
-            if shortcut.id() == quick_ask().id() {
-                if let Err(e) = toggle(app) {
-                    tracing::warn!(error = %e, "okno Szybkiego pytania niedostępne");
-                }
-            } else if shortcut.id() == kill_switch().id() {
-                let core = app.state::<AppCore>().inner().clone();
-                tauri::async_runtime::spawn(async move {
-                    let stopped = core.system_kill_all(KillOrigin::Hotkey).await;
-                    tracing::warn!(zatrzymane = stopped, "STOP WSZYSTKIEGO (Ctrl+Shift+F12)");
-                });
-            } else if shortcut.id() == dictation().id() {
-                voice_shortcut(app, false);
-            } else if shortcut.id() == read_selection().id() {
-                voice_shortcut(app, true);
+            if event.state() == ShortcutState::Pressed {
+                on_pressed(app, shortcut);
             }
         })
         .build()
+}
+
+/// Naciśnięcie skrótu — wspólne dla systemu (wtyczka) i testu prawdziwej aplikacji
+/// ([`e2e_global_shortcut`]).
+fn on_pressed<R: Runtime>(app: &AppHandle<R>, shortcut: &Shortcut) {
+    if shortcut.id() == quick_ask().id() {
+        if let Err(e) = toggle(app) {
+            tracing::warn!(error = %e, "okno Szybkiego pytania niedostępne");
+        }
+    } else if shortcut.id() == kill_switch().id() {
+        let core = app.state::<AppCore>().inner().clone();
+        tauri::async_runtime::spawn(async move {
+            let stopped = core.system_kill_all(KillOrigin::Hotkey).await;
+            tracing::warn!(zatrzymane = stopped, "STOP WSZYSTKIEGO (Ctrl+Shift+F12)");
+        });
+    } else if shortcut.id() == dictation().id() {
+        voice_shortcut(app, false);
+    } else if shortcut.id() == read_selection().id() {
+        voice_shortcut(app, true);
+    }
+}
+
+/// Skróty globalne z nazwami jak w komunikatach i na stronie Skróty.
+fn named() -> [(Shortcut, &'static str); 4] {
+    [
+        (quick_ask(), "Ctrl+Alt+Space"),
+        (kill_switch(), "Ctrl+Shift+F12"),
+        (dictation(), "Ctrl+Alt+D"),
+        (read_selection(), "Ctrl+Alt+R"),
+    ]
+}
+
+/// `e2e_global_shortcut` — wyłącznie budowa testowa (cecha `e2e`): naciśnięcie skrótu globalnego
+/// `keys` tą samą obsługą co naciśnięcie w systemie, bez wstrzykiwania klawiszy w sesję właściciela
+/// (test nie może wejść mu w pisanie). Dyktowanie i czytanie zaznaczenia działają na oknie na
+/// pierwszym planie — najpierw fokus na oknie głównym instancji testowej; bez fokusu odmowa, zanim
+/// cokolwiek sięgnie do innego programu. Wynik: czy ta instancja ma skrót zarejestrowany w systemie.
+/// Poza budową testową — odmowa.
+#[tauri::command]
+pub async fn e2e_global_shortcut(app: AppHandle, keys: String) -> Result<bool, String> {
+    if !cfg!(feature = "e2e") {
+        return Err("Polecenie tylko dla budowy testowej.".into());
+    }
+    let (shortcut, _) = named()
+        .into_iter()
+        .find(|(_, name)| *name == keys)
+        .ok_or_else(|| format!("Nieznany skrót globalny: {keys}"))?;
+    if shortcut.id() == dictation().id() || shortcut.id() == read_selection().id() {
+        focus_main(&app).await?;
+    }
+    let registered = app.global_shortcut().is_registered(shortcut);
+    on_pressed(&app, &shortcut);
+    Ok(registered)
+}
+
+/// Okno główne na pierwszy plan (do 3 s); bez fokusu — błąd.
+async fn focus_main(app: &AppHandle) -> Result<(), String> {
+    let window = app
+        .get_webview_window(windows::MAIN)
+        .ok_or("Brak okna głównego.")?;
+    let shown = window.show().and_then(|()| window.set_focus());
+    shown.map_err(|e| format!("Fokus okna głównego: {e}"))?;
+    for _ in 0..30 {
+        if window.is_focused().unwrap_or(false) {
+            return Ok(());
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    }
+    Err("Okno instancji testowej nie dostało fokusu — skrót nie naciśnięty.".into())
 }
 
 fn toggle<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
@@ -106,12 +160,10 @@ fn register_one(app: &AppHandle, core: &AppCore, shortcut: Shortcut, name: &str)
 /// Rejestruje skróty aplikacji (kill-switch osobno — [`set_kill_switch`]); konflikt (np. zajęty
 /// przez PowerToys) → komunikat w UI.
 pub fn register(app: &AppHandle, core: &AppCore) {
-    for (shortcut, name) in [
-        (quick_ask(), "Ctrl+Alt+Space"),
-        (dictation(), "Ctrl+Alt+D"),
-        (read_selection(), "Ctrl+Alt+R"),
-    ] {
-        register_one(app, core, shortcut, name);
+    for (shortcut, name) in named() {
+        if shortcut.id() != kill_switch().id() {
+            register_one(app, core, shortcut, name);
+        }
     }
 }
 

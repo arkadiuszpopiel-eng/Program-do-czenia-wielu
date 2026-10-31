@@ -1,11 +1,4 @@
 {
   "opis": "Funkcje bez testu sprzed bramki katalogu (docs/plan/45-testy-ai.md). Lista tylko maleje: `node scripts/features.mjs --przytnij` usuwa pozycje z testem; dopisanie = decyzja właściciela.",
-  "funkcje": [
-    "akcja:composer.pastePlain",
-    "akcja:conversation.escape",
-    "akcja:system.killSwitch",
-    "akcja:voice.dictation",
-    "akcja:voice.ptt",
-    "akcja:voice.readSelection"
-  ]
+  "funkcje": []
 }
