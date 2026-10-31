@@ -41,5 +41,34 @@
       "status": "opened_broker",
       "request_id": "br-muo1g480-18"
     }
+  },
+  {
+    "command": "permissions_grants",
+    "args": {},
+    "result": [
+      {
+        "id": "1",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "scope": "połączenie z internetem: strona example.com",
+        "granted_at_ms": 1793476000000,
+        "until_ms": 1793486800000
+      },
+      {
+        "id": "2",
+        "session_id": "s-q3",
+        "agent": null,
+        "scope": "odczyt plików: folder Dokumenty (z podfolderami)",
+        "granted_at_ms": 1793390000000,
+        "until_ms": null
+      }
+    ]
+  },
+  {
+    "command": "permissions_revoke_grant",
+    "args": {
+      "grantId": "2"
+    },
+    "result": true
   }
 ]

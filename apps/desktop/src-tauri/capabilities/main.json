@@ -100,6 +100,8 @@
     "allow-permissions-get",
     "allow-permissions-request-level",
     "allow-permissions-open-approval",
+    "allow-permissions-grants",
+    "allow-permissions-revoke-grant",
     "allow-broker-status",
     "allow-models-local-list",
     "allow-models-local-download",

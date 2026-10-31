@@ -257,6 +257,8 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             roundtrip::<BrokerIntentResult>,
         ),
         "permissions_open_approval" => (vec![("approvalId", s)], roundtrip::<BrokerIntentResult>),
+        "permissions_grants" => (vec![], roundtrip::<Vec<GrantView>>),
+        "permissions_revoke_grant" => (vec![("grantId", s)], b),
         "models_local_list" => (vec![], roundtrip::<Vec<LocalModelInfo>>),
         "models_local_download" | "models_local_cancel" => (vec![("modelId", os)], unit),
         "device_profile" | "device_measure" => (vec![], roundtrip::<DeviceProfile>),

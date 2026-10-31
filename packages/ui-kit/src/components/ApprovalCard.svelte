@@ -152,11 +152,16 @@
     align-items: center;
     gap: var(--alfa-space-1);
   }
+  /* W wąskiej karcie przycisk schodzi pod podpowiedź (przy prawej krawędzi), zamiast z niej wystawać. */
   .foot {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: var(--alfa-space-2);
+  }
+  .foot > :global(.btn) {
+    margin-inline-start: auto;
   }
   .hint {
     color: var(--alfa-color-text-subtle);
