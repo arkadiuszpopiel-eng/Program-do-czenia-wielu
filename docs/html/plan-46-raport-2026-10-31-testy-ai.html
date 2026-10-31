@@ -326,7 +326,7 @@ testów przez AI”. Ten raport mówi, co zrobiłam, gdzie to zobaczyć i czego 
 <h2 id="1-polecenia-wlasciciela-punkt-po-punkcie">1. Polecenia właściciela — punkt po punkcie</h2>
 <div class="tbl"><table><thead><tr><th>Polecenie</th><th>Co zrobiłam</th></tr></thead><tbody><tr><td>System testowania każdej funkcji obecnej</td><td>katalog 601 funkcji wyliczany z kodu (6 rodzajów), przy każdej — czym jest przetestowana; <a href="features-katalog.html"><code>docs/features/KATALOG.md</code></a></td></tr>
 <tr><td>… i przyszłej</td><td>bramka „nowa funkcja bez testu” w <code>verify szybki</code> i <code>verify wersja</code>; przeglądy ogólne palety i ustawień obejmują pozycje dodane później; nowe narzędzie agentki zatrzymuje test spisu narzędzi</td></tr>
-<tr><td>Pełne uprawnienia dla testów przez AI</td><td>instancja testowa startuje z zapamiętanym poziomem Brokera z własnego profilu (<code>ALFA_TEST_AUTONOMY=L4</code>) — zmiana w Brokerze, więc <strong>na gałęzi do przeglądu</strong> <code>do-przegladu-testy-pelny-dostep</code> (§3)</td></tr>
+<tr><td>Pełne uprawnienia dla testów przez AI</td><td>instancja testowa startuje z zapamiętanym poziomem Brokera z własnego profilu (<code>ALFA_TEST_AUTONOMY=L4</code>) — zmiana w Brokerze przeszła przegląd właściciela i jest scalona (<code>b5f7787c</code>); każde <code>verify wersja</code> sprawdza program także na L4 (§3)</td></tr>
 <tr><td>Kontynuuj kolejne etapy</td><td>ścieżki względne w wynikach narzędzi plikowych (z planu raportu 44, C2.3); spłata długu katalogu (§2)</td></tr></tbody></table></div>
 <h2 id="2-splata-dlugu-i-znaleziska">2. Spłata długu i znaleziska</h2>
 <p>Stan po spłacie: <strong>601 funkcji, 595 z testem (99 %), dług 31 → 6</strong>.</p>
@@ -349,10 +349,14 @@ więcej (zatrzymanie, wyjście z edycji). Do sprawdzenia przy przeglądzie skró
 <h2 id="3-pelne-uprawnienia-instancji-testowej">3. Pełne uprawnienia instancji testowej</h2>
 <p>Instancja testowa (<code>scripts/verify-app.sh</code>, profil tymczasowy w <code>target/</code>) dostaje plik zapamiętanego poziomu
 Brokera przed startem (<code>scripts/trial/test-autonomy.sh</code>; odmawia ścieżek spoza <code>target/</code>, nigdy nie dotyka
-profilu właściciela ani rejestru). Broker w procesie czyta ten plik dopiero po zmianie na gałęzi
-<code>do-przegladu-testy-pelny-dostep</code> (<code>crates/app-broker/src/inproc.rs</code>, test
-<code>standing_level_from_the_broker_dir_is_restored</code> zielony, clippy i fmt czyste). Do czasu przeglądu i scalenia
-plik w profilu testowym nic nie zmienia, a test <code>e2e-app/z-pelny-dostep</code> jest pomijany bez <code>ALFA_TEST_AUTONOMY</code>.</p>
+profilu właściciela ani rejestru). Broker w procesie czyta ten plik przy starcie (<code>crates/app-broker/src/inproc.rs</code>,
+test <code>standing_level_from_the_broker_dir_is_restored</code>). Zmianę przygotowałam na gałęzi
+<code>do-przegladu-testy-pelny-dostep</code>; właściciel obejrzał ją 31.10 i zatwierdził scalenie („Zatwierdzam scalenie”) —
+scalone w <code>b5f7787c</code>, testy <code>app-broker</code> i clippy zielone. Broker w procesie działa tylko w budowach
+deweloperskich i testowych — wydanie bez osobnego Brokera przechodzi w bezpieczny stan (<code>kernel.rs</code>), więc
+Alfy właściciela to nie dotyczy (wgrana 0.0.79 nie wymaga ponownego wgrania).</p>
+<p>Od <code>8c6dde32</code> etap „aplikacja” w <code>verify wersja</code> po pełnym biegu uruchamia program jeszcze dwa razy na L4
+(świeży profil za każdym razem): <code>z-pelny-dostep</code> i <code>z-katalog</code>. Czerwony przebieg L4 = czerwony etap.</p>
 <p><strong>Sprawdzone w prawdziwym oknie (31.10 ok. 12:10):</strong> powłoka zbudowana z gałęzi (przeniesionej na <code>112c421c</code>,
 osobny katalog <code>alfa-testy-pelny-dostep</code>), <code>ALFA_TEST_AUTONOMY=L4</code>:</p>
 <ul>
@@ -363,12 +367,16 @@ osobny katalog <code>alfa-testy-pelny-dostep</code>), <code>ALFA_TEST_AUTONOMY=L
 poziomu leżał już w <code>Local\Alfa</code>. Poprawka na głównej gałęzi (<code>112c421c</code>): strażnik pomija wyłącznie ten jeden
 plik, każdy inny plik danych Alfy nadal zatrzymuje bieg.</p>
 <h2 id="4-sprawdzenie">4. Sprawdzenie</h2>
-<p><code>verify wersja</code> na <code>ad95c3ec</code>: <strong>18 z 19 zielonych</strong> (dziewiętnasty, <code>audyt-npm</code>, naprawiony po przebiegu — niżej): Rust 3306/0/41, interfejs 535, przeglądarka 754,
-prawdziwa aplikacja 53 (pokrycie łącza 92,5 %), katalog, dokumenty, zależności, SBOM.</p>
+<p><strong>Końcowy <code>verify wersja</code> na <code>8c6dde32</code> (po scaleniu i z przebiegiem L4): 19 z 19 zielonych</strong> — Rust 3307/0/41,
+interfejs 535, przeglądarka 754, prawdziwa aplikacja 53 (pokrycie łącza 92,5 %) i na L4: <code>z-pelny-dostep</code> 1/1,
+<code>z-katalog</code> 1/1; katalog, zależności, audyt npm, SBOM. Etap „dokumenty” był czerwony tylko dlatego, że po
+ostatniej edycji dokumentu 45 nie odświeżyłam HTML — po <code>node scripts/docs-html.mjs</code> ten sam etap
+(<code>docs-html.mjs --verify</code>) zielony, 0 problemów.</p>
+<p>Wcześniejsze przebiegi:</p>
 <ul>
 <li>Pierwszy przebieg (<code>0fef03bc</code>) wykrył nową podatność <strong>wasmtime 36.0.19 (RUSTSEC-2026-0424)</strong> — podbiłam
 łatkę w linii LTS 36.0.20 (<code>docs/vendor/wasmtime.md</code> na to pozwala), <code>cargo deny</code> zielony, wtyczki 23/23.</li>
-<li><strong><code>audyt-npm</code> naprawiony po przebiegu (<code>2ef398ca</code>):</strong> <code>minimatch</code> &lt; 11.0.1 (DoS przy wzorcach glob) pod
+<li><code>ad95c3ec</code>: 18 z 19 — <strong><code>audyt-npm</code> naprawiony potem (<code>2ef398ca</code>):</strong> <code>minimatch</code> &lt; 11.0.1 (DoS przy wzorcach glob) pod
 <code>eslint</code> i <code>typescript-eslint</code> — narzędzia programisty, nie trafiają do programu. Poprawka jest tylko w 11.x;
 wszyscy użytkownicy (<code>eslint</code>, <code>@eslint/config-array</code>, <code>@eslint/eslintrc</code>, <code>typescript-estree</code>) sięgają po klasę
 <code>Minimatch</code> albo funkcję <code>minimatch</code>, które 11.x eksportuje tak samo, więc nadpisanie w <code>pnpm-workspace.yaml</code>
@@ -388,8 +396,6 @@ poprawki, poniżej progu bramki).</li>
 skróty „Alfa” na pulpicie i w menu Start odświeżone). Program otwiera właściciel skrótem.</p>
 <h2 id="7-do-decyzji-wlasciciela">7. Do decyzji właściciela</h2>
 <ol>
-<li>Przegląd i scalenie gałęzi <code>do-przegladu-testy-pelny-dostep</code> (Broker czyta poziom z profilu instancji testowej;
-działanie sprawdzone w prawdziwym oknie — §3). Do scalenia instancja testowa w <code>verify</code> działa na poziomie domyślnym.</li>
 <li>Spacja „przytrzymaj, aby mówić”: podłączyć czy usunąć ze skrótów.</li>
 </ol>
 </article>

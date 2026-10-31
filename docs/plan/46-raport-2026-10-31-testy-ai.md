@@ -11,7 +11,7 @@ testów przez AI”. Ten raport mówi, co zrobiłam, gdzie to zobaczyć i czego 
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | System testowania każdej funkcji obecnej         | katalog 601 funkcji wyliczany z kodu (6 rodzajów), przy każdej — czym jest przetestowana; [`docs/features/KATALOG.md`](../features/KATALOG.md)                                                            |
 | … i przyszłej                                    | bramka „nowa funkcja bez testu” w `verify szybki` i `verify wersja`; przeglądy ogólne palety i ustawień obejmują pozycje dodane później; nowe narzędzie agentki zatrzymuje test spisu narzędzi              |
-| Pełne uprawnienia dla testów przez AI            | instancja testowa startuje z zapamiętanym poziomem Brokera z własnego profilu (`ALFA_TEST_AUTONOMY=L4`) — zmiana w Brokerze, więc **na gałęzi do przeglądu** `do-przegladu-testy-pelny-dostep` (§3)      |
+| Pełne uprawnienia dla testów przez AI            | instancja testowa startuje z zapamiętanym poziomem Brokera z własnego profilu (`ALFA_TEST_AUTONOMY=L4`) — zmiana w Brokerze przeszła przegląd właściciela i jest scalona (`b5f7787c`); każde `verify wersja` sprawdza program także na L4 (§3) |
 | Kontynuuj kolejne etapy                          | ścieżki względne w wynikach narzędzi plikowych (z planu raportu 44, C2.3); spłata długu katalogu (§2)                                                                                                    |
 
 ## 2. Spłata długu i znaleziska
@@ -42,10 +42,15 @@ Znaleziska — katalog wskazał funkcje zadeklarowane, których nic nie obsługu
 
 Instancja testowa (`scripts/verify-app.sh`, profil tymczasowy w `target/`) dostaje plik zapamiętanego poziomu
 Brokera przed startem (`scripts/trial/test-autonomy.sh`; odmawia ścieżek spoza `target/`, nigdy nie dotyka
-profilu właściciela ani rejestru). Broker w procesie czyta ten plik dopiero po zmianie na gałęzi
-`do-przegladu-testy-pelny-dostep` (`crates/app-broker/src/inproc.rs`, test
-`standing_level_from_the_broker_dir_is_restored` zielony, clippy i fmt czyste). Do czasu przeglądu i scalenia
-plik w profilu testowym nic nie zmienia, a test `e2e-app/z-pelny-dostep` jest pomijany bez `ALFA_TEST_AUTONOMY`.
+profilu właściciela ani rejestru). Broker w procesie czyta ten plik przy starcie (`crates/app-broker/src/inproc.rs`,
+test `standing_level_from_the_broker_dir_is_restored`). Zmianę przygotowałam na gałęzi
+`do-przegladu-testy-pelny-dostep`; właściciel obejrzał ją 31.10 i zatwierdził scalenie („Zatwierdzam scalenie”) —
+scalone w `b5f7787c`, testy `app-broker` i clippy zielone. Broker w procesie działa tylko w budowach
+deweloperskich i testowych — wydanie bez osobnego Brokera przechodzi w bezpieczny stan (`kernel.rs`), więc
+Alfy właściciela to nie dotyczy (wgrana 0.0.79 nie wymaga ponownego wgrania).
+
+Od `8c6dde32` etap „aplikacja” w `verify wersja` po pełnym biegu uruchamia program jeszcze dwa razy na L4
+(świeży profil za każdym razem): `z-pelny-dostep` i `z-katalog`. Czerwony przebieg L4 = czerwony etap.
 
 **Sprawdzone w prawdziwym oknie (31.10 ok. 12:10):** powłoka zbudowana z gałęzi (przeniesionej na `112c421c`,
 osobny katalog `alfa-testy-pelny-dostep`), `ALFA_TEST_AUTONOMY=L4`:
@@ -59,12 +64,17 @@ plik, każdy inny plik danych Alfy nadal zatrzymuje bieg.
 
 ## 4. Sprawdzenie
 
-`verify wersja` na `ad95c3ec`: **18 z 19 zielonych** (dziewiętnasty, `audyt-npm`, naprawiony po przebiegu — niżej): Rust 3306/0/41, interfejs 535, przeglądarka 754,
-prawdziwa aplikacja 53 (pokrycie łącza 92,5 %), katalog, dokumenty, zależności, SBOM.
+**Końcowy `verify wersja` na `8c6dde32` (po scaleniu i z przebiegiem L4): 19 z 19 zielonych** — Rust 3307/0/41,
+interfejs 535, przeglądarka 754, prawdziwa aplikacja 53 (pokrycie łącza 92,5 %) i na L4: `z-pelny-dostep` 1/1,
+`z-katalog` 1/1; katalog, zależności, audyt npm, SBOM. Etap „dokumenty” był czerwony tylko dlatego, że po
+ostatniej edycji dokumentu 45 nie odświeżyłam HTML — po `node scripts/docs-html.mjs` ten sam etap
+(`docs-html.mjs --verify`) zielony, 0 problemów.
+
+Wcześniejsze przebiegi:
 
 - Pierwszy przebieg (`0fef03bc`) wykrył nową podatność **wasmtime 36.0.19 (RUSTSEC-2026-0424)** — podbiłam
   łatkę w linii LTS 36.0.20 (`docs/vendor/wasmtime.md` na to pozwala), `cargo deny` zielony, wtyczki 23/23.
-- **`audyt-npm` naprawiony po przebiegu (`2ef398ca`):** `minimatch` < 11.0.1 (DoS przy wzorcach glob) pod
+- `ad95c3ec`: 18 z 19 — **`audyt-npm` naprawiony potem (`2ef398ca`):** `minimatch` < 11.0.1 (DoS przy wzorcach glob) pod
   `eslint` i `typescript-eslint` — narzędzia programisty, nie trafiają do programu. Poprawka jest tylko w 11.x;
   wszyscy użytkownicy (`eslint`, `@eslint/config-array`, `@eslint/eslintrc`, `typescript-estree`) sięgają po klasę
   `Minimatch` albo funkcję `minimatch`, które 11.x eksportuje tak samo, więc nadpisanie w `pnpm-workspace.yaml`
@@ -86,6 +96,4 @@ skróty „Alfa” na pulpicie i w menu Start odświeżone). Program otwiera wł
 
 ## 7. Do decyzji właściciela
 
-1. Przegląd i scalenie gałęzi `do-przegladu-testy-pelny-dostep` (Broker czyta poziom z profilu instancji testowej;
-   działanie sprawdzone w prawdziwym oknie — §3). Do scalenia instancja testowa w `verify` działa na poziomie domyślnym.
-2. Spacja „przytrzymaj, aby mówić”: podłączyć czy usunąć ze skrótów.
+1. Spacja „przytrzymaj, aby mówić”: podłączyć czy usunąć ze skrótów.

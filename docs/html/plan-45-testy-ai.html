@@ -409,12 +409,12 @@ pracuje przy komputerze albo na jego polecenie; dźwięk — tylko w dzień;</li
 i jej profil są nietykalne (<code>Alfa-uruchomiona</code>, <code>%LOCALAPPDATA%\Alfa</code>, klucze w Menedżerze poświadczeń),
 nigdy <code>taskkill /IM alfa-desktop.exe</code>; wspólne z kontem Windows ustawienia systemu (autostart, skróty globalne
 zajęte przez jego Alfę) nie są zmieniane; żadnej wysyłki na zewnątrz (poczta, wiadomości) z kont właściciela;
-mosty CLI (<code>claude</code>, <code>codex</code>) uruchamia tylko człowiek; kod Brokera i polityk — tylko na gałęzi do przeglądu.</p>
+mosty CLI (<code>claude</code>, <code>codex</code>) uruchamia tylko człowiek; kod Brokera i polityk — tylko na gałęzi do przeglądu (scalenie po zgodzie właściciela).</p>
 <h3 id="6-2-instancja-testowa-pelna-automatyka-bez-okna-zgod">6.2 Instancja testowa — „Pełna automatyka” bez okna zgód</h3>
 <p>Instancja testowa używa Brokera <strong>w procesie</strong> (budowa testowa nie ma obok programów Jądra), a ten bez okna
 zgód odrzuca każdą prośbę: podniesienie do „Pełnej automatyki” (L4) jest niemożliwe, więc funkcje działające
 tylko na L4 (operacje administratora, niepewne polecenia głosowe, pełny dostęp agentek) były nietestowalne.</p>
-<p>Rozwiązanie bez obchodzenia zgód (gałąź <code>do-przegladu-testy-pelny-dostep</code>, <strong>czeka na przegląd właściciela</strong>):</p>
+<p>Rozwiązanie bez obchodzenia zgód (przegląd i zgoda właściciela 31.10, scalone w <code>b5f7787c</code>):</p>
 <ol>
 <li>Broker w procesie czyta ten sam plik zapamiętanego poziomu co Broker poza procesem
 (<code>broker-dev/autonomy-standing.json</code>, decyzja właściciela 27.10 „Pełna automatyka wybierana raz”) —
@@ -424,6 +424,12 @@ właściciel raz zatwierdził „Pełną automatykę” w tym profilu. Profil w�
 <li>Kod produkcyjny Brokera, okna zgód i dowodu fizycznego wejścia — bez zmian. Prośby, o które Broker pyta także
 na L4 (wysyłka po kontakcie z obcą treścią), dalej są odrzucane w instancji testowej — ich ścieżkę sprawdzają
 testy Brokera na atrapie okna (<code>safety-broker-*</code>, <code>broker-ui-*</code>).</li>
+<li><code>verify wersja</code> (etap „aplikacja”) po pełnym biegu uruchamia ten sam program jeszcze dwa razy na L4,
+każdy raz na świeżym profilu: <code>z-pelny-dostep</code> (poziom z profilu) i <code>z-katalog</code> (każde ustawienie zapisane,
+odczytane i przywrócone). Czerwony przebieg L4 = czerwony etap. Ręcznie:
+<code>ALFA_TEST_AUTONOMY=L4 ALFA_APP_SPEC=&lt;plik&gt; bash scripts/verify-app.sh --no-build</code>.</li>
+<li>Broker w procesie działa tylko w budowach deweloperskich i testowych; wydanie bez osobnego Brokera przechodzi
+w bezpieczny stan (<code>apps/desktop/src-tauri/src/kernel.rs</code>), więc plik nie podnosi poziomu w Alfie właściciela.</li>
 </ol>
 <h3 id="6-3-czego-ai-nie-testuje-samo-trzy-powody-z-dokumentu-24-3">6.3 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)</h3>
 <p>Kamera (sprzętowo odłączona), ocena zmysłami właściciela (czy głos się podoba, czy wygląd jest ładny),
@@ -445,7 +451,7 @@ rdzenia <strong>i</strong> scenariusz w prawdziwym oknie (<code>e2e-app</code>).
 <tr><td>Bramka „nowa funkcja bez testu” w <code>verify szybki</code> i <code>wersja</code></td><td>zrobione 31.10</td></tr>
 <tr><td>Przegląd ogólny poleceń palety</td><td>zrobione 31.10: każde polecenie (4 części) zielone na Edge</td></tr>
 <tr><td>Przegląd ogólny ustawień na prawdziwym rdzeniu</td><td>zrobione 31.10: każde ustawienie zielone w prawdziwym oknie (8:25, raport 46)</td></tr>
-<tr><td>Instancja testowa na „Pełnej automatyce”</td><td>gałąź do przeglądu; w prawdziwym oknie 31.10 na L4 zielone (<code>z-pelny-dostep</code>, <code>z-katalog</code>)</td></tr>
+<tr><td>Instancja testowa na „Pełnej automatyce”</td><td>zrobione 31.10: scalone po przeglądzie właściciela; przebieg L4 w każdym <code>verify wersja</code></td></tr>
 <tr><td>Spłata długu</td><td>31 → 6 (31.10, raport 46); zostały klawisze — <code>--kolejka</code></td></tr>
 <tr><td>Przegląd ogólny zdarzeń i narzędzi</td><td>do zrobienia: narzędzia — wywołanie każdego na atrapach portów z poprawnymi argumentami ze schematu</td></tr></tbody></table></div>
 </article>
