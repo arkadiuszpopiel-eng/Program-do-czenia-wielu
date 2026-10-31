@@ -84,6 +84,8 @@ pub struct AppOptions {
     pub dir_watch: Option<Arc<dyn platform_contract::DirWatchPort>>,
     /// Kamery systemu dla `camera-hub` (`None` = Media Foundation; testy: `platform-fake`).
     pub cameras: Option<Arc<dyn platform_contract::CameraPort>>,
+    /// Porty narzędzi agentek: aplikacje, system/sieć, silnik (`Default` — systemowe).
+    pub tool_ports: app_agents::PortOverrides,
     /// Gotowy hub kamer (`None` = `camera-hub-impl` nad `cameras` i konfiguracją).
     pub camera_hub: Option<Arc<dyn camera_hub_contract::CameraHub>>,
     /// Po jakim czasie bez żądań kamera zasypia (`None` = 20 s).
@@ -126,6 +128,7 @@ impl Default for AppOptions {
             signals: None,
             dir_watch: None,
             cameras: None,
+            tool_ports: app_agents::PortOverrides::default(),
             camera_hub: None,
             camera_idle: None,
             healthy_after: Duration::from_secs(30),

@@ -12,7 +12,7 @@ use safety_broker_contract::Broker;
 use voice_pipeline_contract::PipelineCfg;
 
 use super::Extra;
-use super::extra::platform_fs;
+use super::extra::{platform_clipboard, platform_fs};
 use crate::options::{AppOptions, AppPaths};
 use crate::ports::{VoicePort, VoiceUnavailable};
 
@@ -68,16 +68,12 @@ impl Extra {
         let launch = app_agents::Launch::new(Some(locks), Some(gate), Some(personas));
         // Ta sama instancja, którą Broker zabija procesy (kill-switch, Job Objects).
         let exec = self.exec.clone()?;
-        let clipboard: Arc<dyn platform_contract::ClipboardPort> = match &options.clipboard {
-            Some(c) => c.clone(),
-            None => Arc::new(platform_windows_impl::WindowsPlatform::default()),
-        };
         let tools = AgentTools::new(ToolsDeps {
             broker: tickets.clone(),
             journal,
             fs: platform_fs(options),
             exec,
-            clipboard: Some(clipboard),
+            clipboard: Some(platform_clipboard(options)),
             env: path_env_for(&paths.user_root).1,
             deny: app_modules::workdir::tool_deny_lists(paths),
             jobs: Some(kernel.jobs.clone()),
@@ -85,11 +81,11 @@ impl Extra {
             shell: ShellToolsConfig::detected(),
             base_env: None,
             extra,
-            apps: Some(app_agents::AppsDeps::system(&paths.local)),
+            apps: Some(options.tool_ports.apps_or_system(&paths.local)),
             media: Some(media),
         })
         .with_engine(app_agents::engine::engine_tools(
-            engine,
+            (engine, options.tool_ports.engine.clone()),
             &paths.local,
             tickets.clone(),
             path_env_for(&paths.user_root).1,
@@ -155,11 +151,7 @@ impl Extra {
             // Jak w narzędziach agentek: bez wstrzykniętego portu (powłoka go nie ustawia) schowek
             // systemowy. Wcześniej zostawało `None` i „Przeczytaj na głos" zawsze odmawiało
             // („unsupported"), niezależnie od zainstalowanych silników.
-            clipboard: Some(match &options.clipboard {
-                Some(c) => c.clone(),
-                None => Arc::new(platform_windows_impl::WindowsPlatform::default())
-                    as Arc<dyn platform_contract::ClipboardPort>,
-            }),
+            clipboard: Some(platform_clipboard(options)),
         });
         let config = Some(kernel.config.clone() as Arc<dyn core_config_contract::ConfigStore>);
         let voice = PipelineVoice::new(

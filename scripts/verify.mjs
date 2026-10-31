@@ -327,7 +327,11 @@ function numbersFrom(id, output) {
       ...output.matchAll(/test result: \w+\. (\d+) passed; (\d+) failed; (\d+) ignored/g),
     ];
     const sum = (i) => rows.reduce((total, m) => total + Number(m[i]), 0);
-    return `${rows.length} programów testowych, ${sum(1)} zielonych, ${sum(2)} czerwonych, ${sum(3)} pominiętych`;
+    const tests = `${rows.length} programów testowych, ${sum(1)} zielonych, ${sum(2)} czerwonych, ${sum(3)} pominiętych`;
+    // Pierwsze zdanie raportu diagnostyki narzędzi agentek (docs/plan/45 §6.5).
+    const diag = join(root, 'target/verify/narzedzia/raport.md');
+    const tools = existsSync(diag) ? readFileSync(diag, 'utf8').split('\n')[2] : '';
+    return [tests, tools && `narzędzia agentek: ${tools}`].filter(Boolean).join('; ');
   }
   if (id === 'interfejs') return output.match(/Tests\s+(.+)/)?.[1]?.trim() ?? '';
   if (id === 'przegladarka') {

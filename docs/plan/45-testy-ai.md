@@ -160,18 +160,50 @@ Niesprawdzone tym sposobem zostaje tylko dostarczenie komunikatu klawisza przez 
   (lista z `AppCore::agent_tools`, ta sama co spis `narzedzia.txt`), musi mieć poprawną nazwę dla modelu
   (`[a-z][a-z0-9_]`, do 64 znaków, bez powtórzeń), tytuł i opis, grupy ról i zamknięty schemat argumentów
   (`additionalProperties: false`, każdy wymagany argument opisany), a nieznany argument, brak wymaganych
-  i argumenty niebędące obiektem odrzuca jako `InvalidArgs`, zanim cokolwiek zrobi. Rdzeń na atrapach pulpitu,
-  schowka i wykonania poleceń. Wywołań z poprawnymi argumentami przegląd nie robi: część narzędzi
-  w rdzeniu testowym sięga do prawdziwego Windows (przeglądarka, Office, usługi), a właściciel pracuje
-  na tej samej maszynie — działanie sprawdzają testy modułów. Test kontrolny (narzędzie przyjmujące
-  wszystko) pilnuje, że przegląd każde z tych uchybień zgłasza.
+  i argumenty niebędące obiektem odrzuca jako `InvalidArgs`, zanim cokolwiek zrobi. Rdzeń diagnostyki
+  narzędzi z §6.5 (każdy port maszyny jest atrapą). Test kontrolny (narzędzie przyjmujące wszystko)
+  pilnuje, że przegląd każde z tych uchybień zgłasza.
 - **Zdarzenia** (`state/__tests__/events-sweep.test.ts`): każda próbka zdarzenia z fixture'ów rdzenia (118,
   wszystkie 40 typów; `dto_roundtrip` wymaga próbki dla każdego nowego typu) trafia do okna głównego bez
   wyjątku i bez odrzuconej obietnicy, a każdy typ ma obsługę w `applyEvent` albo w strumieniu rozmowy.
 - Oba przeglądy nie zastępują testu działania w bramce katalogu (narzędzia i zdarzenia wymagają testu
   rdzenia albo interfejsu) — pilnują wspólnych reguł dla wszystkich pozycji naraz.
 
-### 6.3 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)
+### 6.5 Diagnostyka narzędzi agentek — każde narzędzie wywołane naprawdę
+
+`crates/app-core/tests/tool_diag.rs` (pomocnicze w `tests/tool_rig/`) wywołuje KAŻDE narzędzie rdzenia,
+także dodane później, z **poprawnymi** argumentami i zapisuje raport `target/verify/narzedzia/raport.{md,json}`
+(klasa wyniku, czas, ślad na atrapach — polecenia i zmienione pliki, tekst dla modelu, zgodność danych
+z `output_schema`). Biegnie w każdym `cargo test` (etap „testy” w `verify szybki` i `wersja`, ok. 13 s);
+podsumowanie trafia do raportu verify.
+
+- **Rdzeń na atrapach** (`tool_rig/fakes.rs`): pliki (`FakeFs` z plikami katalogu roboczego — Kosz też
+  wirtualny), polecenia (`FakeExec`, także git, testy projektu i ffmpeg), schowek, pulpit z oknem
+  Notatnika i elementami UI (`FakeDesktop`), pseudokonsola, Word/Excel (`FakeOffice`), przeglądarka
+  (`FakeBrowser` ze stroną testową), system (`FakeSys` z procesem i usługą, zasilanie, programy), sieć
+  (`FakeHttp` — strona i plik), silnik gier (`FakeEngine`), diagnostyka komputera (`FakeProbe`), model
+  z obrazem (lokalny `FakeProvider`). Podmianę portów aplikacji i silnika daje
+  `AppOptions::tool_ports` (`app_agents::PortOverrides`; domyślnie porty systemowe). Nic nie sięga do
+  pulpitu, schowka, sieci ani Kosza właściciela — może w tym czasie pracować na tym samym komputerze.
+- **Pełne uprawnienia**: poziom L4 zapisany w profilu tymczasowym (ten sam plik co `ALFA_TEST_AUTONOMY`);
+  każde narzędzie w osobnej sesji (obca treść jednego nie zmienia decyzji Brokera dla kolejnych),
+  narzędzia przeglądarki w sesji `browser_open`; prośba o zatwierdzenie wygasa po 2 s.
+- **Argumenty** (`tool_rig/args.rs`): generator ze schematu (wymagane pola, `enum`, granice liczb,
+  `anyOf`, ścieżki i adresy po nazwie pola) i przepisy nadpisujące pola tam, gdzie schemat nie wystarcza
+  (konkretny plik, okno, element UI, PID). Argumenty muszą przejść walidację `input_schema`.
+- **Czerwone**: odrzucenie poprawnych argumentów, błąd wewnętrzny, brak odpowiedzi w 20 s, panika, pusty
+  tekst dla modelu, dane niezgodne z `output_schema`, argumenty niezgodne z `input_schema`, klasa wyniku
+  inna niż we wzorcu `tests/tool_rig/wzorzec.json` i **narzędzie bez wpisu we wzorcu** (nowe narzędzie
+  wymaga przejrzenia raportu i świadomego `ALFA_TOOL_DIAG_UPDATE=1`).
+- **Próby straży**: wywołania, które muszą zostać odrzucone także na L4 — zmienna sterująca Alfą,
+  odczyt i usunięcie pliku poświadczeń, adres niepubliczny, odczyt poświadczeń poleceniem powłoki.
+- **Stan 31.10**: 81 narzędzi — 72 `ok`; 9 innych z wyjaśnieniem w raporcie: 5 działań na stronie po
+  obcej treści czeka na zgodę właściciela (rdzeń testowy nie ma okna Brokera — wykonanie sprawdzają
+  testy `tools-browser-impl`), trwałe usunięcie i terminal czekają na potwierdzenie z założenia,
+  `engine_height` — atrapa silnika bez terenu, `mcp_call` — brak serwerów MCP w profilu testowym.
+  5/5 prób straży odrzuconych. Test kontrolny pilnuje, że każda usterka jest zgłaszana.
+
+### 6.6 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)
 
 Kamera (sprzętowo odłączona), ocena zmysłami właściciela (czy głos się podoba, czy wygląd jest ładny),
 decyzje bezpieczeństwa (testy „do decyzji człowieka”).
@@ -201,3 +233,4 @@ Nowa funkcja (dowolna sesja): bramka sama zatrzyma `verify`, dopóki funkcja nie
 | Skróty globalne w instancji testowej (§6.3)                       | zrobione 31.10: `e2e_global_shortcut` (tylko budowa testowa), 4 testy zielone |
 | Spłata długu                                                      | 31 → 0 (31.10, raport 46): 601 z 601 funkcji z testem |
 | Przegląd ogólny zdarzeń i narzędzi (§6.4)                         | zrobione 31.10: manifest i odrzucanie błędnych argumentów każdego narzędzia; każda próbka zdarzenia w oknie |
+| Diagnostyka narzędzi — każde wywołane na atrapach (§6.5)          | zrobione 31.10: 81 narzędzi (72 ok, 9 wyjaśnionych), 5 prób straży, wzorzec i raport w każdym verify |

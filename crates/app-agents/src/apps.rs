@@ -26,6 +26,24 @@ pub struct AppsDeps {
     pub sysnet: Option<crate::sysnet::SysNetDeps>,
 }
 
+/// Porty narzędzi podmieniane w testach rdzenia (`None` — porty systemowe): aplikacje
+/// i system/sieć oraz silnik gier. Przegląd narzędzi (`app-core/tests/tool_sweep*.rs`) wywołuje
+/// każde narzędzie na atrapach — nic nie sięga do pulpitu, sieci ani Kosza właściciela.
+#[derive(Clone, Default)]
+pub struct PortOverrides {
+    /// Word/Excel, przeglądarka, system i sieć.
+    pub apps: Option<AppsDeps>,
+    /// Silnik gier NextGO.Gray.
+    pub engine: Option<Arc<dyn tools_engine_contract::EnginePort>>,
+}
+
+impl PortOverrides {
+    /// Porty aplikacji: podmienione albo systemowe.
+    pub fn apps_or_system(&self, local: &Path) -> AppsDeps {
+        self.apps.clone().unwrap_or_else(|| AppsDeps::system(local))
+    }
+}
+
 impl std::fmt::Debug for AppsDeps {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("AppsDeps")

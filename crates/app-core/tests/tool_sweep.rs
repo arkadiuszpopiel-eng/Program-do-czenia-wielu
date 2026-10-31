@@ -1,38 +1,22 @@
 //! Przegląd ogólny narzędzi agentek (docs/plan/45 §6.4): KAŻDE narzędzie rdzenia — także dodane
 //! później — ma poprawny manifest (nazwa dla modelu, opis, grupy, zamknięty schemat argumentów)
-//! i odrzuca błędne argumenty (`InvalidArgs`), zanim cokolwiek zrobi. Rdzeń na atrapach pulpitu,
-//! schowka, wykonania poleceń i systemu plików — żadne wywołanie nie sięga do pulpitu właściciela.
-//! Działanie z poprawnymi argumentami sprawdzają testy modułów (`crates/tools-*-impl/tests`).
+//! i odrzuca błędne argumenty (`InvalidArgs`), zanim cokolwiek zrobi. Rdzeń diagnostyki narzędzi
+//! (`tool_rig/fakes.rs`): każdy port maszyny jest atrapą — żadne wywołanie nie sięga do pulpitu,
+//! sieci ani Kosza właściciela. Działanie z poprawnymi argumentami — `tool_diag.rs`.
 //! katalog-przeglad: narzedzie
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 mod common;
+mod tool_rig;
 
 use std::collections::BTreeSet;
-use std::sync::Arc;
 use std::time::Duration;
 
-use app_core::ports::HeadlessShell;
-use app_core::{AppCore, AppPaths};
-use platform_fake::{FakeClipboard, FakeDesktop, FakeExec};
 use risk_classifier_contract::Reversibility;
 use safety_broker_contract::Holder;
 use serde_json::{Value, json};
 use tools_common_contract::{Tool, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome, ToolStatus};
-
-/// Rdzeń z atrapami wszystkich portów, przez które narzędzia działają na maszynie.
-async fn core(dir: &std::path::Path) -> AppCore {
-    let mut opts = common::options(None, Arc::new(HeadlessShell::default()));
-    opts.exec = Some(Arc::new(FakeExec::new()));
-    opts.clipboard = Some(Arc::new(FakeClipboard::new()));
-    opts.gui = Some(app_gui::GuiPorts::from_one(
-        Arc::new(FakeDesktop::new()),
-        true,
-    ));
-    opts.approval_timeout = Some(Duration::from_millis(200));
-    AppCore::build(AppPaths::under(dir), opts).await.unwrap()
-}
 
 /// Problemy manifestu narzędzia (pusta lista — manifest poprawny).
 fn manifest_problems(tool: &dyn Tool) -> Vec<String> {
@@ -124,13 +108,10 @@ fn ctx(workdir: &std::path::Path) -> ToolCtx {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn every_agent_tool_has_a_sound_manifest_and_rejects_bad_arguments() {
-    let dir = tempfile::tempdir().unwrap();
-    let core = core(dir.path()).await;
-    let tools = core.agent_tools();
+    let rig = tool_rig::fakes::rig().await;
+    let tools = rig.core.agent_tools();
     assert!(tools.len() >= 60, "za mało narzędzi: {}", tools.len());
-    let workdir = dir.path().join("praca");
-    std::fs::create_dir_all(&workdir).unwrap();
-    let ctx = ctx(&workdir);
+    let ctx = ctx(&rig.workdir);
 
     let mut names = BTreeSet::new();
     let mut problems = Vec::new();

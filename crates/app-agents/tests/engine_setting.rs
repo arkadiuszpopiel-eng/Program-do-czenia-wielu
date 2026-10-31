@@ -42,7 +42,7 @@ fn harness() -> H {
     let config = Arc::new(FakeConfigStore::new(MachineId::new("pc")));
     let root = watch_root(config.clone());
     let tools = engine_tools(
-        root.clone(),
+        (root.clone(), None),
         &dir.path().join("lokalne"),
         broker,
         env,

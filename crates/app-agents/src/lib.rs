@@ -38,7 +38,7 @@ mod toolset;
 
 pub use agent_runtime_contract::{RunOptions, RunSpec};
 pub use agent_runtime_impl::ApprovalClock;
-pub use apps::{AppsDeps, browser_spec};
+pub use apps::{AppsDeps, PortOverrides, browser_spec};
 pub use family::{ChildInfo, FamilyProjector, RunFamily};
 pub use launch::{Launch, SkillCall};
 pub use map::{FinalText, final_text, short};

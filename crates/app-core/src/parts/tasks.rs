@@ -183,10 +183,7 @@ impl Built {
             None => Arc::new(NoBrokerSink),
         };
         let platform = Arc::new(platform_windows_impl::WindowsPlatform::default());
-        let clipboard: Arc<dyn platform_contract::ClipboardPort> = match &d.options.clipboard {
-            Some(c) => c.clone(),
-            None => platform.clone(),
-        };
+        let clipboard = super::extra::platform_clipboard(d.options);
         // Serwer MCP v1 (UIA, zrzut, rejestr) przez te same narzędzia GUI i rejestr kart Brokera.
         let v1 = kit.as_ref().map(|k| {
             let timeout = d

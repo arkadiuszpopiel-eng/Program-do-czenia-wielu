@@ -344,10 +344,7 @@ impl Built {
         let inner = Inner {
             undo_window: options.undo_window,
             healthy_after: options.healthy_after,
-            clipboard: match &options.clipboard {
-                Some(port) => port.clone(),
-                None => Arc::new(platform_windows_impl::WindowsPlatform::default()),
-            },
+            clipboard: extra::platform_clipboard(&options),
             app_version: options.app_version,
             bus,
             registry,

@@ -96,6 +96,16 @@ pub(crate) fn platform_fs(options: &AppOptions) -> Arc<dyn platform_contract::Fs
         .unwrap_or_else(|| Arc::new(platform_windows_impl::WindowsPlatform::default()))
 }
 
+/// Schowek narzędzi, głosu i rdzenia: wstrzyknięty (atrapa w testach) albo systemowy.
+pub(crate) fn platform_clipboard(
+    options: &AppOptions,
+) -> Arc<dyn platform_contract::ClipboardPort> {
+    options
+        .clipboard
+        .clone()
+        .unwrap_or_else(|| Arc::new(platform_windows_impl::WindowsPlatform::default()))
+}
+
 /// Moduł zdrowy bez usługi (budowany leniwie albo w procesie powłoki).
 pub(crate) fn healthy(slot: Option<&HealthSlot>) {
     if let Some(slot) = slot {

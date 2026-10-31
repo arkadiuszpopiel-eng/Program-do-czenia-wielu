@@ -135,6 +135,13 @@ reqwest = { version = "0.12.28", default-features = false, features = ["rustls-t
 
 [dev-dependencies]
 pc-diag-fake = { path = "../pc-diag-fake" }
+# Diagnostyka narzędzi agentek na atrapach (`tests/tool_diag.rs`).
+platform-apps-contract = { path = "../platform-apps-contract" }
+platform-apps-fake = { path = "../platform-apps-fake" }
+tools-net-fake = { path = "../tools-net-fake" }
+tools-engine-fake = { path = "../tools-engine-fake" }
+tools-system-contract = { path = "../tools-system-contract" }
+jsonschema = { version = "0.58.3", default-features = false }
 base64 = "0.22.1"
 flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
 providers-fake = { path = "../providers-fake" }

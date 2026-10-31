@@ -448,18 +448,49 @@ Niesprawdzone tym sposobem zostaje tylko dostarczenie komunikatu klawisza przez 
 (lista z <code>AppCore::agent_tools</code>, ta sama co spis <code>narzedzia.txt</code>), musi mieć poprawną nazwę dla modelu
 (<code>[a-z][a-z0-9_]</code>, do 64 znaków, bez powtórzeń), tytuł i opis, grupy ról i zamknięty schemat argumentów
 (<code>additionalProperties: false</code>, każdy wymagany argument opisany), a nieznany argument, brak wymaganych
-i argumenty niebędące obiektem odrzuca jako <code>InvalidArgs</code>, zanim cokolwiek zrobi. Rdzeń na atrapach pulpitu,
-schowka i wykonania poleceń. Wywołań z poprawnymi argumentami przegląd nie robi: część narzędzi
-w rdzeniu testowym sięga do prawdziwego Windows (przeglądarka, Office, usługi), a właściciel pracuje
-na tej samej maszynie — działanie sprawdzają testy modułów. Test kontrolny (narzędzie przyjmujące
-wszystko) pilnuje, że przegląd każde z tych uchybień zgłasza.</li>
+i argumenty niebędące obiektem odrzuca jako <code>InvalidArgs</code>, zanim cokolwiek zrobi. Rdzeń diagnostyki
+narzędzi z §6.5 (każdy port maszyny jest atrapą). Test kontrolny (narzędzie przyjmujące wszystko)
+pilnuje, że przegląd każde z tych uchybień zgłasza.</li>
 <li><strong>Zdarzenia</strong> (<code>state/__tests__/events-sweep.test.ts</code>): każda próbka zdarzenia z fixture&#39;ów rdzenia (118,
 wszystkie 40 typów; <code>dto_roundtrip</code> wymaga próbki dla każdego nowego typu) trafia do okna głównego bez
 wyjątku i bez odrzuconej obietnicy, a każdy typ ma obsługę w <code>applyEvent</code> albo w strumieniu rozmowy.</li>
 <li>Oba przeglądy nie zastępują testu działania w bramce katalogu (narzędzia i zdarzenia wymagają testu
 rdzenia albo interfejsu) — pilnują wspólnych reguł dla wszystkich pozycji naraz.</li>
 </ul>
-<h3 id="6-3-czego-ai-nie-testuje-samo-trzy-powody-z-dokumentu-24-3">6.3 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)</h3>
+<h3 id="6-5-diagnostyka-narzedzi-agentek-kazde-narzedzie-wywolane-naprawde">6.5 Diagnostyka narzędzi agentek — każde narzędzie wywołane naprawdę</h3>
+<p><code>crates/app-core/tests/tool_diag.rs</code> (pomocnicze w <code>tests/tool_rig/</code>) wywołuje KAŻDE narzędzie rdzenia,
+także dodane później, z <strong>poprawnymi</strong> argumentami i zapisuje raport <code>target/verify/narzedzia/raport.{md,json}</code>
+(klasa wyniku, czas, ślad na atrapach — polecenia i zmienione pliki, tekst dla modelu, zgodność danych
+z <code>output_schema</code>). Biegnie w każdym <code>cargo test</code> (etap „testy” w <code>verify szybki</code> i <code>wersja</code>, ok. 13 s);
+podsumowanie trafia do raportu verify.</p>
+<ul>
+<li><strong>Rdzeń na atrapach</strong> (<code>tool_rig/fakes.rs</code>): pliki (<code>FakeFs</code> z plikami katalogu roboczego — Kosz też
+wirtualny), polecenia (<code>FakeExec</code>, także git, testy projektu i ffmpeg), schowek, pulpit z oknem
+Notatnika i elementami UI (<code>FakeDesktop</code>), pseudokonsola, Word/Excel (<code>FakeOffice</code>), przeglądarka
+(<code>FakeBrowser</code> ze stroną testową), system (<code>FakeSys</code> z procesem i usługą, zasilanie, programy), sieć
+(<code>FakeHttp</code> — strona i plik), silnik gier (<code>FakeEngine</code>), diagnostyka komputera (<code>FakeProbe</code>), model
+z obrazem (lokalny <code>FakeProvider</code>). Podmianę portów aplikacji i silnika daje
+<code>AppOptions::tool_ports</code> (<code>app_agents::PortOverrides</code>; domyślnie porty systemowe). Nic nie sięga do
+pulpitu, schowka, sieci ani Kosza właściciela — może w tym czasie pracować na tym samym komputerze.</li>
+<li><strong>Pełne uprawnienia</strong>: poziom L4 zapisany w profilu tymczasowym (ten sam plik co <code>ALFA_TEST_AUTONOMY</code>);
+każde narzędzie w osobnej sesji (obca treść jednego nie zmienia decyzji Brokera dla kolejnych),
+narzędzia przeglądarki w sesji <code>browser_open</code>; prośba o zatwierdzenie wygasa po 2 s.</li>
+<li><strong>Argumenty</strong> (<code>tool_rig/args.rs</code>): generator ze schematu (wymagane pola, <code>enum</code>, granice liczb,
+<code>anyOf</code>, ścieżki i adresy po nazwie pola) i przepisy nadpisujące pola tam, gdzie schemat nie wystarcza
+(konkretny plik, okno, element UI, PID). Argumenty muszą przejść walidację <code>input_schema</code>.</li>
+<li><strong>Czerwone</strong>: odrzucenie poprawnych argumentów, błąd wewnętrzny, brak odpowiedzi w 20 s, panika, pusty
+tekst dla modelu, dane niezgodne z <code>output_schema</code>, argumenty niezgodne z <code>input_schema</code>, klasa wyniku
+inna niż we wzorcu <code>tests/tool_rig/wzorzec.json</code> i <strong>narzędzie bez wpisu we wzorcu</strong> (nowe narzędzie
+wymaga przejrzenia raportu i świadomego <code>ALFA_TOOL_DIAG_UPDATE=1</code>).</li>
+<li><strong>Próby straży</strong>: wywołania, które muszą zostać odrzucone także na L4 — zmienna sterująca Alfą,
+odczyt i usunięcie pliku poświadczeń, adres niepubliczny, odczyt poświadczeń poleceniem powłoki.</li>
+<li><strong>Stan 31.10</strong>: 81 narzędzi — 72 <code>ok</code>; 9 innych z wyjaśnieniem w raporcie: 5 działań na stronie po
+obcej treści czeka na zgodę właściciela (rdzeń testowy nie ma okna Brokera — wykonanie sprawdzają
+testy <code>tools-browser-impl</code>), trwałe usunięcie i terminal czekają na potwierdzenie z założenia,
+<code>engine_height</code> — atrapa silnika bez terenu, <code>mcp_call</code> — brak serwerów MCP w profilu testowym.
+5/5 prób straży odrzuconych. Test kontrolny pilnuje, że każda usterka jest zgłaszana.</li>
+</ul>
+<h3 id="6-6-czego-ai-nie-testuje-samo-trzy-powody-z-dokumentu-24-3">6.6 Czego AI nie testuje samo (trzy powody z dokumentu 24 §3)</h3>
 <p>Kamera (sprzętowo odłączona), ocena zmysłami właściciela (czy głos się podoba, czy wygląd jest ładny),
 decyzje bezpieczeństwa (testy „do decyzji człowieka”).</p>
 <h2 id="7-sesja-testujaca-ai-procedura">7. Sesja testująca AI — procedura</h2>
@@ -482,7 +513,8 @@ rdzenia <strong>i</strong> scenariusz w prawdziwym oknie (<code>e2e-app</code>).
 <tr><td>Instancja testowa na „Pełnej automatyce”</td><td>zrobione 31.10: scalone po przeglądzie właściciela; przebieg L4 w każdym <code>verify wersja</code></td></tr>
 <tr><td>Skróty globalne w instancji testowej (§6.3)</td><td>zrobione 31.10: <code>e2e_global_shortcut</code> (tylko budowa testowa), 4 testy zielone</td></tr>
 <tr><td>Spłata długu</td><td>31 → 0 (31.10, raport 46): 601 z 601 funkcji z testem</td></tr>
-<tr><td>Przegląd ogólny zdarzeń i narzędzi (§6.4)</td><td>zrobione 31.10: manifest i odrzucanie błędnych argumentów każdego narzędzia; każda próbka zdarzenia w oknie</td></tr></tbody></table></div>
+<tr><td>Przegląd ogólny zdarzeń i narzędzi (§6.4)</td><td>zrobione 31.10: manifest i odrzucanie błędnych argumentów każdego narzędzia; każda próbka zdarzenia w oknie</td></tr>
+<tr><td>Diagnostyka narzędzi — każde wywołane na atrapach (§6.5)</td><td>zrobione 31.10: 81 narzędzi (72 ok, 9 wyjaśnionych), 5 prób straży, wzorzec i raport w każdym verify</td></tr></tbody></table></div>
 </article>
 <footer>Źródło: <code>docs/plan/45-testy-ai.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>

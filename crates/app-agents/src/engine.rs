@@ -9,7 +9,7 @@ use compliance_contract::{DenyLists, PathEnv};
 use core_config_contract::{ConfigKey, ConfigStore, Scope};
 use futures_util::StreamExt;
 use safety_broker_contract::Broker;
-use tools_engine_contract::ROOT_SETTING;
+use tools_engine_contract::{EnginePort, ROOT_SETTING};
 pub use tools_engine_impl::EngineRoot;
 use tools_engine_impl::{EngineTools, EngineToolsDeps, ProcessEngine};
 
@@ -61,17 +61,24 @@ pub fn watch_root(config: Arc<dyn ConfigStore>) -> EngineRoot {
     root
 }
 
-/// Narzędzia silnika nad prawdziwym serwerem (`local` — katalog danych lokalnych Alfy).
+/// Narzędzia silnika nad prawdziwym serwerem (`local` — katalog danych lokalnych Alfy) albo nad
+/// portem podanym w `port` (atrapa w testach rdzenia).
 pub fn engine_tools(
-    root: EngineRoot,
+    (root, port): (EngineRoot, Option<Arc<dyn EnginePort>>),
     local: &Path,
     broker: Arc<dyn Broker>,
     env: PathEnv,
     deny: DenyLists,
 ) -> EngineTools {
-    let port = ProcessEngine::new(root, local.join("engine"), std::env::vars().collect());
+    let port = port.unwrap_or_else(|| {
+        Arc::new(ProcessEngine::new(
+            root,
+            local.join("engine"),
+            std::env::vars().collect(),
+        ))
+    });
     EngineTools::new(EngineToolsDeps {
-        port: Arc::new(port),
+        port,
         broker,
         env,
         deny,
