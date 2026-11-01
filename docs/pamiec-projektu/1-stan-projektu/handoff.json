@@ -4,17 +4,14 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "1d67eb46-2bd8-4b76-bbc9-6a5dcd27cf28",
-    "updated": "2026-10-31T17:30:00+01:00"
+    "updated": "2026-11-01T03:00:00+01:00"
   },
-  "current_state": "0.0.79 wgrana (11:19). Po niej lokalnie (bez push): dług katalogu 0, PTT, klawisze globalne, przegląd narzędzi i zdarzeń (baaff6ae), diagnostyka narzędzi na atrapach (99d82423, doc 45 §6.5) — verify szybki app-core+app-agents zielony.",
-  "session_goal": "Właściciel 31.10 (/goal): kontynuuj kolejne etapy; opracuj system pełnego automatycznego testowania przez AI każdej funkcji obecnej i przyszłej z pełnymi uprawnieniami dla testów AI.",
+  "current_state": "0.0.81 wgrana 1.11 2:49 z a37125d6 (raport alfa/docs/plan/47). Gałąź ccr-af4b63c6-3fyzaj, lokalnie bez push. Kopia czysta na F: po 6:00 (backup.sh --czysta).",
+  "session_goal": "Właściciel 31.10 noc: praca automatyczna do 6:00 (ulepszaj, rozbudowuj, poprawiaj, testuj), po 6:00 czysta kopia na F:\\Kopie zapasowe programów Spopielony.",
   "in_progress": [
-    "Do decyzji człowieka (raport 46 §7): Spacja PTT niepodłączona. Nadal z raportu 44: `*` w analizatorze powłoki, fs-23, próg F3-07, gałęzie broker-2026-10-28 i pelny-dostep, K.0.",
-    "Diagnostyka narzędzi: przy nowym narzędziu przejrzeć target/verify/narzedzia/raport.md i odświeżyć wzorzec (ALFA_TOOL_DIAG_UPDATE=1). Nie pokryte wykonaniem: 5 działań przeglądarki po obcej treści (zgoda w oknie Brokera), mcp_call (brak serwera MCP w profilu testowym)."
+    "Do decyzji człowieka (raport 47 §5): scalenie do-przegladu-pomoc-sedziego (a7f15783); czy testy prawdziwej aplikacji mogą uruchamiać `claude auth status` (z-terminal → bridges.check). Nadal: gałęzie do-przegladu-broker-2026-10-28 i do-przegladu-pelny-dostep, `*` w analizatorze powłoki, fs-23, próg F3-07, K.0."
   ],
-  "blocking_issues": [
-    "Dysk F: niepodłączony — kopia zapasowa niezrobiona"
-  ],
+  "blocking_issues": [],
   "next_session": [
     "Po decyzji właściciela: przegląd człowieka i scalenie gałęzi do-przegladu-broker-2026-10-28 (do 6407c88f; scalenie = nowa wersja z verify); ewentualnie wdrożenie docs/plan/43 (wyróżnianie czytanego zdania) i zmiana domyślnych paneli chowanych.",
     "Ctrl+Alt+Space zajęty przez inny program na PC (Szybkie pytanie Alfy) — właściciel może zmienić skrót; test laptop_voice losowy pod obciążeniem; sprawdzić też, czy UI mówi o tym właścicielowi (ostrzeżenie przy starcie od 0.0.71).",
@@ -45,7 +42,7 @@
       "alfa-docs (podgląd HTML)": 5180
     }
   },
-  "test_results": "verify wersja ddb13fa0: 19/19 zielone — Rust 3307/0/41, interfejs 540, przeglądarka 758, aplikacja 57 (92,5 %), L4 z-pelny-dostep 1/1, z-katalog 1/1.",
+  "test_results": "verify wersja 0.0.81 bieg 2 (6fe55035): 18/19, czerwone tylko dokumenty (features-katalog.html) → odświeżone w a37125d6, docs-html --verify zielony. Rust 1080 prog. 3324/0/43, interfejs 543, przeglądarka 761, aplikacja 61/61 pokrycie 276/283, L4 1/1+1/1.",
   "decisions_this_session": [
     "Właściciel 21.10: brak zgód ma być naprawiony „raz na zawsze” — skrót „Alfa” do Alfa-uruchomiona, odświeżany przy każdym wgraniu; skrót instalatora NSIS nie jest nadpisywany.",
     "Właściciel 21.10: usunąć stare kompilacje — zwolnione 229 GB (target/debug/deps, .fingerprint, incremental, shell, trial-profile, release, src-tauri/target).",
@@ -59,9 +56,8 @@
     "Właściciel 21.10 ~20:40: „Zamknij wszystkie otwarte tematy, wykonaj pełną działającą wersję… potem wszystko zapisz i zrób pauzę”; wgranie: „To co napisałem wcześniej ma być zrobione”; /goal do 7:00."
   ],
   "next_steps": [
-    "Następna wersja (0.0.80) przy 10 punktach: wpis CHANGELOG z PTT (Poprawki) i testami",
-    "Wywołania narzędzi z poprawnymi argumentami w przeglądzie ogólnym wymagają atrap wszystkich portów (przeglądarka, Office, usługi) w rdzeniu testowym — do rozważenia",
-    "Kopia na F: po podłączeniu dysku (scripts/backup.sh)",
-    "Gałęzie do przeglądu człowieka: do-przegladu-broker-2026-10-28, do-przegladu-pelny-dostep"
+    "Pierwsze uruchomienie 0.0.81 przez właściciela skrótem „Alfa”; sprawdzić rząd czasu zgody w jego oknie Sędziego.",
+    "Diagnostyka na PC stacjonarnym (AMD) — sonda mierzona tylko na laptopie.",
+    "Nieprzećwiczone w prawdziwej aplikacji: skills_export/import i 5 innych (target/verify/app/ipc-coverage.json)."
   ]
 }

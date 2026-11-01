@@ -15,4 +15,4 @@
 - [Alfa — pamięć w repozytorium](alfa-pamiec-w-repozytorium.md) — kopia pamięci w alfa/docs/pamiec-projektu, `scripts/memory-sync.sh` na końcu sesji; na nowym PC najpierw przywrócić zasady z repo
 - [Alfa — silnik NextGO.Gray](alfa-silnik-nextgo.md) — katalog silnika tylko do odczytu (inny model); tools-engine od 0.0.74, ustawienie engine.nextgo.root
 - [Alfa — pulpit i panele 29.10](alfa-pulpit-panele-2026-10-29.md) — stan w pasku pisania, panele chowane w całości, wysuwane i przypinane; tryb pracy czyta poziom globalny
-- [Alfa — miejsce kopii zapasowych](alfa-kopia-zapasowa-miejsce.md) — od 29.10 F:\Kopie zapasowe programów Spopielony\Alfa, kopia-<data> po każdym wgraniu
+- [Alfa — miejsce kopii zapasowych](alfa-kopia-zapasowa-miejsce.md) — od 29.10 F:\Kopie zapasowe programów Spopielony\Alfa, kopia-<data> po każdym wgraniu; od 31.10 `backup.sh --czysta` (bez kompilacji)
