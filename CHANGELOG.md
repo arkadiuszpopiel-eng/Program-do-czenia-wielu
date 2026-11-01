@@ -12,6 +12,31 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.81 — 2026-11-01
+
+Diagnostyka komputera nie zawiesza się na kartach sieciowych i zawsze oddaje to, co zdążyła odczytać. Okno
+Sędziego Cieni mówi konkretnie, co chce zrobić most CLI, wtyczka, podgląd pulpitu i odczyt rejestru.
+
+### Poprawki
+
+- [poważne] Okno Sędziego Cieni pokazuje w „Co dokładnie” polecenie mostu CLI (Claude Code, Codex) z jego
+  końcówką — długie polecenie jest skracane jawnie („…”), a odstępy nie mogą ukryć dalszej części.
+- [poważne] Diagnostyka komputera („Parametry komputera”): karty sieciowe czytane bez zawieszającego się
+  zapytania, odczyt trwa kilka sekund zamiast przekraczać limit 90 s.
+- Diagnostyka oddaje części odczytane do tej pory, gdy któraś przekroczy limit — brakujące części widać jako
+  luki z powodem, zamiast błędu całego odczytu.
+- „Co dokładnie” w oknie Sędziego Cieni także dla podglądu pulpitu (która agentka), wtyczek (który plik i
+  narzędzie) i odczytu rejestru przez MCP (klucz i nazwa wartości).
+- Ustawienia → Uprawnienia: lista zgód „zawsze w tym zakresie” odświeża się po powrocie do okna Alfy i co pół
+  minuty, więc zgodę wydaną w oknie Sędziego i zgodę wygasłą widać od razu.
+- Instrukcja (F1) opisuje wybór czasu zgody i odwoływanie zgód.
+
+### Testy
+
+- Projekty, potoki, kanwa, karty rozmów, „Naucz Alfę” i odmowy błędnych poleceń w prawdziwej aplikacji.
+- Lista zgód w każdym stylu i motywie (dostępność, odwołanie do pustej listy, odświeżenie po powrocie do okna).
+- Sonda diagnostyki zatrzymana po limicie na prawdziwym sprzęcie zachowuje odczytane części.
+
 ## 0.0.80 — 2026-10-31
 
 Okno zgód nazywa się teraz Sędzia Cieni: jest nowe, dokładne i nie pokazuje się wcale na Pełnej

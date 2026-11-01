@@ -323,7 +323,7 @@ blockquote {
 <a href="plan-45-testy-ai.html">45-testy-ai.md</a>. Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).</p>
 <p><strong>Razem: 603 funkcji, z testem 603 (100 %), w długu 0.</strong></p>
-<div class="tbl"><table><thead><tr><th>Rodzaj</th><th style="text-align:right">Funkcji</th><th style="text-align:right">Z testem</th><th style="text-align:right">rdzeń</th><th style="text-align:right">interfejs</th><th style="text-align:right">przeglądarka</th><th style="text-align:right">aplikacja</th><th style="text-align:right">eval</th><th style="text-align:right">przegląd ogólny</th></tr></thead><tbody><tr><td>Polecenia rdzenia</td><td style="text-align:right">283</td><td style="text-align:right">283 (100 %)</td><td style="text-align:right">206</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">252</td><td style="text-align:right">1</td><td style="text-align:right">0</td></tr>
+<div class="tbl"><table><thead><tr><th>Rodzaj</th><th style="text-align:right">Funkcji</th><th style="text-align:right">Z testem</th><th style="text-align:right">rdzeń</th><th style="text-align:right">interfejs</th><th style="text-align:right">przeglądarka</th><th style="text-align:right">aplikacja</th><th style="text-align:right">eval</th><th style="text-align:right">przegląd ogólny</th></tr></thead><tbody><tr><td>Polecenia rdzenia</td><td style="text-align:right">283</td><td style="text-align:right">283 (100 %)</td><td style="text-align:right">206</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">271</td><td style="text-align:right">1</td><td style="text-align:right">0</td></tr>
 <tr><td>Polecenia palety i skróty</td><td style="text-align:right">62</td><td style="text-align:right">62 (100 %)</td><td style="text-align:right">2</td><td style="text-align:right">7</td><td style="text-align:right">9</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">50</td></tr>
 <tr><td>Strony Ustawień</td><td style="text-align:right">38</td><td style="text-align:right">38 (100 %)</td><td style="text-align:right">0</td><td style="text-align:right">3</td><td style="text-align:right">34</td><td style="text-align:right">12</td><td style="text-align:right">0</td><td style="text-align:right">38</td></tr>
 <tr><td>Ustawienia</td><td style="text-align:right">98</td><td style="text-align:right">98 (100 %)</td><td style="text-align:right">14</td><td style="text-align:right">12</td><td style="text-align:right">7</td><td style="text-align:right">9</td><td style="text-align:right">2</td><td style="text-align:right">98</td></tr>
@@ -338,7 +338,7 @@ blockquote {
 <tr><td><code>accounts_remove</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>accounts_rotate</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>accounts_set_disabled</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>accounts_set_enterprise</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>accounts_set_enterprise</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>accounts_set_limit</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>accounts_set_model</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>accounts_set_queue</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
@@ -387,14 +387,14 @@ blockquote {
 <tr><td><code>builder_preview</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>builder_propose</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>builder_save</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>builder_voice_preview</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>builder_voice_preview</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>cameras_frame</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>cameras_refresh</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>cameras_rename</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>cameras_set_enabled</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>cameras_set_master</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>cameras_state</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>canvas_render</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>canvas_render</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>compliance_routes</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>config_raw_check</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>config_raw_get</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
@@ -404,9 +404,9 @@ blockquote {
 <tr><td><code>device_gpu_live</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>device_measure</code></td><td>rdzeń, bieg aplikacji</td><td></td></tr>
 <tr><td><code>device_profile</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>diag_cancel</code></td><td>rdzeń, aplikacja</td><td></td></tr>
-<tr><td><code>diag_export</code></td><td>rdzeń, aplikacja</td><td></td></tr>
-<tr><td><code>diag_run</code></td><td>rdzeń, aplikacja</td><td></td></tr>
+<tr><td><code>diag_cancel</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
+<tr><td><code>diag_export</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
+<tr><td><code>diag_run</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>diag_runs</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>diag_snapshot</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>diag_state</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
@@ -459,8 +459,8 @@ blockquote {
 <tr><td><code>memory_scopes</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>memory_set_pinned</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>memory_status</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>memory_teach</code></td><td>rdzeń</td><td></td></tr>
-<tr><td><code>memory_teach_pick_file</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>memory_teach</code></td><td>rdzeń, aplikacja</td><td></td></tr>
+<tr><td><code>memory_teach_pick_file</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>memory_undo</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>models_bundle_download</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>models_bundle_verify</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
@@ -482,9 +482,9 @@ blockquote {
 <tr><td><code>permissions_open_approval</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>permissions_request_level</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>permissions_revoke_grant</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>pipelines_list</code></td><td>rdzeń</td><td></td></tr>
-<tr><td><code>pipelines_remove</code></td><td>rdzeń</td><td></td></tr>
-<tr><td><code>pipelines_save</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>pipelines_list</code></td><td>rdzeń, aplikacja</td><td></td></tr>
+<tr><td><code>pipelines_remove</code></td><td>rdzeń, aplikacja</td><td></td></tr>
+<tr><td><code>pipelines_save</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>plugins_approve</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>plugins_disable</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>plugins_enable</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
@@ -493,13 +493,13 @@ blockquote {
 <tr><td><code>plugins_propose</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>plugins_reject</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>plugins_remove</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>pricing_apply</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>pricing_apply</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>pricing_get</code></td><td>rdzeń, bieg aplikacji</td><td></td></tr>
-<tr><td><code>projects_list</code></td><td>rdzeń</td><td></td></tr>
-<tr><td><code>projects_pick_dir</code></td><td>rdzeń</td><td></td></tr>
-<tr><td><code>projects_remove</code></td><td>rdzeń</td><td></td></tr>
-<tr><td><code>projects_rename</code></td><td>rdzeń</td><td></td></tr>
-<tr><td><code>projects_save</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>projects_list</code></td><td>rdzeń, aplikacja</td><td></td></tr>
+<tr><td><code>projects_pick_dir</code></td><td>rdzeń, aplikacja</td><td></td></tr>
+<tr><td><code>projects_remove</code></td><td>rdzeń, aplikacja</td><td></td></tr>
+<tr><td><code>projects_rename</code></td><td>rdzeń, aplikacja</td><td></td></tr>
+<tr><td><code>projects_save</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>prompt_templates_get</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>prompt_templates_set</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>quick_ask</code></td><td>rdzeń, interfejs, przeglądarka, aplikacja, bieg aplikacji</td><td></td></tr>
@@ -514,7 +514,7 @@ blockquote {
 <tr><td><code>search_reindex_cancel</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>search_reindex_start</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>search_reindex_status</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>sessions_cards</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>sessions_cards</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>sessions_choose_workdir</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>sessions_create</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>sessions_duplicate_as_template</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
@@ -539,7 +539,7 @@ blockquote {
 <tr><td><code>settings_values</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>skills_approve</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>skills_disable</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>skills_export</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>skills_export</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>skills_import</code></td><td>rdzeń</td><td></td></tr>
 <tr><td><code>skills_list</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>skills_propose</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
@@ -573,7 +573,7 @@ blockquote {
 <tr><td><code>triggers_preview_cron</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>triggers_remove</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>triggers_set_enabled</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>turns_arena_answer</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>turns_arena_answer</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>turns_continue</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>turns_edit_and_resend</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>turns_list</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
@@ -583,14 +583,14 @@ blockquote {
 <tr><td><code>turns_remember</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>turns_run_code</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>turns_save_code</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>turns_select_branch</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>turns_select_branch</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>turns_send</code></td><td>rdzeń, bieg aplikacji</td><td></td></tr>
 <tr><td><code>turns_set_hidden</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>turns_stop</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>turns_undo_step</code></td><td>rdzeń, aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>updates_about</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>updates_cancel</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
-<tr><td><code>updates_check</code></td><td>rdzeń</td><td></td></tr>
+<tr><td><code>updates_check</code></td><td>rdzeń, aplikacja</td><td></td></tr>
 <tr><td><code>updates_dismiss_whats_new</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>updates_download</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
 <tr><td><code>updates_history</code></td><td>aplikacja, bieg aplikacji</td><td></td></tr>
