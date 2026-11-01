@@ -11,6 +11,7 @@ pub mod stream;
 
 use std::io::Read;
 use std::process::{Command, Stdio};
+use std::sync::{Arc, Mutex, mpsc};
 use std::time::{Duration, Instant};
 
 use base64::Engine;
@@ -21,6 +22,9 @@ pub const PROBE_SCRIPT: &str = include_str!("probe.ps1");
 
 /// Domyślny limit czasu odczytu (dziennik zdarzeń i liczniki SMART bywają wolne).
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(90);
+
+/// Ile czekać na koniec wyjścia po zakończeniu albo zabiciu sondy.
+const READ_TAIL: Duration = Duration::from_secs(2);
 
 /// Sonda przez PowerShell.
 #[derive(Debug, Clone)]
@@ -81,10 +85,22 @@ impl WinDiagProbe {
             .stdout
             .take()
             .ok_or_else(|| DiagError::Probe("brak wyjścia PowerShell".into()))?;
-        let reader = std::thread::spawn(move || {
-            let mut buf = Vec::new();
-            let _ = stdout.read_to_end(&mut buf);
-            buf
+        // Wyjście zbierane kawałkami we wspólnym buforze: po zabiciu sondy oddajemy to, co już
+        // przyszło, nawet gdy potok nie dostanie końca (uchwyt odziedziczony przez proces potomny).
+        let buf = Arc::new(Mutex::new(Vec::new()));
+        let (ended_tx, ended_rx) = mpsc::channel::<()>();
+        let sink = Arc::clone(&buf);
+        std::thread::spawn(move || {
+            let mut chunk = [0u8; 8192];
+            while let Ok(n) = stdout.read(&mut chunk) {
+                if n == 0 {
+                    break;
+                }
+                if let Ok(mut b) = sink.lock() {
+                    b.extend_from_slice(&chunk[..n]);
+                }
+            }
+            let _ = ended_tx.send(());
         });
         let start = Instant::now();
         let mut stopped = false;
@@ -102,9 +118,8 @@ impl WinDiagProbe {
                 Err(e) => return Err(DiagError::Probe(e.to_string())),
             }
         }
-        let bytes = reader
-            .join()
-            .map_err(|_| DiagError::Probe("wątek odczytu zakończył się błędem".into()))?;
+        let _ = ended_rx.recv_timeout(READ_TAIL);
+        let bytes = buf.lock().map(|b| b.clone()).unwrap_or_default();
         Ok((String::from_utf8_lossy(&bytes).into_owned(), stopped))
     }
 }
