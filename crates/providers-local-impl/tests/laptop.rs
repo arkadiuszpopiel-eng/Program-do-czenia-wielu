@@ -134,7 +134,17 @@ async fn context_shrinks_to_keep_the_whole_model_on_gpu() {
         "połowa -c 4096, nie konfiguracji"
     );
     assert_eq!(l.llm_lease().unwrap().request.vram_mb, 2_200 + 128);
+    // Możliwości dostawcy mówią o rzeczywistym kontekście wczytanego modelu (licznik w interfejsie).
+    let window = |p: &providers_local_impl::LocalProvider| {
+        providers_contract::ModelProvider::capabilities(p).models[&l.model.id].context_window
+    };
+    assert_eq!(window(&l.provider), Some(4_096));
     l.provider.sidecar().stop("test").await;
+    assert_eq!(
+        window(&l.provider),
+        Some(8_192),
+        "po zatrzymaniu — z konfiguracji"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]

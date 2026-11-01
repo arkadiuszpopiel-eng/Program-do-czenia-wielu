@@ -46,6 +46,8 @@ pub struct Sidecar {
     state: tokio::sync::Mutex<Option<Running>>,
     /// Dzierżawa działającego sidecara (odczyt synchroniczny przy końcu żądania).
     pub(crate) lease: Mutex<Option<LeaseId>>,
+    /// Model wczytany i jego rzeczywisty kontekst `-c` (możliwości dostawcy, odczyt synchroniczny).
+    pub(crate) loaded: Mutex<Option<(String, u32)>>,
     in_flight: AtomicUsize,
     revoked: AtomicBool,
     suspect: AtomicBool,
@@ -84,6 +86,7 @@ impl Sidecar {
             residency,
             state: tokio::sync::Mutex::new(None),
             lease: Mutex::new(None),
+            loaded: Mutex::new(None),
             in_flight: AtomicUsize::new(0),
             revoked: AtomicBool::new(false),
             suspect: AtomicBool::new(false),
@@ -245,6 +248,7 @@ impl Sidecar {
         };
         let engine = Arc::clone(&running.engine);
         *lock(&self.lease) = running.lease;
+        *lock(&self.loaded) = Some((running.model.clone(), running.plan.ctx));
         *st = Some(running);
         self.mark_in_use(true);
         Ok(engine)
@@ -354,6 +358,7 @@ impl Sidecar {
     fn shutdown(&self, mut running: Running, reason: &str) {
         running.process.kill();
         lock(&self.lease).take_if(|id| Some(*id) == running.lease);
+        lock(&self.loaded).take_if(|(m, _)| *m == running.model);
         self.release_lease(running.lease);
         self.emit(LocalEvent::Unloaded {
             model: running.model,

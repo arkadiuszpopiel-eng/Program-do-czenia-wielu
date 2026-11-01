@@ -50,6 +50,15 @@ impl Drop for Busy {
 }
 
 impl LocalProvider {
+    /// Kontekst modelu: rzeczywisty `-c` wczytanego modelu (plan zmniejsza go na słabszej karcie),
+    /// inaczej z konfiguracji — licznik kontekstu i opisy nie obiecują więcej, niż serwer przyjmie.
+    fn ctx_of(&self, model: &str) -> u32 {
+        crate::sidecar::lock(&self.sidecar.loaded)
+            .as_ref()
+            .filter(|(m, _)| m == model)
+            .map_or(self.sidecar.config().ctx, |(_, ctx)| *ctx)
+    }
+
     /// Dostawca z manifestem modeli i menedżerem sidecara.
     pub fn new(models: Vec<ModelEntry>, sidecar: Arc<Sidecar>) -> Self {
         Self {
@@ -119,11 +128,10 @@ impl ModelProvider for LocalProvider {
     }
 
     fn capabilities(&self) -> ProviderCapabilities {
-        let ctx = self.sidecar.config().ctx;
         let models: BTreeMap<String, _> = self
             .models
             .iter()
-            .map(|m| (m.id.clone(), m.capabilities(ctx)))
+            .map(|m| (m.id.clone(), m.capabilities(self.ctx_of(&m.id))))
             .collect();
         let default = &self.sidecar.config().default_model;
         let installed = self.installed();
@@ -217,7 +225,7 @@ impl ModelProvider for LocalProvider {
         let max_out = request
             .params
             .max_tokens
-            .unwrap_or(self.sidecar.config().ctx.min(entry.ctx) / 2);
+            .unwrap_or(self.ctx_of(&entry.id).min(entry.ctx) / 2);
         Some(FREE.estimate(request, u64::from(max_out)))
     }
 
@@ -227,7 +235,6 @@ impl ModelProvider for LocalProvider {
 
     /// Modele zainstalowane (bez ruchu sieciowego).
     async fn list_models(&self) -> Result<Vec<ModelInfo>, ProviderError> {
-        let ctx = self.sidecar.config().ctx;
         Ok(self
             .installed()
             .into_iter()
@@ -235,7 +242,7 @@ impl ModelProvider for LocalProvider {
                 id: m.id.clone(),
                 display_name: Some(m.name.clone()),
                 created: None,
-                capabilities: Some(m.capabilities(ctx)),
+                capabilities: Some(m.capabilities(self.ctx_of(&m.id))),
             })
             .collect())
     }

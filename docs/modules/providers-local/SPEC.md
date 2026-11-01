@@ -210,3 +210,7 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
 - **Niesprawdzone na sprzęcie:** jakość odpowiedzi Bielika 4.5B w kopercie i gramatyka b11559 z prawdziwym modelem
   (próba: `crates/app-models/tests/live_catalog.rs::tool_request` na runnerze). Schemat MCP, którego konwerter gramatyki
   serwera nie obsłuży, kończy się błędem żądania (HTTP 400) — wtedy wyłączyć ustawienie.
+
+**Możliwości a rzeczywisty kontekst (1.11):** `capabilities()`, `list_models()` i `estimate_cost()` podają dla wczytanego
+modelu rzeczywisty `-c` z planu uruchomienia (np. 4096 zamiast 8192, gdy plan zmniejszył kontekst, żeby model mieścił się na
+karcie), dla pozostałych — kontekst z konfiguracji (test `laptop.rs::context_shrinks_to_keep_the_whole_model_on_gpu`).
