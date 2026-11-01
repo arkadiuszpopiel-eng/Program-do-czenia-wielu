@@ -135,7 +135,7 @@ pub(crate) fn worker_result(run: &RunId, exit: Exit) -> WorkerResult {
             retryable: false,
         },
         RunOutcome::Completed { summary, verified } => WorkerResult::Succeeded {
-            output: TaskOutput::text(summary)
+            output: TaskOutput::text(crate::completeness::unwrap_tag(&summary))
                 .with("run", serde_json::json!(run))
                 .with("verified", serde_json::json!(verified)),
         },

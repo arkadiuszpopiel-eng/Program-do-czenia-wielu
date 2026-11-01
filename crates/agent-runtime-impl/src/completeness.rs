@@ -138,6 +138,25 @@ pub(crate) fn can_read(names: &[String]) -> bool {
     names.iter().any(|n| WEB_READERS.contains(&n.as_str()))
 }
 
+/// Raport owinięty w wymyślony znacznik („<raport-plików>…</raport-plików>”) → sama treść. Lekki
+/// model dodawał go mimo zasady w prompcie (próba obowiązku „tidy”, 1.11). Tylko para z łącznikiem
+/// albo literą spoza ASCII w nazwie i bez atrybutów — prawdziwy HTML (`<html>`, `<div>`) zostaje.
+pub(crate) fn unwrap_tag(text: &str) -> String {
+    let body = text.trim();
+    let unwrapped = (|| {
+        let rest = body.strip_prefix('<')?;
+        let (name, rest) = rest.split_once('>')?;
+        let invented = name.contains('-') || !name.is_ascii();
+        let plain = name.chars().all(|c| c.is_alphanumeric() || c == '-');
+        if !invented || !plain || name.is_empty() {
+            return None;
+        }
+        let inner = rest.strip_suffix(&format!("</{name}>"))?;
+        (!inner.contains(&format!("<{name}>"))).then(|| inner.trim().to_owned())
+    })();
+    unwrapped.unwrap_or_else(|| text.to_owned())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -224,6 +243,21 @@ mod tests {
             ),
             None
         );
+    }
+
+    #[test]
+    fn invented_wrapping_tag_is_removed() {
+        let report = "<raport-plików>
+1. Pliki tymczasowe: brak
+</raport-plików>";
+        assert_eq!(unwrap_tag(report), "1. Pliki tymczasowe: brak");
+        let html = "<div>
+treść
+</div>";
+        assert_eq!(unwrap_tag(html), html, "zwykły HTML zostaje");
+        let attrs = "<raport-x a=\"1\">treść</raport-x>";
+        assert_eq!(unwrap_tag(attrs), attrs);
+        assert_eq!(unwrap_tag("Zwykły raport."), "Zwykły raport.");
     }
 
     #[test]
