@@ -65,6 +65,31 @@ function factsText(tasks, triggers, costs, goal, startedMs) {
   return lines.join('\n');
 }
 
+/**
+ * Treść stron wskazanych w poleceniu (np. cenniki dostawców) jako dodatkowe dane dla oceny: liczba
+ * z raportu odczytana ze strony nie jest „spoza danych”. Ceny OpenRouter są w USD za token, a raport
+ * podaje je za 1 mln tokenów — dlatego także wartości × 1 000 000. Strona, której nie da się pobrać,
+ * nie dodaje niczego (raport ma wtedy napisać, że jej nie sprawdził).
+ */
+async function sourcesText(goal) {
+  const urls = [...new Set(goal.match(/https?:\/\/[^\s,;)]+/g) ?? [])];
+  const parts = [];
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(20_000) });
+      const body = (await res.text()).slice(0, 3_000_000).replace(/<[^>]+>/g, ' ');
+      const scaled = (body.match(/\d+\.\d+(?:e-?\d+)?/g) ?? [])
+        .map((n) => Number(n) * 1_000_000)
+        .filter((n) => Number.isFinite(n) && n > 0 && n < 100_000)
+        .map((n) => String(Math.round(n * 1000) / 1000));
+      parts.push(body, scaled.join(' '));
+    } catch {
+      // Strona niedostępna dla oceny — bez danych z niej.
+    }
+  }
+  return parts.join('\n');
+}
+
 const browser = await chromium.connectOverCDP(`http://127.0.0.1:${port}`, { timeout: 20_000 });
 const main = browser
   .contexts()
@@ -84,7 +109,8 @@ const about = await invoke('updates_about');
 const results = [];
 for (const [id, goal] of Object.entries(dutyGoals())) {
   if (only && !only.includes(id)) continue;
-  const name = `Próba obowiązku: ${id}`;
+  // Godzina w nazwie: kolejny bieg na tym samym profilu nie trafia na istniejący wyzwalacz.
+  const name = `Próba obowiązku: ${id} ${new Date().toTimeString().slice(0, 8)}`;
   const trigger = await invoke('triggers_create', {
     draft: {
       name,
@@ -118,7 +144,11 @@ for (const [id, goal] of Object.entries(dutyGoals())) {
   );
   const outside = finished
     ? [
-        ...judge(report, [facts], Math.max(otherTasks.length, triggers.length)),
+        ...judge(
+          report,
+          [facts, await sourcesText(goal)],
+          Math.max(otherTasks.length, triggers.length),
+        ),
         ...formProblems(report),
       ]
     : [];

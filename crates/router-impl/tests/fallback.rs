@@ -269,3 +269,29 @@ async fn model_without_tool_support_falls_back() {
     let (_, events) = first_content(&routed, req("hej")).await;
     assert_switched(&events, 0);
 }
+
+/// Przegląd wymiany informacji 1.11: żądanie za długie dla okna modelu (llama-server
+/// `exceed_context_size_error`, OpenAI `context_length_exceeded`) — następny model z kolejki
+/// (zwykle z większym oknem) dostaje to samo żądanie, zamiast błędu „nieprawidłowe żądanie”.
+#[tokio::test(start_paused = true)]
+async fn context_overflow_falls_back_to_next_model() {
+    for (code, message) in [
+        (
+            "exceed_context_size_error",
+            "the request exceeds the available context size, try increasing it",
+        ),
+        (
+            "context_length_exceeded",
+            "This model's maximum context length is 8192 tokens.",
+        ),
+    ] {
+        let (_core, primary, _backup, routed) = setup();
+        primary.push_script(Script::error(
+            ProviderError::new(ProviderErrorKind::InvalidRequest, message)
+                .with_provider_code(code)
+                .with_status(400),
+        ));
+        let (_, events) = first_content(&routed, req("hej")).await;
+        assert_switched(&events, 0);
+    }
+}

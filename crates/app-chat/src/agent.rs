@@ -22,6 +22,25 @@ use crate::project::render_closed;
 
 use crate::agent_setup::{AgentSetup, failed};
 
+/// Zestaw roboczy pamięci (dane, nie polecenia) w pierwszej wiadomości kontekstu zadania — ten sam,
+/// który dostaje zwykła odpowiedź w rozmowie (`stream::prepare`); bez niego agentka nie znała
+/// zapamiętanych faktów właściciela (przegląd wymiany informacji 1.11).
+fn with_memory(
+    core: &ChatEngine,
+    req: &GenRequest,
+    goal: &str,
+    mut history: Vec<providers_contract::Message>,
+) -> Vec<providers_contract::Message> {
+    if let Some(memory) = core.inner.memory.context(&req.session, &req.agent, goal)
+        && let Some(first) = history.first_mut()
+    {
+        first
+            .content
+            .push(providers_contract::ContentBlock::text(memory));
+    }
+    history
+}
+
 pub(crate) async fn run(
     core: &ChatEngine,
     req: &GenRequest,
@@ -42,7 +61,7 @@ pub(crate) async fn run(
     let goal = history.pop().map(|m| m.visible_text()).unwrap_or_default();
     let history = match crate::project_context::history(core, &req.session, &setup.workdir, history)
     {
-        Ok(history) => history,
+        Ok(history) => with_memory(core, req, &goal, history),
         Err(error) => return Outcome::failed(error),
     };
     let models_before = if crate::conductor_state::billed(core, req) {

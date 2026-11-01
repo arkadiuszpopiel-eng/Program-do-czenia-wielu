@@ -39,6 +39,9 @@ Zdarzenia (bez treści): `router.decision`, `router.fallback` (z → na, przyczy
   → natychmiast następny cel z tą samą historią; zdarzenia przed
   treścią buforowane (jedno `Started`). Błąd **po** treści (`after_output`) — bez cichego przełączenia: konsument dostaje
   błąd, a tura zawiera częściową odpowiedź.
+- Przełączają też błędy `InvalidRequest` dotyczące samego modelu, nie treści: model nieistniejący albo bez narzędzi
+  (`model_unavailable`) i **żądanie za długie dla okna modelu** (`context_overflow`: llama-server
+  `exceed_context_size_error`, OpenAI `context_length_exceeded`) — następny cel, zwykle z większym oknem (1.11).
 - Obwód per dostawca: `failures` błędów w `window` → otwarty na `cooldown`, potem jedna próba half-open. Nie liczą się:
   `InvalidRequest`, `PrivacyBlocked`, `Unsupported`, anulowanie; 429 → osobne okno (reaktywnie: `retry-after`, bez nagłówka
   30 s × 2ⁿ ≤ 1 h).

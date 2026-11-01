@@ -54,4 +54,4 @@ pub use module::{LocalModule, MODULE_TOML};
 pub use process::{LaunchSpec, SidecarLauncher, SidecarProcess, TokioLauncher};
 pub use provider::LocalProvider;
 pub use sidecar::{RESIDENCY_OWNER, Sidecar};
-pub use window::{Fitted, WINDOW_MARGIN, estimate_tokens, fit, reply_reserve};
+pub use window::{Fitted, WINDOW_MARGIN, estimate_tokens, fit, omitted_note, reply_reserve};

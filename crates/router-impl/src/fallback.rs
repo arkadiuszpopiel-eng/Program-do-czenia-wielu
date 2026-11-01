@@ -50,6 +50,28 @@ pub(crate) fn model_unavailable(e: &providers_contract::ProviderError) -> bool {
                 || text.contains("unsupported")))
 }
 
+/// Czy żądanie nie zmieściło się w oknie kontekstu tego modelu (llama-server:
+/// `exceed_context_size_error`, OpenAI: `context_length_exceeded`). Dotyczy modelu, nie treści —
+/// model z większym oknem (zwykle w chmurze) ma szansę, więc przełączamy mimo kodu 400. Wcześniej
+/// długa pętla narzędzi przeniesiona z chmury na mały model lokalny kończyła się ogólnym błędem
+/// „nieprawidłowe żądanie” (przegląd wymiany informacji 1.11).
+pub(crate) fn context_overflow(e: &providers_contract::ProviderError) -> bool {
+    if e.kind != ProviderErrorKind::InvalidRequest {
+        return false;
+    }
+    let code = e.provider_code.as_deref().unwrap_or_default();
+    let text = e.message.to_lowercase();
+    matches!(
+        code,
+        "context_length_exceeded" | "exceed_context_size_error" | "string_above_max_length"
+    ) || (text.contains("context")
+        && (text.contains("exceed")
+            || text.contains("too long")
+            || text.contains("maximum context")
+            || text.contains("context length")
+            || text.contains("context size")))
+}
+
 fn ms(d: Duration) -> u64 {
     u64::try_from(d.as_millis()).unwrap_or(u64::MAX)
 }
@@ -228,10 +250,10 @@ impl Run {
                         kind: e.kind.clone(),
                     },
                 );
-                // „Nie ma takiego modelu / brak dostępu” dotyczy tego jednego modelu, nie treści
-                // żądania — następny model z kolejki ma szansę, więc przełączamy mimo kodu 400/404.
+                // „Nie ma takiego modelu / brak dostępu” i „za długie dla tego okna” dotyczą tego
+                // jednego modelu, nie treści żądania — następny z kolejki ma szansę mimo kodu 400/404.
                 let switch = !e.after_output
-                    && (e.should_fallback() || model_unavailable(&e))
+                    && (e.should_fallback() || model_unavailable(&e) || context_overflow(&e))
                     && has_next
                     && !self.cancel.is_cancelled();
                 if switch {

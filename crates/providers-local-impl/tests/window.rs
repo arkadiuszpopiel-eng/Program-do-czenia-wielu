@@ -12,7 +12,9 @@ use lib_openai_compat::{BuildOptions, WireCodec};
 use providers_contract::{
     ChatRequest, ContentBlock, Message, Role, ToolResult, ToolResultPart, ToolSpec, ToolUse,
 };
-use providers_local_impl::{LlamaCodec, WINDOW_MARGIN, estimate_tokens, fit, reply_reserve};
+use providers_local_impl::{
+    LlamaCodec, WINDOW_MARGIN, estimate_tokens, fit, omitted_note, reply_reserve,
+};
 use serde_json::json;
 
 fn long(i: usize, chars: usize) -> String {
@@ -81,7 +83,8 @@ fn long_conversation_keeps_newest_turns_within_context() {
     );
     let fitted = fit(&req, ctx, reserve);
     let kept = &fitted.request.messages;
-    assert!(fitted.dropped > 0 && fitted.dropped + kept.len() == req.messages.len());
+    // Pominięte + okno + pierwsza wiadomość (polecenie, wklejone na początek okna).
+    assert!(fitted.dropped > 0 && fitted.dropped + kept.len() + 1 == req.messages.len());
     assert_eq!(
         kept.last(),
         req.messages.last(),
@@ -99,9 +102,18 @@ fn long_conversation_keeps_newest_turns_within_context() {
     let system = estimate_tokens(req.system.as_deref().unwrap());
     assert!(tokens(kept) + system <= ctx - reserve - WINDOW_MARGIN);
     assert_eq!(
-        kept,
-        &req.messages[fitted.dropped..],
-        "okno to sufiks historii"
+        &kept[1..],
+        &req.messages[fitted.dropped + 2..],
+        "dalej okno to sufiks historii"
+    );
+    let head = serde_json::to_string(&kept[0].content).unwrap();
+    assert!(
+        head.contains("tura 0:"),
+        "pierwsza wiadomość (polecenie) zostaje"
+    );
+    assert!(
+        head.contains(&omitted_note(fitted.dropped)),
+        "model wie, ile pominięto"
     );
 }
 
@@ -131,7 +143,10 @@ fn tool_call_and_result_are_never_split() {
                 .any(|b| matches!(b, ContentBlock::ToolResult(_))),
             "ctx {ctx}: osierocony wynik narzędzia na początku okna"
         );
-        assert_eq!(kept.last(), req.messages.last());
+        // Ostatnia wiadomość zostaje; gdy jest jedyną w oknie, polecenie stoi przed jej treścią.
+        let last = &kept.last().unwrap().content;
+        let original = &req.messages.last().unwrap().content;
+        assert!(last.ends_with(original), "ctx {ctx}");
     }
 }
 
@@ -150,11 +165,44 @@ fn long_tool_loop_keeps_its_opening_user_turn() {
     }
     let req = ChatRequest::new("m", messages);
     let fitted = fit(&req, 2048, 256);
-    assert_eq!(fitted.dropped, 2);
-    assert_eq!(
-        fitted.request.messages[0],
-        Message::user_text("Uporządkuj pliki w Pobranych.")
-    );
+    // Pominięta tylko stara odpowiedź; pierwsza wiadomość rozmowy idzie na początek okna.
+    assert_eq!(fitted.dropped, 1);
+    let head = serde_json::to_string(&fitted.request.messages[0].content).unwrap();
+    assert!(head.contains("Stara rozmowa.") && head.contains("Uporządkuj pliki w Pobranych."));
+    assert_eq!(fitted.request.messages[1], req.messages[3]);
+}
+
+#[test]
+fn verification_after_long_tool_loop_keeps_the_goal() {
+    // Zadanie agentki: cel w pierwszej wiadomości, długa pętla narzędzi, na końcu prośba
+    // o weryfikację. Bez przypięcia celu mały model widział samą prośbę „sprawdź odpowiedź”.
+    let goal = "Na podstawie danych z programu przygotuj krótki przegląd na dziś.";
+    let mut messages = vec![Message::user_text(goal)];
+    for i in 0..20 {
+        let id = format!("c{i}");
+        messages.extend([tool_call(&id), tool_result(&id, 900)]);
+    }
+    messages.extend([
+        Message::assistant_text("1. Zadania: brak."),
+        Message::user_text("Sprawdź swoją odpowiedź."),
+    ]);
+    let req = ChatRequest::new("m", messages);
+    let fitted = fit(&req, 2048, 256);
+    assert!(fitted.dropped > 0);
+    let head = serde_json::to_string(&fitted.request.messages[0].content).unwrap();
+    assert!(head.contains(goal), "cel zadania zostaje w oknie");
+    assert!(head.contains("Sprawdź swoją odpowiedź."));
+}
+
+#[test]
+fn long_first_message_is_not_pinned() {
+    // Pierwsza wiadomość większa niż ćwierć budżetu (np. wklejony dokument) nie jest przypinana.
+    let mut messages = vec![Message::user_text(long(0, 6000))];
+    messages.extend(conversation(30, 600));
+    let req = ChatRequest::new("m", messages);
+    let fitted = fit(&req, 4096, 1024);
+    let kept = &fitted.request.messages;
+    assert_eq!(kept, &req.messages[fitted.dropped..]);
 }
 
 #[test]

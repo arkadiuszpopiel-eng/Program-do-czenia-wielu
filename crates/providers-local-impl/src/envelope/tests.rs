@@ -342,7 +342,7 @@ fn wire_request_moves_tools_to_the_prompt_and_history_to_text() {
     assert_eq!(wire.messages[1].tool_uses().count(), 0);
     assert_eq!(
         wire.messages[2].visible_text(),
-        "[Wynik narzędzia pogoda]\nSłonecznie\n\n[Wynik narzędzia pogoda]\nBŁĄD: limit"
+        "[Wynik narzędzia pogoda — {\"miasto\":\"Gdańsk\"}]\nSłonecznie\n\n[Wynik narzędzia pogoda — {\"miasto\":\"Gdańsk\"}]\nBŁĄD: limit"
     );
     assert_eq!(
         wire.messages[3], req.messages[3],

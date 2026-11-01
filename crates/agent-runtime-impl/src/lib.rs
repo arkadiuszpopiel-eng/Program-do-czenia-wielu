@@ -28,6 +28,7 @@ mod continuation;
 mod waiting;
 pub use waiting::ApprovalClock;
 mod child;
+mod completeness;
 mod critic;
 mod delegate;
 mod discovery;

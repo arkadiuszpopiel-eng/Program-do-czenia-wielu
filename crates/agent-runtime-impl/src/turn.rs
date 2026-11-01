@@ -269,13 +269,31 @@ impl Engine {
             return Next::Continue;
         }
         if uses.is_empty() {
-            return self.final_answer(text).await;
+            return self
+                .final_answer(text, turn.stop == Some(StopReason::MaxTokens))
+                .await;
         }
         self.run_tools(uses).await
     }
 
     /// Odpowiedź końcowa: weryfikacja (Krytyczka ≠ autorka, gdy obsada na to pozwala).
-    async fn final_answer(&mut self, text: String) -> Next {
+    async fn final_answer(&mut self, text: String, truncated: bool) -> Next {
+        // Urwana odpowiedź albo dane ze stron, których przebieg nie odczytał (`completeness`).
+        if !self.cp.verifying && self.nudges < crate::completeness::MAX_NUDGES {
+            let can_read = crate::completeness::can_read(&self.registry.names());
+            let gap = crate::completeness::gap(
+                &text,
+                truncated,
+                &self.cp.spec.goal,
+                &self.cp.messages,
+                can_read,
+            );
+            if let Some(gap) = gap {
+                self.nudges += 1;
+                self.push(Role::User, vec![ContentBlock::text(gap.note())]);
+                return Next::Continue;
+            }
+        }
         if self.cp.verifying {
             let ok = verdict(&text);
             self.handle

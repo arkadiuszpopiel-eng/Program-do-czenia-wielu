@@ -305,3 +305,25 @@ async fn steering_reaches_the_run_and_stop_cancels_it() {
     )));
     assert_eq!(last_run(&a).await.run.state, RunState::Cancelled);
 }
+
+/// Przegląd wymiany informacji 1.11: zadanie agentki z rozmowy dostaje zestaw roboczy pamięci —
+/// ten sam, który dostaje zwykła odpowiedź (wcześniej agentka nie znała zapamiętanych faktów).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn agent_task_receives_memory_working_set() {
+    let mut a = agents().await;
+    a.h.provider
+        .push(Script::text(FAKE_MODEL, &["Zapamiętam."]));
+    let (first, _) = run_turn(&mut a, "Delta, mleko kupujemy zawsze w Biedronce.").await;
+    a.h.core
+        .turns_remember(first, app_core::dto::RememberScope::Session)
+        .await
+        .unwrap();
+    a.h.provider.push(Script::text(FAKE_MODEL, &["Gotowe."]));
+    run_turn(&mut a, "Delta, przygotuj listę zakupów.").await;
+    let last = a.h.provider.requests().into_iter().last().unwrap();
+    let sent = serde_json::to_string(&last.messages).unwrap();
+    assert!(
+        sent.contains("Pamięć (dane z wcześniejszych rozmów"),
+        "zestaw roboczy pamięci w kontekście zadania: {sent}"
+    );
+}

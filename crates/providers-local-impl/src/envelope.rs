@@ -81,11 +81,11 @@ impl Prepared {
 
     /// Żądanie do serwera w kopercie (bez `tools`) i jego pole `response_format`.
     pub(crate) fn wire_request(&self, req: &ChatRequest) -> (ChatRequest, Value) {
-        let names: HashMap<&str, &str> = req
+        let names: HashMap<&str, (&str, &Value)> = req
             .messages
             .iter()
             .flat_map(|m| m.tool_uses())
-            .map(|t| (t.id.as_str(), t.name.as_str()))
+            .map(|t| (t.id.as_str(), (t.name.as_str(), &t.input)))
             .collect();
         let mut system = String::new();
         if let Some(base) = req.system.as_deref().filter(|b| !b.trim().is_empty()) {
@@ -151,16 +151,37 @@ fn assistant_text(msg: &Message) -> String {
     lines.join("\n")
 }
 
+/// Najdłuższy opis argumentów w nagłówku wyniku (znaki).
+const MAX_ARGS_IN_HEADER: usize = 100;
+
 /// Wyniki narzędzi tury użytkownika jako jeden blok tekstu „[Wynik narzędzia …]” przed resztą.
-fn user_blocks(msg: &Message, names: &HashMap<&str, &str>) -> Vec<ContentBlock> {
+/// Gdy jedno narzędzie ma w tej turze kilka wyników (historia dostawcy z wywołaniami równoległymi),
+/// nagłówek mówi też, z jakimi argumentami było wywołanie — koperta nie niesie identyfikatorów,
+/// więc bez tego mały model nie wiedział, który wynik dotyczy którego pliku (przegląd 1.11).
+fn user_blocks(msg: &Message, names: &HashMap<&str, (&str, &Value)>) -> Vec<ContentBlock> {
+    let name_of = |id: &str| names.get(id).map_or("?", |(n, _)| *n);
+    let ids: Vec<&str> = msg
+        .content
+        .iter()
+        .filter_map(|b| match b {
+            ContentBlock::ToolResult(r) => Some(r.tool_use_id.as_str()),
+            _ => None,
+        })
+        .collect();
+    let repeated = |name: &str| ids.iter().filter(|id| name_of(id) == name).count() > 1;
     let mut results = Vec::new();
     let mut rest = Vec::new();
     for block in &msg.content {
         match block {
             ContentBlock::ToolResult(r) => {
-                let name = names.get(r.tool_use_id.as_str()).copied().unwrap_or("?");
+                let name = name_of(&r.tool_use_id);
                 let body = tool_result_text(&r.content, r.is_error);
-                results.push(format!("[Wynik narzędzia {name}]\n{body}"));
+                let args = names
+                    .get(r.tool_use_id.as_str())
+                    .filter(|_| repeated(name))
+                    .map(|(_, input)| args_summary(input))
+                    .unwrap_or_default();
+                results.push(format!("[Wynik narzędzia {name}{args}]\n{body}"));
             }
             other => rest.push(other.clone()),
         }
@@ -170,9 +191,19 @@ fn user_blocks(msg: &Message, names: &HashMap<&str, &str>) -> Vec<ContentBlock> 
     blocks
 }
 
+/// Argumenty wywołania w nagłówku wyniku: „ — {json}”, skrócone do [`MAX_ARGS_IN_HEADER`].
+fn args_summary(input: &Value) -> String {
+    let json = serde_json::to_string(input).unwrap_or_default();
+    let mut short: String = json.chars().take(MAX_ARGS_IN_HEADER).collect();
+    if json.chars().count() > MAX_ARGS_IN_HEADER {
+        short.push('…');
+    }
+    format!(" — {short}")
+}
+
 /// Wiadomość z wywołaniami albo wynikami narzędzi jako tekst koperty; inne bez zmian
 /// (metadane, np. przerwanie tury, zostają).
-fn as_text(msg: &Message, names: &HashMap<&str, &str>) -> Message {
+fn as_text(msg: &Message, names: &HashMap<&str, (&str, &Value)>) -> Message {
     let has = |f: fn(&ContentBlock) -> bool| msg.content.iter().any(f);
     let content = match msg.role {
         Role::Assistant if has(|b| matches!(b, ContentBlock::ToolUse(_))) => {

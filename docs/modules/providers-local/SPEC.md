@@ -147,7 +147,13 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
   UTF-8 / 3 + 8 na wiadomość). Okno zaczyna się od tury użytkownika bez wyników narzędzi — para „wywołanie → wynik” nie
   jest rozrywana; gdy w budżecie nie ma takiej tury (długa seria narzędzi), okno sięga do najbliższej wcześniejszej.
   Ostatnia wiadomość zostaje zawsze; historia w sesji nietknięta; log `info` z liczbą pominiętych wiadomości (bez treści).
+  Pierwsza wiadomość użytkownika (polecenie zadania, temat rozmowy) zostaje także po przycięciu, jeśli zajmuje najwyżej
+  ćwierć budżetu — trafia na początek okna razem z informacją „[Pominięto N wcześniejszych wiadomości…]”, więc model
+  wie o luce, a przy weryfikacji po długiej pętli narzędzi widzi cel (przegląd wymiany informacji 1.11).
   Testy: `tests/window.rs`.
+- **Wyniki narzędzi w kopercie:** gdy jedno narzędzie ma w turze kilka wyników (historia dostawcy chmurowego z wywołaniami
+  równoległymi), nagłówek „[Wynik narzędzia nazwa — {argumenty}]” podaje argumenty wywołania (≤ 100 znaków) — koperta
+  nie niesie identyfikatorów wywołań.
 - **Wyjście `llama-server` w dzienniku Alfy:** wiersze stderr klasyfikowane (`process::classify_line`) — błędy i brak
   pamięci (`error`, `failed`, `out of memory`…) jako `warn`, architektura modelu, KV cache, odciążenie warstw i urządzenie
   jako `info` (cel `providers_local_impl::llama_server`, zapisywane domyślnie — potwierdzenie szacunków VRAM i diagnoza

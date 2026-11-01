@@ -41,6 +41,11 @@ pub struct Fitted<'a> {
 /// wiadomość zostaje zawsze (gdyby sama się nie mieściła, odpowie błędem serwer). Okno zaczyna
 /// się od wiadomości użytkownika bez wyników narzędzi — para „wywołanie → wynik” nie jest rozrywana,
 /// a szablony czatu wymagające naprzemienności ról dostają poprawny początek.
+///
+/// Pierwsza wiadomość użytkownika (polecenie zadania, temat rozmowy) zostaje także po przycięciu,
+/// jeśli zajmuje najwyżej ćwierć budżetu: bez niej mały model po długiej pętli narzędzi albo przy
+/// weryfikacji widział samo „sprawdź swoją odpowiedź” — bez celu (przegląd 1.11). Trafia na początek
+/// okna razem z informacją, ile wiadomości pominięto ([`omitted_note`]).
 pub fn fit(request: &ChatRequest, ctx: u32, reserve: u32) -> Fitted<'_> {
     let fixed = request
         .system
@@ -52,6 +57,62 @@ pub fn fit(request: &ChatRequest, ctx: u32, reserve: u32) -> Fitted<'_> {
         .saturating_sub(WINDOW_MARGIN)
         .saturating_sub(fixed);
     let messages = &request.messages;
+    let start = window_start(messages, budget);
+    if start == 0 {
+        return Fitted {
+            request: Cow::Borrowed(request),
+            dropped: 0,
+        };
+    }
+    let anchor = messages
+        .first()
+        .filter(|m| opens_window(m))
+        .map(|m| (m, message_tokens(m).saturating_add(NOTE_TOKENS)))
+        .filter(|(_, cost)| *cost <= budget / 4);
+    let Some((anchor, cost)) = anchor else {
+        let mut trimmed = request.clone();
+        trimmed.messages = messages[start..].to_vec();
+        return Fitted {
+            request: Cow::Owned(trimmed),
+            dropped: start,
+        };
+    };
+    let start = window_start(messages, budget.saturating_sub(cost)).max(1);
+    if start == 1 {
+        return Fitted {
+            request: Cow::Borrowed(request),
+            dropped: 0,
+        };
+    }
+    let dropped = start - 1;
+    let mut window = messages[start..].to_vec();
+    // Polecenie i informacja o pominięciu w pierwszej turze okna — jedna wiadomość użytkownika,
+    // więc naprzemienność ról zostaje zachowana.
+    let mut head = anchor.content.clone();
+    head.push(ContentBlock::text(omitted_note(dropped)));
+    head.append(&mut window[0].content);
+    window[0].content = head;
+    let mut trimmed = request.clone();
+    trimmed.messages = window;
+    Fitted {
+        request: Cow::Owned(trimmed),
+        dropped,
+    }
+}
+
+/// Szacunek tokenów informacji o pominięciu.
+const NOTE_TOKENS: u32 = 96;
+
+/// Informacja dla modelu o wiadomościach pominiętych przez okno kontekstu.
+pub fn omitted_note(dropped: usize) -> String {
+    format!(
+        "[Pominięto {dropped} wcześniejszych wiadomości — nie mieszczą się w kontekście modelu \
+         lokalnego. Jeśli czegoś z nich potrzebujesz, powiedz o tym zamiast zgadywać.]"
+    )
+}
+
+/// Początek okna w budżecie `budget` (indeks pierwszej wysyłanej wiadomości).
+fn window_start(messages: &[Message], budget: u32) -> usize {
     let mut used = 0u32;
     let mut start = messages.len();
     for (i, message) in messages.iter().enumerate().rev() {
@@ -64,22 +125,10 @@ pub fn fit(request: &ChatRequest, ctx: u32, reserve: u32) -> Fitted<'_> {
     }
     // Pierwsza wiadomość otwierająca okno w budżecie; gdy takiej nie ma (np. długa seria
     // wywołań narzędzi), najbliższa przed nim — ponad budżet, ale bez osieroconych wyników.
-    start = (start..messages.len())
+    (start..messages.len())
         .find(|&i| opens_window(&messages[i]))
         .or_else(|| (0..start).rev().find(|&i| opens_window(&messages[i])))
-        .unwrap_or(0);
-    if start == 0 {
-        return Fitted {
-            request: Cow::Borrowed(request),
-            dropped: 0,
-        };
-    }
-    let mut trimmed = request.clone();
-    trimmed.messages = messages[start..].to_vec();
-    Fitted {
-        request: Cow::Owned(trimmed),
-        dropped: start,
-    }
+        .unwrap_or(0)
 }
 
 /// Czy wiadomość może otwierać okno: tura użytkownika bez wyników narzędzi.
