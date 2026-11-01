@@ -48,6 +48,15 @@ pliku C:\…aport.xlsx”), potem kto, gdzie, ryzyko, źródło polecenia i dla
 automatyce” okno się nie pokazuje. W rozmowie widzisz kartę „czeka na zatwierdzenie” z opisem: co, dlaczego,
 czy da się cofnąć, poziom ryzyka.
 
+### Zgody „Zawsze w tym zakresie”
+
+Gdy to samo działanie powtarza się w tym samym miejscu (np. zapisy w jednym folderze projektu), w oknie Sędziego
+Cieni możesz zamiast „Zezwól tylko teraz” wybrać w rzędzie **„Zawsze w tym zakresie:”** czas: **1 h**, **3 h**, **24 h** albo
+**Do odwołania**. Do końca tego czasu Sędzia przepuszcza ten sam rodzaj działań w tym samym miejscu bez pytania —
+nic więcej. Listę takich zgód (zakres, agentka, do kiedy) i przycisk **„Odwołaj”** znajdziesz w **Ustawienia →
+Uprawnienia i bezpieczeństwo**; odwołanie działa od razu i nie wymaga okna Sędziego. Nowej zgody nie da się
+tam dodać — tylko w oknie Sędziego. STOP WSZYSTKIEGO kasuje wszystkie zgody.
+
 Przycisk na karcie tylko przenosi Cię do okna Sędziego Cieni — zatwierdzasz zawsze tam. Okno uruchamia sam Sędzia Cieni.
 Stan Sędziego Cieni widzisz w **Ustawienia → Uprawnienia i bezpieczeństwo**:
 
