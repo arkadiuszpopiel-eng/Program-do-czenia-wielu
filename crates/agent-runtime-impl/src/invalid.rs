@@ -42,6 +42,35 @@ pub(crate) fn message(tool: &str, error: &str) -> String {
     )
 }
 
+/// Klucze argumentów będących ścieżką albo adresem — tylko w nich szukamy szablonów (treść pliku
+/// może zawierać `{{imie}}` albo `<b>` naprawdę).
+const PATH_KEYS: &[&str] = &[
+    "path", "from", "to", "new_name", "root", "url", "cwd", "dir", "target", "source",
+];
+
+/// Szablon zamiast wartości w argumencie ścieżki/adresu (`{{old_path}}`, `<url>`): lekki model
+/// przepisywał wzór z opisu zamiast podstawić wartość (pomiar F3 fs-20, próba „prices”, 1.11).
+pub(crate) fn placeholder(input: &serde_json::Value) -> Option<String> {
+    let map = input.as_object()?;
+    PATH_KEYS.iter().find_map(|key| {
+        let value = map.get(*key)?.as_str()?.trim();
+        let word = |inner: &str| {
+            !inner.is_empty()
+                && inner.chars().count() <= 40
+                && inner.chars().all(|c| c.is_alphanumeric() || matches!(c, '_' | '-' | ' ' | '.'))
+        };
+        let mustache = value
+            .strip_prefix("{{")
+            .and_then(|v| v.strip_suffix("}}"))
+            .is_some_and(|v| word(v.trim()));
+        let angle = value
+            .strip_prefix('<')
+            .and_then(|v| v.strip_suffix('>'))
+            .is_some_and(word);
+        (mustache || angle).then(|| format!("`{key}` = „{value}” to szablon, nie wartość — podstaw prawdziwą ścieżkę albo adres (np. z wyniku fs_list)"))
+    })
+}
+
 impl Engine {
     /// Wywołanie z niepoprawnymi argumentami: krok z błędem w osi czasu i opis dla modelu;
     /// `None` — argumenty poprawne.
@@ -64,5 +93,22 @@ impl Engine {
             })
             .await;
         Some(why)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::placeholder;
+    use serde_json::json;
+
+    #[test]
+    fn placeholders_only_in_path_like_arguments() {
+        assert!(placeholder(&json!({"path": "{{old_path}}"})).is_some());
+        assert!(placeholder(&json!({"url": "<url>"})).is_some());
+        assert!(placeholder(&json!({"from": " {{ plik }} "})).is_some());
+        assert!(placeholder(&json!({"path": "raport.txt"})).is_none());
+        assert!(placeholder(&json!({"content": "{{imie}}"})).is_none());
+        assert!(placeholder(&json!({"path": "<a>/<b>"})).is_none());
+        assert!(placeholder(&json!(["{{x}}"])).is_none());
     }
 }

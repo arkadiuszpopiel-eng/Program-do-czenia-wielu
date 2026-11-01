@@ -174,3 +174,57 @@ async fn rejected_calls_do_not_count_as_loop_repeats() {
         "odrzucenia nie są powtórzeniami"
     );
 }
+
+#[tokio::test(start_paused = true)]
+async fn placeholder_path_is_not_run_and_content_templates_are_allowed() {
+    // Pomiar F3 fs-20 (1.11): `{"path": "{{old_path}}"}` szło do narzędzia jako ścieżka.
+    let w = world();
+    w.provider.push_script(call(
+        "p1",
+        "fs_write",
+        json!({"path": "{{old_path}}", "content": "x"}),
+    ));
+    w.provider.push_script(call(
+        "p2",
+        "fs_write",
+        json!({"path": "/Users/ala/Documents/list.txt", "content": "Panie {{imie}}, <b>"}),
+    ));
+    w.provider.push_script(answer("Zapisałam."));
+    let run = w.runtime.start(spec()).await.unwrap();
+    assert!(matches!(
+        w.runtime.wait(&run).await.unwrap(),
+        RunOutcome::Completed { .. }
+    ));
+    assert_eq!(
+        w.fs.calls(FsToolKind::Write).len(),
+        1,
+        "szablon w ścieżce odrzucony, szablon w treści dozwolony"
+    );
+    let reqs = w.provider.requests();
+    let got = results(reqs[1].messages.last().unwrap());
+    assert!(
+        got[0].is_error && result_text(&got[0]).contains("to szablon"),
+        "{got:?}"
+    );
+}
+
+#[tokio::test(start_paused = true)]
+async fn repeated_placeholder_call_is_caught_as_a_loop() {
+    // To samo wywołanie z szablonem co turę: wykrycie pętli zamiast zużycia całego budżetu kroków.
+    let w = world();
+    for i in 0..10 {
+        w.provider.push_script(call(
+            &format!("r{i}"),
+            "fs_write",
+            json!({"path": "{{plik}}", "content": "x"}),
+        ));
+    }
+    let run = w.runtime.start(spec()).await.unwrap();
+    let outcome = w.runtime.wait(&run).await.unwrap();
+    assert!(
+        matches!(outcome, RunOutcome::LoopDetected { .. }),
+        "{outcome:?}"
+    );
+    assert!(w.fs.calls(FsToolKind::Write).is_empty());
+    assert!(w.provider.requests().len() < 10, "pętla przerwana wcześnie");
+}

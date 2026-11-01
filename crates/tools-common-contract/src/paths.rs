@@ -17,7 +17,7 @@ pub enum PathError {
     ParentSegment(String),
     /// Postać niejednoznaczna w Windows (ADS `plik:strumień`, `\\?\`, końcowa kropka/spacja).
     #[error(
-        "ścieżka „{0}” ma postać niedozwoloną (strumień ADS, prefiks urządzenia, końcowa kropka lub spacja)"
+        "ścieżka „{0}” ma postać niedozwoloną (wzorzec `*`/`?`, strumień ADS, prefiks urządzenia, końcowa kropka lub spacja); narzędzie działa na jednej ścieżce — pliki pasujące do wzorca znajdź przez fs_search i wywołaj narzędzie dla każdego osobno"
     )]
     Ambiguous(String),
     /// Nieznana zmienna środowiskowa.

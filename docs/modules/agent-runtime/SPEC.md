@@ -87,3 +87,9 @@ Brak własnych zdolności (tokeny per akcja). `inproc`, `on-demand`. RAM ≤ 10 
 on katalogiem bieżącym narzędzi i powłoki, a pliki w nim podaje się ścieżką względną. Lekki model przepisywał pełną ścieżkę
 z literówkami („Tepm”, „Usersa”), wychodził poza katalog i czekał na zgodę albo dostawał odmowę. Pomiar F3 na Bieliku
 4.5B: pliki 8/24 → 10/24, ścieżki z literówką 0.
+
+**Szablon zamiast wartości (2.11):** wywołanie, w którym argument ścieżki albo adresu (`path`, `from`, `to`, `new_name`, `root`,
+`url`, `cwd`, `dir`, `target`, `source`) jest w całości szablonem (`{{old_path}}`, `<url>`), nie jest wykonywane — model dostaje
+„… to szablon, nie wartość — podstaw prawdziwą ścieżkę”. Treść (`content`) nie jest sprawdzana. Takie wywołanie liczy się
+do wykrywania pętli (pełne wejście), więc powtarzane co turę kończy przebieg `LoopDetected`, a nie zużywa budżet kroków
+(testy `tests/invalid_args.rs`).
