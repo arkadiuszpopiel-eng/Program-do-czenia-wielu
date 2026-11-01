@@ -16,3 +16,4 @@
 - [Alfa — silnik NextGO.Gray](alfa-silnik-nextgo.md) — katalog silnika tylko do odczytu (inny model); tools-engine od 0.0.74, ustawienie engine.nextgo.root
 - [Alfa — pulpit i panele 29.10](alfa-pulpit-panele-2026-10-29.md) — stan w pasku pisania, panele chowane w całości, wysuwane i przypinane; tryb pracy czyta poziom globalny
 - [Alfa — miejsce kopii zapasowych](alfa-kopia-zapasowa-miejsce.md) — od 29.10 F:\Kopie zapasowe programów Spopielony\Alfa, kopia-<data> po każdym wgraniu; od 31.10 `backup.sh --czysta` (bez kompilacji)
+- [Alfa — testy poza ekranem](alfa-testy-poza-ekranem.md) — od 1.11 instancja testowa poza monitorami, bez fokusu; ekran tylko z ALFA_E2E_VISIBLE=1

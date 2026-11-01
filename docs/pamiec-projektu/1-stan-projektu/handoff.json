@@ -4,13 +4,12 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "b8c92890-d32a-48cf-afcf-c2baf7ce1924 (Alfa AI Laptop — jedyna rozmowa projektu od 1.11)",
-    "updated": "2026-11-01T10:20:00+01:00"
+    "updated": "2026-11-01T14:40:00+01:00"
   },
-  "current_state": "0.0.81 wgrana 1.11 2:49. Rano 1.11 inspekcje (raport alfa/docs/plan/48): poprawki do 28258fb7 na gałęzi ccr-af4b63c6-3fyzaj (w kodzie, do następnej wersji). Rozmowy projektu scalone w jedną: „Alfa AI Laptop”.",
+  "current_state": "0.0.82 wgrana 1.11 14:34 z fcd832ef (verify wersja 20/20). Jedna rozmowa projektu: „Alfa AI Laptop”. Kopia F: kopia-2026-11-01_1434.",
   "session_goal": "Kontynuacja w jednej rozmowie; najpierw domknąć otwarte sprawy z raportu 48.",
   "in_progress": [
-    "Pełny verify wersja po 28258fb7 (ostatni bieg 19/20 przed poprawką sondy CIM).",
-    "Testy sprzętowe z dźwiękiem (verify sprzet) przerwane ok. 10:00 — powtórzyć, gdy właściciel pozwoli na dźwięk.",
+    "Obowiązki na lokalnym modelu: morning (raport pusty/urwany), prices (liczby spoza danych) — verify sprzet 1.11.",
     "Do decyzji człowieka: scalenie do-przegladu-zgody-2026-11-01 (3 poważne w zgodach czasowych), zakres zgody „do odwołania” (raport 48 §4 a/b/c), etykieta „Wszystkie agentki w sesji”; dalej gałęzie broker-2026-10-28, pelny-dostep, testy-pelny-dostep, updater-zip9.",
     "Do decyzji człowieka (raport 47 §5): gałęzie do-przegladu-broker-2026-10-28 i do-przegladu-pelny-dostep, `*` w analizatorze powłoki, fs-23, próg F3-07, K.0."
   ],
