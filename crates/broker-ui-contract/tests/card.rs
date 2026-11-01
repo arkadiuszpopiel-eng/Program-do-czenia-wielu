@@ -213,6 +213,18 @@ fn sanitize_time_and_persona() {
     assert_eq!(sanitize("abcdefgh", 5), "abcd…");
     assert_eq!(sanitize("abc defgh", 5), "abc…");
     assert_eq!(sanitize("", 5), "");
+    // Wypełniacze bez kształtu zwinięte jak spacje — ogon polecenia zostaje na wierzchu (1.11).
+    for filler in ['\u{2800}', '\u{3164}', '\u{FFA0}', '\u{115F}', '\u{034F}'] {
+        let padded = format!(
+            "cargo test{}; rm -rf C:\\dane",
+            filler.to_string().repeat(200)
+        );
+        assert_eq!(
+            sanitize(&padded, 300),
+            "cargo test ; rm -rf C:\\dane",
+            "{filler:?}"
+        );
+    }
     assert_eq!(time_left_pl(59_999), "59 s");
     assert_eq!(time_left_pl(61_000), "1 min 1 s");
     assert_eq!(time_left_pl(3_600_000 * 2 + 60_000 * 5), "2 h 5 min");
