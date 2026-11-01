@@ -442,6 +442,14 @@ pierwszym planie — polecenie najpierw daje fokus oknu instancji testowej i odm
 sięga do innych programów. Poza budową testową polecenie odmawia. Test: <code>e2e-app/zy-skroty-globalne</code>.
 Niesprawdzone tym sposobem zostaje tylko dostarczenie komunikatu klawisza przez Windows do wtyczki
 (<code>tauri-plugin-global-shortcut</code>).</p>
+<h3 id="6-3a-instancja-testowa-poza-ekranem-od-1-11">6.3a Instancja testowa poza ekranem (od 1.11)</h3>
+<p>Właściciel 1.11: testy Alfy mają mu nie przeszkadzać — AI uruchamia Alfę „dla siebie”, nie na całym ekranie.
+Instancja testowa (<code>ALFA_E2E_INSTANCE=1</code>, budowa <code>e2e</code>) domyślnie otwiera okna w położeniu (-16000, -16000) —
+poza każdym monitorem — bez paska zadań, bez fokusu i bez powiadomień systemowych (<code>cdp::hidden_instance</code>,
+<code>windows::present</code>). WebView2 rysuje dalej (bez wykrywania zasłonięcia i usypiania w tle), więc zrzuty działają.
+Testy, które muszą wyjść na ekran — maksymalizacja okna, okno „Zapisz jako” przez UI Automation, fokus dla
+dyktowania i czytania zaznaczenia — biegną tylko z <code>ALFA_E2E_VISIBLE=1</code> (bieg, gdy właściciel nie pracuje);
+bez niej są pomijane (<code>HIDDEN</code> w <code>e2e-app/alfa.ts</code>).</p>
 <h3 id="6-4-przeglad-ogolny-narzedzi-agentek-i-zdarzen">6.4 Przegląd ogólny narzędzi agentek i zdarzeń</h3>
 <ul>
 <li><strong>Narzędzia</strong> (<code>crates/app-core/tests/tool_sweep.rs</code>): każde narzędzie rdzenia, także dodane później

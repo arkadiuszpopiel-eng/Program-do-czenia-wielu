@@ -39,7 +39,7 @@ pub fn spawn(app: AppHandle, core: AppCore) {
                 tracing::error!(error = %e, "emit alfa://events nie powiódł się");
             }
             let quiet = app.state::<DoNotDisturb>().0.load(Ordering::Relaxed);
-            if quiet || windows::main_visible(&app) {
+            if quiet || windows::main_visible(&app) || crate::cdp::hidden_instance() {
                 continue;
             }
             for notice in batch.iter().filter_map(native_notice) {

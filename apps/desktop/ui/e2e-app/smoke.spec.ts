@@ -15,6 +15,7 @@ import {
   driveSaveDialog,
   expect,
   expectAccessible,
+  HIDDEN,
   inEverySkin,
   readFindings,
   shot,
@@ -242,7 +243,9 @@ test('Sędzia Cieni w procesie (build debug): baner i stan w Ustawieniach', asyn
     'Tryb deweloperski: Sędzia Cieni w procesie aplikacji, bez okna zatwierdzeń.',
   );
   await openSettings(main, 'Uprawnienia i bezpieczeństwo');
-  await expect(main.getByText('Sędzia Cieni w procesie aplikacji (tryb deweloperski)')).toBeVisible();
+  await expect(
+    main.getByText('Sędzia Cieni w procesie aplikacji (tryb deweloperski)'),
+  ).toBeVisible();
   await expect(main.getByText(/awaryjnie w aplikacji — watchdog nie działa/)).toBeVisible();
   await expect(main.getByText(/Izolacja: słabsza/)).toBeVisible();
   await shot(alfa, '05-broker');
@@ -380,6 +383,11 @@ test('belka okna: bez belki systemowej, pasek LED, maksymalizacja i przywróceni
   expect(frame, 'wysokość ramki systemowej nad stroną').toBeLessThan(12);
   await expect(main.locator('header.titlebar .led')).toBeVisible();
   const controls = main.getByRole('group', { name: 'Okno' });
+  // Maksymalizacja przeniosłaby okno na ekran właściciela — tylko w biegu z oknami na ekranie.
+  if (HIDDEN) {
+    await expect(controls.getByRole('button', { name: 'Maksymalizuj' })).toBeVisible();
+    return;
+  }
   const width = () => main.evaluate(() => window.outerWidth);
   const before = await width();
   await controls.getByRole('button', { name: 'Maksymalizuj' }).click();
@@ -401,6 +409,7 @@ test.describe('eksport przez okno systemowe', () => {
   test.describe.configure({ retries: 2 });
   test('eksport .alfa do katalogu tymczasowego (natywne okno „Zapisz jako”)', async ({ alfa }) => {
     test.skip(process.platform !== 'win32', 'okno „Zapisz jako” obsługuje UI Automation Windows');
+    test.skip(HIDDEN, 'okno systemowe wychodzi na pierwszy plan — tylko z ALFA_E2E_VISIBLE=1');
     const { main } = alfa;
     await toChat(main);
     await openSettings(main, 'Import i eksport');

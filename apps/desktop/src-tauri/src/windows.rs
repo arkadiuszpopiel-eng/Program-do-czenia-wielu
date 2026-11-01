@@ -104,7 +104,7 @@ pub fn ensure_main(app: &AppHandle) -> tauri::Result<WebviewWindow> {
     } else {
         window
     };
-    window
+    let window = window
         .title(if test {
             "Alfa — instancja testowa (nie zamykaj)"
         } else {
@@ -112,14 +112,35 @@ pub fn ensure_main(app: &AppHandle) -> tauri::Result<WebviewWindow> {
         })
         .inner_size(1200.0, 800.0)
         .min_inner_size(400.0, 500.0)
-        .center()
         .resizable(true)
         // Bez belki systemowej: pasek tytułu z przyciskami okna rysuje interfejs; cień zostawia
         // systemową ramkę, zaokrąglenie i zmianę rozmiaru krawędziami.
         .decorations(false)
         .shadow(true)
-        .visible(true)
-        .build()
+        .visible(true);
+    if crate::cdp::hidden_instance() {
+        window
+            .position(OFFSCREEN.0, OFFSCREEN.1)
+            .focused(false)
+            .skip_taskbar(true)
+            .build()
+    } else {
+        window.center().build()
+    }
+}
+
+/// Położenie okien instancji testowej ukrytej (`cdp::hidden_instance`): daleko poza każdym monitorem.
+const OFFSCREEN: (f64, f64) = (-16000.0, -16000.0);
+
+/// Pokazuje okno: zwykle na wierzchu z fokusem; w instancji testowej ukrytej poza ekranem i bez
+/// fokusu — klawiatura zostaje w programie, w którym pracuje właściciel.
+pub fn present<R: tauri::Runtime>(window: &WebviewWindow<R>) -> tauri::Result<()> {
+    if crate::cdp::hidden_instance() {
+        window.set_position(tauri::LogicalPosition::new(OFFSCREEN.0, OFFSCREEN.1))?;
+        return window.show();
+    }
+    window.show()?;
+    window.set_focus()
 }
 
 fn ensure_quick(app: &AppHandle) -> tauri::Result<WebviewWindow> {
@@ -167,8 +188,7 @@ pub fn show_main(app: &AppHandle) -> tauri::Result<()> {
     app.state::<WindowState>().cancel_timer();
     let window = ensure_main(app)?;
     window.unminimize()?;
-    window.show()?;
-    window.set_focus()
+    present(&window)
 }
 
 /// Przełącza okno Szybkiego pytania (`Ctrl+Alt+Space`).
@@ -178,8 +198,7 @@ pub fn toggle_quick(app: &AppHandle) -> tauri::Result<()> {
         return window.hide();
     }
     window.center()?;
-    window.show()?;
-    window.set_focus()
+    present(&window)
 }
 
 /// Chowa okno Szybkiego pytania.

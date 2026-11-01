@@ -262,6 +262,14 @@ export const test = base.extend<object, { alfa: Alfa }>({
 export { expect };
 
 /**
+ * Instancja testowa pracuje poza ekranem (właściciel 1.11: „testy mają mi nie przeszkadzać”): okno
+ * poza monitorami, bez paska zadań i bez fokusu (`cdp::hidden_instance` w powłoce). Testy, które
+ * muszą wyjść na ekran (maksymalizacja, okno systemowe przez UI Automation, fokus dla skrótów głosu),
+ * biegną tylko z `ALFA_E2E_VISIBLE=1`.
+ */
+export const HIDDEN = process.env['ALFA_E2E_VISIBLE'] !== '1';
+
+/**
  * Zrzut okna głównego jako załącznik testu i plik w `out/screens` (błąd zrzutu nie psuje testu).
  * Animacje wejścia (okienka, panele) przewinięte do końca — zrzut pokazuje stan ustalony, a nie
  * półprzezroczystą klatkę z połowy wjazdu (29.10 menu trybu wyglądało na zrzucie na przezroczyste).

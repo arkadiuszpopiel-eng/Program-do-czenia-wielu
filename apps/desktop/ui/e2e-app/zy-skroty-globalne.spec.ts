@@ -7,7 +7,7 @@
 // ma modeli mowy — dyktowanie i czytanie odmawiają komunikatem w oknie; gdyby jednak ruszyły, test je
 // zatrzymuje. STOP WSZYSTKIEGO na końcu. Plik biegnie po `z-terminal` i przed `zz-mode`.
 import type { Page } from '@playwright/test';
-import { expect, test } from './alfa';
+import { expect, HIDDEN, test } from './alfa';
 import { call, raw } from './ipc-call';
 
 interface BootReport {
@@ -99,6 +99,7 @@ test.beforeEach(async ({ alfa }, info) => {
 });
 
 test('Ctrl+Alt+D — dyktowanie (voice.dictation) przez skrót globalny', async ({ alfa }) => {
+  test.skip(HIDDEN, 'fokus okna zabrałby klawiaturę właścicielowi — tylko z ALFA_E2E_VISIBLE=1');
   const before = await toasts(alfa.main);
   await press(alfa.main, 'Ctrl+Alt+D');
   const features = await call<VoiceFeatures>(alfa.main, 'voice_features');
@@ -118,6 +119,7 @@ test('Ctrl+Alt+D — dyktowanie (voice.dictation) przez skrót globalny', async 
 test('Ctrl+Alt+R — czytanie zaznaczenia (voice.readSelection) przez skrót globalny', async ({
   alfa,
 }) => {
+  test.skip(HIDDEN, 'fokus okna zabrałby klawiaturę właścicielowi — tylko z ALFA_E2E_VISIBLE=1');
   const before = await toasts(alfa.main);
   await press(alfa.main, 'Ctrl+Alt+R');
   const features = await call<VoiceFeatures>(alfa.main, 'voice_features');

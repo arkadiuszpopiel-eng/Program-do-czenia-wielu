@@ -42,7 +42,11 @@ fn port_from(value: Option<&str>) -> u16 {
 pub fn browser_args() -> Option<String> {
     let port = port_from(std::env::var(ENV_PORT).ok().as_deref());
     Some(format!(
-        "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port={port}"
+        // Okno poza ekranem (`hidden_instance`) dalej rysuje: bez wykrywania zasłonięcia okna
+        // i bez usypiania stron w tle (inaczej zrzuty i animacje czekają w nieskończoność).
+        "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection,CalculateNativeWinOcclusion \
+         --disable-backgrounding-occluded-windows --disable-renderer-backgrounding \
+         --remote-debugging-port={port}"
     ))
 }
 
@@ -62,6 +66,24 @@ pub fn test_instance() -> bool {
 /// Build produkcyjny nie ma instancji testowych — zawsze jedna instancja.
 #[cfg(not(feature = "e2e"))]
 pub fn test_instance() -> bool {
+    false
+}
+
+/// Zmienna, która pokazuje okna instancji testowej na ekranie (do podglądu testów; domyślnie ukryte).
+#[cfg(feature = "e2e")]
+pub const ENV_VISIBLE: &str = "ALFA_E2E_VISIBLE";
+
+/// Instancja testowa pracuje poza ekranem (właściciel 1.11: „testy mają mi nie przeszkadzać”):
+/// okna poza obszarem monitorów, bez paska zadań, bez fokusu i powiadomień systemowych.
+/// [`ENV_VISIBLE`]`=1` pokazuje je jak zwykle.
+#[cfg(feature = "e2e")]
+pub fn hidden_instance() -> bool {
+    test_instance() && std::env::var(ENV_VISIBLE).ok().is_none_or(|v| v != "1")
+}
+
+/// Build produkcyjny: okna zawsze na ekranie.
+#[cfg(not(feature = "e2e"))]
+pub fn hidden_instance() -> bool {
     false
 }
 

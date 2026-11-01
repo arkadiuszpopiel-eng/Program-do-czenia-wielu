@@ -121,6 +121,11 @@ async fn focus_main(app: &AppHandle) -> Result<(), String> {
     let window = app
         .get_webview_window(windows::MAIN)
         .ok_or("Brak okna głównego.")?;
+    if crate::cdp::hidden_instance() {
+        // Fokus zabrałby klawiaturę właścicielowi; ten skrót sprawdza bieg z oknami na ekranie.
+        return Err("Instancja testowa pracuje poza ekranem — dyktowanie i czytanie zaznaczenia                     sprawdza bieg z ALFA_E2E_VISIBLE=1."
+            .into());
+    }
     let shown = window.show().and_then(|()| window.set_focus());
     shown.map_err(|e| format!("Fokus okna głównego: {e}"))?;
     for _ in 0..30 {
@@ -137,8 +142,7 @@ fn toggle<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
         Some(window) if window.is_visible()? => window.hide(),
         Some(window) => {
             window.center()?;
-            window.show()?;
-            window.set_focus()
+            windows::present(&window)
         }
         None => Ok(()),
     }
