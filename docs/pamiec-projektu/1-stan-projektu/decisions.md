@@ -355,3 +355,14 @@ być lepsze i wydajniejsze”; pobierać na E: (po sprzątaniu starych kompilacj
 poza repozytorium na E:, po próbie posprzątany. 29.10 wieczorem usunięto stare kompilacje (`alfa` 166 → 23 GB).
 **Źródło:** rozmowa 29.10; pamięć `alfa-zgoda-na-pobrania.md`.
 **Status:** Aktywna
+
+### [2026-11-01] Testy prawdziwej aplikacji mogą uruchamiać `claude auth status`
+
+**Kontekst:** test `z-terminal` po „Gotowe” sprawdza stan logowania mostu CLI; rdzeń uruchamia wtedy
+`claude auth status --json` na komputerze właściciela (instancja testowa widzi prawdziwy plan). Raport 47 §5.
+**Opcje:** A — zostawić (test sprawdza prawdziwe zachowanie) vs B — podstawić testom atrapę polecenia.
+**Decyzja (właściciel):** A — „testy mogą uruchamiać claude auth status na tym komputerze”.
+**Konsekwencje:** `z-terminal` bez atrapy. Zgoda dotyczy tylko polecenia stanu logowania z testów prawdziwej
+aplikacji; Alfa nadal nie czyta tokenów (`~/.claude`, `~/.codex`), a sesje AI nie uruchamiają mostów CLI same.
+**Źródło:** rozmowa 1.11 rano.
+**Status:** Aktywna

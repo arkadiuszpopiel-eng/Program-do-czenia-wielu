@@ -9,7 +9,7 @@
   "current_state": "0.0.81 wgrana 1.11 2:49 z a37125d6 (raport alfa/docs/plan/47). Gałąź ccr-af4b63c6-3fyzaj, lokalnie bez push. Kopia czysta na F: po 6:00 (backup.sh --czysta).",
   "session_goal": "Właściciel 31.10 noc: praca automatyczna do 6:00 (ulepszaj, rozbudowuj, poprawiaj, testuj), po 6:00 czysta kopia na F:\\Kopie zapasowe programów Spopielony.",
   "in_progress": [
-    "Do decyzji człowieka (raport 47 §5): czy testy prawdziwej aplikacji mogą uruchamiać `claude auth status` (z-terminal → bridges.check). Nadal: gałęzie do-przegladu-broker-2026-10-28 i do-przegladu-pelny-dostep, `*` w analizatorze powłoki, fs-23, próg F3-07, K.0."
+    "Do decyzji człowieka (raport 47 §5): gałęzie do-przegladu-broker-2026-10-28 i do-przegladu-pelny-dostep, `*` w analizatorze powłoki, fs-23, próg F3-07, K.0."
   ],
   "blocking_issues": [],
   "next_session": [
