@@ -22,7 +22,8 @@ moduł niczego nie naprawia ani nie zmienia w systemie.
 - `DiagProbe` — odczyt parametrów (Windows: `platform-windows-diag-impl`, PowerShell/CIM,
   `-EncodedCommand`, bez okna, limit 90 s; części wypisywane od razu wierszami JSON — po limicie zapis
   powstaje z części odczytanych, brakujące są lukami „nie zdążyło w limicie” (`stream.rs`, 01.11);
-  karty sieciowe z `Win32_NetworkAdapter` — `Get-NetAdapter` wisiał > 80 s; atrapa: `pc-diag-fake`).
+  karty sieciowe z `Win32_NetworkAdapter` — `Get-NetAdapter` wisiał > 80 s; rodzaj „ethernet”/„wifi” tylko
+  dla sprzętu na PCI/USB/SDIO, karty programowe (VirtualBox, TAP, Hyper-V) jako „other”; atrapa: `pc-diag-fake`).
 
 ## Testy (`crates/pc-diag-impl`)
 - Procesor: mieszanie 64-bitowe przez 1,5 s, jeden wątek i wszystkie (skalowanie).
