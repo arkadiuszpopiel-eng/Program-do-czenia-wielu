@@ -27,7 +27,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `accounts_remove` | rdzeń, aplikacja, bieg aplikacji |  |
 | `accounts_rotate` | rdzeń, aplikacja, bieg aplikacji |  |
 | `accounts_set_disabled` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_set_enterprise` | rdzeń, aplikacja |  |
+| `accounts_set_enterprise` | rdzeń, aplikacja, bieg aplikacji |  |
 | `accounts_set_limit` | rdzeń, aplikacja, bieg aplikacji |  |
 | `accounts_set_model` | rdzeń, aplikacja, bieg aplikacji |  |
 | `accounts_set_queue` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -83,7 +83,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `cameras_set_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
 | `cameras_set_master` | rdzeń, aplikacja, bieg aplikacji |  |
 | `cameras_state` | rdzeń, aplikacja, bieg aplikacji |  |
-| `canvas_render` | rdzeń, aplikacja |  |
+| `canvas_render` | rdzeń, aplikacja, bieg aplikacji |  |
 | `compliance_routes` | aplikacja, bieg aplikacji |  |
 | `config_raw_check` | rdzeń, aplikacja, bieg aplikacji |  |
 | `config_raw_get` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -148,7 +148,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `memory_scopes` | rdzeń, aplikacja, bieg aplikacji |  |
 | `memory_set_pinned` | aplikacja, bieg aplikacji |  |
 | `memory_status` | aplikacja, bieg aplikacji |  |
-| `memory_teach` | rdzeń, aplikacja |  |
+| `memory_teach` | rdzeń, aplikacja, bieg aplikacji |  |
 | `memory_teach_pick_file` | rdzeń, aplikacja |  |
 | `memory_undo` | aplikacja, bieg aplikacji |  |
 | `models_bundle_download` | aplikacja, bieg aplikacji |  |
@@ -171,9 +171,9 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `permissions_open_approval` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_request_level` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_revoke_grant` | rdzeń, aplikacja, bieg aplikacji |  |
-| `pipelines_list` | rdzeń, aplikacja |  |
-| `pipelines_remove` | rdzeń, aplikacja |  |
-| `pipelines_save` | rdzeń, aplikacja |  |
+| `pipelines_list` | rdzeń, aplikacja, bieg aplikacji |  |
+| `pipelines_remove` | rdzeń, aplikacja, bieg aplikacji |  |
+| `pipelines_save` | rdzeń, aplikacja, bieg aplikacji |  |
 | `plugins_approve` | rdzeń, aplikacja, bieg aplikacji |  |
 | `plugins_disable` | rdzeń, aplikacja, bieg aplikacji |  |
 | `plugins_enable` | aplikacja, bieg aplikacji |  |
@@ -182,13 +182,13 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `plugins_propose` | rdzeń, aplikacja, bieg aplikacji |  |
 | `plugins_reject` | aplikacja, bieg aplikacji |  |
 | `plugins_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `pricing_apply` | rdzeń, aplikacja |  |
+| `pricing_apply` | rdzeń, aplikacja, bieg aplikacji |  |
 | `pricing_get` | rdzeń, bieg aplikacji |  |
-| `projects_list` | rdzeń, aplikacja |  |
+| `projects_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `projects_pick_dir` | rdzeń, aplikacja |  |
-| `projects_remove` | rdzeń, aplikacja |  |
-| `projects_rename` | rdzeń, aplikacja |  |
-| `projects_save` | rdzeń, aplikacja |  |
+| `projects_remove` | rdzeń, aplikacja, bieg aplikacji |  |
+| `projects_rename` | rdzeń, aplikacja, bieg aplikacji |  |
+| `projects_save` | rdzeń, aplikacja, bieg aplikacji |  |
 | `prompt_templates_get` | rdzeń, aplikacja, bieg aplikacji |  |
 | `prompt_templates_set` | rdzeń, aplikacja, bieg aplikacji |  |
 | `quick_ask` | rdzeń, interfejs, przeglądarka, aplikacja, bieg aplikacji |  |
@@ -203,7 +203,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `search_reindex_cancel` | rdzeń, aplikacja, bieg aplikacji |  |
 | `search_reindex_start` | aplikacja, bieg aplikacji |  |
 | `search_reindex_status` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_cards` | rdzeń, aplikacja |  |
+| `sessions_cards` | rdzeń, aplikacja, bieg aplikacji |  |
 | `sessions_choose_workdir` | rdzeń, aplikacja, bieg aplikacji |  |
 | `sessions_create` | rdzeń, aplikacja, bieg aplikacji |  |
 | `sessions_duplicate_as_template` | aplikacja, bieg aplikacji |  |
@@ -262,7 +262,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `triggers_preview_cron` | rdzeń, aplikacja, bieg aplikacji |  |
 | `triggers_remove` | aplikacja, bieg aplikacji |  |
 | `triggers_set_enabled` | aplikacja, bieg aplikacji |  |
-| `turns_arena_answer` | rdzeń, aplikacja |  |
+| `turns_arena_answer` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_continue` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_edit_and_resend` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_list` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -272,7 +272,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `turns_remember` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_run_code` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_save_code` | aplikacja, bieg aplikacji |  |
-| `turns_select_branch` | rdzeń, aplikacja |  |
+| `turns_select_branch` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_send` | rdzeń, bieg aplikacji |  |
 | `turns_set_hidden` | rdzeń, aplikacja, bieg aplikacji |  |
 | `turns_stop` | rdzeń, aplikacja, bieg aplikacji |  |
