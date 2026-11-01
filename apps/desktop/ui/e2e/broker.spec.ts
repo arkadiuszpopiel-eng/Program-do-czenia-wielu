@@ -132,3 +132,19 @@ for (const theme of ['light', 'dark'] as const) {
     ).toBeVisible();
   });
 }
+
+// Zgoda udzielona w oknie Sędziego: po powrocie do okna Alfy lista zgód jest czytana od nowa
+// (`slow-core` zapisuje każde wywołanie atrapy w `window.__alfaCalls`).
+test('zgody „zawsze w tym zakresie”: odświeżenie po powrocie do okna', async ({ page }) => {
+  await openApp(page, { scenario: 'slow-core' });
+  await waitForChat(page);
+  await openPermissions(page);
+  const calls = () =>
+    page.evaluate(
+      () => (window.__alfaCalls ?? []).filter((c) => c.name === 'permissions.grants').length,
+    );
+  await expect.poll(calls).toBeGreaterThan(0);
+  const before = await calls();
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await expect.poll(calls).toBe(before + 1);
+});

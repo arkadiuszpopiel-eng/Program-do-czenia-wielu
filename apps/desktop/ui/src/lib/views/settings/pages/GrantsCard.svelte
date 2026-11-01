@@ -11,6 +11,8 @@
   import { showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
 
+  /** Odświeżanie listy, gdy karta jest na ekranie (wygasające zgody z terminem). */
+  const REFRESH_MS = 30_000;
   const app = useApp();
   const { t } = app.i18n;
   let grants = $state<readonly GrantView[] | null>(null);
@@ -28,6 +30,18 @@
   $effect(() => {
     void app.broker.view;
     void reload();
+  });
+
+  // Zgoda udzielona w oknie Sędziego i wygaśnięcie zgody z terminem: po powrocie do okna Alfy
+  // (okno Sędziego zabiera fokus) i co pół minuty, dopóki karta jest na ekranie.
+  $effect(() => {
+    const refresh = () => void reload();
+    window.addEventListener('focus', refresh);
+    const timer = setInterval(refresh, REFRESH_MS);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      clearInterval(timer);
+    };
   });
 
   function until(g: GrantView): string {
