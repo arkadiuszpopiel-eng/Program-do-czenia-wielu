@@ -12,6 +12,34 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.82 — 2026-11-01
+
+Zgody „zawsze w tym zakresie” działają szczelnie: odwołana zgoda nie wraca po ponownym uruchomieniu, a STOP
+WSZYSTKIEGO kasuje je naprawdę. Testowa Alfa nie pojawia się już na ekranie podczas pracy.
+
+### Poprawki
+
+- [poważne] Odwołana zgoda „do odwołania” nie wraca po ponownym uruchomieniu Alfy, także gdy zapis do Audytu się
+  nie uda.
+- [poważne] STOP WSZYSTKIEGO kasuje zgody także wtedy, gdy plik zgód blokuje inny program (antywirus,
+  indeksowanie) — nieudany zapis trafia do Audytu.
+- [poważne] Odwołanie zgody unieważnia pozwolenia wydane na jej podstawie; pozwolenie nie żyje dłużej niż zgoda.
+- [poważne] Okno Sędziego Cieni pokazuje pełny opis polecenia mostu CLI, także gdy część była ukryta znakami
+  niewidocznymi.
+- Ustawienia → Uprawnienia: błąd odczytu zgód nie pokazuje „Brak zgód”, a „Odwołaj” zgody, której już nie ma,
+  mówi to wprost.
+- Okno Sędziego Cieni na niskim ekranie pokazuje pomoc pod „?” w pierwszej kolejności; puste znaki-wypełniacze
+  traktuje jak spację.
+- Diagnostyka komputera: karty sieciowe programowe (VirtualBox, VPN, Hyper-V) nie są pokazywane jako kabel,
+  a zawieszony czujnik nie zabiera całego odczytu (limit 10 s na zapytanie).
+- Numery zgód rosną także po ponownym uruchomieniu, więc „Odwołaj” z nieodświeżonej listy nie trafi w inną zgodę.
+
+### Testy
+
+- Testowa Alfa pracuje poza ekranem: bez okna na wierzchu, fokusu, paska zadań i powiadomień.
+- Okna wyboru pliku i katalogu w prawdziwej aplikacji; pokrycie poleceń rdzenia 99 %.
+- Testy sprzętowe z dźwiękiem: odstęp ramek mikrofonu z tolerancją zegara urządzenia.
+
 ## 0.0.81 — 2026-11-01
 
 Diagnostyka komputera nie zawiesza się na kartach sieciowych i zawsze oddaje to, co zdążyła odczytać. Okno

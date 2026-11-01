@@ -93,8 +93,8 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `device_gpu_live` | aplikacja, bieg aplikacji |  |
 | `device_measure` | rdzeń, bieg aplikacji |  |
 | `device_profile` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_cancel` | rdzeń, aplikacja |  |
-| `diag_export` | rdzeń, aplikacja |  |
+| `diag_cancel` | rdzeń, aplikacja, bieg aplikacji |  |
+| `diag_export` | rdzeń, aplikacja, bieg aplikacji |  |
 | `diag_run` | rdzeń, aplikacja, bieg aplikacji |  |
 | `diag_runs` | rdzeń, aplikacja, bieg aplikacji |  |
 | `diag_snapshot` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -251,7 +251,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `terminal_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `terminal_resize` | rdzeń, aplikacja, bieg aplikacji |  |
 | `timeline_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `transfer_export` | rdzeń, bieg aplikacji |  |
+| `transfer_export` | rdzeń |  |
 | `transfer_import` | rdzeń, aplikacja, bieg aplikacji |  |
 | `transfer_inspect` | rdzeń, aplikacja, bieg aplikacji |  |
 | `transfer_rollback` | rdzeń, aplikacja, bieg aplikacji |  |
