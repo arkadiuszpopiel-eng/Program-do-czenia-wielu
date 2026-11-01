@@ -88,7 +88,7 @@ impl BrokerEngine {
                     } else {
                         until_ms.min(max)
                     };
-                    let id = next_id(st);
+                    let id = next_id(st, now);
                     st.grants.push(Grant {
                         id,
                         session: req.holder.session.clone(),

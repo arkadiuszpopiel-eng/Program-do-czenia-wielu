@@ -10,6 +10,8 @@ mod footer;
 mod input;
 #[cfg(windows)]
 mod layout;
+#[cfg(all(test, windows))]
+mod layout_tests;
 #[cfg(windows)]
 mod paint;
 #[cfg(windows)]

@@ -21,7 +21,7 @@ use windows::Win32::Graphics::Gdi::{
 };
 use windows::core::{PCWSTR, w};
 
-use super::layout::{LEAD_LABEL, Measured, WRAP, px};
+use super::layout::{LEAD_LABEL, Measured, WRAP, WRAP_END, px};
 use super::shapes::{CENTER, LINE, fill, glyph, mix, round_rect, text};
 use super::theme::{Palette, palette};
 
@@ -267,7 +267,7 @@ impl Look {
                 right: h.right - s(14),
                 bottom: h.bottom - s(14),
             };
-            text(hdc, f.body, p.text, &view.help, body, WRAP);
+            text(hdc, f.body, p.text, &view.help, body, WRAP_END);
         }
         if let Some(l) = &m.lead {
             let tint = if p.dark { 10 } else { 6 };

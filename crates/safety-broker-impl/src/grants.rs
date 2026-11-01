@@ -9,7 +9,8 @@ use std::path::PathBuf;
 
 use core_bus_contract::{AgentId, SessionId};
 use safety_broker_contract::{
-    BrokerError, Capability, EVENT_GRANT_REVOKED, GrantInfo, Holder, UNTIL_REVOKED,
+    BrokerError, Capability, EVENT_GRANT_PERSIST_FAILED, EVENT_GRANT_RESTORED, EVENT_GRANT_REVOKED,
+    GrantInfo, Holder, TokenId, UNTIL_REVOKED,
 };
 use serde::{Deserialize, Serialize};
 
@@ -45,7 +46,8 @@ impl GrantStore {
             .unwrap_or_default()
     }
 
-    /// Zapisuje zgody do odwołania (żadnych — usuwa plik). Zapis atomowy.
+    /// Zapisuje zgody do odwołania (żadnych — usuwa plik; gdy usunięcie się nie uda, np. plik
+    /// trzyma antywirus, nadpisuje go pustą listą — przegląd 1.11). Zapis atomowy.
     fn save(&self, grants: &[Grant]) -> std::io::Result<()> {
         let keep: Vec<Saved> = grants
             .iter()
@@ -59,11 +61,18 @@ impl GrantStore {
             .collect();
         if keep.is_empty() {
             return match std::fs::remove_file(&self.path) {
-                Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e),
+                // Zapis w miejscu (bez zmiany nazwy): uchwyt bez prawa usuwania go nie blokuje.
+                Err(e) if e.kind() != std::io::ErrorKind::NotFound => {
+                    std::fs::write(&self.path, "[]")
+                }
                 _ => Ok(()),
             };
         }
         let text = serde_json::to_string(&keep).map_err(std::io::Error::other)?;
+        self.write(&text)
+    }
+
+    fn write(&self, text: &str) -> std::io::Result<()> {
         let tmp = self.path.with_extension("tmp");
         std::fs::write(&tmp, text)?;
         std::fs::rename(&tmp, &self.path)
@@ -73,9 +82,15 @@ impl GrantStore {
 impl BrokerEngine {
     /// Wczytuje zgody do odwołania zapisane przed restartem.
     pub(crate) fn restore_grants(&self, store: &GrantStore) {
+        let now = self.now();
         let mut st = self.lock();
-        for s in store.load() {
-            let id = next_id(&mut st);
+        let saved = store.load();
+        if !saved.is_empty() {
+            let payload = serde_json::json!({ "grants": saved.len() });
+            let _ = self.audit(EVENT_GRANT_RESTORED, None, payload);
+        }
+        for s in saved {
+            let id = next_id(&mut st, now);
             st.grants.push(Grant {
                 id,
                 session: s.session,
@@ -87,13 +102,14 @@ impl BrokerEngine {
         }
     }
 
-    /// Utrwala zgody do odwołania (błąd zapisu → wpis w Audycie; zgody w pamięci obowiązują).
+    /// Utrwala zgody do odwołania (błąd zapisu → wpis w Audycie pod własną nazwą; zgody w pamięci
+    /// obowiązują).
     pub(crate) fn persist_grants(&self, st: &State) {
         if let Some(store) = &self.grant_store
             && let Err(e) = store.save(&st.grants)
         {
             let payload = serde_json::json!({ "persist_error": e.to_string() });
-            let _ = self.audit(EVENT_GRANT_REVOKED, None, payload);
+            let _ = self.audit(EVENT_GRANT_PERSIST_FAILED, None, payload);
         }
     }
 
@@ -115,7 +131,9 @@ impl BrokerEngine {
             .collect()
     }
 
-    /// Odwołuje zgodę (wpis w Audycie; zgoda do odwołania znika też z pliku).
+    /// Odwołuje zgodę: znika z pamięci i z pliku, tokeny wydane na jej podstawie tracą ważność,
+    /// wpis w Audycie. Odwołanie obowiązuje także bez zapisu w Audycie (zawęża uprawnienia —
+    /// jak unieważnienie tokenu; przegląd 1.11: wcześniej błąd Audytu przerywał przed plikiem).
     pub(crate) fn revoke_grant_sync(&self, id: u64) -> Result<bool, BrokerError> {
         let mut st = self.lock();
         let Some(pos) = st.grants.iter().position(|g| g.id == id) else {
@@ -127,15 +145,25 @@ impl BrokerEngine {
             agent: g.agent.clone(),
             role: None,
         };
-        let payload = serde_json::json!({ "grant": id, "scope": g.cap, "until_ms": g.until_ms });
-        self.audit(EVENT_GRANT_REVOKED, Some(&holder), payload)?;
         self.persist_grants(&st);
+        let tokens: Vec<TokenId> = st
+            .tokens
+            .iter()
+            .filter(|(_, meta)| meta.grant == Some(id))
+            .map(|(token, _)| *token)
+            .collect();
+        let revoked = self.revoke_ids(&mut st, &tokens, "grant_revoked");
+        let payload = serde_json::json!({
+            "grant": id, "scope": g.cap, "until_ms": g.until_ms, "tokens_revoked": revoked,
+        });
+        let _ = self.audit(EVENT_GRANT_REVOKED, Some(&holder), payload);
         Ok(true)
     }
 }
 
-/// Kolejny numer zgody.
-pub(crate) fn next_id(st: &mut State) -> u64 {
-    st.next_grant += 1;
+/// Kolejny numer zgody: rośnie także między uruchomieniami Brokera (co najmniej bieżąca chwila
+/// w ms), więc „Odwołaj” z nieodświeżonej listy po restarcie nie trafi w inną zgodę (przegląd 1.11).
+pub(crate) fn next_id(st: &mut State, now: u64) -> u64 {
+    st.next_grant = st.next_grant.saturating_add(1).max(now);
     st.next_grant
 }

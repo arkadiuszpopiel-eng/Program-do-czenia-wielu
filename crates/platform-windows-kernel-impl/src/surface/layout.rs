@@ -10,8 +10,8 @@
 use platform_contract::{PixelRect, SurfaceView};
 use windows::Win32::Foundation::RECT;
 use windows::Win32::Graphics::Gdi::{
-    DRAW_TEXT_FORMAT, DT_CALCRECT, DT_EDITCONTROL, DT_NOPREFIX, DT_SINGLELINE, DT_WORDBREAK,
-    DrawTextW, HDC, HFONT, SelectObject,
+    DRAW_TEXT_FORMAT, DT_CALCRECT, DT_EDITCONTROL, DT_END_ELLIPSIS, DT_NOPREFIX, DT_SINGLELINE,
+    DT_WORDBREAK, DrawTextW, HDC, HFONT, SelectObject,
 };
 
 use super::footer::footer;
@@ -20,6 +20,10 @@ use super::paint::Fonts;
 /// Format tekstu wielowierszowego (ten sam przy mierzeniu i rysowaniu).
 pub(super) const WRAP: DRAW_TEXT_FORMAT =
     DRAW_TEXT_FORMAT(DT_WORDBREAK.0 | DT_EDITCONTROL.0 | DT_NOPREFIX.0);
+
+/// Jak [`WRAP`], a gdy tekst się nie mieści — ostatni widoczny wiersz kończy „…” (opis pod „?”
+/// skrócony na niskim ekranie nie urywa się w pół zdania bez znaku).
+pub(super) const WRAP_END: DRAW_TEXT_FORMAT = DRAW_TEXT_FORMAT(WRAP.0 | DT_END_ELLIPSIS.0);
 
 /// Identyfikator przycisku „?” (`IDHELP`; poniżej przycisków decyzji — nigdy nie jest decyzją).
 pub(super) const HELP_ID: u16 = 9;
@@ -256,10 +260,28 @@ pub(super) fn measure(
 }
 
 impl Measured {
-    /// Za wysokie okno (mały ekran, otwarta pomoc): najpierw skraca się opis pod „?”, potem
-    /// odpadają od dołu wiersze szczegółów; stopka z przyciskami zostaje zawsze widoczna.
-    fn fit(&mut self, limit: i32, gap: i32) {
+    /// Za wysokie okno (mały ekran): odpadają od dołu wiersze szczegółów; przy otwartej pomocy
+    /// dopiero potem skraca się opis pod „?” (z „…”) — właściciel otworzył go, żeby przeczytać,
+    /// a po zamknięciu wiersze wracają (przegląd 1.11: pomoc urywała się po pierwszym wierszu).
+    /// „Co dokładnie” i stopka z przyciskami zostają zawsze widoczne.
+    pub(super) fn fit(&mut self, limit: i32, gap: i32) {
         let mut over = self.client.1 - limit;
+        if over <= 0 {
+            return;
+        }
+        if self.help.is_some() {
+            let rows = self
+                .rows
+                .first()
+                .map_or(0, |r| self.status.top - r.label.top.min(r.value.top));
+            let take = over.min(rows.max(0));
+            if take > 0 {
+                self.shift(take, false);
+                let floor = self.status.top - gap;
+                self.rows.retain(|r| r.value.bottom <= floor);
+                over -= take;
+            }
+        }
         if over <= 0 {
             return;
         }

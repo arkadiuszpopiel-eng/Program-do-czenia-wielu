@@ -103,12 +103,29 @@ fn invisible(c: char) -> bool {
         | '\u{2060}'..='\u{2064}' | '\u{2066}'..='\u{2069}' | '\u{FEFF}' | '\u{FFF9}'..='\u{FFFB}')
 }
 
-/// Sanityzacja tekstu z LLM/narzędzi: znaki sterujące i białe → spacja (zwinięte), znaki bidi
-/// i zerowej szerokości usunięte (bez „Trojan Source” w etykietach), obcięcie z „…”.
+/// Znaki bez kształtu, które nie są białe ani sterujące (wypełniacze Hangul, pusty znak Braille'a,
+/// łącznik grafemów, samogłoski khmerskie bez kształtu): wyglądają jak odstęp, więc wypełnienie
+/// nimi odsuwa groźny ogon polecenia poza wzrok (przegląd 1.11). Traktowane jak spacja.
+fn blank(c: char) -> bool {
+    matches!(
+        c,
+        '\u{034F}'
+            | '\u{115F}'
+            | '\u{1160}'
+            | '\u{17B4}'
+            | '\u{17B5}'
+            | '\u{2800}'
+            | '\u{3164}'
+            | '\u{FFA0}'
+    )
+}
+
+/// Sanityzacja tekstu z LLM/narzędzi: znaki sterujące, białe i bez kształtu → spacja (zwinięte),
+/// znaki bidi i zerowej szerokości usunięte (bez „Trojan Source” w etykietach), obcięcie z „…”.
 pub fn sanitize(text: &str, max_chars: usize) -> String {
     let mut chars: Vec<char> = Vec::new();
     for c in text.chars().filter(|c| !invisible(*c)) {
-        let c = if c.is_whitespace() || c.is_control() {
+        let c = if c.is_whitespace() || c.is_control() || blank(c) {
             ' '
         } else {
             c

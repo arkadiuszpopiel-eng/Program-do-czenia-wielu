@@ -54,14 +54,20 @@ impl BrokerEngine {
         verdict: &RiskVerdict,
         via: &str,
         now: u64,
+        grant: Option<(u64, u64)>,
     ) -> Result<Decision, BrokerError> {
         let ttl = Self::ttl(st, req.ttl_ms)?;
+        // Token ze zgody nie żyje dłużej niż sama zgoda (przegląd 1.11: zgoda „1 h” dawała
+        // token ważny do 4 h po swoim końcu).
+        let expires = grant.map_or(now.saturating_add(ttl), |(_, until)| {
+            now.saturating_add(ttl).min(until)
+        });
         let token = Self::mint(
             st,
             req.holder.clone(),
             req.capability.clone(),
             None,
-            now.saturating_add(ttl),
+            expires,
             now,
         );
         let payload = json!({
@@ -75,6 +81,9 @@ impl BrokerEngine {
             return Ok(Decision::Deny(DenyReason::AuditUnavailable));
         }
         Self::register(st, &token);
+        if let (Some((id, _)), Some(meta)) = (grant, st.tokens.get_mut(&token.id)) {
+            meta.grant = Some(id);
+        }
         Ok(Decision::Allow(token))
     }
 
@@ -95,7 +104,7 @@ impl BrokerEngine {
         let verdict = self.classify(&st, &facts, level);
         match verdict.verdict {
             Verdict::HardBlock { rule } => Ok(self.kernel_block(&mut st, &req, rule)),
-            Verdict::Proceed => self.issue_for(&mut st, &req, &verdict, "autonomy", now),
+            Verdict::Proceed => self.issue_for(&mut st, &req, &verdict, "autonomy", now, None),
             Verdict::Ask {
                 non_voice,
                 grantable,
@@ -110,17 +119,21 @@ impl BrokerEngine {
                             .any(|s| s.covers(&req.capability, &req.facts, &verdict.rules))
                 });
                 if by_plan {
-                    return self.issue_for(&mut st, &req, &verdict, "plan", now);
+                    return self.issue_for(&mut st, &req, &verdict, "plan", now, None);
                 }
-                let by_grant = grantable
-                    && st.grants.iter().any(|g| {
-                        now < g.until_ms
+                let by_grant = st
+                    .grants
+                    .iter()
+                    .find(|g| {
+                        grantable
+                            && now < g.until_ms
                             && g.session == req.holder.session
                             && g.agent == req.holder.agent
                             && req.capability.is_subset_of(&g.cap)
-                    });
-                if by_grant {
-                    return self.issue_for(&mut st, &req, &verdict, "grant", now);
+                    })
+                    .map(|g| (g.id, g.until_ms));
+                if by_grant.is_some() {
+                    return self.issue_for(&mut st, &req, &verdict, "grant", now, by_grant);
                 }
                 let summary = req.facts.summary.clone().or_else(|| {
                     req.facts
