@@ -24,10 +24,12 @@ fn loop_rules(spec: &RunSpec) -> Vec<String> {
         "Usuwaj do Kosza (`fs_delete`); trwałe usuwanie zawsze wymaga potwierdzenia właściciela.".to_owned(),
         "W dużym repozytorium edytuj pojedyncze pliki narzędziami plikowymi (fs_write / edycja), zamiast uruchamiać powłokę do każdego zapisu. Powłoka kopiuje cały cwd do cofania; przekroczenie rozmiaru snapshotu jest błędem kopii, a nie odmową Sędziego Cieni. Zawęź cwd lub użyj narzędzia plikowego, nie ponawiaj tej samej zbyt szerokiej kopii.".to_owned(),
     ];
-    if let Some(dir) = &spec.workdir {
+    if spec.workdir.is_some() {
         // Ścieżki względne: lekki model przepisujący długą ścieżkę bezwzględną robił literówki
         // („Tepm” zamiast „Temp”) i zapisywał poza katalogiem zadania (pomiar F3, 2026-10-29).
-        rules.push(format!("Katalog roboczy zadania: {dir}\nPliki i katalogi w nim podawaj ścieżką względną (np. `wynik.txt`, `src/main.rs`) — narzędzia rozwiązują ją względem katalogu roboczego. Ścieżki bezwzględnej używaj tylko dla miejsc spoza niego."));
+        // Pełnej ścieżki w prompcie nie ma — model i tak ją przepisywał (z literówkami, poza
+        // katalogiem → prośba o zgodę albo odmowa; pomiar F3, 1.11). Narzędzia znają katalog.
+        rules.push("Katalog roboczy zadania jest katalogiem bieżącym wszystkich narzędzi i powłoki. Pliki i katalogi w nim podawaj ścieżką względną (np. `wynik.txt`, `src/main.rs`), bez pełnej ścieżki przed nią; w powłoce nie podawaj `cwd` (domyślnie katalog roboczy). Ścieżki bezwzględnej używaj tylko dla miejsc spoza katalogu roboczego.".to_owned());
     }
     if spec
         .roles

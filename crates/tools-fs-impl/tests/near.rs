@@ -36,6 +36,30 @@ async fn typo_in_workdir_name_gets_a_hint() {
 }
 
 #[tokio::test]
+async fn typo_above_the_workdir_gets_a_hint() {
+    // „Users” → „Usres” powyżej katalogu roboczego (pomiar F3: „…\Local\Tepm\…”).
+    let h = files();
+    let st = h
+        .call(
+            K::Stat,
+            json!({"path": "/Usres/ala/Documents/Raporty/marzec.txt"}),
+        )
+        .await;
+    assert!(st.text.contains("Czy chodziło o"), "{}", st.text);
+    let too_many = h
+        .call(
+            K::Stat,
+            json!({"path": "/Usres/aal/Dokuments/Raporty/marzec.txt"}),
+        )
+        .await;
+    assert!(
+        !too_many.text.contains("Czy chodziło o"),
+        "{}",
+        too_many.text
+    );
+}
+
+#[tokio::test]
 async fn typo_inside_workdir_gets_a_hint_on_read_and_list() {
     let h = files();
     let read = h.call(K::Read, json!({"path": "Raprty/marzec.txt"})).await;

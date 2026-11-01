@@ -93,20 +93,29 @@ impl Core {
     }
 
     fn fix_path(&self, path: &Path, workdir: &Path) -> Option<PathBuf> {
-        // Od rodzica katalogu roboczego — literówka bywa w nazwie samego katalogu sesji.
+        // Od rodzica katalogu roboczego — literówka bywa w nazwie samego katalogu sesji. Człony
+        // powyżej porównujemy z tolerancją: model przepisywał „…\Local\Tepm\…” (pomiar F3, 1.11).
         let root = workdir.parent().unwrap_or(workdir);
         let fold = |c: Component<'_>| c.as_os_str().to_string_lossy().to_lowercase();
         let base = root.components().count();
-        if !path
-            .components()
-            .map(fold)
-            .take(base)
-            .eq(root.components().map(fold))
-        {
+        if path.components().count() < base {
             return None;
         }
-        let mut current = root.to_path_buf();
         let mut fixes = 0;
+        for (a, b) in path.components().zip(root.components()) {
+            if fold(a) == fold(b) {
+                continue;
+            }
+            let (Component::Normal(a), Component::Normal(b)) = (a, b) else {
+                return None;
+            };
+            let (a, b) = (a.to_string_lossy(), b.to_string_lossy());
+            if distance(&a, &b) > tolerance(&b) {
+                return None;
+            }
+            fixes += 1;
+        }
+        let mut current = root.to_path_buf();
         for part in path.components().skip(base) {
             let Component::Normal(name) = part else {
                 return None;

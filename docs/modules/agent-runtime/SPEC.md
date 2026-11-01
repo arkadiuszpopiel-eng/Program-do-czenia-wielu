@@ -82,3 +82,8 @@ Brak własnych zdolności (tokeny per akcja). `inproc`, `on-demand`. RAM ≤ 10 
 - **P2-07 (zrobione, wariant bezpieczniejszy):** skażenie na poziomie **sesji**, monotoniczne. Rejestr `SessionTaint` (kontrakt): każdy start pętli (`Shared::launch` — przebieg główny, kolejna tura czatu, delegacja, Krytyczka, zadanie schedulera, wznowienie) dziedziczy taint sesji, a zdarzenie `Tainted` dowolnego przebiegu skaża sesję. W aplikacji źródłem prawdy jest Broker (`BrokerSessionTaint`: `SessionSecurity` + rejestr procesu); bez Brokera — rejestr w pamięci runtime. Reset tylko jawnie przez właściciela gestem nie-głosowym (`TaintReset::by_owner` przyjmuje wyłącznie `CommandOrigin::UserText`, `Runtime::reset_session_taint`); dopóki Broker trzyma taint sesji (do jej końca), przebiegi nadal startują skażone — w praktyce reset = nowa sesja. Komenda UI resetu nie jest podpięta.
 - Cel podprzebiegu (delegacja, Krytyczka, umiejętność z rodzicem) w prompcie: „Zadanie zlecone przez inną agentkę (nie bezpośrednio przez właściciela)…”, nie „Zadanie od właściciela”.
 - Test: `tests/review.rs::next_turn_in_tainted_session_inherits_taint` (przed poprawką: zapis pamięci w kolejnej turze szedł jako zaufany).
+
+**Katalog roboczy w prompcie (1.11):** prompt systemowy nie podaje pełnej ścieżki katalogu roboczego — tylko zasadę, że jest
+on katalogiem bieżącym narzędzi i powłoki, a pliki w nim podaje się ścieżką względną. Lekki model przepisywał pełną ścieżkę
+z literówkami („Tepm”, „Usersa”), wychodził poza katalog i czekał na zgodę albo dostawał odmowę. Pomiar F3 na Bieliku
+4.5B: pliki 8/24 → 10/24, ścieżki z literówką 0.
