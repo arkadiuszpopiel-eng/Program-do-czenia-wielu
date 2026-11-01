@@ -328,7 +328,7 @@ Ten raport mówi, co było zaległe, co znalazłam, co poprawiłam, co czeka na 
 <tr><td>Przegląd zmian z nocy (0.0.81) w świeżym kontekście</td><td>1 poważne (moja poprawka z nocy dalej dawała się obejść) + 5 drobnych; poprawione (§2)</td></tr>
 <tr><td>Okno Sędziego z nową pomocą w każdym motywie i przy 150 %</td><td>obejrzane w podglądzie BMP; znaleziona usterka niskiego ekranu (pomoc urwana po 1 wierszu) — poprawiona (§3)</td></tr>
 <tr><td>7 poleceń rdzenia bez testu w prawdziwej aplikacji</td><td>5 z okien wyboru pliku przećwiczone (nowa kolejka odpowiedzi w budowie testowej); pokrycie 97,5 → 99,3 %</td></tr>
-<tr><td>Testy sprzętowe z dźwiękiem (w nocy cisza)</td><td>rozpoczęte ok. 10:00 (przygotowanie nagrań F1 zapisane); wyniku nie zapisano — sesja przerwana, do powtórzenia</td></tr></tbody></table></div>
+<tr><td>Testy sprzętowe z dźwiękiem (w nocy cisza)</td><td><code>verify sprzet --dzwiek</code> na <code>63aae8b7</code> (10:08–10:16): 11 etapów zielonych (VAD, STT, rozmowa, mikrofon, mówca…), czerwone: <strong>audio</strong> (ramka 10,0132 ms zamiast 10 ms — <code>voice-audio-contract</code> contract_tests.rs:149, do zbadania na tym sprzęcie) i <strong>obowiązki na lokalnym modelu</strong>: „morning” raport pusty/urwany, „prices” liczby spoza danych (3,5; 1000)</td></tr></tbody></table></div>
 <h2 id="2-poprawki-w-kodzie-aplikacji-galaz-glowna">2. Poprawki w kodzie aplikacji (gałąź główna)</h2>
 <ol>
 <li><strong>[poważne] Opis polecenia mostu CLI dało się ukryć znakami niewidocznymi</strong> (<code>7f8d8039</code>). Moja nocna poprawka
