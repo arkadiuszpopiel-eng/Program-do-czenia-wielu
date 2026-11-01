@@ -25,11 +25,14 @@ use crate::agent_setup::{AgentSetup, failed};
 /// Zestaw roboczy pamięci (dane, nie polecenia) w pierwszej wiadomości kontekstu zadania — ten sam,
 /// który dostaje zwykła odpowiedź w rozmowie (`stream::prepare`); bez niego agentka nie znała
 /// zapamiętanych faktów właściciela (przegląd wymiany informacji 1.11).
+/// Obrazy z polecenia idą osobną wiadomością tuż przed nim (cel zadania jest tekstem) — wcześniej
+/// zrzut ekranu dołączony do „Delta, napraw to” przepadał (przegląd wymiany informacji 1.11).
 fn with_memory(
     core: &ChatEngine,
     req: &GenRequest,
     goal: &str,
     mut history: Vec<providers_contract::Message>,
+    images: Vec<providers_contract::ContentBlock>,
 ) -> Vec<providers_contract::Message> {
     if let Some(memory) = core.inner.memory.context(&req.session, &req.agent, goal)
         && let Some(first) = history.first_mut()
@@ -38,7 +41,33 @@ fn with_memory(
             .content
             .push(providers_contract::ContentBlock::text(memory));
     }
+    if !images.is_empty() {
+        let mut blocks = vec![providers_contract::ContentBlock::text(
+            "[Obrazy dołączone przez właściciela do polecenia poniżej]",
+        )];
+        blocks.extend(images);
+        history.push(providers_contract::Message::new(
+            providers_contract::Role::User,
+            blocks,
+        ));
+    }
     history
+}
+
+/// Polecenie (tekst ostatniej wiadomości) i obrazy z niej.
+fn split_goal(
+    history: &mut Vec<providers_contract::Message>,
+) -> (String, Vec<providers_contract::ContentBlock>) {
+    let Some(last) = history.pop() else {
+        return (String::new(), Vec::new());
+    };
+    let goal = last.visible_text();
+    let images = last
+        .content
+        .into_iter()
+        .filter(|b| matches!(b, providers_contract::ContentBlock::Image { .. }))
+        .collect();
+    (goal, images)
 }
 
 pub(crate) async fn run(
@@ -58,10 +87,10 @@ pub(crate) async fn run(
         Err(e) => return Outcome::failed(e),
     };
     let mut history = request.messages.clone();
-    let goal = history.pop().map(|m| m.visible_text()).unwrap_or_default();
+    let (goal, images) = split_goal(&mut history);
     let history = match crate::project_context::history(core, &req.session, &setup.workdir, history)
     {
-        Ok(history) => with_memory(core, req, &goal, history),
+        Ok(history) => with_memory(core, req, &goal, history, images),
         Err(error) => return Outcome::failed(error),
     };
     let models_before = if crate::conductor_state::billed(core, req) {

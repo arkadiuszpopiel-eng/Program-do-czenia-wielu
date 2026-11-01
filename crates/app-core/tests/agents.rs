@@ -327,3 +327,43 @@ async fn agent_task_receives_memory_working_set() {
         "zestaw roboczy pamięci w kontekście zadania: {sent}"
     );
 }
+
+/// Przegląd wymiany informacji 1.11: obraz dołączony do polecenia agentki trafia do kontekstu
+/// zadania (wcześniej z ostatniej wiadomości zostawał sam tekst celu).
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn agent_task_receives_images_from_the_command() {
+    let mut a = agents().await;
+    let png = a.h.dir.path().join("zrzut.png");
+    std::fs::write(
+        &png,
+        b"\x89PNG\r\n\x1a\n\0\0\0\rIHDR\0\0\0\x01\0\0\0\x01\x08\x06\0\0\0\x1f\x15\xc4\x89",
+    )
+    .unwrap();
+    a.h.core.attachments_dropped(vec![png]);
+    a.h.core
+        .attachments_add_dropped(a.sid.clone())
+        .await
+        .unwrap();
+    let ids =
+        a.h.core
+            .attachments_list(a.sid.clone())
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|x| x.id)
+            .collect();
+    a.h.provider
+        .push(Script::text(FAKE_MODEL, &["Widzę błąd."]));
+    let mut options = to_delta("Delta, napraw to, co widać na zrzucie.");
+    options.attachments = ids;
+    let sent = a.h.core.turns_send(a.sid.clone(), options).await.unwrap();
+    until(&mut a.h.rx, ends(&sent.assistant_turn_id.unwrap())).await;
+    let last = a.h.provider.requests().into_iter().last().unwrap();
+    assert!(
+        last.messages
+            .iter()
+            .flat_map(|m| &m.content)
+            .any(|b| matches!(b, providers_contract::ContentBlock::Image { .. })),
+        "obraz z polecenia w kontekście zadania"
+    );
+}
