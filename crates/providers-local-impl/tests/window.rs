@@ -247,3 +247,27 @@ fn codec_sends_only_the_window_to_llama_server() {
         short.messages.len()
     );
 }
+
+#[test]
+fn over_budget_tool_loop_shrinks_older_results() {
+    // Pętla narzędzi dłuższa niż kontekst bez tury użytkownika w środku: zamiast żądania ponad
+    // `-c` (serwer odrzuca, zadanie bez zapasu kończy się błędem) starsze wyniki są skracane.
+    let mut messages = vec![Message::user_text("Uporządkuj pliki w Pobranych.")];
+    for i in 0..12 {
+        let id = format!("c{i}");
+        messages.extend([tool_call(&id), tool_result(&id, 3000)]);
+    }
+    let req = ChatRequest::new("m", messages);
+    let (ctx, reserve) = (4096, 512);
+    let fitted = fit(&req, ctx, reserve);
+    let kept = &fitted.request.messages;
+    assert!(
+        tokens(kept) <= ctx - reserve - WINDOW_MARGIN,
+        "{}",
+        tokens(kept)
+    );
+    let text = serde_json::to_string(kept).unwrap();
+    assert!(text.contains("pominięto") && text.contains("Uporządkuj pliki"));
+    // Bieżący krok pętli (ostatnie wywołanie i wynik) zostaje w całości.
+    assert_eq!(kept.last(), req.messages.last());
+}

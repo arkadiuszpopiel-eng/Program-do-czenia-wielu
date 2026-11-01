@@ -214,3 +214,9 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
 **Możliwości a rzeczywisty kontekst (1.11):** `capabilities()`, `list_models()` i `estimate_cost()` podają dla wczytanego
 modelu rzeczywisty `-c` z planu uruchomienia (np. 4096 zamiast 8192, gdy plan zmniejszył kontekst, żeby model mieścił się na
 karcie), dla pozostałych — kontekst z konfiguracji (test `laptop.rs::context_shrinks_to_keep_the_whole_model_on_gpu`).
+
+**Pętla narzędzi ponad kontekst (1.11):** gdy okno po przycięciu nadal przekracza budżet (długa pętla bez tury
+użytkownika), `fit` skraca teksty starszych wyników narzędzi od najstarszego — najpierw do 300 + 150 znaków z adnotacją
+„[… pominięto N znaków …]”, a gdy to za mało, do samej adnotacji. Dwie ostatnie wiadomości (bieżący krok) zostają
+w całości; wcześniej żądanie szło ponad `-c`, serwer je odrzucał, a zadanie bez modelu zapasowego kończyło się błędem
+(test `window.rs::over_budget_tool_loop_shrinks_older_results`).

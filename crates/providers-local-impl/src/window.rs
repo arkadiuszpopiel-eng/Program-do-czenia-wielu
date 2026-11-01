@@ -5,7 +5,7 @@
 
 use std::borrow::Cow;
 
-use providers_contract::{ChatRequest, ContentBlock, Message, Role};
+use providers_contract::{ChatRequest, ContentBlock, Message, Role, ToolResultPart};
 
 /// Zapas na szablon czatu, tokeny specjalne i błąd szacunku.
 pub const WINDOW_MARGIN: u32 = 256;
@@ -46,16 +46,89 @@ pub struct Fitted<'a> {
 /// jeśli zajmuje najwyżej ćwierć budżetu: bez niej mały model po długiej pętli narzędzi albo przy
 /// weryfikacji widział samo „sprawdź swoją odpowiedź” — bez celu (przegląd 1.11). Trafia na początek
 /// okna razem z informacją, ile wiadomości pominięto ([`omitted_note`]).
+///
+/// Gdy okno i tak przekracza budżet (długa pętla narzędzi bez tury użytkownika w środku), starsze
+/// wyniki narzędzi są skracane do początku i końca ([`shrink_results`]) — zamiast żądania, które
+/// serwer odrzuci, a zadanie bez modelu zapasowego zakończy błędem.
 pub fn fit(request: &ChatRequest, ctx: u32, reserve: u32) -> Fitted<'_> {
+    let budget = budget_of(request, ctx, reserve);
+    let fitted = fit_window(request, budget);
+    let used: u32 = fitted.request.messages.iter().map(message_tokens).sum();
+    if used <= budget {
+        return fitted;
+    }
+    let mut request = fitted.request.into_owned();
+    // Najpierw początek i koniec każdego starszego wyniku; gdy to za mało — sama adnotacja.
+    for (head, tail) in [(KEEP_HEAD, KEEP_TAIL), (0, 0)] {
+        let used: u32 = request.messages.iter().map(message_tokens).sum();
+        if used <= budget {
+            break;
+        }
+        shrink_results(&mut request.messages, used - budget, head, tail);
+    }
+    Fitted {
+        request: Cow::Owned(request),
+        dropped: fitted.dropped,
+    }
+}
+
+/// Wynik narzędzia krótszy niż to (znaki) nie jest skracany.
+const SHRINK_MIN: usize = 200;
+/// Ile znaków początku i końca zostaje w skróconym wyniku (pierwsze przejście).
+const KEEP_HEAD: usize = 300;
+const KEEP_TAIL: usize = 150;
+
+/// Skraca teksty wyników narzędzi od najstarszych (bez dwóch ostatnich wiadomości — bieżący krok
+/// pętli zostaje w całości) do `head` + `tail` znaków, aż oszczędność pokryje `over` tokenów.
+fn shrink_results(messages: &mut [Message], over: u32, head: usize, tail: usize) {
+    let keep = messages.len().saturating_sub(2);
+    let mut saved = 0u32;
+    for message in &mut messages[..keep] {
+        for block in &mut message.content {
+            let ContentBlock::ToolResult(result) = block else {
+                continue;
+            };
+            for part in &mut result.content {
+                let ToolResultPart::Text { text } = part else {
+                    continue;
+                };
+                let count = text.chars().count();
+                let cut = count.saturating_sub(head + tail);
+                if saved >= over || count < SHRINK_MIN || cut < SHRINK_MIN || text.starts_with("[…")
+                {
+                    continue;
+                }
+                let first: String = text.chars().take(head).collect();
+                let last: String = text.chars().skip(count - tail).collect();
+                let short = format!(
+                    "{first}[… pominięto {cut} znaków starszego wyniku — kontekst modelu lokalnego;                      wywołaj narzędzie ponownie, jeśli potrzebujesz całości …]{last}"
+                );
+                saved = saved.saturating_add(
+                    message_part_tokens(text).saturating_sub(message_part_tokens(&short)),
+                );
+                *text = short;
+            }
+        }
+    }
+}
+
+/// Szacunek tokenów tekstu tak, jak liczy go okno (zapis JSON — ze znakami ucieczki).
+fn message_part_tokens(text: &str) -> u32 {
+    serde_json::to_string(text).map_or(0, |s| estimate_tokens(&s))
+}
+
+fn budget_of(request: &ChatRequest, ctx: u32, reserve: u32) -> u32 {
     let fixed = request
         .system
         .as_deref()
         .map_or(0, estimate_tokens)
         .saturating_add(serde_json::to_string(&request.tools).map_or(0, |s| estimate_tokens(&s)));
-    let budget = ctx
-        .saturating_sub(reserve)
+    ctx.saturating_sub(reserve)
         .saturating_sub(WINDOW_MARGIN)
-        .saturating_sub(fixed);
+        .saturating_sub(fixed)
+}
+
+fn fit_window(request: &ChatRequest, budget: u32) -> Fitted<'_> {
     let messages = &request.messages;
     let start = window_start(messages, budget);
     if start == 0 {
