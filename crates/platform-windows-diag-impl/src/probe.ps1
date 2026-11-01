@@ -78,10 +78,12 @@ Part 'gpus' 'gpus' {
 Part 'net' 'network' {
   # Win32_NetworkAdapter zamiast Get-NetAdapter: ten drugi potrafi wisieć ponad limit sondy
   # (31.10 na laptopie właściciela > 80 s). Prędkość tylko połączonej karty (rozłączona podaje
-  # wartość maksymalną zamiast zera).
-  @(Get-CimInstance Win32_NetworkAdapter -Filter 'PhysicalAdapter=TRUE' | ForEach-Object {
+  # wartość maksymalną zamiast zera). Tylko karty z nazwą połączenia; `pnp` (identyfikator
+  # urządzenia) odróżnia sprzęt (PCI, USB, SDIO) od kart programowych, które Windows też oznacza
+  # jako fizyczne (VirtualBox Host-Only, TAP VPN) — przegląd w świeżym kontekście 1.11.
+  @(Get-CimInstance Win32_NetworkAdapter -Filter 'PhysicalAdapter=TRUE AND NetConnectionID IS NOT NULL' | ForEach-Object {
     $up = ($_.NetConnectionStatus -eq 2)
-    @{ name = "$($_.NetConnectionID)"; desc = $_.Name; up = $up
+    @{ name = "$($_.NetConnectionID)"; desc = $_.Name; up = $up; pnp = "$($_.PNPDeviceID)"
        bps = $(if ($up -and $_.Speed) { [int64]$_.Speed } else { 0 }); media = "$($_.AdapterType)" } })
 }
 Part 'battery' 'battery' {

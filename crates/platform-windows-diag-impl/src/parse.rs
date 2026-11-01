@@ -110,10 +110,20 @@ fn health(text: &str) -> Health {
     }
 }
 
-fn net_kind(media: &str, desc: &str) -> &'static str {
+fn net_kind(media: &str, desc: &str, pnp: &str) -> &'static str {
     let m = format!("{media} {desc}").to_ascii_lowercase();
-    if m.contains("bluetooth") {
-        // Sieć przez Bluetooth: Win32_NetworkAdapter podaje ją jako „Ethernet 802.3”.
+    // Karta programowa (identyfikator urządzenia spoza magistral sprzętu albo nazwa karty
+    // wirtualnej): Win32_NetworkAdapter podaje ją jako fizyczną „Ethernet 802.3” — to nie kabel.
+    let id = pnp.to_ascii_uppercase();
+    let hardware = id.is_empty()
+        || ["PCI\\", "USB\\", "SDIO\\"]
+            .iter()
+            .any(|b| id.starts_with(b));
+    let software = ["virtual", "host-only", "tap-", "vpn", "hyper-v", "loopback"]
+        .iter()
+        .any(|k| m.contains(k));
+    if !hardware || software || m.contains("bluetooth") {
+        // Także sieć przez Bluetooth: Win32_NetworkAdapter podaje ją jako „Ethernet 802.3”.
         "other"
     } else if m.contains("802.11")
         || m.contains("wireless")
@@ -280,6 +290,7 @@ pub fn parse(json: &str, now: DateTime<Utc>) -> Result<Snapshot, String> {
             kind: net_kind(
                 &s(n, "media").unwrap_or_default(),
                 &s(n, "desc").unwrap_or_default(),
+                &s(n, "pnp").unwrap_or_default(),
             )
             .into(),
             description: s(n, "desc"),

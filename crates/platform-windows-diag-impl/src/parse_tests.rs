@@ -131,17 +131,46 @@ fn classifies_events() {
 #[test]
 fn network_kind_from_adapter_type_and_name() {
     // Win32_NetworkAdapter (31.10): `AdapterType` bywa „Ethernet 802.3” także dla Wi-Fi i Bluetooth.
+    let pci = r"PCI\VEN_8086&DEV_7AF0&SUBSYS_00948086&REV_11\3&11583659&0&A3";
     assert_eq!(
-        net_kind("Ethernet 802.3", "Intel(R) Wi-Fi 6E AX211 160MHz"),
+        net_kind("Ethernet 802.3", "Intel(R) Wi-Fi 6E AX211 160MHz", pci),
         "wifi"
     );
     assert_eq!(
-        net_kind("Ethernet 802.3", "Realtek PCIe GbE Family Controller"),
+        net_kind("Ethernet 802.3", "Realtek PCIe GbE Family Controller", pci),
         "ethernet"
     );
+    let usb = r"USB\VID_0BDA&PID_8153\000001";
     assert_eq!(
-        net_kind("Ethernet 802.3", "Bluetooth Device (Personal Area Network)"),
+        net_kind("Ethernet 802.3", "Realtek USB GbE Family Controller", usb),
+        "ethernet"
+    );
+    let bth = r"BTH\MS_BTHPAN\6&2A1B&0&2";
+    assert_eq!(
+        net_kind(
+            "Ethernet 802.3",
+            "Bluetooth Device (Personal Area Network)",
+            bth
+        ),
         "other"
     );
-    assert_eq!(net_kind("", "Karta nieznana"), "other");
+    assert_eq!(net_kind("", "Karta nieznana", ""), "other");
+}
+
+#[test]
+fn software_adapters_are_not_reported_as_cable() {
+    // Przegląd 1.11: karty programowe Windows oznacza jako fizyczne „Ethernet 802.3”.
+    for (desc, pnp) in [
+        ("VirtualBox Host-Only Ethernet Adapter", r"ROOT\NET\0000"),
+        ("TAP-Windows Adapter V9", r"ROOT\NET\0001"),
+        (
+            "Microsoft Wi-Fi Direct Virtual Adapter",
+            r"{5D624F94-8850-40C3-A3FA-A4FD2080BAF3}\VWIFIMP_WFD\5",
+        ),
+        ("Hyper-V Virtual Ethernet Adapter", r"ROOT\VMS_MP\0000"),
+        // Bez identyfikatora (zapis sprzed 1.11) o rodzaju decyduje nazwa.
+        ("VirtualBox Host-Only Ethernet Adapter", ""),
+    ] {
+        assert_eq!(net_kind("Ethernet 802.3", desc, pnp), "other", "{desc}");
+    }
 }
