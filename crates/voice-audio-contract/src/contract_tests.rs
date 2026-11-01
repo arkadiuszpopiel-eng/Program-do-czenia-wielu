@@ -146,7 +146,15 @@ pub fn input_frames_are_timestamped(io: &dyn AudioIo, pump: &mut dyn FnMut(Durat
     while let Some(f) = input.read() {
         assert_eq!(f.pcm.len(), 480);
         if let Some(prev) = last {
-            assert_eq!(f.ts.since(prev), Duration::from_millis(10));
+            // Znaczniki z zegara urządzenia (WASAPI, QPC pakietu) mają rozrzut rzędu µs — atrapa
+            // daje dokładnie 10 ms, sprzęt 1.11 dał 9,9838 ms. Czas rośnie, odstęp to ramka ± 1 ms.
+            assert!(f.ts > prev, "czas ramki nie rośnie");
+            let gap = f.ts.since(prev);
+            let frame = Duration::from_millis(10);
+            assert!(
+                gap.abs_diff(frame) <= Duration::from_millis(1),
+                "odstęp ramek {gap:?}"
+            );
         }
         last = Some(f.ts);
         n += 1;
