@@ -12,9 +12,10 @@ use scheduler_contract::{Dispatch, TaskOrigin};
 
 /// Wymagana forma wyniku zadania w tle. Próba na małym modelu lokalnym (2026-10-12) pokazała, że bez
 /// tego model odgrywa obsadę („Dyrygentka:”, „Przekazuję Delcie”) i zadaje pytania, na które nikt
-/// nie odpowie — ocena automatyczna: `scripts/trial/grounding.mjs::formProblems`.
+/// nie odpowie — ocena automatyczna: `scripts/trial/grounding.mjs::formProblems`. Bez słów „raport dla
+/// właściciela”: Bielik robił z nich znacznik `<raport-dla-właściciela>` (próba „tidy”, 1.11).
 pub const REPORT_FORM: &str = concat!(
-    "Forma odpowiedzi: sam gotowy raport dla właściciela, po polsku, w punktach. ",
+    "Forma odpowiedzi: sam gotowy raport po polsku, w punktach, zwykłym tekstem bez znaczników <…>. ",
     "To zadanie w tle — nikt nie czyta na bieżąco i nikt nie odpowie. ",
     "Nie odgrywaj ról, nie podpisuj wypowiedzi imionami ani funkcjami, ",
     "nie przekazuj zadania innej agentce, nie opisuj swoich kroków i nie kończ pytaniem.",

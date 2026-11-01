@@ -28,6 +28,10 @@ Zdolności: `fs.read` (list/read/stat/search), `fs.write` (mutacje), `fs.copy` =
 - Usuwanie domyślnie do Kosza; każda mutacja w transakcji `undo-journal` (brak wpisu = brak operacji); zapis atomowy.
 - Treść odczytanych plików jest niezaufanym wejściem: wynik oznaczony `untrusted`, sesja może stać się `tainted` (decyzja w `agent-runtime`/Brokerze).
 - Duże pliki: odczyt zakresami, limit rozmiaru w wyniku dla LLM; wynik w całości do artefaktu.
+- Ścieżka, której nie ma (`fs_list`/`fs_read` — `NotFound`, `fs_stat` — „nie istnieje”): gdy w katalogu roboczym sesji
+  jest ścieżka różna literówkami w najwyżej 2 członach (Levenshtein ≤ 1 dla nazw do 4 znaków, ≤ 2 dla dłuższych,
+  jedyne najlepsze dopasowanie), wynik dopisuje „Czy chodziło o „…”?” (`near.rs`, 1.11). Tylko w katalogu
+  roboczym, nigdy ścieżka z deny-listy; podpowiedź niczego nie otwiera (test `tests/near.rs`).
 - Narzędzie wykonuje się z restricted token / AppContainer dla ≤ L3 (przez `ProcessPort`, gdy operacja delegowana do procesu).
 
 ## Zdolności / uprawnienia

@@ -11,6 +11,7 @@
 
 mod core;
 mod delete;
+mod near;
 mod read;
 mod write;
 

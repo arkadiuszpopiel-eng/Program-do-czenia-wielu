@@ -14,7 +14,7 @@ use tools_fs_contract::{
     SearchOutput, StatOutput, glob_match,
 };
 
-use crate::core::{Core, Step, platform_failure, shown};
+use crate::core::{Core, Step, shown};
 
 fn entry(e: &DirEntry) -> Entry {
     Entry {
@@ -71,7 +71,8 @@ impl Core {
             let listed = match self.fs.list_dir(&dir) {
                 Ok(l) => l,
                 Err(e) if d == 0 => {
-                    let out = platform_failure(&e, &format!("lista „{path}”"));
+                    let action = format!("lista „{path}”");
+                    let out = self.failure_near(&e, &action, &path, ctx.workdir.as_deref());
                     return Ok(self.done(ctx, m, &auths, out).await);
                 }
                 Err(_) => continue,
@@ -142,7 +143,8 @@ impl Core {
         let (data, total) = match self.fs.read_range(Path::new(&path), wanted, max) {
             Ok(d) => d,
             Err(e) => {
-                let out = platform_failure(&e, &format!("odczyt „{path}”"));
+                let action = format!("odczyt „{path}”");
+                let out = self.failure_near(&e, &action, &path, ctx.workdir.as_deref());
                 return Ok(self.done(ctx, m, &auths, out).await);
             }
         };
@@ -195,7 +197,10 @@ impl Core {
         let (is_dir, size) = kind.unwrap_or((false, 0));
         let shown_path = shown(&path, ctx.workdir.as_deref());
         let body = match (exists, is_dir) {
-            (false, _) => format!("„{shown_path}” nie istnieje."),
+            (false, _) => format!(
+                "„{shown_path}” nie istnieje.{}",
+                self.near_miss(&path, ctx.workdir.as_deref())
+            ),
             (true, true) => format!("„{shown_path}” to katalog."),
             (true, false) => format!("„{shown_path}” to plik, {size} B."),
         };

@@ -152,10 +152,19 @@ for (const [id, goal] of Object.entries(dutyGoals())) {
         ...formProblems(report),
       ]
     : [];
-  const state = !finished ? 'CZERWONY' : outside.length > 0 ? 'CZERWONY' : 'zielony';
-  const why = !finished
-    ? `zadanie nie skończyło się powodzeniem w ${minutes} min (stan: ${task?.state ?? 'brak'}, wynik: ${task?.result ?? '—'}, błąd: ${task?.error ?? '—'})`
-    : outside.join('; ');
+  // Zgoda Sędziego Cieni (np. pobranie strony) w próbie bez właściciela nie przyjdzie — to stan
+  // środowiska, nie błąd agentki; raport mówi o nim wprost i nie liczy go jako zielony.
+  const waited = /ApprovalWait/.test(task?.error ?? '');
+  const state = waited
+    ? 'czeka na zgodę'
+    : !finished || outside.length > 0
+      ? 'CZERWONY'
+      : 'zielony';
+  const why = waited
+    ? 'zadanie poprosiło o zgodę Sędziego Cieni (np. na pobranie strony); w próbie nikt jej nie daje'
+    : !finished
+      ? `zadanie nie skończyło się powodzeniem w ${minutes} min (stan: ${task?.state ?? 'brak'}, wynik: ${task?.result ?? '—'}, błąd: ${task?.error ?? '—'})`
+      : outside.join('; ');
   results.push({ id, state, seconds, why, report });
   console.log(`— ${id}: ${state} (${seconds} s) ${why}`);
 }
