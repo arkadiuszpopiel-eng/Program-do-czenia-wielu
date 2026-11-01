@@ -12,6 +12,39 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.83 — 2026-11-02
+
+Model lokalny i modele w chmurze lepiej przekazują sobie pracę: zadanie agentki dostaje pamięć i obrazy
+z polecenia, długa praca na modelu lokalnym nie przekracza jego kontekstu, a zbyt długa rozmowa przechodzi na model
+w chmurze zamiast kończyć się błędem. Codzienne obowiązki na modelu lokalnym dają prawdziwe raporty.
+
+### Poprawki
+
+- [poważne] Zbyt długa rozmowa dla modelu lokalnego przechodzi na model zapasowy (w chmurze), zamiast kończyć się
+  błędem „przekroczony kontekst”.
+- [poważne] Długa seria działań na modelu lokalnym nie przekracza jego kontekstu — starsze wyniki narzędzi są
+  skracane, a zadanie nie kończy się błędem.
+- [poważne] Zadanie agentki z rozmowy zna zapamiętane fakty (pamięć) i widzi obrazy dołączone do polecenia.
+- Model lokalny po przycięciu rozmowy pamięta polecenie zadania i wie, ile wcześniejszych wiadomości pominięto.
+- Odpowiedź urwana po wstępie („Oto przegląd na dziś:”) albo pusta wraca do agentki do uzupełnienia, zanim zadanie
+  zostanie uznane za skończone.
+- Zadanie, które ma sprawdzić strony internetowe, od razu dostaje narzędzie do ich czytania i nie podaje danych
+  z pamięci, gdy żadnej strony nie otworzyło.
+- Krytyczka kończy sprawdzanie na swoim werdykcie, także gdy model dopisze do niego wywołanie narzędzia.
+- Narzędzia plików podpowiadają poprawną ścieżkę, gdy model zrobi w niej literówkę („Nova rozmowa” → „Nowa
+  rozmowa”).
+- Raport zadania w tle nie ma dosłownych „\n” ani wymyślonych znaczników.
+- Licznik kontekstu w pasku pokazuje okno modelu, który naprawdę odpowiada — także po przejściu na model zapasowy
+  i dla modelu lokalnego z kontekstem zmniejszonym na słabszej karcie.
+- Model lokalny nie dostaje pełnej ścieżki katalogu roboczego (przepisywał ją z literówkami) — pracuje ścieżkami
+  względnymi.
+
+### Testy
+
+- Próba codziennych obowiązków na Bieliku 4.5B: poranny przegląd, podsumowanie dnia, porządki i koszty zielone;
+  kontrola cenników czeka na zgodę Sędziego Cieni na pobranie stron (w próbie bez właściciela — oznaczone wprost).
+- Ocena prób łapie odmowę zamiast raportu, dosłowne „\n” i znaczniki w raporcie.
+
 ## 0.0.82 — 2026-11-01
 
 Zgody „zawsze w tym zakresie” działają szczelnie: odwołana zgoda nie wraca po ponownym uruchomieniu, a STOP
