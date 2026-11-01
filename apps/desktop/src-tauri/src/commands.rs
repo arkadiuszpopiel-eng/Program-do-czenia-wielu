@@ -30,7 +30,7 @@ macro_rules! tauri_commands {
         /// Obsługa wszystkich komend aplikacji (lista `with_commands!` + komendy ze strumieniem).
         pub fn handler() -> impl Fn(tauri::ipc::Invoke) -> bool + Send + Sync + 'static {
             tauri::generate_handler![$( $name, )* terminal_open, crate::boot::boot_report,
-                crate::shortcuts::e2e_global_shortcut]
+                crate::shortcuts::e2e_global_shortcut, crate::e2e_dialog::e2e_answer_dialog]
         }
     };
 }

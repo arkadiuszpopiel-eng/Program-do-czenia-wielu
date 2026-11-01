@@ -6,6 +6,7 @@
 mod boot;
 mod cdp;
 mod commands;
+mod e2e_dialog;
 mod kernel;
 mod logs;
 mod pump;

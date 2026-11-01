@@ -8,7 +8,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 
 | Rodzaj | Funkcji | Z testem | rdzeń | interfejs | przeglądarka | aplikacja | eval | przegląd ogólny |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Polecenia rdzenia | 283 | 283 (100 %) | 206 | 3 | 2 | 271 | 1 | 0 |
+| Polecenia rdzenia | 283 | 283 (100 %) | 206 | 3 | 2 | 272 | 1 | 0 |
 | Polecenia palety i skróty | 62 | 62 (100 %) | 2 | 7 | 9 | 3 | 0 | 50 |
 | Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 12 | 0 | 38 |
 | Ustawienia | 98 | 98 (100 %) | 14 | 12 | 7 | 9 | 2 | 98 |
@@ -229,7 +229,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `skills_approve` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_disable` | aplikacja, bieg aplikacji |  |
 | `skills_export` | rdzeń, aplikacja |  |
-| `skills_import` | rdzeń |  |
+| `skills_import` | rdzeń, aplikacja |  |
 | `skills_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_propose` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_reject` | aplikacja, bieg aplikacji |  |

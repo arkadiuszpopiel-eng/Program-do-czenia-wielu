@@ -3,9 +3,9 @@
 // testowej, z powrotem do stanu wyjściowego. Kanwa, karty rozmów i „Naucz Alfę” — bez modelu
 // (Markdown renderuje rdzeń, fakty wyciąga parser). Odmowy dla nieistniejących celów sprawdzone
 // w kodzie rdzenia (2026-11-01): cennik bez ceny, nieznane konto, nieznana rozmowa — przed
-// siecią i zapisem. Pomijane: okna systemowe (`projects_pick_dir`, `memory_teach_pick_file`,
-// `skills_export/import`, `backups_choose_dir`), dźwięk (`builder_voice_preview`) i sieć
-// (`updates_check`). Bez dźwięku, bez zrzutów ekranu, bez okien systemowych.
+// siecią i zapisem. Okna wyboru pliku i katalogu — `zx-okna-wyboru` (odpowiedź z kolejki budowy
+// testowej); pomijane: dźwięk (`builder_voice_preview`) i sieć (`updates_check`). Bez dźwięku,
+// bez zrzutów ekranu, bez okien systemowych.
 import { expect, test } from './alfa';
 import { call, refused } from './ipc-call';
 

@@ -213,6 +213,7 @@
     "allow-terminal-close",
     "allow-boot-report",
     "allow-e2e-global-shortcut",
+    "allow-e2e-answer-dialog",
     "allow-terminal-list",
     "allow-skills-list",
     "allow-skills-review",

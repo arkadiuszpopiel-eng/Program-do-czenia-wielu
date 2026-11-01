@@ -895,6 +895,7 @@ dependencies = [
  "app-agents",
  "app-api",
  "async-trait",
+ "broker-ui-contract",
  "chrono",
  "compliance-contract",
  "core-bus-contract",

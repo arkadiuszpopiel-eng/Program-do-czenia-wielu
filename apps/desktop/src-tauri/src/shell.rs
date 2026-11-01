@@ -11,7 +11,7 @@ use app_core::{AppCore, AppError};
 use tauri::{AppHandle, Manager};
 use tauri_plugin_dialog::{DialogExt, FilePath};
 
-use crate::windows;
+use crate::{e2e_dialog, windows};
 
 /// Powłoka Tauri.
 pub struct TauriShell {
@@ -118,8 +118,14 @@ impl ShellPort for TauriShell {
     }
 
     fn save_text_as(&self, suggested_name: &str, text: &str) -> Result<bool, AppError> {
-        let dialog = self.app.dialog().file().set_file_name(suggested_name);
-        let Some(path) = picked(dialog.blocking_save_file())? else {
+        let answer = match e2e_dialog::take() {
+            Some(answer) => answer,
+            None => {
+                let dialog = self.app.dialog().file().set_file_name(suggested_name);
+                picked(dialog.blocking_save_file())?
+            }
+        };
+        let Some(path) = answer else {
             return Ok(false);
         };
         std::fs::write(&path, text)
@@ -128,6 +134,9 @@ impl ShellPort for TauriShell {
     }
 
     fn pick_save_path(&self, suggested_name: &str) -> Result<Option<PathBuf>, AppError> {
+        if let Some(answer) = e2e_dialog::take() {
+            return Ok(answer);
+        }
         let dialog = self
             .app
             .dialog()
@@ -138,6 +147,9 @@ impl ShellPort for TauriShell {
     }
 
     fn pick_open_path(&self) -> Result<Option<PathBuf>, AppError> {
+        if let Some(answer) = e2e_dialog::take() {
+            return Ok(answer);
+        }
         let dialog = self
             .app
             .dialog()
@@ -147,6 +159,9 @@ impl ShellPort for TauriShell {
     }
 
     fn pick_folder(&self) -> Result<Option<PathBuf>, AppError> {
+        if let Some(answer) = e2e_dialog::take() {
+            return Ok(answer);
+        }
         let dialog = self
             .app
             .dialog()
@@ -156,6 +171,9 @@ impl ShellPort for TauriShell {
     }
 
     fn pick_files(&self) -> Result<Vec<PathBuf>, AppError> {
+        if let Some(answer) = e2e_dialog::take() {
+            return Ok(answer.into_iter().collect());
+        }
         let dialog = self
             .app
             .dialog()
@@ -178,6 +196,9 @@ impl ShellPort for TauriShell {
         filter: &str,
         extensions: &[&str],
     ) -> Result<Option<PathBuf>, AppError> {
+        if let Some(answer) = e2e_dialog::take() {
+            return Ok(answer);
+        }
         let dialog = self
             .app
             .dialog()

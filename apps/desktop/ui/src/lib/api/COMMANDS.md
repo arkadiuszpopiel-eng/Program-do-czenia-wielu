@@ -391,7 +391,8 @@ UI blokuje `F5` / `Ctrl+R` / `Ctrl+Shift+R`.
 Komendy zarejestrowane w powłoce Tauri poza `app_core::COMMANDS` (bez metody w `AppCore`); `build.rs` nadaje
 im uprawnienia `allow-<komenda>` tak samo jak komendom rdzenia.
 
-| Komenda               | Argumenty | Wynik        | Uwagi                                                                                                                                                  |
-| --------------------- | --------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `boot_report`         | —         | `BootReport` | dziennik rozruchu (`app-logs`): linie od startu procesu po redakcji, werdykt `ok \| warnings \| errors`, plik                                          |
-| `e2e_global_shortcut` | `keys`    | `bool`       | tylko budowa testowa (cecha `e2e`, inaczej odmowa): naciśnięcie skrótu globalnego tą samą obsługą co w systemie; wynik — czy skrót jest zarejestrowany |
+| Komenda               | Argumenty | Wynik        | Uwagi                                                                                                                                                                               |
+| --------------------- | --------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `boot_report`         | —         | `BootReport` | dziennik rozruchu (`app-logs`): linie od startu procesu po redakcji, werdykt `ok \| warnings \| errors`, plik                                                                       |
+| `e2e_global_shortcut` | `keys`    | `bool`       | tylko budowa testowa (cecha `e2e`, inaczej odmowa): naciśnięcie skrótu globalnego tą samą obsługą co w systemie; wynik — czy skrót jest zarejestrowany                              |
+| `e2e_answer_dialog`   | `path`    | `number`     | tylko budowa testowa (cecha `e2e`, inaczej odmowa): odpowiedź następnego okna wyboru pliku/katalogu bez okna systemowego (`null` = anulowanie); wynik — liczba odpowiedzi w kolejce |
