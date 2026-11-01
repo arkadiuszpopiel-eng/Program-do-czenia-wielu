@@ -41,6 +41,11 @@ pub const EVENT_SESSION_TAINTED: &str = "broker.session.tainted";
 pub const EVENT_KEY_ROTATED: &str = "broker.key.rotated";
 /// Audyt: odwołano zgodę „zawsze w tym zakresie” (panel uprawnień).
 pub const EVENT_GRANT_REVOKED: &str = "broker.grant.revoked";
+/// Audyt: nie udało się utrwalić zgód „do odwołania” (plik zgód) — odwołanie albo STOP obowiązuje
+/// w pamięci, ale plik mógł zostać.
+pub const EVENT_GRANT_PERSIST_FAILED: &str = "broker.grant.persist_failed";
+/// Audyt: po restarcie Brokera wczytano zgody „do odwołania” z pliku.
+pub const EVENT_GRANT_RESTORED: &str = "broker.grant.restored";
 /// Audyt: początek nowego łańcucha (przejęcie strumienia od `pre-broker`).
 pub const EVENT_CHAIN_STARTED: &str = "broker.audit.chain_started";
 

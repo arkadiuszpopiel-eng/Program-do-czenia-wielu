@@ -119,7 +119,7 @@ impl BrokerEngine {
         Ok(child)
     }
 
-    fn revoke_ids(&self, st: &mut State, roots: &[TokenId], why: &str) -> usize {
+    pub(crate) fn revoke_ids(&self, st: &mut State, roots: &[TokenId], why: &str) -> usize {
         let mut all: Vec<TokenId> = roots.iter().flat_map(|r| st.descendants(*r)).collect();
         all.sort();
         all.dedup();

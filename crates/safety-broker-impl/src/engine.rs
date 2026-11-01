@@ -236,6 +236,7 @@ impl BrokerEngine {
                 holder: t.holder.clone(),
                 parent: t.parent,
                 expires_at_ms: t.expires_at_ms,
+                grant: None,
             },
         );
     }

@@ -19,6 +19,9 @@ pub(crate) struct TokenMeta {
     pub holder: Holder,
     pub parent: Option<TokenId>,
     pub expires_at_ms: u64,
+    /// Numer zgody „zawsze w tym zakresie”, na podstawie której wydano token — odwołanie zgody
+    /// unieważnia też jej tokeny (przegląd 1.11).
+    pub grant: Option<u64>,
 }
 
 /// Czego dotyczy oczekująca prośba (do wykonania po zatwierdzeniu).
