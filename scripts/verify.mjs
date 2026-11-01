@@ -16,7 +16,6 @@ import { existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from '
 import { cpus, freemem, totalmem } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
 import { gitBash, stageEnv } from './verify-shell.mjs';
 
 /**
@@ -69,11 +68,7 @@ const cargoEnv = {
 };
 const pkgArgs = packages.flatMap((p) => ['-p', p]);
 const SHELL = 'apps/desktop/src-tauri/Cargo.toml';
-// Zadania budowy Rusta (domyślnie 3). Laptop 16 GB 1.11: linker kończył testy „brak pamięci” (LNK1102)
-// przy 3 zadaniach — `ALFA_CARGO_JOBS=2 node scripts/verify.mjs wersja`.
-const JOBS = /^[1-9]$/.test(process.env['ALFA_CARGO_JOBS'] ?? '')
-  ? process.env['ALFA_CARGO_JOBS']
-  : '3';
+const JOBS = process.env['ALFA_CARGO_JOBS']?.match(/^[1-9]$/)?.[0] ?? '3'; // laptop 16 GB: 2 (LNK1102 przy 3)
 /** Bramka katalogu funkcji (docs/plan/45): nowa funkcja bez testu = etap czerwony. */
 const katalog = (f) => ['katalog', 'Katalog funkcji', `node scripts/features.mjs ${f}`, root, 0];
 
