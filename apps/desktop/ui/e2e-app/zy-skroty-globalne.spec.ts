@@ -24,13 +24,29 @@ async function toasts(page: Page): Promise<string[]> {
   return page.locator('.toasts > *').allInnerTexts();
 }
 
-/** Komunikat, którego nie było przed naciśnięciem (komunikaty znikają same — odpytywanie co 100 ms). */
-async function newToast(page: Page, before: string[], what: string): Promise<string> {
+/**
+ * Wynik sprawdzenia logowania mostu CLI po „Gotowe” w `z-terminal` przychodzi z opóźnieniem (stan konta
+ * czyta rdzeń) i potrafi pojawić się już w tym pliku — to nie odpowiedź na skrót.
+ */
+function fromBridgeLogin(text: string): boolean {
+  return text.includes(': zalogowano') || text.startsWith('Sprawdzam logowanie');
+}
+
+/**
+ * Komunikat, którego nie było przed naciśnięciem i który spełnia `accept` (komunikaty znikają same —
+ * odpytywanie co 100 ms).
+ */
+async function newToast(
+  page: Page,
+  before: string[],
+  what: string,
+  accept: (text: string) => boolean = (t) => !fromBridgeLogin(t),
+): Promise<string> {
   let seen = '';
   await expect
     .poll(
       async () => {
-        seen = (await toasts(page)).find((t) => !before.includes(t)) ?? '';
+        seen = (await toasts(page)).find((t) => !before.includes(t) && accept(t)) ?? '';
         return seen;
       },
       { message: `${what}: komunikat po naciśnięciu`, timeout: 15_000, intervals: [100] },
@@ -91,11 +107,12 @@ test('Ctrl+Alt+D — dyktowanie (voice.dictation) przez skrót globalny', async 
     await call(alfa.main, 'voice_dictation', { action: { kind: 'stop' } });
     return;
   }
-  const message = await newToast(alfa.main, before, 'dyktowanie');
   // Ta sama odmowa co z łącza: skrót wywołał dyktowanie, a nie coś innego.
   const reply = await raw(alfa.main, 'voice_dictation', { action: { kind: 'start' } });
   expect(reply.ok, 'dyktowanie bez modeli mowy odmawia').toBe(false);
-  if (!reply.ok) expect(message).toContain(reply.error.message ?? '');
+  const refusal = reply.ok ? '' : (reply.error.message ?? '');
+  expect(refusal.length, 'odmowa dyktowania ma opis').toBeGreaterThan(3);
+  await newToast(alfa.main, before, 'dyktowanie', (t) => t.includes(refusal));
 });
 
 test('Ctrl+Alt+R — czytanie zaznaczenia (voice.readSelection) przez skrót globalny', async ({
@@ -117,8 +134,7 @@ test('Ctrl+Shift+F12 — STOP WSZYSTKIEGO (system.killSwitch) przez skrót globa
 }) => {
   const before = await toasts(alfa.main);
   await press(alfa.main, 'Ctrl+Shift+F12');
-  const message = await newToast(alfa.main, before, 'STOP WSZYSTKIEGO');
-  expect(message).toContain('STOP WSZYSTKIEGO');
+  await newToast(alfa.main, before, 'STOP WSZYSTKIEGO', (t) => t.includes('STOP WSZYSTKIEGO'));
   // Po zatrzymaniu program dalej odpowiada (rdzeń nie zawisł na zatrzymywaniu).
   await call(alfa.main, 'voice_features');
 });

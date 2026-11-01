@@ -182,8 +182,9 @@ test('polecenia bez skutków dla danych: działają albo odmawiają czytelnie', 
     layout: { left_width: 280, right_width: 360, left_collapsed: false, sessions: {} },
   });
   // Pamięć: zakresy, dziennik pierwszego zakresu, Inspektor bez filtrów, konsolidacja na żądanie.
-  const scopes = await call<{ id?: string; scope?: string }[]>(main, 'memory_scopes');
-  const scope = scopes[0]?.id ?? scopes[0]?.scope ?? 'global';
+  // Klucz zakresu to `key` (`scope` jest obiektem); pusty profil — zakres ogólny.
+  const scopes = await call<{ key: string }[]>(main, 'memory_scopes');
+  const scope = scopes[0]?.key ?? 'global';
   await settled(main, 'memory_journal', { scope });
   await call(main, 'memory_inspect', {
     query: {
