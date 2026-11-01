@@ -69,6 +69,11 @@ const cargoEnv = {
 };
 const pkgArgs = packages.flatMap((p) => ['-p', p]);
 const SHELL = 'apps/desktop/src-tauri/Cargo.toml';
+// Zadania budowy Rusta (domyślnie 3). Laptop 16 GB 1.11: linker kończył testy „brak pamięci” (LNK1102)
+// przy 3 zadaniach — `ALFA_CARGO_JOBS=2 node scripts/verify.mjs wersja`.
+const JOBS = /^[1-9]$/.test(process.env['ALFA_CARGO_JOBS'] ?? '')
+  ? process.env['ALFA_CARGO_JOBS']
+  : '3';
 /** Bramka katalogu funkcji (docs/plan/45): nowa funkcja bez testu = etap czerwony. */
 const katalog = (f) => ['katalog', 'Katalog funkcji', `node scripts/features.mjs ${f}`, root, 0];
 
@@ -87,14 +92,14 @@ const STAGES = {
           [
             'linter',
             `Linter: ${packages.join(', ')}`,
-            `cargo clippy -j 3 ${pkgArgs.join(' ')} --all-targets -- -D warnings`,
+            `cargo clippy -j ${JOBS} ${pkgArgs.join(' ')} --all-targets -- -D warnings`,
             root,
             10,
           ],
           [
             'testy',
             `Testy: ${packages.join(', ')}`,
-            `cargo test --no-fail-fast -j 3 ${pkgArgs.join(' ')}`,
+            `cargo test --no-fail-fast -j ${JOBS} ${pkgArgs.join(' ')}`,
             root,
             10,
           ],
@@ -124,28 +129,28 @@ const STAGES = {
     [
       'linter',
       'Linter całego projektu',
-      'cargo clippy --locked -j 3 --workspace --all-targets -- -D warnings',
+      `cargo clippy --locked -j ${JOBS} --workspace --all-targets -- -D warnings`,
       root,
       30,
     ],
     [
       'linter-powloka',
       'Linter powłoki Tauri (zwykła i testowa)',
-      `cargo clippy --locked -j 3 --manifest-path ${SHELL} --all-targets -- -D warnings && cargo clippy --locked -j 3 --manifest-path ${SHELL} --all-targets --features e2e -- -D warnings`,
+      `cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets -- -D warnings && cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets --features e2e -- -D warnings`,
       root,
       15,
     ],
     [
       'testy',
       'Testy całego projektu',
-      'cargo test --locked --workspace --no-fail-fast -j 3',
+      `cargo test --locked --workspace --no-fail-fast -j ${JOBS}`,
       root,
       30,
     ],
     [
       'testy-powloka',
       'Testy powłoki Tauri (zwykła i testowa)',
-      `cargo test --locked -j 3 --manifest-path ${SHELL} --lib && cargo test --locked -j 3 --manifest-path ${SHELL} --lib --features e2e`,
+      `cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib && cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib --features e2e`,
       root,
       15,
     ],
