@@ -227,3 +227,21 @@ async fn readonly_role_filters_both_discovery_and_short_execution() {
             .all(|t| t.name != "fs_write" && t.name != "fs_delete")
     }));
 }
+
+#[test]
+fn goal_with_urls_offers_the_web_reader_up_front() {
+    // Próba „prices” (1.11): bez czytnika sieci w pakiecie mały model sięgał po `curl` w powłoce.
+    let mut manifests: Vec<_> = catalog().iter().map(|t| t.manifest().clone()).collect();
+    let mut fetch = manifest(FsToolKind::Read);
+    fetch.name = "net_fetch".into();
+    manifests.push(fetch);
+    let offered = |goal: &str| {
+        agent_runtime_impl::model_tool_specs(&manifests, goal)
+            .iter()
+            .any(|t| t.name == "net_fetch")
+    };
+    assert!(offered(
+        "Sprawdź cennik na https://openrouter.ai/api/v1/models"
+    ));
+    assert!(!offered("Stan urządzeń w biurze"));
+}

@@ -72,6 +72,13 @@ export function formProblems(report) {
   if (roles.length > 0) {
     problems.push(`odgrywanie ról albo rozmowa zamiast raportu: ${roles.slice(0, 4).join(' | ')}`);
   }
+  // Odmowa zamiast raportu (Bielik po przypomnieniu o urwanej odpowiedzi, 1.11).
+  if (/nie mogę wykonać|nie mam uprawnień/i.test(text)) problems.push('odmowa zamiast raportu');
+  // Podwójnie zakodowany koniec wiersza („\n” jako dwa znaki) i wymyślone znaczniki XML.
+  if (/\\n/.test(text)) problems.push('dosłowne „\\n” zamiast nowych wierszy');
+  const tags = text.match(/<\/?[a-ząćęłńóśźż][\wąćęłńóśźż-]*>/gi) ?? [];
+  if (tags.length > 0)
+    problems.push(`znaczniki w raporcie: ${[...new Set(tags)].slice(0, 3).join(' ')}`);
   return problems;
 }
 
@@ -96,6 +103,9 @@ if (process.argv.includes('--selftest')) {
     ['Koszty: 0,00 zł dziś i 12,50 zł w miesiącu. Przekazuję Delcie do potwierdzenia.', 1],
     ['Koszty: 0,00 zł dziś i 12,50 zł w miesiącu. Czy mogę jeszcze coś zrobić?', 1],
     ['Gotowe.', 1],
+    ['Przepraszam, ale nie mogę wykonać tego polecenia. Jako Alfa nie mam uprawnień.', 1],
+    ['1. Katalog roboczy: brak\\n2. Pliki tymczasowe: brak\\n3. Duplikaty: brak', 1],
+    ['<raport>\n1. Pliki tymczasowe: brak.\n2. Duplikaty plików: brak.\n</raport>', 1],
   ];
   let failed = 0;
   for (const [report, maxCount, expected] of cases) {

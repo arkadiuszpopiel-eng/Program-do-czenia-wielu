@@ -157,10 +157,11 @@ pub(crate) fn verdict(answer: &str) -> Option<bool> {
 }
 
 /// Znacznik z literówką lekkiego modelu („WERYFIKCJA: OK”, „WERYFIKACJA : BLAD”): słowo
-/// zaczynające się od `WERYF` na początku którejś linii, dwukropek, `OK` albo `BŁĄD`/`BLAD`.
-/// Bez tego poprawna odpowiedź szła do poprawki (próba obowiązków 2026-10-15).
+/// zaczynające się od `WERYF` na początku którejś linii albo zdania, dwukropek, `OK` albo
+/// `BŁĄD`/`BLAD`. Bez tego poprawna odpowiedź szła do poprawki (próba obowiązków 2026-10-15);
+/// Krytyczka pisała też werdykt po zdaniu o tym, co robi („…kosztów. WERYFICAJA: OK”, 1.11).
 fn loose_verdict(upper: &str) -> Option<bool> {
-    upper.lines().find_map(|line| {
+    upper.lines().flat_map(|l| l.split(". ")).find_map(|line| {
         let line = line.trim_start_matches(|c: char| !c.is_alphabetic());
         let (word, rest) = line.split_once(':')?;
         let word = word.trim();
@@ -254,6 +255,10 @@ Styl odpowiedzi wybrany przez użytkownika: zwięźle."
         );
         assert_eq!(verdict("WERYFIKACIA: BLAD — brak kosztów"), Some(false));
         assert_eq!(verdict("Weryfikuj to: OK?"), None);
+        assert_eq!(
+            verdict("Odczytuję stronę z kosztami. WERYFICAJA: OK"),
+            Some(true)
+        );
         assert_eq!(
             summary("a\n  b   c sk-ant-api03-ABCDEFGHIJKLMNOPQRS", 100),
             "a b c [ZREDAGOWANO]"

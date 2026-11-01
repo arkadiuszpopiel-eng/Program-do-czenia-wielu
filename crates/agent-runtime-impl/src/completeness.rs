@@ -37,23 +37,37 @@ pub(crate) enum Gap {
     },
 }
 
+/// Najdłuższy fragment polecenia powtarzany w przypomnieniu o urwanej odpowiedzi (znaki).
+const GOAL_IN_NOTE: usize = 600;
+
 impl Gap {
-    /// Wiadomość dla modelu (rola `User`, jak inne komunikaty wykonawcy).
-    pub(crate) fn note(&self) -> &'static str {
+    /// Wiadomość dla modelu (rola `User`, jak inne komunikaty wykonawcy). Przy urwanej odpowiedzi
+    /// powtarza polecenie: samo „podaj cały wynik” mały model brał za nowe, niejasne zadanie
+    /// i odpowiadał odmową niezwiązaną z celem (próba obowiązku „morning”, 1.11).
+    pub(crate) fn note(&self, goal: &str) -> String {
         match self {
             Self::Unfinished => {
-                "[Kontrola] Twoja odpowiedź jest niepełna — urywa się po wstępie albo jest pusta. \
-                 Podaj teraz cały gotowy wynik od początku, w całości, bez wstępu i bez zapowiedzi."
+                let mut goal_part: String = goal.trim().chars().take(GOAL_IN_NOTE).collect();
+                if goal.trim().chars().count() > GOAL_IN_NOTE {
+                    goal_part.push('…');
+                }
+                format!(
+                    "[Kontrola] Twoja odpowiedź jest niepełna — urywa się po wstępie albo jest pusta. \
+                     Polecenie: „{goal_part}”. Podaj teraz cały gotowy wynik tego polecenia od początku, \
+                     w całości, bez wstępu i bez zapowiedzi, na podstawie danych, które już masz."
+                )
             }
             Self::UnreadSources { can_read: true } => {
                 "[Kontrola] Polecenie wskazuje strony do sprawdzenia, a w tym zadaniu nie otworzyłaś \
                  żadnej. Odczytaj je narzędziem (net_fetch). Dane, których nie odczytasz w tym zadaniu, \
                  pomiń i napisz, że nie udało się ich sprawdzić — nie podawaj ich z pamięci."
+                    .to_owned()
             }
             Self::UnreadSources { can_read: false } => {
                 "[Kontrola] Polecenie wskazuje strony do sprawdzenia, a w tym zadaniu nie masz narzędzia \
                  do otwierania stron. Nie podawaj żadnych danych z tych stron ani z pamięci — napisz \
                  krótko, że sprawdzenie się nie udało, bo zadanie nie ma dostępu do sieci."
+                    .to_owned()
             }
         }
     }
@@ -214,10 +228,13 @@ mod tests {
 
     #[test]
     fn notes_tell_what_to_do() {
-        assert!(Gap::Unfinished.note().contains("cały gotowy wynik"));
+        let note = Gap::Unfinished.note("Przygotuj przegląd na dziś.");
+        assert!(note.contains("cały gotowy wynik") && note.contains("Przygotuj przegląd na dziś."));
+        let long = Gap::Unfinished.note(&"x".repeat(2000));
+        assert!(long.chars().count() < 900, "polecenie przycięte");
         assert!(
             Gap::UnreadSources { can_read: false }
-                .note()
+                .note("")
                 .contains("nie ma dostępu do sieci")
         );
         assert!(can_read(&["fs_read".into(), "net_fetch".into()]));

@@ -228,8 +228,11 @@ impl Engine {
         let mut message = turn.message.clone();
         // Werdykt kończy weryfikację: wywołania doklejone do odpowiedzi z werdyktem (lekki model
         // w kopercie dopisuje je odruchowo) nie są wykonywane ani zapisywane w historii — inaczej
-        // weryfikacja krążyła „OK → fs_read” aż do wykrycia pętli (pomiar F3, 2026-10-29).
-        if self.cp.verifying && !uses.is_empty() && verdict(&text).is_some() {
+        // weryfikacja krążyła „OK → fs_read” aż do wykrycia pętli (pomiar F3, 2026-10-29). To samo
+        // w podprzebiegu Krytyczki: „WERYFIKACJA: OK → browser_read” do końca budżetu kroków
+        // (próba obowiązku „morning”, 1.11).
+        let judging = self.cp.verifying || self.critic_run();
+        if judging && !uses.is_empty() && verdict(&text).is_some() {
             uses.clear();
             message
                 .content
@@ -290,7 +293,10 @@ impl Engine {
             );
             if let Some(gap) = gap {
                 self.nudges += 1;
-                self.push(Role::User, vec![ContentBlock::text(gap.note())]);
+                self.push(
+                    Role::User,
+                    vec![ContentBlock::text(gap.note(&self.cp.spec.goal))],
+                );
                 return Next::Continue;
             }
         }

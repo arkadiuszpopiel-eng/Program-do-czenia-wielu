@@ -34,6 +34,7 @@ Odpowiadasz zawsze jednym obiektem JSON i niczym poza nim:
 - odpowiedź bez narzędzia: {"response": "…"}.
 - "response" przy wywołaniu — krótko, co teraz robisz („Odczytuję plik.”); wyniku jeszcze nie znasz, więc nie pisz, że coś zostało zrobione.
 - "response" bez wywołania — odpowiedź dla użytkownika. Nigdy nie wpisuj wywołania do "response".
+- Nowy wiersz w "response" to \n (jeden ukośnik, nie \\n); zwykły tekst albo Markdown, bez znaczników w nawiasach <…>.
 "#;
 
 /// Zasady pola `tool_call`, gdy wywołanie jest opcjonalne.

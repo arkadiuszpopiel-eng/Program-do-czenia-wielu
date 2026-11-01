@@ -16,8 +16,12 @@ pub(crate) fn select_specs(
     }
     let allowed: BTreeSet<_> = available.iter().map(|m| m.name.as_str()).collect();
     let mut selected = BTreeSet::new();
+    // Polecenie z adresami stron: czytnik sieci od razu w pakiecie. Bez tego mały model szukał
+    // go przez tools_find i sięgał po `curl` w powłoce (próba obowiązku „prices”, 1.11).
+    let web = crate::completeness::has_url(goal).then_some(WEB_FIRST);
     for name in CORE
         .iter()
+        .chain(web.into_iter().flatten())
         .copied()
         .map(str::to_owned)
         .chain(discovered.iter().rev().cloned())
@@ -39,6 +43,8 @@ pub(crate) fn select_specs(
 pub(crate) const FIND: &str = "tools_find";
 pub(crate) const CALL: &str = "tool_call";
 pub(crate) const VISIBLE_LIMIT: usize = 24;
+/// Narzędzia dokładane do pakietu, gdy polecenie podaje adresy `http(s)://`.
+const WEB_FIRST: &[&str] = &["net_fetch"];
 pub(crate) const SEARCH_LIMIT: usize = 8;
 pub(crate) const CORE: &[&str] = &[
     "fs_list",

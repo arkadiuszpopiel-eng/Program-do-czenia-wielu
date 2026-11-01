@@ -58,6 +58,12 @@ fn critic_goal(author: &str, goal: &str, answer: &str, steps: &str, round: u32) 
 }
 
 impl Engine {
+    /// Czy ten przebieg to podprzebieg Krytyczki (rola weryfikatorki z [`Engine::critic_plan`]).
+    pub(crate) fn critic_run(&self) -> bool {
+        self.cp.options.parent.is_some()
+            && self.cp.spec.roles.iter().any(|r| r.id == RoleId::critic())
+    }
+
     /// Weryfikatorka z obsady (Krytyczka ≠ autorka); `None` = samoweryfikacja v0.
     pub(crate) fn critic_for_run(&self) -> Option<CriticPick> {
         let crew = self.cp.options.crew.as_ref()?;

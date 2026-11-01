@@ -13,7 +13,7 @@ use agent_runtime_contract::{
 };
 use agent_runtime_impl::{Runtime, RuntimeConfig, RuntimeDeps};
 use common::v1::{Routed, Slow, spec_for, standard_crew};
-use common::{answer, call};
+use common::{answer, call, say_and_call};
 use personas_contract::{Cast, PersonaId, builtin_roles};
 use serde_json::json;
 use tools_common_contract::Tool;
@@ -210,4 +210,45 @@ async fn persistent_rejection_ends_unverified() {
         "{out:?}"
     );
     assert_eq!(rt.children(&run).unwrap().len(), 2, "≤ max_verify_rounds");
+}
+
+#[tokio::test(start_paused = true)]
+async fn critic_verdict_with_a_stray_call_ends_the_check() {
+    // Próba „morning” (1.11): Krytyczka pisała „WERYFIKACJA: OK” i doklejała wywołanie narzędzia,
+    // aż kończył się budżet kroków — werdykt kończy jej podprzebieg, wywołanie przepada.
+    let (p, rt) = world();
+    p.model("m-delta").push_script(answer("1. Zadania: brak."));
+    p.model("m-gama").push_script(say_and_call(
+        "Sprawdzam raport. WERYFIKACJA: OK",
+        "r1",
+        "fs_read",
+        json!({"path": "/u/raport.md"}),
+    ));
+    let run = rt
+        .start_with(author("delta", "operator"), crew_options())
+        .await
+        .unwrap();
+    assert!(matches!(
+        rt.wait(&run).await.unwrap(),
+        RunOutcome::Completed {
+            verified: Some(true),
+            ..
+        }
+    ));
+    let kids = rt.children(&run).unwrap();
+    let tools = rt
+        .events(&kids[0])
+        .unwrap()
+        .iter()
+        .filter(|e| {
+            matches!(
+                e.event,
+                RunEvent::StepStarted {
+                    kind: agent_runtime_contract::StepKind::Tool,
+                    ..
+                }
+            )
+        })
+        .count();
+    assert_eq!(tools, 0, "wywołanie po werdykcie nie jest wykonywane");
 }

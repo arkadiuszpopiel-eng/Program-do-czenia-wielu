@@ -67,9 +67,12 @@ pub fn run() {
             boot::report_previous_failure();
             let mut paths = AppPaths::from_env().map_err(|e| e.message)?;
             // Instancja testowa: katalogi robocze sesji zostają w profilu testu, nie w katalogu
-            // `Alfa` właściciela (`%USERPROFILE%` jest wspólny dla całego konta Windows).
+            // `Alfa` właściciela (`%USERPROFILE%` jest wspólny dla całego konta Windows). Obok danych
+            // programu, nie w nich: katalog w danych Alfy jest na deny-liście, więc polecenia powłoki
+            // w katalogu sesji kończyły zadanie odmową (próba obowiązku „prices”, 1.11).
             if cdp::test_instance() {
-                paths.user_root = paths.local.join("uzytkownik-testowy");
+                let base = paths.local.parent().unwrap_or(&paths.local);
+                paths.user_root = base.join("uzytkownik-testowy");
             }
             // Silniki osierocone przez awarię poprzedniego uruchomienia trzymałyby pamięć karty
             // graficznej — kończymy je, zanim rdzeń zacznie uruchamiać nowe.
