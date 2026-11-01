@@ -56,6 +56,9 @@ interface DiagView {
 test('diagnostyka: prawdziwy zapis parametrów, lekkie testy, historia, raport', async ({
   alfa,
 }) => {
+  // Dwa pełne odczyty sondy (zapis i test spójności), każdy z limitem 90 s; 1.11 zawieszony
+  // czujnik systemu (WMI) wydłużał odczyt, a test kończył się po 120 s, choć program działał.
+  test.setTimeout(240_000);
   const { main } = alfa;
   await call<DiagView>(main, 'diag_state');
   const view = await call<DiagView>(main, 'diag_snapshot');

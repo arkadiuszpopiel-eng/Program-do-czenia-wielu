@@ -52,7 +52,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `attachments_paste` | rdzeń, aplikacja, bieg aplikacji |  |
 | `attachments_pick` | rdzeń, aplikacja, bieg aplikacji |  |
 | `attachments_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `backups_choose_dir` | rdzeń, aplikacja |  |
+| `backups_choose_dir` | rdzeń, aplikacja, bieg aplikacji |  |
 | `backups_configure` | rdzeń, aplikacja, bieg aplikacji |  |
 | `backups_restore` | rdzeń, aplikacja, bieg aplikacji |  |
 | `backups_run_now` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -93,8 +93,8 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `device_gpu_live` | aplikacja, bieg aplikacji |  |
 | `device_measure` | rdzeń, bieg aplikacji |  |
 | `device_profile` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_cancel` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_export` | rdzeń, aplikacja, bieg aplikacji |  |
+| `diag_cancel` | rdzeń, aplikacja |  |
+| `diag_export` | rdzeń, aplikacja |  |
 | `diag_run` | rdzeń, aplikacja, bieg aplikacji |  |
 | `diag_runs` | rdzeń, aplikacja, bieg aplikacji |  |
 | `diag_snapshot` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -149,7 +149,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `memory_set_pinned` | aplikacja, bieg aplikacji |  |
 | `memory_status` | aplikacja, bieg aplikacji |  |
 | `memory_teach` | rdzeń, aplikacja, bieg aplikacji |  |
-| `memory_teach_pick_file` | rdzeń, aplikacja |  |
+| `memory_teach_pick_file` | rdzeń, aplikacja, bieg aplikacji |  |
 | `memory_undo` | aplikacja, bieg aplikacji |  |
 | `models_bundle_download` | aplikacja, bieg aplikacji |  |
 | `models_bundle_verify` | aplikacja, bieg aplikacji |  |
@@ -185,7 +185,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `pricing_apply` | rdzeń, aplikacja, bieg aplikacji |  |
 | `pricing_get` | rdzeń, bieg aplikacji |  |
 | `projects_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `projects_pick_dir` | rdzeń, aplikacja |  |
+| `projects_pick_dir` | rdzeń, aplikacja, bieg aplikacji |  |
 | `projects_remove` | rdzeń, aplikacja, bieg aplikacji |  |
 | `projects_rename` | rdzeń, aplikacja, bieg aplikacji |  |
 | `projects_save` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -228,8 +228,8 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `settings_values` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_approve` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_disable` | aplikacja, bieg aplikacji |  |
-| `skills_export` | rdzeń, aplikacja |  |
-| `skills_import` | rdzeń, aplikacja |  |
+| `skills_export` | rdzeń, aplikacja, bieg aplikacji |  |
+| `skills_import` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_propose` | rdzeń, aplikacja, bieg aplikacji |  |
 | `skills_reject` | aplikacja, bieg aplikacji |  |

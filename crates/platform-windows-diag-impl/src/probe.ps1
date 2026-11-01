@@ -3,6 +3,9 @@
 # Bez adresów IP/MAC i bez pełnych numerów seryjnych (tylko ostatnie 4 znaki).
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
+# Limit jednego zapytania CIM: zawieszona klasa (1.11: bateria przez WMI nie odpowiadała, a sonda
+# traciła cały limit 90 s) kończy się luką tylko swojej części, następne części są czytane dalej.
+$PSDefaultParameterValues['Get-CimInstance:OperationTimeoutSec'] = 10
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 # Każda część trafia na wyjście od razu (`{"k":…,"v":…}`): gdy któraś zawiśnie ponad limit, Alfa
 # zatrzymuje sondę i składa zapis z części już odczytanych (`stream.rs`), brakujące — jako luki.
@@ -11,7 +14,11 @@ function Emit($key, $value) {
   [Console]::Out.Flush()
 }
 function Part($key, $name, [scriptblock]$body) {
-  $v = try { & $body } catch { Emit 'gap' @{ part = $name; error = $_.Exception.Message }; $null }
+  $v = try { & $body } catch {
+    $msg = $_.Exception.Message
+    if ($msg -match '(?i)timed out|timeout|przekroczon') { $msg = 'system nie odpowiedział w 10 s' }
+    Emit 'gap' @{ part = $name; error = $msg }; $null
+  }
   Emit $key $v
 }
 function Tail($s) { if ($s) { $t = "$s".Trim(); if ($t.Length -gt 4) { $t.Substring($t.Length - 4) } else { $t } } }
@@ -89,7 +96,7 @@ Part 'net' 'network' {
 Part 'battery' 'battery' {
   $b = @(Get-CimInstance Win32_Battery)
   if ($b.Count -gt 0) {
-    $wmi = { param($c, $p) try { (Get-CimInstance -Namespace root\wmi $c -ErrorAction Stop | Select-Object -First 1).$p } catch { $null } }
+    $wmi = { param($c, $p) try { (Get-CimInstance -Namespace root\wmi $c -OperationTimeoutSec 4 -ErrorAction Stop | Select-Object -First 1).$p } catch { $null } }
     @{ charge = $b[0].EstimatedChargeRemaining; status = $b[0].BatteryStatus
        design = (& $wmi 'BatteryStaticData' 'DesignedCapacity')
        full = (& $wmi 'BatteryFullChargedCapacity' 'FullChargedCapacity')
