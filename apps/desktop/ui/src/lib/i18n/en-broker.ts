@@ -73,4 +73,8 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'broker.grants.revoke': 'Revoke',
   'broker.grants.revokeLabel': 'Revoke permission: {scope}',
   'broker.grants.revoked': 'Permission revoked — the Shadow Judge will ask again.',
+  'broker.grants.gone':
+    'That permission was already gone (expired or revoked earlier) — list refreshed.',
+  'broker.grants.readFailed':
+    'Could not read permissions from the Shadow Judge — the list may be out of date. Retrying shortly.',
 };

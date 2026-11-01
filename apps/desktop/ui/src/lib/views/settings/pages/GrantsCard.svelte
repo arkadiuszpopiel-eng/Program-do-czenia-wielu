@@ -17,12 +17,23 @@
   const { t } = app.i18n;
   let grants = $state<readonly GrantView[] | null>(null);
   let busy = $state<string | null>(null);
+  /** Ostatni odczyt się nie udał — lista (jeśli jest) pochodzi z wcześniejszego odczytu. */
+  let failed = $state(false);
+  // Numer odczytu: wynik starszego odczytu, który przyszedł po nowszym, jest pomijany
+  // (inaczej odwołana zgoda wracałaby na listę do następnego odświeżenia).
+  let seq = 0;
 
   async function reload() {
+    const mine = ++seq;
     try {
-      grants = await app.client.permissions.grants();
+      const list = await app.client.permissions.grants();
+      if (mine !== seq) return;
+      grants = list;
+      failed = false;
     } catch {
-      grants = [];
+      if (mine !== seq) return;
+      // Błąd łącza nie znaczy „brak zgód”: zostaje ostatnia znana lista i jawny komunikat.
+      failed = true;
     }
   }
 
@@ -60,8 +71,12 @@
   async function revoke(g: GrantView) {
     busy = g.id;
     try {
-      await app.client.permissions.revokeGrant(g.id);
-      app.toasts.show({ kind: 'success', message: t('broker.grants.revoked') });
+      const revoked = await app.client.permissions.revokeGrant(g.id);
+      app.toasts.show(
+        revoked
+          ? { kind: 'success', message: t('broker.grants.revoked') }
+          : { kind: 'info', message: t('broker.grants.gone') },
+      );
       await reload();
     } catch (error) {
       showError(app.toasts, error);
@@ -74,6 +89,9 @@
 <section class="card" aria-labelledby="grants-title">
   <h3 id="grants-title">{t('broker.grants.title')}</h3>
   <p class="desc">{t('broker.grants.intro')}</p>
+  {#if failed}
+    <p class="failed" role="alert">{t('broker.grants.readFailed')}</p>
+  {/if}
   {#if grants && grants.length === 0}
     <p class="empty">{t('broker.grants.empty')}</p>
   {:else if grants}
@@ -120,6 +138,10 @@
   .desc,
   .empty {
     color: var(--alfa-color-text-muted);
+    font-size: var(--alfa-font-size-sm);
+  }
+  .failed {
+    color: var(--alfa-color-error);
     font-size: var(--alfa-font-size-sm);
   }
   ul {

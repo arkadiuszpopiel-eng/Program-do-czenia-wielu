@@ -71,4 +71,8 @@ export const plBroker = {
   'broker.grants.revoke': 'Odwołaj',
   'broker.grants.revokeLabel': 'Odwołaj zgodę: {scope}',
   'broker.grants.revoked': 'Zgoda odwołana — Sędzia Cieni znów zapyta.',
+  'broker.grants.gone':
+    'Tej zgody już nie było (wygasła albo odwołano ją wcześniej) — lista odświeżona.',
+  'broker.grants.readFailed':
+    'Nie udało się odczytać zgód od Sędziego Cieni — lista może być nieaktualna. Spróbuję ponownie za chwilę.',
 } as const satisfies Record<string, Message>;

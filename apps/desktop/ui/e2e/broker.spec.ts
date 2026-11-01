@@ -143,7 +143,20 @@ test('zgody „zawsze w tym zakresie”: odświeżenie po powrocie do okna', asy
     page.evaluate(
       () => (window.__alfaCalls ?? []).filter((c) => c.name === 'permissions.grants').length,
     );
-  await expect.poll(calls).toBeGreaterThan(0);
+  // Liczba odczytów ustalona (pierwszy efekt karty i zmiana stanu Sędziego po wolnym starcie
+  // też czytają listę) — dopiero wtedy fokus; inaczej test przechodziłby bez obsługi fokusu.
+  let settled = -1;
+  await expect
+    .poll(
+      async () => {
+        const now = await calls();
+        const same = now > 0 && now === settled;
+        settled = now;
+        return same;
+      },
+      { intervals: [700] },
+    )
+    .toBe(true);
   const before = await calls();
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await expect.poll(calls).toBe(before + 1);

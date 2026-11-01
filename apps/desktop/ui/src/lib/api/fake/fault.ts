@@ -41,6 +41,8 @@ declare global {
   interface Window {
     /** Rejestr wywołań atrapy (tylko scenariusz „slow-core”, testy E2E). */
     __alfaCalls?: CallRecord[];
+    /** Usterka zgód w atrapie (testy E2E karty zgód): błąd odczytu listy albo zgoda już wygasła. */
+    __alfaGrantsFault?: 'list' | 'gone';
   }
 }
 

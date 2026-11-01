@@ -209,8 +209,17 @@ export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
     },
     openApproval: () =>
       core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') }),
-    grants: () => core.reply([...grants]),
+    // `window.__alfaGrantsFault` (testy E2E): „list” — odczyt listy kończy się błędem łącza,
+    // „gone” — zgoda zniknęła po stronie Sędziego (wygasła), zanim właściciel kliknął „Odwołaj”.
+    grants: () =>
+      globalThis.window?.__alfaGrantsFault === 'list'
+        ? Promise.reject(new CommandError('unavailable', 'Atrapa: Sędzia Cieni nie odpowiada.'))
+        : core.reply([...grants]),
     revokeGrant: (grantId) => {
+      if (globalThis.window?.__alfaGrantsFault === 'gone') {
+        grants = grants.filter((g) => g.id !== grantId);
+        return core.reply(false);
+      }
       const before = grants.length;
       grants = grants.filter((g) => g.id !== grantId);
       return core.reply(grants.length < before);
