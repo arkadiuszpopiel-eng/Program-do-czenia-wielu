@@ -68,6 +68,10 @@ pub(crate) fn announce(
     choice: &BrainChoice,
     t: &BrainTarget,
 ) {
+    // Po fallbacku odpowiada inny model niż w decyzji — licznik kontekstu bierze jego okno.
+    if let Some(window) = t.context_window {
+        core.rt().context_window.insert(req.session.clone(), window);
+    }
     let actual = format!("{}:{}", t.provider_id, t.model);
     let place = if t.local { "lokalnie" } else { "przez API" };
     let now = dto::iso(chrono::Utc::now());

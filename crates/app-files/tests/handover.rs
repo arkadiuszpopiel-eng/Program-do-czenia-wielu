@@ -16,6 +16,7 @@ fn handover_only_between_accounts_and_not_for_transient_errors() {
             account: Some(account.unwrap_or("a1").to_owned()),
             model: "m".into(),
             local: false,
+            context_window: None,
         })
     };
     let event = |kind: serde_json::Value, to: &str| serde_json::json!({ "from": "openai:m", "to": to, "cause": { "cause": "error", "kind": kind } });

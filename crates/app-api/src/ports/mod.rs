@@ -91,6 +91,9 @@ pub struct BrainTarget {
     pub model: String,
     /// Model lokalny (bez ruchu sieciowego).
     pub local: bool,
+    /// Okno kontekstu modelu (tokeny), gdy dostawca je podaje — licznik kontekstu w interfejsie
+    /// po fallbacku pokazuje okno modelu, który naprawdę odpowiada.
+    pub context_window: Option<u64>,
 }
 
 /// Brak możliwości odpowiedzi.

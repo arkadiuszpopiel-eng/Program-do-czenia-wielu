@@ -346,6 +346,18 @@ impl BrainPort for RouterBrain {
     fn target(&self, model: &str) -> Option<BrainTarget> {
         let c = Candidate::parse(model)?;
         let provider = c.provider.as_str().to_owned();
+        let context_window = self
+            .cores()
+            .iter()
+            .find_map(|core| core.registered(&c.provider))
+            .and_then(|r| {
+                r.provider
+                    .capabilities()
+                    .models
+                    .get(&c.model)?
+                    .context_window
+            })
+            .map(u64::from);
         if provider == LOCAL_PROVIDER {
             return Some(BrainTarget {
                 provider_id: provider,
@@ -353,6 +365,7 @@ impl BrainPort for RouterBrain {
                 account: None,
                 model: c.model,
                 local: true,
+                context_window,
             });
         }
         let registered = self.accounts.registered(&provider);
@@ -366,6 +379,7 @@ impl BrainPort for RouterBrain {
             account: registered.map(|r| r.account),
             model: c.model,
             local: false,
+            context_window,
         })
     }
 }
