@@ -105,6 +105,12 @@ impl BrainPort for RouterUnavailable {
     }
 }
 
+/// Okno kontekstu kandydata z możliwości zarejestrowanego dostawcy.
+fn window_of(core: &RouterCore, c: &Candidate) -> Option<u64> {
+    let models = core.registered(&c.provider)?.provider.capabilities().models;
+    models.get(&c.model)?.context_window.map(u64::from)
+}
+
 /// Router jako `BrainPort`.
 pub struct RouterBrain {
     routers: Routers,
@@ -283,14 +289,7 @@ impl BrainPort for RouterBrain {
         let decision = core
             .decide(class, &constraints, request.chat.as_ref())
             .map_err(|e| self.no_route(&e, local_only))?;
-        let context_window = core.registered(&decision.chosen.provider).and_then(|r| {
-            r.provider
-                .capabilities()
-                .models
-                .get(&decision.chosen.model)
-                .and_then(|m| m.context_window)
-                .map(u64::from)
-        });
+        let context_window = window_of(core, &decision.chosen);
         Ok(BrainChoice {
             provider: Arc::new(RoutedProvider::new(core.clone(), class)),
             provider_id: router_contract::ROUTER_PROVIDER_ID.into(),
@@ -346,18 +345,7 @@ impl BrainPort for RouterBrain {
     fn target(&self, model: &str) -> Option<BrainTarget> {
         let c = Candidate::parse(model)?;
         let provider = c.provider.as_str().to_owned();
-        let context_window = self
-            .cores()
-            .iter()
-            .find_map(|core| core.registered(&c.provider))
-            .and_then(|r| {
-                r.provider
-                    .capabilities()
-                    .models
-                    .get(&c.model)?
-                    .context_window
-            })
-            .map(u64::from);
+        let context_window = self.cores().iter().find_map(|core| window_of(core, &c));
         if provider == LOCAL_PROVIDER {
             return Some(BrainTarget {
                 provider_id: provider,
