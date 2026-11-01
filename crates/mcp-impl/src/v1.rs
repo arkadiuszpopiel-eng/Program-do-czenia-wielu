@@ -235,6 +235,7 @@ impl V1Tools {
         let mut facts = DeclaredFacts::new(REGISTRY_TOOL_ID);
         facts.touches_private_data = true;
         facts.untrusted_input_in_args = ctx.untrusted_args;
+        facts.summary = Some(action.clone());
         let auth = match self
             .gate
             .authorize(action_request(ctx, cap.clone(), facts), ctx)

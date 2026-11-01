@@ -104,6 +104,19 @@ fn execute(data: &mut StoreData, op: &str, args: &str) -> Result<Value, HostErro
     authorize_and_run(ctx, &op, needed)
 }
 
+/// Opis „co dokładnie” dla okna Sędziego Cieni (ścieżka albo adres i narzędzie wtyczki).
+fn op_summary(op: &HostOp, tool: &str) -> String {
+    match op {
+        HostOp::FsReadText { path } => format!("odczyt pliku {path} (wtyczka, narzędzie {tool})"),
+        HostOp::FsWriteText { path, content } => format!(
+            "zapis pliku {path}: {} znaków (wtyczka, narzędzie {tool})",
+            content.chars().count()
+        ),
+        HostOp::NetGet { url } => format!("pobranie {url} (wtyczka, narzędzie {tool})"),
+        HostOp::Log { .. } => format!("wpis dziennika (wtyczka, narzędzie {tool})"),
+    }
+}
+
 fn authorize_and_run(
     ctx: &HostCtx,
     op: &HostOp,
@@ -119,6 +132,7 @@ fn authorize_and_run(
         };
     }
     facts.untrusted_input_in_args = true;
+    facts.summary = Some(op_summary(op, &ctx.tool_id));
     let request = ActionRequest {
         holder: ctx.tool_ctx.holder.clone(),
         capability: needed.clone(),
@@ -140,4 +154,29 @@ fn authorize_and_run(
         ctx.gate.release(std::slice::from_ref(&auth)).await;
         result
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn op_summary_names_path_or_address() {
+        let read = HostOp::FsReadText {
+            path: r"C:\dane\a.txt".into(),
+        };
+        assert_eq!(
+            op_summary(&read, "wtyczka.licz"),
+            r"odczyt pliku C:\dane\a.txt (wtyczka, narzędzie wtyczka.licz)"
+        );
+        let write = HostOp::FsWriteText {
+            path: r"C:\dane\b.txt".into(),
+            content: "zażółć".into(),
+        };
+        assert!(op_summary(&write, "t").starts_with(r"zapis pliku C:\dane\b.txt: 6 znaków"));
+        let get = HostOp::NetGet {
+            url: "https://example.com/x".into(),
+        };
+        assert!(op_summary(&get, "t").starts_with("pobranie https://example.com/x"));
+    }
 }

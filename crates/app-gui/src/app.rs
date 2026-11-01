@@ -111,6 +111,9 @@ impl GuiApp {
         };
         let mut facts = DeclaredFacts::new("screen_capture");
         facts.touches_private_data = true;
+        facts.summary = Some(format!(
+            "podgląd pulpitu (zrzuty ekranu) dla agentki {agent} w tej rozmowie"
+        ));
         let request = ActionRequest {
             holder: holder.clone(),
             capability: Capability::GuiControl(app),

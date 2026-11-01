@@ -134,6 +134,7 @@ impl ApprovalSink for BrokerSink {
             .get("command")
             .and_then(|c| c.as_str())
             .map(str::to_owned);
+        facts.summary = Some(bridge_summary(&request.tool, &request.input));
         let mut ctx = ToolCtx::new(Holder::agent(session.as_str(), "delta"));
         ctx.origin = CommandOrigin::Agent;
         ctx.approval_timeout = self.timeout;
@@ -166,5 +167,36 @@ impl ApprovalSink for NoBrokerSink {
         Some(ApprovalDecision::Deny {
             message: "Alfa: Sędzia Cieni niepodłączony — prośba odrzucona.".into(),
         })
+    }
+}
+
+/// Opis „co dokładnie” dla okna Sędziego Cieni: narzędzie mostu i jego cel (polecenie, plik, adres).
+fn bridge_summary(tool: &str, input: &serde_json::Value) -> String {
+    let target = ["command", "file_path", "path", "url", "pattern"]
+        .iter()
+        .find_map(|k| input.get(*k).and_then(|v| v.as_str()))
+        .map(|t| t.chars().take(200).collect::<String>());
+    match target {
+        Some(t) => format!("narzędzie mostu {tool}: {t}"),
+        None => format!("narzędzie mostu {tool}"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    #[test]
+    fn bridge_summary_names_tool_and_target() {
+        let s = super::bridge_summary("Bash", &json!({"command": "cargo test", "timeout": 5}));
+        assert_eq!(s, "narzędzie mostu Bash: cargo test");
+        let w = super::bridge_summary("Write", &json!({"file_path": r"C:\p\a.txt"}));
+        assert_eq!(w, r"narzędzie mostu Write: C:\p\a.txt");
+        assert_eq!(
+            super::bridge_summary("Task", &json!({})),
+            "narzędzie mostu Task"
+        );
+        let long = super::bridge_summary("Bash", &json!({"command": "x".repeat(500)}));
+        assert!(long.chars().count() < 240, "{}", long.len());
     }
 }
