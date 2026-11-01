@@ -28,6 +28,7 @@ personas-contract = { path = "../personas-contract" }
 providers-contract = { path = "../providers-contract" }
 cost-meter-contract = { path = "../cost-meter-contract" }
 safety-broker-contract = { path = "../safety-broker-contract" }
+broker-ui-contract = { path = "../broker-ui-contract" }
 risk-classifier-contract = { path = "../risk-classifier-contract" }
 tools-common-contract = { path = "../tools-common-contract" }
 compliance-contract = { path = "../compliance-contract" }
