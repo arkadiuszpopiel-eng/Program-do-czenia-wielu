@@ -5,6 +5,8 @@
 #
 #   scripts/verify-app.sh [--no-build]
 #   ALFA_APP_SPEC=z-katalog scripts/verify-app.sh --no-build   # tylko wybrane pliki testów
+#   ALFA_SHELL_JOBS=1 scripts/verify-app.sh   # mało pamięci: budowa powłoki jednym zadaniem
+#     (1.11 na laptopie 16 GB: LLVM „out of memory” przy -j 3 w ostatnim crate powłoki)
 # Wynik: target/verify/app/{shell-build.log,smoke.log,out/,ipc-coverage.json}
 set -uo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -21,7 +23,7 @@ if [ "${1:-}" != "--no-build" ]; then
     cd apps/desktop/src-tauri &&
       CARGO_TARGET_DIR="$(cygpath -w "$ROOT/target/shell")" CARGO_PROFILE_DEV_DEBUG=0 \
         ALFA_BUILD_DATE="$(date +%F)" ALFA_BUILD_COMMIT="$(git -c safe.directory='*' -C "$ROOT" rev-parse --short HEAD)" \
-        cargo build --locked -j 3 --features "e2e tauri/custom-protocol" >"$OUT/shell-build.log" 2>&1
+        cargo build --locked -j "${ALFA_SHELL_JOBS:-3}" --features "e2e tauri/custom-protocol" >"$OUT/shell-build.log" 2>&1
   )
   code=$?
   echo "budowa: kod $code, $(tail -1 "$OUT/shell-build.log")"
