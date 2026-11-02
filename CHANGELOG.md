@@ -12,6 +12,33 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.84 — 2026-11-02
+
+Agentka nie zastąpi już treści pliku, którego nie przeczytała, a model lokalny pewniej kończy zadania: prośby
+o sprawdzenie i poprawkę przypominają mu polecenie, a wywołanie z szablonem zamiast ścieżki nie zużywa całego zadania.
+
+### Poprawki
+
+- [poważne] Agentka może zastąpić całą treść istniejącego pliku dopiero po jego odczytaniu w tym samym zadaniu.
+  Model lokalny potrafił „zamienić nazwisko w umowie”, zapisując w pliku jedno zdanie zamiast umowy.
+- Agentka, która podała szablon zamiast ścieżki albo treści (`{{old_path}}`, `zdjecia/{{ plik }}`,
+  `<adresy_po_zmianie>`), dostaje wyjaśnienie zamiast wykonania, a powtarzanie tego samego błędu kończy zadanie od
+  razu, nie po wyczerpaniu wszystkich kroków.
+- Kopiowanie albo przenoszenie „do Kosza” ścieżką (`/Kosz/plik`) podpowiada właściwe narzędzie — usunięcie do Kosza.
+- Ścieżka ze wzorcem `*` w narzędziach plików mówi wprost, jak to zrobić: znaleźć pliki wyszukiwaniem i działać na
+  każdym osobno.
+- Prośba o poprawkę od Krytyczki i prośba o sprawdzenie odpowiedzi powtarzają polecenie zadania — model lokalny po
+  długiej pracy mógł go już nie widzieć.
+- Krytyczka sprawdzająca raport z adresami stron nie dostaje przypomnień przeznaczonych dla autorki raportu.
+- Wyniki tego samego narzędzia dla modelu lokalnego są opisane czytelniej (nazwa pliku na końcu zostaje widoczna).
+- Podpowiedź poprawnej ścieżki nigdy nie wskazuje miejsca chronionego.
+
+### Testy
+
+- Krytyczka: prośba o poprawkę z poleceniem, brak przypomnień w jej przebiegu; szablony w ścieżkach i pętla
+  powtórzeń; okno modelu lokalnego (drugie przejście skracania); ocena raportów z dosłownym „\n”.
+- Narzędzia plików: nadpisanie bez odczytu (inny przebieg, nowy i pusty plik, dopisywanie), Kosz jako cel kopii.
+
 ## 0.0.83 — 2026-11-02
 
 Model lokalny i modele w chmurze lepiej przekazują sobie pracę: zadanie agentki dostaje pamięć i obrazy

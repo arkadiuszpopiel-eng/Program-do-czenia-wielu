@@ -373,7 +373,28 @@ zostaje).</li>
 <p><code>cargo test -p app-agents --test eval_tools -- --ignored</code> (35 zadań: 24 plikowe, 11 powłoki).</p>
 <div class="tbl"><table><thead><tr><th>Przebieg</th><th>Wynik</th><th><code>fs</code></th><th><code>shell</code></th><th>Uwagi</th></tr></thead><tbody><tr><td>30.10 v3 (raport 44)</td><td>11/35</td><td>9/24</td><td>2/11</td><td></td></tr>
 <tr><td>1.11 22:00, przed zmianą promptu</td><td>8/35</td><td>8/24</td><td>0/11</td><td>powłoka: pełna ścieżka z literówkami („Tepm”, „Usersa”) → zgoda/odmowa</td></tr>
-<tr><td>1.11 22:15–22:20, prompt bez pełnej ścieżki</td><td><strong>12/35</strong></td><td><strong>10/24</strong></td><td>2/11</td><td>ścieżek z literówką: 0</td></tr></tbody></table></div>
+<tr><td>1.11 22:15–22:20, prompt bez pełnej ścieżki</td><td><strong>12/35</strong></td><td><strong>10/24</strong></td><td>2/11</td><td>ścieżek z literówką: 0</td></tr>
+<tr><td><strong>2.11 0:00, wersja 0.0.83 — pełny bieg</strong></td><td><strong>14/35</strong></td><td><strong>12/24</strong></td><td>2/11</td><td>najlepszy dotąd; zadania 2–4× szybsze (12–50 s zamiast 50–180 s)</td></tr>
+<tr><td>2.11 0:45, po <code>bf03b8ca</code> (szablony w ścieżkach)</td><td>13/35</td><td>11/24</td><td>2/11</td><td>w granicy zmienności ±1; fs-20 nie kręci się już do końca budżetu</td></tr>
+<tr><td>2.11 1:20, po przeglądzie (<code>85d83b5c</code>)</td><td>12/35</td><td>11/24</td><td>1/11</td><td>zmienność (sh-08); ślady: nadpisanie bez odczytu w fs-11, fs-13</td></tr>
+<tr><td><strong>2.11 1:25, <code>815adb94</code> (nadpisanie po odczycie)</strong></td><td><strong>15/35</strong></td><td><strong>12/24</strong></td><td><strong>3/11</strong></td><td>najlepszy dotąd; fs-11/fs-13 czytają plik przed zapisem</td></tr></tbody></table></div>
+<p>Dwie ogólne przyczyny porażek znalezione w śladach i poprawione po 0.0.83 (<code>bf03b8ca</code>, w następnej wersji):
+<strong>szablon zamiast wartości</strong> (<code>{&quot;path&quot;: &quot;{{old_path}}&quot;}</code>, wcześniej <code>&lt;url&gt;</code> w „prices”) — wywołanie nie trafia do
+narzędzia, model dostaje „… to szablon, nie wartość”, a powtarzane co turę kończy się wykryciem pętli zamiast zużycia
+całego budżetu kroków; <strong>wzorzec w ścieżce</strong> (<code>Pobrane/*.faktura</code>) — komunikat mówi teraz, żeby znaleźć pliki przez
+<code>fs_search</code> i działać na każdym osobno (wcześniej mylące „strumień ADS”).</p>
+<p><strong>Utrata danych przy nadpisaniu (2.11, <code>815adb94</code>, [poważne]).</strong> Ślady fs-11 i fs-13 pokazały, że model „zamieniał
+nazwisko w umowie”, zapisując w trybie <code>overwrite</code> jedno zdanie („Zawartość umowy z zamienionymi nazwiskami…”) bez
+odczytu pliku — a weryfikacja tym samym modelem odpowiadała „OK”. Teraz <code>fs_write overwrite</code> istniejącego, niepustego
+pliku wymaga odczytu (albo własnego zapisu) w tym samym przebiegu; w kolejnym pomiarze oba zadania najpierw odczytały
+plik i zapisały treść opartą na nim. W tej samej serii: szablon w środku ścieżki (<code>zdjecia/{{ file_name }}</code>, fs-20) i cała
+treść będąca szablonem (<code>&lt;adresy_email_po_usunieciu_powtorzek&gt;</code>, fs-22) są odrzucane; kopia do <code>/Kosz/…</code> (fs-24) wskazuje
+<code>fs_delete</code>.</p>
+<p>Obserwacje bez zmian w kodzie: model podwójnie koduje cudzysłowy w treści JSON (<code>{\&quot;motyw\&quot;: …}</code>, fs-13) — poprawka
+w treści zapisu mogłaby psuć prawdziwy kod, więc zostaje; w fs-23 po odmowie trwałego usunięcia model wywołał
+<code>rm -rf</code> w powłoce na ścieżce w katalogu roboczym — polecenie powłoki w katalogu roboczym ma migawkę do cofnięcia,
+więc to zgodne z obecną polityką, ale warto, żeby człowiek ocenił, czy trwałe usuwanie powłoką nie powinno wymagać tej
+samej karty co <code>fs_delete_permanent</code> (Broker — poza moim zakresem).</p>
 <p>Powłokę dalej blokuje świadomie ostrożna reguła: samodzielny <code>*</code> (mnożenie <code>17 * 23</code>, <code>-Property *</code>) analizator traktuje
 jak wzorzec ścieżki poświadczeń i odmawia (sh-03, sh-05, sh-09) — decyzja z raportu 44 nadal czeka (§5). Zmienność
 bieg-do-biegu: ±1 zadanie (sh-02/sh-08).</p>
@@ -398,7 +419,17 @@ kluczy w sesji; kodu nie zmieniałam.</li>
 <li>Testów sprzętowych z dźwiękiem (noc — cisza).</li>
 </ul>
 <h2 id="7-wersja-testy-i-kopia">7. Wersja, testy i kopia</h2>
-<p>WERSJA_I_KOPIA</p>
+<ul>
+<li><strong>Wersja 0.0.83</strong> (<code>3373ac15</code>, poprawka rozmiaru <code>8d0e06c6</code>). <code>verify wersja</code>: bieg 1 — 19/20 (czerwony tylko
+<code>lint</code>: crate <code>app-modules</code> 8001 linii przy limicie 8000; wspólna funkcja <code>window_of</code>), bieg 2 na <code>8d0e06c6</code> —
+<strong>ZIELONE 20/20</strong> (23:33–0:16): Rust 1083 programy, 3355/0/43; interfejs 543; przeglądarka 771; aplikacja 62
+(pokrycie łącza 280/283, 98,9 %).</li>
+<li><strong>Wgrana 2.11 o 0:20</strong> (<code>deploy-owner.sh --no-start</code>) — skrót „Alfa”, program nie był uruchamiany.</li>
+<li>Testy prawdziwej aplikacji wymagające ekranu (w dzień pomijane, żeby nie przeszkadzać): <code>smoke</code>, <code>zx-eksport-okno</code>,
+<code>zy-skroty-globalne</code> z <code>ALFA_E2E_VISIBLE=1</code> — <strong>23/23</strong> zielone (0:22).</li>
+<li>Pomiar F3 na 0.0.83 (pełny bieg, 0:00–0:35): <strong>14/35</strong> (pliki 12/24, powłoka 2/11) — §4.</li>
+<li>KOPIA</li>
+</ul>
 </article>
 <footer>Źródło: <code>docs/plan/49-raport-2026-11-02-noc.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>

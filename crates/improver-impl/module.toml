@@ -1,6 +1,6 @@
 # Manifest Ulepszacza (docs/modules/improver/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
 id = "improver"
-version = "0.0.83"
+version = "0.0.84"
 kind = "service"
 provides = ["improver-contract@1"]
 requires = ["core-bus-contract@1", "core-config-contract@1", "evals-contract@1"]
