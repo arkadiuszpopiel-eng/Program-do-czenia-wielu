@@ -94,10 +94,17 @@ pub(crate) fn hint(stderr: &str) -> &'static str {
         "\n[podpowiedź] Narzędzia uniksowe z Git (grep, rm, sed, tr…) nie działają w izolacji polecenia — \
          użyj poleceń PowerShell (Select-String, Get-Content, Remove-Item, Measure-Object) albo narzędzi \
          plików (fs_*)."
-    } else if stderr.contains("is not recognized as") || stderr.contains("nie jest rozpoznawan") {
-        "\n[podpowiedź] Ta powłoka nie zna tego polecenia — polecenia PowerShell (Get-ChildItem, \
+    } else if stderr.contains("internal or external command")
+        || stderr.contains("polecenie wewnętrzne lub zewnętrzne")
+    {
+        // Komunikat `cmd.exe`: polecenie PowerShell uruchomione w `cmd`.
+        "\n[podpowiedź] `cmd` nie zna tego polecenia — polecenia PowerShell (Get-ChildItem, \
          Select-String…) uruchamiaj z `shell`: „powershell”, a zamiast narzędzi uniksowych użyj ich \
          odpowiedników PowerShell albo narzędzi plików (fs_*)."
+    } else if stderr.contains("is not recognized as") || stderr.contains("nie jest rozpoznawan") {
+        // Komunikat PowerShell: zwykle narzędzie uniksowe (grep, sed) — zmiana powłoki nie pomoże.
+        "\n[podpowiedź] Tego polecenia nie ma na tym komputerze — użyj odpowiednika PowerShell \
+         (Select-String, Get-Content, Remove-Item, Measure-Object) albo narzędzi plików (fs_*)."
     } else {
         ""
     }
@@ -115,6 +122,9 @@ mod tests {
         let cmd = "'Get-ChildItem' is not recognized as an internal or external command,";
         assert!(hint(cmd).contains("„powershell”"));
         assert!(hint("'grep' nie jest rozpoznawany jako polecenie wewnętrzne").contains("fs_*"));
+        // PowerShell: bez rady o zmianie powłoki (model już jest w PowerShell).
+        let pwsh = "The term 'grep' is not recognized as the name of a cmdlet, function";
+        assert!(hint(pwsh).contains("Select-String") && !hint(pwsh).contains("„powershell”"));
         assert_eq!(hint("Access is denied."), "");
     }
 }

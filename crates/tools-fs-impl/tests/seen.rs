@@ -87,3 +87,30 @@ async fn append_needs_no_read() {
     assert!(out.is_ok(), "{out:?}");
     assert_eq!(h.file(PATH).as_deref(), Some("a\nb\n"));
 }
+
+/// Przegląd 2.11: dopisanie i odczyt częściowy nie pokazują całej treści — nie odblokowują nadpisania.
+#[tokio::test]
+async fn append_or_partial_read_does_not_unlock_overwrite() {
+    let h = harness(&[(PATH, "Strona A: Kowalski\nStrona B: Nowak\n")]);
+    let run = in_run("r1");
+    let add = h
+        .call_ctx(
+            K::Write,
+            json!({"path": DOC, "content": "Podpis\n", "mode": "append"}),
+            &run,
+        )
+        .await;
+    assert!(add.is_ok(), "{add:?}");
+    let blind = h.call_ctx(K::Write, overwrite("x"), &run).await;
+    assert!(!blind.is_ok(), "append nie pokazał treści: {blind:?}");
+    let part = h
+        .call_ctx(K::Read, json!({"path": DOC, "max_bytes": 5}), &run)
+        .await;
+    assert!(part.is_ok(), "{part:?}");
+    let still = h.call_ctx(K::Write, overwrite("x"), &run).await;
+    assert!(!still.is_ok(), "odczyt częściowy: {still:?}");
+    let full = h.call_ctx(K::Read, json!({"path": DOC}), &run).await;
+    assert!(full.is_ok(), "{full:?}");
+    let ok = h.call_ctx(K::Write, overwrite("x"), &run).await;
+    assert!(ok.is_ok(), "po pełnym odczycie: {ok:?}");
+}

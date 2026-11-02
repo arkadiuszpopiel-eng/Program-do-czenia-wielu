@@ -157,7 +157,7 @@ impl Core {
                         self.gate.release(&auths).await;
                         let wd = ctx.workdir.as_deref();
                         fixed_note = format!(
-                            "Nie ma „{}” — odczytano „{}” (literówka w ścieżce).\n",
+                            "Nie ma „{}” — w zamian „{}” (literówka w ścieżce).\n",
                             shown(&path, wd),
                             shown(&near, wd)
                         );
@@ -165,7 +165,8 @@ impl Core {
                         continue;
                     }
                     let action = format!("odczyt „{path}”");
-                    let out = self.failure_near(&e, &action, &path, ctx.workdir.as_deref());
+                    let mut out = self.failure_near(&e, &action, &path, ctx.workdir.as_deref());
+                    out.text.insert_str(0, &fixed_note);
                     return Ok(self.done(ctx, m, &auths, out).await);
                 }
             }
@@ -175,12 +176,17 @@ impl Core {
         let end = offset.saturating_add(data.len() as u64);
         let slice = data.as_slice();
         let truncated = end < total;
-        self.seen.note(ctx, &path);
         report_untrusted(&self.gate, ctx, TaintSource::File).await;
         let (content, binary) = match text::decode_text(slice) {
             Some(t) => (text::redact_secrets(&t), false),
             None => (String::new(), true),
         };
+        // Nadpisanie odblokowuje tylko odczyt całej treści tekstowej, którą model naprawdę zobaczy
+        // (nie binarny, nie zakres, nie ucięty limitem wyniku).
+        let whole = !binary && offset == 0 && !truncated;
+        if whole && content.chars().count() < self.config.output_max_chars {
+            self.seen.note(ctx, &path);
+        }
         let shown_path = shown(&path, ctx.workdir.as_deref());
         let body = if binary {
             format!("Plik „{shown_path}” ({total} B) jest binarny — treść pominięta.")

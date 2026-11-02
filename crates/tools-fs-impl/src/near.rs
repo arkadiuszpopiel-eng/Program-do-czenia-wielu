@@ -1,8 +1,9 @@
 //! Podpowiedź przy ścieżce, której nie ma: mały model przepisuje długie ścieżki z literówką
 //! („…\Sesje\Nova rozmowa” zamiast „Nowa rozmowa”) i kończył zadanie przekonany, że katalog
 //! roboczy nie istnieje (próba obowiązku „tidy”, 1.11). Szukamy tylko w katalogu roboczym sesji
-//! (tam model ma już dostęp do odczytu) i nigdy nie podpowiadamy ścieżek z deny-listy. Podpowiedź
-//! niczego nie otwiera — model musi wywołać narzędzie ponownie z poprawioną ścieżką.
+//! (tam model ma już dostęp do odczytu) i nigdy nie podpowiadamy ścieżek z deny-listy. Narzędzia
+//! zmieniające stan tylko podpowiadają; `fs_read` (bez skutków) odczytuje od razu jedyne dopasowanie
+//! — po nowej zgodzie Brokera (pomiar F3 fs-09, 2.11).
 
 use std::path::{Component, Path, PathBuf};
 

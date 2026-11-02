@@ -48,11 +48,12 @@ const PATH_KEYS: &[&str] = &[
     "path", "from", "to", "new_name", "root", "url", "cwd", "dir", "target", "source",
 ];
 
-/// Szablon zamiast wartości: w argumencie ścieżki/adresu cały (`{{old_path}}`, `<url>`) albo
-/// w środku (`zdjecia/{{ file_name }}`), w treści zapisu — cała treść (`<adresy_po_zmianie>`,
-/// `{{wynik}}`). Lekki model przepisywał wzór zamiast podstawić wartość (pomiar F3 fs-20, fs-22,
-/// próba „prices”, 1.11–2.11). Szablon w środku treści jest dozwolony (pliki szablonów, HTML).
-pub(crate) fn placeholder(input: &serde_json::Value) -> Option<String> {
+/// Szablon zamiast wartości: w argumencie ścieżki/adresu cały (`{{old_path}}`, `<url>`) albo jako
+/// ostatni człon (`zdjecia/{{ file_name }}`), w treści zapisu `fs_write` — cała treść
+/// (`<adresy_po_zmianie>`, `{{wynik}}`). Lekki model przepisywał wzór zamiast podstawić wartość
+/// (pomiar F3 fs-20, fs-22, próba „prices”, 1.11–2.11). Katalogi z szablonem w nazwie
+/// (`{{cookiecutter.project_slug}}/setup.py`) i szablon w środku treści są dozwolone.
+pub(crate) fn placeholder(tool: &str, input: &serde_json::Value) -> Option<String> {
     let map = input.as_object()?;
     let word = |inner: &str| {
         let inner = inner.trim();
@@ -74,16 +75,20 @@ pub(crate) fn placeholder(input: &serde_json::Value) -> Option<String> {
             .is_some_and(|w| word(w) && (!strict || w.contains(['_', ' '])));
         mustache || angle
     };
-    let inside = |v: &str| {
-        v.split("{{")
-            .skip(1)
-            .any(|rest| rest.split_once("}}").is_some_and(|(w, _)| word(w)))
+    // Ostatni człon w całości szablonem `{{…}}`, bez kropki (nie `{{cookiecutter.x}}`, nie `<b>`).
+    let last = |v: &str| {
+        let name = v.rsplit(['/', '\\']).next().unwrap_or(v).trim();
+        let inner = name.strip_prefix("{{").and_then(|n| n.strip_suffix("}}"));
+        inner.is_some_and(|n| word(n) && !n.contains('.'))
     };
     let path = PATH_KEYS.iter().find_map(|key| {
         let value = map.get(*key)?.as_str()?.trim();
-        (whole(value, false) || inside(value)).then(|| format!("`{key}` = „{value}” to szablon, nie wartość — podstaw prawdziwą ścieżkę albo adres (np. z wyniku fs_list)"))
+        (whole(value, false) || last(value)).then(|| format!("`{key}` = „{value}” to szablon, nie wartość — podstaw prawdziwą ścieżkę albo adres (np. z wyniku fs_list)"))
     });
     path.or_else(|| {
+        if tool != "fs_write" {
+            return None;
+        }
         let value = map.get("content")?.as_str()?.trim();
         whole(value, true).then(|| format!("`content` = „{value}” to szablon, nie treść — wpisz całą prawdziwą treść (np. na podstawie wyniku fs_read)"))
     })
@@ -121,17 +126,27 @@ mod tests {
 
     #[test]
     fn placeholders_in_paths_and_whole_content() {
-        assert!(placeholder(&json!({"path": "{{old_path}}"})).is_some());
-        assert!(placeholder(&json!({"url": "<url>"})).is_some());
-        assert!(placeholder(&json!({"from": " {{ plik }} "})).is_some());
-        assert!(placeholder(&json!({"path": "raport.txt"})).is_none());
-        assert!(placeholder(&json!({"path": "zdjecia/{{ file_name }}"})).is_some());
-        assert!(placeholder(&json!({"content": "<adresy_po_zmianie>"})).is_some());
-        assert!(placeholder(&json!({"content": " {{wynik}} "})).is_some());
-        assert!(placeholder(&json!({"content": "Panie {{imie}}"})).is_none());
-        assert!(placeholder(&json!({"content": "<br>"})).is_none());
-        assert!(placeholder(&json!({"path": "<a>/<b>"})).is_none());
-        assert!(placeholder(&json!({"path": "a{{b"})).is_none());
-        assert!(placeholder(&json!(["{{x}}"])).is_none());
+        assert!(placeholder("fs_write", &json!({"path": "{{old_path}}"})).is_some());
+        assert!(placeholder("fs_write", &json!({"url": "<url>"})).is_some());
+        assert!(placeholder("fs_write", &json!({"from": " {{ plik }} "})).is_some());
+        assert!(placeholder("fs_write", &json!({"path": "raport.txt"})).is_none());
+        assert!(placeholder("fs_write", &json!({"path": "zdjecia/{{ file_name }}"})).is_some());
+        assert!(placeholder("fs_write", &json!({"content": "<adresy_po_zmianie>"})).is_some());
+        assert!(placeholder("fs_write", &json!({"content": " {{wynik}} "})).is_some());
+        assert!(placeholder("fs_write", &json!({"content": "Panie {{imie}}"})).is_none());
+        assert!(placeholder("fs_write", &json!({"content": "<br>"})).is_none());
+        assert!(placeholder("fs_write", &json!({"path": "<a>/<b>"})).is_none());
+        assert!(placeholder("fs_write", &json!({"path": "a{{b"})).is_none());
+        assert!(placeholder("fs_write", &json!(["{{x}}"])).is_none());
+        let slug = json!({"path": "{{cookiecutter.project_slug}}/setup.py"});
+        assert!(
+            placeholder("fs_read", &slug).is_none(),
+            "katalog z szablonem w nazwie"
+        );
+        let search = json!({"root": ".", "content": "{{imie}}"});
+        assert!(
+            placeholder("fs_search", &search).is_none(),
+            "szukany tekst to nie treść zapisu"
+        );
     }
 }

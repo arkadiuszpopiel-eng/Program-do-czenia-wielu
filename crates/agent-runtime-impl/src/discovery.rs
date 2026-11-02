@@ -59,7 +59,7 @@ impl Engine {
                 }
             }
             // Pełne wejście (jak lokalne błędy bramki) — liczone przez wykrywanie pętli przed odrzuceniem.
-            if let Some(why) = crate::invalid::placeholder(&tu.input).filter(|_| !self.invalid_args.contains_key(&tu.id)) {
+            if let Some(why) = crate::invalid::placeholder(&tu.name, &tu.input).filter(|_| !self.invalid_args.contains_key(&tu.id)) {
                 self.rejected_commands.insert(tu.id.clone());
                 self.invalid_args.insert(tu.id.clone(), why);
             }

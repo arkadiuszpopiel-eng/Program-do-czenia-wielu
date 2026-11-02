@@ -31,10 +31,10 @@ Zdolności: `fs.read` (list/read/stat/search), `fs.write` (mutacje), `fs.copy` =
 - Ścieżka, której nie ma (`fs_list`/`fs_read` — `NotFound`, `fs_stat` — „nie istnieje”): gdy w katalogu roboczym sesji
   jest ścieżka różna literówkami w najwyżej 2 członach (Levenshtein ≤ 1 dla nazw do 4 znaków, ≤ 2 dla dłuższych,
   jedyne najlepsze dopasowanie), wynik dopisuje „Czy chodziło o „…”?” (`near.rs`, 1.11). Tylko w katalogu
-  roboczym, nigdy ścieżka z deny-listy (sprawdzana także dla ścieżki końcowej po wszystkich poprawkach); podpowiedź niczego nie otwiera (test `tests/near.rs`). Człony powyżej
+  roboczym, nigdy ścieżka z deny-listy (sprawdzana także dla ścieżki końcowej po wszystkich poprawkach); narzędzia zmieniające stan tylko podpowiadają (test `tests/near.rs`). Człony powyżej
   katalogu roboczego też porównywane z tolerancją („…\Local\Tepm\…”), w sumie najwyżej 2 poprawki.
   `fs_read` (sam odczyt, bez skutków) przy jedynym dopasowaniu odczytuje od razu poprawioną ścieżkę — z nową zgodą
-  Brokera i zdaniem „Nie ma „…” — odczytano „…” (literówka w ścieżce)” na początku wyniku; model powtarzał literówkę
+  Brokera i zdaniem „Nie ma „…” — odczytano „…” („Nie ma „…” — w zamian „…” (literówka w ścieżce)” na początku wyniku, także gdy i ten odczyt się nie uda); model powtarzał literówkę
   mimo podpowiedzi (pomiar F3 fs-09, 2.11). Narzędzia zmieniające stan nigdy nie poprawiają ścieżki same.
 - Narzędzie wykonuje się z restricted token / AppContainer dla ≤ L3 (przez `ProcessPort`, gdy operacja delegowana do procesu).
 
@@ -76,10 +76,11 @@ Kroki narzędzi w wątku (jedna linia + „Cofnij”), Replay krok po kroku, toa
   Testy: `tools-fs-impl/tests/links.rs`, `app-core/tests/workdir.rs` (`workdir_links_to_protected_dirs_are_rejected`,
   `link_created_after_choice_is_denied_at_tool_call`).
 - **Nadpisanie bez odczytu (2.11):** `fs_write` w trybie `overwrite` istniejącego, niepustego pliku, którego ten przebieg
-  nie odczytał (`fs_read`) ani sam nie zapisał, nie jest wykonywane — wynik `InvalidArgs` każe najpierw odczytać plik.
+  nie odczytał w całości (`fs_read` całego pliku tekstowego, bez zakresu i bez ucięcia) ani sam nie zapisał
+  (`create`/`overwrite`; `append` do niepustego pliku się nie liczy), nie jest wykonywane — wynik `InvalidArgs` każe najpierw odczytać plik.
   Lekki model zastępował treść umowy jednym zdaniem, a weryfikacja tym samym modelem uznawała to za poprawne (pomiar F3
   fs-11, fs-13). Pamięć: ostatnie 32 przebiegi, po 1024 pliki (`seen.rs`); poza przebiegiem (wywołanie z interfejsu),
   dla nowego i pustego pliku oraz `append` — bez zmian (test `tests/seen.rs`).
-- **Kosz jako katalog celu (2.11):** `fs_copy`/`fs_move`/`fs_rename` z celem `/Kosz/…`, `C:\Trash\…` (od korzenia dysku) albo
+- **Kosz jako katalog celu (2.11):** `fs_copy`/`fs_move` z celem od modelu `/Kosz/…`, `C:\Trash\…` (od korzenia dysku) albo
   ze składnikiem `$Recycle.Bin` — wynik `InvalidArgs` wskazuje `fs_delete` (pomiar F3 fs-24). Zwykły katalog „Kosz”
   w katalogu roboczym zostaje katalogiem (test `tests/near.rs`).

@@ -134,6 +134,8 @@ impl Core {
             }
         };
         let had = existing.as_ref().map_or(0, |(d, _)| redactions(d));
+        // Dopisanie do niepustego pliku nie pokazuje modelowi treści — nie odblokowuje nadpisania.
+        let learned = a.mode != WriteMode::Append || existing.as_ref().is_none_or(|(_, t)| *t == 0);
         let data = match (a.mode, existing) {
             (WriteMode::Create, Some(_)) => {
                 let out = ToolOutcome::failed(
@@ -205,7 +207,7 @@ impl Core {
                 },
             )
             .await;
-        if out.is_ok() {
+        if out.is_ok() && learned {
             self.seen.note(ctx, &path);
         }
         Ok(out)
@@ -219,9 +221,6 @@ impl Core {
         ctx: &ToolCtx,
         m: &ToolManifest,
     ) -> Step<ToolOutcome> {
-        if let Some(out) = crate::near::trash_target(to) {
-            return Err(out);
-        }
         let from = self.resolve(from, ctx, m).await?;
         let to = self.resolve(to, ctx, m).await?;
         let action = format!("przeniesienie „{from}” → „{to}”");
@@ -269,6 +268,10 @@ impl Core {
         m: &ToolManifest,
     ) -> Step<ToolOutcome> {
         let a: FromToArgs = parse_args(args)?;
+        // Tylko cel od modelu — `fs_rename` składa cel bezwzględny z katalogu źródła.
+        if let Some(out) = crate::near::trash_target(&a.to) {
+            return Err(out);
+        }
         self.relocate(&a.from, &a.to, ctx, m).await
     }
 

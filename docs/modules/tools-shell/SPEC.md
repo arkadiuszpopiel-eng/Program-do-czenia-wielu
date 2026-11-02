@@ -75,7 +75,10 @@ Krok w wątku i Replay (polecenie, skrócone wyjście, kod wyjścia), karta „c
 - **Pusty `cwd` (2.11):** `cwd` pusty albo z samych spacji znaczy „katalog roboczy przebiegu” (jak brak pola) — lekki model
   wypełniał tak każde pole schematu i dostawał „ścieżka pusta” (pomiar F3 fs-18). Test `tests/run.rs::empty_cwd_means_the_workdir`.
 - **Podpowiedź po porażce środowiska (2.11):** gdy stderr zawiera `NtCreateDirectoryObject` (narzędzia uniksowe z Git padają
-  w izolacji niskiej integralności) albo „is not recognized as” / „nie jest rozpoznawan…” (polecenie PowerShell w `cmd`),
+  w izolacji niskiej integralności) albo komunikat `cmd` „internal or external command” (polecenie PowerShell w `cmd` → rada `shell`: „powershell”)
+  albo PowerShell „is not recognized as” (brak narzędzia uniksowego → odpowiedniki PowerShell, bez zmiany powłoki),
   wynik kończy się „[podpowiedź] …” z odpowiednikami PowerShell i narzędziami `fs_*` (pomiar F3 sh-04, sh-10, fs-23;
   test `outcome::tests::environment_failures_get_a_hint`). Sama izolacja bez zmian — czy wyłączyć z niej narzędzia Git,
   decyduje człowiek (raport 49).
+  Podpowiedź jest dziś częścią wyniku (w bloku niezaufanym); przeniesienie jej do osobnej, zaufanej części wyniku wymaga
+  pola w `ToolOutcome` — do zrobienia (przegląd 2.11, raport 49).
