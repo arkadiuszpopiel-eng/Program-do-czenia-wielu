@@ -334,7 +334,8 @@ sprawdziłam.</p>
 <tr><td>20:46 (ee133a04)</td><td>zielony</td><td>zielony</td><td>czerwony: Krytyczka — „katalog nie istnieje”</td><td>zielony</td><td>czerwony: czeka na zgodę</td></tr>
 <tr><td>21:05 (cae05af8)</td><td>zielony</td><td>zielony</td><td>czerwony: znacznik <code>&lt;raport-plików&gt;</code></td><td>zielony</td><td>czeka na zgodę²</td></tr>
 <tr><td>21:20 (7c2455c7)</td><td>zielony</td><td>—</td><td>zielony</td><td>—</td><td>—</td></tr>
-<tr><td><strong>22:30 (a8e4b13f, końcowy)</strong></td><td><strong>zielony</strong></td><td><strong>zielony</strong></td><td><strong>zielony</strong></td><td><strong>zielony</strong></td><td>czeka na zgodę²</td></tr></tbody></table></div>
+<tr><td><strong>22:30 (a8e4b13f, końcowy)</strong></td><td><strong>zielony</strong></td><td><strong>zielony</strong></td><td><strong>zielony</strong></td><td><strong>zielony</strong></td><td>czeka na zgodę²</td></tr>
+<tr><td><strong>2.11 2:40 (0.0.84)</strong></td><td><strong>zielony</strong></td><td><strong>zielony</strong></td><td><strong>zielony</strong></td><td><strong>zielony</strong></td><td>czeka na zgodę²</td></tr></tbody></table></div>
 <p>¹ Ocena nie łapała wtedy odmowy — raport brzmiał „Przepraszam, nie mogę… usuwania plików” (teraz to czerwone).
 ² <code>net_fetch</code> prosi Sędziego Cieni o zgodę na host; w próbie nikt jej nie daje. Raport oznacza to wprost („czeka na
 zgodę”), nie jako zielone. U właściciela obowiązek pokaże kartę zgody.</p>
@@ -369,6 +370,21 @@ zostaje).</li>
 <tr><td>Krytyczka na lekkim modelu ocenia pracę modelu w chmurze</td><td><strong>decyzja właściciela</strong> (§5)</td></tr>
 <tr><td>Most CLI dostaje tylko tekst użytkownika („zleć to” = poprzednia wiadomość użytkownika)</td><td>zostawione celowo — treść agentki nie jest poleceniem (zasada bezpieczeństwa)</td></tr>
 <tr><td>Anthropic: myślenie przy cudzych wywołaniach; Gemini: <code>thought_signature</code></td><td><strong>niesprawdzone</strong> — zależy od API, bez kluczy w tej sesji (§6)</td></tr></tbody></table></div>
+<p><strong>Przegląd nocnych zmian w świeżym kontekście (2.11 ok. 0:40, ADR 0016)</strong> — 9 uwag, 8 poprawionych w <code>85d83b5c</code>,
+1 nie była błędem:</p>
+<ul>
+<li>prośby „[Weryfikacja] sprawdź…”, „[Weryfikacja] Wykryto problem…” i „[Krytyczka] Wykryto problem…” nie niosły
+polecenia — po przycięciu okna model lokalny poprawiał „na ślepo”; teraz każda powtarza polecenie (≤ 600 znaków);</li>
+<li>kontrola kompletności działała też w podprzebiegu Krytyczki (jej cel zawiera adresy z raportu autorki → fałszywe
+„nie otworzyłaś żadnej strony”) i w przebiegu weryfikacji — teraz pominięta; licznik przypomnień liczony z historii,
+więc przeżywa wznowienie z checkpointu;</li>
+<li>okno modelu lokalnego: w drugim przejściu skracania wynik już skrócony zostawał prawie cały, a adnotacja miała
+zbędne spacje — teraz zostaje sama adnotacja;</li>
+<li>nagłówek wyników: argumenty jako <code>klucz=wartość</code> bez znaków ucieczki JSON, przy długich zostaje koniec (nazwa pliku);</li>
+<li>podpowiedź ścieżki: końcowa ścieżka po wszystkich poprawkach sprawdzana deny-listą, szybkie odrzucenie po długości;</li>
+<li>ocena próby: dosłowne <code>\n</code> liczone tylko przed numerem punktu albo na końcu (nie „E:\Dane\nowy folder”);</li>
+<li>nie błąd: skrót <code>tool_call</code> z szablonem — rozwinięcie skrótu jest przed sprawdzeniem szablonu.</li>
+</ul>
 <h2 id="4-pomiar-narzedzi-f3-na-prawdziwym-bieliku-4-5b-llama-server-cuda-laptop">4. Pomiar narzędzi F3 na prawdziwym Bieliku 4.5B (llama-server CUDA, laptop)</h2>
 <p><code>cargo test -p app-agents --test eval_tools -- --ignored</code> (35 zadań: 24 plikowe, 11 powłoki).</p>
 <div class="tbl"><table><thead><tr><th>Przebieg</th><th>Wynik</th><th><code>fs</code></th><th><code>shell</code></th><th>Uwagi</th></tr></thead><tbody><tr><td>30.10 v3 (raport 44)</td><td>11/35</td><td>9/24</td><td>2/11</td><td></td></tr>
@@ -428,6 +444,16 @@ kluczy w sesji; kodu nie zmieniałam.</li>
 <li>Testy prawdziwej aplikacji wymagające ekranu (w dzień pomijane, żeby nie przeszkadzać): <code>smoke</code>, <code>zx-eksport-okno</code>,
 <code>zy-skroty-globalne</code> z <code>ALFA_E2E_VISIBLE=1</code> — <strong>23/23</strong> zielone (0:22).</li>
 <li>Pomiar F3 na 0.0.83 (pełny bieg, 0:00–0:35): <strong>14/35</strong> (pliki 12/24, powłoka 2/11) — §4.</li>
+<li><strong>Wersja 0.0.84</strong> (<code>66757fba</code>; po niej tylko <code>fe9afd2b</code> — plik roboczy <code>crates/app-core/examples/</code> wycofany ze
+śledzenia, bo trafił przypadkiem do <code>4f31073b</code>; plik został na dysku). Zawiera poprawki z przeglądu nocnych zmian
+w świeżym kontekście (<code>85d83b5c</code>) i nadpisanie po odczycie (<code>815adb94</code>). <code>verify wersja</code> na <code>fe9afd2b</code>: <strong>ZIELONE
+20/20</strong> (1:40–2:37): Rust 1084 programy, 3363/0/43; interfejs 543; przeglądarka 771; aplikacja 62 (pokrycie łącza
+280/283, 98,9 %).</li>
+<li><strong>Wgrana 2.11 o 2:40</strong> (<code>deploy-owner.sh --no-start</code>) — skrót „Alfa”, program nie był uruchamiany; exe zawiera 0.0.84.</li>
+<li>Testy prawdziwej aplikacji wymagające ekranu (<code>smoke</code>, <code>zx-eksport-okno</code>, <code>zy-skroty-globalne</code>, <code>ALFA_E2E_VISIBLE=1</code>)
+na 0.0.84: <strong>23/23</strong> (2:42).</li>
+<li>Próba obowiązków na 0.0.84 (2:40–2:47, instancja testowa poza ekranem): morning, evening, tidy, costs — <strong>zielone</strong>;
+prices — czeka na zgodę Sędziego (jak wyżej).</li>
 <li>KOPIA</li>
 </ul>
 </article>
