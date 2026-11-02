@@ -101,6 +101,9 @@ impl Core {
         raw: Option<&str>,
         ctx: &ToolCtx,
     ) -> Result<String, Box<ToolOutcome>> {
+        // Pusty `cwd` („”) to brak `cwd` — lekki model wypełniał tak każde pole schematu i dostawał
+        // „ścieżka pusta” zamiast katalogu roboczego (pomiar F3 fs-18, 2.11).
+        let raw = raw.filter(|r| !r.trim().is_empty());
         let raw = raw.or(ctx.workdir.as_deref()).ok_or_else(|| {
             Box::new(ToolOutcome::failed(
                 ToolErrorKind::InvalidArgs,

@@ -384,3 +384,16 @@ async fn deleting_a_directory_skipped_by_the_snapshot_is_permanent() {
     assert_eq!(h.exec.runs().len(), runs);
     assert!(h.sh("Remove-Item b.txt").await.is_ok());
 }
+
+/// Pomiar F3 fs-18 (2.11): pusty `cwd` od modelu to katalog roboczy, nie błąd „ścieżka pusta”.
+#[tokio::test]
+async fn empty_cwd_means_the_workdir() {
+    let h = harness(&[("/Users/ala/Projekt/a.txt", "a")]);
+    h.exec.set_default(FakeRun::exit(0, "ok", ""));
+    let out = h
+        .run()
+        .call(json!({"command": "Get-ChildItem", "cwd": " "}), &ctx())
+        .await;
+    assert!(out.is_ok(), "{out:?}");
+    assert_eq!(h.exec.runs()[0].process.cwd, std::path::PathBuf::from(WORK));
+}

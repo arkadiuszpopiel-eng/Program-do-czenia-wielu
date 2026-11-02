@@ -72,3 +72,5 @@ Krok w wątku i Replay (polecenie, skrócone wyjście, kod wyjścia), karta „c
   usuwającym → `Destructiveness::Permanent`, `reversible = no`, `bulk = u32::MAX` (najgorszy przypadek: zgoda
   właściciela do L3) — nigdy „cofalne”. Testy: `analysis::tests::delete_targets_parent_variables_and_pipeline`,
   `tools-shell-impl/tests/run.rs::parent_or_unresolved_delete_targets_need_approval`.
+- **Pusty `cwd` (2.11):** `cwd` pusty albo z samych spacji znaczy „katalog roboczy przebiegu” (jak brak pola) — lekki model
+  wypełniał tak każde pole schematu i dostawał „ścieżka pusta” (pomiar F3 fs-18). Test `tests/run.rs::empty_cwd_means_the_workdir`.
