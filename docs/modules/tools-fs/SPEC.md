@@ -31,7 +31,7 @@ Zdolności: `fs.read` (list/read/stat/search), `fs.write` (mutacje), `fs.copy` =
 - Ścieżka, której nie ma (`fs_list`/`fs_read` — `NotFound`, `fs_stat` — „nie istnieje”): gdy w katalogu roboczym sesji
   jest ścieżka różna literówkami w najwyżej 2 członach (Levenshtein ≤ 1 dla nazw do 4 znaków, ≤ 2 dla dłuższych,
   jedyne najlepsze dopasowanie), wynik dopisuje „Czy chodziło o „…”?” (`near.rs`, 1.11). Tylko w katalogu
-  roboczym, nigdy ścieżka z deny-listy; podpowiedź niczego nie otwiera (test `tests/near.rs`). Człony powyżej
+  roboczym, nigdy ścieżka z deny-listy (sprawdzana także dla ścieżki końcowej po wszystkich poprawkach); podpowiedź niczego nie otwiera (test `tests/near.rs`). Człony powyżej
   katalogu roboczego też porównywane z tolerancją („…\Local\Tepm\…”), w sumie najwyżej 2 poprawki.
 - Narzędzie wykonuje się z restricted token / AppContainer dla ≤ L3 (przez `ProcessPort`, gdy operacja delegowana do procesu).
 

@@ -46,6 +46,11 @@ impl Core {
             .into_iter()
             .filter_map(|e| {
                 let n = e.path.file_name()?.to_string_lossy().into_owned();
+                // Różnica długości większa niż tolerancja wyklucza dopasowanie — bez liczenia
+                // odległości (człon od modelu może mieć tysiące znaków).
+                if n.chars().count().abs_diff(name.chars().count()) > tolerance(name) {
+                    return None;
+                }
                 let d = distance(&n, name);
                 (d > 0 && d <= tolerance(name)).then_some((d, e.path))
             })
@@ -131,7 +136,10 @@ impl Core {
             }
             current = self.closest(&current, &name.to_string_lossy())?;
         }
-        (fixes > 0 && current.starts_with(workdir) && self.fs.exists(&current)).then_some(current)
+        // Także ścieżka końcowa (człony po poprawce dopasowane dokładnie) — nigdy z deny-listy.
+        let safe = !self.denied(&current.to_string_lossy());
+        (fixes > 0 && safe && current.starts_with(workdir) && self.fs.exists(&current))
+            .then_some(current)
     }
 }
 

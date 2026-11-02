@@ -152,8 +152,9 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
   wie o luce, a przy weryfikacji po długiej pętli narzędzi widzi cel (przegląd wymiany informacji 1.11).
   Testy: `tests/window.rs`.
 - **Wyniki narzędzi w kopercie:** gdy jedno narzędzie ma w turze kilka wyników (historia dostawcy chmurowego z wywołaniami
-  równoległymi), nagłówek „[Wynik narzędzia nazwa — {argumenty}]” podaje argumenty wywołania (≤ 100 znaków) — koperta
-  nie niesie identyfikatorów wywołań.
+  równoległymi), nagłówek „[Wynik narzędzia nazwa — klucz=wartość, …]” podaje argumenty wywołania (napisy bez znaków ucieczki JSON,
+  ≤ 100 znaków; przy dłuższych zostaje koniec — nazwa pliku w ścieżce rozróżnia wyniki) — koperta nie niesie
+  identyfikatorów wywołań.
 - **Wyjście `llama-server` w dzienniku Alfy:** wiersze stderr klasyfikowane (`process::classify_line`) — błędy i brak
   pamięci (`error`, `failed`, `out of memory`…) jako `warn`, architektura modelu, KV cache, odciążenie warstw i urządzenie
   jako `info` (cel `providers_local_impl::llama_server`, zapisywane domyślnie — potwierdzenie szacunków VRAM i diagnoza
@@ -220,3 +221,4 @@ użytkownika), `fit` skraca teksty starszych wyników narzędzi od najstarszego 
 „[… pominięto N znaków …]”, a gdy to za mało, do samej adnotacji. Dwie ostatnie wiadomości (bieżący krok) zostają
 w całości; wcześniej żądanie szło ponad `-c`, serwer je odrzucał, a zadanie bez modelu zapasowego kończyło się błędem
 (test `window.rs::over_budget_tool_loop_shrinks_older_results`).
+Wynik już skrócony w pierwszym przejściu w drugim staje się samą adnotacją; adnotacja nie jest skracana ponownie.

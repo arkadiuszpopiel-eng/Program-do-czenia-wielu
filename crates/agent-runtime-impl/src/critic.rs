@@ -283,7 +283,8 @@ impl Engine {
             self.push(
                 MsgRole::User,
                 vec![ContentBlock::text(format!(
-                    "[Krytyczka] Wykryto problem — popraw wynik, a potem zakończ.\n{body}"
+                    "[Krytyczka] Wykryto problem — popraw wynik, a potem zakończ. {}\n{body}",
+                    crate::completeness::goal_reminder(&self.cp.spec.goal)
                 ))],
             );
             return Next::Continue;

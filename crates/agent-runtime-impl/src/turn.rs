@@ -281,8 +281,12 @@ impl Engine {
 
     /// Odpowiedź końcowa: weryfikacja (Krytyczka ≠ autorka, gdy obsada na to pozwala).
     async fn final_answer(&mut self, text: String, truncated: bool) -> Next {
-        // Urwana odpowiedź albo dane ze stron, których przebieg nie odczytał (`completeness`).
-        if !self.cp.verifying && self.nudges < crate::completeness::MAX_NUDGES {
+        // Urwana odpowiedź albo dane ze stron, których przebieg nie odczytał (`completeness`) — nie
+        // w podprzebiegu Krytyczki: jej cel zawiera odpowiedź autorki (niezaufaną, z adresami).
+        let judging = self.cp.verifying || self.critic_run();
+        if !judging
+            && crate::completeness::nudges(&self.cp.messages) < crate::completeness::MAX_NUDGES
+        {
             let can_read = crate::completeness::can_read(&self.registry.names());
             let gap = crate::completeness::gap(
                 &text,
@@ -292,7 +296,6 @@ impl Engine {
                 can_read,
             );
             if let Some(gap) = gap {
-                self.nudges += 1;
                 self.push(
                     Role::User,
                     vec![ContentBlock::text(gap.note(&self.cp.spec.goal))],
@@ -313,9 +316,10 @@ impl Engine {
                 self.escalate();
                 self.push(
                     Role::User,
-                    vec![ContentBlock::text(
-                        "[Weryfikacja] Wykryto problem — popraw wynik, a potem zakończ.",
-                    )],
+                    vec![ContentBlock::text(format!(
+                        "[Weryfikacja] Wykryto problem — popraw wynik, a potem zakończ. {}",
+                        crate::completeness::goal_reminder(&self.cp.spec.goal)
+                    ))],
                 );
                 return Next::Continue;
             }
@@ -344,7 +348,11 @@ impl Engine {
         self.cp.verifying = true;
         self.cp.verify_rounds += 1;
         self.cp.verified_answer = Some(text);
-        self.push(Role::User, vec![ContentBlock::text(VERIFY_PROMPT)]);
+        let reminder = crate::completeness::goal_reminder(&self.cp.spec.goal);
+        self.push(
+            Role::User,
+            vec![ContentBlock::text(format!("{VERIFY_PROMPT} {reminder}"))],
+        );
         Next::Continue
     }
 }

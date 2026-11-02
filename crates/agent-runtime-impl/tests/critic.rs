@@ -252,3 +252,28 @@ async fn critic_verdict_with_a_stray_call_ends_the_check() {
         .count();
     assert_eq!(tools, 0, "wywołanie po werdykcie nie jest wykonywane");
 }
+
+#[tokio::test(start_paused = true)]
+async fn correction_repeats_the_goal_and_critic_gets_no_completeness_nudge() {
+    // Przegląd 2.11: po długiej pętli okno modelu lokalnego mogło pominąć cel — prośba o poprawkę
+    // niesie polecenie; podprzebieg Krytyczki z adresem w celu nie dostaje „[Kontrola] …”.
+    let (p, rt) = world();
+    let d = p.model("m-delta");
+    d.push_script(answer("Wersja 1: https://example.com/cennik"));
+    d.push_script(answer("Wersja 2"));
+    let g = p.model("m-gama");
+    g.push_script(answer("WERYFIKACJA: BŁĄD — brak cen."));
+    g.push_script(answer("WERYFIKACJA: OK"));
+    let mut s = author("delta", "operator");
+    s.goal = "Przygotuj krótki cennik".into();
+    let run = rt.start_with(s, crew_options()).await.unwrap();
+    rt.wait(&run).await.unwrap();
+    let sent = serde_json::to_string(&d.requests()).unwrap();
+    assert!(
+        sent.contains("[Krytyczka] Wykryto problem")
+            && sent.contains("Polecenie: „Przygotuj krótki cennik"),
+        "{sent}"
+    );
+    let critic = serde_json::to_string(&g.requests()).unwrap();
+    assert!(!critic.contains("[Kontrola]"), "{critic}");
+}

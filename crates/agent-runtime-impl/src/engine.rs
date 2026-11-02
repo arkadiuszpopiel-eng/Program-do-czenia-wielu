@@ -45,8 +45,6 @@ pub(crate) struct Engine {
     /// Błędy lokalnego skrótu ze znanym pełnym wejściem (mogą zasilać detektor pętli).
     pub(crate) rejected_commands: BTreeSet<String>,
     pub(crate) storage_error: Option<String>,
-    /// Przypomnienia o luce w odpowiedzi końcowej (`completeness`).
-    pub(crate) nudges: u8,
     pub(crate) approval_clock: Arc<crate::ApprovalClock>,
     waited_at_start: u64,
 }
@@ -80,7 +78,6 @@ impl Engine {
             invalid_args: BTreeMap::new(),
             rejected_commands: BTreeSet::new(),
             storage_error: None,
-            nudges: 0,
             approval_clock,
             waited_at_start,
         }

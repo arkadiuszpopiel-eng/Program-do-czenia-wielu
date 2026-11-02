@@ -192,14 +192,27 @@ fn user_blocks(msg: &Message, names: &HashMap<&str, (&str, &Value)>) -> Vec<Cont
     blocks
 }
 
-/// Argumenty wywołania w nagłówku wyniku: „ — {json}”, skrócone do [`MAX_ARGS_IN_HEADER`].
+/// Argumenty wywołania w nagłówku wyniku: „ — klucz=wartość, …” (napisy bez znaków ucieczki JSON),
+/// skrócone do [`MAX_ARGS_IN_HEADER`] od początku — koniec (nazwa pliku w ścieżce) rozróżnia
+/// wyniki, więc zostaje.
 fn args_summary(input: &Value) -> String {
-    let json = serde_json::to_string(input).unwrap_or_default();
-    let mut short: String = json.chars().take(MAX_ARGS_IN_HEADER).collect();
-    if json.chars().count() > MAX_ARGS_IN_HEADER {
-        short.push('…');
+    let text = match input.as_object() {
+        Some(map) => map
+            .iter()
+            .map(|(k, v)| match v.as_str() {
+                Some(s) => format!("{k}={s}"),
+                None => format!("{k}={v}"),
+            })
+            .collect::<Vec<_>>()
+            .join(", "),
+        None => input.to_string(),
+    };
+    let count = text.chars().count();
+    if count <= MAX_ARGS_IN_HEADER {
+        return format!(" — {text}");
     }
-    format!(" — {short}")
+    let tail: String = text.chars().skip(count - MAX_ARGS_IN_HEADER).collect();
+    format!(" — …{tail}")
 }
 
 /// Wiadomość z wywołaniami albo wynikami narzędzi jako tekst koperty; inne bez zmian

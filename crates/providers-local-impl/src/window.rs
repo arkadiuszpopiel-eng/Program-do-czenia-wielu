@@ -72,6 +72,10 @@ pub fn fit(request: &ChatRequest, ctx: u32, reserve: u32) -> Fitted<'_> {
     }
 }
 
+/// Początek adnotacji o skróceniu wyniku i jej dalszy ciąg.
+const OMITTED_MARK: &str = "[… pominięto";
+const OMITTED_HINT: &str =
+    "kontekst modelu lokalnego; wywołaj narzędzie ponownie, jeśli potrzebujesz całości …";
 /// Wynik narzędzia krótszy niż to (znaki) nie jest skracany.
 const SHRINK_MIN: usize = 200;
 /// Ile znaków początku i końca zostaje w skróconym wyniku (pierwsze przejście).
@@ -92,17 +96,28 @@ fn shrink_results(messages: &mut [Message], over: u32, head: usize, tail: usize)
                 let ToolResultPart::Text { text } = part else {
                     continue;
                 };
-                let count = text.chars().count();
-                let cut = count.saturating_sub(head + tail);
-                if saved >= over || count < SHRINK_MIN || cut < SHRINK_MIN || text.starts_with("[…")
-                {
+                // Wynik już skrócony w pierwszym przejściu w drugim zostaje samą adnotacją (bez
+                // liczby — oryginalnej długości już nie znamy); adnotacji nie skracamy ponownie.
+                if saved >= over || text.starts_with(OMITTED_MARK) {
                     continue;
                 }
-                let first: String = text.chars().take(head).collect();
-                let last: String = text.chars().skip(count - tail).collect();
-                let short = format!(
-                    "{first}[… pominięto {cut} znaków starszego wyniku — kontekst modelu lokalnego;                      wywołaj narzędzie ponownie, jeśli potrzebujesz całości …]{last}"
-                );
+                let short = if text.contains(OMITTED_MARK) {
+                    if head > 0 {
+                        continue;
+                    }
+                    format!("{OMITTED_MARK} starszego wyniku — {OMITTED_HINT}]")
+                } else {
+                    let count = text.chars().count();
+                    let cut = count.saturating_sub(head + tail);
+                    if count < SHRINK_MIN || cut < SHRINK_MIN {
+                        continue;
+                    }
+                    let first: String = text.chars().take(head).collect();
+                    let last: String = text.chars().skip(count - tail).collect();
+                    format!(
+                        "{first}{OMITTED_MARK} {cut} znaków starszego wyniku — {OMITTED_HINT}]{last}"
+                    )
+                };
                 saved = saved.saturating_add(
                     message_part_tokens(text).saturating_sub(message_part_tokens(&short)),
                 );

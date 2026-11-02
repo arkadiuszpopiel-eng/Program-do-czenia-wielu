@@ -16,6 +16,19 @@ use crate::catalog::{CALL, alias};
 /// Najwięcej przypomnień o luce w jednym przebiegu.
 pub(crate) const MAX_NUDGES: u8 = 2;
 
+/// Początek przypomnienia o luce (liczone z historii — przeżywa wznowienie z checkpointu).
+const NOTE_MARK: &str = "[Kontrola]";
+
+/// Ile przypomnień o luce dostał już ten przebieg.
+pub(crate) fn nudges(messages: &[Message]) -> u8 {
+    let n = messages
+        .iter()
+        .filter(|m| m.role == providers_contract::Role::User)
+        .filter(|m| m.visible_text().starts_with(NOTE_MARK))
+        .count();
+    u8::try_from(n).unwrap_or(u8::MAX)
+}
+
 /// Narzędzia, które naprawdę czytają stronę albo wynik wyszukiwania.
 const WEB_READERS: &[&str] = &[
     "net_fetch",
@@ -37,8 +50,20 @@ pub(crate) enum Gap {
     },
 }
 
-/// Najdłuższy fragment polecenia powtarzany w przypomnieniu o urwanej odpowiedzi (znaki).
+/// Najdłuższy fragment polecenia powtarzany w przypomnieniach (znaki).
 const GOAL_IN_NOTE: usize = 600;
+
+/// Polecenie zadania do wiadomości wykonawcy („Polecenie: „…”.”). Okno modelu lokalnego może po
+/// długiej pętli narzędzi pominąć wiadomość z celem (w zadaniu z rozmowy przypięta jest pierwsza
+/// wiadomość — notatka projektu), więc prośby o weryfikację i poprawkę niosą cel same
+/// (przegląd nocnych zmian, 2.11).
+pub(crate) fn goal_reminder(goal: &str) -> String {
+    let mut part: String = goal.trim().chars().take(GOAL_IN_NOTE).collect();
+    if goal.trim().chars().count() > GOAL_IN_NOTE {
+        part.push('…');
+    }
+    format!("Polecenie: „{part}”.")
+}
 
 impl Gap {
     /// Wiadomość dla modelu (rola `User`, jak inne komunikaty wykonawcy). Przy urwanej odpowiedzi
@@ -46,17 +71,12 @@ impl Gap {
     /// i odpowiadał odmową niezwiązaną z celem (próba obowiązku „morning”, 1.11).
     pub(crate) fn note(&self, goal: &str) -> String {
         match self {
-            Self::Unfinished => {
-                let mut goal_part: String = goal.trim().chars().take(GOAL_IN_NOTE).collect();
-                if goal.trim().chars().count() > GOAL_IN_NOTE {
-                    goal_part.push('…');
-                }
-                format!(
-                    "[Kontrola] Twoja odpowiedź jest niepełna — urywa się po wstępie albo jest pusta. \
-                     Polecenie: „{goal_part}”. Podaj teraz cały gotowy wynik tego polecenia od początku, \
-                     w całości, bez wstępu i bez zapowiedzi, na podstawie danych, które już masz."
-                )
-            }
+            Self::Unfinished => format!(
+                "[Kontrola] Twoja odpowiedź jest niepełna — urywa się po wstępie albo jest pusta. \
+                 {} Podaj teraz cały gotowy wynik tego polecenia od początku, w całości, bez wstępu \
+                 i bez zapowiedzi, na podstawie danych, które już masz.",
+                goal_reminder(goal)
+            ),
             Self::UnreadSources { can_read: true } => {
                 "[Kontrola] Polecenie wskazuje strony do sprawdzenia, a w tym zadaniu nie otworzyłaś \
                  żadnej. Odczytaj je narzędziem (net_fetch). Dane, których nie odczytasz w tym zadaniu, \

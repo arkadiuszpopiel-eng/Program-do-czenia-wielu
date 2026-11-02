@@ -93,3 +93,10 @@ z literówkami („Tepm”, „Usersa”), wychodził poza katalog i czekał na 
 „… to szablon, nie wartość — podstaw prawdziwą ścieżkę”. Treść (`content`) nie jest sprawdzana. Takie wywołanie liczy się
 do wykrywania pętli (pełne wejście), więc powtarzane co turę kończy przebieg `LoopDetected`, a nie zużywa budżet kroków
 (testy `tests/invalid_args.rs`).
+
+**Cel w prośbach wykonawcy (2.11, przegląd nocnych zmian):** przypomnienie o urwanej odpowiedzi, prośba o weryfikację,
+„[Weryfikacja] Wykryto problem…” i „[Krytyczka] Wykryto problem…” niosą polecenie zadania („Polecenie: „…”.”, ≤ 600
+znaków) — okno modelu lokalnego mogło pominąć wiadomość z celem. Kontrola kompletności („[Kontrola]”) nie działa
+w przebiegu weryfikacji ani w podprzebiegu Krytyczki (jej cel zawiera adresy z wyniku autorki, a werdykt to nie raport);
+liczba przypomnień liczona z historii, więc przeżywa wznowienie z checkpointu (test
+`tests/critic.rs::correction_repeats_the_goal_and_critic_gets_no_completeness_nudge`).
