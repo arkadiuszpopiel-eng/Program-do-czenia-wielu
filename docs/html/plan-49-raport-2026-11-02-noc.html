@@ -324,6 +324,19 @@ lokalnymi i chmurowymi”, a wieczorem (ok. 19:50): „Posprzątaj, potem wykona
 poprawkami i ulepszeniami […] do 5:00 rano […] po 5:10/15 najpóźniej kopia bezpieczeństwa na dysku F: […], zapis pracy
 w dokumentacji pełnej […] i STOP”. Ten raport mówi, co zrobiłam, co zmierzyłam, co czeka na decyzję i czego nie
 sprawdziłam.</p>
+<p><strong>W skrócie:</strong></p>
+<ul>
+<li>Wgrane dwie wersje: <strong>0.0.83</strong> (0:20) i <strong>0.0.84</strong> (2:40). Obie przeszły pełną bramkę 20/20. Program nie był
+uruchamiany — otwierasz go skrótem „Alfa”.</li>
+<li>Codzienne obowiązki na modelu lokalnym dają prawdziwe raporty: morning, evening, tidy i costs są zielone. „prices”
+czeka na Twoją zgodę na pobieranie stron.</li>
+<li><strong>[poważne]</strong> Model lokalny potrafił „zamienić nazwisko w umowie”, zapisując w pliku jedno zdanie zamiast umowy.
+Od 0.0.84 agentka może zastąpić treść pliku dopiero po jego przeczytaniu.</li>
+<li>Narzędzia na Bieliku 4.5B (zestaw F3): z 8/35 na początku nocy do <strong>16/35</strong>.</li>
+<li>Dwa przeglądy kodu w świeżym kontekście. Wszystkie poważne uwagi poprawione. Cztery ostatnie poprawki są na <code>main</code>
+i wejdą w następną wersję.</li>
+<li>Decyzje dla Ciebie: §5 (7 punktów).</li>
+</ul>
 <h2 id="1-sprzatanie">1. Sprzątanie</h2>
 <p>Zgodnie z odpowiedzią właściciela usunięte tylko pliki kompilacji debug (<code>target/debug</code>, ok. 91 GB). Kopie robocze
 <code>alfa-pelny-dostep</code>, <code>alfa-testy-pelny-dostep</code>, <code>alfa-zgody-przeglad</code>, scalone gałęzie i stare raporty verify —
@@ -393,7 +406,9 @@ zbędne spacje — teraz zostaje sama adnotacja;</li>
 <tr><td><strong>2.11 0:00, wersja 0.0.83 — pełny bieg</strong></td><td><strong>14/35</strong></td><td><strong>12/24</strong></td><td>2/11</td><td>najlepszy dotąd; zadania 2–4× szybsze (12–50 s zamiast 50–180 s)</td></tr>
 <tr><td>2.11 0:45, po <code>bf03b8ca</code> (szablony w ścieżkach)</td><td>13/35</td><td>11/24</td><td>2/11</td><td>w granicy zmienności ±1; fs-20 nie kręci się już do końca budżetu</td></tr>
 <tr><td>2.11 1:20, po przeglądzie (<code>85d83b5c</code>)</td><td>12/35</td><td>11/24</td><td>1/11</td><td>zmienność (sh-08); ślady: nadpisanie bez odczytu w fs-11, fs-13</td></tr>
-<tr><td><strong>2.11 1:25, <code>815adb94</code> (nadpisanie po odczycie)</strong></td><td><strong>15/35</strong></td><td><strong>12/24</strong></td><td><strong>3/11</strong></td><td>najlepszy dotąd; fs-11/fs-13 czytają plik przed zapisem</td></tr></tbody></table></div>
+<tr><td><strong>2.11 1:25, <code>815adb94</code> (nadpisanie po odczycie)</strong></td><td><strong>15/35</strong></td><td><strong>12/24</strong></td><td><strong>3/11</strong></td><td>najlepszy dotąd; fs-11/fs-13 czytają plik przed zapisem</td></tr>
+<tr><td>2.11 2:55, <code>3c1606f9</code> (pusty <code>cwd</code>, odczyt z literówką, podpowiedzi powłoki)</td><td>13/35</td><td>11/24</td><td>2/11</td><td>sh-10 przeszło; fs-09 tym razem szukało po nazwie (inna droga)</td></tr>
+<tr><td><strong>2.11 3:35, <code>78b9b1bf</code> (po 2. przeglądzie, końcowy)</strong></td><td><strong>16/35</strong></td><td><strong>13/24</strong></td><td><strong>3/11</strong></td><td>najlepszy; fs-09 (literówka), fs-22 (szablon w treści), fs-24 (Kosz) przeszły</td></tr></tbody></table></div>
 <p>Dwie ogólne przyczyny porażek znalezione w śladach i poprawione po 0.0.83 (<code>bf03b8ca</code>, w następnej wersji):
 <strong>szablon zamiast wartości</strong> (<code>{&quot;path&quot;: &quot;{{old_path}}&quot;}</code>, wcześniej <code>&lt;url&gt;</code> w „prices”) — wywołanie nie trafia do
 narzędzia, model dostaje „… to szablon, nie wartość”, a powtarzane co turę kończy się wykryciem pętli zamiast zużycia
@@ -414,6 +429,29 @@ samej karty co <code>fs_delete_permanent</code> (Broker — poza moim zakresem).
 <p>Powłokę dalej blokuje świadomie ostrożna reguła: samodzielny <code>*</code> (mnożenie <code>17 * 23</code>, <code>-Property *</code>) analizator traktuje
 jak wzorzec ścieżki poświadczeń i odmawia (sh-03, sh-05, sh-09) — decyzja z raportu 44 nadal czeka (§5). Zmienność
 bieg-do-biegu: ±1 zadanie (sh-02/sh-08).</p>
+<h3 id="po-wersji-0-0-84-na-main-do-nastepnej-wersji">Po wersji 0.0.84 (na <code>main</code>, do następnej wersji)</h3>
+<ul>
+<li><code>b13ec164</code> — pusty <code>cwd</code> w <code>shell_run</code> to katalog roboczy (fs-18: „ścieżka pusta”);</li>
+<li><code>334aaa19</code> — <code>fs_read</code> z literówką mającą jedno dopasowanie w katalogu roboczym odczytuje poprawioną ścieżkę (nowa
+zgoda Brokera, informacja w wyniku); fs-09: model trzy razy powtórzył literówkę mimo podpowiedzi;</li>
+<li><code>3c1606f9</code> — podpowiedź w wyniku powłoki, gdy narzędzia uniksowe z Git padają w izolacji albo <code>cmd</code> nie zna
+polecenia PowerShell (sh-04, sh-10, fs-23);</li>
+<li><code>78b9b1bf</code> — poprawki z drugiego przeglądu (niżej).</li>
+<li><strong>Drugi przegląd w świeżym kontekście</strong> (2.11 ok. 3:15, zmiany <code>815adb94</code>..<code>3c1606f9</code>): bez obejścia Brokera,
+deny-listy ani katalogu roboczego; 1 poważna luka w samej blokadzie — <code>append</code> (dopisanie bez odczytu) odblokowywał
+późniejsze nadpisanie (ta luka jest w wgranej 0.0.84 — nie gorzej niż przed blokadą; poprawka wejdzie w następnej
+wersji) — i kilka fałszywych trafień. Poprawione w <code>78b9b1bf</code>: liczy się tylko pełny odczyt tekstu
+(nie binarny, nie zakres, nie ucięty) albo własny zapis <code>create</code>/<code>overwrite</code>; szablon tylko jako ostatni człon ścieżki
+<code>{{…}}</code> bez kropki (katalogi cookiecutter <code>{{cookiecutter.project_slug}}</code> dozwolone), <code>content</code> tylko w <code>fs_write</code>;
+rada o <code>shell</code>: „powershell” tylko przy komunikacie <code>cmd</code>; Kosz sprawdzany tylko dla celu od modelu (<code>fs_rename</code>
+składał cel bezwzględny — fałszywa odmowa w katalogu <code>D:\Trash\…</code>). Odłożone: podpowiedź powłoki trafia do bloku
+niezaufanego (model może ją pominąć) — przeniesienie do zaufanej części wyniku wymaga pola w kontrakcie
+<code>ToolOutcome</code>; nowy przebieg (wznowienie po budżecie, podprzebieg) musi odczytać plik ponownie przed nadpisaniem —
+kierunek bezpieczny, kosztuje jeden krok.</li>
+<li>Pomiar F3 na <code>3c1606f9</code>: 13/35 — w granicach zmienności tej nocy (12–15 na tym samym kodzie i podobnym). Model za
+każdym razem idzie inną drogą (fs-09: raz literówka w ścieżce, raz szukanie pliku po nazwie), więc pojedynczy bieg
+nie rozróżnia poprawek o ±1–2 zadania; ocena wymaga kilku biegów albo większego zestawu.</li>
+</ul>
 <h2 id="5-decyzje-dla-wlasciciela">5. Decyzje dla właściciela</h2>
 <ol>
 <li><strong><code>*</code> w analizatorze powłoki</strong> (z raportu 44): czy nie traktować <code>*</code> jako wzorca ścieżki, gdy stoi między liczbami
@@ -426,6 +464,13 @@ samej klasy co autorka.</li>
 <li><strong>Zgody w obowiązku „Kontrola cenników”</strong>: obowiązek pobiera 7 stron — 7 kart zgody. Do rozważenia stała zgoda
 na te hosty (to polityka Jądra — tylko człowiek).</li>
 <li>Otwarte z raportu 48 §4: zakres zgody „do odwołania”, etykieta „Wszystkie agentki w sesji”.</li>
+<li><strong>Narzędzia uniksowe z Git w izolacji powłoki</strong> (nowe, 2.11): <code>grep.exe</code>, <code>rm.exe</code> z Git for Windows padają
+w izolacji niskiej integralności (<code>fatal error - NtCreateDirectoryObject</code>). Model dostaje teraz podpowiedź, żeby
+użył PowerShell albo narzędzi plików. Do decyzji: (a) zostawić (bezpieczniej), (b) wyłączyć narzędzia Git z izolacji
+tak jak narzędzia budowania (cargo, npm).</li>
+<li><strong>Trwałe usuwanie powłoką</strong> (obserwacja z F3 fs-23): po odmowie <code>fs_delete_permanent</code> model próbował <code>rm -rf</code>
+w katalogu roboczym; polecenie ma migawkę do cofnięcia, więc jest zgodne z polityką — do oceny, czy nie powinno
+wymagać tej samej karty co trwałe usunięcie narzędziem plików (Broker, tylko człowiek).</li>
 </ol>
 <h2 id="6-czego-nie-sprawdzilam">6. Czego nie sprawdziłam</h2>
 <ul>
@@ -433,6 +478,8 @@ na te hosty (to polityka Jądra — tylko człowiek).</li>
 kluczy w sesji; kodu nie zmieniałam.</li>
 <li>„prices” do końca na modelu lokalnym — zgody Sędziego w próbie nie daje nikt (to okno Jądra, poza automatyzacją).</li>
 <li>Testów sprzętowych z dźwiękiem (noc — cisza).</li>
+<li>Trzech zmian po 0.0.84 (<code>b13ec164</code>, <code>334aaa19</code>, <code>3c1606f9</code>) nie przepuściłam przez pełne <code>verify wersja</code> — mają testy
+własnych crate&#39;ów, clippy, rozmiar, pomiar F3 i testy pakietów aplikacji (§7); pełna bramka przy następnej wersji.</li>
 </ul>
 <h2 id="7-wersja-testy-i-kopia">7. Wersja, testy i kopia</h2>
 <ul>
@@ -454,6 +501,14 @@ w świeżym kontekście (<code>85d83b5c</code>) i nadpisanie po odczycie (<code>
 na 0.0.84: <strong>23/23</strong> (2:42).</li>
 <li>Próba obowiązków na 0.0.84 (2:40–2:47, instancja testowa poza ekranem): morning, evening, tidy, costs — <strong>zielone</strong>;
 prices — czeka na zgodę Sędziego (jak wyżej).</li>
+<li>Po 0.0.84, na końcowym <code>78b9b1bf</code>: testy crate&#39;ów <code>tools-fs-impl</code>, <code>tools-shell-impl</code>, <code>agent-runtime-impl</code> + clippy<ul>
+<li>rozmiar — zielone; testy pakietów aplikacji <code>app-core</code>, <code>app-agents</code>, <code>app-tasks</code>, <code>app-chat</code> — <strong>278/0</strong>
+(4 pominięte), 3:20–3:33. Pełna bramka <code>verify wersja</code> — przy następnej wersji.</li>
+</ul>
+</li>
+<li>Pomiar F3 na końcowym <code>78b9b1bf</code> (3:35–3:45): <strong>16/35</strong> (pliki 13/24, powłoka 3/11) — najlepszy wynik; od początku
+nocy 8/35. Zmienność bieg-do-biegu ±2, więc pewny jest kierunek, nie dokładna liczba.</li>
+<li>Sprzątanie po bramce: <code>target/debug/deps</code> 75 → 42 GB (stare pliki <code>.exe</code>/<code>.pdb</code> &gt; 2 h), na E: 152 GB wolnego.</li>
 <li>KOPIA</li>
 </ul>
 </article>
