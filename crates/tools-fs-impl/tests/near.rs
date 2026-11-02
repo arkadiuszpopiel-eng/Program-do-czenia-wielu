@@ -62,14 +62,23 @@ async fn typo_above_the_workdir_gets_a_hint() {
 #[tokio::test]
 async fn typo_inside_workdir_gets_a_hint_on_read_and_list() {
     let h = files();
+    // Odczyt (bez skutków) od razu z poprawioną ścieżką i informacją, co odczytano (pomiar F3 fs-09).
     let read = h.call(K::Read, json!({"path": "Raprty/marzec.txt"})).await;
+    assert!(read.is_ok(), "{read:?}");
+    assert!(
+        read.text.contains("literówka w ścieżce") && read.text.contains("Raporty"),
+        "{}",
+        read.text
+    );
+    assert!(read.data["path"].as_str().unwrap().contains("Raporty"));
+    // Dwie literówki ponad limit poprawek — zwykły błąd.
+    let far = h.call(K::Read, json!({"path": "Rxxxxxx/mxxxxc.txt"})).await;
     assert_eq!(
-        read.status,
+        far.status,
         ToolStatus::Failed {
             error: ToolErrorKind::NotFound
         }
     );
-    assert!(read.text.contains("Czy chodziło o"), "{}", read.text);
     let list = h.call(K::List, json!({"path": "Raport"})).await;
     assert!(list.text.contains("Czy chodziło o"), "{}", list.text);
 }

@@ -67,14 +67,18 @@ impl Core {
     /// Istniejąca ścieżka w katalogu roboczym różniąca się od `path` literówkami w najwyżej
     /// [`MAX_FIXES`] członach — jako zdanie dla modelu („ Czy chodziło o „…”?”).
     pub(crate) fn near_miss(&self, path: &str, workdir: Option<&str>) -> String {
-        let Some(wd) = workdir.filter(|w| !w.is_empty()) else {
-            return String::new();
-        };
-        let Some(fixed) = self.fix_path(Path::new(path), Path::new(wd)) else {
-            return String::new();
-        };
-        let fixed = fixed.to_string_lossy().into_owned();
-        format!(" Czy chodziło o „{}”?", shown(&fixed, Some(wd)))
+        self.near_fix(path, workdir)
+            .map_or_else(String::new, |fixed| {
+                format!(" Czy chodziło o „{}”?", shown(&fixed, workdir))
+            })
+    }
+
+    /// Istniejąca ścieżka w katalogu roboczym różniąca się od `path` literówkami (jak
+    /// [`Core::near_miss`]) — pełna ścieżka.
+    pub(crate) fn near_fix(&self, path: &str, workdir: Option<&str>) -> Option<String> {
+        let wd = workdir.filter(|w| !w.is_empty())?;
+        let fixed = self.fix_path(Path::new(path), Path::new(wd))?;
+        Some(fixed.to_string_lossy().into_owned())
     }
 
     /// Błąd platformy jak [`platform_failure`], przy braku ścieżki — z podpowiedzią literówki.

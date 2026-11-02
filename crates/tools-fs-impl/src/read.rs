@@ -132,7 +132,6 @@ impl Core {
         m: &ToolManifest,
     ) -> Step<ToolOutcome> {
         let a: ReadArgs = parse_args(args)?;
-        let (path, auths) = self.read_access(ctx, m, &a.path, false).await?;
         let max = u64::from(
             a.max_bytes
                 .unwrap_or(self.config.read_max_bytes)
@@ -140,12 +139,35 @@ impl Core {
         );
         // Tylko żądany zakres: początek pliku o rozmiarze gigabajtów nie trafia w całości do pamięci.
         let wanted = a.offset.unwrap_or(0);
-        let (data, total) = match self.fs.read_range(Path::new(&path), wanted, max) {
-            Ok(d) => d,
-            Err(e) => {
-                let action = format!("odczyt „{path}”");
-                let out = self.failure_near(&e, &action, &path, ctx.workdir.as_deref());
-                return Ok(self.done(ctx, m, &auths, out).await);
+        let mut raw = a.path.clone();
+        let mut fixed_note = String::new();
+        let (path, auths, data, total) = loop {
+            let (path, auths) = self.read_access(ctx, m, &raw, false).await?;
+            match self.fs.read_range(Path::new(&path), wanted, max) {
+                Ok((data, total)) => break (path, auths, data, total),
+                Err(e) => {
+                    // Literówka z jedynym dopasowaniem w katalogu roboczym: odczyt (bez skutków) od razu
+                    // poprawnej ścieżki, z nową zgodą — model powtarzał literówkę mimo podpowiedzi
+                    // „Czy chodziło o…” (pomiar F3 fs-09, 2.11). Tylko jedna poprawka.
+                    let near = matches!(e, platform_contract::PlatformError::NotFound(_))
+                        .then(|| self.near_fix(&path, ctx.workdir.as_deref()))
+                        .flatten()
+                        .filter(|_| fixed_note.is_empty());
+                    if let Some(near) = near {
+                        self.gate.release(&auths).await;
+                        let wd = ctx.workdir.as_deref();
+                        fixed_note = format!(
+                            "Nie ma „{}” — odczytano „{}” (literówka w ścieżce).\n",
+                            shown(&path, wd),
+                            shown(&near, wd)
+                        );
+                        raw = near;
+                        continue;
+                    }
+                    let action = format!("odczyt „{path}”");
+                    let out = self.failure_near(&e, &action, &path, ctx.workdir.as_deref());
+                    return Ok(self.done(ctx, m, &auths, out).await);
+                }
             }
         };
         let offset = wanted.min(total);
@@ -170,6 +192,7 @@ impl Core {
             };
             format!("Plik „{shown_path}” ({total} B{range}):\n{content}")
         };
+        let body = format!("{fixed_note}{body}");
         let data = to_value(&ReadOutput {
             path,
             content,

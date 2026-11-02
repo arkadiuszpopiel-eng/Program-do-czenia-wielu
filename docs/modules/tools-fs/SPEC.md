@@ -33,6 +33,9 @@ Zdolności: `fs.read` (list/read/stat/search), `fs.write` (mutacje), `fs.copy` =
   jedyne najlepsze dopasowanie), wynik dopisuje „Czy chodziło o „…”?” (`near.rs`, 1.11). Tylko w katalogu
   roboczym, nigdy ścieżka z deny-listy (sprawdzana także dla ścieżki końcowej po wszystkich poprawkach); podpowiedź niczego nie otwiera (test `tests/near.rs`). Człony powyżej
   katalogu roboczego też porównywane z tolerancją („…\Local\Tepm\…”), w sumie najwyżej 2 poprawki.
+  `fs_read` (sam odczyt, bez skutków) przy jedynym dopasowaniu odczytuje od razu poprawioną ścieżkę — z nową zgodą
+  Brokera i zdaniem „Nie ma „…” — odczytano „…” (literówka w ścieżce)” na początku wyniku; model powtarzał literówkę
+  mimo podpowiedzi (pomiar F3 fs-09, 2.11). Narzędzia zmieniające stan nigdy nie poprawiają ścieżki same.
 - Narzędzie wykonuje się z restricted token / AppContainer dla ≤ L3 (przez `ProcessPort`, gdy operacja delegowana do procesu).
 
 ## Zdolności / uprawnienia
