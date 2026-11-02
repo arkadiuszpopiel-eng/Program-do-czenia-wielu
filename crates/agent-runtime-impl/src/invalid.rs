@@ -48,26 +48,44 @@ const PATH_KEYS: &[&str] = &[
     "path", "from", "to", "new_name", "root", "url", "cwd", "dir", "target", "source",
 ];
 
-/// Szablon zamiast wartości w argumencie ścieżki/adresu (`{{old_path}}`, `<url>`): lekki model
-/// przepisywał wzór z opisu zamiast podstawić wartość (pomiar F3 fs-20, próba „prices”, 1.11).
+/// Szablon zamiast wartości: w argumencie ścieżki/adresu cały (`{{old_path}}`, `<url>`) albo
+/// w środku (`zdjecia/{{ file_name }}`), w treści zapisu — cała treść (`<adresy_po_zmianie>`,
+/// `{{wynik}}`). Lekki model przepisywał wzór zamiast podstawić wartość (pomiar F3 fs-20, fs-22,
+/// próba „prices”, 1.11–2.11). Szablon w środku treści jest dozwolony (pliki szablonów, HTML).
 pub(crate) fn placeholder(input: &serde_json::Value) -> Option<String> {
     let map = input.as_object()?;
-    PATH_KEYS.iter().find_map(|key| {
-        let value = map.get(*key)?.as_str()?.trim();
-        let word = |inner: &str| {
-            !inner.is_empty()
-                && inner.chars().count() <= 40
-                && inner.chars().all(|c| c.is_alphanumeric() || matches!(c, '_' | '-' | ' ' | '.'))
-        };
-        let mustache = value
+    let word = |inner: &str| {
+        let inner = inner.trim();
+        !inner.is_empty()
+            && inner.chars().count() <= 40
+            && inner
+                .chars()
+                .all(|c| c.is_alphanumeric() || matches!(c, '_' | '-' | ' ' | '.'))
+    };
+    // `strict`: w treści `<…>` liczy się tylko z `_` albo spacją (nie `<br>`, `<html>`).
+    let whole = |v: &str, strict: bool| {
+        let mustache = v
             .strip_prefix("{{")
             .and_then(|v| v.strip_suffix("}}"))
-            .is_some_and(|v| word(v.trim()));
-        let angle = value
+            .is_some_and(word);
+        let angle = v
             .strip_prefix('<')
             .and_then(|v| v.strip_suffix('>'))
-            .is_some_and(word);
-        (mustache || angle).then(|| format!("`{key}` = „{value}” to szablon, nie wartość — podstaw prawdziwą ścieżkę albo adres (np. z wyniku fs_list)"))
+            .is_some_and(|w| word(w) && (!strict || w.contains(['_', ' '])));
+        mustache || angle
+    };
+    let inside = |v: &str| {
+        v.split("{{")
+            .skip(1)
+            .any(|rest| rest.split_once("}}").is_some_and(|(w, _)| word(w)))
+    };
+    let path = PATH_KEYS.iter().find_map(|key| {
+        let value = map.get(*key)?.as_str()?.trim();
+        (whole(value, false) || inside(value)).then(|| format!("`{key}` = „{value}” to szablon, nie wartość — podstaw prawdziwą ścieżkę albo adres (np. z wyniku fs_list)"))
+    });
+    path.or_else(|| {
+        let value = map.get("content")?.as_str()?.trim();
+        whole(value, true).then(|| format!("`content` = „{value}” to szablon, nie treść — wpisz całą prawdziwą treść (np. na podstawie wyniku fs_read)"))
     })
 }
 
@@ -102,13 +120,18 @@ mod tests {
     use serde_json::json;
 
     #[test]
-    fn placeholders_only_in_path_like_arguments() {
+    fn placeholders_in_paths_and_whole_content() {
         assert!(placeholder(&json!({"path": "{{old_path}}"})).is_some());
         assert!(placeholder(&json!({"url": "<url>"})).is_some());
         assert!(placeholder(&json!({"from": " {{ plik }} "})).is_some());
         assert!(placeholder(&json!({"path": "raport.txt"})).is_none());
-        assert!(placeholder(&json!({"content": "{{imie}}"})).is_none());
+        assert!(placeholder(&json!({"path": "zdjecia/{{ file_name }}"})).is_some());
+        assert!(placeholder(&json!({"content": "<adresy_po_zmianie>"})).is_some());
+        assert!(placeholder(&json!({"content": " {{wynik}} "})).is_some());
+        assert!(placeholder(&json!({"content": "Panie {{imie}}"})).is_none());
+        assert!(placeholder(&json!({"content": "<br>"})).is_none());
         assert!(placeholder(&json!({"path": "<a>/<b>"})).is_none());
+        assert!(placeholder(&json!({"path": "a{{b"})).is_none());
         assert!(placeholder(&json!(["{{x}}"])).is_none());
     }
 }

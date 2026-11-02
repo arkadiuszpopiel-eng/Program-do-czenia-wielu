@@ -90,7 +90,8 @@ z literówkami („Tepm”, „Usersa”), wychodził poza katalog i czekał na 
 
 **Szablon zamiast wartości (2.11):** wywołanie, w którym argument ścieżki albo adresu (`path`, `from`, `to`, `new_name`, `root`,
 `url`, `cwd`, `dir`, `target`, `source`) jest w całości szablonem (`{{old_path}}`, `<url>`), nie jest wykonywane — model dostaje
-„… to szablon, nie wartość — podstaw prawdziwą ścieżkę”. Treść (`content`) nie jest sprawdzana. Takie wywołanie liczy się
+„… to szablon, nie wartość — podstaw prawdziwą ścieżkę”. Szablon w środku ścieżki (`zdjecia/{{ file_name }}`) też; treść (`content`) tylko wtedy, gdy cała jest szablonem
+(`<adresy_po_zmianie>` — z `_` albo spacją, `{{wynik}}`; pomiar F3 fs-22) — szablon w środku treści jest dozwolony. Takie wywołanie liczy się
 do wykrywania pętli (pełne wejście), więc powtarzane co turę kończy przebieg `LoopDetected`, a nie zużywa budżet kroków
 (testy `tests/invalid_args.rs`).
 

@@ -153,6 +153,7 @@ impl Core {
         let end = offset.saturating_add(data.len() as u64);
         let slice = data.as_slice();
         let truncated = end < total;
+        self.seen.note(ctx, &path);
         report_untrusted(&self.gate, ctx, TaintSource::File).await;
         let (content, binary) = match text::decode_text(slice) {
             Some(t) => (text::redact_secrets(&t), false),

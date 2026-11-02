@@ -11,8 +11,10 @@
 
 mod core;
 mod delete;
+mod mkdir;
 mod near;
 mod read;
+mod seen;
 mod write;
 
 use std::sync::Arc;
@@ -23,7 +25,7 @@ use tools_common_contract::{Tool, ToolCtx, ToolManifest, ToolOutcome, Toolset};
 use tools_fs_contract::{FsToolKind, manifest};
 
 pub use crate::core::FsToolsDeps;
-pub use crate::write::MKDIR_MARKER;
+pub use crate::mkdir::MKDIR_MARKER;
 
 /// Treść `module.toml` tego modułu.
 pub const MODULE_TOML: &str = include_str!("../module.toml");

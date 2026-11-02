@@ -123,7 +123,7 @@ impl FsToolKind {
             ),
             Self::Write => (
                 "Zapis pliku",
-                "Zapisuje tekst do pliku atomowo: `create` (nowy plik), `overwrite` (zastąpienie) albo `append` (dopisanie). Poprzednia treść trafia do dziennika cofania.",
+                "Zapisuje tekst do pliku atomowo: `create` (nowy plik), `overwrite` (zastąpienie istniejącego pliku — najpierw odczytaj go fs_read) albo `append` (dopisanie). Poprzednia treść trafia do dziennika cofania.",
             ),
             Self::Move => (
                 "Przeniesienie pliku",

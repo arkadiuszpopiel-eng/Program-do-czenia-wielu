@@ -72,3 +72,11 @@ Kroki narzędzi w wątku (jedna linia + „Cofnij”), Replay krok po kroku, toa
   W aplikacji deny-lista narzędzi zawiera też katalogi danych Alfy (`app_modules::workdir::tool_deny_lists`).
   Testy: `tools-fs-impl/tests/links.rs`, `app-core/tests/workdir.rs` (`workdir_links_to_protected_dirs_are_rejected`,
   `link_created_after_choice_is_denied_at_tool_call`).
+- **Nadpisanie bez odczytu (2.11):** `fs_write` w trybie `overwrite` istniejącego, niepustego pliku, którego ten przebieg
+  nie odczytał (`fs_read`) ani sam nie zapisał, nie jest wykonywane — wynik `InvalidArgs` każe najpierw odczytać plik.
+  Lekki model zastępował treść umowy jednym zdaniem, a weryfikacja tym samym modelem uznawała to za poprawne (pomiar F3
+  fs-11, fs-13). Pamięć: ostatnie 32 przebiegi, po 1024 pliki (`seen.rs`); poza przebiegiem (wywołanie z interfejsu),
+  dla nowego i pustego pliku oraz `append` — bez zmian (test `tests/seen.rs`).
+- **Kosz jako katalog celu (2.11):** `fs_copy`/`fs_move`/`fs_rename` z celem `/Kosz/…`, `C:\Trash\…` (od korzenia dysku) albo
+  ze składnikiem `$Recycle.Bin` — wynik `InvalidArgs` wskazuje `fs_delete` (pomiar F3 fs-24). Zwykły katalog „Kosz”
+  w katalogu roboczym zostaje katalogiem (test `tests/near.rs`).

@@ -88,3 +88,36 @@ async fn no_hint_outside_workdir_or_on_the_deny_list() {
         .await;
     assert!(!far.text.contains("Czy chodziło o"), "{}", far.text);
 }
+
+#[tokio::test]
+async fn copy_or_move_to_the_trash_path_points_to_fs_delete() {
+    let h = files();
+    let copy = h
+        .call(
+            K::Copy,
+            json!({"from": "Raporty/marzec.txt", "to": "/Kosz/marzec.txt"}),
+        )
+        .await;
+    assert_eq!(
+        copy.status,
+        ToolStatus::Failed {
+            error: ToolErrorKind::InvalidArgs
+        }
+    );
+    assert!(copy.text.contains("fs_delete"), "{}", copy.text);
+    let mv = h
+        .call(
+            K::Move,
+            json!({"from": "Raporty/marzec.txt", "to": "C:/$Recycle.Bin/m.txt"}),
+        )
+        .await;
+    assert!(mv.text.contains("fs_delete"), "{}", mv.text);
+    // Zwykły katalog „Kosz” w katalogu roboczym zostaje katalogiem.
+    let plain = h
+        .call(
+            K::Copy,
+            json!({"from": "Raporty/marzec.txt", "to": "Kosz/marzec.txt"}),
+        )
+        .await;
+    assert!(!plain.text.contains("Kosz nie jest"), "{}", plain.text);
+}

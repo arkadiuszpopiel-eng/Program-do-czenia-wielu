@@ -43,6 +43,8 @@ pub(crate) struct Core {
     pub(crate) deny: DenyChecker,
     pub(crate) config: FsToolsConfig,
     pub(crate) bus: Option<Arc<dyn EventBus>>,
+    /// Pliki znane przebiegom (blokada nadpisania bez odczytu).
+    pub(crate) seen: crate::seen::Seen,
 }
 
 /// Wynik pośredni: `Err` to gotowy wynik dla modelu (odmowa, błąd).
@@ -58,6 +60,7 @@ impl Core {
             env: deps.env,
             config: deps.config,
             bus: deps.bus,
+            seen: crate::seen::Seen::default(),
         }
     }
 

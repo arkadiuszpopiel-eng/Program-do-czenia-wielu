@@ -143,6 +143,39 @@ impl Core {
     }
 }
 
+/// Nazwy Kosza, które model wpisuje jako katalog celu.
+const TRASH: &[&str] = &["kosz", "trash", "recycle bin", "$recycle.bin", "recycler"];
+
+/// Kopia albo przeniesienie „do Kosza” ścieżką (`/Kosz/plik`, `C:\$Recycle.Bin\…`): Kosz nie jest
+/// katalogiem dla narzędzi — model kopiował tam plik zamiast wywołać `fs_delete` i powtarzał
+/// błąd do końca budżetu (pomiar F3 fs-24, 2.11). Tylko ścieżka od korzenia dysku albo
+/// `$Recycle.Bin` gdziekolwiek; zwykły katalog „Kosz” w katalogu roboczym zostaje katalogiem.
+pub(crate) fn trash_target(raw: &str) -> Option<Box<ToolOutcome>> {
+    let rest = raw.trim();
+    let rest = match rest.as_bytes() {
+        [d, b':', ..] if d.is_ascii_alphabetic() => &rest[2..],
+        _ => rest,
+    };
+    let sep = ['/', '\\'];
+    let first = rest
+        .split(sep)
+        .find(|s| !s.is_empty())
+        .map(str::to_lowercase);
+    let hit = rest.starts_with(sep) && first.is_some_and(|f| TRASH.contains(&f.as_str()))
+        || rest
+            .split(sep)
+            .any(|s| s.eq_ignore_ascii_case("$recycle.bin"));
+    hit.then(|| {
+        Box::new(ToolOutcome::failed(
+            ToolErrorKind::InvalidArgs,
+            format!(
+                "Nie wykonano: „{raw}” — Kosz nie jest katalogiem dla narzędzi plików. Żeby przenieść \
+                 plik do Kosza, wywołaj fs_delete z jego ścieżką (można to cofnąć)."
+            ),
+        ))
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
