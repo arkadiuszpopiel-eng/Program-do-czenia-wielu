@@ -56,7 +56,10 @@ impl Core {
         } else {
             ""
         };
-        let body = format!("{head}{undo_note}\n[stdout]\n{stdout}\n[stderr]\n{stderr}");
+        let body = format!(
+            "{head}{undo_note}\n[stdout]\n{stdout}\n[stderr]\n{stderr}{}",
+            hint(&stderr)
+        );
         let data = RunOutput {
             termination,
             exit_code: code,
@@ -80,5 +83,38 @@ impl Core {
         result.undo = undo;
         result.truncated = truncated;
         result
+    }
+}
+
+/// Podpowiedź po typowej porażce środowiska — model powtarzał to samo polecenie (pomiar F3 sh-04,
+/// sh-10, fs-23, 2.11): narzędzia uniksowe z Git padają w izolacji niskiej integralności, a polecenie
+/// PowerShell w `cmd` „nie jest rozpoznawane”.
+pub(crate) fn hint(stderr: &str) -> &'static str {
+    if stderr.contains("NtCreateDirectoryObject") {
+        "\n[podpowiedź] Narzędzia uniksowe z Git (grep, rm, sed, tr…) nie działają w izolacji polecenia — \
+         użyj poleceń PowerShell (Select-String, Get-Content, Remove-Item, Measure-Object) albo narzędzi \
+         plików (fs_*)."
+    } else if stderr.contains("is not recognized as") || stderr.contains("nie jest rozpoznawan") {
+        "\n[podpowiedź] Ta powłoka nie zna tego polecenia — polecenia PowerShell (Get-ChildItem, \
+         Select-String…) uruchamiaj z `shell`: „powershell”, a zamiast narzędzi uniksowych użyj ich \
+         odpowiedników PowerShell albo narzędzi plików (fs_*)."
+    } else {
+        ""
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::hint;
+
+    #[test]
+    fn environment_failures_get_a_hint() {
+        let msys =
+            "0 [main] grep (30204) grep.exe: *** fatal error - NtCreateDirectoryObject: 0xC0000022";
+        assert!(hint(msys).contains("Select-String"));
+        let cmd = "'Get-ChildItem' is not recognized as an internal or external command,";
+        assert!(hint(cmd).contains("„powershell”"));
+        assert!(hint("'grep' nie jest rozpoznawany jako polecenie wewnętrzne").contains("fs_*"));
+        assert_eq!(hint("Access is denied."), "");
     }
 }

@@ -74,3 +74,8 @@ Krok w wątku i Replay (polecenie, skrócone wyjście, kod wyjścia), karta „c
   `tools-shell-impl/tests/run.rs::parent_or_unresolved_delete_targets_need_approval`.
 - **Pusty `cwd` (2.11):** `cwd` pusty albo z samych spacji znaczy „katalog roboczy przebiegu” (jak brak pola) — lekki model
   wypełniał tak każde pole schematu i dostawał „ścieżka pusta” (pomiar F3 fs-18). Test `tests/run.rs::empty_cwd_means_the_workdir`.
+- **Podpowiedź po porażce środowiska (2.11):** gdy stderr zawiera `NtCreateDirectoryObject` (narzędzia uniksowe z Git padają
+  w izolacji niskiej integralności) albo „is not recognized as” / „nie jest rozpoznawan…” (polecenie PowerShell w `cmd`),
+  wynik kończy się „[podpowiedź] …” z odpowiednikami PowerShell i narzędziami `fs_*` (pomiar F3 sh-04, sh-10, fs-23;
+  test `outcome::tests::environment_failures_get_a_hint`). Sama izolacja bez zmian — czy wyłączyć z niej narzędzia Git,
+  decyduje człowiek (raport 49).
