@@ -4,14 +4,14 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "b8c92890-d32a-48cf-afcf-c2baf7ce1924 (Alfa AI Laptop — jedyna rozmowa projektu od 1.11)",
-    "updated": "2026-11-01T14:40:00+01:00"
+    "updated": "2026-11-02T05:15:00+01:00"
   },
-  "current_state": "0.0.82 wgrana 1.11 14:34 z fcd832ef (verify wersja 20/20). Jedna rozmowa projektu: „Alfa AI Laptop”. Kopia F: kopia-2026-11-01_1434.",
-  "session_goal": "Kontynuacja w jednej rozmowie; najpierw domknąć otwarte sprawy z raportu 48.",
+  "current_state": "0.0.84 wgrana 2.11 2:40 z fe9afd2b (verify wersja 20/20). Po niej na main: b13ec164, 334aaa19, 3c1606f9, 78b9b1bf (+ dokumenty) — do następnej wersji z pełną bramką. Czysta kopia F:\\Kopie zapasowe programów Spopielony\\Alfa\\kopia-2026-11-02_0459 (dad50a25, 71 MB, SHA-256 5807/0).",
+  "session_goal": "Właściciel 1.11 ok. 19:50: „Posprzątaj, potem wykonaj zaległości, potem pracuj dalej nad poprawkami i ulepszeniami — wszelkie testy i poprawki do 5:00; pracujesz automatycznie, mnie nie będzie. Po 5:10/5:15 najpóźniej kopia na F: (Kopie zapasowe programów Spopielony), po kopii zapis pracy w pełnej dokumentacji w katalogu projektu i STOP.”",
   "in_progress": [
-    "Obowiązki na lokalnym modelu: morning (raport pusty/urwany), prices (liczby spoza danych) — verify sprzet 1.11.",
-    "Do decyzji człowieka: scalenie do-przegladu-zgody-2026-11-01 (3 poważne w zgodach czasowych), zakres zgody „do odwołania” (raport 48 §4 a/b/c), etykieta „Wszystkie agentki w sesji”; dalej gałęzie broker-2026-10-28, pelny-dostep, testy-pelny-dostep, updater-zip9.",
-    "Do decyzji człowieka (raport 47 §5): gałęzie do-przegladu-broker-2026-10-28 i do-przegladu-pelny-dostep, `*` w analizatorze powłoki, fs-23, próg F3-07, K.0."
+    "Następna wersja (0.0.85): pełne verify wersja dla zmian po 0.0.84 (pusty cwd, fs_read z poprawioną literówką, podpowiedzi powłoki, poprawki 2. przeglądu — append nie odblokowuje nadpisania).",
+    "Podpowiedź powłoki w zaufanej części wyniku (pole w ToolOutcome, tools-common-contract) — odłożone z przeglądu 2.11.",
+    "F3 na Bieliku: 15/35 najlepszy; pozostałe porażki to głównie granica modelu (przepisywanie nazw z literówkami, podwójnie kodowane cudzysłowy w treści JSON, zamiana tylko pierwszego wystąpienia)."
   ],
   "blocking_issues": [],
   "next_session": [
@@ -44,22 +44,13 @@
       "alfa-docs (podgląd HTML)": 5180
     }
   },
-  "test_results": "verify wersja 0.0.81 bieg 2 (6fe55035): 18/19, czerwone tylko dokumenty (features-katalog.html) → odświeżone w a37125d6, docs-html --verify zielony. Rust 1080 prog. 3324/0/43, interfejs 543, przeglądarka 761, aplikacja 61/61 pokrycie 276/283, L4 1/1+1/1.",
+  "test_results": "verify wersja 0.0.84 (fe9afd2b) ZIELONE 20/20; widoczne testy 23/23; próba obowiązków 4/5 zielone + prices czeka na zgodę; F3 15/35 (815adb94), 13/35 (3c1606f9); testy crate'ów po 78b9b1bf zielone (tools-fs, tools-shell, agent-runtime) — wynik app-core/app-agents/app-tasks/app-chat w raporcie 49 §7.",
   "decisions_this_session": [
-    "Właściciel 21.10: brak zgód ma być naprawiony „raz na zawsze” — skrót „Alfa” do Alfa-uruchomiona, odświeżany przy każdym wgraniu; skrót instalatora NSIS nie jest nadpisywany.",
-    "Właściciel 21.10: usunąć stare kompilacje — zwolnione 229 GB (target/debug/deps, .fingerprint, incremental, shell, trial-profile, release, src-tauri/target).",
-    "Łatki bezpieczeństwa w 0.0.67 (wersje poprawkowe, bez ADR); zip 9 (wersja główna) nadal do decyzji właściciela.",
-    "Przegląd 21.10: strażnik autonomii — przyjęcie podniesienia tylko po approval_outcome=Approved z Brokera; prośby tylko w pamięci (tryb usługi: karta zatwierdzona po restarcie Alfy jest cofana — kierunek bezpieczny, do decyzji przy trybie usługi).",
-    "Właściciel 20.10: poziom „Pełny dostęp” AI (bez zgód), z wyłącznikiem, dziennikiem i ochroną przed wstrzyknięciem; odrzucony wariant „zero ograniczeń”.",
-    "Właściciel 20.10: przełącznik baneru „Tryb deweloperski” — zrobiony (ui.broker_dev_banner).",
-    "Wgranie 0.0.65 po próbie obowiązków (wybór właściciela).",
-    "Usunięto target/agents (62 GB) i scalone kopie robocze wt-s6, gałęzie s5-*/s6-*.",
-    "0.0.66: każda rozmowa z Dyrygentką przez przebieg agentki — wycofane (14 testów: styl, głos, anulowanie, załączniki, 429); zamiast tego informacja o obsadzie w prompcie.",
-    "Właściciel 21.10 ~20:40: „Zamknij wszystkie otwarte tematy, wykonaj pełną działającą wersję… potem wszystko zapisz i zrób pauzę”; wgranie: „To co napisałem wcześniej ma być zrobione”; /goal do 7:00."
+    "2.11: crates/app-core/examples/ wycofany ze śledzenia (trafił przypadkiem do 4f31073b) — plik został na dysku.",
+    "2.11: fs_write overwrite istniejącego niepustego pliku wymaga pełnego odczytu w tym samym przebiegu."
   ],
   "next_steps": [
-    "Pierwsze uruchomienie 0.0.81 przez właściciela skrótem „Alfa”; sprawdzić rząd czasu zgody w jego oknie Sędziego.",
-    "Diagnostyka na PC stacjonarnym (AMD) — sonda mierzona tylko na laptopie.",
-    "Nieprzećwiczone w prawdziwej aplikacji: skills_export/import i 5 innych (target/verify/app/ipc-coverage.json)."
+    "Raport 49 §5 — decyzje właściciela: `*` w analizatorze powłoki; prywatność przy przełączeniu z „tylko lokalnie”; klasa Krytyczki przy pracy modelu w chmurze; stała zgoda na hosty obowiązku „Kontrola cenników”; narzędzia Git w izolacji powłoki (padają: NtCreateDirectoryObject); trwałe usuwanie powłoką vs karta fs_delete_permanent; z raportu 48: zakres zgody „do odwołania”, etykieta „Wszystkie agentki w sesji”.",
+    "Ścieżki Anthropic (myślenie z cudzymi wywołaniami) i Gemini (thought_signature) — niesprawdzone bez kluczy."
   ]
 }

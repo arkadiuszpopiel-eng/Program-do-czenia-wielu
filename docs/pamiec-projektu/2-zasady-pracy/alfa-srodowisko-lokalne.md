@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: reference
   originSessionId: 526ab23b-611a-489a-a8a3-7c1153e69825
-  modified: 2026-10-27T22:11:48.680Z
+  modified: 2026-11-02T01:53:12.251Z
 ---
 
 Stan z 2026-10-08 (laptop i7-13620H, RTX 4050 6 GB) — sprawdź, czy nadal aktualne.
@@ -101,6 +101,9 @@ ok. 15 GB do `target/debug/deps` (121 GB po 8 wersjach). Zasady: (1) przed każd
 `df -h /e`; (2) sprzątać **tylko** `target/debug/deps` i `incremental` — katalog `build` zostawić, bo trzyma
 zbudowany OpenSSL (jego ponowna budowa to ok. 20 min); (3) przy pracy seriami podbijać wersję rzadziej (kilka zmian
 na wersję); (4) nie edytować źródeł Rust, gdy w tle kompiluje się `cargo` — bierze stan mieszany.
+2.11 złamane przy pomiarze F3 (`cargo test … eval_tools` najpierw kompiluje): edycja `outcome.rs` w trakcie →
+błąd kompilacji, stracony bieg. Najpierw `cargo test -p app-agents --test eval_tools --no-run`, potem pomiar w tle,
+a w jego trakcie zmieniać tylko dokumenty.
 **PC stacjonarny, 2026-10-22 2:30:** po dniu z trzema `verify wersja` `target/debug` miał 230 GB, na E: zostało
 14 GB i `verify` oznaczył linter i testy jako NIEURUCHOMIONE (próg ok. 30 GB) — bez czerwonego wyniku, łatwo przeoczyć.
 Przed każdym `verify` sprawdzić `df -h /e`; sprzątanie bez pełnej przebudowy: usunąć z `target/debug/deps` tylko
