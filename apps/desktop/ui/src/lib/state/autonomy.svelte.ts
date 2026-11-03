@@ -32,15 +32,19 @@ export class AutonomyState {
           .then(() => api.childLock(null))
           .catch(() => null),
       ]);
+      // Zerwane łącze z Sędzią (profil „nieznany”): zostaje ostatni znany tryb, Max dostęp
+      // i kłódka — odpowiedzi zastępcze klienta (najwyżej „Ręcznie”, Max dostęp wyłączony) nie
+      // udają zmiany; karta profilu pokazuje „stan nieznany”. Egzekwuje i tak Sędzia.
+      const lost = child?.unknown === true && this.global !== null;
       if (n === this.seq) {
-        this.global = global;
-        this.maxAccess = max_access ?? null;
-        // Zerwane łącze z Sędzią: zostaje ostatni znany stan (kłódka nie „znika” z menu); karta
-        // profilu pokazuje wtedy „stan nieznany”.
-        this.child = child?.unknown && this.child ? this.child : child;
+        if (!lost) {
+          this.global = global;
+          this.maxAccess = max_access ?? null;
+        }
+        this.child = lost && this.child ? this.child : child;
         this.watchOpen(api);
       }
-      return global;
+      return lost ? this.global : global;
     } catch {
       return null;
     }

@@ -87,13 +87,15 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
     ];
     let reads = 0;
     const client = {
-      get: () => Promise.resolve(reply({ global: 'L1' })),
+      get: () => Promise.resolve(reply({ global: reads === 0 ? 'L1' : 'L0' })),
       childLock: () => Promise.resolve(states[Math.min(reads++, 1)]),
     } as unknown as PermissionsApi;
     const autonomy = new AutonomyState();
     await autonomy.load(client);
     expect(autonomy.locked).toBe(true);
-    await autonomy.load(client);
+    // Odpowiedź zastępcza bez łącza (L0) nie zmienia pokazywanego trybu.
+    expect(await autonomy.load(client)).toBe('L1');
+    expect(autonomy.global).toBe('L1');
     expect(autonomy.locked).toBe(true);
     // Bez wcześniejszego odczytu — nieznany stan nie udaje kłódki.
     const fresh = new AutonomyState();
