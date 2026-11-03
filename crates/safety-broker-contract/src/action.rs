@@ -8,7 +8,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::approval::ApprovalId;
-use crate::autonomy::AutonomyTarget;
+use crate::autonomy::{AutonomyTarget, ModelLocation, ModelScope};
 use crate::capability::Capability;
 use crate::token::{CapToken, Holder, TokenId};
 
@@ -41,6 +41,9 @@ pub struct DeclaredFacts {
     /// korzeniami profilu, więc szerszy folder nie daje więcej niż zakres sesji.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub workdir: Option<String>,
+    /// Gdzie działa model przebiegu (z kontekstu wywołania) — dla przełącznika „Max dostęp”.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_location: Option<ModelLocation>,
 }
 
 impl DeclaredFacts {
@@ -57,6 +60,7 @@ impl DeclaredFacts {
             command: None,
             summary: None,
             workdir: None,
+            model_location: None,
         }
     }
 }
@@ -232,6 +236,9 @@ pub struct BrokerMetrics {
     pub pending_approvals: u32,
     /// Twarde blokady od startu.
     pub kernel_blocks: u64,
+    /// Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_access: Option<ModelScope>,
 }
 
 /// Błędy Brokera.

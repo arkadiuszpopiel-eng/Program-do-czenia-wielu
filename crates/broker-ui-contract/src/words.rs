@@ -3,7 +3,9 @@
 //! i opis „Co to jest Sędzia Cieni?” pod przyciskiem „?”.
 
 use risk_classifier_contract::{AutonomyLevel, CommandOrigin, Reversibility, RuleId};
-use safety_broker_contract::{AdminOp, AutonomyTarget, Capability, KernelPolicy, ServiceAction};
+use safety_broker_contract::{
+    AdminOp, AutonomyTarget, Capability, KernelPolicy, ModelScope, ServiceAction,
+};
 
 use crate::card::sanitize;
 
@@ -207,6 +209,16 @@ pub fn target_pl(t: &AutonomyTarget) -> String {
             name(agent.as_str()),
             raw(session.as_str())
         ),
+        AutonomyTarget::Models { scope } => scope_pl(*scope).into(),
+    }
+}
+
+/// Zasięg „Max dostęp” po polsku (okno Sędziego, plan 50 §8.1).
+pub fn scope_pl(scope: ModelScope) -> &'static str {
+    match scope {
+        ModelScope::Local => "Max dostęp: agentki na modelach lokalnych",
+        ModelScope::Cloud => "Max dostęp: agentki na modelach w chmurze",
+        ModelScope::All => "Max dostęp: wszystkie agentki, każdy model",
     }
 }
 

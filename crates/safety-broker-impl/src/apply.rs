@@ -5,9 +5,8 @@ use risk_classifier_contract::{
 };
 use safety_broker_contract::{
     ApprovalDecision, ApprovalId, ApprovalSubject, AutonomyChangeRequest, AutonomyEntry,
-    AutonomyTarget, BrokerError, ChangeOrigin, EVENT_AUTONOMY_CHANGED, EVENT_KERNEL_BLOCK,
-    EVENT_POLICY_CHANGED, EVENT_TOKEN_ISSUED, HelloRequirement, Holder, KernelGuard, KernelPolicy,
-    UNTIL_REVOKED,
+    BrokerError, ChangeOrigin, EVENT_AUTONOMY_CHANGED, EVENT_KERNEL_BLOCK, EVENT_POLICY_CHANGED,
+    EVENT_TOKEN_ISSUED, HelloRequirement, Holder, KernelGuard, KernelPolicy, UNTIL_REVOKED,
 };
 use serde_json::json;
 
@@ -127,8 +126,8 @@ impl BrokerEngine {
                 let payload = json!({ "target": target, "level": level, "until_ms": until_ms, "approval": id });
                 self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;
                 // Podniesienie globalne bez terminu zostaje po restarcie (decyzja właściciela 27.10).
-                if target == AutonomyTarget::Global && until_ms.is_none() {
-                    self.remember_global(level);
+                if until_ms.is_none() {
+                    self.remember(&target, level);
                 }
                 st.autonomy.set(target, AutonomyEntry { level, until_ms });
                 if level == AutonomyLevel::L4 {
@@ -150,8 +149,10 @@ impl BrokerEngine {
     /// czekające karty działań i planów podmiotów, które teraz mają L4, wygasają od razu —
     /// ponowione działanie przejdzie bez pytania (twarda blokada Jądra działa dalej).
     fn withdraw_full_auto(st: &mut State, now: u64) {
-        let full = |st: &State, h: &Holder| {
-            st.autonomy.effective(&h.session, h.agent.as_ref(), now) == AutonomyLevel::L4
+        let full = |st: &State, h: &Holder, location| {
+            st.autonomy
+                .effective_for(&h.session, h.agent.as_ref(), location, now)
+                == AutonomyLevel::L4
         };
         let ids: Vec<ApprovalId> = st
             .approvals
@@ -163,7 +164,13 @@ impl BrokerEngine {
                     Some(PendingAction::Action(_) | PendingAction::Plan { .. })
                 )
             })
-            .filter(|(_, p)| full(st, &p.request.holder))
+            .filter(|(_, p)| {
+                let location = match &p.action {
+                    Some(PendingAction::Action(a)) => a.facts.model_location,
+                    _ => None,
+                };
+                full(st, &p.request.holder, location)
+            })
             .map(|(id, _)| *id)
             .collect();
         for id in ids {
@@ -215,8 +222,8 @@ impl BrokerEngine {
                 level: req.level,
                 until_ms,
             };
-            if req.target == AutonomyTarget::Global && until_ms.is_none() {
-                self.remember_global(req.level);
+            if until_ms.is_none() {
+                self.remember(&req.target, req.level);
             }
             st.autonomy.set(req.target.clone(), entry);
             let payload = json!({ "target": req.target, "from": current, "level": req.level, "origin": req.origin });

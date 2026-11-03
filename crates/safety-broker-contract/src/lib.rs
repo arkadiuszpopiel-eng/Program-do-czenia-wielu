@@ -45,7 +45,7 @@ pub use approval::{
     ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalRequest, ApprovalStatus,
     ApprovalSubject, GrantInfo, PlanStepSummary, UNTIL_REVOKED,
 };
-pub use autonomy::{AutonomyEntry, AutonomyTable, AutonomyTarget};
+pub use autonomy::{AutonomyEntry, AutonomyTable, AutonomyTarget, ModelLocation, ModelScope};
 pub use capability::Capability;
 pub use guard::KernelGuard;
 pub use policy::{

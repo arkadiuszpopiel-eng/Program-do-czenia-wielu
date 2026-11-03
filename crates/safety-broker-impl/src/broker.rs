@@ -111,6 +111,7 @@ impl Broker for BrokerEngine {
         let mut st = self.lock();
         Self::expire(&mut st, now);
         BrokerMetrics {
+            max_access: st.autonomy.max_access(now).map(|(scope, _)| scope),
             approvals_last_hour: st.approvals_last_hour(now),
             active_tokens: u32::try_from(
                 st.tokens.values().filter(|m| now < m.expires_at_ms).count(),

@@ -233,5 +233,10 @@ fn level_in(table: &AutonomyTable, target: &AutonomyTarget, now: u64) -> Autonom
         AutonomyTarget::SessionAgent { session, agent } => {
             table.effective(session, Some(agent), now)
         }
+        // „Max dostęp”: poziom wpisu tego zasięgu; inny zasięg albo wyłączony — domyślny.
+        AutonomyTarget::Models { scope } => match table.max_access(now) {
+            Some((on, level)) if on == *scope => level,
+            _ => AutonomyLevel::default(),
+        },
     }
 }

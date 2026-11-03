@@ -98,9 +98,12 @@ impl BrokerEngine {
         }
         let session = st.session(&req.holder.session);
         let facts = st.guard.derive_facts(&req, &session);
-        let level = st
-            .autonomy
-            .effective(&req.holder.session, req.holder.agent.as_ref(), now);
+        let level = st.autonomy.effective_for(
+            &req.holder.session,
+            req.holder.agent.as_ref(),
+            req.facts.model_location,
+            now,
+        );
         let verdict = self.classify(&st, &facts, level);
         match verdict.verdict {
             Verdict::HardBlock { rule } => Ok(self.kernel_block(&mut st, &req, rule)),
@@ -182,9 +185,10 @@ impl BrokerEngine {
         let now = self.now();
         let mut st = self.lock();
         let session = st.session(&plan.holder.session);
-        let level = st
-            .autonomy
-            .effective(&plan.holder.session, plan.holder.agent.as_ref(), now);
+        let plan_level =
+            st.autonomy
+                .effective(&plan.holder.session, plan.holder.agent.as_ref(), now);
+
         let mut summaries = Vec::new();
         let mut shown = Vec::new();
         let mut meta_rules = Vec::new();
@@ -198,6 +202,12 @@ impl BrokerEngine {
                 ttl_ms: None,
             };
             let facts = st.guard.derive_facts(&req, &session);
+            let level = st.autonomy.effective_for(
+                &plan.holder.session,
+                plan.holder.agent.as_ref(),
+                step.facts.model_location,
+                now,
+            );
             let v = self.classify(&st, &facts, level);
             match v.verdict {
                 Verdict::HardBlock { rule } => {
@@ -250,7 +260,7 @@ impl BrokerEngine {
             hello_required: false,
             explanation: format!("Plan „{}”: kroków wymagających zgody: {asked}.", plan.title),
             rules: meta_rules,
-            autonomy: Some(level),
+            autonomy: Some(plan_level),
         };
         let action = PendingAction::Plan {
             holder: plan.holder,
