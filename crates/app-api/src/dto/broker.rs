@@ -182,4 +182,6 @@ pub enum ChildLockRequest {
     },
     /// Zamknięcie kłódki (bez PIN-u).
     Close,
+    /// Sprawdzenie PIN-u przed dziennikiem rodzica (bez zmiany stanu, ten sam limit prób).
+    Verify { pin: SecretInput },
 }

@@ -112,6 +112,11 @@ pub enum ChildLockChange {
     },
     /// Zamyka kłódkę od razu (bez PIN-u — zawężenie może każdy).
     Close,
+    /// Sprawdza PIN bez zmiany stanu (dziennik rodzica, plan 50 Z.7) — z tym samym limitem prób.
+    Verify {
+        /// PIN rodzica.
+        pin: Pin,
+    },
 }
 
 /// Stan profilu Dziecko dla interfejsu (bez PIN-u i skrótu).

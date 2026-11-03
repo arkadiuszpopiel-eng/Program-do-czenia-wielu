@@ -148,3 +148,31 @@ test('paleta (Ctrl+K) i znak w belce przy kłódce: menu z kłódkami, bez proś
   await page.keyboard.press('1');
   await expect(page.getByText('Tryb pracy: Plan.')).toBeVisible();
 });
+
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`dziennik rodzica pod PIN-em — ${skin}, ${theme}`, async ({ page }) => {
+      await open(page, skin, theme, 'locked');
+      await openCard(page);
+      const card = page.getByRole('region', { name: 'Dziennik rodzica' });
+      await expect(
+        card.getByText('Treść rozmów nie jest tu pokazywana', { exact: false }),
+      ).toBeVisible();
+      const pin = card.getByLabel('PIN rodzica', { exact: true });
+      await pin.fill('1111');
+      await card.getByRole('button', { name: 'Pokaż dziennik' }).click();
+      await expect(page.getByText('błędny PIN rodzica')).toBeVisible();
+      await expect(card.getByRole('list', { name: 'Dziennik rodzica' })).toHaveCount(0);
+      await pin.fill('2468');
+      await card.getByRole('button', { name: 'Pokaż dziennik' }).click();
+      const log = card.getByRole('list', { name: 'Dziennik rodzica' });
+      await expect(log.getByText('fs.write · raport-Q3.docx (cofalne)')).toBeVisible();
+      await expect(log.getByRole('heading', { name: /^Rozmowa „Raport Q3”/ })).toBeVisible();
+      await expectAccessible(page, `dziennik rodzica ${skin} ${theme}`);
+      await expectReadable(page, `dziennik rodzica ${skin} ${theme}`);
+      await card.getByRole('button', { name: 'Ukryj dziennik' }).click();
+      await expect(log).toHaveCount(0);
+      await expect(pin).toHaveValue('');
+    });
+  }
+}

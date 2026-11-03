@@ -73,6 +73,7 @@ impl BrokerEngine {
             ChildLockChange::Enable { on: false, .. } => "disable",
             ChildLockChange::Open { .. } => "open",
             ChildLockChange::Close => "close",
+            ChildLockChange::Verify { .. } => "verify",
         };
         let result = self.apply_child(&mut store, change, now);
         // Audyt każdej próby (bez PIN-u); błąd Audytu przy udanej zmianie = błąd żądania.
@@ -91,6 +92,7 @@ impl BrokerEngine {
         now: u64,
     ) -> Result<(), BrokerError> {
         match change {
+            ChildLockChange::Verify { pin } => Self::require(store, &pin, now),
             ChildLockChange::Close => {
                 if store.locks() {
                     self.set_ceiling(Some(ChildCeiling::locked()));

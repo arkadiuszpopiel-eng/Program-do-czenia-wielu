@@ -10,6 +10,7 @@
   import type { ChildLockRequest, ChildLockState } from '../../../api/types-hub';
   import { showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import ParentLogCard from './ParentLogCard.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -190,6 +191,7 @@
       </div>
     </form>
   </section>
+  {#if lock.pin_set}<ParentLogCard />{/if}
 {/if}
 
 <style>

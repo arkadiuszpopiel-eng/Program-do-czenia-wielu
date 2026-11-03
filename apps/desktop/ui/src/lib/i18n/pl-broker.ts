@@ -144,4 +144,14 @@ export const plBroker = {
     'Kłódka rodzica — wyższe tryby otwiera PIN rodzica w Ustawienia → Uprawnienia.',
   'child.badge': 'Profil Dziecko — kłódka zamknięta. Kliknij, aby zobaczyć tryby',
   'child.badgeWord': 'Dziecko',
+  'parentLog.title': 'Dziennik rodzica',
+  'parentLog.intro':
+    'Co działo się w Alfie: tematy rozmów, działania agentek (narzędzia, strony, pliki), zgody, odmowy i próby otwarcia kłódki. Treść rozmów nie jest tu pokazywana. Dziennik otwiera PIN rodzica.',
+  'parentLog.show': 'Pokaż dziennik',
+  'parentLog.hide': 'Ukryj dziennik',
+  'parentLog.empty': 'Brak zapisanych rozmów.',
+  'parentLog.loading': 'Wczytuję dziennik…',
+  'parentLog.failed': 'Nie udało się wczytać dziennika — spróbuj ponownie.',
+  'parentLog.session': 'Rozmowa „{title}” · ostatnio {when}',
+  'parentLog.none': 'bez działań agentek',
 } as const satisfies Record<string, Message>;

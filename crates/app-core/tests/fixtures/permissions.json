@@ -148,5 +148,20 @@
       "blocked_until_ms": 1793477000000,
       "attempts_left": 0
     }
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": {
+        "op": "verify",
+        "pin": "2468"
+      }
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": true,
+      "open": false,
+      "attempts_left": 5
+    }
   }
 ]

@@ -73,6 +73,7 @@ pub fn to_child(change: ChildLockRequest) -> Result<ChildLockChange, AppError> {
             for_ms: minutes.map(|m| u64::from(m.max(1)) * 60_000),
         },
         ChildLockRequest::Close => ChildLockChange::Close,
+        ChildLockRequest::Verify { pin: p } => ChildLockChange::Verify { pin: pin(&p)? },
     })
 }
 

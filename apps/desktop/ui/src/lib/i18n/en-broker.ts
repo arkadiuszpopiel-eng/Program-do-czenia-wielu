@@ -148,4 +148,14 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
     'Parent padlock — higher modes open with the parent PIN in Settings → Permissions.',
   'child.badge': 'Child profile — padlock closed. Click to see the modes',
   'child.badgeWord': 'Child',
+  'parentLog.title': 'Parent log',
+  'parentLog.intro':
+    'What happened in Alfa: conversation topics, agent actions (tools, websites, files), permissions, refusals and padlock attempts. Conversation content is not shown here. The parent PIN opens the log.',
+  'parentLog.show': 'Show the log',
+  'parentLog.hide': 'Hide the log',
+  'parentLog.empty': 'No recorded conversations.',
+  'parentLog.loading': 'Loading the log…',
+  'parentLog.failed': 'Could not load the log — try again.',
+  'parentLog.session': 'Conversation “{title}” · last {when}',
+  'parentLog.none': 'no agent actions',
 };

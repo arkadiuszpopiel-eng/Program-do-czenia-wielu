@@ -251,6 +251,9 @@ async fn guessing_the_pin_blocks_further_attempts() {
     }
     let view = b.child_lock();
     assert!(view.blocked_until_ms.is_some_and(|u| u > 1_000_000));
+    // Sprawdzenie PIN-u (dziennik rodzica) podlega tej samej blokadzie.
+    let verify = ChildLockChange::Verify { pin: pin("2468") };
+    assert!(b.change_child_lock(verify).await.is_err());
     // W blokadzie nawet dobry PIN nie otwiera; po restarcie blokada trwa.
     let good = ChildLockChange::Open {
         pin: pin("2468"),
@@ -263,4 +266,18 @@ async fn guessing_the_pin_blocks_further_attempts() {
     clock.advance(16 * 60_000);
     b.change_child_lock(good).await.unwrap();
     assert_eq!(b.child_lock().attempts_left, PIN_MAX_FAILURES);
+    let wrong = ChildLockChange::Verify { pin: pin("9999") };
+    assert!(b.change_child_lock(wrong).await.is_err());
+    assert_eq!(
+        b.child_lock().attempts_left,
+        PIN_MAX_FAILURES - 1,
+        "zły PIN liczy próbę"
+    );
+    let right = ChildLockChange::Verify { pin: pin("2468") };
+    let view = b.change_child_lock(right).await.unwrap();
+    assert_eq!(view.attempts_left, PIN_MAX_FAILURES);
+    assert!(
+        view.open_until_ms.is_some(),
+        "sprawdzenie nie zmienia kłódki"
+    );
 }

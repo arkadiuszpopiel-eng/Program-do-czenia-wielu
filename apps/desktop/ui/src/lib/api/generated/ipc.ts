@@ -973,6 +973,10 @@ export type ChildLockRequest =
     }
   | {
       readonly op: 'close';
+    }
+  | {
+      readonly op: 'verify';
+      readonly pin: SecretInput;
     };
 
 /** Profil Dziecko (plan 50 §4.4): stan kłódki trybów pracy (bez PIN-u). */

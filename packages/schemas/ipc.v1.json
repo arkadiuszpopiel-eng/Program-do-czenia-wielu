@@ -3560,6 +3560,23 @@
             "op"
           ],
           "type": "object"
+        },
+        {
+          "description": "Sprawdzenie PIN-u przed dziennikiem rodzica (bez zmiany stanu, ten sam limit prób).",
+          "properties": {
+            "op": {
+              "const": "verify",
+              "type": "string"
+            },
+            "pin": {
+              "$ref": "#/$defs/SecretInput"
+            }
+          },
+          "required": [
+            "op",
+            "pin"
+          ],
+          "type": "object"
         }
       ]
     },

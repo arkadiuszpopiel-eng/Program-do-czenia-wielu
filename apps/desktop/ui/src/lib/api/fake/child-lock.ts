@@ -84,6 +84,9 @@ export function childLockFake(core: FakeCore): FakeChildLock {
           openUntil = null;
         }
         break;
+      case 'verify':
+        error = check(change.pin);
+        break;
       case 'open':
         if (!enabled) error = 'profil Dziecko jest wyłączony';
         else error = check(change.pin);
