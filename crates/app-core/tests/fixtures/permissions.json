@@ -11,6 +11,18 @@
     }
   },
   {
+    "command": "permissions_get",
+    "args": {
+      "sessionId": null
+    },
+    "result": {
+      "global": "L3",
+      "session": null,
+      "hello_enabled": false,
+      "max_access": "all"
+    }
+  },
+  {
     "command": "permissions_request_level",
     "args": {
       "level": "L4",
@@ -26,6 +38,26 @@
     "args": {
       "level": "L1",
       "sessionId": null
+    },
+    "result": {
+      "status": "applied",
+      "request_id": ""
+    }
+  },
+  {
+    "command": "permissions_request_max_access",
+    "args": {
+      "scope": "local"
+    },
+    "result": {
+      "status": "opened_broker",
+      "request_id": "br-max-1"
+    }
+  },
+  {
+    "command": "permissions_request_max_access",
+    "args": {
+      "scope": null
     },
     "result": {
       "status": "applied",

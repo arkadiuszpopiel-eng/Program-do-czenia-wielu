@@ -256,6 +256,10 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
             vec![("level", roundtrip::<AutonomyLevel>), ("sessionId", os)],
             roundtrip::<BrokerIntentResult>,
         ),
+        "permissions_request_max_access" => (
+            vec![("scope", roundtrip::<Option<MaxAccess>>)],
+            roundtrip::<BrokerIntentResult>,
+        ),
         "permissions_open_approval" => (vec![("approvalId", s)], roundtrip::<BrokerIntentResult>),
         "permissions_grants" => (vec![], roundtrip::<Vec<GrantView>>),
         "permissions_revoke_grant" => (vec![("grantId", s)], b),

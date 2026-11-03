@@ -90,7 +90,11 @@ impl BrokerPort for Broker {
         let session = session
             .map(|s| self.effective(Some(s.as_str())))
             .filter(|l| *l != global);
-        Some(AutonomyView { global, session })
+        Some(AutonomyView {
+            global,
+            session,
+            max_access: None,
+        })
     }
     async fn request_level(
         &self,

@@ -1931,6 +1931,12 @@ export interface MarshalState {
   readonly translator: boolean;
 }
 
+/**
+ * Zasięg przełącznika „Max dostęp” (decyzja właściciela 3.11): bez pytań dla agentek na
+ * modelach lokalnych, w chmurze albo na wszystkich.
+ */
+export type MaxAccess = 'local' | 'cloud' | 'all';
+
 /** Stan połączenia z serwerem. */
 export type McpConnState = 'disabled' | 'idle' | 'connected' | 'failed';
 
@@ -2493,6 +2499,8 @@ export type PanelId = 'agents' | 'timeline' | 'files' | 'memory' | 'screen' | 'v
 export interface PermissionsState {
   readonly global: AutonomyLevel;
   readonly hello_enabled: boolean;
+  /** Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony albo Broker niepodłączony. */
+  readonly max_access?: MaxAccess | null;
   readonly session: AutonomyLevel | null;
 }
 
@@ -4531,6 +4539,10 @@ export interface IpcCommands {
   };
   readonly permissions_request_level: {
     readonly args: { readonly level: AutonomyLevel; readonly sessionId: string | null };
+    readonly result: BrokerIntentResult;
+  };
+  readonly permissions_request_max_access: {
+    readonly args: { readonly scope: MaxAccess | null };
     readonly result: BrokerIntentResult;
   };
   readonly permissions_revoke_grant: {

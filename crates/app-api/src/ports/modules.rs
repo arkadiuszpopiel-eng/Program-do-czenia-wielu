@@ -6,7 +6,7 @@ use sessions_contract::SessionId;
 
 use crate::dto::{
     AutonomyLevel, BrokerIntentResult, BrokerStatusView, ExportRequest, ExportResult, GrantView,
-    ImportRequest, ImportResult, InspectResult, SecretInput,
+    ImportRequest, ImportResult, InspectResult, MaxAccess, SecretInput,
 };
 use crate::error::AppError;
 
@@ -69,6 +69,8 @@ pub struct AutonomyView {
     pub global: AutonomyLevel,
     /// Poziom sesji, gdy różni się od globalnego.
     pub session: Option<AutonomyLevel>,
+    /// Włączony „Max dostęp”.
+    pub max_access: Option<MaxAccess>,
 }
 
 /// Stan prośby o zmianę poziomu autonomii w Brokerze (identyfikator z `request_level`).
@@ -108,6 +110,14 @@ pub trait BrokerPort: Send + Sync {
         level: AutonomyLevel,
         session: Option<&SessionId>,
     ) -> Result<BrokerIntentResult, AppError>;
+    /// „Max dostęp” (plan 50 §8.1): włączenie zasięgu — karta w oknie Sędziego; `None` —
+    /// wyłączenie od razu.
+    async fn request_max_access(
+        &self,
+        _scope: Option<MaxAccess>,
+    ) -> Result<BrokerIntentResult, AppError> {
+        Err(AppError::unavailable("Max dostęp", "safety-broker"))
+    }
     /// Przeniesienie do karty zatwierdzenia w oknie Brokera.
     async fn open_approval(&self, approval: &str) -> Result<BrokerIntentResult, AppError>;
     /// Zgody „zawsze w tym zakresie” (panel uprawnień); Broker niepodłączony — pusto.

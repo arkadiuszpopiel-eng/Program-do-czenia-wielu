@@ -268,6 +268,19 @@ pub struct PermissionsState {
     pub global: AutonomyLevel,
     pub session: Option<AutonomyLevel>,
     pub hello_enabled: bool,
+    /// Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony albo Broker niepodłączony.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_access: Option<MaxAccess>,
+}
+
+/// Zasięg przełącznika „Max dostęp” (decyzja właściciela 3.11): bez pytań dla agentek na
+/// modelach lokalnych, w chmurze albo na wszystkich.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum MaxAccess {
+    Local,
+    Cloud,
+    All,
 }
 
 /// Stan intencji Brokera: `opened_broker` — prośba czeka w oknie Brokera; `applied` — zmiana

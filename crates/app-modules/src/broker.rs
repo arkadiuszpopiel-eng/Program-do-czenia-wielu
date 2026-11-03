@@ -22,11 +22,13 @@ use undo_journal_impl::UndoService;
 use watchdog_contract::{KillReason, KillSwitch};
 
 use app_api::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, GrantView,
+    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, GrantView, MaxAccess,
 };
 use app_api::error::{AppError, ErrorCode};
 use app_api::ports::{ApprovalOutcome, ApprovalWindow, AutonomyView, BrokerPort, KillOrigin};
 use broker_ui_contract::{place_pl, verb};
+
+mod max;
 
 /// Sesja-sonda poziomu globalnego (identyfikatory sesji to UUIDv7 — brak kolizji).
 const GLOBAL_PROBE: &str = "__alfa_global__";
@@ -162,7 +164,15 @@ impl BrokerPort for InprocBroker {
         Some(AutonomyView {
             global: from_level(global),
             session,
+            max_access: self.max_access(),
         })
+    }
+
+    async fn request_max_access(
+        &self,
+        scope: Option<MaxAccess>,
+    ) -> Result<BrokerIntentResult, AppError> {
+        self.change_max_access(scope).await
     }
 
     async fn request_level(

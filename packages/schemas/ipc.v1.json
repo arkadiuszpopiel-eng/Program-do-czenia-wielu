@@ -1930,12 +1930,12 @@
         },
         {
           "const": "L1",
-          "description": "Pytaj o wszystko — każda zmiana wymaga „tak”.",
+          "description": "Ręcznie — każda zmiana wymaga „tak”.",
           "type": "string"
         },
         {
           "const": "L2",
-          "description": "Pytaj o ryzykowne — usuwanie, egress, instalacja.",
+          "description": "Akceptuj edycje — zmiany w folderze pracy same; poza nim, usuwanie, egress, instalacja — pyta.",
           "type": "string"
         },
         {
@@ -6953,6 +6953,15 @@
       ],
       "type": "object"
     },
+    "MaxAccess": {
+      "description": "Zasięg przełącznika „Max dostęp” (decyzja właściciela 3.11): bez pytań dla agentek na\nmodelach lokalnych, w chmurze albo na wszystkich.",
+      "enum": [
+        "local",
+        "cloud",
+        "all"
+      ],
+      "type": "string"
+    },
     "McpConnState": {
       "description": "Stan połączenia z serwerem.",
       "oneOf": [
@@ -8992,6 +9001,17 @@
         },
         "hello_enabled": {
           "type": "boolean"
+        },
+        "max_access": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MaxAccess"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony albo Broker niepodłączony."
         },
         "session": {
           "anyOf": [
@@ -16360,6 +16380,26 @@
             "type": [
               "string",
               "null"
+            ]
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/BrokerIntentResult"
+      }
+    },
+    "permissions_request_max_access": {
+      "args": [
+        {
+          "name": "scope",
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MaxAccess"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         }

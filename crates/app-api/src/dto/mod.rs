@@ -87,9 +87,9 @@ pub use hub::{
     Account, AccountAssignment, AccountCostLimit, AccountLastTest, AccountState, AddAccountInput,
     AudioDevice, AuthKind, AzureDeployment, BatteryView, BrokerIntentResult, BrokerIntentStatus,
     CompatKind, ComplianceStatus, CpuView, DeviceProfile, EnterpriseSettings, EnvImportKind,
-    EnvImportResult, GpuView, HwClass, LocalDownloadState, LocalModelInfo, MachineView, ModelInfo,
-    ModelKind, PermissionsState, ProviderInfo, ProviderKind, RecommendationView, SecretInput,
-    TestReport, VoiceProfileId,
+    EnvImportResult, GpuView, HwClass, LocalDownloadState, LocalModelInfo, MachineView, MaxAccess,
+    ModelInfo, ModelKind, PermissionsState, ProviderInfo, ProviderKind, RecommendationView,
+    SecretInput, TestReport, VoiceProfileId,
 };
 pub use licenses::{CommercialUse, LicenseCard, VoiceLicense};
 pub use mcp::{

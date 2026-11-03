@@ -3,7 +3,8 @@
 
 use crate::core::AppCore;
 use crate::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, PermissionsState,
+    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, MaxAccess,
+    PermissionsState,
 };
 use std::collections::BTreeMap;
 
@@ -25,15 +26,25 @@ impl AppCore {
             Some(s) => Some(ids::session(s)?),
             None => None,
         };
-        let (global, session) = match self.inner.broker.levels(session.as_ref()).await {
-            Some(view) => (view.global, view.session),
-            None => (self.autonomy().await, None),
+        let (global, session, max_access) = match self.inner.broker.levels(session.as_ref()).await {
+            Some(view) => (view.global, view.session, view.max_access),
+            None => (self.autonomy().await, None, None),
         };
         Ok(PermissionsState {
             global,
             session,
             hello_enabled: self.config_bool("permissions.hello", false).await,
+            max_access,
         })
+    }
+
+    /// `permissions_request_max_access` ⟶ Sędzia Cieni: włączenie „Max dostęp” — karta w oknie
+    /// Sędziego (stan zapamiętuje Sędzia, także po restarcie); `None` — wyłączenie od razu.
+    pub async fn permissions_request_max_access(
+        &self,
+        scope: Option<MaxAccess>,
+    ) -> Result<BrokerIntentResult, AppError> {
+        self.inner.broker.request_max_access(scope).await
     }
 
     /// `permissions_request_level` ⟶ Broker: obniżenie od razu (`applied`), podniesienie —
