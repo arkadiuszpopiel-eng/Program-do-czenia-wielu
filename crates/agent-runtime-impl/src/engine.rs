@@ -47,6 +47,8 @@ pub(crate) struct Engine {
     pub(crate) storage_error: Option<String>,
     pub(crate) approval_clock: Arc<crate::ApprovalClock>,
     waited_at_start: u64,
+    /// Gdzie działał model ostatniej tury (do kontekstu narzędzi — „Max dostęp”).
+    pub(crate) model_location: Option<safety_broker_contract::ModelLocation>,
 }
 
 impl Engine {
@@ -80,6 +82,7 @@ impl Engine {
             storage_error: None,
             approval_clock,
             waited_at_start,
+            model_location: None,
         }
     }
 

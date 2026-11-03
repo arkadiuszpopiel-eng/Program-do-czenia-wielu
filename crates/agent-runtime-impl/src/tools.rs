@@ -50,6 +50,7 @@ impl Engine {
         ctx.step = step;
         ctx.label = format!("{}: {}", spec.persona.name, title.to_lowercase());
         ctx.workdir = spec.workdir.clone();
+        ctx.model_location = self.model_location;
         ctx.untrusted_args = args_untrusted(args, &self.cp.trusted_text, &self.cp.untrusted_text);
         ctx.cancel = self.handle.cancel.child_token();
         ctx.approval_timeout = std::time::Duration::from_millis(spec.approval_timeout_ms);

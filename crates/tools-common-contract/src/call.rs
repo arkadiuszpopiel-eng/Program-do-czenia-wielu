@@ -7,7 +7,7 @@ use std::time::Duration;
 use async_trait::async_trait;
 use core_bus_contract::RunId;
 use risk_classifier_contract::CommandOrigin;
-use safety_broker_contract::{ApprovalId, ApprovalTicket, Holder, TaintSource};
+use safety_broker_contract::{ApprovalId, ApprovalTicket, Holder, ModelLocation, TaintSource};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use tokio_util::sync::CancellationToken;
@@ -41,6 +41,9 @@ pub struct ToolCtx {
     pub label: String,
     /// Katalog roboczy (ścieżki względne, `cwd` powłoki).
     pub workdir: Option<String>,
+    /// Gdzie działa model przebiegu (runtime z dostawcy tury; `None` — nieznane, Sędzia liczy jak
+    /// chmurę) — dla przełącznika „Max dostęp”.
+    pub model_location: Option<ModelLocation>,
     /// Argumenty mogą pochodzić z niezaufanej treści (heurystyka przepływu danych runtime).
     pub untrusted_args: bool,
     /// Anulowanie (kill-switch, „stop”, anulowanie przebiegu).
@@ -61,6 +64,7 @@ impl std::fmt::Debug for ToolCtx {
             .field("run", &self.run)
             .field("step", &self.step)
             .field("workdir", &self.workdir)
+            .field("model_location", &self.model_location)
             .field("untrusted_args", &self.untrusted_args)
             .finish_non_exhaustive()
     }
@@ -76,6 +80,7 @@ impl ToolCtx {
             step: 0,
             label: String::new(),
             workdir: None,
+            model_location: None,
             untrusted_args: false,
             cancel: CancellationToken::new(),
             approval_timeout: DEFAULT_APPROVAL_TIMEOUT,

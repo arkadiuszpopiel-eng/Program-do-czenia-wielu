@@ -70,6 +70,7 @@ pub fn base_facts(manifest: &ToolManifest, ctx: &ToolCtx) -> DeclaredFacts {
     facts.untrusted_input_in_args = ctx.untrusted_args;
     facts.summary = Some(manifest.title.clone());
     facts.workdir = ctx.workdir.clone();
+    facts.model_location = ctx.model_location;
     facts
 }
 
