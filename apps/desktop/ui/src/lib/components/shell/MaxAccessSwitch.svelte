@@ -116,6 +116,8 @@
       >
     {/each}
   </div>
+  <!-- Co obejmuje zasięg (plan 50 §8.2: działania bez modelu tylko „Wszystkie”). -->
+  <p class="desc scope-hint">{t(`maxAccess.hint.${scope}`)}</p>
 </section>
 
 <style>
@@ -204,6 +206,9 @@
   }
   .on .desc {
     color: var(--alfa-color-text);
+  }
+  .scope-hint {
+    margin-top: var(--alfa-space-1);
   }
   .scopes {
     display: grid;

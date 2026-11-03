@@ -23,6 +23,8 @@ for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
       await page.keyboard.press('ArrowRight');
       await expect(scopes.getByRole('radio', { checked: true })).toHaveText('Chmura');
       await expect(scopes.getByRole('radio', { checked: true })).toBeFocused();
+      // Opis zasięgu: mosty CLI to chmura; działania bez modelu tylko „Wszystkie”.
+      await expect(page.getByText('Chmura: modele przez klucz API i mosty CLI')).toBeVisible();
       await max.click();
       await expect(
         page.getByText('Potwierdź „Max dostęp” (Chmura) w oknie Sędziego Cieni'),

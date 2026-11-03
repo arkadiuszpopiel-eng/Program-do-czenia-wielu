@@ -89,6 +89,9 @@ export const plBroker = {
   'maxAccess.scope.local': 'Lokalne',
   'maxAccess.scope.cloud': 'Chmura',
   'maxAccess.scope.all': 'Wszystkie',
+  'maxAccess.hint.local': 'Lokalne: modele na tym komputerze (llama.cpp, Ollama, LM Studio).',
+  'maxAccess.hint.cloud': 'Chmura: modele przez klucz API i mosty CLI (Claude Code, Codex).',
+  'maxAccess.hint.all': 'Wszystkie: także działania bez modelu — wtyczki, MCP, zrzut ekranu.',
   'maxAccess.requested': 'Potwierdź „Max dostęp” ({where}) w oknie Sędziego Cieni — wystarczy raz.',
   'maxAccess.off': 'Max dostęp wyłączony — agentki znów pytają według trybu pracy.',
   'maxAccess.badge':

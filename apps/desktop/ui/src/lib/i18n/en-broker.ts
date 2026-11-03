@@ -92,6 +92,9 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'maxAccess.scope.local': 'Local',
   'maxAccess.scope.cloud': 'Cloud',
   'maxAccess.scope.all': 'All',
+  'maxAccess.hint.local': 'Local: models on this computer (llama.cpp, Ollama, LM Studio).',
+  'maxAccess.hint.cloud': 'Cloud: models via API key and CLI bridges (Claude Code, Codex).',
+  'maxAccess.hint.all': 'All: also actions without a model — plugins, MCP, screenshots.',
   'maxAccess.requested':
     'Confirm "Max access" ({where}) in the Shadow Judge window — once is enough.',
   'maxAccess.off': 'Max access is off — agents ask again according to the work mode.',
