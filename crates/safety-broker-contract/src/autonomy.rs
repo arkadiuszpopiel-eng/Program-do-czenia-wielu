@@ -195,6 +195,36 @@ impl AutonomyTable {
         }
     }
 
+    /// Podmiot bez własnego poziomu (sesji, agentki, agentki w sesji) — obowiązuje go tryb
+    /// globalny.
+    pub fn follows_global(
+        &self,
+        session: &SessionId,
+        agent: Option<&AgentId>,
+        now_ms: u64,
+    ) -> bool {
+        let own = |target: AutonomyTarget| self.get(&target, now_ms).is_some();
+        let session_own = own(AutonomyTarget::Session {
+            session: session.clone(),
+        });
+        let agent_own = agent.is_some_and(|a| {
+            own(AutonomyTarget::Agent { agent: a.clone() })
+                || own(AutonomyTarget::SessionAgent {
+                    session: session.clone(),
+                    agent: a.clone(),
+                })
+        });
+        !session_own && !agent_own
+    }
+
+    /// Wpis globalny bez terminu (zmiana właściciela).
+    pub fn standing_global(&self) -> Option<AutonomyLevel> {
+        self.entries
+            .get(&AutonomyTarget::Global)
+            .filter(|e| e.until_ms.is_none())
+            .map(|e| e.level)
+    }
+
     /// Wszystkie wpisy (do UI ustawień).
     pub fn entries(&self) -> Vec<(AutonomyTarget, AutonomyEntry)> {
         self.entries.iter().map(|(t, e)| (t.clone(), *e)).collect()

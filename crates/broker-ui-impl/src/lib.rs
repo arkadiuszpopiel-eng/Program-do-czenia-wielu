@@ -22,7 +22,7 @@ mod view;
 pub use broker_ui_contract::{BrokerLink, BrokerUi};
 pub use link::{ChannelLink, PipeLink};
 pub use native::NativeBrokerUi;
-pub use view::{BTN_DENY, BTN_ONCE, BTN_SCOPED, decision_for, view_of};
+pub use view::{BTN_AUTO, BTN_DENY, BTN_ONCE, BTN_SCOPED, decision_for, view_of};
 
 /// Treść `module.toml` tego modułu.
 pub const MODULE_TOML: &str = include_str!("../module.toml");

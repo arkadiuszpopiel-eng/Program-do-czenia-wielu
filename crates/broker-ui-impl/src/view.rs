@@ -13,6 +13,8 @@ pub const BTN_DENY: u16 = 100;
 pub const BTN_ONCE: u16 = 101;
 /// Pierwszy przycisk „Zawsze w tym zakresie” (kolejne czasy: 103, 104, …, ostatni „Do odwołania”).
 pub const BTN_SCOPED: u16 = 102;
+/// „Zezwól i przełącz na Automatycznie” (poza rzędem czasów zgody).
+pub const BTN_AUTO: u16 = 99;
 
 /// Przyciski opcji karty: „Odmów”, „Zezwól tylko teraz”, potem czasy zgody po kolei.
 fn buttons_of(card: &ApprovalCard) -> impl Iterator<Item = (u16, &DecisionOption)> {
@@ -21,6 +23,7 @@ fn buttons_of(card: &ApprovalCard) -> impl Iterator<Item = (u16, &DecisionOption
         let id = match o {
             DecisionOption::Deny => BTN_DENY,
             DecisionOption::AllowOnce => BTN_ONCE,
+            DecisionOption::AllowAndAutomatic => BTN_AUTO,
             DecisionOption::AllowInScope { .. } => {
                 scoped += 1;
                 scoped - 1
@@ -46,6 +49,7 @@ pub fn decision_for(card: &ApprovalCard, button: u16) -> Option<ApprovalDecision
         .map(|(_, o)| match o {
             DecisionOption::Deny => ApprovalDecision::Deny,
             DecisionOption::AllowOnce => ApprovalDecision::Allow,
+            DecisionOption::AllowAndAutomatic => ApprovalDecision::AllowAndAutomatic,
             DecisionOption::AllowInScope { scope, until_ms } => ApprovalDecision::AllowInScope {
                 scope: scope.clone(),
                 until_ms: *until_ms,
@@ -90,6 +94,9 @@ pub fn view_of(card: &ApprovalCard, status: &str, now_ms: u64) -> SurfaceView {
                     Some(mode) => format!("Włącz: {}{hello}", mode_name_pl(mode)),
                     None => format!("Zezwól tylko teraz{hello}"),
                 },
+                DecisionOption::AllowAndAutomatic => {
+                    format!("Zezwól i przełącz na „Automatycznie”{hello}")
+                }
                 DecisionOption::AllowInScope { until_ms, .. } => grant_label(*until_ms, now_ms),
             },
         })

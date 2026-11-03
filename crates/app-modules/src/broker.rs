@@ -148,10 +148,12 @@ impl BrokerPort for InprocBroker {
             .map(|s| self.engine.autonomy(s, None))
             .filter(|l| *l != global)
             .map(from_level);
+        let metrics = self.engine.metrics();
         Some(AutonomyView {
             global: from_level(global),
             session,
-            max_access: self.engine.metrics().max_access.map(from_scope),
+            max_access: metrics.max_access.map(from_scope),
+            standing_global: metrics.standing_global.map(from_level),
         })
     }
 

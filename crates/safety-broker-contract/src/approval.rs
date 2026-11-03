@@ -97,6 +97,10 @@ pub struct ApprovalRequest {
     /// Tryb pracy, przy którym padło pytanie (okno mówi, czemu pyta; na L4 okna nie ma).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub autonomy: Option<AutonomyLevel>,
+    /// Okno może zaproponować „Zezwól i przełącz na Automatycznie”: pojedyncza akcja, tryb
+    /// niższy niż L3, podmiot bez własnego poziomu (zmiana dotyczy trybu globalnego).
+    #[serde(default)]
+    pub auto_switch: bool,
     /// Utworzono (ms).
     pub created_at_ms: u64,
     /// Wygasa (ms).
@@ -151,6 +155,9 @@ pub enum ApprovalDecision {
     },
     /// Odmów.
     Deny,
+    /// Zezwól raz i przełącz tryb pracy na „Automatycznie” (L3) — opcja okna przy niższym trybie
+    /// (plan 50 §4.2, jak w Claude Code). Tylko gdy prośba ma [`ApprovalRequest::auto_switch`].
+    AllowAndAutomatic,
 }
 
 /// Stan prośby widziany przez proszącego.

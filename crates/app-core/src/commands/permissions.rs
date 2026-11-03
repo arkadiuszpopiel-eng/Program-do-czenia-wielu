@@ -97,18 +97,11 @@ impl AppCore {
         let global = self.config_str(keys::AUTONOMY).await.and_then(|s| {
             serde_json::from_value::<AutonomyLevel>(serde_json::Value::String(s)).ok()
         });
-        (
-            global,
-            levels::parse_session_levels(self.config_list(SESSION_LEVELS).await),
-        )
-    }
-
-    /// Lista napisów z konfiguracji (brak albo inny typ — pusta).
-    async fn config_list(&self, key: &str) -> Vec<String> {
-        self.config_value(key)
-            .await
-            .and_then(|v| serde_json::from_value(v).ok())
-            .unwrap_or_default()
+        // Lista napisów (brak albo inny typ — pusta).
+        let sessions = self.config_value(SESSION_LEVELS).await;
+        let sessions = sessions.and_then(|v| serde_json::from_value(v).ok());
+        let sessions = levels::parse_session_levels(sessions.unwrap_or_default());
+        (global, sessions)
     }
 
     /// Zapisuje poziom globalny (`None`) albo sesji (wraca po restarcie aplikacji i Brokera)
@@ -157,6 +150,14 @@ impl AppCore {
         }
         let held = self.adopt_approved_raises().await;
         let (global, sessions) = self.remembered_levels().await;
+        // Zgoda z okna Sędziego („przełącz na Automatycznie”, plan 50 §4.2) — przyjęta, nie cofana.
+        let judged = view
+            .standing_global
+            .filter(|s| *s == view.global && global != Some(*s));
+        let global = match judged {
+            Some(s) if self.inner.raises.is_empty() && self.adopt_raise(None, s).await => Some(s),
+            _ => global,
+        };
         // Zapamiętane L4, Broker na L3 (restart): informacja raz, przy 3. przebiegu z rzędu (ok. 15 s).
         let waiting = global == Some(AutonomyLevel::L4)
             && view.global == AutonomyLevel::L3

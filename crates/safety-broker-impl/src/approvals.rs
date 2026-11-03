@@ -44,6 +44,11 @@ impl BrokerEngine {
     ) -> Result<ApprovalTicket, BrokerError> {
         let nonce = st.keys.nonce().map_err(BrokerError::InvalidRequest)?;
         let id = ApprovalId(st.next_approval + 1);
+        let auto_switch = matches!(action, PendingAction::Action(_))
+            && meta.autonomy.is_some_and(|l| l < AutonomyLevel::L3)
+            && st
+                .autonomy
+                .follows_global(&meta.holder.session, meta.holder.agent.as_ref(), now);
         let request = ApprovalRequest {
             id,
             holder: meta.holder,
@@ -58,6 +63,7 @@ impl BrokerEngine {
             rules: meta.rules,
             explanation: meta.explanation,
             autonomy: meta.autonomy,
+            auto_switch,
             created_at_ms: now,
             expires_at_ms: now.saturating_add(st.policy().approval_ttl_ms),
         };
@@ -157,6 +163,11 @@ impl BrokerEngine {
     }
 
     fn check_decision_shape(p: &Pending, decision: &ApprovalDecision) -> Result<(), BrokerError> {
+        if *decision == ApprovalDecision::AllowAndAutomatic && !p.request.auto_switch {
+            return Err(BrokerError::InvalidRequest(
+                "„przełącz na Automatycznie” nie dotyczy tej prośby".into(),
+            ));
+        }
         let ApprovalDecision::AllowInScope { scope, .. } = decision else {
             return Ok(());
         };

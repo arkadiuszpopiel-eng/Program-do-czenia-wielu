@@ -71,6 +71,8 @@ pub struct AutonomyView {
     pub session: Option<AutonomyLevel>,
     /// Włączony „Max dostęp”.
     pub max_access: Option<MaxAccess>,
+    /// Poziom globalny zapamiętany przez Sędziego po zgodzie w jego oknie — rdzeń go przyjmuje.
+    pub standing_global: Option<AutonomyLevel>,
 }
 
 /// Stan prośby o zmianę poziomu autonomii w Brokerze (identyfikator z `request_level`).

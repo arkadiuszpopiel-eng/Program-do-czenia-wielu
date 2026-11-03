@@ -47,6 +47,8 @@ pub enum DecisionOption {
     },
     /// „Odmów”.
     Deny,
+    /// „Zezwól i przełącz na Automatycznie” — tryb globalny niższy niż L3 (plan 50 §4.2).
+    AllowAndAutomatic,
 }
 
 /// Krok planu na karcie.
@@ -225,6 +227,9 @@ impl ApprovalCard {
                     details.push(("Gdzie".into(), place));
                 }
                 technical = Some(v(tool));
+                if req.auto_switch {
+                    options.push(DecisionOption::AllowAndAutomatic);
+                }
                 if req.grantable {
                     // Czas wybiera właściciel: po przycisku na każdy termin i „do odwołania”.
                     let mut until: Vec<u64> = opts

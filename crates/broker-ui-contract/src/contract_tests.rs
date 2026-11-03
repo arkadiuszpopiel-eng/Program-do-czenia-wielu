@@ -30,6 +30,7 @@ pub fn challenge(id: u64, now_ms: u64) -> ApprovalChallenge {
             rules: Vec::new(),
             explanation: "egress poza allowlistą".into(),
             autonomy: Some(risk_classifier_contract::AutonomyLevel::L3),
+            auto_switch: false,
             created_at_ms: now_ms,
             expires_at_ms: now_ms + 600_000,
         },

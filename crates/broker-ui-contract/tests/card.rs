@@ -29,6 +29,7 @@ fn request(subject: ApprovalSubject) -> ApprovalRequest {
         hello_required: false,
         rules: Vec::new(),
         autonomy: Some(AutonomyLevel::L3),
+        auto_switch: false,
         explanation: "Usuwam\u{202E}gpj.exe\u{200B} 14 plików\n\tz Pobranych".into(),
         created_at_ms: 1_000,
         expires_at_ms: 601_000,

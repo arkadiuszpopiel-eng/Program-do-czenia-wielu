@@ -5,8 +5,9 @@ use risk_classifier_contract::{
 };
 use safety_broker_contract::{
     ApprovalDecision, ApprovalId, ApprovalSubject, AutonomyChangeRequest, AutonomyEntry,
-    BrokerError, ChangeOrigin, EVENT_AUTONOMY_CHANGED, EVENT_KERNEL_BLOCK, EVENT_POLICY_CHANGED,
-    EVENT_TOKEN_ISSUED, HelloRequirement, Holder, KernelGuard, KernelPolicy, UNTIL_REVOKED,
+    AutonomyTarget, BrokerError, ChangeOrigin, EVENT_AUTONOMY_CHANGED, EVENT_KERNEL_BLOCK,
+    EVENT_POLICY_CHANGED, EVENT_TOKEN_ISSUED, HelloRequirement, Holder, KernelGuard, KernelPolicy,
+    UNTIL_REVOKED,
 };
 use serde_json::json;
 
@@ -64,6 +65,10 @@ impl BrokerEngine {
                 let session = st.session(&req.holder.session);
                 if let Some(rule) = st.guard.derive_facts(&req, &session).kernel_rule {
                     return Err(BrokerError::KernelBlock(rule));
+                }
+                if decision == ApprovalDecision::AllowAndAutomatic {
+                    // Przed tokenem: błąd Audytu zmiany trybu = odmowa całości (fail-closed).
+                    self.switch_to_automatic(st, &req.holder, id, now)?;
                 }
                 let ttl = Self::ttl(st, req.ttl_ms)?;
                 let expires = now.saturating_add(ttl);
@@ -143,6 +148,42 @@ impl BrokerEngine {
                 Ok(PendStatus::Approved(None))
             }
         }
+    }
+
+    /// „Zezwól i przełącz na Automatycznie” (plan 50 §4.2): tryb globalny → L3, zapamiętany jak
+    /// zmiana z menu. Gdy w międzyczasie podmiot dostał własny poziom albo tryb globalny jest
+    /// już co najmniej L3 — sama zgoda, bez zmiany trybu.
+    fn switch_to_automatic(
+        &self,
+        st: &mut State,
+        holder: &Holder,
+        id: ApprovalId,
+        now: u64,
+    ) -> Result<(), BrokerError> {
+        let level = AutonomyLevel::L3;
+        let global = st
+            .autonomy
+            .get(&AutonomyTarget::Global, now)
+            .unwrap_or_default();
+        if global >= level
+            || !st
+                .autonomy
+                .follows_global(&holder.session, holder.agent.as_ref(), now)
+        {
+            return Ok(());
+        }
+        let target = AutonomyTarget::Global;
+        let payload = json!({ "target": target, "level": level, "until_ms": null, "approval": id, "via": "approval_card" });
+        self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;
+        self.remember(&target, level);
+        st.autonomy.set(
+            target,
+            AutonomyEntry {
+                level,
+                until_ms: None,
+            },
+        );
+        Ok(())
     }
 
     /// Po przejściu na „Pełną automatykę” okno zgód nie pokazuje się wcale (właściciel 31.10):

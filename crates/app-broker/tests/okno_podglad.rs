@@ -37,6 +37,7 @@ fn request(subject: ApprovalSubject, risk: RiskLevel, explanation: &str) -> Appr
         hello_required: false,
         rules: Vec::new(),
         autonomy: Some(AutonomyLevel::L3),
+        auto_switch: false,
         explanation: explanation.into(),
         created_at_ms: NOW,
         expires_at_ms: NOW + 600_000,
