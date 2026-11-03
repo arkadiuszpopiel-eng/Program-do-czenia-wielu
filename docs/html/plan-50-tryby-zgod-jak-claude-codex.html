@@ -504,6 +504,20 @@ człony poniżej folderu pracy; lista uzupełniona (<code>.cargo</code>, <code>.
 </ol>
 </li>
 </ul>
+<h3 id="8-1-projekt-max-dostep-nastepny-krok-broker-do-przegladu">8.1 Projekt „Max dostęp” (następny krok, Broker — do przeglądu)</h3>
+<ul>
+<li><strong>Skąd Sędzia wie, czy model jest lokalny:</strong> <code>ToolCtx.model_location</code> (<code>local</code> / <code>cloud</code>) ustawia agent-runtime
+z dostawcy przebiegu (llama.cpp / Ollama / LM Studio = lokalny; klucz API albo most CLI = chmura); trafia do
+<code>DeclaredFacts</code> tak jak folder pracy — z kontekstu wywołania, nigdy od modelu. Brak informacji = „chmura”
+(bezpieczniej: przełącznik „lokalne” go nie obejmie).</li>
+<li><strong>Stan w Sędzim:</strong> <code>MaxAccess { off, local, cloud, all }</code> zapisywany jak poziom globalny (raz potwierdzony w oknie
+Sędziego, pamiętany po restarcie, obniżenie od razu). Gdy obejmuje pochodzenie modelu przebiegu — poziom
+skuteczny = L4 (twarde blokady Jądra, STOP i dziennik zostają).</li>
+<li><strong>Interfejs:</strong> pod listą trybów czerwony napis z poświatą „Max dostęp” + wybór lokalne / chmura / wszystkie;
+znak w belce jak dziś „Pełny dostęp”; w profilu Dziecko kłódka (Z.6).</li>
+<li><strong>Testy:</strong> tabela (poziom × pochodzenie × ustawienie), własność „bez informacji o modelu Max dostęp lokalny
+nigdy nie podnosi”, prawdziwa aplikacja w każdym stylu i motywie.</li>
+</ul>
 <h2 id="zrodla">Źródła</h2>
 <ul>
 <li>Claude Code — Permission modes: <a href="https://code.claude.com/docs/en/permission-modes">https://code.claude.com/docs/en/permission-modes</a></li>

@@ -208,6 +208,20 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
      człony poniżej folderu pracy; lista uzupełniona (`.cargo`, `.github\workflows`, `.gitattributes`, `.zshenv`,
      `.envrc`, `.devcontainer`, `.hg`, Autostart).
 
+### 8.1 Projekt „Max dostęp” (następny krok, Broker — do przeglądu)
+
+- **Skąd Sędzia wie, czy model jest lokalny:** `ToolCtx.model_location` (`local` / `cloud`) ustawia agent-runtime
+  z dostawcy przebiegu (llama.cpp / Ollama / LM Studio = lokalny; klucz API albo most CLI = chmura); trafia do
+  `DeclaredFacts` tak jak folder pracy — z kontekstu wywołania, nigdy od modelu. Brak informacji = „chmura”
+  (bezpieczniej: przełącznik „lokalne” go nie obejmie).
+- **Stan w Sędzim:** `MaxAccess { off, local, cloud, all }` zapisywany jak poziom globalny (raz potwierdzony w oknie
+  Sędziego, pamiętany po restarcie, obniżenie od razu). Gdy obejmuje pochodzenie modelu przebiegu — poziom
+  skuteczny = L4 (twarde blokady Jądra, STOP i dziennik zostają).
+- **Interfejs:** pod listą trybów czerwony napis z poświatą „Max dostęp” + wybór lokalne / chmura / wszystkie;
+  znak w belce jak dziś „Pełny dostęp”; w profilu Dziecko kłódka (Z.6).
+- **Testy:** tabela (poziom × pochodzenie × ustawienie), własność „bez informacji o modelu Max dostęp lokalny
+  nigdy nie podnosi”, prawdziwa aplikacja w każdym stylu i motywie.
+
 ## Źródła
 
 - Claude Code — Permission modes: https://code.claude.com/docs/en/permission-modes
