@@ -136,3 +136,45 @@ fn workdir_is_optional_on_the_wire() {
     let back: DeclaredFacts = serde_json::from_value(serde_json::to_value(&f).unwrap()).unwrap();
     assert_eq!(back, f);
 }
+
+proptest::proptest! {
+    /// Folder pracy tylko łagodzi „Akceptuj edycje” wewnątrz profilu: dla dowolnej ścieżki i dowolnego
+    /// folderu werdykt z folderem jest nie łagodniejszy niż bez niego poza profilem, a na każdym
+    /// poziomie innym niż L2 folder niczego nie zmienia (przegląd planu 50, 3.11).
+    #[test]
+    fn workdir_never_widens_beyond_the_profile(
+        drive in proptest::sample::select(vec!["C", "D"]),
+        parts in proptest::collection::vec(
+            proptest::sample::select(vec!["Users", "ala", "Projekt", "src", ".git", "Docs", "..", "a.txt"]),
+            0..6,
+        ),
+        wd_parts in proptest::collection::vec(
+            proptest::sample::select(vec!["Users", "ala", "Projekt", "Docs", ".git"]),
+            0..4,
+        ),
+        write in proptest::bool::ANY,
+    ) {
+        let path = format!(r"{drive}:\{}", parts.join(r"\"));
+        let wd = format!(r"C:\{}", wd_parts.join(r"\"));
+        let Ok(s) = PathScope::exact(&path, &PathEnv::windows_profile(r"C:\Users\ala")) else {
+            return Ok(());
+        };
+        let cap = if write { Capability::FsWrite(s) } else { Capability::ShellExec(s) };
+        let g = guard();
+        let sec = SessionSecurity::default();
+        let with = g.derive_facts(&req(cap.clone(), Some(&wd)), &sec);
+        let without = g.derive_facts(&req(cap, None), &sec);
+        proptest::prop_assert!(without.outside_workdir);
+        if with.scope == risk_classifier_contract::ScopeRelation::Outside {
+            proptest::prop_assert!(with.outside_workdir);
+        }
+        for l in AutonomyLevel::ALL {
+            let a = evaluate(&with, l, &RiskPolicy::default()).verdict.strictness();
+            let b = evaluate(&without, l, &RiskPolicy::default()).verdict.strictness();
+            proptest::prop_assert!(a <= b, "{path} w {wd}: z folderem surowiej niż bez");
+            if l != AutonomyLevel::L2 && with.protected_path == without.protected_path {
+                proptest::prop_assert_eq!(a, b, "{} {:?}: folder zmienił werdykt poza L2", path, l);
+            }
+        }
+    }
+}
