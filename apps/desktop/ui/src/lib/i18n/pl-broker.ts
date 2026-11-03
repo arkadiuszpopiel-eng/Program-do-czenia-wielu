@@ -38,7 +38,7 @@ export const plBroker = {
     'Sędzia Cieni jest niedostępny — tej prośby nie da się teraz zatwierdzić; agentka dostanie odmowę.',
   // Tryb pracy z paska tytułu (`ModeMenu`, decyzja 27.10).
   'titlebar.mode': 'Tryb pracy: {mode}. Zmień tryb',
-  'titlebar.modeTip': 'Tryb pracy agentek — kliknij, aby zmienić (1–4)',
+  'titlebar.modeTip': 'Tryb pracy agentek — kliknij, aby zmienić (1–5)',
   'mode.title': 'Tryb pracy',
   'status.changeMode': 'Zmień tryb pracy',
   'mode.L0.name': 'Tylko podgląd',

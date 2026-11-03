@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { expectAccessible, openApp, waitForChat } from './helpers';
 
-// Menu „Tryb pracy” z paska tytułu (decyzja właściciela 27.10): cztery tryby po polsku, klawisze
-// 1–4, obniżenie od razu, podniesienie przez okno Brokera (raz). Każdy styl i motyw.
+// Menu „Tryb pracy” w pasku pisania (decyzja właściciela 27.10; od 3.11 pięć trybów — plan 50),
+// klawisze 1–5, obniżenie od razu, podniesienie przez okno Brokera (raz). Każdy styl i motyw.
 for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
   for (const theme of ['light', 'dark'] as const) {
     test(`menu trybu pracy — ${style} ${theme}`, async ({ page }) => {
@@ -12,11 +12,13 @@ for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
       await trigger.click();
       const menu = page.getByRole('menu', { name: 'Tryb pracy' });
       const items = menu.getByRole('menuitemradio');
-      await expect(items).toHaveCount(4);
+      await expect(items).toHaveCount(5);
       await expect(items.nth(0)).toContainText('Tylko podgląd');
       await expect(items.nth(1)).toContainText('Pytaj o wszystko');
-      await expect(items.nth(2)).toContainText('Automatycznie');
-      await expect(items.nth(3)).toContainText('Pełna automatyka');
+      await expect(items.nth(2)).toContainText('Akceptuj edycje');
+      await expect(items.nth(2)).toContainText('Zmiany w folderze pracy bez pytania');
+      await expect(items.nth(3)).toContainText('Automatycznie');
+      await expect(items.nth(4)).toContainText('Pełna automatyka');
       await expect(menu.getByRole('menuitemradio', { checked: true })).toContainText(
         'Automatycznie',
       );
@@ -40,7 +42,17 @@ for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
         'Pytaj o wszystko',
       );
       await menu.getByRole('menuitemradio', { name: /Pełna automatyka/ }).click();
-      await expect(page.getByText('Potwierdź „Pełna automatyka” w oknie Sędziego Cieni')).toBeVisible();
+      await expect(
+        page.getByText('Potwierdź „Pełna automatyka” w oknie Sędziego Cieni'),
+      ).toBeVisible();
+      await expect(lowered).toBeVisible();
+
+      // Klawisz 3: „Akceptuj edycje” — z „Pytaj o wszystko” to podniesienie, czeka na okno Sędziego.
+      await lowered.click();
+      await page.keyboard.press('3');
+      await expect(
+        page.getByText('Potwierdź „Akceptuj edycje” w oknie Sędziego Cieni'),
+      ).toBeVisible();
       await expect(lowered).toBeVisible();
 
       // Escape zamyka menu bez zmiany.

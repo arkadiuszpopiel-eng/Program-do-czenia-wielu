@@ -11,10 +11,10 @@ describe('tryb pracy z paska tytułu', () => {
     vi.useRealTimers();
   });
 
-  it('menu ma cztery tryby, a poziom spoza nich (L2) dopisuje w kolejności', () => {
-    expect(modeItems('L3')).toEqual(['L0', 'L1', 'L3', 'L4']);
+  it('menu ma pięć trybów z „Akceptuj edycje” (L2), w kolejności poziomów', () => {
+    expect(modeItems('L3')).toEqual(['L0', 'L1', 'L2', 'L3', 'L4']);
     expect(modeItems('L2')).toEqual(['L0', 'L1', 'L2', 'L3', 'L4']);
-    expect(modeItems(null)).toEqual(['L0', 'L1', 'L3', 'L4']);
+    expect(modeItems(null)).toEqual(['L0', 'L1', 'L2', 'L3', 'L4']);
   });
 
   it('obniżenie działa od razu, bez czekania na okno Sędziego Cieni', async () => {

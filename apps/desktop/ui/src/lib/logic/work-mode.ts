@@ -1,15 +1,15 @@
-// Tryb pracy z paska tytułu (decyzja właściciela 27.10, menu jak w Claude Code, po polsku): cztery
-// tryby = poziomy autonomii globalnie. Podniesienie otwiera kartę w oknie Brokera; zatwierdzone raz
+// Tryb pracy z paska pisania (decyzja właściciela 27.10, od 3.11 na zasadzie Claude Code i Codex —
+// plan 50): pięć trybów = poziomy autonomii globalnie, z „Akceptuj edycje” (L2). Podniesienie otwiera kartę w oknie Brokera; zatwierdzone raz
 // zostaje także po restarcie (Broker je pamięta). Czekanie na zgodę żyje poza menu — menu można
 // zamknąć, a pasek i tak pokaże nowy tryb po zatwierdzeniu.
 import type { AutonomyLevel } from '../api/types';
 import type { BrokerIntentResult } from '../api/types-hub';
 import { watchRaise } from './raise-watch';
 
-/** Tryby w menu (L2 zostaje w Ustawieniach → Uprawnienia). */
-export const WORK_MODES: readonly AutonomyLevel[] = ['L0', 'L1', 'L3', 'L4'];
+/** Tryby w menu — wszystkie poziomy, jak w obu programach (plan 50 §4.1). */
+export const WORK_MODES: readonly AutonomyLevel[] = ['L0', 'L1', 'L2', 'L3', 'L4'];
 
-/** Pozycje menu: cztery tryby, a bieżący poziom spoza nich (L2) — dopisany, żeby było go widać. */
+/** Pozycje menu: pięć trybów, a bieżący poziom spoza nich — dopisany, żeby było go widać. */
 export function modeItems(current: AutonomyLevel | null): AutonomyLevel[] {
   const items = [...WORK_MODES];
   if (current && !items.includes(current)) {

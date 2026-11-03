@@ -46,7 +46,7 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
     const label = (await chip.getAttribute('aria-label')) ?? '';
     const mode = /^Tryb pracy: ([^.]+)\./.exec(label)?.[1] ?? '?';
     await chip.click();
-    await expect(menu.getByRole('menuitemradio')).toHaveCount(4);
+    await expect(menu.getByRole('menuitemradio')).toHaveCount(5);
     await expect(menu.getByRole('menuitemradio', { checked: true })).toContainText(mode);
     await shot(alfa, `42a-menu-trybu-${skin}-${theme}`);
     await main.keyboard.press('Escape');

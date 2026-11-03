@@ -40,7 +40,7 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
     'The Shadow Judge is unavailable — this request cannot be approved now; the agent will be denied.',
   // Tryb pracy z paska tytułu (`ModeMenu`, decyzja 27.10).
   'titlebar.mode': 'Work mode: {mode}. Change mode',
-  'titlebar.modeTip': 'Agents’ work mode — click to change (1–4)',
+  'titlebar.modeTip': 'Agents’ work mode — click to change (1–5)',
   'mode.title': 'Work mode',
   'status.changeMode': 'Change work mode',
   'mode.L0.name': 'Preview only',
@@ -48,7 +48,8 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'mode.L1.name': 'Ask about everything',
   'mode.L1.desc': 'Every change needs your "yes".',
   'mode.L2.name': 'Accept edits',
-  'mode.L2.desc': 'Changes in the work folder without asking; files outside it and the Internet — asks.',
+  'mode.L2.desc':
+    'Changes in the work folder without asking; files outside it and the Internet — asks.',
   'mode.L3.name': 'Automatic',
   'mode.L3.desc': 'Works on her own; asks only about irreversible things outside the scope.',
   'mode.L4.name': 'Full automation',
