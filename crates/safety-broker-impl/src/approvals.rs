@@ -98,6 +98,7 @@ impl BrokerEngine {
 
     /// Przeterminowane prośby → `Expired`.
     pub(crate) fn expire(st: &mut State, now: u64) {
+        st.sync_child(now);
         for p in st.approvals.values_mut() {
             if matches!(p.status, PendStatus::Pending) && now >= p.request.expires_at_ms {
                 p.status = PendStatus::Expired;
@@ -202,6 +203,7 @@ impl BrokerEngine {
         let now = self.now();
         let mut st = self.lock();
         Self::expire(&mut st, now);
+        let locked = st.autonomy.ceiling(now).is_some();
         let p = st
             .approvals
             .get_mut(&id)
@@ -216,6 +218,18 @@ impl BrokerEngine {
             }
         }
         Self::check_decision_shape(p, &decision)?;
+        // Kłódka rodzica (P1 przeglądu 4.11): bez zgód stałych i bez przełączenia trybu, także
+        // na karcie sprzed zamknięcia kłódki.
+        if locked
+            && matches!(
+                decision,
+                ApprovalDecision::AllowAndAutomatic | ApprovalDecision::AllowInScope { .. }
+            )
+        {
+            return Err(BrokerError::InvalidRequest(
+                "kłódka rodzica: ta odpowiedź wymaga PIN-u rodzica".into(),
+            ));
+        }
         let holder = p.request.holder.clone();
         if let Err(reason) = Self::check_proof(p, &proof, now) {
             p.status = PendStatus::Denied;

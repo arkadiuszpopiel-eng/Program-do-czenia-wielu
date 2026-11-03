@@ -162,6 +162,9 @@ pub struct ChildLockState {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub blocked_until_ms: Option<u64>,
     pub attempts_left: u32,
+    /// Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna.
+    #[serde(default)]
+    pub tamper_resistant: bool,
 }
 
 /// Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni.

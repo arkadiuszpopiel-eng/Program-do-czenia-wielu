@@ -18,6 +18,8 @@ export class AutonomyState {
   locked = $derived(this.child !== null && this.child.enabled && !this.child.open);
   /** Numer odczytu — spóźniona odpowiedź nie nadpisze nowszej. */
   private seq = 0;
+  /** Odczyt po upływie terminu otwarcia kłódki (Sędzia zamyka ją sam). */
+  private relock: ReturnType<typeof setTimeout> | null = null;
 
   /** Odczytuje poziom globalny; zwraca go (`null` — odczyt się nie udał, stan bez zmian). */
   async load(api: PermissionsApi): Promise<AutonomyLevel | null> {
@@ -34,10 +36,21 @@ export class AutonomyState {
         this.global = global;
         this.maxAccess = max_access ?? null;
         this.child = child;
+        this.watchOpen(api);
       }
       return global;
     } catch {
       return null;
     }
+  }
+
+  private watchOpen(api: PermissionsApi) {
+    if (this.relock !== null) clearTimeout(this.relock);
+    this.relock = null;
+    const until = this.child?.open ? this.child.open_until_ms : null;
+    if (until == null) return;
+    // Najwyżej co dobę (limit `setTimeout`); po terminie — świeży odczyt z Sędziego.
+    const wait = Math.min(Math.max(until - Date.now(), 0) + 500, 86_400_000);
+    this.relock = setTimeout(() => void this.load(api), wait);
   }
 }

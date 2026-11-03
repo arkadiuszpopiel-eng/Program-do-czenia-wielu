@@ -18,6 +18,7 @@ use serde::de::DeserializeOwned;
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, DuplexStream};
 use watchdog_contract::KillSwitch;
 
+use crate::child::CoreSession;
 use crate::engine::BrokerEngine;
 
 /// Błąd połączenia IPC.
@@ -149,6 +150,7 @@ impl BrokerServer {
         )
         .await?;
         let (role, client) = (hello.credential.role, hello.credential.client_id);
+        let _core = (role == ClientRole::Core).then(|| CoreSession::new(self.engine.clone()));
         while let Some(env) = read_frame::<_, Envelope<Request>>(&mut stream).await? {
             let body = if env.v != PROTOCOL_VERSION {
                 Response::Error(BrokerError::InvalidRequest(

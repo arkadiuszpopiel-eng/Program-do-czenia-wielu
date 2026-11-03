@@ -27,6 +27,7 @@ export function childLockFake(core: FakeCore): FakeChildLock {
   /** Do kiedy otwarta; `Infinity` — do zamknięcia Alfy, `null` — zamknięta. */
   let openUntil: number | null = mode === 'open' ? Infinity : null;
   let failures = 0;
+  let blocks = 0;
   let blockedUntil = 0;
 
   const isOpen = () => enabled && openUntil !== null && Date.now() < openUntil;
@@ -37,6 +38,8 @@ export function childLockFake(core: FakeCore): FakeChildLock {
     open_until_ms: isOpen() && openUntil !== Infinity ? openUntil : null,
     blocked_until_ms: Date.now() < blockedUntil ? blockedUntil : null,
     attempts_left: ATTEMPTS - failures,
+    // Atrapa jak tryb przenośny: Sędzia na koncie użytkownika — ochrona umowna.
+    tamper_resistant: false,
   });
   const refuse = (message: string) =>
     Promise.reject(new CommandError('invalid_input', `Sędzia Cieni: ${message}`));
@@ -48,11 +51,14 @@ export function childLockFake(core: FakeCore): FakeChildLock {
       failures += 1;
       if (failures >= ATTEMPTS) {
         failures = 0;
-        blockedUntil = Date.now() + BLOCK_MS;
+        // Każda następna blokada dwa razy dłuższa (do 16 h), jak w Sędzim.
+        blockedUntil = Date.now() + BLOCK_MS * 2 ** Math.min(blocks, 6);
+        blocks += 1;
       }
       return 'błędny PIN rodzica';
     }
     failures = 0;
+    blocks = 0;
     return null;
   };
   const valid = (p: string) => /^\d{4,8}$/.test(p);
@@ -91,7 +97,8 @@ export function childLockFake(core: FakeCore): FakeChildLock {
         if (!enabled) error = 'profil Dziecko jest wyłączony';
         else error = check(change.pin);
         if (error === null) {
-          openUntil = change.minutes === null ? Infinity : Date.now() + change.minutes * 60_000;
+          openUntil =
+            change.minutes === null ? Infinity : Date.now() + Math.max(change.minutes, 1) * 60_000;
         }
         break;
     }

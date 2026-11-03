@@ -158,4 +158,6 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'parentLog.failed': 'Could not load the log — try again.',
   'parentLog.session': 'Conversation “{title}” · last {when}',
   'parentLog.none': 'no agent actions',
+  'child.contractual':
+    'Contractual protection: the Shadow Judge now runs on your Windows account, so someone with access to it could delete the padlock record. Full protection needs the Shadow Judge as a Windows service on a separate account.',
 };

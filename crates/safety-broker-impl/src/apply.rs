@@ -137,6 +137,7 @@ impl BrokerEngine {
                 level,
                 until_ms,
             } => {
+                st.check_child_lock(&target, level, now)?;
                 let payload = json!({ "target": target, "level": level, "until_ms": until_ms, "approval": id });
                 self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;
                 // Podniesienie globalne bez terminu zostaje po restarcie (decyzja właściciela 27.10).
@@ -253,6 +254,7 @@ impl BrokerEngine {
     ) -> Result<Option<ApprovalId>, BrokerError> {
         let now = self.now();
         let mut st = self.lock();
+        st.sync_child(now);
         let current = st.current_level(&req.target, now);
         if req.until_ms.is_some_and(|u| u <= now) {
             return Err(BrokerError::InvalidRequest(
@@ -288,22 +290,13 @@ impl BrokerEngine {
             self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;
             return Ok(None);
         }
-        // Profil Dziecko: wyższe tryby i „Max dostęp” otwiera tylko PIN rodzica (plan 50 §4.4).
-        if st
-            .autonomy
-            .ceiling(now)
-            .is_some_and(|c| req.level > c || matches!(req.target, AutonomyTarget::Models { .. }))
-        {
-            return Err(BrokerError::InvalidRequest(
-                "kłódka rodzica: ten tryb otwiera PIN rodzica".into(),
-            ));
-        }
         if Self::origin_is_agent(&req.origin) {
             st.kernel_blocks += 1;
             let payload = json!({ "rule": KernelRule::SelfEscalation, "target": req.target, "level": req.level, "origin": req.origin });
             let _ = self.audit(EVENT_KERNEL_BLOCK, None, payload);
             return Err(BrokerError::KernelBlock(KernelRule::SelfEscalation));
         }
+        st.check_child_lock(&req.target, req.level, now)?;
         let hello = req.level == AutonomyLevel::L4
             && st
                 .policy()

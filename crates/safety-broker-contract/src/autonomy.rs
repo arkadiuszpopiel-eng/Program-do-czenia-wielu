@@ -199,7 +199,13 @@ impl AutonomyTable {
         self.capped(self.uncapped(session, agent, now_ms), now_ms)
     }
 
-    fn uncapped(&self, session: &SessionId, agent: Option<&AgentId>, now_ms: u64) -> AutonomyLevel {
+    /// Poziom bez sufitu profilu Dziecko (zapisany stan — do rozpoznania obniżenia).
+    pub fn uncapped(
+        &self,
+        session: &SessionId,
+        agent: Option<&AgentId>,
+        now_ms: u64,
+    ) -> AutonomyLevel {
         if let Some(agent) = agent {
             let pair = AutonomyTarget::SessionAgent {
                 session: session.clone(),

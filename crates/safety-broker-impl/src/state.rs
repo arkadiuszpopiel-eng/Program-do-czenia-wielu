@@ -8,8 +8,8 @@ use risk_classifier_contract::{
 };
 use safety_broker_contract::{
     ActionRequest, ApprovalId, ApprovalRequest, AutonomyEntry, AutonomyTable, AutonomyTarget,
-    CapToken, Capability, DeclaredFacts, Holder, KernelGuard, KernelPolicy, Nonce, PlanStep,
-    SessionSecurity, TokenId,
+    BrokerError, CapToken, Capability, DeclaredFacts, Holder, KernelGuard, KernelPolicy, Nonce,
+    PlanStep, SessionSecurity, TokenId,
 };
 
 use crate::keys::KeyRing;
@@ -143,6 +143,9 @@ pub(crate) struct State {
     /// Poziom globalny ustawiony w tym uruchomieniu zgodą z okna („Zezwól i przełącz na
     /// Automatycznie”); kasowany przy każdej innej zmianie poziomu globalnego (przegląd 3.11).
     pub switched_global: Option<AutonomyLevel>,
+    /// Poziomy bez sufitu profilu Dziecko przy ostatnim sprawdzeniu (kłódka otwarta albo profil
+    /// wyłączony) — przejście w kłódkę zamkniętą unieważnia to, co wydano bez niej.
+    pub unrestricted: bool,
 }
 
 impl State {
@@ -163,7 +166,53 @@ impl State {
             kernel_blocks: 0,
             denied_audit_window: (0, 0),
             switched_global: None,
+            unrestricted: true,
         }
+    }
+
+    /// Profil Dziecko (plan 50 §4.4): przy zamkniętej kłódce wyższe tryby i „Max dostęp” otwiera
+    /// tylko PIN rodzica — także karta zatwierdzona po zamknięciu.
+    pub(crate) fn check_child_lock(
+        &self,
+        target: &AutonomyTarget,
+        level: AutonomyLevel,
+        now: u64,
+    ) -> Result<(), BrokerError> {
+        let models = matches!(target, AutonomyTarget::Models { .. });
+        if self
+            .autonomy
+            .ceiling(now)
+            .is_some_and(|c| level > c || models)
+        {
+            return Err(BrokerError::InvalidRequest(
+                "kłódka rodzica: ten tryb otwiera PIN rodzica".into(),
+            ));
+        }
+        Ok(())
+    }
+
+    /// Kłódka profilu Dziecko zamknęła się od ostatniego sprawdzenia (zamknięcie, włączenie profilu,
+    /// upływ terminu otwarcia): tokeny, plany i karty wydane bez sufitu przestają działać (nowy
+    /// klucz bez okna łaski) — kolejne działania przechodzą przez sufit. Zwraca liczbę tokenów.
+    pub(crate) fn sync_child(&mut self, now: u64) -> usize {
+        let restricted = self.autonomy.ceiling(now).is_some();
+        let was_unrestricted = std::mem::replace(&mut self.unrestricted, !restricted);
+        if !(restricted && was_unrestricted) {
+            return 0;
+        }
+        let revoked = self.tokens.len();
+        self.tokens.clear();
+        let _ = self.keys.wipe();
+        self.plans.clear();
+        for p in self.approvals.values_mut() {
+            if matches!(
+                p.status,
+                PendStatus::Pending | PendStatus::Approved(Some(_))
+            ) {
+                p.status = PendStatus::Expired;
+            }
+        }
+        revoked
     }
 
     /// Ustawia poziom celu; zmiana globalna spoza okna zgody kasuje znacznik przełączenia.
@@ -249,7 +298,7 @@ fn level_in(table: &AutonomyTable, target: &AutonomyTarget, now: u64) -> Autonom
             table.get(target, now).unwrap_or(global)
         }
         AutonomyTarget::SessionAgent { session, agent } => {
-            table.effective(session, Some(agent), now)
+            table.uncapped(session, Some(agent), now)
         }
         // „Max dostęp”: poziom wpisu tego zasięgu; inny zasięg albo wyłączony — domyślny.
         AutonomyTarget::Models { scope } => match table.max_access(now) {

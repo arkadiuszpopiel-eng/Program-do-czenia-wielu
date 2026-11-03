@@ -241,13 +241,13 @@ Plan: [`50-tryby-zgod-jak-claude-codex.md`](50-tryby-zgod-jak-claude-codex.md) (
 | Nr | Zadanie | Stan | Data | Uwagi |
 | --- | --- | --- | --- | --- |
 | Z.0 | Badanie dokumentacji Claude Code i Codex, plan, decyzje właściciela | zrobione | 2026-11-03 | decyzje w §7 planu |
-| Z.1 | Menu 5 trybów + przełącznik Max dostęp | w toku | 2026-11-03 | 5 trybów, klawisze 1–5, nazwy Ręcznie / Akceptuj edycje / Pełny dostęp (gałąź `do-przegladu-tryby-zgod`); Max dostęp i „Plan” — dalej |
+| Z.1 | Menu 5 trybów + przełącznik Max dostęp | zrobione | 2026-11-03 | 5 trybów (klawisze 1–5), czerwony przełącznik Max dostęp z zasięgiem, znak w belce; czeka na przegląd człowieka (gałąź `do-przegladu-tryby-zgod`, §8.2 planu 50) |
 | Z.2 | Poziom „Akceptuj edycje” w Sędzim Cieni | zrobione | 2026-11-03 | czeka na przegląd człowieka (gałąź `do-przegladu-tryby-zgod`); folder pracy + ścieżki chronione; przegląd w świeżym kontekście — §8 planu 50 |
-| Z.3 | Okno zgody z 4 opcjami i zakresem | czeka | — | gałąź do przeglądu |
+| Z.3 | Okno zgody z 4 opcjami i zakresem | zrobione | 2026-11-03 | „Zezwól i przełącz na Automatycznie” w oknie Sędziego, opcja 4 po odmowie; czeka na przegląd człowieka |
 | Z.4 | Model-sędzia dla „Automatycznie” | czeka | — | gałąź do przeglądu |
-| Z.5 | Plan jako tryb | czeka | — | po Z.1 |
-| Z.6 | Profil Dziecko z kłódkami i PIN-em rodzica | czeka | — | gałąź do przeglądu |
-| Z.7 | Dziennik rodzica pod PIN-em | czeka | — | po Z.6 |
+| Z.5 | Plan jako tryb | zrobione | 2026-11-03 | L0 = Plan: narzędzia odczytu, trzy odpowiedzi pod planem |
+| Z.6 | Profil Dziecko z kłódkami i PIN-em rodzica | zrobione | 2026-11-04 | kłódka w Sędzim (sufit L1), PIN Argon2id z blokadą; czeka na przegląd człowieka; odstępstwo: skrót PIN-u w pliku Sędziego (§8.2) |
+| Z.7 | Dziennik rodzica pod PIN-em | w toku | 2026-11-04 | wersja 1: tematy rozmów i działania z osi czasu; pełna treść rozmów — dalej |
 | Z.8 | Testy trybów, ataków i prawdziwej aplikacji | czeka | — | wszystkie |
 
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica

@@ -990,6 +990,8 @@ export interface ChildLockState {
   /** Do kiedy otwarta (ms od 1970); `None` — zamknięta albo do zamknięcia Alfy. */
   readonly open_until_ms?: number | null;
   readonly pin_set: boolean;
+  /** Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna. */
+  readonly tamper_resistant: boolean;
 }
 
 /** Rozwiązanie kolizji. */

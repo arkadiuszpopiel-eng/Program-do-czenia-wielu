@@ -28,7 +28,7 @@ mod standing;
 mod state;
 mod tokens;
 
-pub use child::CHILD_LOCK_FILE;
+pub use child::{CHILD_LOCK_FILE, CoreSession};
 pub use child_store::PinParams;
 pub use engine::{BrokerConfig, BrokerEngine};
 pub use keys::KeyMode;

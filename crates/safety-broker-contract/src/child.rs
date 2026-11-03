@@ -47,7 +47,7 @@ impl ChildCeiling {
     }
 }
 
-/// PIN rodzica (tylko cyfry). `Debug` nie pokazuje wartości.
+/// PIN rodzica (tylko cyfry). `Debug` nie pokazuje wartości; pamięć zerowana przy zwolnieniu.
 #[derive(Clone, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(transparent)]
 pub struct Pin(String);
@@ -76,6 +76,12 @@ impl Pin {
     #[must_use]
     pub fn is_valid(&self) -> bool {
         Self::new(&self.0).is_ok()
+    }
+}
+
+impl Drop for Pin {
+    fn drop(&mut self) {
+        zeroize::Zeroize::zeroize(&mut self.0);
     }
 }
 
@@ -134,6 +140,10 @@ pub struct ChildLockView {
     pub blocked_until_ms: Option<u64>,
     /// Pozostałe próby przed blokadą.
     pub attempts_left: u32,
+    /// Zapis kłódki poza zasięgiem konta dziecka (Sędzia jako usługa na osobnym koncie); `false` —
+    /// ochrona umowna (dziecko na tym samym koncie mogłoby usunąć zapis).
+    #[serde(default)]
+    pub tamper_resistant: bool,
 }
 
 #[cfg(test)]

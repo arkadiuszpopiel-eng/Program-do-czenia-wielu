@@ -47,6 +47,8 @@ pub struct BrokerEngine {
     pub(crate) grant_store: Option<GrantStore>,
     /// Profil Dziecko (bez pliku — wyłączony, jak `standing`).
     pub(crate) child: Mutex<ChildStore>,
+    /// Połączenia aplikacji (rola Jądra) — ostatnie rozłączenie zamyka kłódkę „do zamknięcia Alfy”.
+    pub(crate) core_clients: std::sync::atomic::AtomicUsize,
 }
 
 /// Maksymalne długości pól podmiotu.
@@ -78,6 +80,7 @@ impl BrokerEngine {
             standing: None,
             grant_store: None,
             child: Mutex::new(ChildStore::load(None, PinParams::default())),
+            core_clients: std::sync::atomic::AtomicUsize::new(0),
         })
     }
 

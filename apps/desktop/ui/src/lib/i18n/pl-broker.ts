@@ -154,4 +154,6 @@ export const plBroker = {
   'parentLog.failed': 'Nie udało się wczytać dziennika — spróbuj ponownie.',
   'parentLog.session': 'Rozmowa „{title}” · ostatnio {when}',
   'parentLog.none': 'bez działań agentek',
+  'child.contractual':
+    'Ochrona umowna: Sędzia Cieni działa teraz na Twoim koncie Windows, więc osoba z dostępem do tego konta mogłaby usunąć zapis kłódki. Pełną ochronę daje Sędzia jako usługa Windows na osobnym koncie.',
 } as const satisfies Record<string, Message>;

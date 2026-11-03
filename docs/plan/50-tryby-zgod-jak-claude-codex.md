@@ -189,9 +189,8 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   `outside_workdir` (ścieżka poza profilem albo poza folderem pracy rozmowy; brak folderu = poza) i `protected_path`.
   Reguły `OutsideWorkdir` (≤ L2, „zawsze zezwalaj” możliwe) i `ProtectedPath` (≤ L3, nigdy stała zgoda). Testy:
   tabela 89 × 5, własności z nowymi faktami, `safety-broker-contract/tests/workdir.rs`.
-- **Z.1 w toku:** menu ma 5 trybów (klawisze 1–5); nazwy jak w obu programach: Ręcznie (L1), Akceptuj edycje (L2),
-  Pełny dostęp (L4). L0 zostaje „Tylko podgląd” do Z.5 (tryb Plan). Przełącznik „Max dostęp” — następny krok
-  (wymaga w Sędzim wiedzy, czy agentka pracuje na modelu lokalnym czy w chmurze).
+- **Z.1 zrobione (3.11 wieczór, §8.2):** menu ma 5 trybów (klawisze 1–5); nazwy jak w obu programach: Plan (L0),
+  Ręcznie (L1), Akceptuj edycje (L2), Automatycznie (L3), Pełny dostęp (L4) i czerwony przełącznik „Max dostęp”.
 - **Przegląd w świeżym kontekście (3.11):** nic krytycznego, brak regresji (nowe fakty tylko dodają pytania).
   Luki nowej ochrony i stan:
   1. polecenie powłoki w folderze pracy, które pisze do `.git\hooks` czy `.npmrc`, ocenia się po katalogu
@@ -221,6 +220,50 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   znak w belce jak dziś „Pełny dostęp”; w profilu Dziecko kłódka (Z.6).
 - **Testy:** tabela (poziom × pochodzenie × ustawienie), własność „bez informacji o modelu Max dostęp lokalny
   nigdy nie podnosi”, prawdziwa aplikacja w każdym stylu i motywie.
+
+### 8.2 Stan 3/4.11 noc (gałąź `do-przegladu-tryby-zgod`, ad9ddcba…c07c72fe)
+
+- **Z.1 Max dostęp:** cel `Models{lokalne|chmura|wszystkie}` w Sędzim, pochodzenie modelu tury
+  (`ToolCtx.model_location`, z dostawcy przebiegu — nazwie modelu ufa tylko u Routera), zapis po restarcie,
+  polecenie `permissions_request_max_access`, przełącznik i czerwony znak w belce.
+- **Z.3 okno zgody:** „Zezwól i przełącz na „Automatycznie”” (tylko pojedyncza akcja, tryb globalny < L3, podmiot
+  bez własnego poziomu, bez niezaufanej treści i bez kłódki rodzica); rdzeń przyjmuje to przełączenie jako
+  zapamiętany poziom (znacznik w Sędzim, kasowany każdą inną zmianą globalną). Opcja 4 — po odmowie „Powiedz
+  agentce, co zrobić inaczej” (wskazówka do trwającego zadania albo do pola pisania).
+- **Z.5 Plan:** na L0 agentka ma tylko narzędzia odczytu i zasadę planu w prompcie; plan kończy przebieg bez
+  weryfikacji; pod planem trzy odpowiedzi (tak, automatycznie / tak, ręcznie / nie, planuj dalej). Plan obowiązuje
+  otwartą rozmowę.
+- **Z.6 profil Dziecko:** sufit L1 w tabeli autonomii Sędziego (obejmuje zapamiętany Pełny dostęp i Max dostęp);
+  przy zamkniętej kłódce podniesienia i Max dostęp odrzucane, bez zgód stałych i bez przełączenia z okna. PIN 4–8
+  cyfr, tylko skrót Argon2id (19 MiB, 2 przejścia) z solą z CSPRNG; 5 błędnych prób — blokada 15 min, każda
+  następna dwa razy dłuższa (do 16 h), licznik przetrwa restart; uszkodzony zapis — kłódka zamknięta. Otwarcie na
+  15 min / 1 h / do zamknięcia Alfy; zamknięcie bez PIN-u. Interfejs: kłódki i „Poproś rodzica” w menu trybów,
+  znak w belce, karta w Ustawienia → Uprawnienia.
+  **Odstępstwo do decyzji:** skrót PIN-u leży w pliku `child-lock.json` w prywatnym katalogu Sędziego (ścieżka
+  Jądra, agentki nie mają dostępu), nie w Menedżerze poświadczeń — Sędzia jako usługa działa na osobnym koncie;
+  przeniesienie do Menedżera poświadczeń tego konta — przy przeglądzie. Poza usługą (tryb przenośny, w procesie)
+  plik należy do konta użytkownika, więc ochrona jest umowna — karta profilu mówi to wprost
+  (`tamper_resistant`); decyzja właściciela: dopuścić z ostrzeżeniem czy wymagać Sędziego jako usługi.
+- **Przegląd Z.6 w świeżym kontekście (4.11):** nic krytycznego; poprawione wszystkie poważne: zamknięcie kłódki
+  (także upływ terminu, włączenie profilu) unieważnia tokeny, plany i karty wydane bez niej, karta zatwierdzona po
+  zamknięciu nie podnosi trybu, nie daje zgody stałej ani przełączenia; otwarcie, wyłączenie i nowy PIN obowiązują
+  dopiero po zapisie w Audycie; „do zamknięcia Alfy” kończy się, gdy rozłączy się ostatnie połączenie aplikacji
+  (także po awarii). Z drobnych: samopodniesienie agentki przy kłódce liczone jako blokada Jądra, obniżenie
+  `SessionAgent` rozpoznawane bez sufitu, Max dostęp w metrykach tylko gdy obowiązuje, PIN zerowany w pamięci,
+  zapis pliku z `sync_all`, interfejs odświeża stan po upływie otwarcia, atrapa z rosnącą blokadą. Otwarte:
+  stan „nieznany” profilu przy zerwanym łączu (dziś pokazuje „bez PIN-u”), zmiana zegara systemowego (tylko
+  administrator) wpływa na terminy.
+- **Z.7 dziennik rodzica (wersja 1):** po PIN-ie (ta sama blokada prób) 20 ostatnich rozmów z tematem i czasem
+  oraz działania z osi czasu (narzędzia, Audyt). Pełna treść rozmów — jeszcze nie (włączana jawnie przez
+  rodzica, ze stałym znakiem dla dziecka); „do końca rozmowy” jako czas otwarcia — jeszcze nie.
+- **Przegląd w świeżym kontekście (3.11, zakres Z.1/Z.3/Z.5):** nic krytycznego; 3 poważne poprawione w 29946562
+  (strażnik nie cofa przełączenia przy czekającej prośbie, znacznik zamiast każdego wpisu bez terminu, pochodzenie
+  „lokalne” z nazwy modelu tylko u Routera), z drobnych poprawione: kolejność Audytu przy przełączeniu, brak
+  opcji po niezaufanej treści. **Otwarte:** błąd łącza z Sędzią daje w kliencie zdalnym poziom L0, więc agentka
+  przechodzi w tryb Plan (bezpieczny kierunek, ale myląco — odróżnić „nieznany” od L0); zasięg „chmura” obejmuje
+  też działania bez modelu (wtyczki, zrzut ekranu, mosty CLI, wznowienie z punktu kontrolnego).
+- **Edge case:** restart Sędziego przed przyjęciem przełączenia przez rdzeń (≤ 15 s) — przełączenie przepada,
+  obowiązuje poprzedni zapamiętany poziom (bezpieczny kierunek).
 
 ## Źródła
 

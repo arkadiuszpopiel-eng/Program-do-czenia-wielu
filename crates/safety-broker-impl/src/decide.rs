@@ -93,6 +93,7 @@ impl BrokerEngine {
         Self::ttl(&self.lock(), req.ttl_ms)?;
         let now = self.now();
         let mut st = self.lock();
+        st.sync_child(now);
         if req.origin == CommandOrigin::UntrustedContent || req.facts.untrusted_input_in_args {
             self.taint(&mut st, &req.holder, TaintSource::File);
         }
@@ -186,6 +187,7 @@ impl BrokerEngine {
         }
         let now = self.now();
         let mut st = self.lock();
+        st.sync_child(now);
         let session = st.session(&plan.holder.session);
         let plan_level =
             st.autonomy

@@ -90,7 +90,8 @@ pub fn engine(d: InprocDeps<'_>) -> Result<Arc<BrokerEngine>, String> {
     let mut engine = BrokerEngine::new(config, clock, Arc::new(audit), d.processes)
         .map_err(|e| e.to_string())?
         .with_standing_level(dir.join(STANDING_FILE))
-        .with_child_lock(dir.join(CHILD_LOCK_FILE), PinParams::default())
+        // W procesie: katalog konta użytkownika — ochrona kłódki umowna (interfejs to mówi).
+        .with_child_lock(dir.join(CHILD_LOCK_FILE), PinParams::default(), false)
         .with_bus(d.bus);
     if let Some(c) = d.classifier {
         engine = engine.with_classifier(c);

@@ -123,7 +123,12 @@ impl Broker for BrokerEngine {
         let mut st = self.lock();
         Self::expire(&mut st, now);
         BrokerMetrics {
-            max_access: st.autonomy.max_access(now).map(|(scope, _)| scope),
+            // Przy zamkniętej kłódce rodzica Max dostęp nie obowiązuje (D3 przeglądu 4.11).
+            max_access: st
+                .autonomy
+                .max_access(now)
+                .filter(|_| st.autonomy.ceiling(now).is_none())
+                .map(|(scope, _)| scope),
             standing_global: self.standing.as_ref().and_then(|_| st.switched_global()),
             approvals_last_hour: st.approvals_last_hour(now),
             active_tokens: u32::try_from(

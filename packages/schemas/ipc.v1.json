@@ -3615,13 +3615,19 @@
         },
         "pin_set": {
           "type": "boolean"
+        },
+        "tamper_resistant": {
+          "default": false,
+          "description": "Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna.",
+          "type": "boolean"
         }
       },
       "required": [
         "pin_set",
         "enabled",
         "open",
-        "attempts_left"
+        "attempts_left",
+        "tamper_resistant"
       ],
       "type": "object"
     },

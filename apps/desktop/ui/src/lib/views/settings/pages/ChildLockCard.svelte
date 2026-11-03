@@ -113,6 +113,9 @@
       {/if}
       {status}
     </p>
+    {#if !lock.tamper_resistant}
+      <p class="note">{t('child.contractual')}</p>
+    {/if}
     {#if lock.blocked_until_ms}
       <p class="warn" role="alert">{t('child.blocked', { when: when(lock.blocked_until_ms) })}</p>
     {:else if lock.pin_set && lock.attempts_left < 5}
@@ -217,6 +220,13 @@
     align-items: center;
     gap: var(--alfa-space-2);
     font-weight: var(--alfa-weight-semibold);
+  }
+  .note {
+    padding: var(--alfa-space-2);
+    border-radius: var(--alfa-radius-control);
+    background: color-mix(in srgb, var(--alfa-color-warning) 12%, transparent);
+    color: var(--alfa-color-text);
+    font-size: var(--alfa-font-size-sm);
   }
   .warn {
     color: var(--alfa-color-text);

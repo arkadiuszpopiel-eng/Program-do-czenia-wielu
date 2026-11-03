@@ -125,7 +125,9 @@ pub fn build_engine(
     BrokerEngine::new(broker, clock, audit, processes)
         .map(|engine| {
             let engine = engine.with_standing_level(standing);
-            Arc::new(engine.with_child_lock(child, PinParams::default()))
+            // Usługa na osobnym koncie: zapis kłódki poza zasięgiem konta dziecka.
+            let resistant = !config.dev_mode;
+            Arc::new(engine.with_child_lock(child, PinParams::default(), resistant))
         })
         .map_err(|e| e.to_string())
 }

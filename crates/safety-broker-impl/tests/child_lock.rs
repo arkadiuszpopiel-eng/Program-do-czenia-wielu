@@ -23,7 +23,7 @@ use watchdog_contract::ManualClock;
 fn broker(dir: &Path, clock: &Arc<ManualClock>, audit: &Arc<MemoryAudit>) -> BrokerEngine {
     common::engine_with(test_policy(), clock.clone(), audit.clone())
         .with_standing_level(dir.join("autonomy-standing.json"))
-        .with_child_lock(dir.join(CHILD_LOCK_FILE), PinParams::FAST_FOR_TESTS)
+        .with_child_lock(dir.join(CHILD_LOCK_FILE), PinParams::FAST_FOR_TESTS, true)
 }
 
 fn pin(s: &str) -> Pin {

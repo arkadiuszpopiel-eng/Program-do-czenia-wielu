@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { PermissionsApi } from '../../api/client';
-import type { PermissionsState } from '../../api/types-hub';
+import type { ChildLockState, PermissionsState } from '../../api/types-hub';
 import { AutonomyState } from '../autonomy.svelte';
 
 const reply = (state: Partial<PermissionsState>): PermissionsState => ({
@@ -38,5 +38,36 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
     const result = await autonomy.load(api(() => Promise.reject(new Error('brak Sędziego'))));
     expect(result).toBeNull();
     expect(autonomy.maxAccess).toBe('all');
+  });
+
+  it('kłódka otwarta na czas: po terminie stan odczytany od nowa (plan 50 §4.4)', async () => {
+    vi.useFakeTimers();
+    try {
+      const now = Date.now();
+      const states: ChildLockState[] = [
+        {
+          pin_set: true,
+          enabled: true,
+          open: true,
+          open_until_ms: now + 1_000,
+          attempts_left: 5,
+          tamper_resistant: false,
+        },
+        { pin_set: true, enabled: true, open: false, attempts_left: 5, tamper_resistant: false },
+      ];
+      let reads = 0;
+      const client = {
+        get: () => Promise.resolve(reply({ global: 'L3' })),
+        childLock: () => Promise.resolve(states[Math.min(reads++, 1)]),
+      } as unknown as PermissionsApi;
+      const autonomy = new AutonomyState();
+      await autonomy.load(client);
+      expect(autonomy.locked).toBe(false);
+      await vi.advanceTimersByTimeAsync(1_600);
+      expect(reads).toBe(2);
+      expect(autonomy.locked).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

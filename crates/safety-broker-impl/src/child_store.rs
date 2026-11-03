@@ -84,6 +84,8 @@ pub(crate) struct ChildStore {
     pub(crate) record: Record,
     /// Plik istnieje, ale nie da się go odczytać — kłódka zamknięta, zmiany odrzucane.
     pub(crate) corrupt: bool,
+    /// Katalog niedostępny dla konta dziecka (usługa na osobnym koncie).
+    pub(crate) tamper_resistant: bool,
 }
 
 impl ChildStore {
@@ -103,6 +105,7 @@ impl ChildStore {
             params,
             record,
             corrupt,
+            tamper_resistant: false,
         }
     }
 
@@ -171,7 +174,11 @@ impl ChildStore {
         };
         let text = serde_json::to_string(&self.record).map_err(std::io::Error::other)?;
         let tmp = path.with_extension("tmp");
-        std::fs::write(&tmp, text)?;
+        // Na dysk przed podmianą — przerwa zasilania nie zostawi pustego pliku.
+        let mut file = std::fs::File::create(&tmp)?;
+        std::io::Write::write_all(&mut file, text.as_bytes())?;
+        file.sync_all()?;
+        drop(file);
         std::fs::rename(&tmp, path)
     }
 }

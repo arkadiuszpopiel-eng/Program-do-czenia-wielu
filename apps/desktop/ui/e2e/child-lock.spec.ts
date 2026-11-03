@@ -66,6 +66,7 @@ for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
       await expect(card.getByRole('status')).toHaveText(
         'Profil Dziecko włączony — kłódka zamknięta.',
       );
+      await expect(card.getByText(/^Ochrona umowna/)).toBeVisible();
       await expectAccessible(page, `profil Dziecko ${skin} ${theme}`);
       await expectReadable(page, `profil Dziecko ${skin} ${theme}`);
       const pin = card.getByLabel('PIN rodzica', { exact: true });
