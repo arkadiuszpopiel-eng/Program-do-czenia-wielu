@@ -50,7 +50,7 @@ prop_compose! {
         egress in proptest::option::of((Just("host.example".to_owned()), any::<bool>())),
         destructive in prop_oneof![Just(Destructiveness::None), Just(Destructiveness::Recoverable), Just(Destructiveness::Permanent)],
         bulk in 1u32..20_000,
-        flags in any::<[bool; 4]>(),
+        flags in any::<[bool; 6]>(),
         origin in origin(),
         kernel in kernel(),
     ) -> ActionFacts {
@@ -67,6 +67,8 @@ prop_compose! {
         f.tainted = flags[1];
         f.untrusted_input_in_args = flags[2];
         f.touches_private_data = flags[3];
+        f.outside_workdir = flags[4];
+        f.protected_path = flags[5];
         f.kernel_rule = kernel;
         f
     }
@@ -157,6 +159,8 @@ proptest! {
             ActionFacts { install: true, ..f.clone() },
             ActionFacts { bulk: f.bulk.saturating_mul(100), ..f.clone() },
             ActionFacts { kernel_rule: Some(KernelRule::AuditDisable), ..f.clone() },
+            ActionFacts { outside_workdir: true, ..f.clone() },
+            ActionFacts { protected_path: true, ..f.clone() },
         ];
         for v in variants {
             let s = strictness_all(&v);

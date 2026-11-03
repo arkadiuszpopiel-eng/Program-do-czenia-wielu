@@ -1,4 +1,4 @@
-//! Tabela decyzyjna klasyfikatora: 80 przypadków × 5 poziomów autonomii (400 werdyktów).
+//! Tabela decyzyjna klasyfikatora: 89 przypadków × 5 poziomów autonomii (445 werdyktów).
 //! Kolumna `expect`: werdykt dla L0 L1 L2 L3 L4 — `P` wykonaj, `A` zapytaj, `V` zapytaj
 //! nie-głosem, `B` twarda blokada Jądra. Na L4 tylko `P` albo `B` — okno zgód nie pokazuje się
 //! wcale (decyzja właściciela 31.10).
@@ -36,7 +36,7 @@ fn cases() -> Vec<(&'static str, ActionFacts, L, &'static str)> {
         ("odczyt poza zakresem", f(C::Read).scope(S::Outside), L::Low, "PPPPP"),
         ("odczyt w sesji tainted", f(C::Read).tainted(), L::Low, "PPPPP"),
         ("nowy plik w zakresie", w(), L::Low, "AAPPP"),
-        ("zapis odwracalny poza zakresem", w().scope(S::Outside), L::Medium, "AAPPP"),
+        ("zapis odwracalny poza zakresem", w().scope(S::Outside), L::Medium, "AAAPP"),
         ("zapis nieodwracalny w zakresie", w().reversible(R::No), L::Medium, "AAAPP"),
         ("zapis nieodwracalny poza zakresem", w().reversible(R::No).scope(S::Outside), L::High, "AAAAP"),
         ("1 plik do Kosza", del(D::Recoverable, 1), L::Medium, "AAAPP"),
@@ -108,10 +108,20 @@ fn cases() -> Vec<(&'static str, ActionFacts, L, &'static str)> {
         ("tainted: gui wskazanej aplikacji", f(C::GuiControl).scope(S::AllowedApp).tainted(), L::Medium, "AAPPP"),
         ("gui z niezaufanymi argumentami", f(C::GuiControl).scope(S::AllowedApp).untrusted_args(), L::High, "AAAAP"),
         ("kopia pliku w zakresie", w(), L::Low, "AAPPP"),
-        ("przeniesienie poza zakres (odwracalne)", w().scope(S::Outside), L::Medium, "AAPPP"),
+        ("przeniesienie poza zakres (odwracalne)", w().scope(S::Outside), L::Medium, "AAAPP"),
         ("masowa kopia (bez destrukcji)", w().bulk(5000), L::Low, "AAPPP"),
         ("masowe trwałe głosem pewnym", del(D::Permanent, 500).origin(voice(990, true)), L::Critical, "VVVVP"),
         ("admin z głosu", f(C::Admin).origin(voice(990, true)), L::High, "AAAAP"),
+        // Plan 50 (3.11): „Akceptuj edycje” (L2) = folder pracy rozmowy; ścieżki chronione.
+        ("zapis w profilu poza folderem pracy", w().outside_workdir(), L::Low, "AAAPP"),
+        ("shell poza folderem pracy", sh().outside_workdir(), L::Medium, "AAAPP"),
+        ("odczyt poza folderem pracy", f(C::Read).outside_workdir(), L::Low, "PPPPP"),
+        ("gui wskazanej aplikacji poza folderem", f(C::GuiControl).scope(S::AllowedApp).outside_workdir(), L::Medium, "AAPPP"),
+        ("zapis do .git w folderze pracy", w().protected_path(), L::Medium, "AAAAP"),
+        ("shell w .git", sh().protected_path(), L::Medium, "AAAAP"),
+        ("odczyt .git", f(C::Read).protected_path(), L::Low, "PPPPP"),
+        ("zapis .ssh poza folderem", w().protected_path().outside_workdir(), L::Medium, "AAAAP"),
+        ("głos: zapis do .git", w().protected_path().origin(voice(950, true)), L::Medium, "AAAAP"),
     ]
 }
 

@@ -11,7 +11,8 @@ F3. P0. Jądro (agent nie zmienia; progi to polityka).
 pub struct ActionFacts { tool, class: ActionClass /* Read|Write|Shell|GuiControl|Egress|SecretsRead|Admin */, reversible: Reversibility /* Yes|Scoped|No */,
     scope: ScopeRelation /* InScope|AllowedApp|Outside */, egress: Option<String>, egress_allowlisted, destructive /* None|Recoverable|Permanent */,
     bulk: u32, install, origin: CommandOrigin /* UserText|UserVoice{confidence: SttConfidence(‰), speaker_verified}|Agent|UntrustedContent */,
-    tainted, untrusted_input_in_args, touches_private_data, kernel_rule: Option<KernelRule> }
+    tainted, untrusted_input_in_args, touches_private_data, kernel_rule: Option<KernelRule>,
+    outside_workdir /* poza folderem pracy rozmowy */, protected_path /* .git, .alfa, .ssh, pliki startowe powłoki */ }
 pub enum RiskLevel { Low, Medium, High, Critical }
 pub enum Verdict { Proceed, Ask { non_voice, grantable }, HardBlock { rule: KernelRule } }
 pub fn evaluate(&ActionFacts, AutonomyLevel, &RiskPolicy) -> RiskVerdict { level, verdict, rules, factors, explanation }
@@ -30,6 +31,8 @@ Zdarzenia: `risk.classified` (przy `Ask`/`HardBlock`), `risk.trifecta_detected`,
 | Trifecta / TaintedEgress | każdy | dane prywatne + niezaufane + egress; egress z sesji tainted |
 | MutationNeedsYes | ≤ L1 | każda zmiana |
 | RiskyAtL2 | ≤ L2 | usuwanie, egress, instalacja, sekrety, admin, nieodwracalne |
+| OutsideWorkdir | ≤ L2, grantable | zapis albo polecenie poza folderem pracy rozmowy (`outside_workdir` albo `scope = Outside`) — „Akceptuj edycje” = Codex „workspace-write” (plan 50) |
+| ProtectedPath | ≤ L3 | zmiana ścieżki chronionej (`protected_path`; podnosi ryzyko do średniego) — jak w Claude Code i Codex (plan 50 §4.5) |
 | TaintedHighRisk / UntrustedSource / CriticalRisk | ≤ L3 | tainted + ≥ wysokie; polecenie z niezaufanej treści; krytyczne (np. masowe trwałe usunięcie) |
 | IrreversibleOutside / EgressNotAllowlisted / GuiOutsideApps | ≤ L3, grantable | nieodwracalne poza zakresem; host spoza allowlisty; aplikacja spoza wskazanych |
 Klasa ryzyka: baza wg klasy akcji, podniesienia (destrukcja, masowość ≥ `bulk_threshold`, nieodwracalność, poza zakresem, instalacja, egress z danymi/taintem, trifecta = krytyczne, niezaufane źródło, obszar Jądra), niska pewność STT podnosi o stopień.
@@ -48,7 +51,7 @@ Klasa ryzyka: baza wg klasy akcji, podniesienia (destrukcja, masowość ≥ `bul
 `[security.risk] stt_confidence_min = 0.8` (500–990‰), `bulk_threshold = 50` (≥ 2) — `kernel_policy`.
 
 ## Testy akceptacyjne
-- `ACC-F3-risk-classifier-01`: tabela 80 przypadków × 5 poziomów (`tests/table.rs`) + własności po 2000 przypadków (`tests/props.rs`); zamrożenie ≥ 200 × 5 w `evals/` — przez recenzenta.
+- `ACC-F3-risk-classifier-01`: tabela 89 przypadków × 5 poziomów (`tests/table.rs`) + własności po 2000 przypadków (`tests/props.rs`); zamrożenie ≥ 200 × 5 w `evals/` — przez recenzenta.
 - `ACC-F3-risk-classifier-02`: egress z sesji tainted nigdy `Proceed` (własność, każdy poziom).
 - `ACC-F3-risk-classifier-03`: destrukcja głosem na L4 → zawsze `Ask{non_voice}` (własność + tabela).
 

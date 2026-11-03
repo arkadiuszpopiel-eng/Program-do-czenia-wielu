@@ -69,6 +69,7 @@ pub fn base_facts(manifest: &ToolManifest, ctx: &ToolCtx) -> DeclaredFacts {
     facts.reversible = manifest.reversible;
     facts.untrusted_input_in_args = ctx.untrusted_args;
     facts.summary = Some(manifest.title.clone());
+    facts.workdir = ctx.workdir.clone();
     facts
 }
 

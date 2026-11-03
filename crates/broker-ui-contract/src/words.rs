@@ -108,7 +108,7 @@ pub fn mode_name_pl(l: AutonomyLevel) -> &'static str {
     match l {
         AutonomyLevel::L0 => "Tylko podgląd",
         AutonomyLevel::L1 => "Pytaj o wszystko",
-        AutonomyLevel::L2 => "Pytaj o ryzykowne",
+        AutonomyLevel::L2 => "Akceptuj edycje",
         AutonomyLevel::L3 => "Automatycznie",
         AutonomyLevel::L4 => "Pełna automatyka",
     }
@@ -119,7 +119,9 @@ pub fn mode_note_pl(l: AutonomyLevel) -> &'static str {
     match l {
         AutonomyLevel::L0 => "agentki tylko czytają i podpowiadają, nic nie zmieniają",
         AutonomyLevel::L1 => "każda zmiana czeka na Twoje „tak”",
-        AutonomyLevel::L2 => "drobne rzeczy same; pytają przy usuwaniu, wysyłce i instalacji",
+        AutonomyLevel::L2 => {
+            "zmieniają pliki w folderze pracy same; pytają o resztę, usuwanie, wysyłkę i instalację"
+        }
         AutonomyLevel::L3 => "pracują same; pytają przy nieodwracalnych i po niezaufanej treści",
         AutonomyLevel::L4 => {
             "pracują same i o nic nie pytają — to okno nie pokaże się, aż obniżysz tryb"
@@ -145,6 +147,12 @@ pub fn reason_pl(rule: RuleId) -> &'static str {
         }
         RuleId::MutationNeedsYes => "W tym trybie każda zmiana czeka na Twoje „tak”.",
         RuleId::RiskyAtL2 => "W tym trybie usuwanie, wysyłka i instalacja czekają na Twoją zgodę.",
+        RuleId::OutsideWorkdir => {
+            "W trybie „Akceptuj edycje” zmiany poza folderem pracy rozmowy czekają na Twoją zgodę."
+        }
+        RuleId::ProtectedPath => {
+            "To ścieżka chroniona (np. .git, .alfa, .ssh albo plik startowy powłoki) — zmiana zawsze czeka na Twoją zgodę."
+        }
         RuleId::TaintedHighRisk => {
             "Sesja widziała niezaufaną treść, a to działanie jest ryzykowne."
         }

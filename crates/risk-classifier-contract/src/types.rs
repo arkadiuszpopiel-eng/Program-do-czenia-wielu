@@ -25,7 +25,7 @@ pub enum AutonomyLevel {
     L0,
     /// Pytaj o wszystko — każda zmiana wymaga „tak”.
     L1,
-    /// Pytaj o ryzykowne — usuwanie, egress, instalacja.
+    /// Akceptuj edycje — zmiany w folderze pracy same; poza nim, usuwanie, egress, instalacja — pyta.
     L2,
     /// Bardzo wysoka (domyślny) — pyta przy nieodwracalnych poza zakresem i niezaufanej treści.
     #[default]
@@ -43,7 +43,7 @@ impl AutonomyLevel {
         match self {
             Self::L0 => "Tylko podgląd",
             Self::L1 => "Pytaj o wszystko",
-            Self::L2 => "Pytaj o ryzykowne",
+            Self::L2 => "Akceptuj edycje",
             Self::L3 => "Automatycznie",
             Self::L4 => "Pełna automatyka",
         }

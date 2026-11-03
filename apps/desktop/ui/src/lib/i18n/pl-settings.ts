@@ -166,9 +166,9 @@ export const plSettings = {
   'perm.L0.desc': 'Agentka tylko czyta i podpowiada, nic nie zmienia.',
   'perm.L1.name': 'Pytaj o wszystko',
   'perm.L1.desc': 'Każda zmiana wymaga Twojego „tak".',
-  'perm.L2.name': 'Pytaj o ryzykowne',
+  'perm.L2.name': 'Akceptuj edycje',
   'perm.L2.desc':
-    'Drobiazgi robi sama; pyta przy usuwaniu, wysyłaniu danych na zewnątrz i instalacji.',
+    'Zmienia pliki i uruchamia polecenia w folderze pracy rozmowy sama; pyta o pliki poza nim, ścieżki chronione (.git, .ssh), usuwanie, wysyłanie danych na zewnątrz i instalację.',
   'perm.L3.name': 'Automatycznie — poziom domyślny',
   'perm.L3.desc':
     'Działa sama w całym Twoim profilu i we wskazanych aplikacjach; pyta tylko przy rzeczach nieodwracalnych poza zakresem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).',

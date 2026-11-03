@@ -21,6 +21,7 @@ pub mod ipc;
 pub mod ipc_blocking;
 mod policy;
 mod proof;
+mod protected;
 mod scope;
 mod shell_guard;
 mod token;

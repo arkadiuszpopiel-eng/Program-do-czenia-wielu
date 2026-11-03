@@ -160,9 +160,9 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'perm.L0.desc': 'The agent only reads and suggests; she changes nothing.',
   'perm.L1.name': 'Ask about everything',
   'perm.L1.desc': 'Every change needs your "yes".',
-  'perm.L2.name': 'Ask about risky things',
+  'perm.L2.name': 'Accept edits',
   'perm.L2.desc':
-    'Small things she does herself; she asks before deleting, sending data out and installing.',
+    'She changes files and runs commands in the conversation work folder herself; she asks about files outside it, protected paths (.git, .ssh), deleting, sending data out and installing.',
   'perm.L3.name': 'Automatic — the default level',
   'perm.L3.desc':
     'Works on her own across your profile and selected apps; asks only for irreversible things outside the scope or when acting on untrusted content (mail, web page, file).',

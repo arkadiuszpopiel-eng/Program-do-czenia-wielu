@@ -36,6 +36,11 @@ pub struct DeclaredFacts {
     /// Tylko do pokazania właścicielowi; o decyzji rozstrzygają zdolność i fakty powyżej.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub summary: Option<String>,
+    /// Folder pracy rozmowy (z kontekstu wywołania, nie od modelu). Broker liczy z niego fakt
+    /// „poza folderem pracy” dla trybu „Akceptuj edycje”; liczy się tylko część wspólna z
+    /// korzeniami profilu, więc szerszy folder nie daje więcej niż zakres sesji.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workdir: Option<String>,
 }
 
 impl DeclaredFacts {
@@ -51,6 +56,7 @@ impl DeclaredFacts {
             touches_private_data: false,
             command: None,
             summary: None,
+            workdir: None,
         }
     }
 }

@@ -12,6 +12,7 @@ use risk_classifier_contract::{
 use crate::action::{ActionRequest, DeclaredFacts, SessionSecurity};
 use crate::capability::Capability;
 use crate::policy::{KernelPolicy, PROTECTED_SERVICES};
+use crate::protected::is_protected;
 use crate::scope::{AdminOp, HostPattern, PathScope, ServiceAction};
 use crate::shell_guard::{ShellContext, check_command, system_areas};
 
@@ -204,9 +205,25 @@ impl KernelGuard {
             .any(|a| host.is_subset_of(a))
     }
 
+    /// Fakty o ścieżce akcji: (poza folderem pracy, ścieżka chroniona). Folder pracy liczy się
+    /// tylko wewnątrz korzeni profilu — akcja poza profilem jest zawsze „poza folderem”.
+    fn path_facts(&self, cap: &Capability, workdir: Option<&str>) -> (bool, bool) {
+        let (Capability::FsRead(s) | Capability::FsWrite(s) | Capability::ShellExec(s)) = cap
+        else {
+            return (false, false);
+        };
+        let in_profile = self.policy.profile_roots.iter().any(|r| s.is_subset_of(r));
+        let in_workdir = workdir
+            .filter(|w| !w.trim().is_empty())
+            .and_then(|w| PathScope::tree(w, &self.env).ok())
+            .is_some_and(|w| s.is_subset_of(&w));
+        (!(in_profile && in_workdir), is_protected(&s.norm()))
+    }
+
     /// Fakty dla klasyfikatora: deklaracje narzędzia + to, co Broker wie sam.
     pub fn derive_facts(&self, req: &ActionRequest, session: &SessionSecurity) -> ActionFacts {
         let cap = &req.capability;
+        let (outside_workdir, protected_path) = self.path_facts(cap, req.facts.workdir.as_deref());
         let mut f = ActionFacts::new(req.facts.tool.clone(), cap.action_class())
             .reversible(req.facts.reversible)
             .scope(self.scope_relation(cap))
@@ -221,6 +238,8 @@ impl KernelGuard {
         f.untrusted_input_in_args = req.facts.untrusted_input_in_args;
         f.touches_private_data = session.private_data || req.facts.touches_private_data;
         f.kernel_rule = self.check_request(cap, &req.facts);
+        f.outside_workdir = outside_workdir;
+        f.protected_path = protected_path;
         f
     }
 }
