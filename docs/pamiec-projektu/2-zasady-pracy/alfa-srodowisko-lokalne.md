@@ -47,6 +47,7 @@ Uruchamianie prawdziwej aplikacji bez ruszania danych właściciela (sprawdzone 
   `ExecPort` (`crates/platform-windows-impl/tests/shell_utf8.rs` jako wzór), nie sondą z Pythona — proces z dołączoną
   konsolą zachowuje się inaczej (2026-10-09: sonda pokazała, że `chcp 65001` działa w `cmd`, a pod `ExecPort` nie działa).
 - E2E na tym laptopie: `PW_WORKERS=4 PW_CHANNEL=msedge pnpm test:e2e` (przy domyślnych 8 procesach testy padają z obciążenia).
+- Playwright testuje zbudowany `dist` (vite preview :4173) — po zmianie UI najpierw `pnpm exec vite build`, inaczej test widzi starą wersję (3.11).
 - `cargo clean` w repo jest dozwolone (własne wyniki testów); usuwanie katalogów `rm -rf` blokuje zabezpieczenie sesji.
   Do usuwania katalogów za zgodą właściciela: przeniesienie do Kosza przez PowerShell
   (`Microsoft.VisualBasic.FileIO.FileSystem::DeleteDirectory` z `SendToRecycleBin`); Kosz odrzuca pamięć podręczną npm

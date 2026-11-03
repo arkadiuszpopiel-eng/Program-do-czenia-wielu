@@ -4,14 +4,14 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "b8c92890-d32a-48cf-afcf-c2baf7ce1924 (Alfa AI Laptop — jedyna rozmowa projektu od 1.11)",
-    "updated": "2026-11-02T05:15:00+01:00"
+    "updated": "2026-11-03T20:00:00+01:00"
   },
-  "current_state": "0.0.84 wgrana 2.11 2:40 z fe9afd2b (verify wersja 20/20). Po niej na main: b13ec164, 334aaa19, 3c1606f9, 78b9b1bf (+ dokumenty) — do następnej wersji z pełną bramką. Czysta kopia F:\\Kopie zapasowe programów Spopielony\\Alfa\\kopia-2026-11-02_0459 (dad50a25, 71 MB, SHA-256 5807/0).",
+  "current_state": "gałąź robocza ccr-af4b63c6-3fyzaj (= „main” tej kopii; origin/main starszy): 0.0.84 + poprawki po niej (bez pełnej bramki). Gałąź do-przegladu-tryby-zgod: etap Z (plan 50) — Z.2 zrobione, Z.1 częściowo; czeka na przegląd człowieka. Czysta kopia F:\\Kopie zapasowe programów Spopielony\\Alfa\\kopia-2026-11-03_1959 (1fe129d7, 71 MB, SHA-256 5815/0 błędów, paczka git 34 gałęzie). Raport alfa/docs/plan/51-raport-2026-11-03-wieczor.md; pełny zestaw przeglądarkowy 771/771.",
   "session_goal": "Właściciel 1.11 ok. 19:50: „Posprzątaj, potem wykonaj zaległości, potem pracuj dalej nad poprawkami i ulepszeniami — wszelkie testy i poprawki do 5:00; pracujesz automatycznie, mnie nie będzie. Po 5:10/5:15 najpóźniej kopia na F: (Kopie zapasowe programów Spopielony), po kopii zapis pracy w pełnej dokumentacji w katalogu projektu i STOP.”",
   "in_progress": [
-    "Następna wersja (0.0.85): pełne verify wersja dla zmian po 0.0.84 (pusty cwd, fs_read z poprawioną literówką, podpowiedzi powłoki, poprawki 2. przeglądu — append nie odblokowuje nadpisania).",
-    "Podpowiedź powłoki w zaufanej części wyniku (pole w ToolOutcome, tools-common-contract) — odłożone z przeglądu 2.11.",
-    "F3 na Bieliku: 15/35 najlepszy; pozostałe porażki to głównie granica modelu (przepisywanie nazw z literówkami, podwójnie kodowane cudzysłowy w treści JSON, zamiana tylko pierwszego wystąpienia)."
+    "Etap Z (plan 50): Z.1 Max dostęp (czerwony przełącznik lokalne/chmura/wszystkie) — Sędzia musi znać pochodzenie modelu agentki; L0 → „Plan” razem z Z.5.",
+    "Z.3 okno zgody z 4 opcjami; Z.4 model-sędzia + bezpiecznik 3/20; Z.6 profil Dziecko + PIN (Argon2id w Menedżerze poświadczeń); Z.7 dziennik rodzica; Z.8 testy.",
+    "Następna wersja (0.0.85): pełne verify wersja dla zmian po 0.0.84 na main."
   ],
   "blocking_issues": [],
   "next_session": [
@@ -46,11 +46,10 @@
   },
   "test_results": "verify wersja 0.0.84 (fe9afd2b) ZIELONE 20/20; widoczne testy 23/23; próba obowiązków 4/5 zielone + prices czeka na zgodę; F3 15/35 (815adb94), 13/35 (3c1606f9); testy crate'ów po 78b9b1bf zielone (tools-fs, tools-shell, agent-runtime) — wynik app-core/app-agents/app-tasks/app-chat w raporcie 49 §7.",
   "decisions_this_session": [
-    "2.11: crates/app-core/examples/ wycofany ze śledzenia (trafił przypadkiem do 4f31073b) — plik został na dysku.",
-    "2.11: fs_write overwrite istniejącego niepustego pliku wymaga pełnego odczytu w tym samym przebiegu."
+    "3.11: zgody jak Claude Code/Codex — 5 trybów, Max dostęp z wyborem lokalne/chmura/wszystkie, dziennik rodzica jak ADR 0029, dziecko bez PIN-u tylko Plan i Ręcznie (plan 50 §7)."
   ],
   "next_steps": [
-    "Raport 49 §5 — decyzje właściciela: `*` w analizatorze powłoki; prywatność przy przełączeniu z „tylko lokalnie”; klasa Krytyczki przy pracy modelu w chmurze; stała zgoda na hosty obowiązku „Kontrola cenników”; narzędzia Git w izolacji powłoki (padają: NtCreateDirectoryObject); trwałe usuwanie powłoką vs karta fs_delete_permanent; z raportu 48: zakres zgody „do odwołania”, etykieta „Wszystkie agentki w sesji”.",
-    "Ścieżki Anthropic (myślenie z cudzymi wywołaniami) i Gemini (thought_signature) — niesprawdzone bez kluczy."
+    "Przegląd człowieka gałęzi do-przegladu-tryby-zgod (deaaf0a1, 72214cc2 — safety-broker-contract, risk-classifier-contract, broker-ui-contract) i decyzja o scaleniu.",
+    "Plan 50 §8: otwarte luki ochrony (usuwanie przodka .git, dowiązania w folderze pracy, zapis pośredni git)."
   ]
 }

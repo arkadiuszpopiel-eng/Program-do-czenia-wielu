@@ -11,7 +11,7 @@
 - [Alfa — przegląd i historia zmian](alfa-przeglad-i-historia-zmian.md) — każde okno/panel/skrót, wagi w CHANGELOG, spis funkcji „wkrótce”
 - [Alfa — praca nocna](alfa-praca-nocna.md) — sesja do rana kończy się raportem, planem HTML i zbudowaną wersją; bez dźwięku w nocy
 - [Alfa — samodzielne testowanie](alfa-samodzielne-testowanie.md) — poziomy verify, instancja testowa, „nie sprawdziłem” tylko z trzech powodów; od 31.10 katalog funkcji + bramka „nowa funkcja bez testu” (plan 45)
-- [Alfa — pełny dostęp AI](alfa-pelny-dostep-ai.md) — 20.10 „Pełny dostęp”; 27.10 menu 4 trybów; 31.10 L4 = okno zgód NIGDY (bez wyjątków poza blokadą Jądra), Broker → „Sędzia Cieni” z „?”
+- [Alfa — pełny dostęp AI](alfa-pelny-dostep-ai.md) — 3.11: tryby jak Claude Code + Codex (5 trybów, model-sędzia, Max dostęp, kłódki dziecka na PIN — plan 50); L4 nigdy nie pyta; Broker → „Sędzia Cieni”
 - [Alfa — pamięć w repozytorium](alfa-pamiec-w-repozytorium.md) — kopia pamięci w alfa/docs/pamiec-projektu, `scripts/memory-sync.sh` na końcu sesji; na nowym PC najpierw przywrócić zasady z repo
 - [Alfa — silnik NextGO.Gray](alfa-silnik-nextgo.md) — katalog silnika tylko do odczytu (inny model); tools-engine od 0.0.74, ustawienie engine.nextgo.root
 - [Alfa — pulpit i panele 29.10](alfa-pulpit-panele-2026-10-29.md) — stan w pasku pisania, panele chowane w całości, wysuwane i przypinane; tryb pracy czyta poziom globalny
