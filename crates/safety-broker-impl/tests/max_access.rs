@@ -111,12 +111,14 @@ async fn one_switch_cloud_and_all_scopes() {
     let b = broker(&dir.path().join("s.json"), &clock);
     turn_on(&b, &clock, ModelScope::Cloud).await;
     allowed(b.decide(risky(Some(ModelLocation::Cloud))).await);
-    allowed(b.decide(risky(None)).await);
+    // Działanie bez modelu (wtyczka, zrzut ekranu) — nie „chmura”, tylko „wszystkie” (plan 50 §8.2).
+    needs_approval(b.decide(risky(None)).await);
     needs_approval(b.decide(risky(Some(ModelLocation::Local))).await);
     // Zmiana zasięgu na „wszystkie” — nowa karta, potem jeden wpis.
     turn_on(&b, &clock, ModelScope::All).await;
     allowed(b.decide(risky(Some(ModelLocation::Local))).await);
     allowed(b.decide(risky(Some(ModelLocation::Cloud))).await);
+    allowed(b.decide(risky(None)).await);
 }
 
 #[tokio::test]

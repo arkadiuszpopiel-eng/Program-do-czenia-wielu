@@ -45,19 +45,20 @@ impl ModelLocation {
 pub enum ModelScope {
     /// Modele lokalne.
     Local,
-    /// Modele w chmurze (także przebiegi bez informacji o modelu).
+    /// Modele w chmurze (także mosty CLI). Działania bez informacji o modelu (wtyczki, zrzut
+    /// ekranu, MCP) obejmuje tylko `All` — przegląd 3.11, plan 50 §8.2.
     Cloud,
     /// Wszystkie modele.
     All,
 }
 
 impl ModelScope {
-    /// Czy zasięg obejmuje przebieg o danym pochodzeniu (`None` = nieznane → jak chmura).
+    /// Czy zasięg obejmuje przebieg o danym pochodzeniu (`None` = nieznane — tylko `All`).
     pub fn covers(self, location: Option<ModelLocation>) -> bool {
         match self {
             Self::All => true,
             Self::Local => location == Some(ModelLocation::Local),
-            Self::Cloud => location != Some(ModelLocation::Local),
+            Self::Cloud => location == Some(ModelLocation::Cloud),
         }
     }
 }
@@ -338,9 +339,12 @@ mod tests {
             Some((ModelScope::Cloud, AutonomyLevel::L4))
         );
         assert_eq!(t.effective_for(&s, Some(&a), local, 0), AutonomyLevel::L1);
-        assert_eq!(t.effective_for(&s, Some(&a), None, 0), AutonomyLevel::L4);
+        assert_eq!(t.effective_for(&s, Some(&a), cloud, 0), AutonomyLevel::L4);
+        // Działanie bez modelu (wtyczka, zrzut ekranu) — tylko „wszystkie”.
+        assert_eq!(t.effective_for(&s, Some(&a), None, 0), AutonomyLevel::L1);
         t.set(models(ModelScope::All), entry(AutonomyLevel::L4));
         assert_eq!(t.effective_for(&s, Some(&a), local, 0), AutonomyLevel::L4);
+        assert_eq!(t.effective_for(&s, Some(&a), None, 0), AutonomyLevel::L4);
         assert_eq!(t.entries().len(), 2);
         // Wyłączenie: poziom domyślny albo niższy usuwa wpis.
         t.set(models(ModelScope::All), entry(AutonomyLevel::L3));

@@ -139,6 +139,8 @@ impl ApprovalSink for BrokerSink {
         let mut ctx = ToolCtx::new(Holder::agent(session.as_str(), "delta"));
         ctx.origin = CommandOrigin::Agent;
         ctx.approval_timeout = self.timeout;
+        // Most CLI to model w chmurze — zasięg „Max dostęp: chmura”.
+        ctx.model_location = Some(safety_broker_contract::ModelLocation::Cloud);
         ctx.observer = Some(Arc::new(SinkObserver {
             runs: self.runs.clone(),
             task: task.clone(),

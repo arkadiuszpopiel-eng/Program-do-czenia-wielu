@@ -211,8 +211,8 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
 
 - **Skąd Sędzia wie, czy model jest lokalny:** `ToolCtx.model_location` (`local` / `cloud`) ustawia agent-runtime
   z dostawcy przebiegu (llama.cpp / Ollama / LM Studio = lokalny; klucz API albo most CLI = chmura); trafia do
-  `DeclaredFacts` tak jak folder pracy — z kontekstu wywołania, nigdy od modelu. Brak informacji = „chmura”
-  (bezpieczniej: przełącznik „lokalne” go nie obejmie).
+  `DeclaredFacts` tak jak folder pracy — z kontekstu wywołania, nigdy od modelu. Brak informacji — ani
+  „lokalne”, ani „chmura”; obejmuje go tylko „wszystkie” (zmiana 4.11 po przeglądzie).
 - **Stan w Sędzim:** `MaxAccess { off, local, cloud, all }` zapisywany jak poziom globalny (raz potwierdzony w oknie
   Sędziego, pamiętany po restarcie, obniżenie od razu). Gdy obejmuje pochodzenie modelu przebiegu — poziom
   skuteczny = L4 (twarde blokady Jądra, STOP i dziennik zostają).
@@ -262,8 +262,9 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   „lokalne” z nazwy modelu tylko u Routera), z drobnych poprawione: kolejność Audytu przy przełączeniu, brak
   opcji po niezaufanej treści. Błąd łącza z Sędzią dawał w kliencie zdalnym poziom L0 (agentka nagle w trybie Plan) —
   **poprawione** (4.11 noc): ostatni poziom odczytany dla sesji i agentki, najwyżej L1, bez odczytu L0.
-  **Otwarte:** zasięg „chmura” obejmuje
-  też działania bez modelu (wtyczki, zrzut ekranu, mosty CLI, wznowienie z punktu kontrolnego).
+  Zasięg „chmura” obejmował też działania bez
+  modelu — **poprawione** (4.11 noc): „chmura” = tylko przebiegi z modelem w chmurze (mosty CLI oznaczone
+  jawnie), działania bez informacji o modelu (wtyczki, zrzut ekranu, MCP) obejmuje tylko „wszystkie”.
 - **Edge case:** restart Sędziego przed przyjęciem przełączenia przez rdzeń (≤ 15 s) — przełączenie przepada,
   obowiązuje poprzedni zapamiętany poziom (bezpieczny kierunek).
 
