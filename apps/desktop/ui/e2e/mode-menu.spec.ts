@@ -44,9 +44,8 @@ for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
       await expect(lowered).toBeVisible();
 
       // Klawisz 3: „Akceptuj edycje” — z „Ręcznie” to podniesienie, czeka na okno Sędziego.
-      // Z klawiatury: powiadomienia o prośbach mogą przykrywać żeton w pasku pisania.
-      await lowered.focus();
-      await page.keyboard.press('Enter');
+      // Powiadomienia leżą nad paskiem pisania — żeton trybu da się kliknąć (3.11).
+      await lowered.click();
       await expect(menu.getByRole('menuitemradio', { checked: true })).toBeFocused();
       await page.keyboard.press('3');
       await expect(
@@ -55,8 +54,7 @@ for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
       await expect(lowered).toBeVisible();
 
       // Escape zamyka menu bez zmiany.
-      await lowered.focus();
-      await page.keyboard.press('Enter');
+      await lowered.click();
       await expect(menu).toBeVisible();
       await page.keyboard.press('Escape');
       await expect(menu).toHaveCount(0);
