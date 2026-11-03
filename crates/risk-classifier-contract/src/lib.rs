@@ -114,7 +114,7 @@ mod tests {
         assert!(bad_bulk.validate().is_err());
         assert_eq!(AutonomyLevel::default(), AutonomyLevel::L3);
         assert_eq!(RiskLevel::Critical.bumped(), RiskLevel::Critical);
-        assert!(AutonomyLevel::L4.to_string().contains("Pełna automatyka"));
+        assert!(AutonomyLevel::L4.to_string().contains("Pełny dostęp"));
     }
 
     #[test]

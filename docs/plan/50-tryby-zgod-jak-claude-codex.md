@@ -183,6 +183,29 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
 4. Model-sędzia w „Automatycznie”, „Pełny dostęp” nigdy nie pyta, menu na zasadzie obu programów (§4.1) —
    przyjęte; zastępuje decyzję z 27.10.
 
+## 8. Stan wykonania (3.11 wieczór, gałąź `do-przegladu-tryby-zgod`)
+
+- **Z.2 zrobione (deaaf0a1 + poprawki z przeglądu):** `DeclaredFacts.workdir` z kontekstu wywołania; Sędzia liczy
+  `outside_workdir` (ścieżka poza profilem albo poza folderem pracy rozmowy; brak folderu = poza) i `protected_path`.
+  Reguły `OutsideWorkdir` (≤ L2, „zawsze zezwalaj” możliwe) i `ProtectedPath` (≤ L3, nigdy stała zgoda). Testy:
+  tabela 89 × 5, własności z nowymi faktami, `safety-broker-contract/tests/workdir.rs`.
+- **Z.1 w toku:** menu ma 5 trybów (klawisze 1–5); nazwy jak w obu programach: Ręcznie (L1), Akceptuj edycje (L2),
+  Pełny dostęp (L4). L0 zostaje „Tylko podgląd” do Z.5 (tryb Plan). Przełącznik „Max dostęp” — następny krok
+  (wymaga w Sędzim wiedzy, czy agentka pracuje na modelu lokalnym czy w chmurze).
+- **Przegląd w świeżym kontekście (3.11):** nic krytycznego, brak regresji (nowe fakty tylko dodają pytania).
+  Luki nowej ochrony i stan:
+  1. polecenie powłoki w folderze pracy, które pisze do `.git\hooks` czy `.npmrc`, ocenia się po katalogu
+     roboczym — **otwarte** (wymaga zmiany w `tools-shell`: osobna zdolność dla ścieżek chronionych z polecenia);
+  2. aliasy 8.3 (`GIT~1`) — **poprawione** (dopasowanie jak w deny-listach);
+  3. usuwanie katalogu nadrzędnego wobec `.git` (rekurencyjne) nie jest „ścieżką chronioną” — **otwarte**
+     (Sędzia ocenia ścieżki leksykalnie; na L2 i tak pyta reguła usuwania);
+  4. dowiązania (junction) w folderze pracy prowadzące poza niego — **otwarte** (rozwiązywanie dowiązań przed
+     wyliczeniem zakresu w `tools-fs`);
+  5. bez folderu pracy (mosty CLI, `run_code`, wtyczki, MCP) L2 pyta o każdą zmianę jak L1 — świadomie (bezpieczniej);
+  6. folder pracy pod katalogiem o chronionej nazwie (np. `.claude\worktrees`) — **poprawione**: liczą się tylko
+     człony poniżej folderu pracy; lista uzupełniona (`.cargo`, `.github\workflows`, `.gitattributes`, `.zshenv`,
+     `.envrc`, `.devcontainer`, `.hg`, Autostart).
+
 ## Źródła
 
 - Claude Code — Permission modes: https://code.claude.com/docs/en/permission-modes

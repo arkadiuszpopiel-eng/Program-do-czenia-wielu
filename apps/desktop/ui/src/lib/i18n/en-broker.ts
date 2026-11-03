@@ -45,17 +45,17 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'status.changeMode': 'Change work mode',
   'mode.L0.name': 'Preview only',
   'mode.L0.desc': 'The agent only reads and suggests; she changes nothing.',
-  'mode.L1.name': 'Ask about everything',
+  'mode.L1.name': 'Manual',
   'mode.L1.desc': 'Every change needs your "yes".',
   'mode.L2.name': 'Accept edits',
   'mode.L2.desc':
     'Changes in the work folder without asking; files outside it and the Internet — asks.',
   'mode.L3.name': 'Automatic',
   'mode.L3.desc': 'Works on her own; asks only about irreversible things outside the scope.',
-  'mode.L4.name': 'Full automation',
+  'mode.L4.name': 'Full access',
   'mode.L4.desc': 'No questions. Choose once — it stays after a restart.',
   'mode.note':
-    'Applies to all conversations. You confirm a raise once in the Shadow Judge window. On Full automation the Shadow Judge window never shows until you lower the mode. Always kept: Ctrl+Shift+F12, the journal and the Kernel’s hard blocks.',
+    'Applies to all conversations. You confirm a raise once in the Shadow Judge window. On Full access the Shadow Judge window never shows until you lower the mode. Always kept: Ctrl+Shift+F12, the journal and the Kernel’s hard blocks.',
   'mode.more': 'More in Settings → Permissions',
   'mode.applied': 'Work mode: {mode}.',
   'mode.requested': 'Confirm "{mode}" in the Shadow Judge window — once is enough.',
@@ -63,7 +63,7 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'mode.notApplied': 'The Shadow Judge did not accept "{mode}" — "{current}" is in effect.',
   'mode.sessionOwn':
     'This conversation has its own mode: {mode}. The choice here changes the other conversations; change this one in Permissions.',
-  'mode.badge': 'Full automation is on — agents act without asking. Click to change the work mode',
+  'mode.badge': 'Full access is on — agents act without asking. Click to change the work mode',
   'broker.grants.title': '“Always in this scope” permissions',
   'broker.grants.intro':
     'You grant them in the Shadow Judge window and choose how long: 1 h, 3 h, a day or until revoked. A permission covers one session and one kind of action; it does not change the work mode. Revoking takes effect at once, and STOP (Ctrl+Shift+F12) clears all permissions.',

@@ -60,7 +60,7 @@ pub fn kernel_rules_block_everywhere<C: RiskClassifier + ?Sized>(c: &C) {
     }
 }
 
-/// Na „Pełnej automatyce” (L4) nic nie pyta — okno zgód nie pokazuje się wcale (decyzja
+/// Przy „Pełnym dostępie” (L4) nic nie pyta — okno zgód nie pokazuje się wcale (decyzja
 /// właściciela 31.10); te same akcje pytają do L3. Twarda blokada Jądra działa dalej.
 pub fn l4_never_asks<C: RiskClassifier + ?Sized>(c: &C) {
     let voice_delete = ActionFacts::new("tools-fs.delete", ActionClass::Write)

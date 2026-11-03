@@ -164,7 +164,7 @@ export const plSettings = {
     'Jak bardzo agentka działa sama. Podniesienie potwierdzasz raz w oknie Sędziego Cieni — zostaje także po restarcie, aż sam obniżysz. Agentka nie może sama podnieść sobie poziomu.',
   'perm.L0.name': 'Tylko podgląd',
   'perm.L0.desc': 'Agentka tylko czyta i podpowiada, nic nie zmienia.',
-  'perm.L1.name': 'Pytaj o wszystko',
+  'perm.L1.name': 'Ręcznie',
   'perm.L1.desc': 'Każda zmiana wymaga Twojego „tak".',
   'perm.L2.name': 'Akceptuj edycje',
   'perm.L2.desc':
@@ -172,7 +172,7 @@ export const plSettings = {
   'perm.L3.name': 'Automatycznie — poziom domyślny',
   'perm.L3.desc':
     'Działa sama w całym Twoim profilu i we wskazanych aplikacjach; pyta tylko przy rzeczach nieodwracalnych poza zakresem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).',
-  'perm.L4.name': 'Pełna automatyka',
+  'perm.L4.name': 'Pełny dostęp',
   'perm.L4.desc':
     'Działa sama i o nic nie pyta — okno Sędziego Cieni nie pokazuje się wcale, aż obniżysz poziom. Także operacje administratora, polecenia głosowe i wysyłka danych po kontakcie z niezaufaną treścią (plik, mail, strona) idą bez pytania — ukryte polecenie w obcej treści może więc skłonić agentkę do wysłania danych. Twarde blokady Jądra, Ctrl+Shift+F12 i dziennik obowiązują zawsze. Wybierasz raz — zostaje po restarcie.',
   'perm.current': 'obecny',
@@ -184,7 +184,7 @@ export const plSettings = {
   'perm.scope.global': 'Globalnie',
   'perm.scope.session': 'Tylko ta sesja',
   'perm.kept':
-    'Nawet przy pełnej automatyce zostają: kill-switch (Ctrl+Shift+F12), dziennik cofania, audyt i twarde blokady Jądra.',
+    'Nawet przy Pełnym dostępie zostają: kill-switch (Ctrl+Shift+F12), dziennik cofania, audyt i twarde blokady Jądra.',
   'perm.hello':
     'Windows Hello przy podnoszeniu do L4: {state}. Zmienisz to w oknie Sędziego Cieni.',
 

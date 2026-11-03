@@ -1,4 +1,4 @@
-//! Zapamiętany poziom globalny (decyzja właściciela 27.10, „Pełna automatyka” wybierana raz):
+//! Zapamiętany poziom globalny (decyzja właściciela 27.10, „Pełny dostęp” wybierany raz):
 //! podniesienie globalne bez terminu, zatwierdzone przez właściciela w oknie Brokera, przetrwa
 //! restart Brokera i komputera — aż właściciel sam obniży poziom. Plik leży w prywatnym katalogu
 //! danych Brokera (ścieżka Jądra: agentki nie mają do niego dostępu). Zapisywany jest tylko poziom

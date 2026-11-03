@@ -113,7 +113,7 @@ proptest! {
     fn voice_destruction_never_proceeds_below_l4(f in facts()) {
         let p = RiskPolicy::default();
         if f.origin.is_voice() && f.destructive != Destructiveness::None && f.kernel_rule.is_none() {
-            // Na L4 („Pełna automatyka”) reguły głosu nie pytają — decyzja właściciela 27.10.
+            // Na L4 („Pełny dostęp”) reguły głosu nie pytają — decyzja właściciela 27.10.
             for a in AutonomyLevel::ALL.into_iter().filter(|a| *a != AutonomyLevel::L4) {
                 let v = evaluate(&f, a, &p).verdict;
                 prop_assert!(matches!(v, Verdict::Ask { non_voice: true, grantable: false }), "{:?}", v);
@@ -133,7 +133,7 @@ proptest! {
 
     #[test]
     fn l4_only_proceeds_or_hard_blocks(f in facts()) {
-        // „Pełna automatyka”: okno zgód nie pokazuje się wcale (decyzja właściciela 31.10).
+        // „Pełny dostęp”: okno zgód nie pokazuje się wcale (decyzja właściciela 31.10).
         let v = evaluate(&f, AutonomyLevel::L4, &RiskPolicy::default()).verdict;
         prop_assert!(matches!(v, Verdict::Proceed | Verdict::HardBlock { .. }), "{:?}", v);
     }

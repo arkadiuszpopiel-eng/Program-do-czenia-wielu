@@ -125,7 +125,7 @@ fn cards() -> Vec<(&'static str, ApprovalRequest)> {
             r"odczyt pliku C:\Users\Spopielony\Documents\notatki.txt",
         ),
         RiskLevel::Low,
-        "Tryb „Pytaj o wszystko” pyta przy każdym działaniu.",
+        "Tryb „Ręcznie” pyta przy każdym działaniu.",
     );
     vec![
         ("usuniecie", delete),

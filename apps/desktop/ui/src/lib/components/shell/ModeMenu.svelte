@@ -1,7 +1,7 @@
 <!--
   Menu „Tryb pracy” (decyzja właściciela 27.10, od 29.10 w pasku pisania, od 3.11 pięć trybów na
-  zasadzie Claude Code i Codex — plan 50): Tylko podgląd, Pytaj o wszystko, Akceptuj edycje,
-  Automatycznie, Pełna automatyka. Tryb
+  zasadzie Claude Code i Codex — plan 50): Tylko podgląd, Ręcznie, Akceptuj edycje,
+  Automatycznie, Pełny dostęp. Tryb
   obowiązuje we wszystkich rozmowach; podniesienie potwierdzasz raz w oknie Brokera i zostaje po
   restarcie. Zaznaczony jest poziom globalny odczytany z Brokera, a komunikat o zmianie pojawia
   się dopiero, gdy Broker ją przyjął. Klawisze 1–5 wybierają tryb, strzałki przesuwają zaznaczenie.

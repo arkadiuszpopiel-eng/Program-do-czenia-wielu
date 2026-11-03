@@ -177,9 +177,9 @@ fn voice_plan_autonomy_and_policy_cards() {
         until_ms: Some(1_000 + 90_000),
     });
     let card = ApprovalCard::from_request(&auto, 1_000, CardOptions::default());
-    assert_eq!(card.title, "Zmiana trybu pracy: Pełna automatyka");
+    assert_eq!(card.title, "Zmiana trybu pracy: Pełny dostęp");
     assert_eq!(detail(&card, "Dotyczy"), "agentka Delta w sesji s1");
-    assert_eq!(detail(&card, "Tryb"), "Automatycznie → Pełna automatyka");
+    assert_eq!(detail(&card, "Tryb"), "Automatycznie → Pełny dostęp");
     assert_eq!(detail(&card, "Na czas"), "1 min 30 s");
     assert!(detail(&card, "Zawsze zostaje").contains("Ctrl+Shift+F12"));
     assert_eq!(card.mode_change, Some(AutonomyLevel::L4));

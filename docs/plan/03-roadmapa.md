@@ -241,8 +241,8 @@ Plan: [`50-tryby-zgod-jak-claude-codex.md`](50-tryby-zgod-jak-claude-codex.md) (
 | Nr | Zadanie | Stan | Data | Uwagi |
 | --- | --- | --- | --- | --- |
 | Z.0 | Badanie dokumentacji Claude Code i Codex, plan, decyzje właściciela | zrobione | 2026-11-03 | decyzje w §7 planu |
-| Z.1 | Menu 5 trybów + przełącznik Max dostęp | czeka | — | po Z.0 |
-| Z.2 | Poziom „Akceptuj edycje” w Sędzim Cieni | czeka | — | gałąź do przeglądu |
+| Z.1 | Menu 5 trybów + przełącznik Max dostęp | w toku | 2026-11-03 | 5 trybów, klawisze 1–5, nazwy Ręcznie / Akceptuj edycje / Pełny dostęp (gałąź `do-przegladu-tryby-zgod`); Max dostęp i „Plan” — dalej |
+| Z.2 | Poziom „Akceptuj edycje” w Sędzim Cieni | zrobione, czeka na przegląd człowieka | 2026-11-03 | folder pracy + ścieżki chronione; przegląd w świeżym kontekście — §8 planu 50 |
 | Z.3 | Okno zgody z 4 opcjami i zakresem | czeka | — | gałąź do przeglądu |
 | Z.4 | Model-sędzia dla „Automatycznie” | czeka | — | gałąź do przeglądu |
 | Z.5 | Plan jako tryb | czeka | — | po Z.1 |

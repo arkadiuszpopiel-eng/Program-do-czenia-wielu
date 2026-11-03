@@ -262,7 +262,7 @@ async fn waiting_tools_run_after_owner_approval_in_broker_window() {
     );
 }
 
-/// Część 2 (decyzja właściciela 31.10): sesja przeglądarki podniesiona do „Pełnej automatyki”
+/// Część 2 (decyzja właściciela 31.10): sesja przeglądarki podniesiona do „Pełnego dostępu”
 /// jedną kartą zmiany trybu, potem te same działania na stronie po obcej treści — każde ma się
 /// wykonać od razu, bez żadnego okna (limit zgody 15 s: karta skończyłaby się odmową).
 async fn full_automation_shows_no_window(
@@ -272,7 +272,7 @@ async fn full_automation_shows_no_window(
     lines: &mut Vec<String>,
     problems: &mut Vec<String>,
 ) {
-    eprintln!("→ podniesienie sesji przeglądarki do L4 — kliknij „Włącz: Pełna automatyka”…");
+    eprintln!("→ podniesienie sesji przeglądarki do L4 — kliknij „Włącz: Pełny dostęp”…");
     rig.core
         .permissions_request_level(AutonomyLevel::L4, Some(browser.to_owned()))
         .await

@@ -16,7 +16,7 @@ Każde działanie agentki na Twoim komputerze — pliki, polecenia, programy, si
 systemu — najpierw trafia do niego. Sędzia ocenia ryzyko według trybu pracy z menu „Tryb pracy” \
 w pasku Alfy i albo przepuszcza działanie, albo pyta Cię w tym oknie. Zgodę dajesz tylko tutaj, \
 myszą albo klawiszem — agentka ani strona internetowa nie mogą kliknąć za Ciebie. Twarde blokady \
-Jądra (np. hasła przeglądarek, wyłączenie dziennika) działają zawsze. Na „Pełnej automatyce” to \
+Jądra (np. hasła przeglądarek, wyłączenie dziennika) działają zawsze. Przy „Pełnym dostępie” to \
 okno nie pokazuje się wcale, aż obniżysz tryb. „Zawsze w tym zakresie” pozwala na ten sam rodzaj \
 działań w tym samym miejscu przez 1 h, 3 h, dobę albo do odwołania — listę zgód i „Odwołaj” \
 znajdziesz w Ustawienia → Uprawnienia. Wszystko zapisuje się w dzienniku działań, \
@@ -107,10 +107,10 @@ pub fn reversible_pl(r: Reversibility) -> &'static str {
 pub fn mode_name_pl(l: AutonomyLevel) -> &'static str {
     match l {
         AutonomyLevel::L0 => "Tylko podgląd",
-        AutonomyLevel::L1 => "Pytaj o wszystko",
+        AutonomyLevel::L1 => "Ręcznie",
         AutonomyLevel::L2 => "Akceptuj edycje",
         AutonomyLevel::L3 => "Automatycznie",
-        AutonomyLevel::L4 => "Pełna automatyka",
+        AutonomyLevel::L4 => "Pełny dostęp",
     }
 }
 

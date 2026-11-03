@@ -1,5 +1,5 @@
 <!--
-  Znak „Pełna automatyka” w belce. Tryb pracy wybiera się w pasku pisania (29.10), ale gdy agentki
+  Znak „Pełny dostęp” w belce. Tryb pracy wybiera się w pasku pisania (29.10), ale gdy agentki
   działają bez pytań, widać to zawsze — także w Ustawieniach. Klik otwiera menu trybów.
 -->
 <script lang="ts">
@@ -32,7 +32,7 @@
     <Lazy
       load={loadModes}
       props={{
-        // Fokus wraca na znak (po zejściu z Pełnej automatyki znaku już nie ma — wtedy zostaje).
+        // Fokus wraca na znak (po zejściu z Pełnego dostępu znaku już nie ma — wtedy zostaje).
         onclose: () => {
           open = false;
           requestAnimationFrame(() =>

@@ -1,7 +1,7 @@
 <!--
   Pasek tytułu (36 px, PLAN §14.2): znak i nazwa programu, przełącznik panelu Sesje, ścieżka projekt ▸ sesja (klik = zmień
   nazwę), obsada α β γ δ z pierścieniem koloru (świeci mówiąca / pracująca), wskaźniki na żywo
-  (ekran, kamera, mikrofon), znak „Pełna automatyka”, panel prawy, ustawienia. Stan (profil, tryb
+  (ekran, kamera, mikrofon), znak „Pełny dostęp”, panel prawy, ustawienia. Stan (profil, tryb
   pracy, koszt) jest w pasku pisania (właściciel 29.10). Puste obszary to region przeciągania okna (Tauri); natywne przyciski
   okna (`WindowControls`) rysuje interfejs — okno nie ma belki systemowej. Wzdłuż dolnej krawędzi
   biegnie pasek LED (`TitleLed`).

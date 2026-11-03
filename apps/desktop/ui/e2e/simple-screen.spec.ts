@@ -3,7 +3,7 @@ import { expectReadable } from './contrast';
 import { expectAccessible, waitForChat } from './helpers';
 
 // Uproszczony ekran (`ui.simple`, etap K.3): mniej przycisków dla dziecka. Niezmiennik
-// bezpieczeństwa: wskaźnik mikrofonu, tryb pracy w pasku pisania, znak „Pełna automatyka” w belce
+// bezpieczeństwa: wskaźnik mikrofonu, tryb pracy w pasku pisania, znak „Pełny dostęp” w belce
 // i Ustawienia są widoczne zawsze. To wygoda, nie blokada — skróty klawiszowe dalej działają.
 
 async function open(page: Page, query: string, theme: 'light' | 'dark' = 'light') {
@@ -42,12 +42,10 @@ test('uproszczony ekran: mniej przycisków, wskaźniki bezpieczeństwa zostają'
   for (const name of ['Ponów (nowy wariant)', 'Więcej akcji']) {
     await expect(actions.getByRole('button', { name })).toHaveCount(0);
   }
-  // Zawsze widoczne: mikrofon, tryb pracy (także znak Pełnej automatyki), Ustawienia.
+  // Zawsze widoczne: mikrofon, tryb pracy (także znak Pełnego dostępu), Ustawienia.
   await expect(page.getByRole('button', { name: /^Mikrofon:/ })).toBeVisible();
-  await expect(
-    composer.getByRole('button', { name: /^Tryb pracy: Pełna automatyka/ }),
-  ).toBeVisible();
-  await expect(page.getByRole('button', { name: /^Włączona Pełna automatyka/ })).toBeVisible();
+  await expect(composer.getByRole('button', { name: /^Tryb pracy: Pełny dostęp/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Włączony Pełny dostęp/ })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Ustawienia (Ctrl+,)' })).toBeVisible();
   // Wygoda, nie blokada: skrót otwiera panel Sesje mimo schowanych przycisków.
   await page.keyboard.press('Control+b');

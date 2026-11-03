@@ -1,6 +1,6 @@
 // Tryb pracy (poziom autonomii) globalny — jedno źródło dla paska pisania, belki i menu „Tryb
 // pracy”. Zgłoszenie właściciela 29.10: bez otwartej rozmowy pasek pokazywał na sztywno
-// „Automatycznie”, więc po wyborze „Pełnej automatyki” wyglądało, jakby zmiana nie działała.
+// „Automatycznie”, więc po wyborze „Pełnego dostępu” wyglądało, jakby zmiana nie działała.
 // Poziom z Brokera odczytujemy po starcie, po każdej zmianie z menu i po powrocie do okna (zgoda
 // w oknie Brokera przychodzi z innego procesu).
 import type { PermissionsApi } from '../api/client';

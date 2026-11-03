@@ -158,7 +158,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
     'How much an agent acts on her own. You confirm a raise once in the Shadow Judge window — it stays after a restart until you lower it. An agent cannot raise her own level.',
   'perm.L0.name': 'Preview only',
   'perm.L0.desc': 'The agent only reads and suggests; she changes nothing.',
-  'perm.L1.name': 'Ask about everything',
+  'perm.L1.name': 'Manual',
   'perm.L1.desc': 'Every change needs your "yes".',
   'perm.L2.name': 'Accept edits',
   'perm.L2.desc':
@@ -166,7 +166,7 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'perm.L3.name': 'Automatic — the default level',
   'perm.L3.desc':
     'Works on her own across your profile and selected apps; asks only for irreversible things outside the scope or when acting on untrusted content (mail, web page, file).',
-  'perm.L4.name': 'Full automation',
+  'perm.L4.name': 'Full access',
   'perm.L4.desc':
     'Works on her own and never asks — the Shadow Judge window does not show at all until you lower the level. Administrative operations, voice commands and sending data out after untrusted content (file, mail, web page) also go without asking, so a hidden instruction in foreign content could make an agent send data out. The Kernel’s hard blocks, Ctrl+Shift+F12 and the journal always apply. Choose once — it stays after a restart.',
   'perm.current': 'current',

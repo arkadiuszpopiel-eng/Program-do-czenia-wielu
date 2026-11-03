@@ -39,7 +39,7 @@ Klasa ryzyka: baza wg klasy akcji, podniesienia (destrukcja, masowość ≥ `bul
 
 ## Niezmienniki
 - Deterministyczny; monotoniczny w poziomie autonomii z konstrukcji (każda reguła „do poziomu X” albo „każdy”) i w czynnikach ryzyka (taint, niezaufane, dane prywatne, instalacja, masowość, niższa pewność STT nigdy nie luzują) — testy własności.
-- Twarde blokady blokują na L4; L4 („Pełna automatyka”) poza nimi pyta tylko o egress z taintem, trifectę, obcy głos i niską pewność rozpoznania. Admin i destrukcja głosem działają do L3 (decyzja właściciela 2026-10-27).
+- Twarde blokady blokują na L4; L4 („Pełny dostęp”) poza nimi pyta tylko o egress z taintem, trifectę, obcy głos i niską pewność rozpoznania. Admin i destrukcja głosem działają do L3 (decyzja właściciela 2026-10-27).
 
 ## Zależności
 `core-bus-contract`; wywoływany przez `safety-broker` (in-proc), podglądowo przez `agent-runtime`.

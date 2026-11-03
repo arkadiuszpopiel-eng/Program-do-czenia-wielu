@@ -11,7 +11,7 @@ use crate::types::{AutonomyLevel, SttConfidence};
 pub enum RuleId {
     /// Twarda blokada Jądra (każdy poziom).
     KernelBlock,
-    /// Destrukcja zlecona głosem → potwierdzenie nie-głosem (≤ L3; „Pełna automatyka” — decyzja 27.10).
+    /// Destrukcja zlecona głosem → potwierdzenie nie-głosem (≤ L3; „Pełny dostęp” — decyzja 27.10).
     VoiceDestructive,
     /// Zmiana stanu zlecona głosem przy niskiej pewności STT (≤ L3; na L4 bez pytania — decyzja 31.10).
     VoiceLowConfidence,
@@ -83,7 +83,7 @@ const fn rule(
     }
 }
 
-/// Tabela reguł w kolejności oceny. Na „Pełnej automatyce” (L4) działa tylko twarda blokada Jądra —
+/// Tabela reguł w kolejności oceny. Przy „Pełnym dostępie” (L4) działa tylko twarda blokada Jądra —
 /// okno zgód nie pokazuje się wcale, aż właściciel obniży poziom (decyzja właściciela 31.10).
 /// Reguły pilnujące obcej treści i głosu nigdy nie są `grantable`.
 pub const RULES: [RuleDescription; 17] = [
