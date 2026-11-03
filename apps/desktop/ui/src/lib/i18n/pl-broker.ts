@@ -61,6 +61,14 @@ export const plBroker = {
   'mode.sessionOwn':
     'Ta rozmowa ma własny tryb: {mode}. Wybór tutaj zmienia tryb pozostałych rozmów; tryb tej rozmowy zmienisz w Uprawnieniach.',
   'mode.badge': 'Włączony Pełny dostęp — agentki działają bez pytań. Kliknij, aby zmienić tryb',
+  // Odmowa z „powiedz agentce, co zrobić inaczej” (plan 50 §4.2).
+  'approval.feedback.open': 'Powiedz agentce, co zrobić inaczej',
+  'approval.feedback.label': 'Co agentka ma zrobić inaczej?',
+  'approval.feedback.placeholder': 'np. nie usuwaj — przenieś pliki do Archiwum',
+  'approval.feedback.send': 'Wyślij agentce',
+  'approval.feedback.sent': 'Agentka dostała wskazówkę — uwzględni ją w następnym kroku.',
+  'approval.feedback.toComposer':
+    'Zadanie już się zakończyło — wskazówka czeka w polu pisania; wyślij ją Enterem.',
   // Tryb „Plan” (plan 50 §4.1, Z.5): trzy odpowiedzi pod planem.
   'plan.title': 'Plan gotowy — co dalej?',
   'plan.auto': 'Tak, i działaj automatycznie',

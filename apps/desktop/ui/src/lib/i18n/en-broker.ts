@@ -64,6 +64,14 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'mode.sessionOwn':
     'This conversation has its own mode: {mode}. The choice here changes the other conversations; change this one in Permissions.',
   'mode.badge': 'Full access is on — agents act without asking. Click to change the work mode',
+  // Denial with "tell the agent what to do instead" (plan 50 §4.2).
+  'approval.feedback.open': 'Tell the agent what to do instead',
+  'approval.feedback.label': 'What should the agent do instead?',
+  'approval.feedback.placeholder': 'e.g. do not delete — move the files to the Archive',
+  'approval.feedback.send': 'Send to the agent',
+  'approval.feedback.sent': 'The agent got the hint — she will use it in the next step.',
+  'approval.feedback.toComposer':
+    'The task has already finished — the hint is waiting in the message box; send it with Enter.',
   // "Plan" mode (plan 50 §4.1, Z.5): three answers below the plan.
   'plan.title': 'Plan ready — what next?',
   'plan.auto': 'Yes, and work automatically',

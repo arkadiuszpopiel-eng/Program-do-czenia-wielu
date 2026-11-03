@@ -181,6 +181,14 @@ export class FakeStreamer {
           };
           turn.approval = approval;
           emit({ type: 'ApprovalPending', session_id: sid, turn_id: tid, approval });
+          // Decyzja „w oknie Sędziego” — w testach E2E przez `window.__alfaResolveApproval()`.
+          if (globalThis.window) {
+            globalThis.window.__alfaResolveApproval = (status) => {
+              const resolved = { ...approval, status };
+              turn.approval = resolved;
+              emit({ type: 'ApprovalPending', session_id: sid, turn_id: tid, approval: resolved });
+            };
+          }
         }
         phase = 'text';
         nextToken();
