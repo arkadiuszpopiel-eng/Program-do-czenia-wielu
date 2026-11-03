@@ -13,8 +13,8 @@ pub const BTN_DENY: u16 = 100;
 pub const BTN_ONCE: u16 = 101;
 /// Pierwszy przycisk „Zawsze w tym zakresie” (kolejne czasy: 103, 104, …, ostatni „Do odwołania”).
 pub const BTN_SCOPED: u16 = 102;
-/// „Zezwól i przełącz na Automatycznie” (poza rzędem czasów zgody).
-pub const BTN_AUTO: u16 = 99;
+/// „Zezwól i przełącz na Automatycznie” (poza rzędem czasów zgody: 102 … 119).
+pub const BTN_AUTO: u16 = 120;
 
 /// Przyciski opcji karty: „Odmów”, „Zezwól tylko teraz”, potem czasy zgody po kolei.
 fn buttons_of(card: &ApprovalCard) -> impl Iterator<Item = (u16, &DecisionOption)> {
@@ -105,7 +105,7 @@ pub fn view_of(card: &ApprovalCard, status: &str, now_ms: u64) -> SurfaceView {
     let scoped: Vec<u16> = buttons
         .iter()
         .map(|b| b.id)
-        .filter(|id| *id >= BTN_SCOPED)
+        .filter(|id| (BTN_SCOPED..BTN_AUTO).contains(id))
         .collect();
     let choice = (!scoped.is_empty()).then(|| SurfaceChoice {
         label: format!("Zawsze w tym zakresie{hello}:"),

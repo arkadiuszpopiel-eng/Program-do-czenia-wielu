@@ -128,7 +128,12 @@ fn cards() -> Vec<(&'static str, ApprovalRequest)> {
         RiskLevel::Low,
         "Tryb „Ręcznie” pyta przy każdym działaniu.",
     );
+    // Tryb „Ręcznie”: okno proponuje przełączenie na „Automatycznie” (plan 50 §4.2).
+    let mut switch = low.clone();
+    switch.autonomy = Some(AutonomyLevel::L1);
+    switch.auto_switch = true;
     vec![
+        ("przelacz", switch),
         ("usuniecie", delete),
         ("wysylka", egress),
         ("glos", voice),
@@ -167,7 +172,7 @@ fn judge_window_previews_in_both_themes() {
         }
     }
     // 150 % i niski ekran: stopka z przyciskami zostaje, wiersze odpadają od dołu.
-    let (_, req) = cards().remove(0);
+    let (_, req) = cards().remove(1);
     let view = view_of(
         &ApprovalCard::from_request(&req, NOW, CardOptions::default()),
         "",

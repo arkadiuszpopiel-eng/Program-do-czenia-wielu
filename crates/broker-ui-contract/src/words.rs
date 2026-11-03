@@ -21,7 +21,8 @@ myszą albo klawiszem — agentka ani strona internetowa nie mogą kliknąć za 
 Jądra (np. hasła przeglądarek, wyłączenie dziennika) działają zawsze. Przy „Pełnym dostępie” to \
 okno nie pokazuje się wcale, aż obniżysz tryb. „Zawsze w tym zakresie” pozwala na ten sam rodzaj \
 działań w tym samym miejscu przez 1 h, 3 h, dobę albo do odwołania — listę zgód i „Odwołaj” \
-znajdziesz w Ustawienia → Uprawnienia. Wszystko zapisuje się w dzienniku działań, \
+znajdziesz w Ustawienia → Uprawnienia. „Zezwól i przełącz na „Automatycznie”” zgadza się raz \
+i zmienia tryb pracy — potem Sędzia pyta już tylko o rzeczy ryzykowne. Wszystko zapisuje się w dzienniku działań, \
 a Ctrl+Shift+F12 zatrzymuje agentki natychmiast.";
 
 /// Rodzaj działania (rodzina zdolności).

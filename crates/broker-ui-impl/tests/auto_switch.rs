@@ -64,7 +64,8 @@ fn switch_button_sits_in_the_main_row_and_maps_to_its_decision() {
     assert_eq!(label, "Zezwól i przełącz na „Automatycznie”");
     let chips = &view.choice.as_ref().unwrap().buttons;
     assert!(!chips.contains(&BTN_AUTO), "poza rzędem czasów zgody");
-    assert!(chips.iter().all(|id| *id >= BTN_SCOPED));
+    assert!(chips.iter().all(|id| (BTN_SCOPED..BTN_AUTO).contains(id)));
+    view.validate().unwrap();
     assert_eq!(view.initial_focus, BTN_DENY);
     assert_eq!(
         decision_for(&card, BTN_AUTO),
