@@ -1,11 +1,12 @@
 <!--
   Menu „Tryb pracy” (decyzja właściciela 27.10, od 29.10 w pasku pisania, od 3.11 pięć trybów na
-  zasadzie Claude Code i Codex — plan 50): Tylko podgląd, Ręcznie, Akceptuj edycje,
+  zasadzie Claude Code i Codex — plan 50): Plan, Ręcznie, Akceptuj edycje,
   Automatycznie, Pełny dostęp. Tryb
   obowiązuje we wszystkich rozmowach; podniesienie potwierdzasz raz w oknie Brokera i zostaje po
   restarcie. Zaznaczony jest poziom globalny odczytany z Brokera, a komunikat o zmianie pojawia
   się dopiero, gdy Broker ją przyjął. Klawisze 1–5 wybierają tryb, strzałki przesuwają zaznaczenie.
-  Na dole czerwony przełącznik „Max dostęp” (plan 50 §8.1).
+  Na dole czerwony przełącznik „Max dostęp” (plan 50 §8.1). „Plan” (L0) obowiązuje tylko otwartą
+  rozmowę (Z.5); w rozmowie w trybie Plan wybór innego trybu zmienia poziom tej rozmowy.
 -->
 <script lang="ts">
   import Check from '@lucide/svelte/icons/check';
@@ -24,10 +25,13 @@
   const app = useApp();
   const { t, tk } = app.i18n;
   const session = $derived(app.sessions.active);
-  const current = $derived<AutonomyLevel>(app.autonomy.global ?? session?.autonomy ?? 'L3');
+  const planning = $derived(session?.autonomy === 'L0' ? session : null);
+  const current = $derived<AutonomyLevel>(
+    planning ? 'L0' : (app.autonomy.global ?? session?.autonomy ?? 'L3'),
+  );
   // Rozmowa z własnym poziomem (Ustawienia → Uprawnienia) — menu zmienia tryb globalny.
   const own = $derived(
-    session && app.autonomy.global && session.autonomy !== app.autonomy.global
+    session && !planning && app.autonomy.global && session.autonomy !== app.autonomy.global
       ? session.autonomy
       : null,
   );
@@ -43,14 +47,23 @@
     (checked ?? list?.querySelector<HTMLElement>('[role="menuitemradio"]'))?.focus();
   });
 
+  /** Poziom w zakresie zmiany: rozmowy (Plan) albo globalny. */
+  async function readLevel(scope: string | null): Promise<AutonomyLevel | null> {
+    if (!scope) return app.autonomy.load(app.client.permissions);
+    const state = await app.client.permissions.get(scope);
+    return state.session ?? state.global;
+  }
+
   async function choose(level: AutonomyLevel) {
     onclose();
     if (level === current) return;
+    // Plan i wyjście z Planu dotyczą otwartej rozmowy; bez rozmowy — poziomu globalnego.
+    const scope = session && (level === 'L0' || planning) ? session.id : null;
     try {
       await requestMode(level, {
-        request: (l) => app.client.permissions.requestLevel(l, null),
-        readGlobal: () => app.autonomy.load(app.client.permissions),
-        notify: (event, l) => void report(event, l),
+        request: (l) => app.client.permissions.requestLevel(l, scope),
+        readGlobal: () => readLevel(scope),
+        notify: (event, l) => void report(event, l, scope),
       });
     } catch (error) {
       showError(app.toasts, error);
@@ -58,13 +71,17 @@
   }
 
   /** Komunikat po zmianie — sukces dopiero po odczycie z Brokera, że poziom obowiązuje. */
-  async function report(event: 'applied' | 'requested' | 'raised', level: AutonomyLevel) {
+  async function report(
+    event: 'applied' | 'requested' | 'raised',
+    level: AutonomyLevel,
+    scope: string | null,
+  ) {
     const mode = tk(`mode.${level}.name`);
     if (event === 'requested') {
       app.toasts.show({ kind: 'info', message: t('mode.requested', { mode }) });
       return;
     }
-    const now = event === 'raised' ? level : await app.autonomy.load(app.client.permissions);
+    const now = event === 'raised' ? level : await readLevel(scope);
     if (now === level || now === null) {
       app.toasts.show({ kind: 'success', message: t(`mode.${event}`, { mode }) });
     } else {

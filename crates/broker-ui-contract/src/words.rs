@@ -108,7 +108,7 @@ pub fn reversible_pl(r: Reversibility) -> &'static str {
 /// Nazwa trybu pracy taka jak w menu „Tryb pracy” w pasku Alfy.
 pub fn mode_name_pl(l: AutonomyLevel) -> &'static str {
     match l {
-        AutonomyLevel::L0 => "Tylko podgląd",
+        AutonomyLevel::L0 => "Plan",
         AutonomyLevel::L1 => "Ręcznie",
         AutonomyLevel::L2 => "Akceptuj edycje",
         AutonomyLevel::L3 => "Automatycznie",

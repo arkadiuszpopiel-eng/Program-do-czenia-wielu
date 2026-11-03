@@ -188,6 +188,18 @@ export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
   ];
   if (global !== 'L3')
     for (const s of core.sessions) core.updateSession(s.id, { autonomy: global });
+  // Poziom obowiązuje: sesji (własny) albo globalny dla sesji bez własnego.
+  const apply = (level: AutonomyLevel, sid: string | null) => {
+    if (sid) {
+      own.add(sid);
+      core.updateSession(sid, { autonomy: level });
+      return;
+    }
+    global = level;
+    for (const s of core.sessions) {
+      if (!own.has(s.id)) core.updateSession(s.id, { autonomy: level });
+    }
+  };
   return {
     get: (sid) =>
       core.reply({
@@ -200,17 +212,11 @@ export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
     requestLevel: (level, sid) => {
       const current = sid ? (core.session(sid)?.autonomy ?? global) : global;
       if (ORDER.indexOf(level) > ORDER.indexOf(current)) {
+        // Zgoda „w oknie Sędziego” — w testach E2E przez `window.__alfaApproveRaise()`.
+        if (globalThis.window) globalThis.window.__alfaApproveRaise = () => apply(level, sid);
         return core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') });
       }
-      if (sid) {
-        own.add(sid);
-        core.updateSession(sid, { autonomy: level });
-      } else {
-        global = level;
-        for (const s of core.sessions) {
-          if (!own.has(s.id)) core.updateSession(s.id, { autonomy: level });
-        }
-      }
+      apply(level, sid);
       return core.reply({ status: 'applied' as const, request_id: '' });
     },
     openApproval: () =>

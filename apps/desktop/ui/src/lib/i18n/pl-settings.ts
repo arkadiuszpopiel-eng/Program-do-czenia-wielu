@@ -162,8 +162,8 @@ export const plSettings = {
   'perm.title': 'Poziom autonomii',
   'perm.intro':
     'Jak bardzo agentka działa sama. Podniesienie potwierdzasz raz w oknie Sędziego Cieni — zostaje także po restarcie, aż sam obniżysz. Agentka nie może sama podnieść sobie poziomu.',
-  'perm.L0.name': 'Tylko podgląd',
-  'perm.L0.desc': 'Agentka tylko czyta i podpowiada, nic nie zmienia.',
+  'perm.L0.name': 'Plan',
+  'perm.L0.desc': 'Najpierw plan — agentka tylko czyta, zmiany dopiero po Twojej akceptacji.',
   'perm.L1.name': 'Ręcznie',
   'perm.L1.desc': 'Każda zmiana wymaga Twojego „tak".',
   'perm.L2.name': 'Akceptuj edycje',

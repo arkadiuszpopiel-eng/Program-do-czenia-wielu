@@ -13,7 +13,7 @@ for (const style of ['classic', 'glass', 'next', 'junior'] as const) {
       const menu = page.getByRole('menu', { name: 'Tryb pracy' });
       const items = menu.getByRole('menuitemradio');
       await expect(items).toHaveCount(5);
-      await expect(items.nth(0)).toContainText('Tylko podgląd');
+      await expect(items.nth(0)).toContainText('Plan');
       await expect(items.nth(1)).toContainText('Ręcznie');
       await expect(items.nth(2)).toContainText('Akceptuj edycje');
       await expect(items.nth(2)).toContainText('Zmiany w folderze pracy bez pytania');

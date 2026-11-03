@@ -34,6 +34,12 @@ export interface ResponseScript {
   readonly model?: { readonly provider: string; readonly model: string };
 }
 
+const PLAN_REPLY =
+  'Plan porządków:\n\n1. Przejrzę folder Raporty i wypiszę duplikaty (tylko odczyt).\n' +
+  '2. Starsze niż rok przeniosę do Archiwum/2026.\n' +
+  '3. Duplikaty usunę do Kosza — każdy krok da się cofnąć.\n\n' +
+  'Ryzyko: pliki otwarte w Excelu pominę. Wykonać ten plan?';
+
 const base = (agent: AgentId, role_id: string, text: string): ResponseScript => ({
   agent,
   role_id,
@@ -64,6 +70,10 @@ export function pickResponse(
     const doc = has(input, 'dokument');
     const text = doc ? CANVAS_DOCUMENT_REPLY : CANVAS_ARTIFACTS_REPLY;
     return base(addressed ?? 'gama', doc ? 'researcher' : 'coder', text);
+  }
+  // Tryb „Plan” (Z.5): sam plan, bez narzędzi zmieniających i bez prośby o zgodę.
+  if (has(input, 'zaplanuj')) {
+    return base(addressed ?? 'delta', 'researcher', PLAN_REPLY);
   }
   if (has(input, 'kod', 'code', 'funkcj', 'skrypt')) {
     return {

@@ -43,6 +43,8 @@ declare global {
     __alfaCalls?: CallRecord[];
     /** Usterka zgód w atrapie (testy E2E karty zgód): błąd odczytu listy albo zgoda już wygasła. */
     __alfaGrantsFault?: 'list' | 'gone';
+    /** Zgoda w „oknie Sędziego” atrapy (testy E2E): przyjmuje ostatnią prośbę o podniesienie. */
+    __alfaApproveRaise?: () => void;
   }
 }
 

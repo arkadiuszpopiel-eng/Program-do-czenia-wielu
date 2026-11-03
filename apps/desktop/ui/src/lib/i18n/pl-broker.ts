@@ -41,8 +41,8 @@ export const plBroker = {
   'titlebar.modeTip': 'Tryb pracy agentek — kliknij, aby zmienić (1–5)',
   'mode.title': 'Tryb pracy',
   'status.changeMode': 'Zmień tryb pracy',
-  'mode.L0.name': 'Tylko podgląd',
-  'mode.L0.desc': 'Agentka tylko czyta i podpowiada, nic nie zmienia.',
+  'mode.L0.name': 'Plan',
+  'mode.L0.desc': 'Najpierw plan, zmiany po Twojej akceptacji. Tylko ta rozmowa.',
   'mode.L1.name': 'Ręcznie',
   'mode.L1.desc': 'Zawsze pyta przed zmianami — każda czeka na Twoje „tak”.',
   'mode.L2.name': 'Akceptuj edycje',
@@ -61,6 +61,16 @@ export const plBroker = {
   'mode.sessionOwn':
     'Ta rozmowa ma własny tryb: {mode}. Wybór tutaj zmienia tryb pozostałych rozmów; tryb tej rozmowy zmienisz w Uprawnieniach.',
   'mode.badge': 'Włączony Pełny dostęp — agentki działają bez pytań. Kliknij, aby zmienić tryb',
+  // Tryb „Plan” (plan 50 §4.1, Z.5): trzy odpowiedzi pod planem.
+  'plan.title': 'Plan gotowy — co dalej?',
+  'plan.auto': 'Tak, i działaj automatycznie',
+  'plan.manual': 'Tak, zatwierdzam ręcznie',
+  'plan.refine': 'Nie, planuj dalej',
+  'plan.requested':
+    'Potwierdź „{mode}” w oknie Sędziego Cieni — potem agentka od razu wykona plan.',
+  'plan.started': 'Plan zaakceptowany — agentka wykonuje go w trybie „{mode}”.',
+  'plan.refineHint': 'Napisz, co zmienić w planie — agentka zaplanuje dalej.',
+  'plan.go': 'Akceptuję plan — wykonaj go.',
   // „Max dostęp” (plan 50 §8.1, decyzja właściciela 3.11).
   'maxAccess.name': 'Max dostęp',
   'maxAccess.desc':

@@ -6,7 +6,9 @@
   import { now } from '../../state/clock.svelte';
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
+  import { showsPlanActions } from '../../logic/plan-mode';
   import MessageItem from './MessageItem.svelte';
+  import PlanActions from './PlanActions.svelte';
   import VirtualList from './VirtualList.svelte';
 
   interface Props {
@@ -49,6 +51,11 @@
     return out;
   });
   const turnCount = $derived(conv.path.length);
+  const lastTurn = $derived(conv.path.at(-1));
+  // Tryb „Plan” obowiązuje rozmowę (Z.5): pod ostatnim planem trzy odpowiedzi.
+  const autonomy = $derived(
+    app.sessions.active?.id === conv.sessionId ? app.sessions.active.autonomy : undefined,
+  );
   const positions = $derived(Object.fromEntries(conv.path.map((turn, i) => [turn.id, i + 1])));
 
   $effect(() => {
@@ -81,6 +88,9 @@
             count={turnCount}
             highlighted={item.turn.id === focusTurn}
           />
+          {#if showsPlanActions(item.turn, lastTurn, autonomy)}
+            <PlanActions {conv} agent={item.turn.author === 'user' ? null : item.turn.author} />
+          {/if}
         {/if}
       </div>
     {/snippet}

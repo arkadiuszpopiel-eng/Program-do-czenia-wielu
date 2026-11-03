@@ -156,8 +156,8 @@ export const enSettings: Record<keyof typeof plSettings, Message> = {
   'perm.title': 'Autonomy level',
   'perm.intro':
     'How much an agent acts on her own. You confirm a raise once in the Shadow Judge window — it stays after a restart until you lower it. An agent cannot raise her own level.',
-  'perm.L0.name': 'Preview only',
-  'perm.L0.desc': 'The agent only reads and suggests; she changes nothing.',
+  'perm.L0.name': 'Plan',
+  'perm.L0.desc': 'Plan first — the agent only reads; changes only after you accept the plan.',
   'perm.L1.name': 'Manual',
   'perm.L1.desc': 'Every change needs your "yes".',
   'perm.L2.name': 'Accept edits',

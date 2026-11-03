@@ -43,8 +43,8 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'titlebar.modeTip': 'Agents’ work mode — click to change (1–5)',
   'mode.title': 'Work mode',
   'status.changeMode': 'Change work mode',
-  'mode.L0.name': 'Preview only',
-  'mode.L0.desc': 'The agent only reads and suggests; she changes nothing.',
+  'mode.L0.name': 'Plan',
+  'mode.L0.desc': 'Plan first, changes after you accept it. This conversation only.',
   'mode.L1.name': 'Manual',
   'mode.L1.desc': 'Every change needs your "yes".',
   'mode.L2.name': 'Accept edits',
@@ -64,6 +64,16 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'mode.sessionOwn':
     'This conversation has its own mode: {mode}. The choice here changes the other conversations; change this one in Permissions.',
   'mode.badge': 'Full access is on — agents act without asking. Click to change the work mode',
+  // "Plan" mode (plan 50 §4.1, Z.5): three answers below the plan.
+  'plan.title': 'Plan ready — what next?',
+  'plan.auto': 'Yes, and work automatically',
+  'plan.manual': 'Yes, I approve manually',
+  'plan.refine': 'No, keep planning',
+  'plan.requested':
+    'Confirm "{mode}" in the Shadow Judge window — then the agent carries out the plan.',
+  'plan.started': 'Plan accepted — the agent carries it out in "{mode}" mode.',
+  'plan.refineHint': 'Write what to change in the plan — the agent will keep planning.',
+  'plan.go': 'I accept the plan — carry it out.',
   // "Max access" (plan 50 §8.1).
   'maxAccess.name': 'Max access',
   'maxAccess.desc':
