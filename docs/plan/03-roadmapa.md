@@ -234,6 +234,22 @@ Opis: [`18-wielu-uzytkownikow.md`](18-wielu-uzytkownikow.md). Zlecenie właścic
 **Wyjście z U:** dwie osoby korzystają z jednej Alfy na komputerze i z dwóch telefonów, nie widząc swoich danych;
 dziecko nie uruchomi działania w systemie; właściciel odbiera dostęp jednym kliknięciem.
 
+## Etap Z — Tryby zgód jak w Claude Code i Codex
+
+Plan: [`50-tryby-zgod-jak-claude-codex.md`](50-tryby-zgod-jak-claude-codex.md) (zlecenie właściciela 3.11).
+
+| Nr | Zadanie | Stan | Data | Uwagi |
+| --- | --- | --- | --- | --- |
+| Z.0 | Badanie dokumentacji Claude Code i Codex, plan, decyzje właściciela | w toku | 2026-11-03 | pytania w §7 planu |
+| Z.1 | Menu 5 trybów + przełącznik Max dostęp | czeka | — | po Z.0 |
+| Z.2 | Poziom „Akceptuj edycje” w Sędzim Cieni | czeka | — | gałąź do przeglądu |
+| Z.3 | Okno zgody z 4 opcjami i zakresem | czeka | — | gałąź do przeglądu |
+| Z.4 | Model-sędzia dla „Automatycznie” | czeka | — | gałąź do przeglądu |
+| Z.5 | Plan jako tryb | czeka | — | po Z.1 |
+| Z.6 | Profil Dziecko z kłódkami i PIN-em rodzica | czeka | — | gałąź do przeglądu |
+| Z.7 | Dziennik rodzica pod PIN-em | czeka | — | po Z.6 |
+| Z.8 | Testy trybów, ataków i prawdziwej aplikacji | czeka | — | wszystkie |
+
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 
 Plan: [`41-tryb-dla-dzieci.md`](41-tryb-dla-dzieci.md) (zlecenie właściciela 27.10).
