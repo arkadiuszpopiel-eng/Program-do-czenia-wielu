@@ -337,12 +337,12 @@ impl Core {
         let action = format!("kopia „{from}” → „{to}”");
         let mut read_facts = self.facts(m, ctx);
         read_facts.reversible = risk_classifier_contract::Reversibility::Yes;
+        // Kopia katalogu z `.git` czy `.vscode` tworzy ścieżki chronione w celu.
+        let mut write_facts = self.facts(m, ctx);
+        write_facts.contains_protected = self.holds_protected(&from, ctx.workdir.as_deref());
         let caps = vec![
             (Capability::FsRead(self.scope(&from, false)?), read_facts),
-            (
-                Capability::FsWrite(self.scope(&to, false)?),
-                self.facts(m, ctx),
-            ),
+            (Capability::FsWrite(self.scope(&to, false)?), write_facts),
         ];
         let auths = self.authorize(ctx, m, caps, &action).await?;
         let (f, t) = (Core::path_buf(&from), Core::path_buf(&to));

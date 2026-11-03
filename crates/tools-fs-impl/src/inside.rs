@@ -1,5 +1,5 @@
-//! Zawartość katalogu przed jego usunięciem albo przeniesieniem (plan 50 §8, luka 3 z przeglądu
-//! 3.11). Sędzia ocenia ścieżki leksykalnie, więc usunięcie katalogu z podrepozytorium (`.git`)
+//! Zawartość katalogu przed jego usunięciem, przeniesieniem albo kopią (plan 50 §8, luka 3
+//! z przeglądu 3.11). Sędzia ocenia ścieżki leksykalnie, więc usunięcie katalogu z podrepozytorium (`.git`)
 //! albo z `.vscode` nie było „zmianą ścieżki chronionej”. Narzędzie przegląda drzewo na dysku
 //! i zgłasza Sędziemu fakt `contains_protected`; przy zbyt dużym albo nieczytelnym drzewie — też
 //! (ostrożnie: zapyta).

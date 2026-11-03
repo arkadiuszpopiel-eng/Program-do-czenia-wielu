@@ -1,5 +1,5 @@
 //! Luka 3 z przeglądu planu 50 (3.11): usunięcie albo przeniesienie katalogu, w którym leży `.git`
-//! (podrepozytorium), to dla Sędziego zmiana ścieżki chronionej — na „Automatycznie” pyta, choć
+//! (podrepozytorium), a także jego kopia — to dla Sędziego zmiana ścieżki chronionej — na „Automatycznie” pyta, choć
 //! zwykły katalog idzie bez pytania.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
@@ -37,4 +37,10 @@ async fn deleting_a_tree_with_git_asks_even_on_automatic() {
         .await;
     assert!(asked(&moved.status), "{moved:?}");
     assert!(h.file(GIT).is_some());
+    // Kopia do folderu pracy nie tworzy `.git` bez pytania (przegląd 4.11).
+    let copied = h
+        .call_ctx(K::Copy, json!({"from": "lib", "to": "kopia"}), &c)
+        .await;
+    assert!(asked(&copied.status), "{copied:?}");
+    assert!(h.file("/Users/ala/Documents/kopia/.git/config").is_none());
 }
