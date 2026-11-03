@@ -102,5 +102,51 @@
       "grantId": "2"
     },
     "result": true
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": null
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": true,
+      "open": false,
+      "attempts_left": 5
+    }
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": {
+        "op": "open",
+        "pin": "2468",
+        "minutes": 60
+      }
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": true,
+      "open": true,
+      "open_until_ms": 1793479600000,
+      "attempts_left": 5
+    }
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": {
+        "op": "set_pin",
+        "old": null,
+        "new": "2468"
+      }
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": false,
+      "open": false,
+      "blocked_until_ms": 1793477000000,
+      "attempts_left": 0
+    }
   }
 ]

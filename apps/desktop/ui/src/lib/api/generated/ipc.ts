@@ -954,6 +954,40 @@ export interface CheckRun {
   readonly results: readonly CheckResult[];
 }
 
+/** Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni. */
+export type ChildLockRequest =
+  | {
+      readonly new: SecretInput;
+      readonly old: SecretInput | null;
+      readonly op: 'set_pin';
+    }
+  | {
+      readonly on: boolean;
+      readonly op: 'enable';
+      readonly pin: SecretInput;
+    }
+  | {
+      readonly minutes: number | null;
+      readonly op: 'open';
+      readonly pin: SecretInput;
+    }
+  | {
+      readonly op: 'close';
+    };
+
+/** Profil Dziecko (plan 50 §4.4): stan kłódki trybów pracy (bez PIN-u). */
+export interface ChildLockState {
+  readonly attempts_left: number;
+  /** Blokada po błędnych próbach do (ms od 1970). */
+  readonly blocked_until_ms?: number | null;
+  readonly enabled: boolean;
+  /** Kłódka otwarta teraz PIN-em rodzica. */
+  readonly open: boolean;
+  /** Do kiedy otwarta (ms od 1970); `None` — zamknięta albo do zamknięcia Alfy. */
+  readonly open_until_ms?: number | null;
+  readonly pin_set: boolean;
+}
+
 /** Rozwiązanie kolizji. */
 export type CollisionResolution = 'keep_local' | 'take_imported' | 'keep_both';
 
@@ -4521,6 +4555,10 @@ export interface IpcCommands {
   readonly modules_set_enabled: {
     readonly args: { readonly id: string; readonly enabled: boolean };
     readonly result: ModulesView;
+  };
+  readonly permissions_child_lock: {
+    readonly args: { readonly change: ChildLockRequest | null };
+    readonly result: ChildLockState;
   };
   readonly permissions_get: {
     readonly args: { readonly sessionId: string | null };

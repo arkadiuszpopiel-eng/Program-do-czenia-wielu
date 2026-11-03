@@ -6,7 +6,8 @@ use std::path::PathBuf;
 use std::sync::MutexGuard;
 
 use safety_broker_contract::{
-    BrokerError, ChildCeiling, ChildLockChange, ChildLockView, EVENT_CHILD_LOCK, Pin,
+    BrokerError, ChildCeiling, ChildLockChange, ChildLockView, EVENT_CHILD_LOCK, OPEN_UNTIL_CLOSE,
+    Pin,
 };
 use serde_json::json;
 
@@ -126,13 +127,14 @@ impl BrokerEngine {
                 self.set_ceiling(on.then(ChildCeiling::locked));
                 Ok(())
             }
-            ChildLockChange::Open { pin, until_ms } => {
+            ChildLockChange::Open { pin, for_ms } => {
                 if !store.locks() {
                     return Err(refused("profil Dziecko jest wyłączony"));
                 }
-                if until_ms <= now {
-                    return Err(refused("termin otwarcia kłódki w przeszłości"));
+                if for_ms == Some(0) {
+                    return Err(refused("czas otwarcia kłódki musi być dodatni"));
                 }
+                let until_ms = for_ms.map_or(OPEN_UNTIL_CLOSE, |d| now.saturating_add(d));
                 Self::require(store, &pin, now)?;
                 self.set_ceiling(Some(ChildCeiling {
                     open_until_ms: Some(until_ms),

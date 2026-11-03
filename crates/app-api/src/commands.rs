@@ -102,6 +102,7 @@ macro_rules! with_commands {
             permissions_open_approval(approval_id: String) -> $crate::dto::BrokerIntentResult;
             permissions_grants() -> Vec<$crate::dto::GrantView>;
             permissions_revoke_grant(grant_id: String) -> bool;
+            permissions_child_lock(change: Option<$crate::dto::ChildLockRequest>) -> $crate::dto::ChildLockState;
             broker_status() -> $crate::dto::BrokerStatusView;
             models_local_list() -> Vec<$crate::dto::LocalModelInfo>;
             models_local_download(model_id: Option<String>) -> ();

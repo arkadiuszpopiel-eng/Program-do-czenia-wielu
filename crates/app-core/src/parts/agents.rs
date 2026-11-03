@@ -113,7 +113,9 @@ impl Extra {
             return port.clone();
         }
         let noise = noise_setting(&kernel.config);
-        let talk = super::voice_talk::talk_settings(&kernel.config);
+        let talk = app_voice::talk_settings(
+            &(kernel.config.clone() as Arc<dyn core_config_contract::ConfigStore>),
+        );
         let base: Arc<dyn VoicePort> = match &self.audio {
             Some(audio) => Arc::new(
                 app_modules::voice::VoiceAdapter::new(audio.io(), self.tts.clone(), events.clone())

@@ -1,10 +1,15 @@
 //! Przekłady między typami Sędziego Cieni a DTO poleceń (`app-api`): poziom autonomii, zasięg
 //! „Max dostęp” (plan 50 §8.1), wynik intencji i błąd Brokera jako błąd komendy.
 
-use app_api::dto::{AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, MaxAccess};
+use app_api::dto::{
+    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, ChildLockRequest, ChildLockState,
+    MaxAccess, SecretInput,
+};
 use app_api::error::{AppError, ErrorCode};
 use risk_classifier_contract::AutonomyLevel as Level;
-use safety_broker_contract::{BrokerError, ModelScope};
+use safety_broker_contract::{
+    BrokerError, ChildLockChange, ChildLockView, ModelScope, OPEN_UNTIL_CLOSE, Pin,
+};
 
 /// Poziom z polecenia → poziom Sędziego.
 pub fn to_level(level: AutonomyLevel) -> Level {
@@ -51,6 +56,35 @@ pub fn applied() -> BrokerIntentResult {
     BrokerIntentResult {
         status: BrokerIntentStatus::Applied,
         request_id: String::new(),
+    }
+}
+
+/// Zmiana profilu Dziecko z polecenia → zmiana dla Sędziego.
+pub fn to_child(change: ChildLockRequest) -> Result<ChildLockChange, AppError> {
+    let pin = |s: &SecretInput| Pin::new(s.expose()).map_err(AppError::invalid);
+    Ok(match change {
+        ChildLockRequest::SetPin { old, new } => ChildLockChange::SetPin {
+            old: old.as_ref().map(pin).transpose()?,
+            new: pin(&new)?,
+        },
+        ChildLockRequest::Enable { pin: p, on } => ChildLockChange::Enable { pin: pin(&p)?, on },
+        ChildLockRequest::Open { pin: p, minutes } => ChildLockChange::Open {
+            pin: pin(&p)?,
+            for_ms: minutes.map(|m| u64::from(m.max(1)) * 60_000),
+        },
+        ChildLockRequest::Close => ChildLockChange::Close,
+    })
+}
+
+/// Stan profilu Dziecko z Sędziego → odpowiedź (termin „do zamknięcia Alfy” bez liczby).
+pub fn from_child(v: ChildLockView) -> ChildLockState {
+    ChildLockState {
+        pin_set: v.pin_set,
+        enabled: v.enabled,
+        open: v.open_until_ms.is_some(),
+        open_until_ms: v.open_until_ms.filter(|u| *u != OPEN_UNTIL_CLOSE),
+        blocked_until_ms: v.blocked_until_ms,
+        attempts_left: v.attempts_left,
     }
 }
 

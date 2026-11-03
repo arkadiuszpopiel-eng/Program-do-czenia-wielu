@@ -74,6 +74,15 @@ impl AppCore {
         Ok(self.inner.broker.grants().await)
     }
 
+    /// `permissions_child_lock` — profil Dziecko (plan 50 §4.4): `None` — odczyt, inaczej zmiana;
+    /// PIN sprawdza wyłącznie Sędzia Cieni, rdzeń go nie zapisuje.
+    pub async fn permissions_child_lock(
+        &self,
+        change: Option<crate::dto::ChildLockRequest>,
+    ) -> Result<crate::dto::ChildLockState, AppError> {
+        self.inner.broker.child_lock(change).await
+    }
+
     /// `permissions_revoke_grant` — odwołanie zgody (tylko zawęża — bez okna Sędziego).
     pub async fn permissions_revoke_grant(&self, grant_id: String) -> Result<bool, AppError> {
         self.inner.broker.revoke_grant(&grant_id).await

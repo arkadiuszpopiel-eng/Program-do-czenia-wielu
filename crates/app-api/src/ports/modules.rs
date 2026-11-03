@@ -5,8 +5,9 @@ use async_trait::async_trait;
 use sessions_contract::SessionId;
 
 use crate::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerStatusView, ExportRequest, ExportResult, GrantView,
-    ImportRequest, ImportResult, InspectResult, MaxAccess, SecretInput,
+    AutonomyLevel, BrokerIntentResult, BrokerStatusView, ChildLockRequest, ChildLockState,
+    ExportRequest, ExportResult, GrantView, ImportRequest, ImportResult, InspectResult, MaxAccess,
+    SecretInput,
 };
 use crate::error::AppError;
 
@@ -128,6 +129,10 @@ pub trait BrokerPort: Send + Sync {
     /// Odwołanie zgody (tylko zawęża uprawnienia — bez okna Sędziego); `false` — nie ma takiej.
     async fn revoke_grant(&self, _grant: &str) -> Result<bool, AppError> {
         Ok(false)
+    }
+    /// Profil Dziecko (plan 50 §4.4): `None` — odczyt, inaczej zmiana (PIN sprawdza Sędzia).
+    async fn child_lock(&self, _: Option<ChildLockRequest>) -> Result<ChildLockState, AppError> {
+        Err(AppError::unavailable("Profil Dziecko", "safety-broker"))
     }
     /// Stan prośby o zmianę poziomu; `None` — Broker nieosiągalny albo stan nieznany (strażnik
     /// autonomii spróbuje później i niczego nie przyjmuje).

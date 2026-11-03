@@ -4,6 +4,7 @@
 
 use serde::{Deserialize, Serialize};
 
+use super::SecretInput;
 use super::common::{AutonomyLevel, LocalizedText};
 
 /// Gdzie działa Broker (ADR 0003).
@@ -143,4 +144,42 @@ pub enum BrokerIntentStatus {
 pub struct BrokerIntentResult {
     pub status: BrokerIntentStatus,
     pub request_id: String,
+}
+
+/// Profil Dziecko (plan 50 §4.4): stan kłódki trybów pracy (bez PIN-u).
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema,
+)]
+pub struct ChildLockState {
+    pub pin_set: bool,
+    pub enabled: bool,
+    /// Kłódka otwarta teraz PIN-em rodzica.
+    pub open: bool,
+    /// Do kiedy otwarta (ms od 1970); `None` — zamknięta albo do zamknięcia Alfy.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub open_until_ms: Option<u64>,
+    /// Blokada po błędnych próbach do (ms od 1970).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub blocked_until_ms: Option<u64>,
+    pub attempts_left: u32,
+}
+
+/// Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni.
+#[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
+#[serde(tag = "op", rename_all = "snake_case")]
+pub enum ChildLockRequest {
+    /// Ustawienie PIN-u (zmiana wymaga starego).
+    SetPin {
+        old: Option<SecretInput>,
+        new: SecretInput,
+    },
+    /// Włączenie albo wyłączenie profilu.
+    Enable { pin: SecretInput, on: bool },
+    /// Otwarcie kłódki na `minutes` minut; `None` — do zamknięcia Alfy.
+    Open {
+        pin: SecretInput,
+        minutes: Option<u32>,
+    },
+    /// Zamknięcie kłódki (bez PIN-u).
+    Close,
 }

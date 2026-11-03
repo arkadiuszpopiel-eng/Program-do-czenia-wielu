@@ -22,11 +22,14 @@ use undo_journal_impl::UndoService;
 use watchdog_contract::{KillReason, KillSwitch};
 
 use app_api::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, GrantView, MaxAccess,
+    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, ChildLockRequest,
+    ChildLockState, GrantView, MaxAccess,
 };
 use app_api::error::{AppError, ErrorCode};
 use app_api::ports::{ApprovalOutcome, ApprovalWindow, AutonomyView, BrokerPort, KillOrigin};
-use app_broker::convert::{applied, broker_error, from_level, from_scope, to_level, to_scope};
+use app_broker::convert::{
+    applied, broker_error, from_child, from_level, from_scope, to_child, to_level, to_scope,
+};
 use broker_ui_contract::{place_pl, verb};
 
 /// Sesja-sonda poziomu globalnego (identyfikatory sesji to UUIDv7 — brak kolizji).
@@ -183,6 +186,14 @@ impl BrokerPort for InprocBroker {
             None => AutonomyTarget::Global,
         };
         self.change(target, to_level(level)).await
+    }
+
+    async fn child_lock(&self, c: Option<ChildLockRequest>) -> Result<ChildLockState, AppError> {
+        let Some(c) = c else {
+            return Ok(from_child(self.engine.child_lock()));
+        };
+        let view = self.engine.change_child_lock(to_child(c)?).await;
+        view.map(from_child).map_err(broker_error)
     }
 
     async fn open_approval(&self, approval: &str) -> Result<BrokerIntentResult, AppError> {

@@ -10,7 +10,6 @@ pub(crate) mod key_watch;
 mod memory;
 mod ports;
 pub(crate) mod tasks;
-mod voice_talk;
 mod work;
 
 use std::collections::HashMap;

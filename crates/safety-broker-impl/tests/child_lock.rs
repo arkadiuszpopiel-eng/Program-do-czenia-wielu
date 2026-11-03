@@ -14,8 +14,7 @@ use safety_broker_contract::contract_tests::{
 };
 use safety_broker_contract::{
     ApprovalChannel, AutonomyChangeRequest, AutonomyLevel, AutonomyTarget, Broker, BrokerError,
-    Capability, ChangeOrigin, ChildLockChange, CommandOrigin, ModelScope, OPEN_UNTIL_CLOSE,
-    PIN_MAX_FAILURES, Pin,
+    Capability, ChangeOrigin, ChildLockChange, CommandOrigin, ModelScope, PIN_MAX_FAILURES, Pin,
 };
 use safety_broker_impl::audit::MemoryAudit;
 use safety_broker_impl::{BrokerEngine, CHILD_LOCK_FILE, PinParams};
@@ -172,13 +171,21 @@ async fn parent_pin_opens_for_a_time_and_closes_by_itself() {
     let b = broker(dir.path(), &clock, &audit);
     set_level(&b, &clock, AutonomyTarget::Global, AutonomyLevel::L4).await;
     enable(&b).await;
-    let open = |p: &str, until_ms| ChildLockChange::Open {
+    let open = |p: &str, for_ms| ChildLockChange::Open {
         pin: pin(p),
-        until_ms,
+        for_ms,
     };
-    assert!(b.change_child_lock(open("1357", 4_600_000)).await.is_err());
+    assert!(
+        b.change_child_lock(open("1357", Some(3_600_000)))
+            .await
+            .is_err()
+    );
+    assert!(b.change_child_lock(open("2468", Some(0))).await.is_err());
     assert_eq!(level(&b), AutonomyLevel::L1);
-    let view = b.change_child_lock(open("2468", 4_600_000)).await.unwrap();
+    let view = b
+        .change_child_lock(open("2468", Some(3_600_000)))
+        .await
+        .unwrap();
     assert_eq!(view.open_until_ms, Some(4_600_000));
     assert_eq!(
         level(&b),
@@ -190,15 +197,11 @@ async fn parent_pin_opens_for_a_time_and_closes_by_itself() {
     assert_eq!(b.child_lock().open_until_ms, None);
 
     // „Do zamknięcia Alfy”: do restartu Sędziego; „Zamknij” — od razu, bez PIN-u.
-    b.change_child_lock(open("2468", OPEN_UNTIL_CLOSE))
-        .await
-        .unwrap();
+    b.change_child_lock(open("2468", None)).await.unwrap();
     assert_eq!(level(&b), AutonomyLevel::L4);
     b.change_child_lock(ChildLockChange::Close).await.unwrap();
     assert_eq!(level(&b), AutonomyLevel::L1);
-    b.change_child_lock(open("2468", OPEN_UNTIL_CLOSE))
-        .await
-        .unwrap();
+    b.change_child_lock(open("2468", None)).await.unwrap();
     drop(b);
     let b = broker(dir.path(), &clock, &audit);
     assert_eq!(level(&b), AutonomyLevel::L1, "restart zamyka kłódkę");
@@ -241,7 +244,7 @@ async fn guessing_the_pin_blocks_further_attempts() {
         let r = b
             .change_child_lock(ChildLockChange::Open {
                 pin: pin(&guess),
-                until_ms: OPEN_UNTIL_CLOSE,
+                for_ms: None,
             })
             .await;
         assert!(r.is_err());
@@ -251,7 +254,7 @@ async fn guessing_the_pin_blocks_further_attempts() {
     // W blokadzie nawet dobry PIN nie otwiera; po restarcie blokada trwa.
     let good = ChildLockChange::Open {
         pin: pin("2468"),
-        until_ms: OPEN_UNTIL_CLOSE,
+        for_ms: None,
     };
     assert!(b.change_child_lock(good.clone()).await.is_err());
     drop(b);

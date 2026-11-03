@@ -3470,6 +3470,144 @@
       ],
       "type": "object"
     },
+    "ChildLockRequest": {
+      "description": "Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni.",
+      "oneOf": [
+        {
+          "description": "Ustawienie PIN-u (zmiana wymaga starego).",
+          "properties": {
+            "new": {
+              "$ref": "#/$defs/SecretInput"
+            },
+            "old": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SecretInput"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "op": {
+              "const": "set_pin",
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "old",
+            "new"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Włączenie albo wyłączenie profilu.",
+          "properties": {
+            "on": {
+              "type": "boolean"
+            },
+            "op": {
+              "const": "enable",
+              "type": "string"
+            },
+            "pin": {
+              "$ref": "#/$defs/SecretInput"
+            }
+          },
+          "required": [
+            "op",
+            "pin",
+            "on"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Otwarcie kłódki na `minutes` minut; `None` — do zamknięcia Alfy.",
+          "properties": {
+            "minutes": {
+              "format": "uint32",
+              "minimum": 0,
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "op": {
+              "const": "open",
+              "type": "string"
+            },
+            "pin": {
+              "$ref": "#/$defs/SecretInput"
+            }
+          },
+          "required": [
+            "op",
+            "pin",
+            "minutes"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Zamknięcie kłódki (bez PIN-u).",
+          "properties": {
+            "op": {
+              "const": "close",
+              "type": "string"
+            }
+          },
+          "required": [
+            "op"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "ChildLockState": {
+      "description": "Profil Dziecko (plan 50 §4.4): stan kłódki trybów pracy (bez PIN-u).",
+      "properties": {
+        "attempts_left": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "blocked_until_ms": {
+          "description": "Blokada po błędnych próbach do (ms od 1970).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "open": {
+          "description": "Kłódka otwarta teraz PIN-em rodzica.",
+          "type": "boolean"
+        },
+        "open_until_ms": {
+          "description": "Do kiedy otwarta (ms od 1970); `None` — zamknięta albo do zamknięcia Alfy.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "pin_set": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "pin_set",
+        "enabled",
+        "open",
+        "attempts_left"
+      ],
+      "type": "object"
+    },
     "CollisionResolution": {
       "description": "Rozwiązanie kolizji.",
       "enum": [
@@ -16326,6 +16464,26 @@
       ],
       "result": {
         "$ref": "#/$defs/ModulesView"
+      }
+    },
+    "permissions_child_lock": {
+      "args": [
+        {
+          "name": "change",
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ChildLockRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/ChildLockState"
       }
     },
     "permissions_get": {

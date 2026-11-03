@@ -55,7 +55,7 @@ pub use board::BoardItem;
 pub use bridges::{BridgeAccount, BridgeAccountState, BridgeCard, BridgeLogin, BridgeSource};
 pub use broker::{
     BrokerIntentResult, BrokerIntentStatus, BrokerLinkState, BrokerMode, BrokerStatusView,
-    GrantView, MaxAccess, PermissionsState,
+    ChildLockRequest, ChildLockState, GrantView, MaxAccess, PermissionsState,
 };
 pub use cameras::{
     CAMERA_FRAME_MAX_SIDE, CAMERA_FRAME_MIN_SIDE, CameraFrame, CameraKindView, CameraStateView,

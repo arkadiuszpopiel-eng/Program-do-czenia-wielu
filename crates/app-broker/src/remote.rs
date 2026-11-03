@@ -21,8 +21,8 @@ use safety_broker_contract::ipc::{Request, Response, UserChannel};
 use safety_broker_contract::{
     ActionRequest, ApprovalId, ApprovalStatus, AttenuateRequest, AutonomyChangeRequest,
     AutonomyTarget, Broker, BrokerError, BrokerMetrics, CapToken, Capability, ChangeOrigin,
-    Decision, GrantInfo, Holder, KernelPolicy, PlanDecision, PlanRequest, SessionSecurity,
-    TaintSource, TokenId, event_kind,
+    ChildLockChange, ChildLockView, Decision, GrantInfo, Holder, KernelPolicy, PlanDecision,
+    PlanRequest, SessionSecurity, TaintSource, TokenId, event_kind,
 };
 use serde_json::json;
 use watchdog_contract::{
@@ -276,6 +276,25 @@ impl Broker for RemoteBroker {
         let req = Request::RevokeGrant { id };
         answer(self.link.call_async(req).await, |r| match r {
             Response::Revoked(done) => Some(done),
+            _ => None,
+        })
+    }
+
+    fn child_lock(&self) -> ChildLockView {
+        match self.link.call(Request::ChildLock) {
+            Ok(Response::ChildLock(v)) => v,
+            // Sędzia nieosiągalny — stan nieznany; kłódkę i tak sprawdza Sędzia przy każdym działaniu.
+            _ => ChildLockView::default(),
+        }
+    }
+
+    async fn change_child_lock(
+        &self,
+        change: ChildLockChange,
+    ) -> Result<ChildLockView, BrokerError> {
+        let req = Request::ChangeChildLock(change);
+        answer(self.link.call_async(req).await, |r| match r {
+            Response::ChildLock(v) => Some(v),
             _ => None,
         })
     }

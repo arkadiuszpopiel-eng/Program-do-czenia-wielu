@@ -103,12 +103,12 @@ pub enum ChildLockChange {
         /// `true` — profil Dziecko włączony.
         on: bool,
     },
-    /// Otwiera kłódkę na czas (PIN rodzica); [`OPEN_UNTIL_CLOSE`] — do zamknięcia Alfy.
+    /// Otwiera kłódkę na czas liczony zegarem Sędziego (PIN rodzica).
     Open {
         /// PIN rodzica.
         pin: Pin,
-        /// Do kiedy (ms).
-        until_ms: u64,
+        /// Na ile (ms); `None` — do zamknięcia Alfy (restartu Sędziego).
+        for_ms: Option<u64>,
     },
     /// Zamyka kłódkę od razu (bez PIN-u — zawężenie może każdy).
     Close,

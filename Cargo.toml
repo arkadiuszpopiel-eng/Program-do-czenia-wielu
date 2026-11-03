@@ -77,6 +77,13 @@ opt-level = 3
 [profile.dev.package.sqlite-vec]
 opt-level = 3
 
+# Skrót PIN-u rodzica (Argon2id, 19 MiB) — bez optymalizacji w dev trwa sekundy.
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3
+
 [profile.release]
 lto = "fat"
 strip = true

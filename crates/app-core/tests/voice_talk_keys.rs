@@ -1,4 +1,4 @@
-//! Ustawienia rozmowy (`voice.talk_*`, `parts/voice_talk.rs`) mają swoje miejsca w drzewie Ustawień.
+//! Ustawienia rozmowy (`voice.talk_*`, `app-voice` `talk_config.rs`) mają swoje miejsca w drzewie Ustawień.
 
 const KEYS: [&str; 5] = [
     "voice.talk_smart_turn",
