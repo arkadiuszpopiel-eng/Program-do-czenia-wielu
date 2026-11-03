@@ -4,11 +4,11 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 [45-testy-ai.md](../plan/45-testy-ai.md). Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).
 
-**Razem: 603 funkcji, z testem 603 (100 %), w długu 0.**
+**Razem: 604 funkcji, z testem 604 (100 %), w długu 0.**
 
 | Rodzaj | Funkcji | Z testem | rdzeń | interfejs | przeglądarka | aplikacja | eval | przegląd ogólny |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Polecenia rdzenia | 283 | 283 (100 %) | 206 | 3 | 2 | 272 | 1 | 0 |
+| Polecenia rdzenia | 284 | 284 (100 %) | 207 | 3 | 2 | 272 | 1 | 0 |
 | Polecenia palety i skróty | 62 | 62 (100 %) | 2 | 7 | 9 | 3 | 0 | 50 |
 | Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 12 | 0 | 38 |
 | Ustawienia | 98 | 98 (100 %) | 14 | 12 | 7 | 9 | 2 | 98 |
@@ -170,6 +170,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `permissions_grants` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_open_approval` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_request_level` | rdzeń, aplikacja, bieg aplikacji |  |
+| `permissions_request_max_access` | rdzeń |  |
 | `permissions_revoke_grant` | rdzeń, aplikacja, bieg aplikacji |  |
 | `pipelines_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `pipelines_remove` | rdzeń, aplikacja, bieg aplikacji |  |

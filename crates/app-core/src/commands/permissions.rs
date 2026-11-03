@@ -22,10 +22,7 @@ impl AppCore {
         &self,
         session_id: Option<String>,
     ) -> Result<PermissionsState, AppError> {
-        let session = match &session_id {
-            Some(s) => Some(ids::session(s)?),
-            None => None,
-        };
+        let session = session_id.as_deref().map(ids::session).transpose()?;
         let (global, session, max_access) = match self.inner.broker.levels(session.as_ref()).await {
             Some(view) => (view.global, view.session, view.max_access),
             None => (self.autonomy().await, None, None),
@@ -38,8 +35,7 @@ impl AppCore {
         })
     }
 
-    /// `permissions_request_max_access` ⟶ Sędzia Cieni: włączenie „Max dostęp” — karta w oknie
-    /// Sędziego (stan zapamiętuje Sędzia, także po restarcie); `None` — wyłączenie od razu.
+    /// `permissions_request_max_access` ⟶ Sędzia Cieni: włączenie — karta, `None` — wyłączenie.
     pub async fn permissions_request_max_access(
         &self,
         scope: Option<MaxAccess>,
@@ -54,10 +50,7 @@ impl AppCore {
         level: AutonomyLevel,
         session_id: Option<String>,
     ) -> Result<BrokerIntentResult, AppError> {
-        let session = match session_id {
-            Some(s) => Some(ids::session(&s)?),
-            None => None,
-        };
+        let session = session_id.as_deref().map(ids::session).transpose()?;
         let result = self
             .inner
             .broker
@@ -267,7 +260,7 @@ impl AppCore {
         }
         tracing::info!(
             ?level,
-            "przyjęto podniesienie poziomu zatwierdzone w oknie Sędziego Cieni"
+            "przyjęto podniesienie zatwierdzone w oknie Sędziego Cieni"
         );
         true
     }

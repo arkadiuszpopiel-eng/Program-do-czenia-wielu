@@ -2,7 +2,7 @@
 import { CommandError } from '../command-error';
 import type { AlfaClient } from '../client';
 import type { AutonomyLevel, EventLevel } from '../types';
-import type { GrantView } from '../types-hub';
+import type { GrantView, MaxAccess } from '../types-hub';
 import type { FakeChat } from './api-chat';
 import { bootReport } from './api-boot';
 import type { FakeCore } from './core';
@@ -154,11 +154,16 @@ export function filesApi(core: FakeCore): AlfaClient['files'] {
   };
 }
 
+const MAX_SCOPES: readonly MaxAccess[] = ['local', 'cloud', 'all'];
+
 export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
   // Jak Broker: obniżenie działa od razu (`applied`), podniesienie czeka w oknie Brokera.
   // Poziom startowy z adresu (`?autonomy=L4` — podgląd znaku „Pełny dostęp” w belce).
   const start = new URLSearchParams(globalThis.location?.search ?? '').get('autonomy');
   let global: AutonomyLevel = ORDER.find((l) => l === start) ?? 'L3';
+  // „Max dostęp” z adresu (`?max=local|cloud|all` — podgląd włączonego przełącznika i znaku w belce).
+  const max = new URLSearchParams(globalThis.location?.search ?? '').get('max');
+  let maxAccess: MaxAccess | null = MAX_SCOPES.find((s) => s === max) ?? null;
   // Sesje z własnym poziomem; pozostałe pokazują poziom globalny (jak `session_autonomy` w rdzeniu).
   const own = new Set<string>();
   // Zgody „zawsze w tym zakresie” (jak lista z Sędziego Cieni): jedna z terminem, jedna do odwołania.
@@ -190,6 +195,7 @@ export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
         // Jak rdzeń: poziom sesji tylko wtedy, gdy ustawiono jej własny.
         session: sid && own.has(sid) ? (core.session(sid)?.autonomy ?? null) : null,
         hello_enabled: false,
+        max_access: maxAccess,
       }),
     requestLevel: (level, sid) => {
       const current = sid ? (core.session(sid)?.autonomy ?? global) : global;
@@ -209,6 +215,14 @@ export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
     },
     openApproval: () =>
       core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') }),
+    // Jak Sędzia: włączenie (także zmiana zasięgu) czeka na kartę, wyłączenie działa od razu.
+    requestMaxAccess: (scope) => {
+      if (scope !== null) {
+        return core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') });
+      }
+      maxAccess = null;
+      return core.reply({ status: 'applied' as const, request_id: '' });
+    },
     // `window.__alfaGrantsFault` (testy E2E): „list” — odczyt listy kończy się błędem łącza,
     // „gone” — zgoda zniknęła po stronie Sędziego (wygasła), zanim właściciel kliknął „Odwołaj”.
     grants: () =>

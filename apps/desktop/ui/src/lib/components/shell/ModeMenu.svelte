@@ -5,6 +5,7 @@
   obowiązuje we wszystkich rozmowach; podniesienie potwierdzasz raz w oknie Brokera i zostaje po
   restarcie. Zaznaczony jest poziom globalny odczytany z Brokera, a komunikat o zmianie pojawia
   się dopiero, gdy Broker ją przyjął. Klawisze 1–5 wybierają tryb, strzałki przesuwają zaznaczenie.
+  Na dole czerwony przełącznik „Max dostęp” (plan 50 §8.1).
 -->
 <script lang="ts">
   import Check from '@lucide/svelte/icons/check';
@@ -12,6 +13,7 @@
   import { modeItems, requestMode } from '../../logic/work-mode';
   import { showError } from '../../state/attempt';
   import { useApp } from '../../state/context';
+  import MaxAccessSwitch from './MaxAccessSwitch.svelte';
 
   interface Props {
     /** Zamyka menu po wyborze albo przejściu do Ustawień. */
@@ -124,6 +126,7 @@
     {/each}
   </div>
   {#if own}<p class="note own">{t('mode.sessionOwn', { mode: tk(`mode.${own}.name`) })}</p>{/if}
+  <MaxAccessSwitch />
   <p class="note">{t('mode.note')}</p>
   <button type="button" class="more" onclick={settings}>{t('mode.more')}</button>
 </div>

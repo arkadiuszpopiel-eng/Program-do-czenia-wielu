@@ -6954,7 +6954,7 @@
       "type": "object"
     },
     "MaxAccess": {
-      "description": "Zasięg przełącznika „Max dostęp” (decyzja właściciela 3.11): bez pytań dla agentek na\nmodelach lokalnych, w chmurze albo na wszystkich.",
+      "description": "Zasięg „Max dostęp” (plan 50 §8.1): bez pytań na modelach lokalnych, w chmurze albo wszystkich.",
       "enum": [
         "local",
         "cloud",

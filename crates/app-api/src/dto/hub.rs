@@ -6,7 +6,7 @@ pub use accounts_hub_contract::{AzureDeployment, EnterpriseSettings};
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
 
-use super::common::{AutonomyLevel, Iso8601, LocalizedText, Money};
+use super::common::{Iso8601, LocalizedText, Money};
 
 /// Rodzaj usług dostawcy.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
@@ -260,43 +260,6 @@ pub struct TestReport {
     /// Komunikat dostawcy w oryginale (bez sekretów).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub detail: Option<String>,
-}
-
-/// Uprawnienia (PLAN §8.3).
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
-pub struct PermissionsState {
-    pub global: AutonomyLevel,
-    pub session: Option<AutonomyLevel>,
-    pub hello_enabled: bool,
-    /// Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony albo Broker niepodłączony.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub max_access: Option<MaxAccess>,
-}
-
-/// Zasięg przełącznika „Max dostęp” (decyzja właściciela 3.11): bez pytań dla agentek na
-/// modelach lokalnych, w chmurze albo na wszystkich.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum MaxAccess {
-    Local,
-    Cloud,
-    All,
-}
-
-/// Stan intencji Brokera: `opened_broker` — prośba czeka w oknie Brokera; `applied` — zmiana
-/// niewymagająca zatwierdzenia (obniżenie poziomu) została zastosowana od razu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum BrokerIntentStatus {
-    OpenedBroker,
-    Applied,
-}
-
-/// Wynik intencji Brokera.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
-pub struct BrokerIntentResult {
-    pub status: BrokerIntentStatus,
-    pub request_id: String,
 }
 
 /// Klasa sprzętu.

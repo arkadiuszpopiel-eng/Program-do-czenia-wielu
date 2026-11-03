@@ -36,6 +36,7 @@ export type {
   ModelRoutingSettings,
   ModelTier,
   PackageManifestSummary,
+  MaxAccess,
   PermissionsState,
   ProviderInfo,
   ProviderKind,

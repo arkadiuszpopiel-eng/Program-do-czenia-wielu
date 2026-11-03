@@ -61,6 +61,20 @@ export const plBroker = {
   'mode.sessionOwn':
     'Ta rozmowa ma własny tryb: {mode}. Wybór tutaj zmienia tryb pozostałych rozmów; tryb tej rozmowy zmienisz w Uprawnieniach.',
   'mode.badge': 'Włączony Pełny dostęp — agentki działają bez pytań. Kliknij, aby zmienić tryb',
+  // „Max dostęp” (plan 50 §8.1, decyzja właściciela 3.11).
+  'maxAccess.name': 'Max dostęp',
+  'maxAccess.desc':
+    'Bez żadnych pytań dla agentek na wybranych modelach. Włączenie potwierdzasz raz w oknie Sędziego Cieni.',
+  'maxAccess.onDesc':
+    'Włączony: {where} — agentki nie pytają o nic. Zostają STOP (Ctrl+Shift+F12), dziennik i twarde blokady Jądra.',
+  'maxAccess.scopeLabel': 'Zasięg Max dostępu',
+  'maxAccess.scope.local': 'Lokalne',
+  'maxAccess.scope.cloud': 'Chmura',
+  'maxAccess.scope.all': 'Wszystkie',
+  'maxAccess.requested': 'Potwierdź „Max dostęp” ({where}) w oknie Sędziego Cieni — wystarczy raz.',
+  'maxAccess.off': 'Max dostęp wyłączony — agentki znów pytają według trybu pracy.',
+  'maxAccess.badge':
+    'Włączony Max dostęp ({where}) — agentki działają bez żadnych pytań. Kliknij, aby zmienić',
   'broker.grants.title': 'Zgody „zawsze w tym zakresie”',
   'broker.grants.intro':
     'Udzielasz ich w oknie Sędziego Cieni i sam wybierasz czas: 1 h, 3 h, doba albo do odwołania. Zgoda dotyczy tylko jednej sesji i jednego rodzaju działań; nie zmienia trybu pracy. Odwołanie działa od razu, a STOP (Ctrl+Shift+F12) kasuje wszystkie zgody.',

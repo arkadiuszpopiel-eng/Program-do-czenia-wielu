@@ -110,11 +110,10 @@ pub trait BrokerPort: Send + Sync {
         level: AutonomyLevel,
         session: Option<&SessionId>,
     ) -> Result<BrokerIntentResult, AppError>;
-    /// „Max dostęp” (plan 50 §8.1): włączenie zasięgu — karta w oknie Sędziego; `None` —
-    /// wyłączenie od razu.
+    /// „Max dostęp” (plan 50 §8.1): włączenie — karta Sędziego; `None` — wyłączenie od razu.
     async fn request_max_access(
         &self,
-        _scope: Option<MaxAccess>,
+        _: Option<MaxAccess>,
     ) -> Result<BrokerIntentResult, AppError> {
         Err(AppError::unavailable("Max dostęp", "safety-broker"))
     }

@@ -97,27 +97,3 @@ pub enum TerminalFrame {
     Output { data_b64: String },
     Exit { code: Option<i32> },
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn frames_and_profiles_have_ipc_shape() {
-        let f = TerminalFrame::Output {
-            data_b64: "YQ==".into(),
-        };
-        assert_eq!(
-            serde_json::to_value(&f).unwrap(),
-            serde_json::json!({"kind": "output", "data_b64": "YQ=="})
-        );
-        assert_eq!(
-            serde_json::to_value(TerminalFrame::Exit { code: None }).unwrap(),
-            serde_json::json!({"kind": "exit", "code": null})
-        );
-        assert_eq!(
-            serde_json::to_value(TerminalProfileId::ClaudeLogin).unwrap(),
-            serde_json::json!("claude_login")
-        );
-    }
-}

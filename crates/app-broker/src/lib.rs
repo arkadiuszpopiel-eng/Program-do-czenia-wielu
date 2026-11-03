@@ -15,6 +15,7 @@
 
 mod answer;
 pub mod children;
+pub mod convert;
 pub mod inproc;
 pub mod kernel;
 pub mod levels;

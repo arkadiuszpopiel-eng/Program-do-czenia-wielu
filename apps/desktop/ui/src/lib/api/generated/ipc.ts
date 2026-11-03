@@ -1931,10 +1931,7 @@ export interface MarshalState {
   readonly translator: boolean;
 }
 
-/**
- * Zasięg przełącznika „Max dostęp” (decyzja właściciela 3.11): bez pytań dla agentek na
- * modelach lokalnych, w chmurze albo na wszystkich.
- */
+/** Zasięg „Max dostęp” (plan 50 §8.1): bez pytań na modelach lokalnych, w chmurze albo wszystkich. */
 export type MaxAccess = 'local' | 'cloud' | 'all';
 
 /** Stan połączenia z serwerem. */

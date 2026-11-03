@@ -93,6 +93,7 @@ export class TauriAlfaClient implements AlfaClient {
     get: (sessionId) => call('permissions_get', { sessionId }),
     requestLevel: (level, sessionId) => call('permissions_request_level', { level, sessionId }),
     openApproval: (approvalId) => call('permissions_open_approval', { approvalId }),
+    requestMaxAccess: (scope) => call('permissions_request_max_access', { scope }),
     grants: () => call('permissions_grants'),
     revokeGrant: (grantId) => call('permissions_revoke_grant', { grantId }),
   };

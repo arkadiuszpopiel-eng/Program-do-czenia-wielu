@@ -12,7 +12,7 @@ use risk_classifier_contract::{
     AutonomyLevel as Level, CommandOrigin, Destructiveness, Reversibility,
 };
 use safety_broker_contract::{
-    AutonomyChangeRequest, AutonomyTarget, Broker, BrokerError, Capability, ChangeOrigin, Decision,
+    AutonomyChangeRequest, AutonomyTarget, Broker, Capability, ChangeOrigin, Decision,
     DeclaredFacts, DenyReason, Holder, PathScope, UNTIL_REVOKED,
 };
 use safety_broker_impl::BrokerEngine;
@@ -26,9 +26,8 @@ use app_api::dto::{
 };
 use app_api::error::{AppError, ErrorCode};
 use app_api::ports::{ApprovalOutcome, ApprovalWindow, AutonomyView, BrokerPort, KillOrigin};
+use app_broker::convert::{applied, broker_error, from_level, from_scope, to_level, to_scope};
 use broker_ui_contract::{place_pl, verb};
-
-mod max;
 
 /// Sesja-sonda poziomu globalnego (identyfikatory sesji to UUIDv7 — brak kolizji).
 const GLOBAL_PROBE: &str = "__alfa_global__";
@@ -42,37 +41,6 @@ pub struct InprocBroker {
     env: PathEnv,
     /// Zakres katalogów roboczych sesji (`%USERPROFILE%\Alfa\Sesje`).
     workdirs: String,
-}
-
-fn to_level(level: AutonomyLevel) -> Level {
-    match level {
-        AutonomyLevel::L0 => Level::L0,
-        AutonomyLevel::L1 => Level::L1,
-        AutonomyLevel::L2 => Level::L2,
-        AutonomyLevel::L3 => Level::L3,
-        AutonomyLevel::L4 => Level::L4,
-    }
-}
-
-fn from_level(level: Level) -> AutonomyLevel {
-    match level {
-        Level::L0 => AutonomyLevel::L0,
-        Level::L1 => AutonomyLevel::L1,
-        Level::L2 => AutonomyLevel::L2,
-        Level::L3 => AutonomyLevel::L3,
-        Level::L4 => AutonomyLevel::L4,
-    }
-}
-
-/// Błąd Brokera → błąd komendy.
-fn broker_error(e: BrokerError) -> AppError {
-    let code = match &e {
-        BrokerError::KernelBlock(_) | BrokerError::Unauthorized(_) => ErrorCode::Forbidden,
-        BrokerError::AuditUnavailable(_) => ErrorCode::Unavailable,
-        BrokerError::UnknownApproval(_) | BrokerError::UnknownSession(_) => ErrorCode::NotFound,
-        _ => ErrorCode::InvalidInput,
-    };
-    AppError::new(code, format!("Sędzia Cieni: {e}"))
 }
 
 fn undo_error(e: UndoError) -> AppError {
@@ -148,6 +116,25 @@ impl InprocBroker {
         })
     }
 
+    /// Zmiana poziomu z interfejsu: obniżenie od razu, podniesienie — karta w oknie Sędziego.
+    async fn change(
+        &self,
+        target: AutonomyTarget,
+        level: Level,
+    ) -> Result<BrokerIntentResult, AppError> {
+        let request = AutonomyChangeRequest {
+            target,
+            level,
+            until_ms: None,
+            origin: ChangeOrigin::UserInterface,
+        };
+        match self.engine.request_autonomy_change(request).await {
+            Ok(None) => Ok(applied()),
+            Ok(Some(approval)) => self.present(approval.0),
+            Err(e) => Err(broker_error(e)),
+        }
+    }
+
     fn global(&self) -> Level {
         self.engine.autonomy(&SessionId::new(GLOBAL_PROBE), None)
     }
@@ -164,15 +151,24 @@ impl BrokerPort for InprocBroker {
         Some(AutonomyView {
             global: from_level(global),
             session,
-            max_access: self.max_access(),
+            max_access: self.engine.metrics().max_access.map(from_scope),
         })
     }
 
+    /// „Max dostęp” (plan 50 §8.1): włączenie (także zmiana zasięgu) — karta Sędziego;
+    /// wyłączenie — obniżenie bieżącego zasięgu, od razu. Stan trzyma i zapamiętuje Sędzia.
     async fn request_max_access(
         &self,
         scope: Option<MaxAccess>,
     ) -> Result<BrokerIntentResult, AppError> {
-        self.change_max_access(scope).await
+        let (scope, level) = match scope {
+            Some(s) => (to_scope(s), Level::L4),
+            None => match self.engine.metrics().max_access {
+                Some(on) => (on, Level::L3),
+                None => return Ok(applied()),
+            },
+        };
+        self.change(AutonomyTarget::Models { scope }, level).await
     }
 
     async fn request_level(
@@ -184,20 +180,7 @@ impl BrokerPort for InprocBroker {
             Some(s) => AutonomyTarget::Session { session: s.clone() },
             None => AutonomyTarget::Global,
         };
-        let request = AutonomyChangeRequest {
-            target,
-            level: to_level(level),
-            until_ms: None,
-            origin: ChangeOrigin::UserInterface,
-        };
-        match self.engine.request_autonomy_change(request).await {
-            Ok(None) => Ok(BrokerIntentResult {
-                status: BrokerIntentStatus::Applied,
-                request_id: String::new(),
-            }),
-            Ok(Some(approval)) => self.present(approval.0),
-            Err(e) => Err(broker_error(e)),
-        }
+        self.change(target, to_level(level)).await
     }
 
     async fn open_approval(&self, approval: &str) -> Result<BrokerIntentResult, AppError> {

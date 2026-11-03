@@ -53,7 +53,10 @@ pub use agents::{
 };
 pub use board::BoardItem;
 pub use bridges::{BridgeAccount, BridgeAccountState, BridgeCard, BridgeLogin, BridgeSource};
-pub use broker::{BrokerLinkState, BrokerMode, BrokerStatusView, GrantView};
+pub use broker::{
+    BrokerIntentResult, BrokerIntentStatus, BrokerLinkState, BrokerMode, BrokerStatusView,
+    GrantView, MaxAccess, PermissionsState,
+};
 pub use cameras::{
     CAMERA_FRAME_MAX_SIDE, CAMERA_FRAME_MIN_SIDE, CameraFrame, CameraKindView, CameraStateView,
     CameraView, CamerasState,
@@ -85,11 +88,10 @@ pub use health::{
 pub use help::{HelpHit, HelpPage, HelpTopic};
 pub use hub::{
     Account, AccountAssignment, AccountCostLimit, AccountLastTest, AccountState, AddAccountInput,
-    AudioDevice, AuthKind, AzureDeployment, BatteryView, BrokerIntentResult, BrokerIntentStatus,
-    CompatKind, ComplianceStatus, CpuView, DeviceProfile, EnterpriseSettings, EnvImportKind,
-    EnvImportResult, GpuView, HwClass, LocalDownloadState, LocalModelInfo, MachineView, MaxAccess,
-    ModelInfo, ModelKind, PermissionsState, ProviderInfo, ProviderKind, RecommendationView,
-    SecretInput, TestReport, VoiceProfileId,
+    AudioDevice, AuthKind, AzureDeployment, BatteryView, CompatKind, ComplianceStatus, CpuView,
+    DeviceProfile, EnterpriseSettings, EnvImportKind, EnvImportResult, GpuView, HwClass,
+    LocalDownloadState, LocalModelInfo, MachineView, ModelInfo, ModelKind, ProviderInfo,
+    ProviderKind, RecommendationView, SecretInput, TestReport, VoiceProfileId,
 };
 pub use licenses::{CommercialUse, LicenseCard, VoiceLicense};
 pub use mcp::{

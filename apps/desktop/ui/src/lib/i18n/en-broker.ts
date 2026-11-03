@@ -64,6 +64,21 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'mode.sessionOwn':
     'This conversation has its own mode: {mode}. The choice here changes the other conversations; change this one in Permissions.',
   'mode.badge': 'Full access is on — agents act without asking. Click to change the work mode',
+  // "Max access" (plan 50 §8.1).
+  'maxAccess.name': 'Max access',
+  'maxAccess.desc':
+    'No questions at all for agents on the chosen models. You confirm turning it on once in the Shadow Judge window.',
+  'maxAccess.onDesc':
+    'On: {where} — agents ask about nothing. STOP (Ctrl+Shift+F12), the journal and the Kernel’s hard blocks stay.',
+  'maxAccess.scopeLabel': 'Max access scope',
+  'maxAccess.scope.local': 'Local',
+  'maxAccess.scope.cloud': 'Cloud',
+  'maxAccess.scope.all': 'All',
+  'maxAccess.requested':
+    'Confirm "Max access" ({where}) in the Shadow Judge window — once is enough.',
+  'maxAccess.off': 'Max access is off — agents ask again according to the work mode.',
+  'maxAccess.badge':
+    'Max access is on ({where}) — agents act without any questions. Click to change',
   'broker.grants.title': '“Always in this scope” permissions',
   'broker.grants.intro':
     'You grant them in the Shadow Judge window and choose how long: 1 h, 3 h, a day or until revoked. A permission covers one session and one kind of action; it does not change the work mode. Revoking takes effect at once, and STOP (Ctrl+Shift+F12) clears all permissions.',
