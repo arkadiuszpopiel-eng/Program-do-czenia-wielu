@@ -52,6 +52,7 @@ pub use policy::{
     HelloRequirement, KernelPolicy, PROTECTED_PROCESSES, PROTECTED_SERVICES, PROVIDER_APPS,
 };
 pub use proof::{InputSource, Nonce, PhysicalInputProof, broker_ui_only};
+pub use protected::is_protected_scope;
 pub use scope::{
     AdminOp, AppSelector, HostPattern, PathScope, ScopeError, SecretId, ServiceAction, render_path,
 };

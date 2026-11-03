@@ -213,11 +213,12 @@ impl KernelGuard {
             return (false, false);
         };
         let in_profile = self.policy.profile_roots.iter().any(|r| s.is_subset_of(r));
-        let in_workdir = workdir
+        let wd = workdir
             .filter(|w| !w.trim().is_empty())
-            .and_then(|w| PathScope::tree(w, &self.env).ok())
-            .is_some_and(|w| s.is_subset_of(&w));
-        (!(in_profile && in_workdir), is_protected(&s.norm()))
+            .and_then(|w| PathScope::tree(w, &self.env).ok());
+        let in_workdir = wd.as_ref().is_some_and(|w| s.is_subset_of(w));
+        let protected = is_protected(&s.norm(), wd.map(|w| w.norm()).as_ref());
+        (!(in_profile && in_workdir), protected)
     }
 
     /// Fakty dla klasyfikatora: deklaracje narzędzia + to, co Broker wie sam.
