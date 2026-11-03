@@ -260,8 +260,9 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
 - **Przegląd w świeżym kontekście (3.11, zakres Z.1/Z.3/Z.5):** nic krytycznego; 3 poważne poprawione w 29946562
   (strażnik nie cofa przełączenia przy czekającej prośbie, znacznik zamiast każdego wpisu bez terminu, pochodzenie
   „lokalne” z nazwy modelu tylko u Routera), z drobnych poprawione: kolejność Audytu przy przełączeniu, brak
-  opcji po niezaufanej treści. **Otwarte:** błąd łącza z Sędzią daje w kliencie zdalnym poziom L0, więc agentka
-  przechodzi w tryb Plan (bezpieczny kierunek, ale myląco — odróżnić „nieznany” od L0); zasięg „chmura” obejmuje
+  opcji po niezaufanej treści. Błąd łącza z Sędzią dawał w kliencie zdalnym poziom L0 (agentka nagle w trybie Plan) —
+  **poprawione** (4.11 noc): ostatni poziom odczytany dla sesji i agentki, najwyżej L1, bez odczytu L0.
+  **Otwarte:** zasięg „chmura” obejmuje
   też działania bez modelu (wtyczki, zrzut ekranu, mosty CLI, wznowienie z punktu kontrolnego).
 - **Edge case:** restart Sędziego przed przyjęciem przełączenia przez rdzeń (≤ 15 s) — przełączenie przepada,
   obowiązuje poprzedni zapamiętany poziom (bezpieczny kierunek).

@@ -171,6 +171,8 @@ async fn broken_link_is_a_safe_state_until_reconnected() {
     let task = tokio::spawn(fetch(r.gate(), r.executed.clone()));
     let engine = r.service.engine.clone();
     common::wait_until("prośba u Sędziego Cieni", || !engine.pending().is_empty());
+    let known = core_bus_contract::SessionId::new("s-znana");
+    assert_eq!(r.kernel.broker.autonomy(&known, None), AutonomyLevel::L3);
     r.breaker.break_all();
     // Czekające narzędzie: odmowa (Broker niedostępny), nie wisi do limitu.
     let err = task.await.unwrap().unwrap_err();
@@ -185,7 +187,7 @@ async fn broken_link_is_a_safe_state_until_reconnected() {
     let window = r.kernel.window.clone().unwrap();
     assert!(!window.available());
     assert!(window.present("1").is_err(), "karta nie przeniesie do okna");
-    // Każda nowa decyzja — odmowa; stan sesji najostrzejszy; poziom L0.
+    // Każda nowa decyzja — odmowa; stan sesji najostrzejszy; poziom L0 (bez wcześniejszego odczytu).
     let decide = r
         .kernel
         .broker
@@ -206,6 +208,8 @@ async fn broken_link_is_a_safe_state_until_reconnected() {
     let security = r.kernel.broker.session_security(&s1);
     assert!(security.tainted && security.private_data);
     assert_eq!(r.kernel.broker.autonomy(&s1, None), AutonomyLevel::L0);
+    // Sesja odczytana przed zerwaniem: ostatni znany poziom, najwyżej „Ręcznie” — nie tryb Plan.
+    assert_eq!(r.kernel.broker.autonomy(&known, None), AutonomyLevel::L1);
     assert!(matches!(
         r.kernel.health(),
         core_registry_contract::HealthStatus::Unhealthy(_)

@@ -3,7 +3,8 @@
 //!
 //! Bezpieczny stan (fail-closed): gdy łącze jest zerwane albo Broker nie odpowiada, każda decyzja
 //! kończy się `BrokerError::AuditUnavailable` (narzędzia: odmowa „Audyt niedostępny”), weryfikacja
-//! tokenu — odrzuceniem, stan sesji — „skażona, z danymi prywatnymi”, poziom autonomii — L0.
+//! tokenu — odrzuceniem, stan sesji — „skażona, z danymi prywatnymi”, poziom autonomii — ostatni
+//! znany, najwyżej L1 (bez odczytu L0; [`crate::last_level`]).
 //! Kill-switch zawsze zabija lokalne drzewa procesów narzędzi i wycisza audio, nawet bez Brokera.
 //!
 //! Stan zawężający, który Broker przyjął (skażenie sesji, obniżenia poziomu przez właściciela),
@@ -31,6 +32,7 @@ use watchdog_contract::{
 };
 
 use crate::answer::{answer, count, ok};
+use crate::last_level::LastLevels;
 use crate::link::BrokerLink;
 
 /// Limit odpowiedzi Brokera na kill-switch (lokalne drzewa i audio są zatrzymane wcześniej).
@@ -52,6 +54,8 @@ pub struct RemoteBroker {
     /// Karty podniesień poziomu czekające na decyzję (identyfikator → cel) — po zatwierdzeniu
     /// dziennik zapomina wcześniejsze obniżenie celu.
     raises: Arc<std::sync::Mutex<std::collections::BTreeMap<u64, AutonomyTarget>>>,
+    /// Ostatnie poziomy z Sędziego — odpowiedź przy zerwanym łączu.
+    levels: Arc<LastLevels>,
 }
 
 impl RemoteBroker {
@@ -60,6 +64,7 @@ impl RemoteBroker {
         Self {
             link,
             raises: Arc::default(),
+            levels: Arc::default(),
         }
     }
 }
@@ -237,8 +242,8 @@ impl Broker for RemoteBroker {
             agent: agent.cloned(),
         };
         match self.link.call(req) {
-            Ok(Response::Level(level)) => level,
-            _ => AutonomyLevel::L0,
+            Ok(Response::Level(level)) => self.levels.remember(session, agent, level),
+            _ => self.levels.offline(session, agent),
         }
     }
 
