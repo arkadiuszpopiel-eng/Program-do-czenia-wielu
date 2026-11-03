@@ -284,7 +284,10 @@ impl Broker for RemoteBroker {
         match self.link.call(Request::ChildLock) {
             Ok(Response::ChildLock(v)) => v,
             // Sędzia nieosiągalny — stan nieznany; kłódkę i tak sprawdza Sędzia przy każdym działaniu.
-            _ => ChildLockView::default(),
+            _ => ChildLockView {
+                unknown: true,
+                ..ChildLockView::default()
+            },
         }
     }
 

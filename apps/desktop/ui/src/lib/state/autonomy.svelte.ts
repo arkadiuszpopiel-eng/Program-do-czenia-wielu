@@ -35,7 +35,9 @@ export class AutonomyState {
       if (n === this.seq) {
         this.global = global;
         this.maxAccess = max_access ?? null;
-        this.child = child;
+        // Zerwane łącze z Sędzią: zostaje ostatni znany stan (kłódka nie „znika” z menu); karta
+        // profilu pokazuje wtedy „stan nieznany”.
+        this.child = child?.unknown && this.child ? this.child : child;
         this.watchOpen(api);
       }
       return global;

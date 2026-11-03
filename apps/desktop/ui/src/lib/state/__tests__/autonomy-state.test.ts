@@ -52,8 +52,16 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
           open_until_ms: now + 1_000,
           attempts_left: 5,
           tamper_resistant: false,
+          unknown: false,
         },
-        { pin_set: true, enabled: true, open: false, attempts_left: 5, tamper_resistant: false },
+        {
+          pin_set: true,
+          enabled: true,
+          open: false,
+          attempts_left: 5,
+          tamper_resistant: false,
+          unknown: false,
+        },
       ];
       let reads = 0;
       const client = {
@@ -69,5 +77,31 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it('stan profilu nieznany (zerwane łącze) — zostaje ostatni znany stan kłódki', async () => {
+    const base = { pin_set: true, open: false, attempts_left: 5, tamper_resistant: false };
+    const states: ChildLockState[] = [
+      { ...base, enabled: true, unknown: false },
+      { ...base, pin_set: false, enabled: false, unknown: true },
+    ];
+    let reads = 0;
+    const client = {
+      get: () => Promise.resolve(reply({ global: 'L1' })),
+      childLock: () => Promise.resolve(states[Math.min(reads++, 1)]),
+    } as unknown as PermissionsApi;
+    const autonomy = new AutonomyState();
+    await autonomy.load(client);
+    expect(autonomy.locked).toBe(true);
+    await autonomy.load(client);
+    expect(autonomy.locked).toBe(true);
+    // Bez wcześniejszego odczytu — nieznany stan nie udaje kłódki.
+    const fresh = new AutonomyState();
+    const lost = {
+      get: () => Promise.resolve(reply({ global: 'L1' })),
+      childLock: () => Promise.resolve(states[1]),
+    } as unknown as PermissionsApi;
+    await fresh.load(lost);
+    expect(fresh.locked).toBe(false);
   });
 });

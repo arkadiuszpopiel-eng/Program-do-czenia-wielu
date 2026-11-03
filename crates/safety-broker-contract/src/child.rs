@@ -144,6 +144,10 @@ pub struct ChildLockView {
     /// ochrona umowna (dziecko na tym samym koncie mogłoby usunąć zapis).
     #[serde(default)]
     pub tamper_resistant: bool,
+    /// Stanu nie da się odczytać (zerwane łącze z Sędzią) — interfejs pokazuje „nieznany” zamiast
+    /// „bez PIN-u”; samą kłódkę i tak sprawdza Sędzia przy każdym działaniu.
+    #[serde(default)]
+    pub unknown: bool,
 }
 
 #[cfg(test)]

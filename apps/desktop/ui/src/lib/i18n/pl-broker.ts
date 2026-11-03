@@ -111,6 +111,9 @@ export const plBroker = {
   'child.intro':
     'Gdy profil jest włączony, dziecko korzysta tylko z trybów Plan i Ręcznie. Akceptuj edycje, Automatycznie, Pełny dostęp, Max dostęp i zgody stałe zamyka kłódka — otwiera ją tylko PIN rodzica, na czas. PIN sprawdza Sędzia Cieni i przechowuje wyłącznie jego skrót; po 5 błędnych próbach PIN blokuje się na 15 minut.',
   'child.state.none': 'PIN rodzica nie jest ustawiony — najpierw go ustaw.',
+  'child.state.unknown':
+    'Stan profilu Dziecko nieznany — brak łącza z Sędzią Cieni. Kłódkę i tak sprawdza Sędzia przy każdym działaniu.',
+  'child.retry': 'Sprawdź ponownie',
   'child.state.off': 'Profil Dziecko wyłączony — tryby pracy bez kłódki.',
   'child.state.locked': 'Profil Dziecko włączony — kłódka zamknięta.',
   'child.state.open': 'Kłódka otwarta {until}.',

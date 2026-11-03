@@ -177,3 +177,22 @@ for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
     });
   }
 }
+
+// Zerwane łącze z Sędzią (plan 50 §8.2): karta mówi „stan nieznany”, nie „bez PIN-u”, i nie
+// pokazuje pól PIN-u ani dziennika — tylko ponowny odczyt.
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`stan nieznany bez łącza z Sędzią — ${skin}, ${theme}`, async ({ page }) => {
+      await open(page, skin, theme, 'unknown');
+      const card = await openCard(page);
+      await expect(card.getByRole('status')).toContainText('Stan profilu Dziecko nieznany');
+      await expect(card.getByText('PIN rodzica nie jest ustawiony')).toHaveCount(0);
+      await expect(card.getByLabel('Nowy PIN')).toHaveCount(0);
+      await expect(page.getByRole('region', { name: 'Dziennik rodzica' })).toHaveCount(0);
+      await card.getByRole('button', { name: 'Sprawdź ponownie' }).click();
+      await expect(card.getByRole('status')).toContainText('Stan profilu Dziecko nieznany');
+      await expectAccessible(page, `stan nieznany ${skin} ${theme}`);
+      await expectReadable(page, `stan nieznany ${skin} ${theme}`);
+    });
+  }
+}

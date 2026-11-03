@@ -115,6 +115,9 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'child.intro':
     'With the profile on, the child can use only the Plan and Manual modes. Accept edits, Automatic, Full access, Max access and standing permissions are behind a padlock that only the parent PIN opens, for a set time. The Shadow Judge checks the PIN and keeps only its hash; after 5 wrong tries the PIN locks for 15 minutes.',
   'child.state.none': 'No parent PIN yet — set one first.',
+  'child.state.unknown':
+    'Child profile state unknown — no link to the Shadow Judge. The Judge still checks the padlock on every action.',
+  'child.retry': 'Check again',
   'child.state.off': 'Child profile is off — work modes have no padlock.',
   'child.state.locked': 'Child profile is on — padlock closed.',
   'child.state.open': 'Padlock open {until}.',

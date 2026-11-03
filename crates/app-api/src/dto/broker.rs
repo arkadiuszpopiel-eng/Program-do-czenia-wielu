@@ -165,6 +165,9 @@ pub struct ChildLockState {
     /// Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna.
     #[serde(default)]
     pub tamper_resistant: bool,
+    /// Stan nieznany (zerwane łącze z Sędzią); interfejs pokazuje ostatni znany stan i „nieznany”.
+    #[serde(default)]
+    pub unknown: bool,
 }
 
 /// Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni.

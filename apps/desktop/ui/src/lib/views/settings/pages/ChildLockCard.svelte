@@ -52,13 +52,15 @@
   const status = $derived(
     !lock
       ? ''
-      : !lock.pin_set
-        ? t('child.state.none')
-        : !lock.enabled
-          ? t('child.state.off')
-          : lock.open
-            ? t('child.state.open', { until })
-            : t('child.state.locked'),
+      : lock.unknown
+        ? t('child.state.unknown')
+        : !lock.pin_set
+          ? t('child.state.none')
+          : !lock.enabled
+            ? t('child.state.off')
+            : lock.open
+              ? t('child.state.open', { until })
+              : t('child.state.locked'),
   );
 
   /** Wysyła zmianę do Sędziego; pola PIN-u zawsze czyszczone. */
@@ -113,7 +115,11 @@
       {/if}
       {status}
     </p>
-    {#if !lock.tamper_resistant}
+    {#if lock.unknown}
+      <div class="actions">
+        <Button onclick={() => void reload()}>{t('child.retry')}</Button>
+      </div>
+    {:else if !lock.tamper_resistant}
       <p class="note">{t('child.contractual')}</p>
     {/if}
     {#if lock.blocked_until_ms}
@@ -122,7 +128,8 @@
       <p class="warn">{t('child.attempts', { n: lock.attempts_left })}</p>
     {/if}
 
-    {#if lock.pin_set}
+    <!-- Bez łącza z Sędzią nie ma czego zmieniać — tylko ponowny odczyt. -->
+    {#if lock.pin_set && !lock.unknown}
       <form class="row" onsubmit={withPin}>
         <TextField
           label={t('child.pin')}
@@ -162,39 +169,41 @@
       </form>
     {/if}
 
-    <form class="row" onsubmit={setPin}>
-      {#if lock.pin_set}
+    {#if !lock.unknown}
+      <form class="row" onsubmit={setPin}>
+        {#if lock.pin_set}
+          <TextField
+            label={t('child.oldPin')}
+            type="password"
+            inputmode="numeric"
+            maxlength={8}
+            bind:value={oldPin}
+          />
+        {/if}
         <TextField
-          label={t('child.oldPin')}
+          label={t('child.newPin')}
           type="password"
           inputmode="numeric"
           maxlength={8}
-          bind:value={oldPin}
+          bind:value={newPin}
         />
-      {/if}
-      <TextField
-        label={t('child.newPin')}
-        type="password"
-        inputmode="numeric"
-        maxlength={8}
-        bind:value={newPin}
-      />
-      <TextField
-        label={t('child.repeat')}
-        type="password"
-        inputmode="numeric"
-        maxlength={8}
-        bind:value={repeat}
-        error={formError ?? undefined}
-      />
-      <div class="actions">
-        <Button type="submit" disabled={busy || !newPin || (lock.pin_set && !oldPin)}
-          >{t(lock.pin_set ? 'child.changePin' : 'child.setPin')}</Button
-        >
-      </div>
-    </form>
+        <TextField
+          label={t('child.repeat')}
+          type="password"
+          inputmode="numeric"
+          maxlength={8}
+          bind:value={repeat}
+          error={formError ?? undefined}
+        />
+        <div class="actions">
+          <Button type="submit" disabled={busy || !newPin || (lock.pin_set && !oldPin)}
+            >{t(lock.pin_set ? 'child.changePin' : 'child.setPin')}</Button
+          >
+        </div>
+      </form>
+    {/if}
   </section>
-  {#if lock.pin_set}<ParentLogCard />{/if}
+  {#if lock.pin_set && !lock.unknown}<ParentLogCard />{/if}
 {/if}
 
 <style>

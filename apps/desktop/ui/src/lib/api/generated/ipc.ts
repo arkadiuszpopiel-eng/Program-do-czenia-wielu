@@ -992,6 +992,8 @@ export interface ChildLockState {
   readonly pin_set: boolean;
   /** Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna. */
   readonly tamper_resistant: boolean;
+  /** Stan nieznany (zerwane łącze z Sędzią); interfejs pokazuje ostatni znany stan i „nieznany”. */
+  readonly unknown: boolean;
 }
 
 /** Rozwiązanie kolizji. */

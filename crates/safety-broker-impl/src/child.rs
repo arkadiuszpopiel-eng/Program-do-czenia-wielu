@@ -83,6 +83,7 @@ impl BrokerEngine {
                 .then_some(store.record.blocked_until_ms),
             attempts_left: store.attempts_left(),
             tamper_resistant: store.tamper_resistant,
+            unknown: false,
         }
     }
 

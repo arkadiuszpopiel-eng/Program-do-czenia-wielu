@@ -3620,6 +3620,11 @@
           "default": false,
           "description": "Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna.",
           "type": "boolean"
+        },
+        "unknown": {
+          "default": false,
+          "description": "Stan nieznany (zerwane łącze z Sędzią); interfejs pokazuje ostatni znany stan i „nieznany”.",
+          "type": "boolean"
         }
       },
       "required": [
@@ -3627,7 +3632,8 @@
         "enabled",
         "open",
         "attempts_left",
-        "tamper_resistant"
+        "tamper_resistant",
+        "unknown"
       ],
       "type": "object"
     },

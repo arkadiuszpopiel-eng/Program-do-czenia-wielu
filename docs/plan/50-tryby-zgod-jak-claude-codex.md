@@ -250,8 +250,9 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   dopiero po zapisie w Audycie; „do zamknięcia Alfy” kończy się, gdy rozłączy się ostatnie połączenie aplikacji
   (także po awarii). Z drobnych: samopodniesienie agentki przy kłódce liczone jako blokada Jądra, obniżenie
   `SessionAgent` rozpoznawane bez sufitu, Max dostęp w metrykach tylko gdy obowiązuje, PIN zerowany w pamięci,
-  zapis pliku z `sync_all`, interfejs odświeża stan po upływie otwarcia, atrapa z rosnącą blokadą. Otwarte:
-  stan „nieznany” profilu przy zerwanym łączu (dziś pokazuje „bez PIN-u”), zmiana zegara systemowego (tylko
+  zapis pliku z `sync_all`, interfejs odświeża stan po upływie otwarcia, atrapa z rosnącą blokadą. Stan
+  „nieznany” profilu przy zerwanym łączu — **poprawione** (4.11 noc): karta mówi „stan nieznany” i daje tylko
+  ponowny odczyt, menu trybów zachowuje ostatni znany stan kłódki. Otwarte: zmiana zegara systemowego (tylko
   administrator) wpływa na terminy.
 - **Z.7 dziennik rodzica (wersja 1):** po PIN-ie (ta sama blokada prób) 20 ostatnich rozmów z tematem i czasem
   oraz działania z osi czasu (narzędzia, Audyt). Pełna treść rozmów — jeszcze nie (włączana jawnie przez

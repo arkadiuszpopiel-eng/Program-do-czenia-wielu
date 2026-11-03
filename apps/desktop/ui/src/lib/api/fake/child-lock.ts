@@ -1,7 +1,7 @@
 // Atrapa profilu Dziecko (plan 50 §4.4) — zachowuje się jak Sędzia Cieni: PIN 4–8 cyfr, 5 błędnych
 // prób i blokada 15 min, kłódka obniża tryb do „Ręcznie” i odrzuca podniesienia. Stan startowy
 // z adresu: `?child=locked` (PIN atrapy 2468), `open` (otwarta do zamknięcia Alfy), `off` (PIN
-// ustawiony, profil wyłączony); bez parametru — brak PIN-u.
+// ustawiony, profil wyłączony), `unknown` (zerwane łącze z Sędzią); bez parametru — brak PIN-u.
 import { CommandError } from '../command-error';
 import type { AutonomyLevel } from '../types';
 import type { ChildLockRequest, ChildLockState } from '../types-hub';
@@ -29,6 +29,8 @@ export function childLockFake(core: FakeCore): FakeChildLock {
   let failures = 0;
   let blocks = 0;
   let blockedUntil = 0;
+  /** Zerwane łącze z Sędzią: stan nieznany, zmiany odrzucone. */
+  const unknown = mode === 'unknown';
 
   const isOpen = () => enabled && openUntil !== null && Date.now() < openUntil;
   const state = (): ChildLockState => ({
@@ -40,6 +42,7 @@ export function childLockFake(core: FakeCore): FakeChildLock {
     attempts_left: ATTEMPTS - failures,
     // Atrapa jak tryb przenośny: Sędzia na koncie użytkownika — ochrona umowna.
     tamper_resistant: false,
+    unknown,
   });
   const refuse = (message: string) =>
     Promise.reject(new CommandError('invalid_input', `Sędzia Cieni: ${message}`));
@@ -65,6 +68,7 @@ export function childLockFake(core: FakeCore): FakeChildLock {
 
   function childLock(change: ChildLockRequest | null): Promise<ChildLockState> {
     if (change === null) return core.reply(state());
+    if (unknown) return refuse('brak łącza');
     const pins = [
       'pin' in change ? change.pin : null,
       'new' in change ? change.new : null,

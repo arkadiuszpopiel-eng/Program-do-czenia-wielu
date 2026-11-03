@@ -270,3 +270,20 @@ async fn agent_origin_level_change_is_refused_by_core_relay() {
         Err(BrokerError::KernelBlock(KernelRule::KernelPolicyChange))
     );
 }
+
+/// Profil Dziecko bez łącza z Sędzią (plan 50 §8.2): stan „nieznany”, nie „bez PIN-u” — interfejs
+/// traktuje wtedy tryby jak za kłódką.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn child_lock_state_is_unknown_without_the_link() {
+    let (b, _) = fresh();
+    assert!(!b.broker.child_lock().unknown, "łącze działa");
+    let app = Arc::new(FakePipes::default().process(common::CORE_PID));
+    let status = Arc::new(app_broker::KernelStatus::new(
+        app_api::dto::BrokerMode::Service,
+        false,
+    ));
+    let config = app_broker::link::LinkConfig::new(common::PIPE);
+    let link = app_broker::link::BrokerLink::new(app.clone(), app, config, status);
+    let view = RemoteBroker::new(link).child_lock();
+    assert!(view.unknown && !view.pin_set);
+}

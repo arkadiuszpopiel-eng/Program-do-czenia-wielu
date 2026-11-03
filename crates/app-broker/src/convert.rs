@@ -87,6 +87,7 @@ pub fn from_child(v: ChildLockView) -> ChildLockState {
         blocked_until_ms: v.blocked_until_ms,
         attempts_left: v.attempts_left,
         tamper_resistant: v.tamper_resistant,
+        unknown: v.unknown,
     }
 }
 
