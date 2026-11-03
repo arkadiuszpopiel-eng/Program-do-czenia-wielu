@@ -200,8 +200,10 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   2. aliasy 8.3 (`GIT~1`) — **poprawione** (dopasowanie jak w deny-listach);
   3. usuwanie katalogu nadrzędnego wobec `.git` (rekurencyjne) nie jest „ścieżką chronioną” — **otwarte**
      (Sędzia ocenia ścieżki leksykalnie; na L2 i tak pyta reguła usuwania);
-  4. dowiązania (junction) w folderze pracy prowadzące poza niego — **otwarte** (rozwiązywanie dowiązań przed
-     wyliczeniem zakresu w `tools-fs`);
+  4. dowiązania (junction) w folderze pracy prowadzące poza niego — **poprawione** (4.11 noc): narzędzia
+     plikowe rozwiązują dowiązania przy każdym wywołaniu (`tools_common_contract::workdir_links`); ścieżka,
+     która przez dowiązanie wychodzi poza folder pracy, idzie do Sędziego bez folderu pracy — L2 pyta.
+     Zostają polecenia powłoki (cel ścieżki oceniany leksykalnie, jak zapis pośredni z pkt 1);
   5. bez folderu pracy (mosty CLI, `run_code`, wtyczki, MCP) L2 pyta o każdą zmianę jak L1 — świadomie (bezpieczniej);
   6. folder pracy pod katalogiem o chronionej nazwie (np. `.claude\worktrees`) — **poprawione**: liczą się tylko
      człony poniżej folderu pracy; lista uzupełniona (`.cargo`, `.github\workflows`, `.gitattributes`, `.zshenv`,

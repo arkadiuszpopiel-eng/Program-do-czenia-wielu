@@ -150,6 +150,17 @@ pub struct ChildLockView {
     pub unknown: bool,
 }
 
+impl ChildLockView {
+    /// Stan nieznany — Sędzia nieosiągalny (zerwane łącze).
+    #[must_use]
+    pub fn lost() -> Self {
+        Self {
+            unknown: true,
+            ..Self::default()
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

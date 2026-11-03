@@ -23,6 +23,7 @@ pub mod netpath;
 pub mod paths;
 mod scripted;
 pub mod text;
+pub mod workdir_links;
 
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
