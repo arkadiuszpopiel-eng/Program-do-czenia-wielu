@@ -44,7 +44,9 @@ impl BrokerEngine {
     ) -> Result<ApprovalTicket, BrokerError> {
         let nonce = st.keys.nonce().map_err(BrokerError::InvalidRequest)?;
         let id = ApprovalId(st.next_approval + 1);
+        // Nie po niezaufanej treści: wstrzyknięcie nie może ciągiem kart wymusić zmiany trybu.
         let auto_switch = matches!(action, PendingAction::Action(_))
+            && !meta.tainted
             && meta.autonomy.is_some_and(|l| l < AutonomyLevel::L3)
             && st
                 .autonomy

@@ -154,9 +154,12 @@ impl AppCore {
         let judged = view
             .standing_global
             .filter(|s| *s == view.global && global != Some(*s));
+        // Przyjęcie po świeżym odczycie (obniżenie z menu w trakcie przebiegu wygrywa); gdy czeka
+        // inna prośba o podniesienie — odłożone, a ten przebieg nie obniża poziomu globalnego.
         let global = match judged {
-            Some(s) if self.inner.raises.is_empty() && self.adopt_raise(None, s).await => Some(s),
-            _ => global,
+            Some(s) if self.inner.raises.is_empty() && self.adopt_judged(s).await => Some(s),
+            Some(_) => None,
+            None => global,
         };
         // Zapamiętane L4, Broker na L3 (restart): informacja raz, przy 3. przebiegu z rzędu (ok. 15 s).
         let waiting = global == Some(AutonomyLevel::L4)
@@ -198,6 +201,13 @@ impl AppCore {
             }
         }
         true
+    }
+
+    /// Przyjmuje poziom z okna Sędziego, jeśli świeży odczyt nadal go potwierdza.
+    async fn adopt_judged(&self, level: AutonomyLevel) -> bool {
+        let fresh = self.inner.broker.levels(None).await;
+        fresh.is_some_and(|v| v.global == level && v.standing_global == Some(level))
+            && self.adopt_raise(None, level).await
     }
 
     /// Poziom obowiązujący sesję w Brokerze (`None` — Broker nieosiągalny).

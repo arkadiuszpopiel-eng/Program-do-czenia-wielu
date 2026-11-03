@@ -7,9 +7,9 @@ use risk_classifier_contract::{
     AutonomyLevel, CommandOrigin, Destructiveness, Reversibility, RuleId, describe,
 };
 use safety_broker_contract::{
-    ActionRequest, ApprovalId, ApprovalRequest, AutonomyTable, AutonomyTarget, CapToken,
-    Capability, DeclaredFacts, Holder, KernelGuard, KernelPolicy, Nonce, PlanStep, SessionSecurity,
-    TokenId,
+    ActionRequest, ApprovalId, ApprovalRequest, AutonomyEntry, AutonomyTable, AutonomyTarget,
+    CapToken, Capability, DeclaredFacts, Holder, KernelGuard, KernelPolicy, Nonce, PlanStep,
+    SessionSecurity, TokenId,
 };
 
 use crate::keys::KeyRing;
@@ -140,6 +140,9 @@ pub(crate) struct State {
     pub approval_times: VecDeque<u64>,
     pub kernel_blocks: u64,
     pub denied_audit_window: (u64, u32),
+    /// Poziom globalny ustawiony w tym uruchomieniu zgodą z okna („Zezwól i przełącz na
+    /// Automatycznie”); kasowany przy każdej innej zmianie poziomu globalnego (przegląd 3.11).
+    pub switched_global: Option<AutonomyLevel>,
 }
 
 impl State {
@@ -159,7 +162,22 @@ impl State {
             approval_times: VecDeque::new(),
             kernel_blocks: 0,
             denied_audit_window: (0, 0),
+            switched_global: None,
         }
+    }
+
+    /// Ustawia poziom celu; zmiana globalna spoza okna zgody kasuje znacznik przełączenia.
+    pub(crate) fn set_level(&mut self, target: AutonomyTarget, entry: AutonomyEntry) {
+        if target == AutonomyTarget::Global {
+            self.switched_global = None;
+        }
+        self.autonomy.set(target, entry);
+    }
+
+    /// Przełączenie z okna zgody, jeśli nadal obowiązuje (wpis globalny bez terminu, ten poziom).
+    pub(crate) fn switched_global(&self) -> Option<AutonomyLevel> {
+        self.switched_global
+            .filter(|l| self.autonomy.standing_global() == Some(*l))
     }
 
     pub(crate) fn policy(&self) -> &KernelPolicy {

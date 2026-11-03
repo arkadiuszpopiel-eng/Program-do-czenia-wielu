@@ -239,8 +239,9 @@ pub struct BrokerMetrics {
     /// Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_access: Option<ModelScope>,
-    /// Poziom globalny ustawiony w Sędzim bez terminu (zmiana właściciela — także z okna zgody
-    /// „Zezwól i przełącz na Automatycznie”); `None` — brak wpisu (np. Sędzia po restarcie).
+    /// Poziom globalny ustawiony w tym uruchomieniu Sędziego zgodą z okna („Zezwól i przełącz
+    /// na Automatycznie”) i nadal obowiązujący; `None` — brak takiej zgody (także po restarcie
+    /// i po każdej innej zmianie poziomu globalnego).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub standing_global: Option<risk_classifier_contract::AutonomyLevel>,
 }

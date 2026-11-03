@@ -61,3 +61,29 @@ async fn without_the_judge_record_the_owner_lowering_returns() {
     assert_eq!(*broker.global.lock().unwrap(), AutonomyLevel::L1);
     drop(core);
 }
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn pending_raise_postpones_adoption_without_reverting_the_switch() {
+    let dir = tempfile::tempdir().unwrap();
+    let secrets = Arc::new(MemorySecretStore::default());
+    let broker = Broker::with_window(AutonomyLevel::L3);
+    let core = start(dir.path(), broker.clone(), &secrets).await;
+    core.permissions_request_level(AutonomyLevel::L1, None)
+        .await
+        .unwrap();
+    // Karta podniesienia do L4 czeka w oknie, a właściciel na innej karcie przełącza na L3.
+    core.permissions_request_level(AutonomyLevel::L4, None)
+        .await
+        .unwrap();
+    *broker.global.lock().unwrap() = AutonomyLevel::L3;
+    *broker.standing.lock().unwrap() = Some(AutonomyLevel::L3);
+    broker.requests.lock().unwrap().clear();
+    passes(&broker, 2).await;
+    assert!(
+        !broker.sent().contains(&(AutonomyLevel::L1, None)),
+        "przełączenie nie jest cofane: {:?}",
+        broker.sent()
+    );
+    assert_eq!(*broker.global.lock().unwrap(), AutonomyLevel::L3);
+    drop(core);
+}

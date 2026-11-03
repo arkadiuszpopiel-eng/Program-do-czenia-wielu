@@ -7,20 +7,9 @@ use agent_runtime_contract::{RunEvent, RunOutcome, StepKind, StepStatus};
 use futures_util::StreamExt;
 use providers_contract::{ChatRequest, ContentBlock, Role, StopReason, TurnAccumulator};
 
-use safety_broker_contract::ModelLocation;
-
 use crate::engine::{Engine, Next};
+use crate::location::model_location;
 
-/// Pochodzenie modelu tury dla Sędziego („Max dostęp”, plan 50 §8.1): lokalny, gdy odpowiedział
-/// dostawca `local` albo Router podał `local:model`; wszystko inne — chmura.
-pub(crate) fn model_location(provider: &str, model: Option<&str>) -> ModelLocation {
-    let local = |m: &str| ModelLocation::of_model(m) == ModelLocation::Local;
-    if local(provider) || model.is_some_and(local) {
-        ModelLocation::Local
-    } else {
-        ModelLocation::Cloud
-    }
-}
 use crate::prompt::{VERIFY_PROMPT, skipped, summary, system_prompt_for, verdict};
 
 impl Engine {
@@ -375,25 +364,5 @@ impl Engine {
             vec![ContentBlock::text(format!("{VERIFY_PROMPT} {reminder}"))],
         );
         Next::Continue
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn model_location_from_provider_or_router_model() {
-        assert_eq!(model_location("local", None), ModelLocation::Local);
-        assert_eq!(
-            model_location("router", Some("local:bielik")),
-            ModelLocation::Local
-        );
-        assert_eq!(
-            model_location("router", Some("anthropic:claude")),
-            ModelLocation::Cloud
-        );
-        assert_eq!(model_location("router", None), ModelLocation::Cloud);
-        assert_eq!(model_location("openai", Some("gpt")), ModelLocation::Cloud);
     }
 }

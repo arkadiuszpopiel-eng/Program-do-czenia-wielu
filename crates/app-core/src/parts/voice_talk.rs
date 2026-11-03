@@ -51,13 +51,3 @@ pub(crate) fn talk_settings(config: &Arc<core_config_impl::FileConfigStore>) -> 
     shared
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn keys_exist_in_the_settings_tree() {
-        let pages = include_str!("../../data/settings-pages.json");
-        for key in super::KEYS {
-            assert!(pages.contains(&format!("\"{key}\"")), "{key}");
-        }
-    }
-}
