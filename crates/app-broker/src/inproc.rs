@@ -12,7 +12,7 @@ use platform_contract::ProcessPort;
 use risk_classifier_contract::RiskClassifier;
 use safety_broker_contract::KernelPolicy;
 use safety_broker_impl::audit::{BrokerAuditWriter, FileAnchorStore};
-use safety_broker_impl::{BrokerConfig, BrokerEngine, KeyMode};
+use safety_broker_impl::{BrokerConfig, BrokerEngine, CHILD_LOCK_FILE, KeyMode, PinParams};
 
 use crate::KernelBroker;
 
@@ -90,6 +90,7 @@ pub fn engine(d: InprocDeps<'_>) -> Result<Arc<BrokerEngine>, String> {
     let mut engine = BrokerEngine::new(config, clock, Arc::new(audit), d.processes)
         .map_err(|e| e.to_string())?
         .with_standing_level(dir.join(STANDING_FILE))
+        .with_child_lock(dir.join(CHILD_LOCK_FILE), PinParams::default())
         .with_bus(d.bus);
     if let Some(c) = d.classifier {
         engine = engine.with_classifier(c);

@@ -267,6 +267,10 @@ impl BrokerServer {
             Request::Metrics => Ok(Response::Metrics(e.metrics())),
             Request::Grants => Ok(Response::Grants(e.grants())),
             Request::RevokeGrant { id } => e.revoke_grant(id).await.map(Response::Revoked),
+            Request::ChildLock => Ok(Response::ChildLock(e.child_lock())),
+            Request::ChangeChildLock(change) => {
+                e.change_child_lock(change).await.map(Response::ChildLock)
+            }
             Request::PendingApprovals => Ok(Response::Pending(e.pending())),
             Request::Resolve {
                 id,

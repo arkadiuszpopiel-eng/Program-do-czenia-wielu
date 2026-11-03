@@ -6,8 +6,9 @@ use risk_classifier_contract::AutonomyLevel;
 use safety_broker_contract::{
     ActionRequest, ApprovalChallenge, ApprovalChannel, ApprovalDecision, ApprovalId,
     ApprovalStatus, AttenuateRequest, AutonomyChangeRequest, Broker, BrokerError, BrokerMetrics,
-    CapToken, Capability, ChangeOrigin, Decision, GrantInfo, Holder, KernelPolicy,
-    PhysicalInputProof, PlanDecision, PlanRequest, SessionSecurity, TaintSource, TokenId,
+    CapToken, Capability, ChangeOrigin, ChildLockChange, ChildLockView, Decision, GrantInfo,
+    Holder, KernelPolicy, PhysicalInputProof, PlanDecision, PlanRequest, SessionSecurity,
+    TaintSource, TokenId,
 };
 
 use crate::engine::BrokerEngine;
@@ -104,6 +105,17 @@ impl Broker for BrokerEngine {
 
     async fn revoke_grant(&self, id: u64) -> Result<bool, BrokerError> {
         self.revoke_grant_sync(id)
+    }
+
+    fn child_lock(&self) -> ChildLockView {
+        self.child_view()
+    }
+
+    async fn change_child_lock(
+        &self,
+        change: ChildLockChange,
+    ) -> Result<ChildLockView, BrokerError> {
+        self.change_child_sync(change)
     }
 
     fn metrics(&self) -> BrokerMetrics {

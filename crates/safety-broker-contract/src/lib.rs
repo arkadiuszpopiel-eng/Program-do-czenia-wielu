@@ -15,6 +15,7 @@ mod api;
 mod approval;
 mod autonomy;
 mod capability;
+mod child;
 mod guard;
 pub mod hex;
 pub mod ipc;
@@ -36,7 +37,7 @@ pub use action::{
 };
 pub use api::{
     AnchorStore, ApprovalChannel, Broker, ChainAnchor, EVENT_APPROVAL_DECIDED,
-    EVENT_APPROVAL_REQUESTED, EVENT_AUTONOMY_CHANGED, EVENT_CHAIN_STARTED,
+    EVENT_APPROVAL_REQUESTED, EVENT_AUTONOMY_CHANGED, EVENT_CHAIN_STARTED, EVENT_CHILD_LOCK,
     EVENT_GRANT_PERSIST_FAILED, EVENT_GRANT_RESTORED, EVENT_GRANT_REVOKED, EVENT_KERNEL_BLOCK,
     EVENT_KEY_ROTATED, EVENT_KILL_SWITCH, EVENT_POLICY_CHANGED, EVENT_SESSION_TAINTED,
     EVENT_TOKEN_DENIED, EVENT_TOKEN_ISSUED, EVENT_TOKEN_REVOKED,
@@ -47,6 +48,10 @@ pub use approval::{
 };
 pub use autonomy::{AutonomyEntry, AutonomyTable, AutonomyTarget, ModelLocation, ModelScope};
 pub use capability::Capability;
+pub use child::{
+    CHILD_CEILING, ChildCeiling, ChildLockChange, ChildLockView, OPEN_UNTIL_CLOSE, PIN_BLOCK_MS,
+    PIN_MAX_DIGITS, PIN_MAX_FAILURES, PIN_MIN_DIGITS, Pin,
+};
 pub use guard::KernelGuard;
 pub use policy::{
     HelloRequirement, KernelPolicy, PROTECTED_PROCESSES, PROTECTED_SERVICES, PROVIDER_APPS,

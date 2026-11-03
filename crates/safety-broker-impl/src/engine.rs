@@ -14,6 +14,7 @@ use safety_broker_contract::{
 use watchdog_contract::{Clock, JobTable};
 
 use crate::audit::AuditSink;
+use crate::child_store::{ChildStore, PinParams};
 use crate::grants::{GRANTS_FILE, GrantStore};
 use crate::keys::{KeyMode, KeyRing, mac};
 use crate::standing::StandingStore;
@@ -44,6 +45,8 @@ pub struct BrokerEngine {
     pub(crate) standing: Option<StandingStore>,
     /// Zgody „do odwołania” (`None` — bez zapisu, jak `standing`).
     pub(crate) grant_store: Option<GrantStore>,
+    /// Profil Dziecko (bez pliku — wyłączony, jak `standing`).
+    pub(crate) child: Mutex<ChildStore>,
 }
 
 /// Maksymalne długości pól podmiotu.
@@ -74,6 +77,7 @@ impl BrokerEngine {
             env: config.env,
             standing: None,
             grant_store: None,
+            child: Mutex::new(ChildStore::load(None, PinParams::default())),
         })
     }
 

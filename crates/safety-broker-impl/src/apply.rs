@@ -288,6 +288,16 @@ impl BrokerEngine {
             self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;
             return Ok(None);
         }
+        // Profil Dziecko: wyższe tryby i „Max dostęp” otwiera tylko PIN rodzica (plan 50 §4.4).
+        if st
+            .autonomy
+            .ceiling(now)
+            .is_some_and(|c| req.level > c || matches!(req.target, AutonomyTarget::Models { .. }))
+        {
+            return Err(BrokerError::InvalidRequest(
+                "kłódka rodzica: ten tryb otwiera PIN rodzica".into(),
+            ));
+        }
         if Self::origin_is_agent(&req.origin) {
             st.kernel_blocks += 1;
             let payload = json!({ "rule": KernelRule::SelfEscalation, "target": req.target, "level": req.level, "origin": req.origin });

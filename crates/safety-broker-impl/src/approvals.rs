@@ -47,6 +47,7 @@ impl BrokerEngine {
         // Nie po niezaufanej treści: wstrzyknięcie nie może ciągiem kart wymusić zmiany trybu.
         let auto_switch = matches!(action, PendingAction::Action(_))
             && !meta.tainted
+            && st.autonomy.ceiling(now).is_none()
             && meta.autonomy.is_some_and(|l| l < AutonomyLevel::L3)
             && st
                 .autonomy

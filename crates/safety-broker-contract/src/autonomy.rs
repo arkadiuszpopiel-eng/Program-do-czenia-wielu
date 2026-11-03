@@ -8,6 +8,8 @@ use risk_classifier_contract::AutonomyLevel;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::child::ChildCeiling;
+
 /// Gdzie działa model przebiegu — z kontekstu wywołania (dostawca wybrany przez runtime), nigdy
 /// od modelu. Brak informacji Sędzia traktuje jak chmurę (plan 50 §8.1).
 #[derive(
@@ -104,12 +106,36 @@ pub struct AutonomyEntry {
 
 /// Tabela poziomów. Rozstrzyganie: `SessionAgent` → min(`Session`, `Agent`) → `Global` → L3.
 /// Minimum przy konflikcie sesji i agentki = sufit sesji (bezpieczniejsza interpretacja).
+/// Zamknięta kłódka profilu Dziecko ([`ChildCeiling`]) ogranicza każdy wynik, także „Max dostęp”.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AutonomyTable {
     entries: BTreeMap<AutonomyTarget, AutonomyEntry>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    child: Option<ChildCeiling>,
 }
 
 impl AutonomyTable {
+    /// Profil Dziecko: sufit z kłódką (`None` — profil wyłączony).
+    pub fn set_child(&mut self, child: Option<ChildCeiling>) {
+        self.child = child;
+    }
+
+    /// Profil Dziecko (sufit i otwarcie kłódki).
+    #[must_use]
+    pub fn child(&self) -> Option<ChildCeiling> {
+        self.child
+    }
+
+    /// Sufit obowiązujący teraz (kłódka zamknięta); `None` — brak ograniczenia.
+    #[must_use]
+    pub fn ceiling(&self, now_ms: u64) -> Option<AutonomyLevel> {
+        self.child.filter(|c| c.is_locked(now_ms)).map(|c| c.level)
+    }
+
+    fn capped(&self, level: AutonomyLevel, now_ms: u64) -> AutonomyLevel {
+        self.ceiling(now_ms).map_or(level, |c| level.min(c))
+    }
+
     /// Ustawia wpis. „Max dostęp” jest jednym przełącznikiem: nowy wpis `Models` zastępuje
     /// poprzedni, a poziom nie wyższy niż domyślny go wyłącza.
     pub fn set(&mut self, target: AutonomyTarget, entry: AutonomyEntry) {
@@ -142,11 +168,12 @@ impl AutonomyTable {
         location: Option<ModelLocation>,
         now_ms: u64,
     ) -> AutonomyLevel {
-        let base = self.effective(session, agent, now_ms);
-        match self.max_access(now_ms) {
+        let base = self.uncapped(session, agent, now_ms);
+        let level = match self.max_access(now_ms) {
             Some((scope, level)) if scope.covers(location) => base.max(level),
             _ => base,
-        }
+        };
+        self.capped(level, now_ms)
     }
 
     /// Usuwa wpis (powrót do reguły ogólniejszej).
@@ -162,13 +189,17 @@ impl AutonomyTable {
             .map(|e| e.level)
     }
 
-    /// Poziom obowiązujący agentkę w sesji.
+    /// Poziom obowiązujący agentkę w sesji (z sufitem profilu Dziecko).
     pub fn effective(
         &self,
         session: &SessionId,
         agent: Option<&AgentId>,
         now_ms: u64,
     ) -> AutonomyLevel {
+        self.capped(self.uncapped(session, agent, now_ms), now_ms)
+    }
+
+    fn uncapped(&self, session: &SessionId, agent: Option<&AgentId>, now_ms: u64) -> AutonomyLevel {
         if let Some(agent) = agent {
             let pair = AutonomyTarget::SessionAgent {
                 session: session.clone(),

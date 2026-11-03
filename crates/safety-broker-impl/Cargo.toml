@@ -27,6 +27,8 @@ tokio = { workspace = true, features = ["io-util"] }
 hmac = "0.12.1"
 sha2 = "0.10.9"
 getrandom = "0.4.3"
+# PIN rodzica (profil Dziecko, plan 50 §4.4): skrót Argon2id, bez samego PIN-u.
+argon2 = { version = "0.5.3", default-features = false, features = ["alloc"] }
 
 [dev-dependencies]
 core-registry-contract.workspace = true

@@ -112,6 +112,8 @@ impl BrokerEngine {
                 non_voice,
                 grantable,
             } => {
+                // Profil Dziecko z zamkniętą kłódką: bez zgód stałych (zapisanych i nowych).
+                let grantable = grantable && st.autonomy.ceiling(now).is_none();
                 let by_plan = st.plans.iter().any(|p| {
                     now < p.until_ms
                         && p.session == req.holder.session

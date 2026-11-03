@@ -13,10 +13,13 @@ use crate::action::{
 };
 use crate::approval::{ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalStatus, GrantInfo};
 use crate::capability::Capability;
+use crate::child::{ChildLockChange, ChildLockView};
 use crate::policy::KernelPolicy;
 use crate::proof::PhysicalInputProof;
 use crate::token::{CapToken, Holder, TokenId};
 
+/// Audyt: zmiana profilu Dziecko albo próba otwarcia kłódki (bez PIN-u).
+pub const EVENT_CHILD_LOCK: &str = "broker.child.lock";
 /// Audyt: wydano token.
 pub const EVENT_TOKEN_ISSUED: &str = "broker.token.issued";
 /// Audyt: unieważniono tokeny.
@@ -149,6 +152,22 @@ pub trait Broker: Send + Sync {
     async fn revoke_grant(&self, id: u64) -> Result<bool, BrokerError> {
         let _ = id;
         Ok(false)
+    }
+
+    /// Stan profilu Dziecko (plan 50 §4.4). Domyślnie — wyłączony, bez PIN-u.
+    fn child_lock(&self) -> ChildLockView {
+        ChildLockView::default()
+    }
+
+    /// Zmiana profilu Dziecko (PIN rodzica sprawdza Sędzia). Domyślnie nieobsługiwana.
+    async fn change_child_lock(
+        &self,
+        change: ChildLockChange,
+    ) -> Result<ChildLockView, BrokerError> {
+        let _ = change;
+        Err(BrokerError::InvalidRequest(
+            "profil Dziecko nieobsługiwany".into(),
+        ))
     }
 }
 

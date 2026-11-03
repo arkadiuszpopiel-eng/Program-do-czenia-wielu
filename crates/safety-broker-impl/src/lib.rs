@@ -17,6 +17,8 @@ pub mod service;
 mod apply;
 mod approvals;
 mod broker;
+mod child;
+mod child_store;
 mod decide;
 mod engine;
 mod grants;
@@ -26,6 +28,8 @@ mod standing;
 mod state;
 mod tokens;
 
+pub use child::CHILD_LOCK_FILE;
+pub use child_store::PinParams;
 pub use engine::{BrokerConfig, BrokerEngine};
 pub use keys::KeyMode;
 
