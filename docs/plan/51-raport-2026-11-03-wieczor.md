@@ -34,7 +34,8 @@ Wszystkie poniższe przeszły:
 - tools-fs, tools-common, safety-broker-impl/fake, broker-ui, app-chat;
 - vitest: 543/543;
 - svelte-check: 0 błędów;
-- Playwright (Edge): menu trybu, panele, połączenia, błędy — 27/27 w każdym stylu i motywie.
+- Playwright (Edge): menu trybu, panele, połączenia, błędy — 27/27 w każdym stylu i motywie; pełny zestaw
+  przeglądarkowy po wszystkich zmianach — **771/771** (11,4 min).
 
 Pełnej bramki `verify wersja` nie uruchamiałam: zmiany czekają na przegląd, a wersja i budowa wypadają co 10 punktów.
 
