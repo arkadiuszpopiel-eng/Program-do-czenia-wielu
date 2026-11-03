@@ -195,7 +195,9 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
 - **Przegląd w świeżym kontekście (3.11):** nic krytycznego, brak regresji (nowe fakty tylko dodają pytania).
   Luki nowej ochrony i stan:
   1. polecenie powłoki w folderze pracy, które pisze do `.git\hooks` czy `.npmrc`, ocenia się po katalogu
-     roboczym — **otwarte** (wymaga zmiany w `tools-shell`: osobna zdolność dla ścieżek chronionych z polecenia);
+     roboczym — **poprawione** (72214cc2): słowa polecenia wskazujące ścieżkę chronioną idą do Sędziego jako
+     osobny zakres; zostaje zapis pośredni (np. `git commit` pisze do `.git` bez podania ścieżki) — jak w Codex
+     wymagałby piaskownicy zapisu, do decyzji;
   2. aliasy 8.3 (`GIT~1`) — **poprawione** (dopasowanie jak w deny-listach);
   3. usuwanie katalogu nadrzędnego wobec `.git` (rekurencyjne) nie jest „ścieżką chronioną” — **otwarte**
      (Sędzia ocenia ścieżki leksykalnie; na L2 i tak pyta reguła usuwania);
