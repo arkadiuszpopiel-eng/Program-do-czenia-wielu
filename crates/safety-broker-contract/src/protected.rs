@@ -65,6 +65,18 @@ pub fn is_protected_scope(scope: &crate::scope::PathScope) -> bool {
     is_protected(&scope.norm(), None)
 }
 
+/// Czy ścieżka jest chroniona względem folderu pracy (narzędzia sprawdzające zawartość katalogu
+/// przed usunięciem; człony samego folderu pracy się nie liczą, jak u Sędziego).
+pub fn is_protected_in(
+    scope: &crate::scope::PathScope,
+    workdir: Option<&crate::scope::PathScope>,
+) -> bool {
+    is_protected(
+        &scope.norm(),
+        workdir.map(crate::scope::PathScope::norm).as_ref(),
+    )
+}
+
 fn any_of(comp: &str, names: &[&str]) -> bool {
     let comp = comp.to_lowercase();
     names.iter().any(|n| comp_matches(&comp, n))

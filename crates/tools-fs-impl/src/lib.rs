@@ -11,6 +11,7 @@
 
 mod core;
 mod delete;
+mod inside;
 mod mkdir;
 mod near;
 mod read;

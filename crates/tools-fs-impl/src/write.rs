@@ -46,12 +46,32 @@ impl Core {
         )>,
         action: &str,
     ) -> Step<Vec<Authorization>> {
+        self.dir_access(ctx, m, caps, action, None).await
+    }
+
+    /// Jak [`Self::mutate_access`]; `dir` — usuwany albo przenoszony katalog: zawartość z `.git`
+    /// czy `.vscode` to dla Sędziego zmiana ścieżki chronionej (pierwsza zdolność).
+    pub(crate) async fn dir_access(
+        &self,
+        ctx: &ToolCtx,
+        m: &ToolManifest,
+        caps: Vec<(
+            Capability,
+            risk_classifier_contract::Reversibility,
+            Destructiveness,
+        )>,
+        action: &str,
+        dir: Option<&str>,
+    ) -> Step<Vec<Authorization>> {
+        let inside = dir.is_some_and(|d| self.holds_protected(d, ctx.workdir.as_deref()));
         let caps = caps
             .into_iter()
-            .map(|(cap, reversible, destructive)| {
+            .enumerate()
+            .map(|(i, (cap, reversible, destructive))| {
                 let mut f = self.facts(m, ctx);
                 f.reversible = reversible;
                 f.destructive = destructive;
+                f.contains_protected = inside && i == 0;
                 (cap, f)
             })
             .collect();
@@ -236,7 +256,7 @@ impl Core {
                 Destructiveness::None,
             ),
         ];
-        let auths = self.mutate_access(ctx, m, caps, &action).await?;
+        let auths = self.dir_access(ctx, m, caps, &action, Some(&from)).await?;
         let (f, t) = (Core::path_buf(&from), Core::path_buf(&to));
         let journal = self.journal.clone();
         Ok(self

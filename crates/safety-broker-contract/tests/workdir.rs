@@ -171,10 +171,43 @@ proptest::proptest! {
         for l in AutonomyLevel::ALL {
             let a = evaluate(&with, l, &RiskPolicy::default()).verdict.strictness();
             let b = evaluate(&without, l, &RiskPolicy::default()).verdict.strictness();
-            proptest::prop_assert!(a <= b, "{path} w {wd}: z folderem surowiej niż bez");
+            // Wyjątek: usunięcie folderu pracy albo jego przodka (ścieżka chroniona) — tylko surowiej.
+            let tightened = with.protected_path && !without.protected_path;
+            proptest::prop_assert!(tightened || a <= b, "{path} w {wd}: z folderem surowiej niż bez");
             if l != AutonomyLevel::L2 && with.protected_path == without.protected_path {
                 proptest::prop_assert_eq!(a, b, "{} {:?}: folder zmienił werdykt poza L2", path, l);
             }
         }
     }
+}
+
+/// Luka 3 z przeglądu 3.11: usunięcie albo przeniesienie folderu pracy, jego przodka albo katalogu
+/// z `.git` w środku (fakt narzędzia) to zmiana ścieżki chronionej — pyta także na L3.
+#[test]
+fn removing_the_workdir_or_a_tree_with_git_is_protected() {
+    let g = guard();
+    let s = SessionSecurity::default();
+    let w = |p: &str| g.derive_facts(&req(Capability::FsWrite(scope(p)), Some(WORKDIR)), &s);
+    assert!(w(WORKDIR).protected_path, "sam folder pracy");
+    assert!(w(r"C:\Users\ala").protected_path, "przodek folderu pracy");
+    assert!(!w(r"C:\Users\ala\Projekt\src").protected_path);
+    let tree = PathScope::tree(WORKDIR, &PathEnv::windows_profile(r"C:\Users\ala")).unwrap();
+    let mkdir = req(Capability::FsWrite(tree), Some(WORKDIR));
+    assert!(
+        !g.derive_facts(&mkdir, &s).protected_path,
+        "utworzenie istniejącego folderu pracy to nie usunięcie"
+    );
+    let shell = req(Capability::ShellExec(scope(WORKDIR)), Some(WORKDIR));
+    assert!(
+        !g.derive_facts(&shell, &s).protected_path,
+        "polecenie w folderze pracy to nie usunięcie"
+    );
+    let mut sub = req(
+        Capability::FsWrite(scope(r"C:\Users\ala\Projekt\vendor\lib")),
+        Some(WORKDIR),
+    );
+    assert_eq!(verdicts(&sub), "AAPPP");
+    sub.facts.contains_protected = true;
+    assert!(g.derive_facts(&sub, &s).protected_path);
+    assert_eq!(verdicts(&sub), "AAAAP");
 }

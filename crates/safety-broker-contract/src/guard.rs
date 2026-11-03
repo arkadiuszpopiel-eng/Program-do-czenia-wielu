@@ -217,7 +217,14 @@ impl KernelGuard {
             .filter(|w| !w.trim().is_empty())
             .and_then(|w| PathScope::tree(w, &self.env).ok());
         let in_workdir = wd.as_ref().is_some_and(|w| s.is_subset_of(w));
-        let protected = is_protected(&s.norm(), wd.map(|w| w.norm()).as_ref());
+        // Usunięcie albo przeniesienie samego folderu pracy lub jego przodka zabiera `.git` i resztę.
+        // Zakres dokładny na katalogu to usunięcie albo przeniesienie (`mkdir` pyta o poddrzewo).
+        let holds_workdir = matches!(cap, Capability::FsWrite(_))
+            && !s.subtree()
+            && wd.as_ref().is_some_and(|w| {
+                PathScope::tree(s.canonical(), &self.env).is_ok_and(|t| t.contains(&w.norm()))
+            });
+        let protected = holds_workdir || is_protected(&s.norm(), wd.map(|w| w.norm()).as_ref());
         (!(in_profile && in_workdir), protected)
     }
 
@@ -240,7 +247,7 @@ impl KernelGuard {
         f.touches_private_data = session.private_data || req.facts.touches_private_data;
         f.kernel_rule = self.check_request(cap, &req.facts);
         f.outside_workdir = outside_workdir;
-        f.protected_path = protected_path;
+        f.protected_path = protected_path || req.facts.contains_protected;
         f
     }
 }

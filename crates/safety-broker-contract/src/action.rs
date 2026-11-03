@@ -44,6 +44,10 @@ pub struct DeclaredFacts {
     /// Gdzie działa model przebiegu (z kontekstu wywołania) — dla przełącznika „Max dostęp”.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_location: Option<ModelLocation>,
+    /// Usuwany albo przenoszony katalog zawiera ścieżkę chronioną (np. `.git` podrepozytorium) —
+    /// sprawdza narzędzie na dysku; Sędzia traktuje wtedy działanie jak zmianę ścieżki chronionej.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub contains_protected: bool,
 }
 
 impl DeclaredFacts {
@@ -61,6 +65,7 @@ impl DeclaredFacts {
             summary: None,
             workdir: None,
             model_location: None,
+            contains_protected: false,
         }
     }
 }

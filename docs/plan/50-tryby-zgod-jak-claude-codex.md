@@ -198,8 +198,10 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
      osobny zakres; zostaje zapis pośredni (np. `git commit` pisze do `.git` bez podania ścieżki) — jak w Codex
      wymagałby piaskownicy zapisu, do decyzji;
   2. aliasy 8.3 (`GIT~1`) — **poprawione** (dopasowanie jak w deny-listach);
-  3. usuwanie katalogu nadrzędnego wobec `.git` (rekurencyjne) nie jest „ścieżką chronioną” — **otwarte**
-     (Sędzia ocenia ścieżki leksykalnie; na L2 i tak pyta reguła usuwania);
+  3. usuwanie katalogu nadrzędnego wobec `.git` (rekurencyjne) nie jest „ścieżką chronioną” — **poprawione**
+     (4.11 noc): usunięcie albo przeniesienie folderu pracy lub jego przodka to dla Sędziego ścieżka
+     chroniona; narzędzia plikowe przeglądają usuwany katalog i zgłaszają fakt `contains_protected`
+     (podrepozytorium `.git`, `.vscode`…; drzewo > 5000 wpisów albo nieczytelne — też), więc pyta także L3;
   4. dowiązania (junction) w folderze pracy prowadzące poza niego — **poprawione** (4.11 noc): narzędzia
      plikowe rozwiązują dowiązania przy każdym wywołaniu (`tools_common_contract::workdir_links`); ścieżka,
      która przez dowiązanie wychodzi poza folder pracy, idzie do Sędziego bez folderu pracy — L2 pyta.
