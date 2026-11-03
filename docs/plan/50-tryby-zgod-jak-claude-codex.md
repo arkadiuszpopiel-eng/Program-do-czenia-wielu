@@ -173,13 +173,15 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   mówcą); w profilu Dziecko niemożliwe bez PIN-u.
 - PIN: tylko skrót, limit prób, brak w logach; kłódka sprawdzana w Sędzim, nie tylko w interfejsie.
 
-## 7. Pytania do właściciela
+## 7. Decyzje właściciela (3.11)
 
-1. **„Max dostęp — Chmura/Lokalnie”:** jeden przełącznik z wyborem „lokalne / chmura / wszystkie” (tak w §4.1),
-   czy dwa osobne przełączniki?
-2. **Dziennik rodzica:** pełna treść rozmów dziecka domyślnie widoczna pod PIN-em (zmiana ADR 0029 pkt 2), czy
-   jak w ADR — tematy i alerty, treść po jawnym włączeniu?
-3. **Czy „Akceptuj edycje” ma być otwarte dla dziecka**, czy tylko Plan i Ręcznie (tak w §4.4)?
+1. **Max dostęp:** jeden czerwony przełącznik z wyborem **modele lokalne / modele w chmurze / wszystkie**.
+2. **Dziennik rodzica:** jak w ADR 0029 — pod PIN-em działania, tematy i alerty; pełną treść rozmów rodzic włącza
+   jawnie dla dziecka (dziecko widzi stały znak).
+3. **Dziecko bez PIN-u:** tylko **Plan** i **Ręcznie**; reszta (Akceptuj edycje, Automatycznie, Pełny dostęp,
+   Max dostęp) na kłódkę.
+4. Model-sędzia w „Automatycznie”, „Pełny dostęp” nigdy nie pyta, menu na zasadzie obu programów (§4.1) —
+   przyjęte; zastępuje decyzję z 27.10.
 
 ## Źródła
 
