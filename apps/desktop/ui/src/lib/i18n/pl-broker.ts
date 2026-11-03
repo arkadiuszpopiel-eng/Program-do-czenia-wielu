@@ -143,4 +143,5 @@ export const plBroker = {
   'child.lockedNote':
     'Kłódka rodzica — wyższe tryby otwiera PIN rodzica w Ustawienia → Uprawnienia.',
   'child.badge': 'Profil Dziecko — kłódka zamknięta. Kliknij, aby zobaczyć tryby',
+  'child.badgeWord': 'Dziecko',
 } as const satisfies Record<string, Message>;

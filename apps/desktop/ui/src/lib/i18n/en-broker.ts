@@ -147,4 +147,5 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'child.lockedNote':
     'Parent padlock — higher modes open with the parent PIN in Settings → Permissions.',
   'child.badge': 'Child profile — padlock closed. Click to see the modes',
+  'child.badgeWord': 'Child',
 };

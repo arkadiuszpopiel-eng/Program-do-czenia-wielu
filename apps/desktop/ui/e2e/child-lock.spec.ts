@@ -44,6 +44,10 @@ for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
       }
       const max = page.getByRole('switch', { name: 'Max dostęp' });
       await expect(max).toHaveAttribute('aria-disabled', 'true');
+      // Znak w belce: kłódka zamiast zapamiętanego wyższego trybu.
+      await expect(
+        page.getByRole('button', { name: /^Profil Dziecko — kłódka zamknięta/ }),
+      ).toBeVisible();
       await expectAccessible(page, `kłódka menu ${skin} ${theme}`);
       await expectReadable(page, `kłódka menu ${skin} ${theme}`);
       // Klawisz 3 (Automatycznie) i przełącznik — tylko podpowiedź, bez prośby do Sędziego.
@@ -120,4 +124,27 @@ test('pierwszy PIN, włączenie profilu i blokada po 5 błędnych próbach', asy
   await pin.fill('13579');
   await card.getByRole('button', { name: 'Otwórz kłódkę' }).click();
   await expect(page.getByText(/PIN chwilowo zablokowany/)).toBeVisible();
+});
+
+test('paleta (Ctrl+K) i znak w belce przy kłódce: menu z kłódkami, bez prośby do Sędziego', async ({
+  page,
+}) => {
+  await open(page, 'classic', 'light', 'locked');
+  await page.keyboard.press('Control+k');
+  await page.keyboard.type('tryb pracy');
+  await page.keyboard.press('Enter');
+  const menu = page.getByRole('menu', { name: 'Tryb pracy' });
+  await expect(menu).toBeVisible();
+  await page.keyboard.press('5');
+  await expect(page.getByRole('status').getByText(NOTE).first()).toBeVisible();
+  await expect(menu.getByRole('menuitemradio', { name: /^Pełny dostęp/ })).toHaveAttribute(
+    'aria-disabled',
+    'true',
+  );
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: /^Profil Dziecko — kłódka zamknięta/ }).click();
+  await expect(menu).toBeVisible();
+  // Plan wolno zawsze (zawęża) — klawisz 1 przechodzi do Sędziego.
+  await page.keyboard.press('1');
+  await expect(page.getByText('Tryb pracy: Plan.')).toBeVisible();
 });
