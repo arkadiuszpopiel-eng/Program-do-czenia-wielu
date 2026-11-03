@@ -67,6 +67,9 @@ impl Engine {
                 if self.cp.verifying && m.mutating {
                     self.rejected_commands.insert(tu.id.clone());
                     self.invalid_args.insert(tu.id.clone(), "Weryfikacja dopuszcza wyłącznie operacje odczytu.".into());
+                } else if m.mutating && self.planning() {
+                    self.rejected_commands.insert(tu.id.clone());
+                    self.invalid_args.insert(tu.id.clone(), "Tryb Plan: tylko odczyt — przedstaw plan; zmiany dopiero po akceptacji właściciela.".into());
                 } else { self.remember_tools(&[tu.name.clone()]); }
             }
             tu
@@ -92,7 +95,8 @@ impl Engine {
                 );
             }
         };
-        let names = self.registry.find(args.query.trim(), self.cp.verifying);
+        let read_only = self.cp.verifying || self.planning();
+        let names = self.registry.find(args.query.trim(), read_only);
         let items: Vec<_> = names.iter().filter_map(|n| {
             let m = self.registry.manifest(n)?;
             Some(json!({"name":m.name,"title":m.title,"description":m.description.chars().take(180).collect::<String>(),"read_only":!m.mutating}))

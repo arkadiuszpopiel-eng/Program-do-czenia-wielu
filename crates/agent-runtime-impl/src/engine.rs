@@ -86,6 +86,15 @@ impl Engine {
         }
     }
 
+    /// Tryb „Plan” (plan 50 §4.1, Z.5): rozmowa na L0 — agentka bada narzędziami do odczytu
+    /// i przedstawia plan; zmiany dopiero po akceptacji właściciela (wyższy poziom rozmowy).
+    pub(crate) fn planning(&self) -> bool {
+        self.shared.ext.autonomy.as_ref().is_some_and(|o| {
+            o.level(&self.cp.spec.session, &self.cp.spec.agent)
+                == risk_classifier_contract::AutonomyLevel::L0
+        })
+    }
+
     pub(crate) fn elapsed_ms(&self) -> u64 {
         self.base_elapsed
             .saturating_add(u64::try_from(self.started.elapsed().as_millis()).unwrap_or(u64::MAX))

@@ -31,11 +31,14 @@ impl Engine {
         } else {
             crate::context::view(&self.cp.messages)
         };
+        let planning = self.planning();
         let mut req = ChatRequest::new(spec.model.clone(), messages)
-            .with_system(system_prompt_for(spec, self.cp.verifying));
-        req.tools = self
-            .registry
-            .specs(self.cp.verifying, &spec.goal, &self.cp.discovered_tools);
+            .with_system(system_prompt_for(spec, self.cp.verifying, planning));
+        req.tools = self.registry.specs(
+            self.cp.verifying || planning,
+            &spec.goal,
+            &self.cp.discovered_tools,
+        );
         if req.tools.iter().any(|t| t.name == crate::catalog::FIND) {
             req.system
                 .get_or_insert_with(String::new)
@@ -353,7 +356,8 @@ impl Engine {
                 verified: ok,
             });
         }
-        if !self.cp.spec.verify {
+        // Plan nie jest jeszcze wykonaniem celu — bez samoweryfikacji i Krytyczki.
+        if !self.cp.spec.verify || self.planning() {
             return Next::Finish(RunOutcome::Completed {
                 summary: text,
                 verified: None,

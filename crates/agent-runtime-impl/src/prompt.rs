@@ -15,6 +15,11 @@ pub(crate) const VERIFY_FAIL: &str = "WERYFIKACJA: BŁĄD";
 pub(crate) const VERIFY_PROMPT: &str = "[Weryfikacja] Sprawdź, czy cel zadania został osiągnięty — w razie potrzeby \
 narzędziami tylko do odczytu. Zakończ odpowiedzią zaczynającą się od „WERYFIKACJA: OK” albo „WERYFIKACJA: BŁĄD — <powód>”.";
 
+/// Zasada trybu „Plan” (Z.5) doklejana do promptu systemowego, gdy rozmowa jest na L0.
+pub(crate) const PLAN_NOTE: &str = "
+
+Tryb Plan (wybrał właściciel): zbadaj sprawę wyłącznie narzędziami do odczytu i przedstaw plan — kroki, pliki lub miejsca do zmiany, ryzyka i sposób sprawdzenia wyniku. Niczego nie zmieniaj: narzędzia zmieniające są wyłączone, dopóki właściciel nie zaakceptuje planu. Zakończ krótkim pytaniem, czy wykonać plan.";
+
 fn loop_rules(spec: &RunSpec) -> Vec<String> {
     let mut rules = vec![
         "Pracujesz w pętli: najpierw krótki plan (1–5 kroków), potem wykonanie i sprawdzenie wyniku. Niezależne odczyty zlecaj razem w jednej turze — runtime wykona je w ograniczonej paczce równoległej. Zapisy i operacje zależne wykonuj kolejno. Nie powtarzaj planu przed każdym narzędziem.".to_owned(),
@@ -54,12 +59,13 @@ fn loop_rules(spec: &RunSpec) -> Vec<String> {
 }
 
 /// Prompt systemowy przebiegu; w turze weryfikacji (`verifying`) bez stylu odpowiedzi — znaczniki
-/// „WERYFIKACJA: …” mają wyjść w stałej formie, jak u Krytyczki.
-pub(crate) fn system_prompt_for(spec: &RunSpec, verifying: bool) -> String {
+/// „WERYFIKACJA: …” mają wyjść w stałej formie, jak u Krytyczki. W trybie „Plan” — z [`PLAN_NOTE`].
+pub(crate) fn system_prompt_for(spec: &RunSpec, verifying: bool, planning: bool) -> String {
     if verifying {
         return base_prompt(spec);
     }
-    system_prompt(spec)
+    let prompt = system_prompt(spec);
+    if planning { prompt + PLAN_NOTE } else { prompt }
 }
 
 /// Prompt systemowy przebiegu.
@@ -215,9 +221,11 @@ Brak: docker"
 Styl odpowiedzi wybrany przez użytkownika: zwięźle."
         ));
         assert!(
-            !system_prompt_for(&spec, true).contains("Styl odpowiedzi"),
+            !system_prompt_for(&spec, true, false).contains("Styl odpowiedzi"),
             "tura weryfikacji bez stylu"
         );
+        assert!(system_prompt_for(&spec, false, true).ends_with(PLAN_NOTE));
+        assert!(!system_prompt_for(&spec, true, true).contains("Tryb Plan"));
         spec.reply_style = Some("  ".into());
         assert!(!system_prompt(&spec).ends_with("  "));
     }
