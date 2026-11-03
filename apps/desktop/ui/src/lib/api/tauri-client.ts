@@ -96,6 +96,7 @@ export class TauriAlfaClient implements AlfaClient {
     requestMaxAccess: (scope) => call('permissions_request_max_access', { scope }),
     grants: () => call('permissions_grants'),
     revokeGrant: (grantId) => call('permissions_revoke_grant', { grantId }),
+    childLock: (change) => call('permissions_child_lock', { change }),
   };
 
   readonly models: AlfaClient['models'] = {

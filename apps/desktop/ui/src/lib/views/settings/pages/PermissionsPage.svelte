@@ -12,6 +12,7 @@
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BrokerStatusCard from './BrokerStatusCard.svelte';
+  import ChildLockCard from './ChildLockCard.svelte';
   import GrantsCard from './GrantsCard.svelte';
 
   const app = useApp();
@@ -131,6 +132,7 @@
     </p>
   </section>
   <GrantsCard />
+  <ChildLockCard />
 {/if}
 
 <style>

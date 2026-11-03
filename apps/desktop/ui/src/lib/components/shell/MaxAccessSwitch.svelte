@@ -5,6 +5,7 @@
   Włączenie i zmianę zasięgu potwierdzasz raz w oknie Sędziego Cieni; wyłączenie działa od razu.
 -->
 <script lang="ts">
+  import Lock from '@lucide/svelte/icons/lock';
   import Zap from '@lucide/svelte/icons/zap';
   import type { MaxAccess } from '../../api/types-hub';
   import { showError } from '../../state/attempt';
@@ -39,7 +40,14 @@
     }
   }
 
+  // Profil Dziecko z zamkniętą kłódką: włączenie otwiera tylko PIN rodzica (wyłączyć wolno zawsze).
+  const locked = $derived(app.autonomy.locked);
+
   function toggle() {
+    if (locked && !on) {
+      app.toasts.show({ kind: 'info', message: t('child.lockedNote') });
+      return;
+    }
     void request(on ? null : scope);
   }
 
@@ -67,12 +75,14 @@
     <span class="title-wrap">
       <Zap size={16} strokeWidth={2} aria-hidden="true" />
       <span class="title" id="max-title">{t('maxAccess.name')}</span>
+      {#if locked && !on}<Lock size={14} strokeWidth={2} aria-hidden="true" />{/if}
     </span>
     <button
       type="button"
       role="switch"
       class="switch"
       aria-checked={on !== null}
+      aria-disabled={locked && !on ? true : undefined}
       aria-labelledby="max-title"
       aria-describedby="max-desc"
       aria-busy={busy}
@@ -82,7 +92,11 @@
     </button>
   </div>
   <p class="desc" id="max-desc">
-    {on ? t('maxAccess.onDesc', { where: t(`maxAccess.scope.${on}`) }) : t('maxAccess.desc')}
+    {on
+      ? t('maxAccess.onDesc', { where: t(`maxAccess.scope.${on}`) })
+      : locked
+        ? t('child.askParent')
+        : t('maxAccess.desc')}
   </p>
   <div
     class="scopes"

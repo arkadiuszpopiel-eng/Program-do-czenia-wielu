@@ -1,7 +1,14 @@
 // Interfejsy Brokera: stan (`broker_status`) i uprawnienia `permissions_*` (części `AlfaClient`).
 import type { AutonomyLevel } from './types';
 import type { BrokerStatusView } from './types-broker';
-import type { BrokerIntentResult, GrantView, MaxAccess, PermissionsState } from './types-hub';
+import type {
+  BrokerIntentResult,
+  ChildLockRequest,
+  ChildLockState,
+  GrantView,
+  MaxAccess,
+  PermissionsState,
+} from './types-hub';
 
 /** Broker: tylko odczyt stanu — zmiany i zatwierdzenia wyłącznie w oknie Brokera. */
 export interface BrokerApi {
@@ -29,4 +36,9 @@ export interface PermissionsApi extends GrantsApi {
    * Cieni; `null` wyłącza od razu.
    */
   requestMaxAccess(scope: MaxAccess | null): Promise<BrokerIntentResult>;
+  /**
+   * Profil Dziecko (plan 50 §4.4): `null` — odczyt; zmiana z PIN-em rodzica, który sprawdza
+   * wyłącznie Sędzia Cieni (zły PIN — `invalid_input`).
+   */
+  childLock(change: ChildLockRequest | null): Promise<ChildLockState>;
 }

@@ -10,6 +10,7 @@
 -->
 <script lang="ts">
   import Check from '@lucide/svelte/icons/check';
+  import Lock from '@lucide/svelte/icons/lock';
   import type { AutonomyLevel } from '../../api/types';
   import { modeItems, requestMode } from '../../logic/work-mode';
   import { showError } from '../../state/attempt';
@@ -54,7 +55,14 @@
     return state.session ?? state.global;
   }
 
+  /** Tryb za kłódką rodzica (profil Dziecko, plan 50 §4.4): Plan i Ręcznie zostają otwarte. */
+  const behindLock = (level: AutonomyLevel) => app.autonomy.locked && level > 'L1';
+
   async function choose(level: AutonomyLevel) {
+    if (behindLock(level)) {
+      app.toasts.show({ kind: 'info', message: t('child.lockedNote') });
+      return;
+    }
     onclose();
     if (level === current) return;
     // Plan i wyjście z Planu dotyczą otwartej rozmowy; bez rozmowy — poziomu globalnego.
@@ -129,19 +137,27 @@
         aria-checked={level === current}
         class="item"
         class:full={level === 'L4'}
+        class:locked={behindLock(level)}
+        aria-disabled={behindLock(level) ? true : undefined}
         onclick={() => void choose(level)}
       >
         <span class="text">
           <span class="name">{tk(`mode.${level}.name`)}</span>
-          <span class="desc">{tk(`mode.${level}.desc`)}</span>
+          <span class="desc"
+            >{behindLock(level) ? t('child.askParent') : tk(`mode.${level}.desc`)}</span
+          >
         </span>
         <span class="mark" aria-hidden="true">
-          {#if level === current}<Check size={16} strokeWidth={2} />{/if}
+          {#if level === current}<Check
+              size={16}
+              strokeWidth={2}
+            />{:else if behindLock(level)}<Lock size={14} strokeWidth={2} />{/if}
         </span>
         <span class="key" aria-hidden="true">{i + 1}</span>
       </button>
     {/each}
   </div>
+  {#if app.autonomy.locked}<p class="note own">{t('child.lockedNote')}</p>{/if}
   {#if own}<p class="note own">{t('mode.sessionOwn', { mode: tk(`mode.${own}.name`) })}</p>{/if}
   <MaxAccessSwitch />
   <p class="note">{t('mode.note')}</p>
@@ -204,6 +220,11 @@
   }
   .full .name {
     color: var(--alfa-color-warning);
+  }
+  /* Profil Dziecko: tryb za kłódką rodzica — wyciszony, z kłódką zamiast znacznika. */
+  .locked .name,
+  .locked .mark {
+    color: var(--alfa-color-text-muted);
   }
   .desc,
   .note {
