@@ -99,6 +99,8 @@
     "allow-transfer-rollback",
     "allow-permissions-get",
     "allow-permissions-request-level",
+    "allow-permissions-request-max-access",
+    "allow-permissions-child-lock",
     "allow-permissions-open-approval",
     "allow-permissions-grants",
     "allow-permissions-revoke-grant",
