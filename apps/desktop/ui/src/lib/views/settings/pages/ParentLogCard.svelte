@@ -1,7 +1,8 @@
 <!--
   Dziennik rodzica (plan 50 §4.4, Z.7; ADR 0029 pkt 2): po PIN-ie rodzica — rozmowy (temat, czas)
-  i działania agentek z osi czasu (narzędzia, Audyt: zgody, odmowy, blokady, kłódka). Treść
-  rozmów nie jest pokazywana (decyzja właściciela 3.11: włącza ją rodzic jawnie — osobny krok).
+  i działania agentek z osi czasu (narzędzia, Audyt: zgody, odmowy, blokady, kłódka). Pełną treść
+  rozmów rodzic włącza jawnie PIN-em (decyzja właściciela 3.11; przełącznik w Sędzim, dziecko
+  widzi wtedy stały znak w belce) — dopiero wtedy przy rozmowie jest „Pokaż treść”.
   PIN sprawdza Sędzia Cieni z tym samym limitem prób; dziennik znika po „Ukryj” i po wyjściu.
 -->
 <script lang="ts">
@@ -9,6 +10,7 @@
   import type { TimelineEvent, TimelineKind } from '../../../api/types';
   import { showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
+  import ParentTranscript from './ParentTranscript.svelte';
 
   /** Najwięcej rozmów i działań na rozmowę w dzienniku. */
   const SESSIONS = 20;
@@ -27,6 +29,11 @@
   let busy = $state(false);
   let failed = $state(false);
   let log = $state<Entry[] | null>(null);
+  /** Pełna treść rozmów włączona przez rodzica (stan z Sędziego). */
+  let transcripts = $state(false);
+  let switchPin = $state('');
+  /** Rozmowy z rozwiniętą treścią. */
+  let reading = $state<string[]>([]);
 
   async function load() {
     const sessions = [...(await app.client.sessions.list())]
@@ -59,12 +66,37 @@
       return;
     }
     try {
+      transcripts = (await app.client.permissions.childLock(null)).transcripts;
       await load();
     } catch {
       failed = true;
     } finally {
       busy = false;
     }
+  }
+
+  /** Włącza albo wyłącza pełną treść (PIN jeszcze raz — zmiana widoczna dla dziecka). */
+  async function toggleTranscripts(event: SubmitEvent) {
+    event.preventDefault();
+    const given = switchPin;
+    switchPin = '';
+    const on = !transcripts;
+    try {
+      const state = await app.client.permissions.childLock({ op: 'transcripts', pin: given, on });
+      transcripts = state.transcripts;
+      if (!transcripts) reading = [];
+      app.toasts.show({
+        kind: 'success',
+        message: t(on ? 'parentLog.transcriptsOn' : 'parentLog.transcriptsOff'),
+      });
+      await app.autonomy.load(app.client.permissions);
+    } catch (error) {
+      showError(app.toasts, error);
+    }
+  }
+
+  function toggleReading(id: string) {
+    reading = reading.includes(id) ? reading.filter((x) => x !== id) : [...reading, id];
   }
 </script>
 
@@ -86,8 +118,28 @@
     {#if failed}<p class="desc" role="alert">{t('parentLog.failed')}</p>{/if}
   {:else}
     <div>
-      <Button onclick={() => (log = null)}>{t('parentLog.hide')}</Button>
+      <Button
+        onclick={() => {
+          log = null;
+          reading = [];
+        }}>{t('parentLog.hide')}</Button
+      >
     </div>
+    <form class="row" onsubmit={toggleTranscripts}>
+      <TextField
+        label={t('child.pin')}
+        type="password"
+        inputmode="numeric"
+        maxlength={8}
+        bind:value={switchPin}
+      />
+      <Button type="submit" disabled={!switchPin}
+        >{t(transcripts ? 'parentLog.disableTranscripts' : 'parentLog.enableTranscripts')}</Button
+      >
+    </form>
+    <p class="desc">
+      {t(transcripts ? 'parentLog.transcriptsNoteOn' : 'parentLog.transcriptsNote')}
+    </p>
     {#if log.length === 0}
       <p class="desc">{t('parentLog.empty')}</p>
     {:else}
@@ -95,6 +147,14 @@
         {#each log as s (s.id)}
           <li>
             <h4>{t('parentLog.session', { title: s.title, when: s.when })}</h4>
+            {#if transcripts}
+              <div>
+                <Button size="sm" onclick={() => toggleReading(s.id)}
+                  >{t(reading.includes(s.id) ? 'parentLog.hideText' : 'parentLog.showText')}</Button
+                >
+              </div>
+              {#if reading.includes(s.id)}<ParentTranscript sessionId={s.id} />{/if}
+            {/if}
             {#if s.events.length === 0}
               <p class="desc">{t('parentLog.none')}</p>
             {:else}

@@ -74,6 +74,9 @@ pub fn to_child(change: ChildLockRequest) -> Result<ChildLockChange, AppError> {
         },
         ChildLockRequest::Close => ChildLockChange::Close,
         ChildLockRequest::Verify { pin: p } => ChildLockChange::Verify { pin: pin(&p)? },
+        ChildLockRequest::Transcripts { pin: p, on } => {
+            ChildLockChange::Transcripts { pin: pin(&p)?, on }
+        }
     })
 }
 
@@ -88,6 +91,7 @@ pub fn from_child(v: ChildLockView) -> ChildLockState {
         attempts_left: v.attempts_left,
         tamper_resistant: v.tamper_resistant,
         unknown: v.unknown,
+        transcripts: v.transcripts,
     }
 }
 

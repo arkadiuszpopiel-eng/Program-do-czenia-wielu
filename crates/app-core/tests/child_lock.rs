@@ -83,6 +83,14 @@ async fn parent_pin_locks_and_opens_the_modes() {
         .await
         .unwrap();
     assert!(!closed.open);
+    // Pełna treść rozmów w dzienniku rodzica — tylko PIN-em (Z.7).
+    let reads = core
+        .permissions_child_lock(change(
+            serde_json::json!({ "op": "transcripts", "pin": "2468", "on": true }),
+        ))
+        .await
+        .unwrap();
+    assert!(reads.transcripts);
     let off = core
         .permissions_child_lock(change(
             serde_json::json!({ "op": "enable", "pin": "2468", "on": false }),

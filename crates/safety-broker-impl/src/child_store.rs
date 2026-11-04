@@ -62,6 +62,9 @@ pub(crate) struct Record {
     pub(crate) blocked_until_ms: u64,
     #[serde(default)]
     blocks: u32,
+    /// Pełna treść rozmów w dzienniku rodzica.
+    #[serde(default)]
+    pub(crate) transcripts: bool,
 }
 
 /// Wynik sprawdzenia PIN-u.

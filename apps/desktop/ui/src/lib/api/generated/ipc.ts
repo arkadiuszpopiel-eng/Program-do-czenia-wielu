@@ -977,6 +977,11 @@ export type ChildLockRequest =
   | {
       readonly op: 'verify';
       readonly pin: SecretInput;
+    }
+  | {
+      readonly on: boolean;
+      readonly op: 'transcripts';
+      readonly pin: SecretInput;
     };
 
 /** Profil Dziecko (plan 50 §4.4): stan kłódki trybów pracy (bez PIN-u). */
@@ -992,6 +997,8 @@ export interface ChildLockState {
   readonly pin_set: boolean;
   /** Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna. */
   readonly tamper_resistant: boolean;
+  /** Rodzic włączył pełną treść rozmów w dzienniku (dziecko widzi stały znak). */
+  readonly transcripts: boolean;
   /** Stan nieznany (zerwane łącze z Sędzią); interfejs pokazuje ostatni znany stan i „nieznany”. */
   readonly unknown: boolean;
 }

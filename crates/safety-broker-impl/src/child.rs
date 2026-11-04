@@ -84,6 +84,7 @@ impl BrokerEngine {
             attempts_left: store.attempts_left(),
             tamper_resistant: store.tamper_resistant,
             unknown: false,
+            transcripts: store.record.transcripts,
         }
     }
 
@@ -103,6 +104,8 @@ impl BrokerEngine {
             ChildLockChange::Open { .. } => ("open", true),
             ChildLockChange::Close => ("close", false),
             ChildLockChange::Verify { .. } => ("verify", true),
+            ChildLockChange::Transcripts { on: true, .. } => ("transcripts_on", true),
+            ChildLockChange::Transcripts { on: false, .. } => ("transcripts_off", true),
         };
         match self.apply_child(&mut store, change, now, op) {
             Ok(()) if !widening => {
@@ -135,6 +138,17 @@ impl BrokerEngine {
             ChildLockChange::Verify { pin } => {
                 Self::require(store, &pin, now)?;
                 self.granted(op)
+            }
+            ChildLockChange::Transcripts { pin, on } => {
+                Self::require(store, &pin, now)?;
+                // W obie strony najpierw Audyt — dziecko i rodzic widzą w dzienniku, kto i kiedy.
+                self.granted(op)?;
+                let before = store.record.transcripts;
+                store.record.transcripts = on;
+                store.save().map_err(|e| {
+                    store.record.transcripts = before;
+                    io(&e)
+                })
             }
             ChildLockChange::Close => {
                 if store.locks() {

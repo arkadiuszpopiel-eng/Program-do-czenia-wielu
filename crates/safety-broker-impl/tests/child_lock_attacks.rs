@@ -133,3 +133,51 @@ async fn guessing_the_pin_in_open_counts_and_blocks() {
     // Zamknięcie i obniżenie działają zawsze (bez PIN-u).
     assert!(b.change_child_lock(ChildLockChange::Close).await.is_ok());
 }
+
+/// Z.7 (decyzja właściciela 3.11): pełną treść rozmów w dzienniku włącza tylko rodzic PIN-em;
+/// przełącznik w zapisie Sędziego (przetrwa restart), w Audycie rodzaj zmiany bez PIN-u.
+#[tokio::test]
+async fn transcripts_switch_needs_the_parent_pin() {
+    let dir = tempfile::tempdir().unwrap();
+    let clock = Arc::new(ManualClock::new(1_000_000));
+    let audit = Arc::new(MemoryAudit::default());
+    let b = common::engine_with(test_policy(), clock.clone(), audit.clone()).with_child_lock(
+        dir.path().join(CHILD_LOCK_FILE),
+        PinParams::FAST_FOR_TESTS,
+        true,
+    );
+    locked(&b).await;
+    assert!(!b.child_lock().transcripts, "domyślnie tylko tematy");
+    let wrong = ChildLockChange::Transcripts {
+        pin: pin("1357"),
+        on: true,
+    };
+    assert!(b.change_child_lock(wrong).await.is_err());
+    assert!(!b.child_lock().transcripts);
+    assert_eq!(b.child_lock().attempts_left, 4, "zła próba liczona");
+    let on = ChildLockChange::Transcripts {
+        pin: pin("2468"),
+        on: true,
+    };
+    assert!(b.change_child_lock(on).await.unwrap().transcripts);
+    let text = format!("{:?}", audit.events());
+    assert!(text.contains("transcripts_on") && !text.contains("2468"));
+    drop(b);
+    let b = broker(dir.path(), &clock);
+    assert!(b.child_lock().transcripts, "przetrwa restart Sędziego");
+    // Bez Audytu nie zmienia się w żadną stronę.
+    let audit = Arc::new(MemoryAudit::default());
+    let b2 = common::engine_with(test_policy(), clock.clone(), audit.clone()).with_child_lock(
+        dir.path().join(CHILD_LOCK_FILE),
+        PinParams::FAST_FOR_TESTS,
+        true,
+    );
+    drop(b);
+    audit.set_failing(true);
+    let off = ChildLockChange::Transcripts {
+        pin: pin("2468"),
+        on: false,
+    };
+    assert!(b2.change_child_lock(off).await.is_err());
+    assert!(b2.child_lock().transcripts);
+}

@@ -114,7 +114,8 @@
       "open": false,
       "attempts_left": 5,
       "tamper_resistant": false,
-      "unknown": false
+      "unknown": false,
+      "transcripts": false
     }
   },
   {
@@ -133,7 +134,8 @@
       "open_until_ms": 1793479600000,
       "attempts_left": 5,
       "tamper_resistant": false,
-      "unknown": false
+      "unknown": false,
+      "transcripts": false
     }
   },
   {
@@ -152,7 +154,8 @@
       "blocked_until_ms": 1793477000000,
       "attempts_left": 0,
       "tamper_resistant": false,
-      "unknown": false
+      "unknown": false,
+      "transcripts": false
     }
   },
   {
@@ -169,7 +172,8 @@
       "open": false,
       "attempts_left": 5,
       "tamper_resistant": false,
-      "unknown": false
+      "unknown": false,
+      "transcripts": false
     }
   }
 ]

@@ -53,6 +53,7 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
           attempts_left: 5,
           tamper_resistant: false,
           unknown: false,
+          transcripts: false,
         },
         {
           pin_set: true,
@@ -61,6 +62,7 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
           attempts_left: 5,
           tamper_resistant: false,
           unknown: false,
+          transcripts: false,
         },
       ];
       let reads = 0;
@@ -80,7 +82,13 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
   });
 
   it('stan profilu nieznany (zerwane łącze) — zostaje ostatni znany stan kłódki', async () => {
-    const base = { pin_set: true, open: false, attempts_left: 5, tamper_resistant: false };
+    const base = {
+      pin_set: true,
+      open: false,
+      attempts_left: 5,
+      tamper_resistant: false,
+      transcripts: false,
+    };
     const states: ChildLockState[] = [
       { ...base, enabled: true, unknown: false },
       { ...base, pin_set: false, enabled: false, unknown: true },

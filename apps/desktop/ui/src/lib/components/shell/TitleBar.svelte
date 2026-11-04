@@ -18,6 +18,7 @@
   import CastStrip from './CastStrip.svelte';
   import MicIndicator from './MicIndicator.svelte';
   import ModeBadge from './ModeBadge.svelte';
+  import ParentReadsBadge from './ParentReadsBadge.svelte';
   import TitleLed from './TitleLed.svelte';
   import WindowControls from './WindowControls.svelte';
 
@@ -138,6 +139,7 @@
       {#if live}<live.gui /><live.camera />{/if}
       <MicIndicator />
     </div>
+    <ParentReadsBadge />
     <ModeBadge />
     <div class="group tools">
       {#if app.view !== 'settings' && !simple}

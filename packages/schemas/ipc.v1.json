@@ -3577,6 +3577,27 @@
             "pin"
           ],
           "type": "object"
+        },
+        {
+          "description": "Pełna treść rozmów w dzienniku rodzica (dziecko widzi stały znak).",
+          "properties": {
+            "on": {
+              "type": "boolean"
+            },
+            "op": {
+              "const": "transcripts",
+              "type": "string"
+            },
+            "pin": {
+              "$ref": "#/$defs/SecretInput"
+            }
+          },
+          "required": [
+            "op",
+            "pin",
+            "on"
+          ],
+          "type": "object"
         }
       ]
     },
@@ -3621,6 +3642,11 @@
           "description": "Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna.",
           "type": "boolean"
         },
+        "transcripts": {
+          "default": false,
+          "description": "Rodzic włączył pełną treść rozmów w dzienniku (dziecko widzi stały znak).",
+          "type": "boolean"
+        },
         "unknown": {
           "default": false,
           "description": "Stan nieznany (zerwane łącze z Sędzią); interfejs pokazuje ostatni znany stan i „nieznany”.",
@@ -3633,7 +3659,8 @@
         "open",
         "attempts_left",
         "tamper_resistant",
-        "unknown"
+        "unknown",
+        "transcripts"
       ],
       "type": "object"
     },

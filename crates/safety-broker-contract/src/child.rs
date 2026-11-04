@@ -123,6 +123,14 @@ pub enum ChildLockChange {
         /// PIN rodzica.
         pin: Pin,
     },
+    /// Pełna treść rozmów w dzienniku rodzica (decyzja właściciela 3.11, ADR 0029 pkt 2): włącza
+    /// rodzic jawnie PIN-em; dziecko widzi wtedy stały znak.
+    Transcripts {
+        /// PIN rodzica.
+        pin: Pin,
+        /// `true` — dziennik pokazuje treść rozmów.
+        on: bool,
+    },
 }
 
 /// Stan profilu Dziecko dla interfejsu (bez PIN-u i skrótu).
@@ -148,6 +156,9 @@ pub struct ChildLockView {
     /// „bez PIN-u”; samą kłódkę i tak sprawdza Sędzia przy każdym działaniu.
     #[serde(default)]
     pub unknown: bool,
+    /// Rodzic włączył pełną treść rozmów w dzienniku (dziecko widzi stały znak).
+    #[serde(default)]
+    pub transcripts: bool,
 }
 
 impl ChildLockView {

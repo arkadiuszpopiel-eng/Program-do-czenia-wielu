@@ -196,3 +196,41 @@ for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
     });
   }
 }
+
+// Z.7 (decyzja właściciela 3.11): pełną treść rozmów rodzic włącza PIN-em; dziecko widzi wtedy
+// stały znak „Rodzic czyta” w belce. Każdy styl i motyw.
+for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`pełna treść rozmów w dzienniku rodzica — ${skin}, ${theme}`, async ({ page }) => {
+      await open(page, skin, theme, 'locked');
+      const sign = page.getByRole('img', { name: /^Rodzic może czytać treść rozmów/ });
+      await expect(sign).toHaveCount(0);
+      await openCard(page);
+      const card = page.getByRole('region', { name: 'Dziennik rodzica' });
+      await card.getByLabel('PIN rodzica', { exact: true }).fill('2468');
+      await card.getByRole('button', { name: 'Pokaż dziennik' }).click();
+      const log = card.getByRole('list', { name: 'Dziennik rodzica' });
+      await expect(log).toBeVisible();
+      await expect(log.getByRole('button', { name: 'Pokaż treść' })).toHaveCount(0);
+      const pin = card.getByLabel('PIN rodzica', { exact: true });
+      await pin.fill('1111');
+      await card.getByRole('button', { name: 'Włącz pełną treść rozmów' }).click();
+      await expect(page.getByText('błędny PIN rodzica')).toBeVisible();
+      await expect(sign).toHaveCount(0);
+      await pin.fill('2468');
+      await card.getByRole('button', { name: 'Włącz pełną treść rozmów' }).click();
+      await expect(sign).toBeVisible();
+      await log.getByRole('button', { name: 'Pokaż treść' }).first().click();
+      const text = card.getByRole('list', { name: 'Treść rozmowy' }).first();
+      await expect(
+        text.or(card.getByText('Brak wiadomości w tej rozmowie.')).first(),
+      ).toBeVisible();
+      await expectAccessible(page, `treść rozmów ${skin} ${theme}`);
+      await expectReadable(page, `treść rozmów ${skin} ${theme}`);
+      await pin.fill('2468');
+      await card.getByRole('button', { name: 'Wyłącz pełną treść rozmów' }).click();
+      await expect(sign).toHaveCount(0);
+      await expect(log.getByRole('button', { name: 'Pokaż treść' })).toHaveCount(0);
+    });
+  }
+}

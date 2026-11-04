@@ -2,6 +2,7 @@
 // prób i blokada 15 min, kłódka obniża tryb do „Ręcznie” i odrzuca podniesienia. Stan startowy
 // z adresu: `?child=locked` (PIN atrapy 2468), `open` (otwarta do zamknięcia Alfy), `off` (PIN
 // ustawiony, profil wyłączony), `unknown` (zerwane łącze z Sędzią); bez parametru — brak PIN-u.
+// `&transcripts=on` — rodzic włączył pełną treść rozmów w dzienniku.
 import { CommandError } from '../command-error';
 import type { AutonomyLevel } from '../types';
 import type { ChildLockRequest, ChildLockState } from '../types-hub';
@@ -31,6 +32,9 @@ export function childLockFake(core: FakeCore): FakeChildLock {
   let blockedUntil = 0;
   /** Zerwane łącze z Sędzią: stan nieznany, zmiany odrzucone. */
   const unknown = mode === 'unknown';
+  /** Pełna treść rozmów w dzienniku rodzica (`?transcripts=on`). */
+  let transcripts =
+    new URLSearchParams(globalThis.location?.search ?? '').get('transcripts') === 'on';
 
   const isOpen = () => enabled && openUntil !== null && Date.now() < openUntil;
   const state = (): ChildLockState => ({
@@ -43,6 +47,7 @@ export function childLockFake(core: FakeCore): FakeChildLock {
     // Atrapa jak tryb przenośny: Sędzia na koncie użytkownika — ochrona umowna.
     tamper_resistant: false,
     unknown,
+    transcripts,
   });
   const refuse = (message: string) =>
     Promise.reject(new CommandError('invalid_input', `Sędzia Cieni: ${message}`));
@@ -96,6 +101,10 @@ export function childLockFake(core: FakeCore): FakeChildLock {
         break;
       case 'verify':
         error = check(change.pin);
+        break;
+      case 'transcripts':
+        error = check(change.pin);
+        if (error === null) transcripts = change.on;
         break;
       case 'open':
         if (!enabled) error = 'profil Dziecko jest wyłączony';

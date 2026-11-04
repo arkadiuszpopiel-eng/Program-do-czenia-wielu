@@ -154,9 +154,25 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
     'Parent padlock — higher modes open with the parent PIN in Settings → Permissions.',
   'child.badge': 'Child profile — padlock closed. Click to see the modes',
   'child.badgeWord': 'Child',
+  'parentLog.enableTranscripts': 'Turn on full conversation text',
+  'parentLog.disableTranscripts': 'Turn off full conversation text',
+  'parentLog.transcriptsNote':
+    'By default the log shows only topics and actions. Full text needs the PIN — the child then sees a permanent sign in the title bar.',
+  'parentLog.transcriptsNoteOn':
+    'Full conversation text is on — the child sees the “Parent reads” sign in the title bar.',
+  'parentLog.transcriptsOn':
+    'Full conversation text is on. The child sees a sign in the title bar.',
+  'parentLog.transcriptsOff': 'Full conversation text is off.',
+  'parentLog.showText': 'Show text',
+  'parentLog.hideText': 'Hide text',
+  'parentLog.transcript': 'Conversation text',
+  'parentLog.noText': 'No messages in this conversation.',
+  'parentLog.child': 'child',
+  'parentLog.readsBadge': 'A parent can read the conversations (child profile)',
+  'parentLog.readsWord': 'Parent reads',
   'parentLog.title': 'Parent log',
   'parentLog.intro':
-    'What happened in Alfa: conversation topics, agent actions (tools, websites, files), permissions, refusals and padlock attempts. Conversation content is not shown here. The parent PIN opens the log.',
+    'What happened in Alfa: conversation topics, agent actions (tools, websites, files), permissions, refusals and padlock attempts. Conversation content is not shown here unless you turn it on with the PIN. The parent PIN opens the log.',
   'parentLog.show': 'Show the log',
   'parentLog.hide': 'Hide the log',
   'parentLog.empty': 'No recorded conversations.',

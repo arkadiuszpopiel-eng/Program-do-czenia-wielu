@@ -168,6 +168,9 @@ pub struct ChildLockState {
     /// Stan nieznany (zerwane łącze z Sędzią); interfejs pokazuje ostatni znany stan i „nieznany”.
     #[serde(default)]
     pub unknown: bool,
+    /// Rodzic włączył pełną treść rozmów w dzienniku (dziecko widzi stały znak).
+    #[serde(default)]
+    pub transcripts: bool,
 }
 
 /// Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni.
@@ -190,4 +193,6 @@ pub enum ChildLockRequest {
     Close,
     /// Sprawdzenie PIN-u przed dziennikiem rodzica (bez zmiany stanu, ten sam limit prób).
     Verify { pin: SecretInput },
+    /// Pełna treść rozmów w dzienniku rodzica (dziecko widzi stały znak).
+    Transcripts { pin: SecretInput, on: bool },
 }
