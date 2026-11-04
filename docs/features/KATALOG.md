@@ -166,7 +166,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `models_verify` | aplikacja, bieg aplikacji |  |
 | `modules_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `modules_set_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
-| `permissions_child_lock` | rdzeń, aplikacja |  |
+| `permissions_child_lock` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_get` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_grants` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_open_approval` | rdzeń, aplikacja, bieg aplikacji |  |

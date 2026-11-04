@@ -4,16 +4,19 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "b8c92890-d32a-48cf-afcf-c2baf7ce1924 (Alfa AI Laptop — jedyna rozmowa projektu od 1.11)",
-    "updated": "2026-11-03T20:00:00+01:00"
+    "updated": "2026-11-04T03:40:00+01:00"
   },
-  "current_state": "gałąź robocza ccr-af4b63c6-3fyzaj (= „main” tej kopii; origin/main starszy): 0.0.84 + poprawki po niej (bez pełnej bramki). Gałąź do-przegladu-tryby-zgod: etap Z (plan 50) — Z.2 zrobione, Z.1 częściowo; czeka na przegląd człowieka. Czysta kopia F:\\Kopie zapasowe programów Spopielony\\Alfa\\kopia-2026-11-03_1959 (1fe129d7, 71 MB, SHA-256 5815/0 błędów, paczka git 34 gałęzie). Raport alfa/docs/plan/51-raport-2026-11-03-wieczor.md; pełny zestaw przeglądarkowy 771/771.",
-  "session_goal": "Właściciel 1.11 ok. 19:50: „Posprzątaj, potem wykonaj zaległości, potem pracuj dalej nad poprawkami i ulepszeniami — wszelkie testy i poprawki do 5:00; pracujesz automatycznie, mnie nie będzie. Po 5:10/5:15 najpóźniej kopia na F: (Kopie zapasowe programów Spopielony), po kopii zapis pracy w pełnej dokumentacji w katalogu projektu i STOP.”",
+  "current_state": "**Bieżący (2026-11-04 noc, 3:30):** etap Z (plan alfa/docs/plan/50 — zgody jak w Claude Code i Codex) na gałęzi `do-przegladu-tryby-zgod` (NIE scalona — safety-broker, broker-ui, klasyfikator czekają na przegląd człowieka). Zrobione: Z.1 Max dostęp (zasięg lokalne/chmura/wszystkie; „chmura” tylko modele w chmurze i mosty CLI, działania bez modelu tylko „wszystkie”), Z.2 Akceptuj edycje + ścieżki chronione (także dowiązania w folderze pracy i usunięcie/przeniesienie/kopia katalogu z `.git` — fakt `contains_protected`), Z.3 okno zgody z przełączeniem, Z.5 Plan (L0), Z.6 profil Dziecko (kłódka w Sędzim, PIN Argon2id, stan „nieznany” przy zerwanym łączu), Z.7 dziennik rodzica + pełna treść włączana PIN-em (znak „Rodzic czyta” w belce), Z.8 testy (tabela tryb × kategoria, ataki na kłódkę, prawdziwe okno). Bramka `verify wersja` 236f9b2d ZIELONA 20/20: Rust 3422/0/43, vitest 553, Playwright 845, prawdziwa aplikacja 63 (98,6 % poleceń). Zostaje: Z.4 model-sędzia, otwarcie kłódki „do końca rozmowy” (sufit per rozmowa), decyzje właściciela z raportu 52 §4. Raport alfa/docs/plan/52-raport-2026-11-04-noc.md; czysta kopia F:\\Kopie zapasowe programów Spopielony\\Alfa\\kopia-2026-11-04 (po końcowym commicie; wynik w raporcie 52 §6).",
+  "session_goal": "Właściciel 3.11: „Prace kontynuuj automatycznie sam do 4:30 poprawki i ulepszenia (plan nasz), mnie w tym czasie nie będzie! potem przeprowadź testy i po nich zrób kopie bezpieczeństwa na dysku F: w katalogu - Kopie zapasowe programów Spopielony (i zakończ prace po tym)”.",
   "in_progress": [
-    "Etap Z (plan 50): Z.1 Max dostęp (czerwony przełącznik lokalne/chmura/wszystkie) — Sędzia musi znać pochodzenie modelu agentki; L0 → „Plan” razem z Z.5.",
-    "Z.3 okno zgody z 4 opcjami; Z.4 model-sędzia + bezpiecznik 3/20; Z.6 profil Dziecko + PIN (Argon2id w Menedżerze poświadczeń); Z.7 dziennik rodzica; Z.8 testy.",
-    "Następna wersja (0.0.85): pełne verify wersja dla zmian po 0.0.84 na main."
+    "Etap Z na gałęzi do-przegladu-tryby-zgod — czeka na przegląd człowieka (Sędzia, broker-ui, klasyfikator).",
+    "Z.4 model-sędzia dla „Automatycznie” (nowy moduł approval-judge) — nie zaczęty.",
+    "Z.7: otwarcie kłódki „do końca rozmowy” — wymaga sufitu kłódki per rozmowa w Sędzim."
   ],
-  "blocking_issues": [],
+  "blocking_issues": [
+    "Decyzja właściciela: profil Dziecko poza usługą Windows (ochrona umowna) — dopuścić z ostrzeżeniem czy wymagać usługi.",
+    "Decyzja przy przeglądzie: skrót PIN-u w pliku Sędziego zamiast Menedżera poświadczeń."
+  ],
   "next_session": [
     "Po decyzji właściciela: przegląd człowieka i scalenie gałęzi do-przegladu-broker-2026-10-28 (do 6407c88f; scalenie = nowa wersja z verify); ewentualnie wdrożenie docs/plan/43 (wyróżnianie czytanego zdania) i zmiana domyślnych paneli chowanych.",
     "Ctrl+Alt+Space zajęty przez inny program na PC (Szybkie pytanie Alfy) — właściciel może zmienić skrót; test laptop_voice losowy pod obciążeniem; sprawdzić też, czy UI mówi o tym właścicielowi (ostrzeżenie przy starcie od 0.0.71).",
@@ -44,12 +47,13 @@
       "alfa-docs (podgląd HTML)": 5180
     }
   },
-  "test_results": "verify wersja 0.0.84 (fe9afd2b) ZIELONE 20/20; widoczne testy 23/23; próba obowiązków 4/5 zielone + prices czeka na zgodę; F3 15/35 (815adb94), 13/35 (3c1606f9); testy crate'ów po 78b9b1bf zielone (tools-fs, tools-shell, agent-runtime) — wynik app-core/app-agents/app-tasks/app-chat w raporcie 49 §7.",
+  "test_results": "verify wersja 236f9b2d ZIELONE 20/20 (4.11 2:40–3:25): Rust 3422/0/43, vitest 553, Playwright 845, aplikacja 63/63 (281/285 poleceń), cargo deny ok, katalog 605/605.",
   "decisions_this_session": [
     "3.11: zgody jak Claude Code/Codex — 5 trybów, Max dostęp z wyborem lokalne/chmura/wszystkie, dziennik rodzica jak ADR 0029, dziecko bez PIN-u tylko Plan i Ręcznie (plan 50 §7)."
   ],
   "next_steps": [
-    "Przegląd człowieka gałęzi do-przegladu-tryby-zgod (deaaf0a1, 72214cc2 — safety-broker-contract, risk-classifier-contract, broker-ui-contract) i decyzja o scaleniu.",
-    "Plan 50 §8: otwarte luki ochrony (usuwanie przodka .git, dowiązania w folderze pracy, zapis pośredni git)."
+    "Przegląd człowieka gałęzi do-przegladu-tryby-zgod i scalenie.",
+    "Z.4 model-sędzia + bezpiecznik 3/20 + dziennik.",
+    "Otwarte z planu 50 §8: zapis pośredni (git commit do .git) — piaskownica zapisu; zegar systemowy a terminy kłódki."
   ]
 }
