@@ -180,4 +180,16 @@ async fn transcripts_switch_needs_the_parent_pin() {
     };
     assert!(b2.change_child_lock(off).await.is_err());
     assert!(b2.child_lock().transcripts);
+    // Wyłączenie profilu kończy pełną treść — po ponownym włączeniu rodzic decyduje od nowa.
+    audit.set_failing(false);
+    let disable = ChildLockChange::Enable {
+        pin: pin("2468"),
+        on: false,
+    };
+    assert!(!b2.change_child_lock(disable).await.unwrap().transcripts);
+    let enable = ChildLockChange::Enable {
+        pin: pin("2468"),
+        on: true,
+    };
+    assert!(!b2.change_child_lock(enable).await.unwrap().transcripts);
 }

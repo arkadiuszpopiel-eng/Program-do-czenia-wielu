@@ -264,7 +264,10 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   oraz działania z osi czasu (narzędzia, Audyt). **Pełna treść rozmów (4.11 noc):** przełącznik w zapisie
   kłódki w Sędzim (`ChildLockChange::Transcripts`, PIN rodzica, Audyt przed zmianą w obie strony, przetrwa
   restart); po włączeniu przy rozmowie „Pokaż treść” (zwykły tekst, ostatnie 40 tur), dziecko widzi w belce stały
-  znak „Rodzic czyta”. „Do końca rozmowy” jako czas otwarcia — jeszcze nie (sufit kłódki per rozmowa).
+  znak „Rodzic czyta”. Przegląd 4.11: znak brany z tego samego odczytu Sędziego co treść, błąd odczytu go nie
+  zdejmuje, wyłączenie profilu zeruje przełącznik (po ponownym włączeniu rodzic decyduje od nowa); drobne
+  otwarte — przy nieudanym zapisie pliku Audyt ma wpis „ok”, a potem „błąd”. „Do końca rozmowy” jako czas
+  otwarcia — jeszcze nie (sufit kłódki per rozmowa).
 - **Przegląd w świeżym kontekście (3.11, zakres Z.1/Z.3/Z.5):** nic krytycznego; 3 poważne poprawione w 29946562
   (strażnik nie cofa przełączenia przy czekającej prośbie, znacznik zamiast każdego wpisu bez terminu, pochodzenie
   „lokalne” z nazwy modelu tylko u Routera), z drobnych poprawione: kolejność Audytu przy przełączeniu, brak

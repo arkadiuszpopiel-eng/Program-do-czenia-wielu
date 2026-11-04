@@ -177,11 +177,15 @@ impl BrokerEngine {
                 if !on {
                     self.granted(op)?;
                 }
-                let before = store.record.enabled;
+                let (before, reads) = (store.record.enabled, store.record.transcripts);
                 store.record.enabled = on;
+                // Wyłączenie profilu kończy też pełną treść w dzienniku — po ponownym włączeniu
+                // rodzic decyduje o niej od nowa (znak dla dziecka zależy od obu).
+                store.record.transcripts &= on;
                 if let Err(e) = store.save() {
                     // Włączenie obowiązuje i bez zapisu (bezpieczny kierunek); wyłączenie — nie.
                     store.record.enabled = before || on;
+                    store.record.transcripts = reads;
                     if store.record.enabled {
                         self.set_ceiling(Some(ChildCeiling::locked()), now);
                     }

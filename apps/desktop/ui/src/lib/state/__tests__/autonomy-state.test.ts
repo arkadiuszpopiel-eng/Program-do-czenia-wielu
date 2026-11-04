@@ -114,4 +114,31 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
     await fresh.load(lost);
     expect(fresh.locked).toBe(false);
   });
+
+  it('błąd odczytu profilu nie zdejmuje znaku „Rodzic czyta”; świeży widok z karty wprost', async () => {
+    const reading: ChildLockState = {
+      pin_set: true,
+      enabled: true,
+      open: false,
+      attempts_left: 5,
+      tamper_resistant: false,
+      unknown: false,
+      transcripts: true,
+    };
+    let fail = false;
+    const client = {
+      get: () => Promise.resolve(reply({ global: 'L1' })),
+      childLock: () => (fail ? Promise.reject(new Error('łącze')) : Promise.resolve(reading)),
+    } as unknown as PermissionsApi;
+    const autonomy = new AutonomyState();
+    await autonomy.load(client);
+    expect(autonomy.child?.transcripts).toBe(true);
+    fail = true;
+    await autonomy.load(client);
+    expect(autonomy.child?.transcripts).toBe(true);
+    autonomy.applyChild({ ...reading, transcripts: false });
+    expect(autonomy.child?.transcripts).toBe(false);
+    autonomy.applyChild({ ...reading, unknown: true, enabled: false });
+    expect(autonomy.child?.enabled).toBe(true);
+  });
 });

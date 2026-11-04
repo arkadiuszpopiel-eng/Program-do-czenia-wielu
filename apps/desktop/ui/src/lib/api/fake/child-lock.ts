@@ -97,6 +97,8 @@ export function childLockFake(core: FakeCore): FakeChildLock {
         if (error === null) {
           enabled = change.on;
           openUntil = null;
+          // Jak w Sędzim: wyłączenie profilu kończy pełną treść w dzienniku.
+          if (!change.on) transcripts = false;
         }
         break;
       case 'verify':

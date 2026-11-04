@@ -66,7 +66,10 @@
       return;
     }
     try {
-      transcripts = (await app.client.permissions.childLock(null)).transcripts;
+      const state = await app.client.permissions.childLock(null);
+      // Znak „Rodzic czyta” w belce z tego samego odczytu, z którego karta pokazuje treść.
+      app.autonomy.applyChild(state);
+      transcripts = state.enabled && state.transcripts;
       await load();
     } catch {
       failed = true;
@@ -83,13 +86,13 @@
     const on = !transcripts;
     try {
       const state = await app.client.permissions.childLock({ op: 'transcripts', pin: given, on });
-      transcripts = state.transcripts;
+      app.autonomy.applyChild(state);
+      transcripts = state.enabled && state.transcripts;
       if (!transcripts) reading = [];
       app.toasts.show({
         kind: 'success',
         message: t(on ? 'parentLog.transcriptsOn' : 'parentLog.transcriptsOff'),
       });
-      await app.autonomy.load(app.client.permissions);
     } catch (error) {
       showError(app.toasts, error);
     }

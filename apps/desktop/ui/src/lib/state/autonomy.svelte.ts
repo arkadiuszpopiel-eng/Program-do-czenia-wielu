@@ -41,13 +41,19 @@ export class AutonomyState {
           this.global = global;
           this.maxAccess = max_access ?? null;
         }
-        this.child = lost && this.child ? this.child : child;
+        // Błąd odczytu (`null`) też nie zeruje kłódki ani znaku „Rodzic czyta”.
+        this.child = (lost || child === null) && this.child ? this.child : child;
         this.watchOpen(api);
       }
       return lost ? this.global : global;
     } catch {
       return null;
     }
+  }
+
+  /** Świeży stan profilu wprost z odpowiedzi Sędziego (karta profilu, dziennik rodzica). */
+  applyChild(child: ChildLockState) {
+    if (!child.unknown) this.child = child;
   }
 
   private watchOpen(api: PermissionsApi) {
