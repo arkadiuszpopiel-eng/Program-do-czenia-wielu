@@ -1,7 +1,7 @@
 // Z.8 (plan 50 §5) w PRAWDZIWYM oknie: profil Dziecko przez rdzeń i Sędziego Cieni. PIN rodzica
 // (przez IPC — szybciej i bez zależności od układu karty), włączenie profilu, w menu „Tryb pracy”
 // wyższe tryby z kłódką i „Poproś rodzica”, przełącznik „Max dostęp” wyłączony, znak w belce.
-// Na końcu profil WYŁĄCZONY PIN-em — następny plik (zz-mode) obniża tryb bez kłódki. Profil
+// Operacje na kłódce trafiają do dziennika rozmowy (Z.7). Na końcu profil WYŁĄCZONY PIN-em — następny plik (zz-mode) obniża tryb bez kłódki. Profil
 // instancji testowej jest tymczasowy (na przebieg); przy ustawionym już PIN-ie test się pomija.
 import { expect, shot, test } from './alfa';
 import { call } from './ipc-call';
@@ -58,5 +58,17 @@ test('profil Dziecko: kłódka w menu trybów, wyłączenie PIN-em', async ({ al
       change: { op: 'enable', pin: PIN, on: false },
     });
     expect(off.enabled).toBe(false);
+  }
+  // Z.7: operacje na kłódce w dzienniku aktywnej rozmowy (wpis „audit”), bez PIN-u.
+  const boot = await call<{ active_session_id: string | null }>(main, 'app_bootstrap', {});
+  if (boot.active_session_id) {
+    const events = await call<{ title: string }[]>(main, 'timeline_list', {
+      sessionId: boot.active_session_id,
+      filter: { kinds: ['audit'], min_level: 'debug' },
+    });
+    const titles = events.map((e) => e.title);
+    expect(titles).toContain('Profil Dziecko: włączenie profilu Dziecko');
+    expect(titles).toContain('Profil Dziecko: wyłączenie profilu Dziecko');
+    expect(titles.join(' ')).not.toContain(PIN);
   }
 });
