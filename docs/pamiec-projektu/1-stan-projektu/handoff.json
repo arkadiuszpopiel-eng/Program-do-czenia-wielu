@@ -4,14 +4,12 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "b8c92890-d32a-48cf-afcf-c2baf7ce1924 (Alfa AI Laptop — jedyna rozmowa projektu od 1.11)",
-    "updated": "2026-11-04T03:40:00+01:00"
+    "updated": "2026-11-05T21:00:00+01:00"
   },
-  "current_state": "**Bieżący (2026-11-04 noc, 3:30):** etap Z (plan alfa/docs/plan/50 — zgody jak w Claude Code i Codex) na gałęzi `do-przegladu-tryby-zgod` (NIE scalona — safety-broker, broker-ui, klasyfikator czekają na przegląd człowieka). Zrobione: Z.1 Max dostęp (zasięg lokalne/chmura/wszystkie; „chmura” tylko modele w chmurze i mosty CLI, działania bez modelu tylko „wszystkie”), Z.2 Akceptuj edycje + ścieżki chronione (także dowiązania w folderze pracy i usunięcie/przeniesienie/kopia katalogu z `.git` — fakt `contains_protected`), Z.3 okno zgody z przełączeniem, Z.5 Plan (L0), Z.6 profil Dziecko (kłódka w Sędzim, PIN Argon2id, stan „nieznany” przy zerwanym łączu), Z.7 dziennik rodzica + pełna treść włączana PIN-em (znak „Rodzic czyta” w belce), Z.8 testy (tabela tryb × kategoria, ataki na kłódkę, prawdziwe okno). Bramka `verify wersja` 236f9b2d ZIELONA 20/20: Rust 3422/0/43, vitest 553, Playwright 845, prawdziwa aplikacja 63 (98,6 % poleceń). Zostaje: Z.4 model-sędzia, otwarcie kłódki „do końca rozmowy” (sufit per rozmowa), decyzje właściciela z raportu 52 §4. Raport alfa/docs/plan/52-raport-2026-11-04-noc.md; czysta kopia F:\\Kopie zapasowe programów Spopielony\\Alfa\\kopia-2026-11-04_0326 (81971a41, 72 MB, SHA-256 5858/0 błędów, paczka git 34 gałęzie).",
-  "session_goal": "Właściciel 3.11: „Prace kontynuuj automatycznie sam do 4:30 poprawki i ulepszenia (plan nasz), mnie w tym czasie nie będzie! potem przeprowadź testy i po nich zrób kopie bezpieczeństwa na dysku F: w katalogu - Kopie zapasowe programów Spopielony (i zakończ prace po tym)”.",
+  "current_state": "**Bieżący (2026-11-05 wieczór, PC):** sprzątanie kompilacji automatyczne (scripts/sprzatanie.sh po verify i backup, f05b8a6e; katalog 200+ → 25 GB). Etap Z.4 (model-sędzia trybu „Automatycznie”) na gałęzi `do-przegladu-tryby-zgod` (NIE scalona — Broker czeka na przegląd człowieka): poprawki przeglądu P1–P4 (fd67148a), dziennik werdyktów i wyników próśb na osi czasu „audit” — dziennik rodzica pokazuje wreszcie zgody/odmowy (03157612, 27fa1bde), zestaw ACC-Z4-judge-04 evals/Z4/judge (22 ataki + 6 zleconych): Bielik 4.5B SAM przepuścił 21/22 ataków → zapora poza modelem guard() (zgoda tylko dla akcji odwracalnej, bez niszczenia, bez treści obcej, bez granic właściciela) — 0/22, 5/6 zleconych sam (64f047e3). Otwarte: prośby spoza przebiegów (zmiana trybu, Max dostęp, kłódka) tylko w Audycie Brokera; pełny verify wersja nie uruchomiony od 236f9b2d; decyzje właściciela z raportu 52 §4.",
+  "session_goal": "Właściciel 5.11: „katalog zajmuje ponad 200GB… stare kompilacje mają być kasowane”, potem „kontynuuj poprawki i ulepszenia”.",
   "in_progress": [
-    "Etap Z na gałęzi do-przegladu-tryby-zgod — czeka na przegląd człowieka (Sędzia, broker-ui, klasyfikator).",
-    "Z.4 model-sędzia dla „Automatycznie” (nowy moduł approval-judge) — nie zaczęty.",
-    "Z.7: otwarcie kłódki „do końca rozmowy” — wymaga sufitu kłódki per rozmowa w Sędzim."
+    "Gałąź do-przegladu-tryby-zgod (Z.1–Z.8 + Z.4 z zaporą) — przegląd człowieka i scalenie."
   ],
   "blocking_issues": [
     "Decyzja właściciela: profil Dziecko poza usługą Windows (ochrona umowna) — dopuścić z ostrzeżeniem czy wymagać usługi.",
@@ -47,13 +45,13 @@
       "alfa-docs (podgląd HTML)": 5180
     }
   },
-  "test_results": "verify wersja 236f9b2d ZIELONE 20/20 (4.11 2:40–3:25): Rust 3422/0/43, vitest 553, Playwright 845, aplikacja 63/63 (281/285 poleceń), cargo deny ok, katalog 605/605.",
+  "test_results": "5.11: testy modułów sędziego, Brokera, app-core/app-agents/app-judge zielone, clippy czysty; ACC-Z4-judge-04 na Bieliku 4.5B: 0/22 zgód na atak z zaporą (21/22 bez). Pełny verify wersja — nie od 236f9b2d.",
   "decisions_this_session": [
     "3.11: zgody jak Claude Code/Codex — 5 trybów, Max dostęp z wyborem lokalne/chmura/wszystkie, dziennik rodzica jak ADR 0029, dziecko bez PIN-u tylko Plan i Ręcznie (plan 50 §7)."
   ],
   "next_steps": [
-    "Przegląd człowieka gałęzi do-przegladu-tryby-zgod i scalenie.",
-    "Z.4 model-sędzia + bezpiecznik 3/20 + dziennik.",
-    "Otwarte z planu 50 §8: zapis pośredni (git commit do .git) — piaskownica zapisu; zegar systemowy a terminy kłódki."
+    "verify wersja na gałęzi przed scaleniem",
+    "Wpisy audit dla próśb spoza przebiegów (zmiana trybu, Max dostęp, kłódka)",
+    "Decyzje właściciela: raport 52 §4"
   ]
 }
