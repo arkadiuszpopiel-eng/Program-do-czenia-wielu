@@ -19,291 +19,291 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 
 | Funkcja | Testy | Uwagi |
 | --- | --- | --- |
-| `accounts_add` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_assign` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_catalog` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_import_env` | aplikacja, bieg aplikacji |  |
-| `accounts_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_rotate` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_set_disabled` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_set_enterprise` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_set_limit` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_set_model` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_set_queue` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_set_shared_queue` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_shared_queues` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_suggest_queue` | rdzeń, aplikacja, bieg aplikacji |  |
-| `accounts_test` | rdzeń, aplikacja, bieg aplikacji |  |
-| `agents_apply_cast` | rdzeń, aplikacja, bieg aplikacji |  |
-| `agents_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `agents_open_terminal` | rdzeń, aplikacja, bieg aplikacji |  |
-| `agents_runs` | rdzeń, aplikacja, bieg aplikacji |  |
-| `agents_set_roles` | rdzeń, aplikacja, bieg aplikacji |  |
-| `agents_steer` | rdzeń, aplikacja, bieg aplikacji |  |
-| `app_bootstrap` | rdzeń, przeglądarka, aplikacja, bieg aplikacji |  |
-| `app_complete_onboarding` | rdzeń, aplikacja, bieg aplikacji |  |
-| `app_open_system_settings` | rdzeń, aplikacja, bieg aplikacji |  |
-| `app_save_layout` | rdzeń, aplikacja, bieg aplikacji |  |
-| `app_set_active_session` | rdzeń, aplikacja, bieg aplikacji |  |
-| `attachments_add_camera` | rdzeń, aplikacja, bieg aplikacji |  |
-| `attachments_add_dropped` | rdzeń, aplikacja, bieg aplikacji |  |
-| `attachments_list` | rdzeń, bieg aplikacji |  |
-| `attachments_paste` | rdzeń, aplikacja, bieg aplikacji |  |
-| `attachments_pick` | rdzeń, aplikacja, bieg aplikacji |  |
-| `attachments_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `backups_choose_dir` | rdzeń, aplikacja, bieg aplikacji |  |
-| `backups_configure` | rdzeń, aplikacja, bieg aplikacji |  |
-| `backups_restore` | rdzeń, aplikacja, bieg aplikacji |  |
-| `backups_run_now` | rdzeń, aplikacja, bieg aplikacji |  |
-| `backups_set_password` | rdzeń, aplikacja, bieg aplikacji |  |
-| `backups_status` | rdzeń, aplikacja, bieg aplikacji |  |
-| `backups_verify` | rdzeń, aplikacja, bieg aplikacji |  |
-| `board_list` | aplikacja, bieg aplikacji |  |
-| `board_pin` | aplikacja, bieg aplikacji |  |
-| `board_unpin` | aplikacja, bieg aplikacji |  |
-| `bridges_check` | rdzeń, aplikacja, bieg aplikacji |  |
-| `bridges_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `bridges_mark_login` | rdzeń, aplikacja, bieg aplikacji |  |
-| `bridges_open_login` | rdzeń, aplikacja, bieg aplikacji |  |
-| `bridges_pin` | rdzeń, aplikacja, bieg aplikacji |  |
-| `bridges_set_enabled` | aplikacja, bieg aplikacji |  |
-| `bridges_set_schedule` | rdzeń, aplikacja, bieg aplikacji |  |
-| `broker_status` | rdzeń, aplikacja, bieg aplikacji |  |
-| `builder_dry_run` | rdzeń, aplikacja, bieg aplikacji |  |
-| `builder_library` | rdzeń, aplikacja, bieg aplikacji |  |
-| `builder_policy` | rdzeń, aplikacja, bieg aplikacji |  |
-| `builder_preview` | rdzeń, aplikacja, bieg aplikacji |  |
-| `builder_propose` | aplikacja, bieg aplikacji |  |
-| `builder_save` | rdzeń, aplikacja, bieg aplikacji |  |
+| `accounts_add` | rdzeń, aplikacja |  |
+| `accounts_assign` | rdzeń, aplikacja |  |
+| `accounts_catalog` | rdzeń, aplikacja |  |
+| `accounts_import_env` | aplikacja |  |
+| `accounts_list` | rdzeń, aplikacja |  |
+| `accounts_remove` | rdzeń, aplikacja |  |
+| `accounts_rotate` | rdzeń, aplikacja |  |
+| `accounts_set_disabled` | rdzeń, aplikacja |  |
+| `accounts_set_enterprise` | rdzeń, aplikacja |  |
+| `accounts_set_limit` | rdzeń, aplikacja |  |
+| `accounts_set_model` | rdzeń, aplikacja |  |
+| `accounts_set_queue` | rdzeń, aplikacja |  |
+| `accounts_set_shared_queue` | rdzeń, aplikacja |  |
+| `accounts_shared_queues` | rdzeń, aplikacja |  |
+| `accounts_suggest_queue` | rdzeń, aplikacja |  |
+| `accounts_test` | rdzeń, aplikacja |  |
+| `agents_apply_cast` | rdzeń, aplikacja |  |
+| `agents_list` | rdzeń, aplikacja |  |
+| `agents_open_terminal` | rdzeń, aplikacja |  |
+| `agents_runs` | rdzeń, aplikacja |  |
+| `agents_set_roles` | rdzeń, aplikacja |  |
+| `agents_steer` | rdzeń, aplikacja |  |
+| `app_bootstrap` | rdzeń, przeglądarka, aplikacja |  |
+| `app_complete_onboarding` | rdzeń, aplikacja |  |
+| `app_open_system_settings` | rdzeń, aplikacja |  |
+| `app_save_layout` | rdzeń, aplikacja |  |
+| `app_set_active_session` | rdzeń, aplikacja |  |
+| `attachments_add_camera` | rdzeń, aplikacja |  |
+| `attachments_add_dropped` | rdzeń, aplikacja |  |
+| `attachments_list` | rdzeń |  |
+| `attachments_paste` | rdzeń, aplikacja |  |
+| `attachments_pick` | rdzeń, aplikacja |  |
+| `attachments_remove` | rdzeń, aplikacja |  |
+| `backups_choose_dir` | rdzeń, aplikacja |  |
+| `backups_configure` | rdzeń, aplikacja |  |
+| `backups_restore` | rdzeń, aplikacja |  |
+| `backups_run_now` | rdzeń, aplikacja |  |
+| `backups_set_password` | rdzeń, aplikacja |  |
+| `backups_status` | rdzeń, aplikacja |  |
+| `backups_verify` | rdzeń, aplikacja |  |
+| `board_list` | aplikacja |  |
+| `board_pin` | aplikacja |  |
+| `board_unpin` | aplikacja |  |
+| `bridges_check` | rdzeń, aplikacja |  |
+| `bridges_list` | rdzeń, aplikacja |  |
+| `bridges_mark_login` | rdzeń, aplikacja |  |
+| `bridges_open_login` | rdzeń, aplikacja |  |
+| `bridges_pin` | rdzeń, aplikacja |  |
+| `bridges_set_enabled` | aplikacja |  |
+| `bridges_set_schedule` | rdzeń, aplikacja |  |
+| `broker_status` | rdzeń, aplikacja |  |
+| `builder_dry_run` | rdzeń, aplikacja |  |
+| `builder_library` | rdzeń, aplikacja |  |
+| `builder_policy` | rdzeń, aplikacja |  |
+| `builder_preview` | rdzeń, aplikacja |  |
+| `builder_propose` | aplikacja |  |
+| `builder_save` | rdzeń, aplikacja |  |
 | `builder_voice_preview` | rdzeń, aplikacja |  |
-| `cameras_frame` | rdzeń, aplikacja, bieg aplikacji |  |
-| `cameras_refresh` | rdzeń, aplikacja, bieg aplikacji |  |
-| `cameras_rename` | rdzeń, aplikacja, bieg aplikacji |  |
-| `cameras_set_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
-| `cameras_set_master` | rdzeń, aplikacja, bieg aplikacji |  |
-| `cameras_state` | rdzeń, aplikacja, bieg aplikacji |  |
-| `canvas_render` | rdzeń, aplikacja, bieg aplikacji |  |
-| `compliance_routes` | aplikacja, bieg aplikacji |  |
-| `config_raw_check` | rdzeń, aplikacja, bieg aplikacji |  |
-| `config_raw_get` | rdzeń, aplikacja, bieg aplikacji |  |
-| `config_raw_save` | rdzeń, aplikacja, bieg aplikacji |  |
-| `costs_set_monthly_limit` | rdzeń, aplikacja, bieg aplikacji |  |
-| `costs_summary` | rdzeń, interfejs, aplikacja, bieg aplikacji |  |
-| `device_gpu_live` | aplikacja, bieg aplikacji |  |
-| `device_measure` | rdzeń, bieg aplikacji |  |
-| `device_profile` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_cancel` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_export` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_run` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_runs` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_snapshot` | rdzeń, aplikacja, bieg aplikacji |  |
-| `diag_state` | rdzeń, aplikacja, bieg aplikacji |  |
-| `embed_model_activate` | rdzeń, aplikacja, bieg aplikacji |  |
-| `evals_list` | aplikacja, bieg aplikacji |  |
-| `evals_verify` | aplikacja, bieg aplikacji |  |
-| `events_resume` | rdzeń, aplikacja, bieg aplikacji |  |
-| `files_act` | aplikacja, bieg aplikacji |  |
-| `files_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `files_preview` | aplikacja, bieg aplikacji |  |
-| `gui_desktop_grant` | aplikacja, bieg aplikacji |  |
-| `gui_release` | rdzeń, aplikacja, bieg aplikacji |  |
-| `gui_screenshot` | aplikacja, bieg aplikacji |  |
-| `gui_status` | rdzeń, aplikacja, bieg aplikacji |  |
-| `gui_stop` | rdzeń, aplikacja, bieg aplikacji |  |
-| `health_approve` | rdzeń, aplikacja, bieg aplikacji |  |
-| `health_reject` | aplikacja, bieg aplikacji |  |
-| `health_report` | aplikacja, bieg aplikacji |  |
-| `health_scan` | rdzeń, aplikacja, bieg aplikacji |  |
-| `health_undo` | rdzeń, aplikacja, bieg aplikacji |  |
-| `help_page` | aplikacja, bieg aplikacji |  |
-| `help_search` | aplikacja, bieg aplikacji |  |
-| `help_topics` | aplikacja, bieg aplikacji |  |
-| `improver_approve` | rdzeń, aplikacja, bieg aplikacji |  |
-| `improver_cycle` | aplikacja, bieg aplikacji |  |
-| `improver_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `improver_reject` | aplikacja, bieg aplikacji |  |
-| `improver_rollback` | aplikacja, bieg aplikacji |  |
-| `marshal_approve` | aplikacja, bieg aplikacji |  |
-| `marshal_propose` | aplikacja, bieg aplikacji |  |
-| `marshal_reject` | aplikacja, bieg aplikacji |  |
-| `marshal_report` | aplikacja, bieg aplikacji |  |
-| `marshal_revoke` | aplikacja, bieg aplikacji |  |
-| `marshal_state` | aplikacja, bieg aplikacji |  |
-| `mcp_approve` | rdzeń, aplikacja, bieg aplikacji |  |
-| `mcp_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `mcp_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `mcp_revoke` | aplikacja, bieg aplikacji |  |
-| `mcp_save` | rdzeń, aplikacja, bieg aplikacji |  |
-| `mcp_tools` | rdzeń, aplikacja, bieg aplikacji |  |
-| `memory_approve` | aplikacja, bieg aplikacji |  |
-| `memory_consolidate_now` | aplikacja, bieg aplikacji |  |
-| `memory_edit` | aplikacja, bieg aplikacji |  |
-| `memory_explain` | rdzeń, aplikacja, bieg aplikacji |  |
-| `memory_forget` | aplikacja, bieg aplikacji |  |
-| `memory_forget_preview` | rdzeń, aplikacja, bieg aplikacji |  |
-| `memory_inspect` | rdzeń, aplikacja, bieg aplikacji |  |
-| `memory_journal` | aplikacja, bieg aplikacji |  |
-| `memory_promote` | aplikacja, bieg aplikacji |  |
-| `memory_scopes` | rdzeń, aplikacja, bieg aplikacji |  |
-| `memory_set_pinned` | aplikacja, bieg aplikacji |  |
-| `memory_status` | aplikacja, bieg aplikacji |  |
-| `memory_teach` | rdzeń, aplikacja, bieg aplikacji |  |
-| `memory_teach_pick_file` | rdzeń, aplikacja, bieg aplikacji |  |
-| `memory_undo` | aplikacja, bieg aplikacji |  |
-| `models_bundle_download` | aplikacja, bieg aplikacji |  |
-| `models_bundle_verify` | aplikacja, bieg aplikacji |  |
-| `models_bundles` | rdzeń, aplikacja, bieg aplikacji |  |
-| `models_cancel` | aplikacja, bieg aplikacji |  |
-| `models_download` | rdzeń, aplikacja, bieg aplikacji |  |
-| `models_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `models_local_cancel` | aplikacja, bieg aplikacji |  |
-| `models_local_download` | rdzeń, aplikacja, bieg aplikacji |  |
-| `models_local_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `models_remove` | aplikacja, bieg aplikacji |  |
-| `models_repair` | rdzeń, aplikacja, bieg aplikacji |  |
-| `models_trust_hash` | aplikacja, bieg aplikacji |  |
-| `models_verify` | aplikacja, bieg aplikacji |  |
-| `modules_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `modules_set_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
-| `permissions_child_lock` | rdzeń, aplikacja, bieg aplikacji |  |
-| `permissions_get` | rdzeń, aplikacja, bieg aplikacji |  |
-| `permissions_grants` | rdzeń, aplikacja, bieg aplikacji |  |
-| `permissions_open_approval` | rdzeń, aplikacja, bieg aplikacji |  |
-| `permissions_request_level` | rdzeń, aplikacja, bieg aplikacji |  |
+| `cameras_frame` | rdzeń, aplikacja |  |
+| `cameras_refresh` | rdzeń, aplikacja |  |
+| `cameras_rename` | rdzeń, aplikacja |  |
+| `cameras_set_enabled` | rdzeń, aplikacja |  |
+| `cameras_set_master` | rdzeń, aplikacja |  |
+| `cameras_state` | rdzeń, aplikacja |  |
+| `canvas_render` | rdzeń, aplikacja |  |
+| `compliance_routes` | aplikacja |  |
+| `config_raw_check` | rdzeń, aplikacja |  |
+| `config_raw_get` | rdzeń, aplikacja |  |
+| `config_raw_save` | rdzeń, aplikacja |  |
+| `costs_set_monthly_limit` | rdzeń, aplikacja |  |
+| `costs_summary` | rdzeń, interfejs, aplikacja |  |
+| `device_gpu_live` | aplikacja |  |
+| `device_measure` | rdzeń |  |
+| `device_profile` | rdzeń, aplikacja |  |
+| `diag_cancel` | rdzeń, aplikacja |  |
+| `diag_export` | rdzeń, aplikacja |  |
+| `diag_run` | rdzeń, aplikacja |  |
+| `diag_runs` | rdzeń, aplikacja |  |
+| `diag_snapshot` | rdzeń, aplikacja |  |
+| `diag_state` | rdzeń, aplikacja |  |
+| `embed_model_activate` | rdzeń, aplikacja |  |
+| `evals_list` | aplikacja |  |
+| `evals_verify` | aplikacja |  |
+| `events_resume` | rdzeń, aplikacja |  |
+| `files_act` | aplikacja |  |
+| `files_list` | rdzeń, aplikacja |  |
+| `files_preview` | aplikacja |  |
+| `gui_desktop_grant` | aplikacja |  |
+| `gui_release` | rdzeń, aplikacja |  |
+| `gui_screenshot` | aplikacja |  |
+| `gui_status` | rdzeń, aplikacja |  |
+| `gui_stop` | rdzeń, aplikacja |  |
+| `health_approve` | rdzeń, aplikacja |  |
+| `health_reject` | aplikacja |  |
+| `health_report` | aplikacja |  |
+| `health_scan` | rdzeń, aplikacja |  |
+| `health_undo` | rdzeń, aplikacja |  |
+| `help_page` | aplikacja |  |
+| `help_search` | aplikacja |  |
+| `help_topics` | aplikacja |  |
+| `improver_approve` | rdzeń, aplikacja |  |
+| `improver_cycle` | aplikacja |  |
+| `improver_list` | rdzeń, aplikacja |  |
+| `improver_reject` | aplikacja |  |
+| `improver_rollback` | aplikacja |  |
+| `marshal_approve` | aplikacja |  |
+| `marshal_propose` | aplikacja |  |
+| `marshal_reject` | aplikacja |  |
+| `marshal_report` | aplikacja |  |
+| `marshal_revoke` | aplikacja |  |
+| `marshal_state` | aplikacja |  |
+| `mcp_approve` | rdzeń, aplikacja |  |
+| `mcp_list` | rdzeń, aplikacja |  |
+| `mcp_remove` | rdzeń, aplikacja |  |
+| `mcp_revoke` | aplikacja |  |
+| `mcp_save` | rdzeń, aplikacja |  |
+| `mcp_tools` | rdzeń, aplikacja |  |
+| `memory_approve` | aplikacja |  |
+| `memory_consolidate_now` | aplikacja |  |
+| `memory_edit` | aplikacja |  |
+| `memory_explain` | rdzeń, aplikacja |  |
+| `memory_forget` | aplikacja |  |
+| `memory_forget_preview` | rdzeń, aplikacja |  |
+| `memory_inspect` | rdzeń, aplikacja |  |
+| `memory_journal` | aplikacja |  |
+| `memory_promote` | aplikacja |  |
+| `memory_scopes` | rdzeń, aplikacja |  |
+| `memory_set_pinned` | aplikacja |  |
+| `memory_status` | aplikacja |  |
+| `memory_teach` | rdzeń, aplikacja |  |
+| `memory_teach_pick_file` | rdzeń, aplikacja |  |
+| `memory_undo` | aplikacja |  |
+| `models_bundle_download` | aplikacja |  |
+| `models_bundle_verify` | aplikacja |  |
+| `models_bundles` | rdzeń, aplikacja |  |
+| `models_cancel` | aplikacja |  |
+| `models_download` | rdzeń, aplikacja |  |
+| `models_list` | rdzeń, aplikacja |  |
+| `models_local_cancel` | aplikacja |  |
+| `models_local_download` | rdzeń, aplikacja |  |
+| `models_local_list` | rdzeń, aplikacja |  |
+| `models_remove` | aplikacja |  |
+| `models_repair` | rdzeń, aplikacja |  |
+| `models_trust_hash` | aplikacja |  |
+| `models_verify` | aplikacja |  |
+| `modules_list` | rdzeń, aplikacja |  |
+| `modules_set_enabled` | rdzeń, aplikacja |  |
+| `permissions_child_lock` | rdzeń, aplikacja |  |
+| `permissions_get` | rdzeń, aplikacja |  |
+| `permissions_grants` | rdzeń, aplikacja |  |
+| `permissions_open_approval` | rdzeń, aplikacja |  |
+| `permissions_request_level` | rdzeń, aplikacja |  |
 | `permissions_request_max_access` | rdzeń |  |
-| `permissions_revoke_grant` | rdzeń, aplikacja, bieg aplikacji |  |
-| `pipelines_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `pipelines_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `pipelines_save` | rdzeń, aplikacja, bieg aplikacji |  |
-| `plugins_approve` | rdzeń, aplikacja, bieg aplikacji |  |
-| `plugins_disable` | rdzeń, aplikacja, bieg aplikacji |  |
-| `plugins_enable` | aplikacja, bieg aplikacji |  |
-| `plugins_inspect` | rdzeń, aplikacja, bieg aplikacji |  |
-| `plugins_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `plugins_propose` | rdzeń, aplikacja, bieg aplikacji |  |
-| `plugins_reject` | aplikacja, bieg aplikacji |  |
-| `plugins_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `pricing_apply` | rdzeń, aplikacja, bieg aplikacji |  |
-| `pricing_get` | rdzeń, bieg aplikacji |  |
-| `projects_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `projects_pick_dir` | rdzeń, aplikacja, bieg aplikacji |  |
-| `projects_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `projects_rename` | rdzeń, aplikacja, bieg aplikacji |  |
-| `projects_save` | rdzeń, aplikacja, bieg aplikacji |  |
-| `prompt_templates_get` | rdzeń, aplikacja, bieg aplikacji |  |
-| `prompt_templates_set` | rdzeń, aplikacja, bieg aplikacji |  |
-| `quick_ask` | rdzeń, interfejs, przeglądarka, aplikacja, bieg aplikacji |  |
-| `quick_commands_get` | rdzeń, aplikacja, bieg aplikacji |  |
-| `quick_commands_set` | rdzeń, aplikacja, bieg aplikacji |  |
-| `quick_commands_test` | rdzeń, aplikacja, bieg aplikacji |  |
-| `quick_expand_to_main` | rdzeń, aplikacja, bieg aplikacji |  |
-| `quick_hide` | rdzeń, aplikacja, bieg aplikacji |  |
-| `routing_get` | rdzeń, aplikacja, bieg aplikacji |  |
-| `routing_preview` | rdzeń, bieg aplikacji |  |
-| `routing_set` | rdzeń, bieg aplikacji |  |
-| `search_reindex_cancel` | rdzeń, aplikacja, bieg aplikacji |  |
-| `search_reindex_start` | aplikacja, bieg aplikacji |  |
-| `search_reindex_status` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_cards` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_choose_workdir` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_create` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_duplicate_as_template` | aplikacja, bieg aplikacji |  |
-| `sessions_export` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_export_conversation` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_get_draft` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_mark_read` | aplikacja, bieg aplikacji |  |
-| `sessions_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_rename` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_save_draft` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_search` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_set_archived` | aplikacja, bieg aplikacji |  |
-| `sessions_set_pinned` | aplikacja, bieg aplikacji |  |
-| `sessions_set_project` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_undo_remove` | rdzeń, aplikacja, bieg aplikacji |  |
-| `sessions_workdir` | rdzeń, aplikacja, bieg aplikacji |  |
-| `settings_reset` | rdzeń, aplikacja, bieg aplikacji |  |
-| `settings_schema` | rdzeń, aplikacja, bieg aplikacji |  |
-| `settings_set` | rdzeń, aplikacja, bieg aplikacji |  |
-| `settings_set_shortcut` | rdzeń, aplikacja, bieg aplikacji |  |
-| `settings_values` | rdzeń, aplikacja, bieg aplikacji |  |
-| `skills_approve` | rdzeń, aplikacja, bieg aplikacji |  |
-| `skills_disable` | aplikacja, bieg aplikacji |  |
-| `skills_export` | rdzeń, aplikacja, bieg aplikacji |  |
-| `skills_import` | rdzeń, aplikacja, bieg aplikacji |  |
-| `skills_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `skills_propose` | rdzeń, aplikacja, bieg aplikacji |  |
-| `skills_reject` | aplikacja, bieg aplikacji |  |
-| `skills_release` | aplikacja, bieg aplikacji |  |
-| `skills_review` | rdzeń, aplikacja, bieg aplikacji |  |
-| `skills_run` | rdzeń, aplikacja, bieg aplikacji |  |
-| `system_clipboard_text` | rdzeń, bieg aplikacji |  |
-| `system_retry_queue` | rdzeń, aplikacja, bieg aplikacji |  |
-| `system_status` | rdzeń, aplikacja, eval, bieg aplikacji |  |
-| `tasks_cancel` | rdzeń, aplikacja, bieg aplikacji |  |
-| `tasks_create` | rdzeń, aplikacja, bieg aplikacji |  |
-| `tasks_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `tasks_pause` | aplikacja, bieg aplikacji |  |
-| `tasks_resume` | aplikacja, bieg aplikacji |  |
-| `tasks_retry` | rdzeń, aplikacja, bieg aplikacji |  |
-| `tasks_steer` | aplikacja, bieg aplikacji |  |
-| `terminal_close` | rdzeń, bieg aplikacji |  |
-| `terminal_input` | rdzeń, bieg aplikacji |  |
-| `terminal_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `terminal_resize` | rdzeń, aplikacja, bieg aplikacji |  |
-| `timeline_list` | rdzeń, aplikacja, bieg aplikacji |  |
+| `permissions_revoke_grant` | rdzeń, aplikacja |  |
+| `pipelines_list` | rdzeń, aplikacja |  |
+| `pipelines_remove` | rdzeń, aplikacja |  |
+| `pipelines_save` | rdzeń, aplikacja |  |
+| `plugins_approve` | rdzeń, aplikacja |  |
+| `plugins_disable` | rdzeń, aplikacja |  |
+| `plugins_enable` | aplikacja |  |
+| `plugins_inspect` | rdzeń, aplikacja |  |
+| `plugins_list` | rdzeń, aplikacja |  |
+| `plugins_propose` | rdzeń, aplikacja |  |
+| `plugins_reject` | aplikacja |  |
+| `plugins_remove` | rdzeń, aplikacja |  |
+| `pricing_apply` | rdzeń, aplikacja |  |
+| `pricing_get` | rdzeń |  |
+| `projects_list` | rdzeń, aplikacja |  |
+| `projects_pick_dir` | rdzeń, aplikacja |  |
+| `projects_remove` | rdzeń, aplikacja |  |
+| `projects_rename` | rdzeń, aplikacja |  |
+| `projects_save` | rdzeń, aplikacja |  |
+| `prompt_templates_get` | rdzeń, aplikacja |  |
+| `prompt_templates_set` | rdzeń, aplikacja |  |
+| `quick_ask` | rdzeń, interfejs, przeglądarka, aplikacja |  |
+| `quick_commands_get` | rdzeń, aplikacja |  |
+| `quick_commands_set` | rdzeń, aplikacja |  |
+| `quick_commands_test` | rdzeń, aplikacja |  |
+| `quick_expand_to_main` | rdzeń, aplikacja |  |
+| `quick_hide` | rdzeń, aplikacja |  |
+| `routing_get` | rdzeń, aplikacja |  |
+| `routing_preview` | rdzeń |  |
+| `routing_set` | rdzeń |  |
+| `search_reindex_cancel` | rdzeń, aplikacja |  |
+| `search_reindex_start` | aplikacja |  |
+| `search_reindex_status` | rdzeń, aplikacja |  |
+| `sessions_cards` | rdzeń, aplikacja |  |
+| `sessions_choose_workdir` | rdzeń, aplikacja |  |
+| `sessions_create` | rdzeń, aplikacja |  |
+| `sessions_duplicate_as_template` | aplikacja |  |
+| `sessions_export` | rdzeń, aplikacja |  |
+| `sessions_export_conversation` | rdzeń, aplikacja |  |
+| `sessions_get_draft` | rdzeń, aplikacja |  |
+| `sessions_list` | rdzeń, aplikacja |  |
+| `sessions_mark_read` | aplikacja |  |
+| `sessions_remove` | rdzeń, aplikacja |  |
+| `sessions_rename` | rdzeń, aplikacja |  |
+| `sessions_save_draft` | rdzeń, aplikacja |  |
+| `sessions_search` | rdzeń, aplikacja |  |
+| `sessions_set_archived` | aplikacja |  |
+| `sessions_set_pinned` | aplikacja |  |
+| `sessions_set_project` | rdzeń, aplikacja |  |
+| `sessions_undo_remove` | rdzeń, aplikacja |  |
+| `sessions_workdir` | rdzeń, aplikacja |  |
+| `settings_reset` | rdzeń, aplikacja |  |
+| `settings_schema` | rdzeń, aplikacja |  |
+| `settings_set` | rdzeń, aplikacja |  |
+| `settings_set_shortcut` | rdzeń, aplikacja |  |
+| `settings_values` | rdzeń, aplikacja |  |
+| `skills_approve` | rdzeń, aplikacja |  |
+| `skills_disable` | aplikacja |  |
+| `skills_export` | rdzeń, aplikacja |  |
+| `skills_import` | rdzeń, aplikacja |  |
+| `skills_list` | rdzeń, aplikacja |  |
+| `skills_propose` | rdzeń, aplikacja |  |
+| `skills_reject` | aplikacja |  |
+| `skills_release` | aplikacja |  |
+| `skills_review` | rdzeń, aplikacja |  |
+| `skills_run` | rdzeń, aplikacja |  |
+| `system_clipboard_text` | rdzeń |  |
+| `system_retry_queue` | rdzeń, aplikacja |  |
+| `system_status` | rdzeń, aplikacja, eval |  |
+| `tasks_cancel` | rdzeń, aplikacja |  |
+| `tasks_create` | rdzeń, aplikacja |  |
+| `tasks_list` | rdzeń, aplikacja |  |
+| `tasks_pause` | aplikacja |  |
+| `tasks_resume` | aplikacja |  |
+| `tasks_retry` | rdzeń, aplikacja |  |
+| `tasks_steer` | aplikacja |  |
+| `terminal_close` | rdzeń |  |
+| `terminal_input` | rdzeń |  |
+| `terminal_list` | rdzeń, aplikacja |  |
+| `terminal_resize` | rdzeń, aplikacja |  |
+| `timeline_list` | rdzeń, aplikacja |  |
 | `transfer_export` | rdzeń |  |
-| `transfer_import` | rdzeń, aplikacja, bieg aplikacji |  |
-| `transfer_inspect` | rdzeń, aplikacja, bieg aplikacji |  |
-| `transfer_rollback` | rdzeń, aplikacja, bieg aplikacji |  |
-| `triggers_create` | rdzeń, aplikacja, bieg aplikacji |  |
-| `triggers_fire_now` | rdzeń, aplikacja, bieg aplikacji |  |
-| `triggers_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `triggers_log` | rdzeń, aplikacja, bieg aplikacji |  |
-| `triggers_preview_cron` | rdzeń, aplikacja, bieg aplikacji |  |
-| `triggers_remove` | aplikacja, bieg aplikacji |  |
-| `triggers_set_enabled` | aplikacja, bieg aplikacji |  |
-| `turns_arena_answer` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_continue` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_edit_and_resend` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_list` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_rate` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_read_aloud` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_regenerate` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_remember` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_run_code` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_save_code` | aplikacja, bieg aplikacji |  |
-| `turns_select_branch` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_send` | rdzeń, bieg aplikacji |  |
-| `turns_set_hidden` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_stop` | rdzeń, aplikacja, bieg aplikacji |  |
-| `turns_undo_step` | rdzeń, aplikacja, bieg aplikacji |  |
-| `updates_about` | aplikacja, bieg aplikacji |  |
-| `updates_cancel` | aplikacja, bieg aplikacji |  |
+| `transfer_import` | rdzeń, aplikacja |  |
+| `transfer_inspect` | rdzeń, aplikacja |  |
+| `transfer_rollback` | rdzeń, aplikacja |  |
+| `triggers_create` | rdzeń, aplikacja |  |
+| `triggers_fire_now` | rdzeń, aplikacja |  |
+| `triggers_list` | rdzeń, aplikacja |  |
+| `triggers_log` | rdzeń, aplikacja |  |
+| `triggers_preview_cron` | rdzeń, aplikacja |  |
+| `triggers_remove` | aplikacja |  |
+| `triggers_set_enabled` | aplikacja |  |
+| `turns_arena_answer` | rdzeń, aplikacja |  |
+| `turns_continue` | rdzeń, aplikacja |  |
+| `turns_edit_and_resend` | rdzeń, aplikacja |  |
+| `turns_list` | rdzeń, aplikacja |  |
+| `turns_rate` | rdzeń, aplikacja |  |
+| `turns_read_aloud` | rdzeń, aplikacja |  |
+| `turns_regenerate` | rdzeń, aplikacja |  |
+| `turns_remember` | rdzeń, aplikacja |  |
+| `turns_run_code` | rdzeń, aplikacja |  |
+| `turns_save_code` | aplikacja |  |
+| `turns_select_branch` | rdzeń, aplikacja |  |
+| `turns_send` | rdzeń |  |
+| `turns_set_hidden` | rdzeń, aplikacja |  |
+| `turns_stop` | rdzeń, aplikacja |  |
+| `turns_undo_step` | rdzeń, aplikacja |  |
+| `updates_about` | aplikacja |  |
+| `updates_cancel` | aplikacja |  |
 | `updates_check` | rdzeń, aplikacja |  |
-| `updates_dismiss_whats_new` | aplikacja, bieg aplikacji |  |
-| `updates_download` | aplikacja, bieg aplikacji |  |
-| `updates_history` | aplikacja, bieg aplikacji |  |
-| `updates_restart` | aplikacja, bieg aplikacji |  |
-| `updates_rollback` | aplikacja, bieg aplikacji |  |
-| `updates_status` | rdzeń, aplikacja, bieg aplikacji |  |
-| `updates_whats_new` | aplikacja, bieg aplikacji |  |
-| `voice_devices` | rdzeń, aplikacja, bieg aplikacji |  |
-| `voice_dictation` | aplikacja, bieg aplikacji |  |
-| `voice_engines` | aplikacja, bieg aplikacji |  |
-| `voice_features` | aplikacja, bieg aplikacji |  |
-| `voice_preview` | aplikacja, bieg aplikacji |  |
-| `voice_ptt` | interfejs, aplikacja, bieg aplikacji |  |
-| `voice_read` | aplikacja, bieg aplikacji |  |
-| `voice_set_mic_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
-| `voice_set_muted` | rdzeń, aplikacja, bieg aplikacji |  |
-| `voice_speaker` | aplikacja, bieg aplikacji |  |
-| `voice_start_mic_test` | rdzeń, bieg aplikacji |  |
-| `voice_status` | rdzeń, aplikacja, bieg aplikacji |  |
-| `voice_stop_mic_test` | rdzeń, aplikacja, bieg aplikacji |  |
-| `voice_stop_speech` | rdzeń, aplikacja, bieg aplikacji |  |
-| `voice_wake` | aplikacja, bieg aplikacji |  |
+| `updates_dismiss_whats_new` | aplikacja |  |
+| `updates_download` | aplikacja |  |
+| `updates_history` | aplikacja |  |
+| `updates_restart` | aplikacja |  |
+| `updates_rollback` | aplikacja |  |
+| `updates_status` | rdzeń, aplikacja |  |
+| `updates_whats_new` | aplikacja |  |
+| `voice_devices` | rdzeń, aplikacja |  |
+| `voice_dictation` | aplikacja |  |
+| `voice_engines` | aplikacja |  |
+| `voice_features` | aplikacja |  |
+| `voice_preview` | aplikacja |  |
+| `voice_ptt` | interfejs, aplikacja |  |
+| `voice_read` | aplikacja |  |
+| `voice_set_mic_enabled` | rdzeń, aplikacja |  |
+| `voice_set_muted` | rdzeń, aplikacja |  |
+| `voice_speaker` | aplikacja |  |
+| `voice_start_mic_test` | rdzeń |  |
+| `voice_status` | rdzeń, aplikacja |  |
+| `voice_stop_mic_test` | rdzeń, aplikacja |  |
+| `voice_stop_speech` | rdzeń, aplikacja |  |
+| `voice_wake` | aplikacja |  |
 
 ## Polecenia palety i skróty
 
