@@ -278,6 +278,11 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   jawnie), działania bez informacji o modelu (wtyczki, zrzut ekranu, MCP) obejmuje tylko „wszystkie”.
 - **Edge case:** restart Sędziego przed przyjęciem przełączenia przez rdzeń (≤ 15 s) — przełączenie przepada,
   obowiązuje poprzedni zapamiętany poziom (bezpieczny kierunek).
+- **Z.4 model-sędzia — projekt (5.11):** `docs/modules/approval-judge/SPEC.md`. Broker nie woła modeli i
+  zatwierdza tylko fizycznym wejściem, więc: prośba L3 w stanie `AwaitingJudge` (ukryta przed broker-ui), kierowca
+  sędziego w rdzeniu (rola `Core`) odsyła werdykt `Allow` (tylko raz) / `Deny` / `Escalate`; termin 30 s i każdy
+  błąd → karta właściciela. Bezpiecznik 3 z rzędu / 20 w zadaniu w Brokerze. Kod nie zaczęty — na komputerze
+  z 5.11 (i7-7700HQ) brak gita i Visual Studio Build Tools. 3 pytania do właściciela w SPEC.
 
 ## Źródła
 

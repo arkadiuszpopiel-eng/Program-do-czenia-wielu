@@ -1206,6 +1206,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "approval-judge-contract"
+version = "0.0.84"
+dependencies = [
+ "async-trait",
+ "proptest",
+ "risk-classifier-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "approval-judge-fake"
+version = "0.0.84"
+dependencies = [
+ "approval-judge-contract",
+ "async-trait",
+ "risk-classifier-contract",
+ "tokio",
+]
+
+[[package]]
 name = "arbitrary"
 version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
