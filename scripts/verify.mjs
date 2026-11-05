@@ -293,7 +293,7 @@ for (const [id, title, command, cwd, needGb] of STAGES) {
     title,
     state,
     seconds,
-    numbers: numbersFrom(id, output),
+    numbers: numbersFrom(id, output, root),
     command,
     log: `${level}-${id}.log`,
   });
