@@ -51,3 +51,29 @@ pub fn talk_settings(config: &Arc<dyn ConfigStore>) -> TalkSettings {
     });
     shared
 }
+
+/// Klucz ustawienia redukcji szumów mikrofonu (`off` / `standard` / `strong`).
+pub const NOISE_KEY: &str = "voice.noise_reduction";
+
+/// Ustawienie redukcji szumów śledzące konfigurację: test mikrofonu i rozmowa czytają je przy
+/// każdym starcie, więc zmiana w Ustawieniach działa bez restartu programu.
+pub fn noise_setting<C: ConfigStore + 'static>(config: Arc<C>) -> voice_dsp_contract::NoiseSetting {
+    let setting = voice_dsp_contract::NoiseSetting::default();
+    let shared = setting.clone();
+    tokio::spawn(async move {
+        let Ok(key) = ConfigKey::new(NOISE_KEY) else {
+            return;
+        };
+        let mut changes = config.watch(NOISE_KEY);
+        loop {
+            let value = config.get(&key, &Scope::Global).await.ok().flatten();
+            if let Some(text) = value.as_ref().and_then(|v| v.as_str()) {
+                shared.set(voice_dsp_contract::NoiseReduction::parse(text));
+            }
+            if changes.next().await.is_none() {
+                break;
+            }
+        }
+    });
+    setting
+}

@@ -16,22 +16,6 @@ use crate::error::AppError;
 
 const MB: u64 = 1024 * 1024;
 
-fn progress(
-    model_id: &str,
-    state: LocalDownloadState,
-    bytes: u64,
-    total: Option<u64>,
-    error: Option<String>,
-) -> AlfaEvent {
-    AlfaEvent::LocalModelProgress {
-        model_id: model_id.to_owned(),
-        state,
-        bytes,
-        total,
-        error,
-    }
-}
-
 impl AppCore {
     fn local_module(&self) -> Result<Arc<LocalModule>, AppError> {
         self.inner
@@ -72,7 +56,13 @@ impl AppCore {
             .ok_or_else(|| AppError::invalid(format!("Nieznany model lokalny „{id}”.")))?;
         let total = Some(u64::from(entry.size_mb) * MB);
         if provider.installed().iter().any(|m| m.id == id) {
-            self.emit(progress(&id, LocalDownloadState::Done, 0, total, None));
+            self.emit(AlfaEvent::local_progress(
+                &id,
+                LocalDownloadState::Done,
+                0,
+                total,
+                None,
+            ));
             return Ok(());
         }
         let cancel = {
@@ -84,7 +74,7 @@ impl AppCore {
             rt.downloads.insert(id.clone(), cancel.clone());
             cancel
         };
-        self.emit(progress(
+        self.emit(AlfaEvent::local_progress(
             &id,
             LocalDownloadState::Downloading,
             0,
@@ -98,12 +88,18 @@ impl AppCore {
             let event = match result {
                 Ok(done) => {
                     let bytes = std::fs::metadata(&done.path).map_or(0, |m| m.len());
-                    progress(&id, LocalDownloadState::Done, bytes, Some(bytes), None)
+                    AlfaEvent::local_progress(
+                        &id,
+                        LocalDownloadState::Done,
+                        bytes,
+                        Some(bytes),
+                        None,
+                    )
                 }
                 Err(LocalError::Cancelled) => {
-                    progress(&id, LocalDownloadState::Cancelled, 0, total, None)
+                    AlfaEvent::local_progress(&id, LocalDownloadState::Cancelled, 0, total, None)
                 }
-                Err(e) => progress(
+                Err(e) => AlfaEvent::local_progress(
                     &id,
                     LocalDownloadState::Failed,
                     0,

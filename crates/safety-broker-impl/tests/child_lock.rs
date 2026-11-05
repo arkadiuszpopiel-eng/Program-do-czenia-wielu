@@ -225,7 +225,9 @@ async fn parent_pin_opens_for_a_time_and_closes_by_itself() {
     assert!(!off.enabled);
     assert_eq!(level(&b), AutonomyLevel::L4);
 
-    let text = format!("{:?}", audit.events());
+    // Tylko ładunki: identyfikatory i skróty łańcucha mogą losowo zawierać te cyfry.
+    let payloads: Vec<_> = audit.events().into_iter().map(|e| e.payload).collect();
+    let text = serde_json::to_string(&payloads).unwrap();
     for secret in ["2468", "1357", "97531", "1111"] {
         assert!(!text.contains(secret), "PIN {secret} w Audycie");
     }

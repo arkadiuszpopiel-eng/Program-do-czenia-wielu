@@ -22,6 +22,7 @@ mod last_level;
 pub mod levels;
 pub mod link;
 pub mod mode;
+pub mod notes;
 pub mod notice;
 mod remote;
 mod remote_kill;

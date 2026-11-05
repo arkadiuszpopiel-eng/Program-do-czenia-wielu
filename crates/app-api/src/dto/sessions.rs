@@ -63,6 +63,17 @@ impl SessionTemplate {
             Self::Admin => "Administracja PC",
         }
     }
+    /// Szablon modułu sesji.
+    pub fn core(self) -> sessions_contract::SessionTemplate {
+        use sessions_contract::SessionTemplate as Core;
+        match self {
+            Self::Empty => Core::Empty,
+            Self::Coding => Core::Coding,
+            Self::Research => Core::Research,
+            Self::Voice => Core::VoiceAssistant,
+            Self::Admin => Core::PcAdmin,
+        }
+    }
 }
 
 /// Bilet cofnięcia usunięcia (10 s).

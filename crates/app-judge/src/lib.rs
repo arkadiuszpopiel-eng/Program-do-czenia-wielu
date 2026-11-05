@@ -3,6 +3,7 @@
 //! kierowcy pytająca Brokera o prośby co sekundę.
 
 mod context;
+mod note;
 
 use std::sync::Arc;
 
@@ -14,6 +15,7 @@ use safety_broker_contract::Broker;
 use sessions_contract::SessionHistory;
 
 pub use context::{SessionContext, context_from_turns};
+pub use note::describe;
 
 fn judge_on(core: &Arc<RouterCore>) -> Arc<dyn approval_judge_contract::ApprovalJudge> {
     let provider: Arc<dyn ModelProvider> =

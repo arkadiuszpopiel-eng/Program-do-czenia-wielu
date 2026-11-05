@@ -5,7 +5,10 @@
 
 mod common;
 
-use app_core::dto::{AutonomyLevel, ChildLockRequest, ChildLockState};
+use app_core::dto::{
+    AutonomyLevel, ChildLockRequest, ChildLockState, EventLevel, SessionTemplate, TimelineFilter,
+    TimelineKind,
+};
 use common::harness;
 
 fn change(json: serde_json::Value) -> Option<ChildLockRequest> {
@@ -101,5 +104,61 @@ async fn parent_pin_locks_and_opens_the_modes() {
     assert_eq!(
         core.permissions_get(None).await.unwrap().global,
         AutonomyLevel::L3
+    );
+}
+
+/// Zmiany bezpieczeństwa spoza przebiegów (Z.7) w dzienniku rozmowy: tryb, kłódka i nieudany PIN — bez PIN-u.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn security_changes_land_in_the_active_conversation_log() {
+    let h = harness().await;
+    let core = &h.core;
+    let session = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    core.app_set_active_session(Some(session.clone()))
+        .await
+        .unwrap();
+    core.permissions_request_level(AutonomyLevel::L1, None)
+        .await
+        .unwrap();
+    core.permissions_child_lock(change(
+        serde_json::json!({ "op": "set_pin", "old": null, "new": "2468" }),
+    ))
+    .await
+    .unwrap();
+    let wrong = core
+        .permissions_child_lock(change(
+            serde_json::json!({ "op": "open", "pin": "1357", "minutes": 30 }),
+        ))
+        .await;
+    assert!(wrong.is_err());
+    let filter = TimelineFilter {
+        kinds: vec![TimelineKind::Audit],
+        min_level: EventLevel::Debug,
+    };
+    let titles: Vec<String> = core
+        .timeline_list(session, filter)
+        .await
+        .unwrap()
+        .into_iter()
+        .map(|e| e.title)
+        .collect();
+    assert!(
+        titles.contains(&"Tryb pracy zmieniony na „Ręcznie” (wszystkie rozmowy)".to_owned()),
+        "{titles:?}"
+    );
+    assert!(titles.contains(&"Profil Dziecko: ustawienie PIN-u rodzica".to_owned()));
+    assert!(
+        titles
+            .iter()
+            .any(|t| t.starts_with("Profil Dziecko: nieudana próba — otwarcie kłódki na czas")),
+        "{titles:?}"
+    );
+    assert!(
+        titles
+            .iter()
+            .all(|t| !t.contains("1357") && !t.contains("2468"))
     );
 }

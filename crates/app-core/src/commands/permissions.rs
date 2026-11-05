@@ -3,12 +3,12 @@
 
 use crate::core::AppCore;
 use crate::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, MaxAccess,
-    PermissionsState,
+    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, EventLevel, MaxAccess,
+    PermissionsState, TimelineKind,
 };
 use std::collections::BTreeMap;
 
-use app_broker::levels;
+use app_broker::{levels, notes};
 use sessions_contract::SessionId;
 
 use crate::error::AppError;
@@ -40,7 +40,10 @@ impl AppCore {
         &self,
         scope: Option<MaxAccess>,
     ) -> Result<BrokerIntentResult, AppError> {
-        self.inner.broker.request_max_access(scope).await
+        let result = self.inner.broker.request_max_access(scope).await;
+        let (level, title) = notes::max_access_note(scope, &result);
+        self.security_note(None, level, title).await;
+        result
     }
 
     /// `permissions_request_level` ⟶ Broker: obniżenie od razu (`applied`), podniesienie —
@@ -55,7 +58,11 @@ impl AppCore {
             .inner
             .broker
             .request_level(level, session.as_ref())
-            .await?;
+            .await;
+        let (note_level, title) = notes::level_note(level, session.is_some(), &result);
+        self.security_note(session.as_ref(), note_level, title)
+            .await;
+        let result = result?;
         if result.status == BrokerIntentStatus::OpenedBroker {
             // Podniesienie czeka na zgodę w oknie Brokera: strażnik przyjmie ten poziom, gdy
             // Broker potwierdzi zgodę na tę prośbę, zamiast cofać do zapamiętanego obniżenia.
@@ -80,7 +87,16 @@ impl AppCore {
         &self,
         change: Option<crate::dto::ChildLockRequest>,
     ) -> Result<crate::dto::ChildLockState, AppError> {
-        self.inner.broker.child_lock(change).await
+        // Opis liczony przed przekazaniem zmiany (PIN idzie do Sędziego Cieni, nigdy do wpisu).
+        let action = change.as_ref().map(notes::child_lock_action);
+        let result = self.inner.broker.child_lock(change).await;
+        if let Some(action) = action
+            && let Some((level, title)) =
+                notes::child_lock_note(action, result.as_ref().map(|_| ()))
+        {
+            self.security_note(None, level, title).await;
+        }
+        result
     }
 
     /// `permissions_revoke_grant` — odwołanie zgody (tylko zawęża — bez okna Sędziego).
@@ -99,6 +115,23 @@ impl AppCore {
         approval_id: String,
     ) -> Result<BrokerIntentResult, AppError> {
         self.inner.broker.open_approval(&approval_id).await
+    }
+
+    /// Wpis „audit” o zmianie bezpieczeństwa na osi czasu rozmowy (`None` — aktywnej; bez rozmowy — tylko
+    /// Audyt Sędziego Cieni).
+    async fn security_note(&self, session: Option<&SessionId>, level: EventLevel, title: String) {
+        let session = match session {
+            Some(s) => Some(s.clone()),
+            None => self
+                .config_str(keys::ACTIVE_SESSION)
+                .await
+                .and_then(|a| ids::session(&a).ok()),
+        };
+        if let Some(session) = session
+            && self.ensure_session(&session).is_ok()
+        {
+            self.timeline_note(&session, TimelineKind::Audit, level, title, None);
+        }
     }
 
     /// Zapamiętane obniżenia: poziom globalny i poziomy sesji (sesje usunięte — pomijane).

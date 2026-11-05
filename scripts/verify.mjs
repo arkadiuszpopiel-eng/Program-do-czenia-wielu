@@ -13,33 +13,11 @@
 // niekompletny. Poziom „wersja” obejmuje te same bramki co CI (audyt 2026-10-14, A-09).
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, statfsSync, writeFileSync } from 'node:fs';
-import { cpus, freemem, totalmem } from 'node:os';
+import { cpus, totalmem } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gitBash, stageEnv } from './verify-shell.mjs';
-
-/**
- * Ile przeglądarek testowych naraz: każda zajmuje ok. 1,5 GB. Przy małej wolnej pamięci (inne programy
- * otwarte obok) cztery naraz dławią maszynę i testy padają na przekroczeniu czasu w losowych
- * miejscach (2026-10-14: 2,6 GB wolnej pamięci → 11–14 losowych czerwonych). `PW_WORKERS` nadpisuje.
- */
-function e2eWorkers() {
-  if (process.env.PW_WORKERS) return process.env.PW_WORKERS;
-  const freeGb = freemem() / 1024 ** 3;
-  return String(Math.max(1, Math.min(4, Math.floor(freeGb / 1.5))));
-}
-
-// Testy w przeglądarce celują w Edge (silnik WebView2). Komputer bez Edge (stacjonarny, 2026-10-21)
-// dostaje Chromium Playwrighta zamiast zawsze czerwonego etapu — z adnotacją w raporcie.
-// `PW_CHANNEL` z otoczenia ma pierwszeństwo (pusty = Chromium).
-function e2eChannel() {
-  if (process.env.PW_CHANNEL !== undefined) return process.env.PW_CHANNEL;
-  if (process.platform !== 'win32') return 'msedge';
-  const edge = ['C:\\Program Files (x86)', 'C:\\Program Files'].map((dir) =>
-    join(dir, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
-  );
-  return edge.some((path) => existsSync(path)) ? 'msedge' : '';
-}
+import { e2eChannel, e2eWorkers, numbersFrom } from './verify-stages.mjs';
 
 const BASH = gitBash();
 
@@ -68,8 +46,8 @@ const cargoEnv = {
 };
 const pkgArgs = packages.flatMap((p) => ['-p', p]);
 const SHELL = 'apps/desktop/src-tauri/Cargo.toml';
-// Powłoka budowana zawsze do `target/shell` (jak verify-app.sh) — bez tego każdy bieg odtwarzał osobne
-// ~50 GB w apps/desktop/src-tauri/target (właściciel 5.11: „koniec z zapychaniem dysku”).
+// Powłoka zawsze do `target/shell` (jak verify-app.sh), nie osobne ~50 GB w src-tauri/target (5.11).
+const SHELL_TARGET = 'CARGO_TARGET_DIR=target/shell';
 const JOBS = process.env['ALFA_CARGO_JOBS']?.match(/^[1-9]$/)?.[0] ?? '3'; // laptop 16 GB: 2 (LNK1102 przy 3)
 /** Bramka katalogu funkcji (docs/plan/45): nowa funkcja bez testu = etap czerwony. */
 const katalog = (f) => ['katalog', 'Katalog funkcji', `node scripts/features.mjs ${f}`, root, 0];
@@ -133,7 +111,7 @@ const STAGES = {
     [
       'linter-powloka',
       'Linter powłoki Tauri (zwykła i testowa)',
-      `CARGO_TARGET_DIR=target/shell cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets -- -D warnings && CARGO_TARGET_DIR=target/shell cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets --features e2e -- -D warnings`,
+      `${SHELL_TARGET} cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets -- -D warnings && ${SHELL_TARGET} cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets --features e2e -- -D warnings`,
       root,
       15,
     ],
@@ -147,7 +125,7 @@ const STAGES = {
     [
       'testy-powloka',
       'Testy powłoki Tauri (zwykła i testowa)',
-      `CARGO_TARGET_DIR=target/shell cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib && CARGO_TARGET_DIR=target/shell cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib --features e2e`,
+      `${SHELL_TARGET} cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib && ${SHELL_TARGET} cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib --features e2e`,
       root,
       15,
     ],
@@ -319,40 +297,7 @@ for (const [id, title, command, cwd, needGb] of STAGES) {
     command,
     log: `${level}-${id}.log`,
   });
-  console.log(`— ${id}: ${state} (${seconds} s) ${numbersFrom(id, output)}`);
-}
-
-/** Liczby do raportu wyjęte z wyjścia etapu (nie z pamięci). */
-function numbersFrom(id, output) {
-  if (id === 'testy') {
-    const rows = [
-      ...output.matchAll(/test result: \w+\. (\d+) passed; (\d+) failed; (\d+) ignored/g),
-    ];
-    const sum = (i) => rows.reduce((total, m) => total + Number(m[i]), 0);
-    const tests = `${rows.length} programów testowych, ${sum(1)} zielonych, ${sum(2)} czerwonych, ${sum(3)} pominiętych`;
-    // Pierwsze zdanie raportu diagnostyki narzędzi agentek (docs/plan/45 §6.5).
-    const diag = join(root, 'target/verify/narzedzia/raport.md');
-    const tools = existsSync(diag) ? readFileSync(diag, 'utf8').split('\n')[2] : '';
-    return [tests, tools && `narzędzia agentek: ${tools}`].filter(Boolean).join('; ');
-  }
-  if (id === 'interfejs') return output.match(/Tests\s+(.+)/)?.[1]?.trim() ?? '';
-  if (id === 'przegladarka') {
-    const passed = output.match(/^\s*(\d+ passed.*)$/m)?.[1]?.trim() ?? '';
-    return e2eChannel() ? passed : `${passed} (Chromium Playwrighta — brak Edge)`;
-  }
-  if (id === 'aplikacja') {
-    const passed = output.match(/^\s*(\d+ passed.*)$/m)?.[1]?.trim() ?? '';
-    const coverage = output.match(/przećwiczone w prawdziwej aplikacji: (.+)/)?.[1] ?? '';
-    return [passed, coverage && `pokrycie łącza ${coverage}`].filter(Boolean).join('; ');
-  }
-  if (id === 'sprzet' || id === 'obowiazki') {
-    return output
-      .split(/\r?\n/)
-      .filter((line) => line.startsWith('— '))
-      .map((line) => line.slice(2).trim())
-      .join(' · ');
-  }
-  return '';
+  console.log(`— ${id}: ${state} (${seconds} s) ${numbersFrom(id, output, root)}`);
 }
 
 const count = (state) => results.filter((r) => r.state === state).length;
@@ -399,9 +344,8 @@ writeFileSync(
 );
 console.log(`Raport: ${join(out, `raport-${level}.md`)}`);
 console.log(`Wynik: ${verdict}`);
-// Stare kompilacje kasowane po każdym biegu (właściciel 5.11) — `ALFA_KEEP_BUILD=1` zostawia je na
-// następny bieg tego samego wieczoru.
-if (process.env['ALFA_KEEP_BUILD'] !== '1') {
+// Stare kompilacje kasowane po każdym biegu (5.11); `ALFA_KEEP_BUILD=1` je zostawia.
+const keep = process.env['ALFA_KEEP_BUILD'] === '1';
+if (!keep)
   spawnSync(BASH, [join(root, 'scripts', 'sprzatanie.sh')], { cwd: root, stdio: 'inherit' });
-}
 process.exit({ CZERWONY: 1, NIEKOMPLETNY: 3, ZIELONY: 0 }[verdict]);

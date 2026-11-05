@@ -282,3 +282,22 @@ pub struct EventsResume {
     /// Ramki po `after_seq`, w kolejności.
     pub frames: Vec<EventFrame>,
 }
+
+impl AlfaEvent {
+    /// Zdarzenie postępu pobierania modelu lokalnego.
+    pub fn local_progress(
+        model_id: &str,
+        state: LocalDownloadState,
+        bytes: u64,
+        total: Option<u64>,
+        error: Option<String>,
+    ) -> Self {
+        Self::LocalModelProgress {
+            model_id: model_id.to_owned(),
+            state,
+            bytes,
+            total,
+            error,
+        }
+    }
+}

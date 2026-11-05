@@ -112,7 +112,11 @@ impl BrokerEngine {
                 drop(store);
                 self.audit(EVENT_CHILD_LOCK, None, json!({ "op": op, "ok": true }))?;
             }
-            Ok(()) => drop(store),
+            Ok(()) => {
+                drop(store);
+                // Zmiana już obowiązuje (zgoda zapisana przed nią) — wynik dopisany, gdy Audyt działa.
+                let _ = self.audit(EVENT_CHILD_LOCK, None, json!({ "op": op, "ok": true }));
+            }
             Err(e) => {
                 drop(store);
                 let _ = self.audit(EVENT_CHILD_LOCK, None, json!({ "op": op, "ok": false }));
@@ -122,9 +126,14 @@ impl BrokerEngine {
         Ok(self.child_view())
     }
 
-    /// Zapis udanego poszerzenia w Audycie, zanim zacznie obowiązywać.
+    /// Zgoda na poszerzenie (PIN sprawdzony) w Audycie, zanim zacznie obowiązywać; wynik (`ok`) dopisuje
+    /// `change_child_sync` po zmianie — nieudany zapis pliku daje „zgoda”, potem „błąd”, nigdy „ok”.
     fn granted(&self, op: &str) -> Result<(), BrokerError> {
-        self.audit(EVENT_CHILD_LOCK, None, json!({ "op": op, "ok": true }))
+        self.audit(
+            EVENT_CHILD_LOCK,
+            None,
+            json!({ "op": op, "stage": "granted" }),
+        )
     }
 
     fn apply_child(

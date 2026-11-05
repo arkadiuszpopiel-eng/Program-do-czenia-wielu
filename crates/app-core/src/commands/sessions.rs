@@ -8,7 +8,6 @@ use cost_meter_contract::CostMeter;
 use search_contract::{Caller, DocKind, Mode, Query, Search, SessionSet};
 use sessions_contract::{
     NewSession, SessionCatalog, SessionHistory, SessionId, SessionPatch, SessionQuery,
-    SessionTemplate as CoreTemplate,
 };
 
 use crate::core::AppCore;
@@ -19,16 +18,6 @@ use crate::dto::{
 use crate::error::AppError;
 use crate::ids;
 use crate::settings::keys;
-
-fn core_template(t: SessionTemplate) -> CoreTemplate {
-    match t {
-        SessionTemplate::Empty => CoreTemplate::Empty,
-        SessionTemplate::Coding => CoreTemplate::Coding,
-        SessionTemplate::Research => CoreTemplate::Research,
-        SessionTemplate::Voice => CoreTemplate::VoiceAssistant,
-        SessionTemplate::Admin => CoreTemplate::PcAdmin,
-    }
-}
 
 const BUILTIN_AGENTS: [&str; 4] = ["alfa", "beta", "gama", "delta"];
 
@@ -65,7 +54,7 @@ impl AppCore {
     ) -> Result<SessionSummary, AppError> {
         self.create_session(NewSession {
             title: template.title().to_owned(),
-            template: core_template(template),
+            template: template.core(),
             agents: BUILTIN_AGENTS.iter().map(|a| (*a).into()).collect(),
             ..NewSession::default()
         })

@@ -196,3 +196,47 @@ async fn open_until_exit_closes_when_the_app_disconnects() {
     );
     assert!(!b.child_lock().tamper_resistant || b.child_lock().enabled);
 }
+
+/// Nieudany zapis pliku kłódki po zgodzie: Audyt ma „zgoda”, potem „błąd” — nigdy „ok” (plan 50 Z.7).
+#[tokio::test]
+async fn failed_save_after_grant_is_never_logged_as_ok() {
+    let dir = tempfile::tempdir().unwrap();
+    let clock = Arc::new(ManualClock::new(1_000_000));
+    let audit = Arc::new(MemoryAudit::default());
+    let b = broker(dir.path(), &clock, &audit);
+    set_pin(&b).await;
+    enable(&b).await;
+    // Katalog w miejscu pliku tymczasowego — zapis pliku kłódki się nie uda.
+    let tmp = dir.path().join(CHILD_LOCK_FILE).with_extension("tmp");
+    std::fs::create_dir(&tmp).unwrap();
+    let on = ChildLockChange::Transcripts {
+        pin: pin(),
+        on: true,
+    };
+    assert!(b.change_child_lock(on).await.is_err());
+    assert!(!b.child_lock().transcripts);
+    let trail: Vec<serde_json::Value> = audit
+        .events()
+        .into_iter()
+        .map(|e| e.payload)
+        .filter(|p| p["op"] == "transcripts_on")
+        .collect();
+    assert_eq!(
+        trail,
+        vec![
+            serde_json::json!({ "op": "transcripts_on", "stage": "granted" }),
+            serde_json::json!({ "op": "transcripts_on", "ok": false }),
+        ]
+    );
+    std::fs::remove_dir(&tmp).unwrap();
+    let on = ChildLockChange::Transcripts {
+        pin: pin(),
+        on: true,
+    };
+    assert!(b.change_child_lock(on).await.unwrap().transcripts);
+    let last = audit.events().last().map(|e| e.payload.clone());
+    assert_eq!(
+        last,
+        Some(serde_json::json!({ "op": "transcripts_on", "ok": true }))
+    );
+}

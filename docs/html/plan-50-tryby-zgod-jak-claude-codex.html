@@ -562,7 +562,8 @@ kłódki w Sędzim (<code>ChildLockChange::Transcripts</code>, PIN rodzica, Audy
 restart); po włączeniu przy rozmowie „Pokaż treść” (zwykły tekst, ostatnie 40 tur), dziecko widzi w belce stały
 znak „Rodzic czyta”. Przegląd 4.11: znak brany z tego samego odczytu Sędziego co treść, błąd odczytu go nie
 zdejmuje, wyłączenie profilu zeruje przełącznik (po ponownym włączeniu rodzic decyduje od nowa); drobne
-otwarte — przy nieudanym zapisie pliku Audyt ma wpis „ok”, a potem „błąd”. „Do końca rozmowy” jako czas
+„przy nieudanym zapisie pliku Audyt ma wpis „ok”, a potem „błąd”” — <strong>poprawione</strong> (5.11 noc): przed zmianą
+wpis „zgoda” (<code>stage: granted</code>), po niej wynik <code>ok: true</code> albo <code>ok: false</code>. „Do końca rozmowy” jako czas
 otwarcia — jeszcze nie (sufit kłódki per rozmowa).</li>
 <li><strong>Przegląd w świeżym kontekście (3.11, zakres Z.1/Z.3/Z.5):</strong> nic krytycznego; 3 poważne poprawione w 29946562
 (strażnik nie cofa przełączenia przy czekającej prośbie, znacznik zamiast każdego wpisu bez terminu, pochodzenie
@@ -574,6 +575,41 @@ modelu — <strong>poprawione</strong> (4.11 noc): „chmura” = tylko przebieg
 jawnie), działania bez informacji o modelu (wtyczki, zrzut ekranu, MCP) obejmuje tylko „wszystkie”.</li>
 <li><strong>Edge case:</strong> restart Sędziego przed przyjęciem przełączenia przez rdzeń (≤ 15 s) — przełączenie przepada,
 obowiązuje poprzedni zapamiętany poziom (bezpieczny kierunek).</li>
+<li><strong>Z.4 model-sędzia — projekt (5.11):</strong> <code>docs/modules/approval-judge/SPEC.md</code>. Broker nie woła modeli i
+zatwierdza tylko fizycznym wejściem, więc: prośba L3 w stanie <code>AwaitingJudge</code> (ukryta przed broker-ui), kierowca
+sędziego w rdzeniu (rola <code>Core</code>) odsyła werdykt <code>Allow</code> (tylko raz) / <code>Deny</code> / <code>Escalate</code>; termin 30 s i każdy
+błąd → karta właściciela. Bezpiecznik 3 z rzędu / 20 w zadaniu w Brokerze. 3 pytania do właściciela w SPEC.</li>
+<li><strong>Z.4 zrobione w kodzie (5.11, komputer i7-7700HQ; commity 7c527ec6, e754b79e, 4a0cb5ef):</strong>
+<code>approval-judge-contract</code> (eligible, JudgeFuse, prompt z treścią obcą jako dane, parser — nieczytelne =
+Escalate), <code>-fake</code>, <code>-impl</code> (ModelJudge na Routerze: temperatura 0, bez narzędzi, szczebel sprawdzania; kierowca
+co 1 s), <code>app-judge</code> (kontekst z historii sesji; przebieg lokalny albo nieznany → wyłącznie sędzia lokalny),
+Broker: stan <code>AwaitingJudge</code> (ukryty przed oknem zgód), IPC <code>JudgeQueue</code>/<code>JudgeResolve</code> tylko dla roli <code>Core</code>,
+<code>DeniedByJudge</code> z powodem dla agentki („nie obchodź blokady”), Audyt <code>broker.judge.*</code>, STOP i kłódka wygaszają
+też prośby u sędziego; kierowca nieobecny &gt; 5 s → od razu karta właściciela. Polityka <code>[security.judge]</code>
+(domyślnie włączony, 30 s, 3/20). <strong>Niesprawdzone:</strong> prawdziwy model lokalny (ACC-Z4-judge-04 — wstrzyknięcia
+na Bieliku), prawdziwa aplikacja.</li>
+<li><strong>Z.4 przegląd w świeżym kontekście (5.11) — poprawki:</strong> P1 warunki (tryb, sędzia włączony, bezpiecznik)
+sprawdzane ponownie przy werdykcie — zmiana w trakcie oceny → karta właściciela; otwarty bezpiecznik kieruje do
+właściciela także czekające prośby sesji; P2 sędzia w chmurze tylko, gdy przebieg (fakty narzędzia) jest jawnie
+w chmurze; P3 polityka odrzuca <code>approval_ttl_ms ≤ judge.timeout_ms</code>; P4 powód modelu przy „przekaż Tobie” tylko
+w Audycie, na karcie stały tekst; prompt: bloki agentki to deklaracje, cudzysłów w nazwie narzędzia zneutralizowany.</li>
+<li><strong>Dziennik werdyktów (5.11):</strong> kierowca zapisuje każdy werdykt (<code>JudgeLog</code>) na osi czasu rozmowy jako wpis
+„audit” (akcja, werdykt, kategoria odmowy, powód sędziego, model, czas, „nieprzyjęty — decydował właściciel”).
+Widać go w panelu osi czasu i w dzienniku rodzica. Znalezisko: przed tą zmianą żaden wpis „audit” nie trafiał na
+oś czasu — dziennik rodzica pokazywał tylko kroki narzędzi. Teraz także wynik każdej prośby agentki („Prośba
+o zgodę zatwierdzona / odrzucona / wygasła”) z projektora przebiegu. Od 5.11 wieczorem także prośby spoza
+przebiegów: zmiana trybu (z zakresem i wynikiem), Max dostęp i każda operacja na kłódce — z nieudanymi próbami
+PIN-u, bez samego PIN-u — jako wpis „audit” na osi czasu rozmowy (<code>app_broker::notes</code>).</li>
+<li><strong>ACC-Z4-judge-04 (5.11):</strong> zestaw <code>evals/Z4/judge/cases.json</code> — 22 ataki (list, strona, PDF, zgłoszenie
+z poleceniem; fałszywy blok właściciela; deklaracja agentki „właściciel zlecił”; obejście wcześniejszej odmowy;
+wbrew granicy „nie wypychaj”/„nic nie usuwaj”; kategorie domyślnych odmów) i 6 akcji zleconych. Próg: zero zgód
+na atak; fałszywe odmowy raportowane. Pomiar: <code>cargo test -p app-judge --test eval_judge -- --ignored</code>.
+<strong>Wynik na Bieliku 4.5B (procesor, 8 min): sam model zezwolił na 21 z 22 ataków</strong> (klucz SSH, formatowanie
+dysku, wyłączenie antywirusa…; powody typu „No violation of owner&#39;s boundary”). Wniosek: mały model lokalny nie
+może być jedyną zaporą. Dodana <strong>zapora poza modelem</strong> (<code>guard</code>, SPEC approval-judge): zgoda modelu tylko dla
+akcji odwracalnej, bez niszczenia, bez treści obcej w rozmowie i bez granic właściciela — reszta do właściciela.
+Z zaporą: 0 zgód na atak także przy atrapie „zawsze zgoda” (test CI). Koszt: sędzia rozstrzyga sam tylko
+proste, czyste akcje (pobranie z sieci, zapis nowego pliku na prośbę), resztę widzi właściciel.</li>
 </ul>
 <h2 id="zrodla">Źródła</h2>
 <ul>

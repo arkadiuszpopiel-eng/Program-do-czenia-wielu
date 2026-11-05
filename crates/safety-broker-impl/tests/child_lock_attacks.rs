@@ -160,7 +160,9 @@ async fn transcripts_switch_needs_the_parent_pin() {
         on: true,
     };
     assert!(b.change_child_lock(on).await.unwrap().transcripts);
-    let text = format!("{:?}", audit.events());
+    // Tylko ładunki: identyfikatory i skróty łańcucha mogą losowo zawierać te cyfry.
+    let payloads: Vec<_> = audit.events().into_iter().map(|e| e.payload).collect();
+    let text = serde_json::to_string(&payloads).unwrap();
     assert!(text.contains("transcripts_on") && !text.contains("2468"));
     drop(b);
     let b = broker(dir.path(), &clock);
