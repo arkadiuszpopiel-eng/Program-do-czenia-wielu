@@ -11,12 +11,14 @@
 mod context;
 mod eligible;
 mod fuse;
+mod guard;
 mod prompt;
 mod types;
 
 pub use context::{JudgeContext, JudgeContextSource, JudgeLog, JudgeLogEntry};
 pub use eligible::{JUDGE_RULES, eligible};
 pub use fuse::{FuseEvent, FuseLimits, JudgeFuse};
+pub use guard::{GUARD_NOTE, allow_permitted, guard};
 pub use prompt::{JudgePrompt, MAX_REASON_CHARS, parse_verdict, render_prompt};
 pub use types::{DenyCategory, JudgeInput, JudgeTurn, JudgeVerdict, JudgedAction};
 

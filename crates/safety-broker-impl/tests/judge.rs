@@ -136,14 +136,15 @@ async fn allow_after_mode_lowered_goes_to_owner() {
     let (b, _, clock) = with_driver();
     let id = ask(&b).await;
     contract_tests::set_level(&b, &clock, AutonomyTarget::Global, AutonomyLevel::L1).await;
-    b.judge_resolve(
-        id,
-        resolution(JudgeVerdict::Allow {
-            reason: "ok".into(),
-        }),
-    )
-    .await
-    .unwrap();
+    let late = b
+        .judge_resolve(
+            id,
+            resolution(JudgeVerdict::Allow {
+                reason: "ok".into(),
+            }),
+        )
+        .await;
+    assert!(matches!(late, Err(BrokerError::InvalidRequest(_))));
     assert_eq!(b.approval_status(id, &delta()), Ok(ApprovalStatus::Pending));
     let card = b.pending().into_iter().find(|c| c.request.id == id);
     assert!(card.is_some_and(|c| {

@@ -41,8 +41,10 @@ pub struct JudgeLogEntry {
     pub model: String,
     /// Czas oceny (ms).
     pub took_ms: u64,
-    /// Sędzia Cieni przyjął werdykt (`false` — termin minął albo warunki się zmieniły; decyduje właściciel).
+    /// Sędzia Cieni przyjął werdykt.
     pub accepted: bool,
+    /// Dlaczego nie przyjął (komunikat Sędziego Cieni: termin, zmiana trybu, błąd zapisu w Audycie).
+    pub rejected_because: Option<String>,
 }
 
 /// Odbiorca dziennika werdyktów (rdzeń: oś czasu rozmowy). Błąd zapisu nie zmienia decyzji.

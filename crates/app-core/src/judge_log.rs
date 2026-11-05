@@ -32,9 +32,9 @@ pub(crate) fn describe(entry: &JudgeLogEntry) -> (String, String, EventLevel) {
         entry.tool, entry.model, entry.took_ms
     );
     if !entry.accepted {
-        detail.push_str(
-            " · werdykt nieprzyjęty (termin minął albo zmienił się tryb) — decydował właściciel",
-        );
+        let why = entry.rejected_because.as_deref().unwrap_or("bez powodu");
+        let why: String = why.chars().take(MAX_REASON).collect();
+        detail.push_str(&format!(" · Sędzia Cieni nie przyjął werdyktu: {why}"));
     }
     (title, detail, level)
 }
@@ -66,6 +66,7 @@ mod tests {
             model: "local:bielik".into(),
             took_ms: 840,
             accepted,
+            rejected_because: (!accepted).then(|| "termin minął — decyduje właściciel".into()),
         }
     }
 
@@ -89,7 +90,7 @@ mod tests {
         };
         let (title, detail, level) = describe(&entry(allow, false));
         assert!(title.starts_with("Sędzia zgód zezwolił raz"));
-        assert!(detail.contains("decydował właściciel"));
+        assert!(detail.contains("nie przyjął werdyktu: termin minął"));
         assert!(detail.chars().count() < 600);
         assert_eq!(level, EventLevel::Info);
     }

@@ -8,7 +8,7 @@ use std::time::{Duration, Instant};
 
 use approval_judge_contract::{
     ApprovalJudge, JudgeContext, JudgeContextSource, JudgeInput, JudgeLog, JudgeLogEntry,
-    JudgeVerdict, JudgedAction,
+    JudgeVerdict, JudgedAction, guard,
 };
 use providers_contract::CancellationToken;
 use safety_broker_contract::{Broker, BrokerError, JudgeRequest, JudgeResolution, ModelLocation};
@@ -137,7 +137,9 @@ impl JudgeDriver {
                     ),
                     Some(judge) => {
                         let input = build_input(&req, ctx);
-                        (judge.review(&input).await, judge.model_name(), task)
+                        // Zapora poza modelem: zgoda tylko dla akcji „czystej” (ACC-Z4-judge-04).
+                        let verdict = guard(&input, judge.review(&input).await);
+                        (verdict, judge.model_name(), task)
                     }
                 }
             }
@@ -152,6 +154,7 @@ impl JudgeDriver {
             model: model.clone(),
             took_ms,
             accepted: false,
+            rejected_because: None,
         });
         let resolution = JudgeResolution {
             verdict,
@@ -162,6 +165,7 @@ impl JudgeDriver {
         let result = self.broker.judge_resolve(req.approval, resolution).await;
         if let (Some(log), Some(mut entry)) = (&self.log, entry) {
             entry.accepted = result.is_ok();
+            entry.rejected_because = result.as_ref().err().map(ToString::to_string);
             log.record(entry);
         }
         result

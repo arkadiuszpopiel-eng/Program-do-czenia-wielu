@@ -139,6 +139,13 @@ fn ctx(local_only: bool) -> JudgeContext {
     }
 }
 
+/// Kontekst bez granic właściciela — zapora pozwala na zgodę modelu.
+fn clean_ctx() -> JudgeContext {
+    let mut c = ctx(true);
+    c.limits.clear();
+    c
+}
+
 fn allow() -> JudgeVerdict {
     JudgeVerdict::Allow {
         reason: "ok".into(),
@@ -176,7 +183,7 @@ async fn verdict_goes_back_with_task_and_model() {
             local: Some(local.clone()),
             any: None,
         },
-        Arc::new(Ctx(Some(ctx(true)))),
+        Arc::new(Ctx(Some(clean_ctx()))),
     );
     driver.judge_one(request(4)).await.unwrap();
     let resolved = broker.resolved.lock().unwrap().clone();
@@ -262,7 +269,7 @@ async fn verdict_is_logged_with_acceptance() {
             local: Some(Arc::new(ScriptedJudge::with_queue([allow()]))),
             any: None,
         },
-        Arc::new(Ctx(Some(ctx(true)))),
+        Arc::new(Ctx(Some(clean_ctx()))),
         log.clone(),
     );
     driver.judge_one(request(5)).await.unwrap();
@@ -293,4 +300,24 @@ async fn local_run_location_overrides_cloud_history() {
         resolved[0].1.verdict,
         JudgeVerdict::Escalate { .. }
     ));
+}
+
+/// Zapora w kierowcy: zgoda modelu przy granicy właściciela („nie wysyłaj nic”) → karta właściciela.
+#[tokio::test]
+async fn guard_turns_allow_with_owner_limits_into_owner_card() {
+    let broker = Arc::new(StubBroker::default());
+    let driver = JudgeDriver::new(
+        broker.clone(),
+        Judges {
+            local: Some(Arc::new(ScriptedJudge::with_queue([allow()]))),
+            any: None,
+        },
+        Arc::new(Ctx(Some(ctx(true)))),
+    );
+    driver.judge_one(request(8)).await.unwrap();
+    let resolved = broker.resolved.lock().unwrap().clone();
+    assert_eq!(
+        resolved[0].1.verdict,
+        JudgeVerdict::escalate(approval_judge_contract::GUARD_NOTE)
+    );
 }

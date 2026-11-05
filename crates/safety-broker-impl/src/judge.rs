@@ -196,9 +196,13 @@ impl BrokerEngine {
             Self::to_owner_all(&mut st, &holder, id, FUSE_OPEN_NOTE);
         }
         match verdict {
+            // Błąd mówi kierowcy (i dziennikowi werdyktów), że zgoda nie weszła w życie.
             JudgeVerdict::Allow { .. } if !still_judged => {
                 Self::to_owner(&mut st, id, CHANGED_NOTE);
-                Ok(())
+                Err(BrokerError::InvalidRequest(
+                    "tryb albo ustawienia sędziego zmieniły się w trakcie oceny — decyduje właściciel"
+                        .into(),
+                ))
             }
             JudgeVerdict::Allow { .. } => {
                 if let Some(p) = st.approvals.get_mut(&id) {

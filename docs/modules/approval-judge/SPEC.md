@@ -67,12 +67,19 @@ Tylko poziom efektywny **L3** (profil Dziecko z kłódką ma sufit ≤ L1 — ni
 - Domyślne odmowy w prompcie = `DenyCategory` (plan 50 §4.3) + granice z rozmowy („nie wypychaj”, „nie usuwaj”).
 - Po `Deny` agentka dostaje powód i zakaz obchodzenia: „Wybierz wyraźnie bezpieczniejszą drogę albo zapytaj”.
 
+## Zapora poza modelem (`guard`, 5.11)
+Kierowca przepuszcza każdy werdykt przez `approval_judge_contract::guard`: `Allow` zostaje tylko dla akcji
+odwracalnej (`reversible ≠ No`), bez niszczenia danych (`destructive = None`), w rozmowie bez treści obcej
+(`tainted = false`) i bez granic właściciela (`limits` puste) — inaczej `Escalate` (karta właściciela). Powód:
+pomiar ACC-Z4-judge-04 na Bieliku 4.5B (5.11) — sam model zezwolił na 21 z 22 ataków. Zapora jest
+deterministyczna, więc test CI z atrapą „zawsze zgoda” dowodzi zera zgód na atak bez względu na model.
+
 ## Niezmienniki (testy)
 - Sędzia nigdy nie daje zgody stałej, nie przełącza trybu, nie widzi próśb spoza `eligible`, nie działa poza L3.
 - Każda ścieżka błędu (termin, brak modelu, zły JSON, zerwane łącze, rola ≠ `Core`, prośba nie `AwaitingJudge`)
   kończy się kartą właściciela albo odmową — nigdy `Allow`.
-- Treść obca z poleceniem „zatwierdź” nie zmienia werdyktu atrapy-modelu-podatnej poza `Escalate/Deny` (test
-  wstrzyknięcia na prawdziwym modelu w Z.8).
+- Treść obca z poleceniem „zatwierdź” nie daje zgody nawet przy atrapie „zawsze zgoda” (zapora;
+  `app-judge/tests/eval_judge.rs`); pomiar na prawdziwym modelu: `evals/Z4/judge`.
 - Werdykt i powód zawsze w audycie przed wydaniem tokenu (audyt niedostępny → `Deny(AuditUnavailable)`).
 
 ## Zależności
