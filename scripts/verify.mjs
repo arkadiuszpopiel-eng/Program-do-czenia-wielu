@@ -68,6 +68,8 @@ const cargoEnv = {
 };
 const pkgArgs = packages.flatMap((p) => ['-p', p]);
 const SHELL = 'apps/desktop/src-tauri/Cargo.toml';
+// Powłoka budowana zawsze do `target/shell` (jak verify-app.sh) — bez tego każdy bieg odtwarzał osobne
+// ~50 GB w apps/desktop/src-tauri/target (właściciel 5.11: „koniec z zapychaniem dysku”).
 const JOBS = process.env['ALFA_CARGO_JOBS']?.match(/^[1-9]$/)?.[0] ?? '3'; // laptop 16 GB: 2 (LNK1102 przy 3)
 /** Bramka katalogu funkcji (docs/plan/45): nowa funkcja bez testu = etap czerwony. */
 const katalog = (f) => ['katalog', 'Katalog funkcji', `node scripts/features.mjs ${f}`, root, 0];
@@ -131,7 +133,7 @@ const STAGES = {
     [
       'linter-powloka',
       'Linter powłoki Tauri (zwykła i testowa)',
-      `cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets -- -D warnings && cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets --features e2e -- -D warnings`,
+      `CARGO_TARGET_DIR=target/shell cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets -- -D warnings && CARGO_TARGET_DIR=target/shell cargo clippy --locked -j ${JOBS} --manifest-path ${SHELL} --all-targets --features e2e -- -D warnings`,
       root,
       15,
     ],
@@ -145,7 +147,7 @@ const STAGES = {
     [
       'testy-powloka',
       'Testy powłoki Tauri (zwykła i testowa)',
-      `cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib && cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib --features e2e`,
+      `CARGO_TARGET_DIR=target/shell cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib && CARGO_TARGET_DIR=target/shell cargo test --locked -j ${JOBS} --manifest-path ${SHELL} --lib --features e2e`,
       root,
       15,
     ],
@@ -397,4 +399,9 @@ writeFileSync(
 );
 console.log(`Raport: ${join(out, `raport-${level}.md`)}`);
 console.log(`Wynik: ${verdict}`);
+// Stare kompilacje kasowane po każdym biegu (właściciel 5.11) — `ALFA_KEEP_BUILD=1` zostawia je na
+// następny bieg tego samego wieczoru.
+if (process.env['ALFA_KEEP_BUILD'] !== '1') {
+  spawnSync(BASH, [join(root, 'scripts', 'sprzatanie.sh')], { cwd: root, stdio: 'inherit' });
+}
 process.exit({ CZERWONY: 1, NIEKOMPLETNY: 3, ZIELONY: 0 }[verdict]);
