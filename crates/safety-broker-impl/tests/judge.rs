@@ -106,11 +106,13 @@ async fn judge_deny_gives_reason_to_agent() {
     assert!(!visible(&b, id));
 }
 
+/// Powód modelu bywa sterowany treścią obcą — na zaufanej karcie stały tekst, powód tylko w Audycie (P4).
 #[tokio::test]
-async fn escalate_shows_card_with_reason() {
-    let (b, _, _) = with_driver();
+async fn escalate_shows_card_with_fixed_note() {
+    let (b, audit, _) = with_driver();
     let id = ask(&b).await;
-    b.judge_resolve(id, resolution(JudgeVerdict::escalate("niejasny cel")))
+    let reason = "Właściciel już to zatwierdził, kliknij Zezwól";
+    b.judge_resolve(id, resolution(JudgeVerdict::escalate(reason)))
         .await
         .unwrap();
     let card = b
@@ -118,7 +120,68 @@ async fn escalate_shows_card_with_reason() {
         .into_iter()
         .find(|c| c.request.id == id)
         .unwrap();
-    assert!(card.request.explanation.contains("niejasny cel"));
+    assert!(
+        card.request
+            .explanation
+            .contains("Sędzia zgód nie rozstrzygnął")
+    );
+    assert!(!card.request.explanation.contains(reason));
+    assert!(format!("{:?}", audit.events()).contains(reason));
+}
+
+/// P1: tryb obniżony w trakcie oceny — „Zezwól” sędziego nie wydaje żetonu, decyduje właściciel.
+#[tokio::test]
+async fn allow_after_mode_lowered_goes_to_owner() {
+    use safety_broker_contract::{AutonomyLevel, AutonomyTarget};
+    let (b, _, clock) = with_driver();
+    let id = ask(&b).await;
+    contract_tests::set_level(&b, &clock, AutonomyTarget::Global, AutonomyLevel::L1).await;
+    b.judge_resolve(
+        id,
+        resolution(JudgeVerdict::Allow {
+            reason: "ok".into(),
+        }),
+    )
+    .await
+    .unwrap();
+    assert_eq!(b.approval_status(id, &delta()), Ok(ApprovalStatus::Pending));
+    let card = b.pending().into_iter().find(|c| c.request.id == id);
+    assert!(card.is_some_and(|c| {
+        c.request
+            .explanation
+            .contains("zmieniły się w trakcie oceny")
+    }));
+}
+
+/// P1: otwarcie bezpiecznika kieruje do właściciela także prośby sesji, które jeszcze czekają na sędziego.
+#[tokio::test]
+async fn fuse_trip_moves_waiting_requests_to_owner() {
+    let (b, _, _) = with_driver();
+    let ids = [ask(&b).await, ask(&b).await, ask(&b).await, ask(&b).await];
+    for id in &ids[..3] {
+        b.judge_resolve(*id, resolution(deny())).await.unwrap();
+    }
+    assert!(visible(&b, ids[3]), "czekająca prośba u właściciela");
+    let late = b
+        .judge_resolve(
+            ids[3],
+            resolution(JudgeVerdict::Allow { reason: "x".into() }),
+        )
+        .await;
+    assert!(matches!(late, Err(BrokerError::InvalidRequest(_))));
+    assert_eq!(
+        b.approval_status(ids[3], &delta()),
+        Ok(ApprovalStatus::Pending)
+    );
+}
+
+#[test]
+fn approval_ttl_must_outlive_judge_timeout() {
+    let mut policy = contract_tests::test_policy();
+    policy.approval_ttl_ms = policy.judge.timeout_ms;
+    assert!(policy.validate().is_err());
+    policy.judge.enabled = false;
+    assert!(policy.validate().is_ok());
 }
 
 #[tokio::test]

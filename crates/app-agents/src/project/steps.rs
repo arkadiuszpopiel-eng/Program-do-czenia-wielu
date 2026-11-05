@@ -123,7 +123,9 @@ impl RunProjector {
             let mut holder = Holder::agent(self.ctx.session.as_str(), &self.ctx.agent);
             holder.role.clone_from(&self.ctx.role);
             match self.tickets.as_ref().and_then(|t| t.resolved(id, &holder)) {
-                Some(BrokerApproval::Denied) => ApprovalStatus::Denied,
+                Some(BrokerApproval::Denied | BrokerApproval::DeniedByJudge { .. }) => {
+                    ApprovalStatus::Denied
+                }
                 Some(BrokerApproval::Approved { .. }) => ApprovalStatus::Approved,
                 _ => ApprovalStatus::Expired,
             }

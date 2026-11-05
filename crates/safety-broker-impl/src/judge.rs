@@ -131,6 +131,7 @@ impl BrokerEngine {
                     tainted: facts.tainted,
                     outside_workdir: facts.outside_workdir,
                     host: facts.egress.clone(),
+                    model_location: req.facts.model_location,
                     deadline_ms,
                 })
             })
@@ -157,6 +158,22 @@ impl BrokerEngine {
             ));
         }
         let holder = p.request.holder.clone();
+        // Przegląd 5.11 (P1): warunki sprawdzane jeszcze raz przy werdykcie — w trakcie oceny właściciel mógł
+        // obniżyć tryb albo wyłączyć sędziego, a bezpiecznik sesji mógł się otworzyć.
+        let location = match &p.action {
+            Some(PendingAction::Action(a)) => a.facts.model_location,
+            _ => None,
+        };
+        let (rules, non_voice) = (p.request.rules.clone(), p.request.non_voice);
+        let level =
+            st.autonomy
+                .effective_for(&holder.session, holder.agent.as_ref(), location, now);
+        let still_judged = st.policy().judge.enabled
+            && eligible(&rules, level, non_voice)
+            && !st
+                .judge_fuses
+                .get(&holder.session)
+                .is_some_and(|f| f.fuse.is_open());
         let verdict = resolution.verdict;
         let payload = json!({
             "approval": id, "verdict": verdict, "model": resolution.model,
@@ -175,8 +192,14 @@ impl BrokerEngine {
             }
             return Err(e);
         }
-        self.record_fuse(&mut st, &holder, &verdict, resolution.task);
+        if self.record_fuse(&mut st, &holder, &verdict, resolution.task) {
+            Self::to_owner_all(&mut st, &holder, id, FUSE_OPEN_NOTE);
+        }
         match verdict {
+            JudgeVerdict::Allow { .. } if !still_judged => {
+                Self::to_owner(&mut st, id, CHANGED_NOTE);
+                Ok(())
+            }
             JudgeVerdict::Allow { .. } => {
                 if let Some(p) = st.approvals.get_mut(&id) {
                     p.status = PendStatus::Pending;
@@ -190,35 +213,65 @@ impl BrokerEngine {
                 }
                 Ok(())
             }
-            JudgeVerdict::Escalate { reason } => {
-                if let Some(p) = st.approvals.get_mut(&id) {
-                    p.status = PendStatus::Pending;
-                    p.request
-                        .explanation
-                        .push_str(&format!(" Sędzia przekazał decyzję Tobie: {reason}"));
-                }
+            // Powód modelu (sterowalny treścią obcą) tylko w Audycie — na zaufanej karcie stały tekst (P4).
+            JudgeVerdict::Escalate { .. } => {
+                Self::to_owner(&mut st, id, ESCALATED_NOTE);
                 Ok(())
             }
         }
     }
 
+    /// Prośba `AwaitingJudge` (albo chwilowo `Pending`) → karta właściciela z dopiskiem.
+    fn to_owner(st: &mut State, id: ApprovalId, note: &str) {
+        if let Some(p) = st.approvals.get_mut(&id) {
+            p.status = PendStatus::Pending;
+            p.request.explanation.push(' ');
+            p.request.explanation.push_str(note);
+        }
+    }
+
+    /// Otwarty bezpiecznik: pozostałe prośby sesji czekające na sędziego idą do właściciela.
+    fn to_owner_all(st: &mut State, holder: &Holder, except: ApprovalId, note: &str) {
+        let ids: Vec<ApprovalId> = st
+            .approvals
+            .iter()
+            .filter(|(id, p)| {
+                **id != except
+                    && p.request.holder.session == holder.session
+                    && matches!(p.status, PendStatus::AwaitingJudge { .. })
+            })
+            .map(|(id, _)| *id)
+            .collect();
+        for id in ids {
+            Self::to_owner(st, id, note);
+        }
+    }
+
+    /// Zapisuje werdykt w bezpieczniku; `true` — bezpiecznik właśnie się otworzył.
     fn record_fuse(
         &self,
         st: &mut State,
         holder: &Holder,
         verdict: &JudgeVerdict,
         task: Option<String>,
-    ) {
+    ) -> bool {
         let f = fuse_for(st, holder);
         if task.is_some() && f.task != task {
             f.fuse.new_task();
             f.task = task;
         }
-        if f.fuse.record(verdict) == FuseEvent::Tripped {
-            let payload = json!({
-                "open": true, "consecutive": f.fuse.consecutive(), "task_denials": f.fuse.task_denials(),
-            });
-            let _ = self.audit(EVENT_JUDGE_FUSE, Some(holder), payload);
+        if f.fuse.record(verdict) != FuseEvent::Tripped {
+            return false;
         }
+        let payload = json!({
+            "open": true, "consecutive": f.fuse.consecutive(), "task_denials": f.fuse.task_denials(),
+        });
+        let _ = self.audit(EVENT_JUDGE_FUSE, Some(holder), payload);
+        true
     }
 }
+
+const CHANGED_NOTE: &str =
+    "Tryb pracy albo ustawienia sędziego zmieniły się w trakcie oceny — decydujesz Ty.";
+const ESCALATED_NOTE: &str = "Sędzia zgód nie rozstrzygnął — decydujesz Ty (powód w dzienniku).";
+const FUSE_OPEN_NOTE: &str = "Sędzia zgód odmówił kilka razy z rzędu — decydujesz Ty.";

@@ -12,6 +12,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::approval::ApprovalId;
+use crate::autonomy::ModelLocation;
 use crate::capability::Capability;
 use crate::token::Holder;
 
@@ -103,6 +104,10 @@ pub struct JudgeRequest {
     pub outside_workdir: bool,
     /// Host wyjścia sieciowego.
     pub host: Option<String>,
+    /// Gdzie działa model bieżącego przebiegu (z kontekstu wywołania narzędzia). Tylko jawna chmura pozwala
+    /// na sędziego w chmurze — inaczej zapis rozmowy nie opuszcza komputera (przegląd 5.11, P2).
+    #[serde(default)]
+    pub model_location: Option<ModelLocation>,
     /// Termin werdyktu (ms) — później prośba przechodzi na kartę właściciela.
     pub deadline_ms: u64,
 }

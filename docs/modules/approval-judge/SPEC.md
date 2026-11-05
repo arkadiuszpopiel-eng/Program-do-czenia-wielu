@@ -1,4 +1,4 @@
-# approval-judge — SPEC (v0: projekt, czeka na akceptację człowieka — dotyka Brokera)
+# approval-judge — SPEC (v1: zaimplementowany 5.11 na gałęzi do przeglądu — dotyka Brokera, akceptuje człowiek)
 
 ## Cel
 Model-sędzia trybu **„Automatycznie”** (L3): zamiast właściciela ocenia akcje, o które Sędzia Cieni zapytałby na L3

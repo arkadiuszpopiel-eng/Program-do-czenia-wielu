@@ -142,6 +142,10 @@ impl KernelPolicy {
         }
         self.deny_lists.validate().map_err(|e| e.to_string())?;
         self.judge.validate()?;
+        // Prośba musi przeżyć termin sędziego — inaczej wygasa, zanim zobaczy ją właściciel (przegląd 5.11).
+        if self.judge.enabled && self.approval_ttl_ms <= self.judge.timeout_ms {
+            return Err("approval_ttl_ms musi być dłuższy niż judge.timeout_ms".into());
+        }
         self.risk.validate()
     }
 
