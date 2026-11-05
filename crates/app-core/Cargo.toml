@@ -35,6 +35,8 @@ app-terminal = { path = "../app-terminal" }
 app-skills = { path = "../app-skills" }
 app-health = { path = "../app-health" }
 app-plugins = { path = "../app-plugins" }
+# Model-sędzia trybu „Automatycznie” (plan 50 §4.3): kontekst z historii sesji, pętla kierowcy.
+app-judge = { path = "../app-judge" }
 # Aktualizacje (updater-impl: pobieranie, weryfikacja, restart przez launcher), „O programie”.
 app-updates = { path = "../app-updates" }
 # Menedżer modeli i silników (pobieranie z wznawianiem, SHA-256/TOFU, sidecary) + embedder wyszukiwania.

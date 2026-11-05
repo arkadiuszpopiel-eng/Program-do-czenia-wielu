@@ -562,6 +562,7 @@ dependencies = [
  "app-files",
  "app-gui",
  "app-health",
+ "app-judge",
  "app-mcp",
  "app-memory",
  "app-models",
@@ -791,6 +792,22 @@ dependencies = [
  "tempfile",
  "tokio",
  "watchdog-contract",
+]
+
+[[package]]
+name = "app-judge"
+version = "0.0.84"
+dependencies = [
+ "approval-judge-contract",
+ "approval-judge-impl",
+ "core-bus-contract",
+ "providers-contract",
+ "router-contract",
+ "router-impl",
+ "safety-broker-contract",
+ "sessions-contract",
+ "sessions-fake",
+ "tokio",
 ]
 
 [[package]]

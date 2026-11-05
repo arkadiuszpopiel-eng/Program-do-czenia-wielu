@@ -486,6 +486,7 @@ dependencies = [
  "app-files",
  "app-gui",
  "app-health",
+ "app-judge",
  "app-mcp",
  "app-memory",
  "app-models",
@@ -668,6 +669,21 @@ dependencies = [
  "sessions-contract",
  "tokio",
  "watchdog-contract",
+]
+
+[[package]]
+name = "app-judge"
+version = "0.0.84"
+dependencies = [
+ "approval-judge-contract",
+ "approval-judge-impl",
+ "core-bus-contract",
+ "providers-contract",
+ "router-contract",
+ "router-impl",
+ "safety-broker-contract",
+ "sessions-contract",
+ "tokio",
 ]
 
 [[package]]
@@ -997,6 +1013,30 @@ dependencies = [
  "voice-vad-impl",
  "voice-wake-contract",
  "voice-wake-impl",
+]
+
+[[package]]
+name = "approval-judge-contract"
+version = "0.0.84"
+dependencies = [
+ "async-trait",
+ "risk-classifier-contract",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "approval-judge-impl"
+version = "0.0.84"
+dependencies = [
+ "approval-judge-contract",
+ "async-trait",
+ "futures-util",
+ "providers-contract",
+ "safety-broker-contract",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]
@@ -6547,6 +6587,7 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 name = "safety-broker-contract"
 version = "0.0.84"
 dependencies = [
+ "approval-judge-contract",
  "async-trait",
  "compliance-contract",
  "core-bus-contract",
@@ -6564,6 +6605,7 @@ dependencies = [
 name = "safety-broker-impl"
 version = "0.0.84"
 dependencies = [
+ "approval-judge-contract",
  "argon2",
  "async-trait",
  "chrono",
