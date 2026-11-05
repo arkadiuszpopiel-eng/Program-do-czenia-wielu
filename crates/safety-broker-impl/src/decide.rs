@@ -165,9 +165,17 @@ impl BrokerEngine {
                     explanation: verdict.explanation.clone(),
                     autonomy: Some(level),
                 };
+                // Tryb „Automatycznie”: model-sędzia zamiast właściciela (plan 50 §4.3, Z.4).
+                let judge =
+                    Self::routes_to_judge(&st, &req.holder, level, &verdict.rules, non_voice, now);
                 let action = PendingAction::Action(Box::new(req));
                 match self.open_approval(&mut st, subject, meta, action, now) {
-                    Ok(ticket) => Ok(Decision::NeedsApproval(ticket)),
+                    Ok(ticket) => {
+                        if judge {
+                            self.hand_to_judge(&mut st, ticket.id, now);
+                        }
+                        Ok(Decision::NeedsApproval(ticket))
+                    }
                     Err(BrokerError::AuditUnavailable(_)) => {
                         Ok(Decision::Deny(DenyReason::AuditUnavailable))
                     }

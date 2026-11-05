@@ -2,6 +2,7 @@
 
 use std::collections::{BTreeMap, VecDeque};
 
+use approval_judge_contract::JudgeFuse;
 use core_bus_contract::{AgentId, SessionId};
 use risk_classifier_contract::{
     AutonomyLevel, CommandOrigin, Destructiveness, Reversibility, RuleId, describe,
@@ -44,9 +45,28 @@ pub(crate) enum PendingAction {
 /// Stan prośby.
 pub(crate) enum PendStatus {
     Pending,
+    /// Czeka na model-sędziego (niewidoczna w Broker-UI); po `deadline_ms` — `Pending` (karta właściciela).
+    AwaitingJudge {
+        deadline_ms: u64,
+    },
     Approved(Option<Box<CapToken>>),
     Denied,
+    /// Odmowa modelu-sędziego z powodem dla agentki.
+    DeniedByJudge(String),
     Expired,
+}
+
+impl PendStatus {
+    /// Prośba jeszcze nierozstrzygnięta (u właściciela albo u sędziego).
+    pub(crate) fn is_open(&self) -> bool {
+        matches!(self, Self::Pending | Self::AwaitingJudge { .. })
+    }
+}
+
+/// Bezpiecznik sędziego jednej sesji z bieżącym zadaniem (zmiana zadania zeruje licznik „w zadaniu”).
+pub(crate) struct SessionFuse {
+    pub fuse: JudgeFuse,
+    pub task: Option<String>,
 }
 
 /// Prośba z wyzwaniem.
@@ -146,6 +166,11 @@ pub(crate) struct State {
     /// Poziomy bez sufitu profilu Dziecko przy ostatnim sprawdzeniu (kłódka otwarta albo profil
     /// wyłączony) — przejście w kłódkę zamkniętą unieważnia to, co wydano bez niej.
     pub unrestricted: bool,
+    /// Ostatnie pytanie kierowcy sędziego o kolejkę (znak życia; brak = prośby od razu do właściciela).
+    pub judge_seen_ms: Option<u64>,
+    /// Bezpieczniki sędziego per sesja (w pamięci; restart zaczyna od zamkniętych — sędzia nic nie
+    /// przepuszcza poza zgodą jednorazową, więc restart nie luzuje ochrony).
+    pub judge_fuses: BTreeMap<SessionId, SessionFuse>,
 }
 
 impl State {
@@ -167,6 +192,8 @@ impl State {
             denied_audit_window: (0, 0),
             switched_global: None,
             unrestricted: true,
+            judge_seen_ms: None,
+            judge_fuses: BTreeMap::new(),
         }
     }
 
@@ -205,10 +232,7 @@ impl State {
         let _ = self.keys.wipe();
         self.plans.clear();
         for p in self.approvals.values_mut() {
-            if matches!(
-                p.status,
-                PendStatus::Pending | PendStatus::Approved(Some(_))
-            ) {
+            if p.status.is_open() || matches!(p.status, PendStatus::Approved(Some(_))) {
                 p.status = PendStatus::Expired;
             }
         }

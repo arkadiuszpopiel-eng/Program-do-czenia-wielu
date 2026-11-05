@@ -20,6 +20,7 @@ mod guard;
 pub mod hex;
 pub mod ipc;
 pub mod ipc_blocking;
+mod judge;
 mod policy;
 mod proof;
 mod protected;
@@ -53,6 +54,10 @@ pub use child::{
     PIN_MAX_DIGITS, PIN_MAX_FAILURES, PIN_MIN_DIGITS, Pin,
 };
 pub use guard::KernelGuard;
+pub use judge::{
+    EVENT_JUDGE_DECIDED, EVENT_JUDGE_FUSE, EVENT_JUDGE_REQUESTED, EVENT_JUDGE_TIMEOUT,
+    JUDGE_DRIVER_STALE_MS, JudgePolicy, JudgeRequest, JudgeResolution,
+};
 pub use policy::{
     HelloRequirement, KernelPolicy, PROTECTED_PROCESSES, PROTECTED_SERVICES, PROVIDER_APPS,
 };

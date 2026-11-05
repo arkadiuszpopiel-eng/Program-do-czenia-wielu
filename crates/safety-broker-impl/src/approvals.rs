@@ -100,7 +100,7 @@ impl BrokerEngine {
     pub(crate) fn expire(st: &mut State, now: u64) {
         st.sync_child(now);
         for p in st.approvals.values_mut() {
-            if matches!(p.status, PendStatus::Pending) && now >= p.request.expires_at_ms {
+            if p.status.is_open() && now >= p.request.expires_at_ms {
                 p.status = PendStatus::Expired;
             }
         }
@@ -111,6 +111,7 @@ impl BrokerEngine {
         let now = self.now();
         let mut st = self.lock();
         Self::expire(&mut st, now);
+        self.promote_judge_timeouts(&mut st, now);
         st.approvals
             .values()
             .filter(|p| matches!(p.status, PendStatus::Pending))
@@ -130,6 +131,7 @@ impl BrokerEngine {
         let now = self.now();
         let mut st = self.lock();
         Self::expire(&mut st, now);
+        self.promote_judge_timeouts(&mut st, now);
         let p = st
             .approvals
             .get_mut(&id)
@@ -138,11 +140,14 @@ impl BrokerEngine {
             return Err(BrokerError::Unauthorized("prośba innego podmiotu".into()));
         }
         Ok(match &mut p.status {
-            PendStatus::Pending => ApprovalStatus::Pending,
+            PendStatus::Pending | PendStatus::AwaitingJudge { .. } => ApprovalStatus::Pending,
             PendStatus::Approved(token) => ApprovalStatus::Approved {
                 token: token.take(),
             },
             PendStatus::Denied => ApprovalStatus::Denied,
+            PendStatus::DeniedByJudge(reason) => ApprovalStatus::DeniedByJudge {
+                reason: reason.clone(),
+            },
             PendStatus::Expired => ApprovalStatus::Expired,
         })
     }
@@ -247,6 +252,10 @@ impl BrokerEngine {
             }
             return Err(e);
         }
-        self.apply_decision(&mut st, id, decision, now)
+        let approved = decision != ApprovalDecision::Deny;
+        let result = self.apply_decision(&mut st, id, decision, now);
+        // Zgoda właściciela zamyka bezpiecznik sędziego tej sesji (plan 50 §4.3).
+        self.owner_decided_fuse(&mut st, &holder, approved && result.is_ok());
+        result
     }
 }

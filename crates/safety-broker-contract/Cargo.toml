@@ -15,6 +15,7 @@ contract-tests = []
 
 [dependencies]
 risk-classifier-contract = { path = "../risk-classifier-contract" }
+approval-judge-contract = { path = "../approval-judge-contract" }
 compliance-contract = { path = "../compliance-contract" }
 watchdog-contract = { path = "../watchdog-contract" }
 core-bus-contract.workspace = true

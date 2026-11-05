@@ -24,6 +24,7 @@ pub mod link;
 pub mod mode;
 pub mod notice;
 mod remote;
+mod remote_kill;
 pub mod replay;
 mod status;
 pub mod supervise;
@@ -40,7 +41,8 @@ use safety_broker_contract::Broker;
 use safety_broker_impl::BrokerEngine;
 use watchdog_contract::{JobRegistry, KillSwitch};
 
-pub use remote::{KILL_TIMEOUT, RemoteBroker, RemoteKill};
+pub use remote::{KILL_TIMEOUT, RemoteBroker};
+pub use remote_kill::RemoteKill;
 pub use status::{KernelStatus, LinkState};
 pub use window::RemoteWindow;
 

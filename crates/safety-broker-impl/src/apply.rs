@@ -216,7 +216,7 @@ impl BrokerEngine {
         let ids: Vec<ApprovalId> = st
             .approvals
             .iter()
-            .filter(|(_, p)| matches!(p.status, PendStatus::Pending))
+            .filter(|(_, p)| p.status.is_open())
             .filter(|(_, p)| {
                 matches!(
                     p.action,

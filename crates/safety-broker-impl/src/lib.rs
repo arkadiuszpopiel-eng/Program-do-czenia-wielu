@@ -22,6 +22,7 @@ mod child_store;
 mod decide;
 mod engine;
 mod grants;
+mod judge;
 mod keys;
 mod kill;
 mod standing;

@@ -270,6 +270,11 @@ impl BrokerServer {
             Request::Grants => Ok(Response::Grants(e.grants())),
             Request::RevokeGrant { id } => e.revoke_grant(id).await.map(Response::Revoked),
             Request::ChildLock => Ok(Response::ChildLock(e.child_lock())),
+            Request::JudgeQueue => Ok(Response::JudgeQueue(e.judge_queue())),
+            Request::JudgeResolve { id, resolution } => e
+                .judge_resolve(id, *resolution)
+                .await
+                .map(|()| Response::Ok),
             Request::ChangeChildLock(change) => {
                 e.change_child_lock(change).await.map(Response::ChildLock)
             }

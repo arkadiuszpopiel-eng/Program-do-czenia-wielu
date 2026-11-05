@@ -14,6 +14,7 @@ use crate::action::{
 use crate::approval::{ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalStatus, GrantInfo};
 use crate::capability::Capability;
 use crate::child::{ChildLockChange, ChildLockView};
+use crate::judge::{JudgeRequest, JudgeResolution};
 use crate::policy::KernelPolicy;
 use crate::proof::PhysicalInputProof;
 use crate::token::{CapToken, Holder, TokenId};
@@ -167,6 +168,25 @@ pub trait Broker: Send + Sync {
         let _ = change;
         Err(BrokerError::InvalidRequest(
             "profil Dziecko nieobsługiwany".into(),
+        ))
+    }
+
+    /// Prośby czekające na model-sędziego (plan 50 §4.3) — tylko kierowca sędziego w jądrze. Wywołanie
+    /// jest też znakiem życia kierowcy. Domyślnie pusto: bez kierowcy prośby trafiają do właściciela.
+    fn judge_queue(&self) -> Vec<JudgeRequest> {
+        Vec::new()
+    }
+
+    /// Werdykt sędziego dla prośby „czeka na sędziego”: `Allow` — jedna akcja, `Deny` — odmowa z powodem,
+    /// `Escalate` — karta właściciela. Domyślnie nieobsługiwane.
+    async fn judge_resolve(
+        &self,
+        id: ApprovalId,
+        resolution: JudgeResolution,
+    ) -> Result<(), BrokerError> {
+        let _ = (id, resolution);
+        Err(BrokerError::InvalidRequest(
+            "model-sędzia nieobsługiwany".into(),
         ))
     }
 }

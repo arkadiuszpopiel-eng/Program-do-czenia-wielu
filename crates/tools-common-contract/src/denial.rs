@@ -21,6 +21,13 @@ pub enum DenialReason {
         /// Prośba.
         approval: ApprovalId,
     },
+    /// Model-sędzia trybu „Automatycznie” odmówił (plan 50 §4.3).
+    JudgeDenied {
+        /// Prośba.
+        approval: ApprovalId,
+        /// Kategoria i powód po polsku (`reason` zajmuje tag serde).
+        detail: String,
+    },
     /// Prośba wygasła albo unieważniona (kill-switch).
     ApprovalExpired {
         /// Prośba.
@@ -48,6 +55,10 @@ impl DenialReason {
                 "ścieżka lub polecenie na deny-liście (poświadczenia, dane Jądra)".into()
             }
             Self::OwnerDenied { .. } => "właściciel odmówił zgody".into(),
+            Self::JudgeDenied { detail, .. } => format!(
+                "sędzia zgód odmówił ({detail}). Nie obchodź tej blokady innym poleceniem ani narzędziem — \
+                 wybierz wyraźnie bezpieczniejszą drogę albo zapytaj właściciela"
+            ),
             Self::ApprovalExpired { .. } => {
                 "prośba o zgodę wygasła albo została unieważniona".into()
             }

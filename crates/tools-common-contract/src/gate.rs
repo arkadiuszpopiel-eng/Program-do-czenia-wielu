@@ -181,6 +181,12 @@ impl BrokerGate {
                         approval: id,
                     }));
                 }
+                ApprovalStatus::DeniedByJudge { reason } => {
+                    return Err(GateError::Denied(DenialReason::JudgeDenied {
+                        approval: id,
+                        detail: reason,
+                    }));
+                }
                 ApprovalStatus::Expired => {
                     return Err(GateError::Denied(DenialReason::ApprovalExpired {
                         approval: id,

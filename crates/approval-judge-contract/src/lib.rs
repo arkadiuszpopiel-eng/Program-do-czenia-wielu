@@ -8,11 +8,13 @@
 //! Crate zawiera wyłącznie czyste funkcje i typy, żeby Broker (osobny proces, bez dostawców modeli) mógł użyć
 //! `eligible` i `JudgeFuse`, a rdzeń — `render_prompt` i `parse_verdict`.
 
+mod context;
 mod eligible;
 mod fuse;
 mod prompt;
 mod types;
 
+pub use context::{JudgeContext, JudgeContextSource};
 pub use eligible::{JUDGE_RULES, eligible};
 pub use fuse::{FuseEvent, FuseLimits, JudgeFuse};
 pub use prompt::{JudgePrompt, MAX_REASON_CHARS, parse_verdict, render_prompt};

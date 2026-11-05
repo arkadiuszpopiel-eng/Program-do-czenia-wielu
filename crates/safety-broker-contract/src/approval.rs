@@ -173,6 +173,11 @@ pub enum ApprovalStatus {
     },
     /// Odrzucona.
     Denied,
+    /// Odrzucona przez model-sędziego trybu „Automatycznie” (plan 50 §4.3) — agentka dostaje powód.
+    DeniedByJudge {
+        /// Kategoria i powód po polsku.
+        reason: String,
+    },
     /// Wygasła albo unieważniona (kill-switch).
     Expired,
 }
