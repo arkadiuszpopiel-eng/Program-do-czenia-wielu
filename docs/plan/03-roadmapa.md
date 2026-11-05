@@ -244,11 +244,11 @@ Plan: [`50-tryby-zgod-jak-claude-codex.md`](50-tryby-zgod-jak-claude-codex.md) (
 | Z.1 | Menu 5 trybów + przełącznik Max dostęp | zrobione | 2026-11-03 | 5 trybów (klawisze 1–5), czerwony przełącznik Max dostęp z zasięgiem, znak w belce; czeka na przegląd człowieka (gałąź `do-przegladu-tryby-zgod`, §8.2 planu 50) |
 | Z.2 | Poziom „Akceptuj edycje” w Sędzim Cieni | zrobione | 2026-11-03 | czeka na przegląd człowieka (gałąź `do-przegladu-tryby-zgod`); folder pracy + ścieżki chronione; przegląd w świeżym kontekście — §8 planu 50 |
 | Z.3 | Okno zgody z 4 opcjami i zakresem | zrobione | 2026-11-03 | „Zezwól i przełącz na Automatycznie” w oknie Sędziego, opcja 4 po odmowie; czeka na przegląd człowieka |
-| Z.4 | Model-sędzia dla „Automatycznie” | czeka | — | gałąź do przeglądu |
+| Z.4 | Model-sędzia dla „Automatycznie” | zrobione | 2026-11-05 | czeka na przegląd człowieka (gałąź `do-przegladu-tryby-zgod`); kierowca w rdzeniu, bezpiecznik 3/20, dziennik werdyktów na osi czasu; zapora poza modelem (`guard`) — Bielik 4.5B sam przepuścił 21/22 ataków, z zaporą 0/22 (`evals/Z4/judge`) |
 | Z.5 | Plan jako tryb | zrobione | 2026-11-03 | L0 = Plan: narzędzia odczytu, trzy odpowiedzi pod planem |
 | Z.6 | Profil Dziecko z kłódkami i PIN-em rodzica | zrobione | 2026-11-04 | kłódka w Sędzim (sufit L1), PIN Argon2id z blokadą; czeka na przegląd człowieka; odstępstwo: skrót PIN-u w pliku Sędziego (§8.2) |
-| Z.7 | Dziennik rodzica pod PIN-em | w toku | 2026-11-04 | tematy rozmów i działania z osi czasu; pełna treść rozmów włączana PIN-em (przełącznik w Sędzim, znak „Rodzic czyta” w belce); zostaje otwarcie „do końca rozmowy” |
-| Z.8 | Testy trybów, ataków i prawdziwej aplikacji | w toku | 2026-11-04 | tabela tryb × kategoria działania (`modes_matrix.rs`), ataki na kłódkę w Sędzim (głos, agentka, Max dostęp lokalny, zgadywanie PIN-u — `child_lock_attacks.rs`), kłódka w menu/palecie w każdym stylu i motywie; zostają: wstrzyknięcie do modelu-sędziego (po Z.4), prawdziwa aplikacja |
+| Z.7 | Dziennik rodzica pod PIN-em | w toku | 2026-11-04 | tematy rozmów i działania z osi czasu (od 5.11 także zgody, odmowy i werdykty sędziego); pełna treść rozmów włączana PIN-em (przełącznik w Sędzim, znak „Rodzic czyta” w belce); zostaje otwarcie „do końca rozmowy” |
+| Z.8 | Testy trybów, ataków i prawdziwej aplikacji | w toku | 2026-11-04 | tabela tryb × kategoria działania (`modes_matrix.rs`), ataki na kłódkę w Sędzim (głos, agentka, Max dostęp lokalny, zgadywanie PIN-u — `child_lock_attacks.rs`), kłódka w menu/palecie w każdym stylu i motywie; wstrzyknięcia do modelu-sędziego ACC-Z4-judge-04 (5.11, prawdziwy Bielik); zostaje prawdziwa aplikacja |
 
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 
