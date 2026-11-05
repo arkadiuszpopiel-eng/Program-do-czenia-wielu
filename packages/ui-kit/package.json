@@ -47,7 +47,7 @@
     "bits-ui": "2.19.3"
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "9.1.9",
+    "@storybook/addon-a11y": "10.6.1",
     "@storybook/svelte-vite": "9.1.9",
     "@sveltejs/vite-plugin-svelte": "6.2.4",
     "storybook": "9.1.9",
