@@ -103,6 +103,7 @@ async fn cards_and_tokens_from_before_the_lock_stop_working() {
     let open = ChildLockChange::Open {
         pin: pin(),
         for_ms: Some(60_000),
+        session: None,
     };
     b.change_child_lock(open).await.unwrap();
     let token = allowed(b.decide(in_profile()).await);
@@ -125,6 +126,7 @@ async fn card_opened_while_unlocked_cannot_switch_mode_or_grant_after_locking() 
     let open = ChildLockChange::Open {
         pin: pin(),
         for_ms: None,
+        session: None,
     };
     b.change_child_lock(open).await.unwrap();
     // Otwarta kłódka, tryb L3: zapis poza profilem pyta.
@@ -152,6 +154,7 @@ async fn widening_needs_the_audit_record_first() {
     let open = ChildLockChange::Open {
         pin: pin(),
         for_ms: None,
+        session: None,
     };
     assert!(b.change_child_lock(open).await.is_err());
     let off = ChildLockChange::Enable {
@@ -179,6 +182,7 @@ async fn open_until_exit_closes_when_the_app_disconnects() {
     let open = ChildLockChange::Open {
         pin: pin(),
         for_ms: None,
+        session: None,
     };
     b.change_child_lock(open).await.unwrap();
     assert_eq!(level(&b), AutonomyLevel::L3);
@@ -239,4 +243,59 @@ async fn failed_save_after_grant_is_never_logged_as_ok() {
         last,
         Some(serde_json::json!({ "op": "transcripts_on", "ok": true }))
     );
+}
+
+/// „Do końca rozmowy” (Z.7): kłódka otwarta tylko dla jednej rozmowy; inne rozmowy, działania bez sesji
+/// i zgody stałe mają sufit; zamknięcie i rozłączenie aplikacji wracają do pełnej kłódki.
+#[tokio::test]
+async fn open_for_one_conversation_only() {
+    let dir = tempfile::tempdir().unwrap();
+    let clock = Arc::new(ManualClock::new(1_000_000));
+    let audit = Arc::new(MemoryAudit::default());
+    let b = Arc::new(broker(dir.path(), &clock, &audit));
+    set_pin(&b).await;
+    enable(&b).await;
+    let app = CoreSession::new(b.clone());
+    let h = delta();
+    let other = core_bus_contract::SessionId::from("inna-rozmowa");
+    let open = ChildLockChange::Open {
+        pin: pin(),
+        for_ms: Some(1),
+        session: Some(h.session.clone()),
+    };
+    let view = b.change_child_lock(open).await.unwrap();
+    assert!(view.conversation && view.open_until_ms.is_some());
+    assert_eq!(level(&b), AutonomyLevel::L3, "ta rozmowa bez sufitu");
+    assert_eq!(b.autonomy(&other, None), AutonomyLevel::L1, "inna rozmowa");
+    clock.advance(3_600_000);
+    assert_eq!(
+        level(&b),
+        AutonomyLevel::L3,
+        "bez terminu — do końca rozmowy"
+    );
+    let names: Vec<_> = audit.events().into_iter().map(|e| e.payload).collect();
+    assert!(
+        names
+            .iter()
+            .any(|p| p["op"] == "open_conversation" && p["ok"] == true)
+    );
+
+    let closed = b.change_child_lock(ChildLockChange::Close).await.unwrap();
+    assert!(!closed.conversation && closed.open_until_ms.is_none());
+    assert_eq!(level(&b), AutonomyLevel::L1);
+
+    let again = ChildLockChange::Open {
+        pin: pin(),
+        for_ms: None,
+        session: Some(h.session.clone()),
+    };
+    b.change_child_lock(again).await.unwrap();
+    assert_eq!(level(&b), AutonomyLevel::L3);
+    drop(app);
+    assert_eq!(
+        level(&b),
+        AutonomyLevel::L1,
+        "Alfa zamknięta — kłódka zamknięta"
+    );
+    assert!(!b.child_lock().conversation);
 }

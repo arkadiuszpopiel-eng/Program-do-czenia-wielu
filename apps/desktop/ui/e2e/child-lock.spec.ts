@@ -84,6 +84,16 @@ for (const skin of ['classic', 'glass', 'next', 'junior'] as const) {
       await expect(card.getByRole('status')).toHaveText(
         'Profil Dziecko włączony — kłódka zamknięta.',
       );
+      // „Do końca rozmowy” (Z.7): tylko aktywna rozmowa, bez terminu.
+      await pin.fill('2468');
+      await card.getByRole('radio', { name: 'Do końca rozmowy' }).click();
+      await card.getByRole('button', { name: 'Otwórz kłódkę' }).click();
+      await expect(card.getByRole('status')).toHaveText('Kłódka otwarta do końca tej rozmowy.');
+      await expectReadable(page, `kłódka do końca rozmowy ${skin} ${theme}`);
+      await card.getByRole('button', { name: 'Zamknij kłódkę' }).click();
+      await expect(card.getByRole('status')).toHaveText(
+        'Profil Dziecko włączony — kłódka zamknięta.',
+      );
     });
   }
 }

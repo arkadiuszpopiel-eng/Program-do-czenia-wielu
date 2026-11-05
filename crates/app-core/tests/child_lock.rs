@@ -162,3 +162,59 @@ async fn security_changes_land_in_the_active_conversation_log() {
             .all(|t| !t.contains("1357") && !t.contains("2468"))
     );
 }
+
+/// „Do końca rozmowy” (Z.7): kłódka otwarta dla aktywnej rozmowy zamyka się po przełączeniu na inną.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn conversation_opening_ends_when_another_conversation_becomes_active() {
+    let h = harness().await;
+    let core = &h.core;
+    let first = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    let second = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    core.app_set_active_session(Some(first.clone()))
+        .await
+        .unwrap();
+    for step in [
+        serde_json::json!({ "op": "set_pin", "old": null, "new": "2468" }),
+        serde_json::json!({ "op": "enable", "pin": "2468", "on": true }),
+    ] {
+        core.permissions_child_lock(change(step)).await.unwrap();
+    }
+    let open = core
+        .permissions_child_lock(change(serde_json::json!({
+            "op": "open", "pin": "2468", "minutes": null, "session_id": first
+        })))
+        .await
+        .unwrap();
+    assert!(open.open && open.conversation);
+    let level = |s: &String| core.permissions_get(Some(s.clone()));
+    assert_eq!(
+        level(&first).await.unwrap().global,
+        AutonomyLevel::L1,
+        "globalnie — sufit"
+    );
+    core.app_set_active_session(Some(first.clone()))
+        .await
+        .unwrap();
+    assert!(
+        core.permissions_child_lock(None).await.unwrap().open,
+        "ta sama rozmowa"
+    );
+    core.app_set_active_session(Some(second)).await.unwrap();
+    let after = core.permissions_child_lock(None).await.unwrap();
+    assert!(
+        !after.open && !after.conversation,
+        "inna rozmowa — kłódka zamknięta"
+    );
+    let missing = serde_json::json!({
+        "op": "open", "pin": "2468", "minutes": null, "session_id": "nie-ma-takiej"
+    });
+    assert!(core.permissions_child_lock(change(missing)).await.is_err());
+}

@@ -41,6 +41,8 @@ pub(crate) struct Runtime {
     pub downloads: HashMap<String, CancellationToken>,
     /// Kolejne przebiegi strażnika z zapamiętanym L4 przy Brokerze na L3 (informacja przy trzecim).
     pub level_notice: u8,
+    /// Rozmowa, dla której kłódka profilu Dziecko jest otwarta „do końca rozmowy”.
+    pub child_conversation: Option<String>,
 }
 
 /// Współdzielony stan kompozycji.

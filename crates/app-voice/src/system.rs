@@ -159,6 +159,19 @@ impl SystemVoice {
         self
     }
 
+    /// Profil sprzętu dla głosu: dzierżawa Whispera wskazuje kartę z profilu (laptop z dwiema
+    /// kartami); bez profilu — karta główna.
+    #[must_use]
+    pub fn with_device_opt(
+        voice: Self,
+        device: Option<&Arc<dyn device_profile_contract::DeviceProfile>>,
+    ) -> Self {
+        match device {
+            Some(d) => voice.with_device(d.clone()),
+            None => voice,
+        }
+    }
+
     /// Profil urządzenia: dzierżawa Whispera na GPU zajmuje pulę karty, na której liczy jego
     /// backend (C6.6; na komputerze z jedną kartą bez zmian).
     #[must_use]

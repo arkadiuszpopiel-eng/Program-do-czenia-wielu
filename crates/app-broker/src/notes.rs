@@ -4,7 +4,8 @@
 
 use app_api::AppError;
 use app_api::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, ChildLockRequest, EventLevel, MaxAccess,
+    AlfaEvent, AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, ChildLockRequest, EventLevel,
+    LocalizedText, MaxAccess, ToastKind,
 };
 
 /// Nazwa trybu pracy jak w menu (plan 50 §4.1).
@@ -90,6 +91,10 @@ pub fn child_lock_action(change: &ChildLockRequest) -> ChildLockAction {
         ChildLockRequest::Enable { on: true, .. } => "włączenie profilu Dziecko",
         ChildLockRequest::Enable { on: false, .. } => "wyłączenie profilu Dziecko",
         ChildLockRequest::Open {
+            session_id: Some(_),
+            ..
+        } => "otwarcie kłódki do końca rozmowy",
+        ChildLockRequest::Open {
             minutes: Some(_), ..
         } => "otwarcie kłódki na czas",
         ChildLockRequest::Open { minutes: None, .. } => "otwarcie kłódki do zamknięcia Alfy",
@@ -118,6 +123,17 @@ pub fn child_lock_note(
             EventLevel::Warn,
             format!("Profil Dziecko: nieudana próba — {what} ({})", e.message),
         )),
+    }
+}
+
+/// Informacja po restarcie: zapamiętany Pełny dostęp (L4) wymaga ponownego potwierdzenia.
+pub fn l4_after_restart() -> AlfaEvent {
+    AlfaEvent::Toast {
+        kind: ToastKind::Warning,
+        message: LocalizedText::new(
+            "Po uruchomieniu obowiązuje L3 — zapamiętany L4 wymaga ponownego potwierdzenia: Ustawienia → Uprawnienia.",
+            "After the restart L3 applies — the remembered L4 needs confirming again: Settings → Permissions.",
+        ),
     }
 }
 
@@ -169,6 +185,7 @@ mod tests {
         let open = ChildLockRequest::Open {
             pin,
             minutes: Some(30),
+            session_id: None,
         };
         let err = AppError::forbidden("zły PIN");
         let (level, title) = child_lock_note(child_lock_action(&open), Err(&err)).unwrap();

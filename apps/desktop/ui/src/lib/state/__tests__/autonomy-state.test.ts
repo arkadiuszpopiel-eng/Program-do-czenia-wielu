@@ -54,6 +54,7 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
           tamper_resistant: false,
           unknown: false,
           transcripts: false,
+          conversation: false,
         },
         {
           pin_set: true,
@@ -63,6 +64,7 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
           tamper_resistant: false,
           unknown: false,
           transcripts: false,
+          conversation: false,
         },
       ];
       let reads = 0;
@@ -88,6 +90,7 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
       attempts_left: 5,
       tamper_resistant: false,
       transcripts: false,
+      conversation: false,
     };
     const states: ChildLockState[] = [
       { ...base, enabled: true, unknown: false },
@@ -124,6 +127,7 @@ describe('AutonomyState — tryb pracy i „Max dostęp” (plan 50 §8.1)', () 
       tamper_resistant: false,
       unknown: false,
       transcripts: true,
+      conversation: false,
     };
     let fail = false;
     const client = {

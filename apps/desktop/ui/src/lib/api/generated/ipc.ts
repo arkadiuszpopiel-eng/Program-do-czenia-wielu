@@ -970,6 +970,7 @@ export type ChildLockRequest =
       readonly minutes: number | null;
       readonly op: 'open';
       readonly pin: SecretInput;
+      readonly session_id: string | null;
     }
   | {
       readonly op: 'close';
@@ -989,6 +990,8 @@ export interface ChildLockState {
   readonly attempts_left: number;
   /** Blokada po błędnych próbach do (ms od 1970). */
   readonly blocked_until_ms?: number | null;
+  /** Kłódka otwarta „do końca rozmowy” (tylko jedna rozmowa). */
+  readonly conversation: boolean;
   readonly enabled: boolean;
   /** Kłódka otwarta teraz PIN-em rodzica. */
   readonly open: boolean;

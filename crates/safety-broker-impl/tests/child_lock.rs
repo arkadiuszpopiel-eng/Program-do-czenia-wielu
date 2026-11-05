@@ -174,6 +174,7 @@ async fn parent_pin_opens_for_a_time_and_closes_by_itself() {
     let open = |p: &str, for_ms| ChildLockChange::Open {
         pin: pin(p),
         for_ms,
+        session: None,
     };
     assert!(
         b.change_child_lock(open("1357", Some(3_600_000)))
@@ -247,6 +248,7 @@ async fn guessing_the_pin_blocks_further_attempts() {
             .change_child_lock(ChildLockChange::Open {
                 pin: pin(&guess),
                 for_ms: None,
+                session: None,
             })
             .await;
         assert!(r.is_err());
@@ -260,6 +262,7 @@ async fn guessing_the_pin_blocks_further_attempts() {
     let good = ChildLockChange::Open {
         pin: pin("2468"),
         for_ms: None,
+        session: None,
     };
     assert!(b.change_child_lock(good.clone()).await.is_err());
     drop(b);

@@ -268,7 +268,10 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   zdejmuje, wyłączenie profilu zeruje przełącznik (po ponownym włączeniu rodzic decyduje od nowa); drobne
   „przy nieudanym zapisie pliku Audyt ma wpis „ok”, a potem „błąd”” — **poprawione** (5.11 noc): przed zmianą
   wpis „zgoda” (`stage: granted`), po niej wynik `ok: true` albo `ok: false`. „Do końca rozmowy” jako czas
-  otwarcia — jeszcze nie (sufit kłódki per rozmowa).
+  otwarcia — **zrobione** (5.11 noc): Sędzia zdejmuje sufit tylko dla wskazanej rozmowy (`AutonomyTable::
+  ceiling_for`); inne rozmowy, działania bez sesji, zgody stałe i przełączenie z okna dalej mają sufit; zamknięcie
+  unieważnia tokeny i karty z otwarcia; rdzeń zamyka kłódkę, gdy aktywna staje się inna rozmowa; zamknięcie Alfy
+  zamyka ją jak „do zamknięcia Alfy”. Opcja „Do końca rozmowy” w karcie profilu (tylko przy aktywnej rozmowie).
 - **Przegląd w świeżym kontekście (3.11, zakres Z.1/Z.3/Z.5):** nic krytycznego; 3 poważne poprawione w 29946562
   (strażnik nie cofa przełączenia przy czekającej prośbie, znacznik zamiast każdego wpisu bez terminu, pochodzenie
   „lokalne” z nazwy modelu tylko u Routera), z drobnych poprawione: kolejność Audytu przy przełączeniu, brak

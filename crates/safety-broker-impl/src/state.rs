@@ -222,7 +222,9 @@ impl State {
     /// upływ terminu otwarcia): tokeny, plany i karty wydane bez sufitu przestają działać (nowy
     /// klucz bez okna łaski) — kolejne działania przechodzą przez sufit. Zwraca liczbę tokenów.
     pub(crate) fn sync_child(&mut self, now: u64) -> usize {
-        let restricted = self.autonomy.ceiling(now).is_some();
+        // Otwarcie „do końca rozmowy” to stan bez pełnej kłódki: jego zamknięcie też unieważnia tokeny.
+        let restricted =
+            self.autonomy.child_session().is_none() && self.autonomy.ceiling(now).is_some();
         let was_unrestricted = std::mem::replace(&mut self.unrestricted, !restricted);
         if !(restricted && was_unrestricted) {
             return 0;

@@ -126,7 +126,7 @@ impl Extra {
         let factory: Option<Arc<dyn VoiceEngineFactory>> =
             match (&options.voice_engine, &self.audio) {
                 (Some(f), _) => Some(f.clone()),
-                (None, Some(audio)) => Some(Arc::new(with_device(
+                (None, Some(audio)) => Some(Arc::new(app_voice::SystemVoice::with_device_opt(
                     SystemVoice::new(
                         paths.clone(),
                         audio.io(),
@@ -219,16 +219,4 @@ pub(crate) async fn diag_app(
         app.spawn_auto();
     }
     app
-}
-
-/// Profil sprzętu dla głosu: dzierżawa Whispera wskazuje kartę z profilu (laptop z dwiema
-/// kartami); bez profilu — karta główna, jak wcześniej.
-fn with_device(
-    voice: SystemVoice,
-    device: Option<&Arc<dyn device_profile_contract::DeviceProfile>>,
-) -> SystemVoice {
-    match device {
-        Some(d) => voice.with_device(d.clone()),
-        None => voice,
-    }
 }

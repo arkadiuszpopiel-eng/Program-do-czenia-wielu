@@ -113,12 +113,28 @@ pub struct AutonomyTable {
     entries: BTreeMap<AutonomyTarget, AutonomyEntry>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     child: Option<ChildCeiling>,
+    /// Kłódka otwarta „do końca rozmowy” — tylko dla tej sesji; każda inna ma sufit (plan 50 Z.7).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    child_session: Option<SessionId>,
 }
 
 impl AutonomyTable {
     /// Profil Dziecko: sufit z kłódką (`None` — profil wyłączony).
     pub fn set_child(&mut self, child: Option<ChildCeiling>) {
         self.child = child;
+        self.child_session = None;
+    }
+
+    /// Kłódka otwarta tylko dla jednej rozmowy (inne sesje i działania bez sesji — z sufitem).
+    pub fn set_child_for(&mut self, child: ChildCeiling, session: SessionId) {
+        self.child = Some(child);
+        self.child_session = Some(session);
+    }
+
+    /// Rozmowa, dla której kłódka jest otwarta („do końca rozmowy”).
+    #[must_use]
+    pub fn child_session(&self) -> Option<&SessionId> {
+        self.child_session.as_ref()
     }
 
     /// Profil Dziecko (sufit i otwarcie kłódki).
@@ -127,14 +143,25 @@ impl AutonomyTable {
         self.child
     }
 
-    /// Sufit obowiązujący teraz (kłódka zamknięta); `None` — brak ograniczenia.
+    /// Sufit obowiązujący teraz (kłódka zamknięta); `None` — brak ograniczenia. Kłódka otwarta tylko dla jednej rozmowy liczy się tu jako zamknięta: zgody stałe, przełączenie
+    /// z okna i poziom globalny dalej mają sufit.
     #[must_use]
     pub fn ceiling(&self, now_ms: u64) -> Option<AutonomyLevel> {
-        self.child.filter(|c| c.is_locked(now_ms)).map(|c| c.level)
+        self.ceiling_for(None, now_ms)
     }
 
-    fn capped(&self, level: AutonomyLevel, now_ms: u64) -> AutonomyLevel {
-        self.ceiling(now_ms).map_or(level, |c| level.min(c))
+    /// Sufit obowiązujący sesję (`None` — działanie bez sesji).
+    #[must_use]
+    pub fn ceiling_for(&self, session: Option<&SessionId>, now_ms: u64) -> Option<AutonomyLevel> {
+        let other = |s: &SessionId| session != Some(s);
+        self.child
+            .filter(|c| c.is_locked(now_ms) || self.child_session.as_ref().is_some_and(other))
+            .map(|c| c.level)
+    }
+
+    fn capped(&self, level: AutonomyLevel, session: &SessionId, now_ms: u64) -> AutonomyLevel {
+        self.ceiling_for(Some(session), now_ms)
+            .map_or(level, |c| level.min(c))
     }
 
     /// Ustawia wpis. „Max dostęp” jest jednym przełącznikiem: nowy wpis `Models` zastępuje
@@ -174,7 +201,7 @@ impl AutonomyTable {
             Some((scope, level)) if scope.covers(location) => base.max(level),
             _ => base,
         };
-        self.capped(level, now_ms)
+        self.capped(level, session, now_ms)
     }
 
     /// Usuwa wpis (powrót do reguły ogólniejszej).
@@ -197,7 +224,7 @@ impl AutonomyTable {
         agent: Option<&AgentId>,
         now_ms: u64,
     ) -> AutonomyLevel {
-        self.capped(self.uncapped(session, agent, now_ms), now_ms)
+        self.capped(self.uncapped(session, agent, now_ms), session, now_ms)
     }
 
     /// Poziom bez sufitu profilu Dziecko (zapisany stan — do rozpoznania obniżenia).

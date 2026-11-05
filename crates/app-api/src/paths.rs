@@ -156,3 +156,11 @@ impl AppPaths {
         }
     }
 }
+
+/// Nazwa komputera (układ okien zapisywany per maszyna); bez zmiennych środowiska — „Ten komputer”.
+pub fn machine_name() -> String {
+    ["COMPUTERNAME", "HOSTNAME"]
+        .iter()
+        .find_map(|v| std::env::var(v).ok().filter(|s| !s.trim().is_empty()))
+        .unwrap_or_else(|| "Ten komputer".to_owned())
+}

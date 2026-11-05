@@ -115,6 +115,10 @@ pub enum ChildLockChange {
         pin: Pin,
         /// Na ile (ms); `None` — do zamknięcia Alfy (restartu Sędziego).
         for_ms: Option<u64>,
+        /// „Do końca rozmowy”: otwarcie tylko dla tej sesji (bez terminu — do zamknięcia kłódki przez
+        /// rdzeń przy zmianie rozmowy, do zamknięcia Alfy albo restartu Sędziego); `for_ms` pomijane.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        session: Option<core_bus_contract::SessionId>,
     },
     /// Zamyka kłódkę od razu (bez PIN-u — zawężenie może każdy).
     Close,
@@ -159,6 +163,9 @@ pub struct ChildLockView {
     /// Rodzic włączył pełną treść rozmów w dzienniku (dziecko widzi stały znak).
     #[serde(default)]
     pub transcripts: bool,
+    /// Kłódka otwarta „do końca rozmowy” — tylko dla jednej sesji.
+    #[serde(default)]
+    pub conversation: bool,
 }
 
 impl ChildLockView {

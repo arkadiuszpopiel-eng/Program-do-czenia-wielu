@@ -3523,7 +3523,7 @@
           "type": "object"
         },
         {
-          "description": "Otwarcie kłódki na `minutes` minut; `None` — do zamknięcia Alfy.",
+          "description": "Otwarcie kłódki na `minutes` minut; `None` — do zamknięcia Alfy; z `session_id` — „do końca\nrozmowy” (tylko ta rozmowa, do przełączenia na inną).",
           "properties": {
             "minutes": {
               "format": "uint32",
@@ -3539,12 +3539,20 @@
             },
             "pin": {
               "$ref": "#/$defs/SecretInput"
+            },
+            "session_id": {
+              "default": null,
+              "type": [
+                "string",
+                "null"
+              ]
             }
           },
           "required": [
             "op",
             "pin",
-            "minutes"
+            "minutes",
+            "session_id"
           ],
           "type": "object"
         },
@@ -3618,6 +3626,11 @@
             "null"
           ]
         },
+        "conversation": {
+          "default": false,
+          "description": "Kłódka otwarta „do końca rozmowy” (tylko jedna rozmowa).",
+          "type": "boolean"
+        },
         "enabled": {
           "type": "boolean"
         },
@@ -3660,7 +3673,8 @@
         "attempts_left",
         "tamper_resistant",
         "unknown",
-        "transcripts"
+        "transcripts",
+        "conversation"
       ],
       "type": "object"
     },

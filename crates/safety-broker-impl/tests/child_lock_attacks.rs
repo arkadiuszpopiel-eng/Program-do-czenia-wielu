@@ -118,6 +118,7 @@ async fn guessing_the_pin_in_open_counts_and_blocks() {
         let open = ChildLockChange::Open {
             pin: pin(guess),
             for_ms: None,
+            session: None,
         };
         assert!(b.change_child_lock(open).await.is_err());
     }
@@ -125,6 +126,7 @@ async fn guessing_the_pin_in_open_counts_and_blocks() {
     let open = ChildLockChange::Open {
         pin: pin("2468"),
         for_ms: None,
+        session: None,
     };
     assert!(b.change_child_lock(open).await.is_err());
     let view = b.child_lock();

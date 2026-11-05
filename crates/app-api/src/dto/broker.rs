@@ -171,6 +171,9 @@ pub struct ChildLockState {
     /// Rodzic włączył pełną treść rozmów w dzienniku (dziecko widzi stały znak).
     #[serde(default)]
     pub transcripts: bool,
+    /// Kłódka otwarta „do końca rozmowy” (tylko jedna rozmowa).
+    #[serde(default)]
+    pub conversation: bool,
 }
 
 /// Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni.
@@ -184,10 +187,13 @@ pub enum ChildLockRequest {
     },
     /// Włączenie albo wyłączenie profilu.
     Enable { pin: SecretInput, on: bool },
-    /// Otwarcie kłódki na `minutes` minut; `None` — do zamknięcia Alfy.
+    /// Otwarcie kłódki na `minutes` minut; `None` — do zamknięcia Alfy; z `session_id` — „do końca
+    /// rozmowy” (tylko ta rozmowa, do przełączenia na inną).
     Open {
         pin: SecretInput,
         minutes: Option<u32>,
+        #[serde(default)]
+        session_id: Option<String>,
     },
     /// Zamknięcie kłódki (bez PIN-u).
     Close,

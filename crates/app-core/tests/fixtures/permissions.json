@@ -115,7 +115,8 @@
       "attempts_left": 5,
       "tamper_resistant": false,
       "unknown": false,
-      "transcripts": false
+      "transcripts": false,
+      "conversation": false
     }
   },
   {
@@ -135,7 +136,8 @@
       "attempts_left": 5,
       "tamper_resistant": false,
       "unknown": false,
-      "transcripts": false
+      "transcripts": false,
+      "conversation": false
     }
   },
   {
@@ -155,7 +157,8 @@
       "attempts_left": 0,
       "tamper_resistant": false,
       "unknown": false,
-      "transcripts": false
+      "transcripts": false,
+      "conversation": false
     }
   },
   {
@@ -173,7 +176,29 @@
       "attempts_left": 5,
       "tamper_resistant": false,
       "unknown": false,
-      "transcripts": false
+      "transcripts": false,
+      "conversation": false
+    }
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": {
+        "op": "open",
+        "pin": "2468",
+        "minutes": null,
+        "session_id": "s-1"
+      }
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": true,
+      "open": true,
+      "attempts_left": 5,
+      "tamper_resistant": false,
+      "unknown": false,
+      "transcripts": false,
+      "conversation": true
     }
   }
 ]

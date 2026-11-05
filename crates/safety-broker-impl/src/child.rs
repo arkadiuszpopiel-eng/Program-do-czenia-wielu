@@ -72,7 +72,10 @@ impl BrokerEngine {
     pub(crate) fn child_view(&self) -> ChildLockView {
         let now = self.now();
         let store = self.child_store();
-        let ceiling = self.lock().autonomy.child();
+        let (ceiling, conversation) = {
+            let st = self.lock();
+            (st.autonomy.child(), st.autonomy.child_session().is_some())
+        };
         ChildLockView {
             pin_set: store.pin_set(),
             enabled: store.locks(),
@@ -85,6 +88,7 @@ impl BrokerEngine {
             tamper_resistant: store.tamper_resistant,
             unknown: false,
             transcripts: store.record.transcripts,
+            conversation,
         }
     }
 
@@ -101,7 +105,8 @@ impl BrokerEngine {
             ChildLockChange::SetPin { .. } => ("set_pin", true),
             ChildLockChange::Enable { on: true, .. } => ("enable", false),
             ChildLockChange::Enable { on: false, .. } => ("disable", true),
-            ChildLockChange::Open { .. } => ("open", true),
+            ChildLockChange::Open { session: None, .. } => ("open", true),
+            ChildLockChange::Open { .. } => ("open_conversation", true),
             ChildLockChange::Close => ("close", false),
             ChildLockChange::Verify { .. } => ("verify", true),
             ChildLockChange::Transcripts { on: true, .. } => ("transcripts_on", true),
@@ -203,23 +208,38 @@ impl BrokerEngine {
                 self.set_ceiling(on.then(ChildCeiling::locked), now);
                 Ok(())
             }
-            ChildLockChange::Open { pin, for_ms } => {
+            ChildLockChange::Open {
+                pin,
+                for_ms,
+                session,
+            } => {
                 if !store.locks() {
                     return Err(refused("profil Dziecko jest wyłączony"));
                 }
-                if for_ms == Some(0) {
+                if session.is_none() && for_ms == Some(0) {
                     return Err(refused("czas otwarcia kłódki musi być dodatni"));
                 }
-                let until_ms = for_ms.map_or(OPEN_UNTIL_CLOSE, |d| now.saturating_add(d));
+                let until_ms = match (&session, for_ms) {
+                    (Some(_), _) | (None, None) => OPEN_UNTIL_CLOSE,
+                    (None, Some(d)) => now.saturating_add(d),
+                };
                 Self::require(store, &pin, now)?;
                 self.granted(op)?;
-                self.set_ceiling(
-                    Some(ChildCeiling {
-                        open_until_ms: Some(until_ms),
-                        ..ChildCeiling::locked()
-                    }),
-                    now,
-                );
+                let open = ChildCeiling {
+                    open_until_ms: Some(until_ms),
+                    ..ChildCeiling::locked()
+                };
+                match session {
+                    Some(session) => {
+                        // Najpierw pełna kłódka: tokeny i karty wcześniejszego otwarcia przepadają.
+                        let mut st = self.lock();
+                        st.autonomy.set_child(Some(ChildCeiling::locked()));
+                        st.sync_child(now);
+                        st.autonomy.set_child_for(open, session);
+                        st.sync_child(now);
+                    }
+                    None => self.set_ceiling(Some(open), now),
+                }
                 Ok(())
             }
         }

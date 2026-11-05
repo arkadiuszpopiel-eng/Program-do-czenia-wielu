@@ -68,9 +68,14 @@ pub fn to_child(change: ChildLockRequest) -> Result<ChildLockChange, AppError> {
             new: pin(&new)?,
         },
         ChildLockRequest::Enable { pin: p, on } => ChildLockChange::Enable { pin: pin(&p)?, on },
-        ChildLockRequest::Open { pin: p, minutes } => ChildLockChange::Open {
+        ChildLockRequest::Open {
+            pin: p,
+            minutes,
+            session_id,
+        } => ChildLockChange::Open {
             pin: pin(&p)?,
             for_ms: minutes.map(|m| u64::from(m.max(1)) * 60_000),
+            session: session_id.map(core_bus_contract::SessionId::new),
         },
         ChildLockRequest::Close => ChildLockChange::Close,
         ChildLockRequest::Verify { pin: p } => ChildLockChange::Verify { pin: pin(&p)? },
@@ -92,6 +97,7 @@ pub fn from_child(v: ChildLockView) -> ChildLockState {
         tamper_resistant: v.tamper_resistant,
         unknown: v.unknown,
         transcripts: v.transcripts,
+        conversation: v.conversation,
     }
 }
 

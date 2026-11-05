@@ -11,13 +11,6 @@ use crate::settings::keys;
 pub const SYSTEM_SETTINGS_ALLOWED: [&str; 2] =
     ["ms-settings:privacy-microphone", "ms-settings:storagesense"];
 
-fn machine_name() -> String {
-    ["COMPUTERNAME", "HOSTNAME"]
-        .iter()
-        .find_map(|v| std::env::var(v).ok().filter(|s| !s.trim().is_empty()))
-        .unwrap_or_else(|| "Ten komputer".to_owned())
-}
-
 impl AppCore {
     /// Obiekt JSON zapisany w konfiguracji jako tekst (klucze dowolne — nie są kluczami TOML).
     pub(crate) async fn config_json<T: serde::de::DeserializeOwned>(&self, key: &str) -> Option<T> {
@@ -47,7 +40,7 @@ impl AppCore {
             app_version: self.inner.app_version.clone(),
             locale,
             onboarding_done: self.config_bool(keys::ONBOARDING_DONE, false).await,
-            machine_name: machine_name(),
+            machine_name: app_api::paths::machine_name(),
             settings: self.settings_values().await?,
             layout: self.config_json(keys::LAYOUT).await,
             active_session_id: active,
@@ -87,10 +80,12 @@ impl AppCore {
                 if let Err(e) = self.chat().sync_taint(&id).await {
                     tracing::warn!(error = %e, "zgłoszenie skażenia sesji Sędziemu Cieni nie powiodło się");
                 }
-                Some(id.to_string().into())
+                Some(serde_json::Value::from(id.to_string()))
             }
             None => None,
         };
+        self.end_conversation_lock(value.as_ref().and_then(serde_json::Value::as_str))
+            .await;
         self.config_set(keys::ACTIVE_SESSION, value, true).await
     }
 

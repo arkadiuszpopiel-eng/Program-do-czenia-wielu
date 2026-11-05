@@ -1,6 +1,6 @@
 <!--
   Profil Dziecko (Ustawienia → Uprawnienia, plan 50 §4.4): PIN rodzica, włączenie profilu, kłódka
-  otwierana na czas i zamykana od razu. PIN wpisany tutaj idzie wyłącznie do Sędziego Cieni (on go
+  otwierana na czas (także „do końca rozmowy” — tylko aktywna rozmowa) i zamykana od razu. PIN wpisany tutaj idzie wyłącznie do Sędziego Cieni (on go
   sprawdza i trzyma tylko skrót); pola czyścimy zaraz po wysłaniu, niczego nie zapisujemy w Alfie.
 -->
 <script lang="ts">
@@ -45,9 +45,11 @@
   }
 
   const until = $derived(
-    lock?.open_until_ms
-      ? t('child.until.time', { when: when(lock.open_until_ms) })
-      : t('child.until.close'),
+    lock?.conversation
+      ? t('child.until.conversation')
+      : lock?.open_until_ms
+        ? t('child.until.time', { when: when(lock.open_until_ms) })
+        : t('child.until.close'),
   );
   const status = $derived(
     !lock
@@ -94,8 +96,10 @@
     const submitter = (event.submitter as HTMLButtonElement | null)?.value;
     if (!PIN.test(pin)) return void (formError = t('child.format'));
     if (submitter === 'open') {
-      const minutes = duration === 'close' ? null : Number(duration);
-      void send({ op: 'open', pin, minutes }, () => t('child.opened', { until }));
+      // „Do końca rozmowy”: tylko aktywna rozmowa; rdzeń zamyka kłódkę po przełączeniu na inną.
+      const session_id = duration === 'conversation' ? app.activeId : null;
+      const minutes = duration === 'close' || session_id ? null : Number(duration);
+      void send({ op: 'open', pin, minutes, session_id }, () => t('child.opened', { until }));
     } else {
       const on = !lock.enabled;
       void send({ op: 'enable', pin, on }, () => t(on ? 'child.enabled' : 'child.disabled'));
@@ -145,6 +149,9 @@
             options={[
               { value: '15', label: t('child.for.15') },
               { value: '60', label: t('child.for.60') },
+              ...(app.activeId
+                ? [{ value: 'conversation', label: t('child.for.conversation') }]
+                : []),
               { value: 'close', label: t('child.for.close') },
             ]}
           />

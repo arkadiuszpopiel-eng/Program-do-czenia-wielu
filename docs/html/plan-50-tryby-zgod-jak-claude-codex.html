@@ -564,7 +564,9 @@ znak „Rodzic czyta”. Przegląd 4.11: znak brany z tego samego odczytu Sędzi
 zdejmuje, wyłączenie profilu zeruje przełącznik (po ponownym włączeniu rodzic decyduje od nowa); drobne
 „przy nieudanym zapisie pliku Audyt ma wpis „ok”, a potem „błąd”” — <strong>poprawione</strong> (5.11 noc): przed zmianą
 wpis „zgoda” (<code>stage: granted</code>), po niej wynik <code>ok: true</code> albo <code>ok: false</code>. „Do końca rozmowy” jako czas
-otwarcia — jeszcze nie (sufit kłódki per rozmowa).</li>
+otwarcia — <strong>zrobione</strong> (5.11 noc): Sędzia zdejmuje sufit tylko dla wskazanej rozmowy (<code>AutonomyTable:: ceiling_for</code>); inne rozmowy, działania bez sesji, zgody stałe i przełączenie z okna dalej mają sufit; zamknięcie
+unieważnia tokeny i karty z otwarcia; rdzeń zamyka kłódkę, gdy aktywna staje się inna rozmowa; zamknięcie Alfy
+zamyka ją jak „do zamknięcia Alfy”. Opcja „Do końca rozmowy” w karcie profilu (tylko przy aktywnej rozmowie).</li>
 <li><strong>Przegląd w świeżym kontekście (3.11, zakres Z.1/Z.3/Z.5):</strong> nic krytycznego; 3 poważne poprawione w 29946562
 (strażnik nie cofa przełączenia przy czekającej prośbie, znacznik zamiast każdego wpisu bez terminu, pochodzenie
 „lokalne” z nazwy modelu tylko u Routera), z drobnych poprawione: kolejność Audytu przy przełączeniu, brak

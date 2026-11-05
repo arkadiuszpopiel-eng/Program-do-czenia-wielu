@@ -3,8 +3,8 @@
 
 use crate::core::AppCore;
 use crate::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, EventLevel, MaxAccess,
-    PermissionsState, TimelineKind,
+    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, ChildLockRequest,
+    EventLevel, MaxAccess, PermissionsState, TimelineKind,
 };
 use std::collections::BTreeMap;
 
@@ -85,11 +85,29 @@ impl AppCore {
     /// PIN sprawdza wyłącznie Sędzia Cieni, rdzeń go nie zapisuje.
     pub async fn permissions_child_lock(
         &self,
-        change: Option<crate::dto::ChildLockRequest>,
+        change: Option<ChildLockRequest>,
     ) -> Result<crate::dto::ChildLockState, AppError> {
         // Opis liczony przed przekazaniem zmiany (PIN idzie do Sędziego Cieni, nigdy do wpisu).
         let action = change.as_ref().map(notes::child_lock_action);
+        let conversation = match &change {
+            Some(ChildLockRequest::Open {
+                session_id: Some(id),
+                ..
+            }) => {
+                self.ensure_session(&ids::session(id)?)?;
+                Some(id.clone())
+            }
+            _ => None,
+        };
         let result = self.inner.broker.child_lock(change).await;
+        if let Ok(state) = &result {
+            let mut rt = self.rt();
+            if !state.conversation {
+                rt.child_conversation = None;
+            } else if conversation.is_some() {
+                rt.child_conversation = conversation;
+            }
+        }
         if let Some(action) = action
             && let Some((level, title)) =
                 notes::child_lock_note(action, result.as_ref().map(|_| ()))
@@ -115,6 +133,17 @@ impl AppCore {
         approval_id: String,
     ) -> Result<BrokerIntentResult, AppError> {
         self.inner.broker.open_approval(&approval_id).await
+    }
+
+    /// Kłódka otwarta „do końca rozmowy” zamyka się, gdy aktywna staje się inna rozmowa (albo żadna).
+    pub(crate) async fn end_conversation_lock(&self, active: Option<&str>) {
+        let open = self.rt().child_conversation.clone();
+        if open.is_some() && open.as_deref() != active {
+            let closed = self.permissions_child_lock(Some(ChildLockRequest::Close));
+            if let Err(e) = closed.await {
+                tracing::warn!(error = %e, "zamknięcie kłódki po zmianie rozmowy nie powiodło się");
+            }
+        }
     }
 
     /// Wpis „audit” o zmianie bezpieczeństwa na osi czasu rozmowy (`None` — aktywnej; bez rozmowy — tylko
@@ -214,13 +243,7 @@ impl AppCore {
             rt.level_notice
         };
         if passes == 3 {
-            self.emit(crate::dto::AlfaEvent::Toast {
-                kind: crate::dto::ToastKind::Warning,
-                message: crate::dto::LocalizedText::new(
-                    "Po uruchomieniu obowiązuje L3 — zapamiętany L4 wymaga ponownego potwierdzenia: Ustawienia → Uprawnienia.",
-                    "After the restart L3 applies — the remembered L4 needs confirming again: Settings → Permissions.",
-                ),
-            });
+            self.emit(notes::l4_after_restart());
         }
         if let Some(level) = global
             && level < view.global
