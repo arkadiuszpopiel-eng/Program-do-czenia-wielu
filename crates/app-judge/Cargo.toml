@@ -23,6 +23,11 @@ tokio.workspace = true
 
 [dev-dependencies]
 sessions-fake = { path = "../sessions-fake" }
+approval-judge-fake = { path = "../approval-judge-fake" }
+# Eval ACC-Z4-judge-04 na modelu lokalnym (test `#[ignore]`) — app-judge jest korzeniem składania.
+providers-local-impl = { path = "../providers-local-impl" }
+serde.workspace = true
+serde_json.workspace = true
 
 [lints]
 workspace = true

@@ -3,8 +3,8 @@
 
 use agent_runtime_contract::{StepKind, StepStatus};
 use app_api::dto::{
-    ApprovalPending, ApprovalStatus, EventLevel, ReplayStatus, ReplayStep, RunState, ToolStatus,
-    ToolStep, iso,
+    ApprovalPending, ApprovalStatus, EventLevel, ReplayStatus, ReplayStep, RunState, TimelineKind,
+    ToolStatus, ToolStep, iso,
 };
 use app_api::ids;
 use chrono::Utc;
@@ -117,13 +117,16 @@ impl RunProjector {
         let Some(id) = self.approvals.remove(&n) else {
             return;
         };
+        let mut by_judge = false;
         let resolved = if status == StepStatus::Ok {
             ApprovalStatus::Approved
         } else {
             let mut holder = Holder::agent(self.ctx.session.as_str(), &self.ctx.agent);
             holder.role.clone_from(&self.ctx.role);
             match self.tickets.as_ref().and_then(|t| t.resolved(id, &holder)) {
-                Some(BrokerApproval::Denied | BrokerApproval::DeniedByJudge { .. }) => {
+                Some(BrokerApproval::Denied) => ApprovalStatus::Denied,
+                Some(BrokerApproval::DeniedByJudge { .. }) => {
+                    by_judge = true;
                     ApprovalStatus::Denied
                 }
                 Some(BrokerApproval::Approved { .. }) => ApprovalStatus::Approved,
@@ -132,6 +135,18 @@ impl RunProjector {
         };
         if let Some(mut card) = self.approval.clone().filter(|c| c.id == id.0.to_string()) {
             card.status = resolved;
+            // Wynik prośby w dzienniku (oś czasu „audit”, dziennik rodzica); odmowę sędziego zapisuje jego dziennik.
+            if !by_judge {
+                let (level, what) = match resolved {
+                    ApprovalStatus::Approved => (EventLevel::Info, "zatwierdzona"),
+                    ApprovalStatus::Denied => (EventLevel::Warn, "odrzucona"),
+                    _ => (EventLevel::Warn, "wygasła bez decyzji"),
+                };
+                let title = format!("Prośba o zgodę {what}: {}", short(&card.what, 200));
+                let mut entry = self.timeline(level, title, Some(short(&card.why, 300)));
+                entry.kind = TimelineKind::Audit;
+                out.timeline.push(entry);
+            }
             self.push_approval(out, card);
         }
         if self.run.state == RunState::WaitingApproval {
@@ -213,3 +228,7 @@ pub(super) struct StepFinish<'a> {
     pub(super) undo: Option<&'a tools_common_contract::UndoRef>,
     pub(super) intent: Option<&'a tools_common_contract::ToolIntent>,
 }
+
+#[cfg(test)]
+#[path = "steps_tests.rs"]
+mod tests;

@@ -800,12 +800,16 @@ name = "app-judge"
 version = "0.0.84"
 dependencies = [
  "approval-judge-contract",
+ "approval-judge-fake",
  "approval-judge-impl",
  "core-bus-contract",
  "providers-contract",
+ "providers-local-impl",
  "router-contract",
  "router-impl",
  "safety-broker-contract",
+ "serde",
+ "serde_json",
  "sessions-contract",
  "sessions-fake",
  "tokio",
