@@ -11,6 +11,7 @@ mod compose;
 mod core;
 mod host;
 mod infra;
+mod judge_log;
 mod lifecycle;
 mod options;
 mod parts;

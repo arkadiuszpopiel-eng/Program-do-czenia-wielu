@@ -498,6 +498,7 @@ dependencies = [
  "app-terminal",
  "app-updates",
  "app-voice",
+ "approval-judge-contract",
  "artifacts-contract",
  "artifacts-impl",
  "async-trait",

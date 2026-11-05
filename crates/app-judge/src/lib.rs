@@ -22,18 +22,19 @@ fn judge_on(core: &Arc<RouterCore>) -> Arc<dyn approval_judge_contract::Approval
 }
 
 /// Uruchamia kierowcę sędziego. `local` — rdzeń Routera bez chmury (sędzia dla przebiegów lokalnych),
-/// `hybrid` — rdzeń z kluczami API (przebiegi w chmurze). Zwraca token zatrzymania.
+/// `hybrid` — rdzeń z kluczami API (przebiegi w chmurze), `log` — dziennik werdyktów. Zwraca token zatrzymania.
 pub fn spawn(
     broker: Arc<dyn Broker>,
     local: Option<&Arc<RouterCore>>,
     hybrid: Option<&Arc<RouterCore>>,
     history: Arc<dyn SessionHistory>,
+    log: Arc<dyn approval_judge_contract::JudgeLog>,
 ) -> CancellationToken {
     let judges = Judges {
         local: local.map(judge_on),
         any: hybrid.map(judge_on),
     };
-    let driver = JudgeDriver::new(broker, judges, Arc::new(SessionContext::new(history)));
+    let driver = JudgeDriver::with_log(broker, judges, Arc::new(SessionContext::new(history)), log);
     let cancel = CancellationToken::new();
     tokio::spawn(driver.run(cancel.clone()));
     cancel

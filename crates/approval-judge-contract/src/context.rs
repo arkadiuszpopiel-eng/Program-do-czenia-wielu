@@ -23,3 +23,30 @@ pub trait JudgeContextSource: Send + Sync {
     /// Kontekst dla sesji i agentki z prośby.
     fn context(&self, session: &str, agent: Option<&str>) -> Option<JudgeContext>;
 }
+
+/// Wpis dziennika werdyktów (panel „Zgody”, oś czasu rozmowy, dziennik rodzica).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct JudgeLogEntry {
+    /// Sesja proszącej agentki.
+    pub session: String,
+    /// Agentka (gdy znana).
+    pub agent: Option<String>,
+    /// Narzędzie (np. `shell.run`).
+    pub tool: String,
+    /// Opis akcji po polsku (z faktów Sędziego Cieni).
+    pub summary: String,
+    /// Werdykt modelu.
+    pub verdict: crate::JudgeVerdict,
+    /// Model sędziego.
+    pub model: String,
+    /// Czas oceny (ms).
+    pub took_ms: u64,
+    /// Sędzia Cieni przyjął werdykt (`false` — termin minął albo warunki się zmieniły; decyduje właściciel).
+    pub accepted: bool,
+}
+
+/// Odbiorca dziennika werdyktów (rdzeń: oś czasu rozmowy). Błąd zapisu nie zmienia decyzji.
+pub trait JudgeLog: Send + Sync {
+    /// Zapisuje jeden werdykt.
+    fn record(&self, entry: JudgeLogEntry);
+}

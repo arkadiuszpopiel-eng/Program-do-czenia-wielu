@@ -64,6 +64,7 @@ impl AppCore {
             Some(&routers.local),
             Some(&routers.hybrid),
             history,
+            std::sync::Arc::new(crate::judge_log::TimelineJudgeLog(self.clone())),
         );
     }
 

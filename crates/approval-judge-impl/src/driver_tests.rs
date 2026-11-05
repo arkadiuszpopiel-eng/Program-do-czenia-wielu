@@ -122,6 +122,7 @@ fn request(id: u64) -> JudgeRequest {
         tainted: false,
         outside_workdir: false,
         host: Some("api.nbp.pl".into()),
+        model_location: Some(safety_broker_contract::ModelLocation::Local),
         deadline_ms: 0,
     }
 }
@@ -239,4 +240,57 @@ async fn tick_judges_each_request_once() {
     assert_eq!(broker.resolved.lock().unwrap().len(), 1);
     assert_eq!(driver.tick(), 0, "kolejka pusta po werdykcie");
     assert_eq!(judge.seen().len(), 1);
+}
+
+#[derive(Default)]
+struct MemLog(Mutex<Vec<JudgeLogEntry>>);
+
+impl JudgeLog for MemLog {
+    fn record(&self, entry: JudgeLogEntry) {
+        self.0.lock().unwrap().push(entry);
+    }
+}
+
+/// Dziennik werdyktów: wpis z sesją, narzędziem i informacją, czy Sędzia Cieni przyjął werdykt.
+#[tokio::test]
+async fn verdict_is_logged_with_acceptance() {
+    let broker = Arc::new(StubBroker::default());
+    let log = Arc::new(MemLog::default());
+    let driver = JudgeDriver::with_log(
+        broker.clone(),
+        Judges {
+            local: Some(Arc::new(ScriptedJudge::with_queue([allow()]))),
+            any: None,
+        },
+        Arc::new(Ctx(Some(ctx(true)))),
+        log.clone(),
+    );
+    driver.judge_one(request(5)).await.unwrap();
+    let entries = log.0.lock().unwrap().clone();
+    assert_eq!(entries.len(), 1);
+    assert_eq!(entries[0].verdict, allow());
+    assert_eq!(entries[0].tool, request(5).tool);
+    assert!(entries[0].accepted);
+}
+
+/// P2: przebieg lokalny (fakty narzędzia) — sędzia w chmurze nie dostaje zapisu, choć historia mówi „chmura”.
+#[tokio::test]
+async fn local_run_location_overrides_cloud_history() {
+    let broker = Arc::new(StubBroker::default());
+    let cloud = Arc::new(ScriptedJudge::with_queue([allow()]));
+    let driver = JudgeDriver::new(
+        broker.clone(),
+        Judges {
+            local: None,
+            any: Some(cloud.clone()),
+        },
+        Arc::new(Ctx(Some(ctx(false)))),
+    );
+    driver.judge_one(request(6)).await.unwrap();
+    assert!(cloud.seen().is_empty());
+    let resolved = broker.resolved.lock().unwrap().clone();
+    assert!(matches!(
+        resolved[0].1.verdict,
+        JudgeVerdict::Escalate { .. }
+    ));
 }

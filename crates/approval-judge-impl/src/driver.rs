@@ -7,10 +7,11 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::{Duration, Instant};
 
 use approval_judge_contract::{
-    ApprovalJudge, JudgeContext, JudgeContextSource, JudgeInput, JudgeVerdict, JudgedAction,
+    ApprovalJudge, JudgeContext, JudgeContextSource, JudgeInput, JudgeLog, JudgeLogEntry,
+    JudgeVerdict, JudgedAction,
 };
 use providers_contract::CancellationToken;
-use safety_broker_contract::{Broker, BrokerError, JudgeRequest, JudgeResolution};
+use safety_broker_contract::{Broker, BrokerError, JudgeRequest, JudgeResolution, ModelLocation};
 
 /// Co ile kierowca pyta o kolejkę (znacznie poniżej progu „kierowca nieobecny” w Brokerze).
 pub const POLL_EVERY: Duration = Duration::from_millis(1_000);
@@ -69,6 +70,7 @@ pub struct JudgeDriver {
     broker: Arc<dyn Broker>,
     judges: Judges,
     context: Arc<dyn JudgeContextSource>,
+    log: Option<Arc<dyn JudgeLog>>,
     in_flight: Mutex<BTreeSet<u64>>,
 }
 
@@ -83,6 +85,23 @@ impl JudgeDriver {
             broker,
             judges,
             context,
+            log: None,
+            in_flight: Mutex::new(BTreeSet::new()),
+        })
+    }
+
+    /// Kierowca z dziennikiem werdyktów (oś czasu rozmowy).
+    pub fn with_log(
+        broker: Arc<dyn Broker>,
+        judges: Judges,
+        context: Arc<dyn JudgeContextSource>,
+        log: Arc<dyn JudgeLog>,
+    ) -> Arc<Self> {
+        Arc::new(Self {
+            broker,
+            judges,
+            context,
+            log: Some(log),
             in_flight: Mutex::new(BTreeSet::new()),
         })
     }
@@ -108,7 +127,9 @@ impl JudgeDriver {
             ),
             Some(ctx) => {
                 let task = ctx.task.clone();
-                match self.judges.pick(ctx.local_only) {
+                // Sędzia w chmurze tylko, gdy i przebieg (fakty narzędzia), i historia mówią „chmura”.
+                let local_only = ctx.local_only || req.model_location != Some(ModelLocation::Cloud);
+                match self.judges.pick(local_only) {
                     None => (
                         JudgeVerdict::escalate("brak modelu sędziego (lokalnego dla tej rozmowy)"),
                         "brak".to_owned(),
@@ -122,13 +143,28 @@ impl JudgeDriver {
             }
         };
         let took_ms = u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX);
+        let entry = self.log.as_ref().map(|_| JudgeLogEntry {
+            session: req.holder.session.as_str().to_owned(),
+            agent: req.holder.agent.as_ref().map(|a| a.as_str().to_owned()),
+            tool: req.tool.clone(),
+            summary: req.summary.clone().unwrap_or_else(|| req.tool.clone()),
+            verdict: verdict.clone(),
+            model: model.clone(),
+            took_ms,
+            accepted: false,
+        });
         let resolution = JudgeResolution {
             verdict,
             model,
             task,
             took_ms,
         };
-        self.broker.judge_resolve(req.approval, resolution).await
+        let result = self.broker.judge_resolve(req.approval, resolution).await;
+        if let (Some(log), Some(mut entry)) = (&self.log, entry) {
+            entry.accepted = result.is_ok();
+            log.record(entry);
+        }
+        result
     }
 
     /// Pobiera kolejkę i uruchamia ocenę każdej nowej prośby we własnym zadaniu. Zwraca liczbę nowych.

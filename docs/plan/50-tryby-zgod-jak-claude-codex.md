@@ -281,8 +281,26 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
 - **Z.4 model-sędzia — projekt (5.11):** `docs/modules/approval-judge/SPEC.md`. Broker nie woła modeli i
   zatwierdza tylko fizycznym wejściem, więc: prośba L3 w stanie `AwaitingJudge` (ukryta przed broker-ui), kierowca
   sędziego w rdzeniu (rola `Core`) odsyła werdykt `Allow` (tylko raz) / `Deny` / `Escalate`; termin 30 s i każdy
-  błąd → karta właściciela. Bezpiecznik 3 z rzędu / 20 w zadaniu w Brokerze. Kod nie zaczęty — na komputerze
-  z 5.11 (i7-7700HQ) brak gita i Visual Studio Build Tools. 3 pytania do właściciela w SPEC.
+  błąd → karta właściciela. Bezpiecznik 3 z rzędu / 20 w zadaniu w Brokerze. 3 pytania do właściciela w SPEC.
+- **Z.4 zrobione w kodzie (5.11, komputer i7-7700HQ; commity 7c527ec6, e754b79e, 4a0cb5ef):**
+  `approval-judge-contract` (eligible, JudgeFuse, prompt z treścią obcą jako dane, parser — nieczytelne =
+  Escalate), `-fake`, `-impl` (ModelJudge na Routerze: temperatura 0, bez narzędzi, szczebel sprawdzania; kierowca
+  co 1 s), `app-judge` (kontekst z historii sesji; przebieg lokalny albo nieznany → wyłącznie sędzia lokalny),
+  Broker: stan `AwaitingJudge` (ukryty przed oknem zgód), IPC `JudgeQueue`/`JudgeResolve` tylko dla roli `Core`,
+  `DeniedByJudge` z powodem dla agentki („nie obchodź blokady”), Audyt `broker.judge.*`, STOP i kłódka wygaszają
+  też prośby u sędziego; kierowca nieobecny > 5 s → od razu karta właściciela. Polityka `[security.judge]`
+  (domyślnie włączony, 30 s, 3/20). **Niesprawdzone:** prawdziwy model lokalny (ACC-Z4-judge-04 — wstrzyknięcia
+  na Bieliku), prawdziwa aplikacja.
+- **Z.4 przegląd w świeżym kontekście (5.11) — poprawki:** P1 warunki (tryb, sędzia włączony, bezpiecznik)
+  sprawdzane ponownie przy werdykcie — zmiana w trakcie oceny → karta właściciela; otwarty bezpiecznik kieruje do
+  właściciela także czekające prośby sesji; P2 sędzia w chmurze tylko, gdy przebieg (fakty narzędzia) jest jawnie
+  w chmurze; P3 polityka odrzuca `approval_ttl_ms ≤ judge.timeout_ms`; P4 powód modelu przy „przekaż Tobie” tylko
+  w Audycie, na karcie stały tekst; prompt: bloki agentki to deklaracje, cudzysłów w nazwie narzędzia zneutralizowany.
+- **Dziennik werdyktów (5.11):** kierowca zapisuje każdy werdykt (`JudgeLog`) na osi czasu rozmowy jako wpis
+  „audit” (akcja, werdykt, kategoria odmowy, powód sędziego, model, czas, „nieprzyjęty — decydował właściciel”).
+  Widać go w panelu osi czasu i w dzienniku rodzica. Znalezisko: przed tą zmianą żaden wpis „audit” nie trafiał na
+  oś czasu — dziennik rodzica pokazywał tylko kroki narzędzi; decyzje właściciela na kartach Sędziego nadal tam nie
+  trafiają (Audyt Brokera jest tylko w pliku) — otwarte.
 
 ## Źródła
 
