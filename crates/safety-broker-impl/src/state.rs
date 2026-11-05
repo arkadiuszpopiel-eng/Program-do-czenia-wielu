@@ -206,9 +206,16 @@ impl State {
         now: u64,
     ) -> Result<(), BrokerError> {
         let models = matches!(target, AutonomyTarget::Models { .. });
+        // Poziom rozmowy otwartej „do końca rozmowy” — z jej sufitem; reszta celów — z pełną kłódką.
+        let session = match target {
+            AutonomyTarget::Session { session } | AutonomyTarget::SessionAgent { session, .. } => {
+                Some(session)
+            }
+            _ => None,
+        };
         if self
             .autonomy
-            .ceiling(now)
+            .ceiling_for(session, now)
             .is_some_and(|c| level > c || models)
         {
             return Err(BrokerError::InvalidRequest(

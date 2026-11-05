@@ -27,8 +27,8 @@ export function childLockFake(core: FakeCore): FakeChildLock {
   let enabled = mode === 'locked' || mode === 'open';
   /** Do kiedy otwarta; `Infinity` — do zamknięcia Alfy, `null` — zamknięta. */
   let openUntil: number | null = mode === 'open' ? Infinity : null;
-  /** Otwarta „do końca rozmowy” (tylko jedna rozmowa). */
-  let conversation = false;
+  /** Rozmowa, dla której kłódka jest otwarta „do końca rozmowy”. */
+  let conversation: string | null = null;
   let failures = 0;
   let blocks = 0;
   let blockedUntil = 0;
@@ -50,7 +50,8 @@ export function childLockFake(core: FakeCore): FakeChildLock {
     tamper_resistant: false,
     unknown,
     transcripts,
-    conversation: isOpen() && conversation,
+    conversation: isOpen() && conversation !== null,
+    conversation_id: isOpen() ? conversation : null,
   });
   const refuse = (message: string) =>
     Promise.reject(new CommandError('invalid_input', `Sędzia Cieni: ${message}`));
@@ -89,7 +90,7 @@ export function childLockFake(core: FakeCore): FakeChildLock {
     switch (change.op) {
       case 'close':
         openUntil = null;
-        conversation = false;
+        conversation = null;
         break;
       case 'set_pin':
         if (pin !== null)
@@ -116,9 +117,9 @@ export function childLockFake(core: FakeCore): FakeChildLock {
         if (!enabled) error = 'profil Dziecko jest wyłączony';
         else error = check(change.pin);
         if (error === null) {
-          conversation = Boolean(change.session_id);
+          conversation = change.session_id ?? null;
           openUntil =
-            change.minutes === null || conversation
+            change.minutes === null || conversation !== null
               ? Infinity
               : Date.now() + Math.max(change.minutes, 1) * 60_000;
         }

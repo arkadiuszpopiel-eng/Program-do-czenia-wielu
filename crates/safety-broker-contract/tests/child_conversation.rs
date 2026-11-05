@@ -29,3 +29,27 @@ fn lock_open_for_one_conversation_caps_every_other() {
     assert_eq!(t.child_session(), None);
     assert_eq!(t.effective(&a, None, 10), AutonomyLevel::L1);
 }
+
+/// Max dostęp nie obowiązuje przy kłódce otwartej tylko dla jednej rozmowy (przegląd 5.11, P1).
+#[test]
+fn max_access_stays_off_in_the_open_conversation() {
+    use safety_broker_contract::{ModelLocation, ModelScope};
+    let a = SessionId::from("a");
+    let mut t = AutonomyTable::default();
+    t.set(
+        AutonomyTarget::Models {
+            scope: ModelScope::All,
+        },
+        entry(AutonomyLevel::L4),
+    );
+    let open = ChildCeiling {
+        open_until_ms: Some(OPEN_UNTIL_CLOSE),
+        ..ChildCeiling::locked()
+    };
+    t.set_child_for(open, a.clone());
+    let level = t.effective_for(&a, None, Some(ModelLocation::Local), 10);
+    assert_eq!(level, AutonomyLevel::L3, "poziom rozmowy bez Max dostępu");
+    t.set_child(None);
+    let level = t.effective_for(&a, None, Some(ModelLocation::Local), 10);
+    assert_eq!(level, AutonomyLevel::L4);
+}

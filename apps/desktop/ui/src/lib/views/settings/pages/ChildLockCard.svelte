@@ -97,6 +97,9 @@
     if (!PIN.test(pin)) return void (formError = t('child.format'));
     if (submitter === 'open') {
       // „Do końca rozmowy”: tylko aktywna rozmowa; rdzeń zamyka kłódkę po przełączeniu na inną.
+      // Rozmowa zniknęła, zanim rodzic kliknął — nie otwieramy szerzej niż wybrał (przegląd 5.11, D1).
+      if (duration === 'conversation' && !app.activeId)
+        return void (formError = t('child.noConversation'));
       const session_id = duration === 'conversation' ? app.activeId : null;
       const minutes = duration === 'close' || session_id ? null : Number(duration);
       void send({ op: 'open', pin, minutes, session_id }, () => t('child.opened', { until }));

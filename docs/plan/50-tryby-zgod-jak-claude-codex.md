@@ -271,7 +271,12 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   otwarcia — **zrobione** (5.11 noc): Sędzia zdejmuje sufit tylko dla wskazanej rozmowy (`AutonomyTable::
   ceiling_for`); inne rozmowy, działania bez sesji, zgody stałe i przełączenie z okna dalej mają sufit; zamknięcie
   unieważnia tokeny i karty z otwarcia; rdzeń zamyka kłódkę, gdy aktywna staje się inna rozmowa; zamknięcie Alfy
-  zamyka ją jak „do zamknięcia Alfy”. Opcja „Do końca rozmowy” w karcie profilu (tylko przy aktywnej rozmowie).
+  zamyka ją jak „do zamknięcia Alfy”. Opcja „Do końca rozmowy” w karcie profilu (tylko przy aktywnej rozmowie). **Przegląd w świeżym kontekście (6.11 noc):** nic
+  krytycznego; poprawione wszystkie: P1 Max dostęp nie obowiązuje w rozmowie otwartej „do końca rozmowy” (wcześniej
+  działał, a przełącznik był zgaszony), P2 w tej rozmowie menu trybów zmienia poziom rozmowy (Sędzia sprawdza sufit
+  celu `Session`), w innych — kłódka; P3 rdzeń nie gubi rozmowy po odczycie albo zerwanym łączu (zamknięcie pyta
+  Sędziego o stan); D1 bez aktywnej rozmowy opcja nie otwiera szerzej, D2 tylko rozmowa otwarta w oknie, D3 zmiana
+  rozmowy w trakcie otwarcia zamyka kłódkę.
 - **Przegląd w świeżym kontekście (3.11, zakres Z.1/Z.3/Z.5):** nic krytycznego; 3 poważne poprawione w 29946562
   (strażnik nie cofa przełączenia przy czekającej prośbie, znacznik zamiast każdego wpisu bez terminu, pochodzenie
   „lokalne” z nazwy modelu tylko u Routera), z drobnych poprawione: kolejność Audytu przy przełączeniu, brak

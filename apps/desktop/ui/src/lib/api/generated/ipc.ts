@@ -992,6 +992,8 @@ export interface ChildLockState {
   readonly blocked_until_ms?: number | null;
   /** Kłódka otwarta „do końca rozmowy” (tylko jedna rozmowa). */
   readonly conversation: boolean;
+  /** Ta rozmowa (gdy rdzeń ją zna) — interfejs pokazuje kłódkę w każdej innej. */
+  readonly conversation_id?: string | null;
   readonly enabled: boolean;
   /** Kłódka otwarta teraz PIN-em rodzica. */
   readonly open: boolean;

@@ -194,6 +194,18 @@ async fn conversation_opening_ends_when_another_conversation_becomes_active() {
         .await
         .unwrap();
     assert!(open.open && open.conversation);
+    assert_eq!(open.conversation_id.as_deref(), Some(first.as_str()));
+    // Odczyt stanu nie zapomina rozmowy (przegląd 5.11, P3); inna niż aktywna — odmowa (D2).
+    let read = core.permissions_child_lock(None).await.unwrap();
+    assert_eq!(read.conversation_id.as_deref(), Some(first.as_str()));
+    let not_active = serde_json::json!({
+        "op": "open", "pin": "2468", "minutes": null, "session_id": second
+    });
+    assert!(
+        core.permissions_child_lock(change(not_active))
+            .await
+            .is_err()
+    );
     let level = |s: &String| core.permissions_get(Some(s.clone()));
     assert_eq!(
         level(&first).await.unwrap().global,

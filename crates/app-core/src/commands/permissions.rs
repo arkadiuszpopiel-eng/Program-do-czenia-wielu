@@ -89,24 +89,35 @@ impl AppCore {
     ) -> Result<crate::dto::ChildLockState, AppError> {
         // Opis liczony przed przekazaniem zmiany (PIN idzie do Sędziego Cieni, nigdy do wpisu).
         let action = change.as_ref().map(notes::child_lock_action);
+        let changing = change.is_some();
+        // „Do końca rozmowy” — tylko rozmowa otwarta teraz w oknie (aktywna = istniejąca; przegląd 5.11, D2).
         let conversation = match &change {
             Some(ChildLockRequest::Open {
                 session_id: Some(id),
                 ..
             }) => {
-                self.ensure_session(&ids::session(id)?)?;
+                if self.config_str(keys::ACTIVE_SESSION).await.as_deref() != Some(id.as_str()) {
+                    return Err(AppError::invalid(NOT_ACTIVE));
+                }
                 Some(id.clone())
             }
             _ => None,
         };
-        let result = self.inner.broker.child_lock(change).await;
-        if let Ok(state) = &result {
+        let mut result = self.inner.broker.child_lock(change).await;
+        if let Ok(state) = &mut result {
             let mut rt = self.rt();
-            if !state.conversation {
+            // Zapamiętana rozmowa zmienia się tylko po zmianie ze znanym stanem — nie po odczycie (P3).
+            if changing && !state.unknown && !state.conversation {
                 rt.child_conversation = None;
-            } else if conversation.is_some() {
-                rt.child_conversation = conversation;
+            } else if changing && conversation.is_some() {
+                rt.child_conversation.clone_from(&conversation);
             }
+            state.conversation_id = rt.child_conversation.clone().filter(|_| state.conversation);
+        }
+        // Aktywna rozmowa zmieniła się w trakcie otwarcia — kłódka od razu zamknięta (D3).
+        if conversation.is_some() && result.is_ok() {
+            let active = self.config_str(keys::ACTIVE_SESSION).await;
+            self.end_conversation_lock(active.as_deref()).await;
         }
         if let Some(action) = action
             && let Some((level, title)) =
@@ -138,8 +149,10 @@ impl AppCore {
     /// Kłódka otwarta „do końca rozmowy” zamyka się, gdy aktywna staje się inna rozmowa (albo żadna).
     pub(crate) async fn end_conversation_lock(&self, active: Option<&str>) {
         let open = self.rt().child_conversation.clone();
-        if open.is_some() && open.as_deref() != active {
-            let closed = self.permissions_child_lock(Some(ChildLockRequest::Close));
+        // Stan od Sędziego: rdzeń mógł zgubić rozmowę (zerwane łącze, wyścig odczytu) — przegląd 5.11, P3.
+        let held = matches!(self.inner.broker.child_lock(None).await, Ok(s) if s.conversation);
+        if (open.is_some() || held) && open.as_deref() != active {
+            let closed = Box::pin(self.permissions_child_lock(Some(ChildLockRequest::Close)));
             if let Err(e) = closed.await {
                 tracing::warn!(error = %e, "zamknięcie kłódki po zmianie rozmowy nie powiodło się");
             }
@@ -379,3 +392,5 @@ const OLD_PENDING_RAISES: &str = "permissions.pending_raises";
 const GUARD_RETRY: std::time::Duration = std::time::Duration::from_secs(2);
 /// Odstęp sprawdzeń po połączeniu (restart Brokera przywraca poziom domyślny).
 const GUARD_TICK: std::time::Duration = std::time::Duration::from_secs(15);
+/// Otwarcie „do końca rozmowy” dla rozmowy, która nie jest otwarta w oknie.
+const NOT_ACTIVE: &str = "Kłódkę „do końca rozmowy” otwiera się tylko dla otwartej rozmowy.";

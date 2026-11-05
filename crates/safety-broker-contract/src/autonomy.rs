@@ -197,8 +197,11 @@ impl AutonomyTable {
         now_ms: u64,
     ) -> AutonomyLevel {
         let base = self.uncapped(session, agent, now_ms);
+        // Max dostęp tylko bez kłódki: otwarcie „do końca rozmowy” go nie włącza (przegląd 5.11, P1).
         let level = match self.max_access(now_ms) {
-            Some((scope, level)) if scope.covers(location) => base.max(level),
+            Some((scope, level)) if scope.covers(location) && self.ceiling(now_ms).is_none() => {
+                base.max(level)
+            }
             _ => base,
         };
         self.capped(level, session, now_ms)

@@ -14,8 +14,20 @@ export class AutonomyState {
   maxAccess = $state<MaxAccess | null>(null);
   /** Profil Dziecko (plan 50 §4.4); `null` — nie wczytano albo Sędzia go nie obsługuje. */
   child = $state<ChildLockState | null>(null);
-  /** Kłódka rodzica zamknięta: wyższe tryby i „Max dostęp” otwiera tylko PIN rodzica. */
-  locked = $derived(this.child !== null && this.child.enabled && !this.child.open);
+  /** Kłódka rodzica zamknięta: wyższe tryby i „Max dostęp” otwiera tylko PIN rodzica. Otwarta
+   * „do końca rozmowy” liczy się tu jako zamknięta (tryb globalny i Max dostęp mają sufit) —
+   * wyjątek tylko w tej rozmowie: {@link AutonomyState.openHere}. */
+  locked = $derived(
+    this.child !== null && this.child.enabled && (!this.child.open || this.child.conversation),
+  );
+
+  /** Kłódka otwarta „do końca rozmowy” właśnie dla tej rozmowy (tryb zmienia się wtedy w niej). */
+  openHere(sessionId: string | null | undefined): boolean {
+    const c = this.child;
+    return (
+      !!c && c.enabled && c.open && c.conversation && !!sessionId && c.conversation_id === sessionId
+    );
+  }
   /** Numer odczytu — spóźniona odpowiedź nie nadpisze nowszej. */
   private seq = 0;
   /** Odczyt po upływie terminu otwarcia kłódki (Sędzia zamyka ją sam). */

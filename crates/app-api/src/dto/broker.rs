@@ -147,9 +147,7 @@ pub struct BrokerIntentResult {
 }
 
 /// Profil Dziecko (plan 50 §4.4): stan kłódki trybów pracy (bez PIN-u).
-#[derive(
-    Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema,
-)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
 pub struct ChildLockState {
     pub pin_set: bool,
     pub enabled: bool,
@@ -174,6 +172,9 @@ pub struct ChildLockState {
     /// Kłódka otwarta „do końca rozmowy” (tylko jedna rozmowa).
     #[serde(default)]
     pub conversation: bool,
+    /// Ta rozmowa (gdy rdzeń ją zna) — interfejs pokazuje kłódkę w każdej innej.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_id: Option<String>,
 }
 
 /// Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni.

@@ -27,8 +27,14 @@
   const { t, tk } = app.i18n;
   const session = $derived(app.sessions.active);
   const planning = $derived(session?.autonomy === 'L0' ? session : null);
+  // Kłódka otwarta „do końca rozmowy” dla tej rozmowy — tryb zmienia się tylko w niej (Z.7).
+  const here = $derived(app.autonomy.openHere(session?.id));
   const current = $derived<AutonomyLevel>(
-    planning ? 'L0' : (app.autonomy.global ?? session?.autonomy ?? 'L3'),
+    planning
+      ? 'L0'
+      : here && session
+        ? session.autonomy
+        : (app.autonomy.global ?? session?.autonomy ?? 'L3'),
   );
   // Rozmowa z własnym poziomem (Ustawienia → Uprawnienia) — menu zmienia tryb globalny.
   const own = $derived(
@@ -56,7 +62,7 @@
   }
 
   /** Tryb za kłódką rodzica (profil Dziecko, plan 50 §4.4): Plan i Ręcznie zostają otwarte. */
-  const behindLock = (level: AutonomyLevel) => app.autonomy.locked && level > 'L1';
+  const behindLock = (level: AutonomyLevel) => app.autonomy.locked && !here && level > 'L1';
 
   async function choose(level: AutonomyLevel) {
     if (behindLock(level)) {
@@ -66,7 +72,7 @@
     onclose();
     if (level === current) return;
     // Plan i wyjście z Planu dotyczą otwartej rozmowy; bez rozmowy — poziomu globalnego.
-    const scope = session && (level === 'L0' || planning) ? session.id : null;
+    const scope = session && (level === 'L0' || planning || here) ? session.id : null;
     try {
       await requestMode(level, {
         request: (l) => app.client.permissions.requestLevel(l, scope),
@@ -157,7 +163,7 @@
       </button>
     {/each}
   </div>
-  {#if app.autonomy.locked}<p class="note own">{t('child.lockedNote')}</p>{/if}
+  {#if app.autonomy.locked && !here}<p class="note own">{t('child.lockedNote')}</p>{/if}
   {#if own}<p class="note own">{t('mode.sessionOwn', { mode: tk(`mode.${own}.name`) })}</p>{/if}
   <MaxAccessSwitch />
   <p class="note">{t('mode.note')}</p>

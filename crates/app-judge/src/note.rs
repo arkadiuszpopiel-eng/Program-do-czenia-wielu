@@ -32,6 +32,19 @@ pub fn describe(entry: &JudgeLogEntry) -> (String, String, bool) {
     (title, detail, warn)
 }
 
+/// Dziennik werdyktów przekazujący wpis (sesja, tytuł, szczegóły, ostrzeżenie) do osi czasu aplikacji.
+pub struct NoteLog<F>(pub F);
+
+impl<F> approval_judge_contract::JudgeLog for NoteLog<F>
+where
+    F: Fn(&str, String, String, bool) + Send + Sync,
+{
+    fn record(&self, entry: JudgeLogEntry) {
+        let (title, detail, warn) = describe(&entry);
+        (self.0)(&entry.session, title, detail, warn);
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {

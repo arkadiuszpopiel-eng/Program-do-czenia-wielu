@@ -138,6 +138,7 @@ export const plBroker = {
   'child.for.60': '1 h',
   'child.for.close': 'Do zamknięcia Alfy',
   'child.for.conversation': 'Do końca rozmowy',
+  'child.noConversation': 'Nie ma otwartej rozmowy — wybierz inny czas otwarcia.',
   'child.mismatch': 'Nowe PIN-y się różnią.',
   'child.format': 'PIN ma od 4 do 8 cyfr.',
   'child.attempts': 'Pozostałe próby PIN-u: {n}.',

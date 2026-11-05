@@ -142,6 +142,7 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'child.for.60': '1 h',
   'child.for.close': 'Until Alfa closes',
   'child.for.conversation': 'Until this conversation ends',
+  'child.noConversation': 'No conversation is open — choose another duration.',
   'child.mismatch': 'The new PINs differ.',
   'child.format': 'The PIN has 4 to 8 digits.',
   'child.attempts': 'PIN tries left: {n}.',

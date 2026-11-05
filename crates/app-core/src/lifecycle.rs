@@ -59,12 +59,26 @@ impl AppCore {
         };
         let history: std::sync::Arc<dyn sessions_contract::SessionHistory> =
             self.inner.sessions.clone();
+        // Dziennik werdyktów: wpis „audit” na osi czasu rozmowy (panel osi czasu, dziennik rodzica).
+        let core = self.clone();
         let _stop = app_judge::spawn(
             kernel.broker.clone(),
             Some(&routers.local),
             Some(&routers.hybrid),
             history,
-            std::sync::Arc::new(crate::judge_log::TimelineJudgeLog(self.clone())),
+            std::sync::Arc::new(app_judge::NoteLog(
+                move |session: &str, title, detail, warn| {
+                    use crate::dto::{EventLevel, TimelineKind};
+                    let level = if warn {
+                        EventLevel::Warn
+                    } else {
+                        EventLevel::Info
+                    };
+                    if let Ok(s) = crate::ids::session(session) {
+                        core.timeline_note(&s, TimelineKind::Audit, level, title, Some(detail));
+                    }
+                },
+            )),
         );
     }
 

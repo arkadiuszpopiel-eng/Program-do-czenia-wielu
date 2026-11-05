@@ -98,6 +98,7 @@ pub fn from_child(v: ChildLockView) -> ChildLockState {
         unknown: v.unknown,
         transcripts: v.transcripts,
         conversation: v.conversation,
+        conversation_id: None,
     }
 }
 

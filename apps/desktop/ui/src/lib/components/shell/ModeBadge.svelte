@@ -16,7 +16,7 @@
   const { t, tk } = app.i18n;
   const loadModes = () => import('./ModeMenu.svelte');
   const level = $derived(app.sessions.active?.autonomy ?? app.autonomy.global ?? 'L3');
-  const locked = $derived(app.autonomy.locked);
+  const locked = $derived(app.autonomy.locked && !app.autonomy.openHere(app.sessions.active?.id));
   const max = $derived(locked ? null : app.autonomy.maxAccess);
   const label = $derived(
     locked

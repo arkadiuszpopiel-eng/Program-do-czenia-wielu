@@ -15,7 +15,7 @@ use safety_broker_contract::Broker;
 use sessions_contract::SessionHistory;
 
 pub use context::{SessionContext, context_from_turns};
-pub use note::describe;
+pub use note::{NoteLog, describe};
 
 fn judge_on(core: &Arc<RouterCore>) -> Arc<dyn approval_judge_contract::ApprovalJudge> {
     let provider: Arc<dyn ModelProvider> =

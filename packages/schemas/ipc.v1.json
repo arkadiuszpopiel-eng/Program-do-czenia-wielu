@@ -3631,6 +3631,13 @@
           "description": "Kłódka otwarta „do końca rozmowy” (tylko jedna rozmowa).",
           "type": "boolean"
         },
+        "conversation_id": {
+          "description": "Ta rozmowa (gdy rdzeń ją zna) — interfejs pokazuje kłódkę w każdej innej.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "enabled": {
           "type": "boolean"
         },

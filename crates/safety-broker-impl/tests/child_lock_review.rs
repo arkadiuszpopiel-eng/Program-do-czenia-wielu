@@ -280,6 +280,27 @@ async fn open_for_one_conversation_only() {
             .any(|p| p["op"] == "open_conversation" && p["ok"] == true)
     );
 
+    // Podniesienie: tylko poziom tej rozmowy (przegląd 5.11, P2); inna rozmowa i tryb globalny — kłódka.
+    let raise = |target| AutonomyChangeRequest {
+        target,
+        level: AutonomyLevel::L4,
+        until_ms: None,
+        origin: ChangeOrigin::UserInterface,
+    };
+    let here = AutonomyTarget::Session {
+        session: h.session.clone(),
+    };
+    assert!(b.request_autonomy_change(raise(here)).await.is_ok());
+    let there = AutonomyTarget::Session {
+        session: other.clone(),
+    };
+    assert!(b.request_autonomy_change(raise(there)).await.is_err());
+    assert!(
+        b.request_autonomy_change(raise(AutonomyTarget::Global))
+            .await
+            .is_err()
+    );
+
     let closed = b.change_child_lock(ChildLockChange::Close).await.unwrap();
     assert!(!closed.conversation && closed.open_until_ms.is_none());
     assert_eq!(level(&b), AutonomyLevel::L1);
