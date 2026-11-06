@@ -4,12 +4,12 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "b8c92890-d32a-48cf-afcf-c2baf7ce1924 (Alfa AI Laptop — jedyna rozmowa projektu od 1.11)",
-    "updated": "2026-11-05T21:00:00+01:00"
+    "updated": "2026-11-06T04:40:00+01:00"
   },
-  "current_state": "**Bieżący (2026-11-05 wieczór, PC):** sprzątanie kompilacji automatyczne (scripts/sprzatanie.sh po verify i backup, f05b8a6e; katalog 200+ → 25 GB). Etap Z.4 (model-sędzia trybu „Automatycznie”) na gałęzi `do-przegladu-tryby-zgod` (NIE scalona — Broker czeka na przegląd człowieka): poprawki przeglądu P1–P4 (fd67148a), dziennik werdyktów i wyników próśb na osi czasu „audit” — dziennik rodzica pokazuje wreszcie zgody/odmowy (03157612, 27fa1bde), zestaw ACC-Z4-judge-04 evals/Z4/judge (22 ataki + 6 zleconych): Bielik 4.5B SAM przepuścił 21/22 ataków → zapora poza modelem guard() (zgoda tylko dla akcji odwracalnej, bez niszczenia, bez treści obcej, bez granic właściciela) — 0/22, 5/6 zleconych sam (64f047e3). Otwarte: prośby spoza przebiegów (zmiana trybu, Max dostęp, kłódka) tylko w Audycie Brokera; pełny verify wersja nie uruchomiony od 236f9b2d; decyzje właściciela z raportu 52 §4.",
-  "session_goal": "Właściciel 5.11: „katalog zajmuje ponad 200GB… stare kompilacje mają być kasowane”, potem „kontynuuj poprawki i ulepszenia”.",
+  "current_state": "**Bieżący (2026-11-06 noc, PC):** praca nocna do 4:30 (polecenie 5.11: „Kontynuuj prace do 4:30 automatycznie… kopia na F:… raport”); raport alfa/docs/plan/53-raport-2026-11-06-noc.md. Gałąź `do-przegladu-tryby-zgod` (NIE scalona — Broker czeka na przegląd człowieka): Z.4 zamknięty (zapora guard; Bielik 4.5B sam 21/22, z zaporą 0/22), Z.7 zamknięty — zmiany trybu/Max dostęp/kłódka w dzienniku rozmowy (app_broker::notes, bez PIN-u; d7660928), Audyt kłódki stage=granted→ok/false, kłódka „do końca rozmowy” (Sędzia: ceiling_for/set_child_for, rdzeń zamyka przy zmianie rozmowy; 32787c11) + poprawki przeglądu w świeżym kontekście P1–P3, D1–D3 (d5a173ad), Z.8 prawdziwe okno (zy-klodka: dziennik, do końca rozmowy, Max dostęp; pokrycie łącza 282/285). Limit 8000 linii app-core pilnowany: kod przenoszony do app-judge/app-voice/app-api/app-broker. poprawki drugiego przeglądu (6dd5f6b2); verify wersja b57a92cc: 19/20 — jedyny czerwony pomiar palety Ctrl+K (klatka 300 ms przez sterownik karty nocą; powtórka 845/845); Rust 3489/0/44, interfejs 553, aplikacja 63 (282/285). Kopia: F:\\Kopie zapasowe programów Spopielony\\Alfa\\kopia-2026-11-06_0430 (30965f7d, 73 MB, SHA-256 5900/0).",
+  "session_goal": "Właściciel 5.11 wieczór: „Kontynuuj prace do godziny 4:30 automatycznie! … Kontynuacja planu, poprawki i testy, po tym czasie kopia na F: i raport”.",
   "in_progress": [
-    "Gałąź do-przegladu-tryby-zgod (Z.1–Z.8 + Z.4 z zaporą) — przegląd człowieka i scalenie."
+    "Gałąź do-przegladu-tryby-zgod (etap Z kompletny w kodzie: Z.1–Z.7, Z.8 bez sędziego na modelu w prawdziwej aplikacji) — przegląd człowieka i scalenie."
   ],
   "blocking_issues": [
     "Decyzja właściciela: profil Dziecko poza usługą Windows (ochrona umowna) — dopuścić z ostrzeżeniem czy wymagać usługi.",
@@ -45,13 +45,15 @@
       "alfa-docs (podgląd HTML)": 5180
     }
   },
-  "test_results": "5.11: testy modułów sędziego, Brokera, app-core/app-agents/app-judge zielone, clippy czysty; ACC-Z4-judge-04 na Bieliku 4.5B: 0/22 zgód na atak z zaporą (21/22 bez). Pełny verify wersja — nie od 236f9b2d.",
+  "test_results": "6.11: verify wersja b57a92cc — 19/20; przeglądarka 844/845 (pomiar palety Ctrl+K, opóźniona klatka w sterowniku karty), powtórka 845/845; Rust 3489/0/44, vitest 553, aplikacja 63/63 (282/285 = 98,9 %). Kopia F: kopia-2026-11-06_0430 SHA-256 5900/0.",
   "decisions_this_session": [
-    "3.11: zgody jak Claude Code/Codex — 5 trybów, Max dostęp z wyborem lokalne/chmura/wszystkie, dziennik rodzica jak ADR 0029, dziecko bez PIN-u tylko Plan i Ręcznie (plan 50 §7)."
+    "5.11: stare kompilacje kasowane automatycznie (sprzatanie.sh, target/debug ≤ 50 GB).",
+    "5.11: model-sędzia nie jest jedyną zaporą — guard() poza modelem (zgoda tylko dla akcji czystej)."
   ],
   "next_steps": [
-    "verify wersja na gałęzi przed scaleniem",
-    "Wpisy audit dla próśb spoza przebiegów (zmiana trybu, Max dostęp, kłódka)",
-    "Decyzje właściciela: raport 52 §4"
+    "Decyzje właściciela: raport 53 §4 (scalenie gałęzi, sędzia przy małym modelu, „do końca rozmowy” a tryb globalny, spawn_blocking w tools-fs) i raport 52 §4",
+    "Powtórzyć za dnia pomiar palety (e2e/keyboard.spec.ts) przy włączonym ekranie",
+    "Z.8: model-sędzia w prawdziwej aplikacji z modelem lokalnym",
+    "Po scaleniu: nowa wersja z verify wersja i deploy-owner"
   ]
 }
