@@ -4,7 +4,7 @@
 // Operacje na kłódce trafiają do dziennika rozmowy (Z.7). Na końcu profil WYŁĄCZONY PIN-em — następny plik (zz-mode) obniża tryb bez kłódki. Profil
 // instancji testowej jest tymczasowy (na przebieg); przy ustawionym już PIN-ie test się pomija.
 import { expect, shot, test } from './alfa';
-import { call } from './ipc-call';
+import { call, refused } from './ipc-call';
 
 interface ChildLock {
   pin_set: boolean;
@@ -53,6 +53,8 @@ test('profil Dziecko: kłódka w menu trybów, wyłączenie PIN-em', async ({ al
     const view = await call<{ global: string }>(main, 'permissions_get', { sessionId: null });
     expect(view.global <= 'L1').toBe(true);
     await main.keyboard.press('Escape');
+    // Max dostęp przy zamkniętej kłódce — odmowa Sędziego od razu, bez karty w oknie zgód.
+    await refused(main, 'permissions_request_max_access', { scope: 'local' });
 
     // Z.7 „do końca rozmowy”: kłódka otwarta tylko dla aktywnej rozmowy; inna rozmowa ją zamyka.
     const before = await call<{ active_session_id: string | null }>(main, 'app_bootstrap', {});
@@ -87,6 +89,8 @@ test('profil Dziecko: kłódka w menu trybów, wyłączenie PIN-em', async ({ al
     });
     expect(off.enabled).toBe(false);
   }
+  // Wyłączenie Max dostępu (zawężenie) działa zawsze, bez okna zgód.
+  await call(main, 'permissions_request_max_access', { scope: null });
   // Z.7: operacje na kłódce w dzienniku aktywnej rozmowy (wpis „audit”), bez PIN-u.
   const boot = await call<{ active_session_id: string | null }>(main, 'app_bootstrap', {});
   if (boot.active_session_id) {
