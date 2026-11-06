@@ -347,14 +347,23 @@ czeka na przegląd człowieka. Wersja programu się nie zmieniła (0.0.84; budow
 <tr><td>Testy prawdziwego okna: wpisy kłódki w dzienniku rozmowy, „do końca rozmowy” z zamknięciem po zmianie rozmowy, Max dostęp odrzucony przy kłódce</td><td>e7fd3ea5, 7d5a73bb, d7b0a082</td><td>Sprawdzone w zbudowanej aplikacji; pokrycie łącza 282 z 285 poleceń</td></tr>
 <tr><td>Bramka: limit 8000 linii paczki rdzenia i 400 linii pliku (kod przeniesiony do paczek, do których należy), testy PIN-u w Audycie bez losowych porażek</td><td>d7660928, abc9dcb2</td><td>Bramka znowu zielona</td></tr></tbody></table></div>
 <h2 id="2-testy">2. Testy</h2>
-<p><strong>Wynik końcowy: <code>verify wersja</code> 19 z 20 zielonych + 1 poprawiony po biegu</strong> (commit 202e0eb1, 6.11 1:15–2:15
-PC, <code>-j 6</code>). Jedyny czerwony krok: „Plan w HTML: aktualność” — strona tego raportu i katalog funkcji
-zmieniły się w trakcie biegu (raport pisany równolegle); po <code>node scripts/docs-html.mjs</code> — 0 problemów.</p>
-<div class="tbl"><table><thead><tr><th>Krok</th><th>Wynik</th></tr></thead><tbody><tr><td>Testy całego projektu (Rust)</td><td><strong>3488 zielonych, 0 czerwonych</strong>, 44 pominięte (1114 programów testowych)</td></tr>
+<p><strong>Wynik końcowy: <code>verify wersja</code> 19 z 20 zielonych</strong> (commit b57a92cc — kod po drugim przeglądzie, 6.11
+2:29–3:34 PC, <code>-j 6</code>). Jedyny czerwony krok: przeglądarka <strong>844/845</strong> — pomiar otwarcia palety <code>Ctrl+K</code>
+(<code>keyboard.spec.ts</code>): mediana 8–9 ms (próg 50 ms), ale jedna z 7 prób 235–300 ms (próg najgorszej 150 ms).
+Sprawdziłam, czy to regres: ten sam wynik daje kod sprzed zmian tej nocy (menu trybu cofnięte do 202e0eb1),
+w przeglądarce nie ma żadnego długiego zadania JS ani żądania w chwili opóźnienia — spóźnia się sama klatka
+(kompozycja/karta graficzna), a przy rozgrzewce 4 s wszystkie próby mają 8–10 ms. Ślad wydajności Edge
+potwierdza: w chwili opóźnienia przez 506 ms pracuje wątek główny procesu karty graficznej
+(<code>RasterDecoderImpl::DoEndRasterCHROMIUM::Flush</code> — opróżnienie rasteryzacji w sterowniku), nie kod strony. Ten sam test był zielony
+w biegu 202e0eb1 o 1:15; Edge się nie aktualizował. Najbardziej prawdopodobne: wygaszony nocą ekran zmienia
+taktowanie klatek. <strong>Progu nie luzuję.</strong> Powtórzony cały zestaw przeglądarki na tym samym kodzie (6.11
+3:40–3:53, Edge, 4 przeglądarki naraz): <strong>845/845</strong>, z pomiarem palety włącznie.
+Poprzedni pełny bieg (202e0eb1, 1:15–2:15) — 19/20, „dokumenty” zielone po regeneracji, przeglądarka 845/845.</p>
+<div class="tbl"><table><thead><tr><th>Krok</th><th>Wynik</th></tr></thead><tbody><tr><td>Testy całego projektu (Rust)</td><td><strong>3489 zielonych, 0 czerwonych</strong>, 44 pominięte (1115 programów testowych)</td></tr>
 <tr><td>Linter projektu i powłoki Tauri (zwykła i testowa), formatowanie, graf modułów</td><td>zielone, zero ostrzeżeń</td></tr>
 <tr><td>Testy powłoki Tauri</td><td>zielone</td></tr>
 <tr><td>Interfejs (vitest)</td><td><strong>553/553</strong></td></tr>
-<tr><td>Przeglądarka (Playwright, Edge, każdy styl i motyw, axe i kontrast)</td><td><strong>845/845</strong></td></tr>
+<tr><td>Przeglądarka (Playwright, Edge, każdy styl i motyw, axe i kontrast)</td><td>844/845 w bramce, <strong>845/845</strong> w powtórce (pomiar palety — opis wyżej)</td></tr>
 <tr><td>Prawdziwa aplikacja (instancja testowa poza ekranem)</td><td><strong>63/63</strong>, 282 z 285 poleceń rdzenia przećwiczonych (<strong>98,9 %</strong>, było 98,6 %); Pełny dostęp L4 1/1 + 1/1</td></tr>
 <tr><td><code>cargo deny</code>, audyt npm, SBOM, schematy, typy łącza, tokeny, katalog funkcji (605/605)</td><td>zielone</td></tr></tbody></table></div>
 <p>Droga do zielonego tej nocy — pierwszy bieg (5.11 ok. 20:00, commit 6c39eac8): <strong>15 zielonych, 4 czerwone,
@@ -420,9 +429,21 @@ Przeniesienie do <code>spawn_blocking</code> wymaga dodania środowiska tokio do
 jest od niego niezależna — zostawiłam do decyzji (wpływ: chwilowe opóźnienie przy usuwaniu dużych drzew).</li>
 <li>Otwarte z raportu 52 §4 (skrót PIN-u w pliku Sędziego czy w Menedżerze poświadczeń; Sędzia jako usługa) —
 bez zmian.</li>
+<li><strong>Pomiar palety <code>Ctrl+K</code></strong> (jedyny czerwony test w bramce, w powtórce zielony, §2) — dla pewności powtórzyć
+za dnia przy włączonym ekranie:
+<code>PW_CHANNEL=msedge pnpm exec playwright test e2e/keyboard.spec.ts</code> w <code>apps/desktop/ui</code>. Jeżeli powtórzy się
+za dnia, szukam przyczyny w kodzie (przy rozgrzewce 4 s znika, więc winny może być start okna).</li>
 </ol>
 <h2 id="5-kopia-i-sprzatanie">5. Kopia i sprzątanie</h2>
-<p>KOPIA</p>
+<ul>
+<li><strong>Kopia czysta</strong> (bez zbudowanego programu i plików kompilacji) 6.11 o 4:30:
+<code>F:\Kopie zapasowe programów Spopielony\Alfa\kopia-2026-11-06_0430</code> — 73 MB, ostatni commit 30965f7d
+(gałąź <code>do-przegladu-tryby-zgod</code>), brak niezatwierdzonych zmian. Sprawdzenie: <strong>SHA-256 5900 plików,
+0 błędów</strong>, paczka git (<code>alfa.bundle</code>) poprawna. Dysk F: (Seagate Backup Plus, FC15-F59F) — wolne 1,3 TB.</li>
+<li><strong>Sprzątanie</strong> po bramce i kopii (<code>scripts/sprzatanie.sh</code>): katalog kompilacji 109 → 26 GB; stare kompilacje
+kasowane automatycznie.</li>
+<li>Kopia programu u właściciela nie zmieniła się tej nocy — gałęzi do przeglądu nie wgrywam.</li>
+</ul>
 </article>
 <footer>Źródło: <code>docs/plan/53-raport-2026-11-06-noc.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>
