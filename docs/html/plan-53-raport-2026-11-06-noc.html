@@ -343,12 +343,58 @@ czeka na przegląd człowieka. Wersja programu się nie zmieniła (0.0.84; budow
 <tr><td>Zmiany trybu, Max dostęp i każda operacja na kłódce w dzienniku rozmowy (bez PIN-u)</td><td>d7660928</td><td>Rodzic widzi, kto i kiedy zmieniał ustawienia bezpieczeństwa</td></tr>
 <tr><td>Audyt kłódki: przed zmianą „zgoda”, po niej „ok” albo „błąd” — nigdy „ok” przed błędem</td><td>d7660928</td><td>Zapis Audytu nie myli</td></tr>
 <tr><td>Kłódka „do końca rozmowy”: Sędzia zdejmuje sufit tylko dla tej rozmowy; zmiana rozmowy albo zamknięcie Alfy zamyka kłódkę</td><td>32787c11</td><td>Rodzic otwiera tryby na jedną rozmowę, nie na cały program</td></tr>
-<tr><td>Test prawdziwego okna: operacje na kłódce w dzienniku rozmowy</td><td>e7fd3ea5</td><td>Sprawdzone w zbudowanej aplikacji</td></tr>
+<tr><td>Poprawki przeglądu „do końca rozmowy” (§3): Max dostęp zostaje zamknięty, menu trybów zmienia tryb tej rozmowy, rdzeń nie gubi rozmowy</td><td>d5a173ad</td><td>W otwartej rozmowie da się wybrać tryb; w innych widać kłódkę</td></tr>
+<tr><td>Testy prawdziwego okna: wpisy kłódki w dzienniku rozmowy, „do końca rozmowy” z zamknięciem po zmianie rozmowy, Max dostęp odrzucony przy kłódce</td><td>e7fd3ea5, 7d5a73bb, d7b0a082</td><td>Sprawdzone w zbudowanej aplikacji; pokrycie łącza 282 z 285 poleceń</td></tr>
 <tr><td>Bramka: limit 8000 linii paczki rdzenia i 400 linii pliku (kod przeniesiony do paczek, do których należy), testy PIN-u w Audycie bez losowych porażek</td><td>d7660928, abc9dcb2</td><td>Bramka znowu zielona</td></tr></tbody></table></div>
 <h2 id="2-testy">2. Testy</h2>
-<p>WYNIKI_KONCOWE</p>
+<p><strong>Wynik końcowy: <code>verify wersja</code> 19 z 20 zielonych + 1 poprawiony po biegu</strong> (commit 202e0eb1, 6.11 1:15–2:15
+PC, <code>-j 6</code>). Jedyny czerwony krok: „Plan w HTML: aktualność” — strona tego raportu i katalog funkcji
+zmieniły się w trakcie biegu (raport pisany równolegle); po <code>node scripts/docs-html.mjs</code> — 0 problemów.</p>
+<div class="tbl"><table><thead><tr><th>Krok</th><th>Wynik</th></tr></thead><tbody><tr><td>Testy całego projektu (Rust)</td><td><strong>3488 zielonych, 0 czerwonych</strong>, 44 pominięte (1114 programów testowych)</td></tr>
+<tr><td>Linter projektu i powłoki Tauri (zwykła i testowa), formatowanie, graf modułów</td><td>zielone, zero ostrzeżeń</td></tr>
+<tr><td>Testy powłoki Tauri</td><td>zielone</td></tr>
+<tr><td>Interfejs (vitest)</td><td><strong>553/553</strong></td></tr>
+<tr><td>Przeglądarka (Playwright, Edge, każdy styl i motyw, axe i kontrast)</td><td><strong>845/845</strong></td></tr>
+<tr><td>Prawdziwa aplikacja (instancja testowa poza ekranem)</td><td><strong>63/63</strong>, 282 z 285 poleceń rdzenia przećwiczonych (<strong>98,9 %</strong>, było 98,6 %); Pełny dostęp L4 1/1 + 1/1</td></tr>
+<tr><td><code>cargo deny</code>, audyt npm, SBOM, schematy, typy łącza, tokeny, katalog funkcji (605/605)</td><td>zielone</td></tr></tbody></table></div>
+<p>Droga do zielonego tej nocy — pierwszy bieg (5.11 ok. 20:00, commit 6c39eac8): <strong>15 zielonych, 4 czerwone,
+1 nieuruchomiony</strong>:</p>
+<ol>
+<li><strong>Limity rozmiaru</strong> — <code>verify.mjs</code> 407 linii, paczka rdzenia 8074 linii (limit 8000). Zamiast podnosić limit:
+kod przeniesiony do paczek, do których należy (opis werdyktu → <code>app-judge</code>, redukcja szumów → <code>app-voice</code>,
+zamiany typów → <code>app-api</code>, wpisy bezpieczeństwa → <code>app-broker</code>), pomocnicze bramki → <code>verify-stages.mjs</code>.</li>
+<li><strong>SBOM</strong> — <code>cargo metadata --offline</code> bez pobranej paczki <code>android_system_properties</code> (zależność innej
+platformy); <code>cargo fetch</code> i zielone.</li>
+<li><strong>Plan w HTML</strong> — nieodświeżone strony; wygenerowane.</li>
+<li><strong>Przeglądarka 844/845</strong> — <code>kanwa — za duży artefakt</code> (glass, dark) raz za długo pod obciążeniem;
+powtórzony 2× cały plik kanwy: <strong>70/70</strong>.</li>
+<li>„Zależności” nieuruchomione (brak narzędzia w tym biegu) — w następnych biegach zielone.</li>
+</ol>
+<p>Testy chwiejne usunięte u źródła: dwa testy Sędziego szukały cyfr PIN-u w wydruku całych zdarzeń Audytu —
+losowe identyfikatory (UUID, skróty łańcucha) czasem je zawierały (<code>PIN 1357 w Audycie</code>); teraz sprawdzane są
+tylko ładunki zdarzeń. Jeden bieg etapu „aplikacja” padł na zajętym porcie 9333 po przerwanej bramce
+(instancja testowa z poprzedniego biegu) — powtórzony: zielony.</p>
+<p>Nowe testy tej nocy: <code>security_changes_land_in_the_active_conversation_log</code>,
+<code>conversation_opening_ends_when_another_conversation_becomes_active</code> (rdzeń), <code>open_for_one_conversation_only</code>,
+<code>failed_save_after_grant_is_never_logged_as_ok</code> (Sędzia), <code>child_conversation.rs</code> (kontrakt: sufit tylko
+w innej rozmowie, Max dostęp zamknięty), Playwright „Do końca rozmowy” w 8 wariantach wyglądu, prawdziwe okno
+(<code>zy-klodka-dziecko</code>: dziennik, „do końca rozmowy”, Max dostęp), <code>eval_judge.rs</code> (zapora przy modelu
+„zawsze tak”: 0/22).</p>
+<p><strong>Pomiar sędziego powtórzony na prawdziwym Bieliku 4.5B (6.11 ok. 2:20, procesor, 412 s) na kodzie po zmianach
+tej nocy:</strong> zgody na atak <strong>0 z 22</strong>, fałszywe odmowy 0 z 6; sam model bez zapory nadal zgodziłby się na 21 z 22 —
+wynik jak 5.11 (<a href="../../evals/Z4/judge/wyniki-2026-11-06.md"><code>evals/Z4/judge/wyniki-2026-11-06.md</code></a>). Większego
+modelu lokalnego na dysku nie ma (7B leży tylko w katalogu innego projektu i nie jest w spisie modeli Alfy).</p>
 <h2 id="3-przeglad-w-swiezym-kontekscie">3. Przegląd w świeżym kontekście</h2>
-<p>PRZEGLAD</p>
+<p>Przegląd zmian tej nocy (d7660928 … 32787c11) w osobnej sesji ze świeżym kontekstem — tylko poprawność
+i bezpieczeństwo. <strong>Krytycznych: 0.</strong> Wszystkie znaleziska poprawione w d5a173ad, każde z testem:</p>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Waga</th><th>Co było</th><th>Poprawka</th></tr></thead><tbody><tr><td>P1</td><td>poważne</td><td>Przy kłódce otwartej „do końca rozmowy” zapamiętany Max dostęp działał w tej rozmowie, a przełącznik był zgaszony</td><td>Max dostęp tylko bez kłódki (test kontraktu)</td></tr>
+<tr><td>P2</td><td>poważne</td><td>W otwartej rozmowie nie dało się wybrać wyższego trybu, a w innych rozmowach menu nie pokazywało kłódek</td><td>Sędzia sprawdza sufit samej rozmowy; menu zmienia tryb tej rozmowy, w innych — kłódka (test Sędziego)</td></tr>
+<tr><td>P3</td><td>poważne</td><td>Rdzeń mógł „zapomnieć”, dla której rozmowy kłódka jest otwarta (odczyt stanu, zerwane łącze) i nie zamknąć jej po zmianie rozmowy</td><td>Zapamiętana rozmowa zmienia się tylko po zmianie; zamknięcie pyta Sędziego o stan (test rdzenia)</td></tr>
+<tr><td>D1–D3</td><td>drobne</td><td>Opcja bez aktywnej rozmowy otwierała szerzej; otwarcie dla rozmowy nieotwartej w oknie; zmiana rozmowy w trakcie otwarcia</td><td>Blokada w formularzu; tylko rozmowa otwarta w oknie; ponowne sprawdzenie po otwarciu</td></tr></tbody></table></div>
+<p>Bez znalezisk: unieważnianie tokenów i kart przy każdej zmianie otwarcia, restart Sędziego (otwarcie nie
+przetrwa), zgody stałe i przełączenie z okna przy otwartej rozmowie, Audyt kłódki („poszerzenie dopiero po wpisie”
+nadal obowiązuje), brak PIN-u we wpisach dziennika, przeniesienia kodu bez zmiany zachowania.</p>
+<p>Wcześniejszy przegląd Z.4 (5.11 wieczorem): nic krytycznego, poprawki P1–P4 w fd67148a.</p>
 <h2 id="4-do-decyzji-wlasciciela">4. Do decyzji właściciela</h2>
 <ol>
 <li><strong>Scalenie gałęzi <code>do-przegladu-tryby-zgod</code></strong> — etap Z (tryby jak w Claude Code i Codex, Max dostęp, profil
@@ -356,6 +402,11 @@ Dziecko, model-sędzia, dziennik rodzica) jest kompletny w kodzie; kod Sędziego
 <li><strong>Model-sędzia przy małym modelu lokalnym</strong> — z zaporą sędzia sam zatwierdza tylko proste, czyste akcje (pobranie
 z sieci, zapis nowego pliku na prośbę); resztę widzi właściciel. Do decyzji: czy to wystarcza, czy szukać
 większego modelu lokalnego jako sędziego (pomiar tym samym zestawem: <code>evals/Z4/judge/README.md</code>).</li>
+<li><strong>„Do końca rozmowy” a tryb globalny</strong> — w otwartej rozmowie menu zmienia tryb tylko tej rozmowy; tryb
+globalny i Max dostęp zostają pod kłódką. Do potwierdzenia, że tak ma być.</li>
+<li>Drobne z planu 50 §8 (pkt 3): przegląd drzewa katalogu przed usunięciem działa w wątku asynchronicznym.
+Przeniesienie do <code>spawn_blocking</code> wymaga dodania środowiska tokio do paczki narzędzi plikowych, która dziś
+jest od niego niezależna — zostawiłam do decyzji (wpływ: chwilowe opóźnienie przy usuwaniu dużych drzew).</li>
 <li>Otwarte z raportu 52 §4 (skrót PIN-u w pliku Sędziego czy w Menedżerze poświadczeń; Sędzia jako usługa) —
 bez zmian.</li>
 </ol>

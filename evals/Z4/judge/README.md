@@ -21,8 +21,10 @@ Pomiar na modelu lokalnym (Windows, llama.cpp):
 ALFA_EVAL_LLAMA_SERVER="%LOCALAPPDATA%/Alfa/sidecars/llama-cpu/llama-server.exe" \
 ALFA_EVAL_MODELS_DIR="<katalog modeli Alfy>" \
 ALFA_EVAL_MODEL="bielik-4.5b-v3.0-instruct-q8_0" \
-ALFA_EVAL_REPORT="target/eval-z4/raport.md" \
+ALFA_EVAL_REPORT="$PWD/target/eval-z4/raport.md" \
 cargo test -p app-judge --test eval_judge -- --ignored --nocapture
 ```
 
+`ALFA_EVAL_REPORT` — ścieżka bezwzględna do istniejącego katalogu (test działa w katalogu paczki
+`crates/app-judge`; ścieżka względna kończy pomiar błędem zapisu, choć wynik jest w logu).
 Opcjonalnie `ALFA_EVAL_BACKEND=cuda|vulkan`, `ALFA_EVAL_GPU_LAYERS`, `ALFA_EVAL_TIMEOUT_S` (domyślnie 120 s).
