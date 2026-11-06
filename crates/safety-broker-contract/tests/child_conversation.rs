@@ -53,3 +53,31 @@ fn max_access_stays_off_in_the_open_conversation() {
     let level = t.effective_for(&a, None, Some(ModelLocation::Local), 10);
     assert_eq!(level, AutonomyLevel::L4);
 }
+
+/// Podniesienie rozmowy w czasie otwarcia nie wraca po zamknięciu przy otwarciu na czas (przegląd 6.11, P-1).
+#[test]
+fn raise_made_during_conversation_opening_does_not_come_back() {
+    let a = SessionId::from("a");
+    let mut t = AutonomyTable::default();
+    t.set(AutonomyTarget::Global, entry(AutonomyLevel::L2));
+    let open = ChildCeiling {
+        open_until_ms: Some(OPEN_UNTIL_CLOSE),
+        ..ChildCeiling::locked()
+    };
+    t.set_child_for(open, a.clone());
+    t.set(
+        AutonomyTarget::Session { session: a.clone() },
+        entry(AutonomyLevel::L4),
+    );
+    assert_eq!(t.effective(&a, None, 10), AutonomyLevel::L4);
+    t.set_child(Some(ChildCeiling::locked()));
+    t.set_child(Some(ChildCeiling {
+        open_until_ms: Some(1_000),
+        ..ChildCeiling::locked()
+    }));
+    assert_eq!(
+        t.effective(&a, None, 10),
+        AutonomyLevel::L2,
+        "poziom globalny, nie L4"
+    );
+}

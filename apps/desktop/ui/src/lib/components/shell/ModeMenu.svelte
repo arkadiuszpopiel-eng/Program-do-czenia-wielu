@@ -38,7 +38,7 @@
   );
   // Rozmowa z własnym poziomem (Ustawienia → Uprawnienia) — menu zmienia tryb globalny.
   const own = $derived(
-    session && !planning && app.autonomy.global && session.autonomy !== app.autonomy.global
+    session && !planning && !here && app.autonomy.global && session.autonomy !== app.autonomy.global
       ? session.autonomy
       : null,
   );

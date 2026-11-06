@@ -276,7 +276,8 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
   działał, a przełącznik był zgaszony), P2 w tej rozmowie menu trybów zmienia poziom rozmowy (Sędzia sprawdza sufit
   celu `Session`), w innych — kłódka; P3 rdzeń nie gubi rozmowy po odczycie albo zerwanym łączu (zamknięcie pyta
   Sędziego o stan); D1 bez aktywnej rozmowy opcja nie otwiera szerzej, D2 tylko rozmowa otwarta w oknie, D3 zmiana
-  rozmowy w trakcie otwarcia zamyka kłódkę.
+  rozmowy w trakcie otwarcia zamyka kłódkę. Drugi przegląd (samych poprawek, 6.11): P-1 podniesienia rozmowy z czasu otwarcia
+  usuwane przy jego końcu (nie wracają przy otwarciu na czas ani po wyłączeniu profilu), D-1…D-5 poprawione.
 - **Przegląd w świeżym kontekście (3.11, zakres Z.1/Z.3/Z.5):** nic krytycznego; 3 poważne poprawione w 29946562
   (strażnik nie cofa przełączenia przy czekającej prośbie, znacznik zamiast każdego wpisu bez terminu, pochodzenie
   „lokalne” z nazwy modelu tylko u Routera), z drobnych poprawione: kolejność Audytu przy przełączeniu, brak

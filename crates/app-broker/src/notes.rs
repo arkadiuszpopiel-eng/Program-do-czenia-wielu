@@ -4,8 +4,8 @@
 
 use app_api::AppError;
 use app_api::dto::{
-    AlfaEvent, AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, ChildLockRequest, EventLevel,
-    LocalizedText, MaxAccess, ToastKind,
+    AlfaEvent, AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, ChildLockRequest,
+    ChildLockState, EventLevel, LocalizedText, MaxAccess, ToastKind,
 };
 
 /// Nazwa trybu pracy jak w menu (plan 50 §4.1).
@@ -124,6 +124,32 @@ pub fn child_lock_note(
             format!("Profil Dziecko: nieudana próba — {what} ({})", e.message),
         )),
     }
+}
+
+/// Otwarcie „do końca rozmowy” dla rozmowy, która nie jest otwarta w oknie.
+pub const NOT_ACTIVE: &str = "Kłódkę „do końca rozmowy” otwiera się tylko dla otwartej rozmowy.";
+/// Aktywna rozmowa zmieniła się w trakcie otwarcia — kłódka zamknięta od razu.
+pub const CONVERSATION_CHANGED: &str = "Rozmowa zmieniła się w trakcie otwarcia kłódki — kłódka zamknięta. Otwórz ją ponownie w tej rozmowie.";
+
+/// Rozmowa zapamiętana przez rdzeń po odpowiedzi Sędziego: zmienia się tylko po zmianie ze znanym stanem —
+/// odczyt ani zerwane łącze jej nie gubią (przegląd 5.11, P3).
+pub fn remembered(
+    known: Option<String>,
+    changing: bool,
+    state: &ChildLockState,
+    opened: Option<String>,
+) -> Option<String> {
+    match (changing && !state.unknown, state.conversation, opened) {
+        (true, false, _) => None,
+        (true, true, Some(id)) => Some(id),
+        _ => known,
+    }
+}
+
+/// Czy zamknąć kłódkę „do końca rozmowy” po zmianie aktywnej rozmowy: rdzeń nie zna rozmowy, a Sędzia
+/// trzyma otwarcie (przegląd 6.11, D-2), albo aktywna jest inna rozmowa.
+pub fn should_close(open: Option<&str>, held: bool, active: Option<&str>) -> bool {
+    (held && open.is_none()) || (open.is_some() && open != active)
 }
 
 /// Informacja po restarcie: zapamiętany Pełny dostęp (L4) wymaga ponownego potwierdzenia.

@@ -84,9 +84,14 @@ impl AppCore {
             }
             None => None,
         };
-        self.end_conversation_lock(value.as_ref().and_then(serde_json::Value::as_str))
-            .await;
-        self.config_set(keys::ACTIVE_SESSION, value, true).await
+        // Najpierw zapis: otwarcie w toku widzi już nową rozmowę (przegląd 6.11, D-1).
+        let active = value
+            .as_ref()
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_owned);
+        let saved = self.config_set(keys::ACTIVE_SESSION, value, true).await;
+        self.end_conversation_lock(active.as_deref()).await;
+        saved
     }
 
     /// „Przejdź do sesji" spoza okna głównego (zasobnik, protokół `alfa://session/…`,

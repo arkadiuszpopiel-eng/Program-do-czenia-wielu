@@ -5,6 +5,7 @@
 //! (port zwraca czytelny błąd, Broker — bezpieczną odmowę), a rejestr pokazuje go jako
 //! niezdrowy.
 
+use crate::compose::internal as err;
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
@@ -119,10 +120,6 @@ pub(crate) fn unhealthy(slot: Option<&HealthSlot>, id: &str, e: &AppError) {
         let message = e.message.clone();
         let _ = slot.set(Arc::new(move || HealthStatus::Unhealthy(message.clone())));
     }
-}
-
-fn err(id: &str) -> impl Fn(String) -> AppError + '_ {
-    move |e| AppError::internal(format!("{id}: {e}"))
 }
 
 impl Extra {

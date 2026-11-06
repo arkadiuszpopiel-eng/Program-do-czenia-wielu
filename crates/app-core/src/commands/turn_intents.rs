@@ -64,23 +64,15 @@ impl AppCore {
     ) -> Result<(SessionId, Option<String>, String), AppError> {
         let (id, turn) = ids::parse_turn(turn_id)?;
         let turn = self.inner.sessions.turn(&id, turn)?;
-        let blocks =
-            lib_markdown::render_blocks(&turn.content.text, lib_markdown::RenderOptions::default());
-        let code = blocks
-            .iter()
-            .find(|b| b.id == block)
-            .and_then(|b| b.code.first())
+        let (lang, code) = lib_markdown::code_block(&turn.content.text, block)
             .ok_or_else(|| AppError::not_found("Ten blok nie zawiera kodu."))?;
-        Ok((id, code.lang.clone(), code.text.clone()))
+        Ok((id, lang, code))
     }
 
     /// `turns_save_code` ⟶ natywny dialog zapisu.
     pub async fn turns_save_code(&self, turn_id: String, block_index: u64) -> Result<(), AppError> {
         let (_, lang, code) = self.code_block(&turn_id, block_index)?;
-        let ext = lang
-            .as_deref()
-            .filter(|l| l.chars().all(|c| c.is_ascii_alphanumeric()) && !l.is_empty())
-            .unwrap_or("txt");
+        let ext = lib_markdown::code_extension(lang.as_deref());
         // Natywny dialog blokuje wątek — poza pulą zadań async.
         let shell = self.inner.shell.clone();
         let name = format!("kod.{ext}");
