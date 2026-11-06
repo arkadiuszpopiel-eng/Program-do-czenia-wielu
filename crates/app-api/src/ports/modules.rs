@@ -5,8 +5,9 @@ use async_trait::async_trait;
 use sessions_contract::SessionId;
 
 use crate::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerStatusView, ExportRequest, ExportResult, GrantView,
-    ImportRequest, ImportResult, InspectResult, SecretInput,
+    AutonomyLevel, BrokerIntentResult, BrokerStatusView, ChildLockRequest, ChildLockState,
+    ExportRequest, ExportResult, GrantView, ImportRequest, ImportResult, InspectResult, MaxAccess,
+    SecretInput,
 };
 use crate::error::AppError;
 
@@ -69,6 +70,10 @@ pub struct AutonomyView {
     pub global: AutonomyLevel,
     /// Poziom sesji, gdy różni się od globalnego.
     pub session: Option<AutonomyLevel>,
+    /// Włączony „Max dostęp”.
+    pub max_access: Option<MaxAccess>,
+    /// Poziom globalny zapamiętany przez Sędziego po zgodzie w jego oknie — rdzeń go przyjmuje.
+    pub standing_global: Option<AutonomyLevel>,
 }
 
 /// Stan prośby o zmianę poziomu autonomii w Brokerze (identyfikator z `request_level`).
@@ -108,6 +113,13 @@ pub trait BrokerPort: Send + Sync {
         level: AutonomyLevel,
         session: Option<&SessionId>,
     ) -> Result<BrokerIntentResult, AppError>;
+    /// „Max dostęp” (plan 50 §8.1): włączenie — karta Sędziego; `None` — wyłączenie od razu.
+    async fn request_max_access(
+        &self,
+        _: Option<MaxAccess>,
+    ) -> Result<BrokerIntentResult, AppError> {
+        Err(AppError::unavailable("Max dostęp", "safety-broker"))
+    }
     /// Przeniesienie do karty zatwierdzenia w oknie Brokera.
     async fn open_approval(&self, approval: &str) -> Result<BrokerIntentResult, AppError>;
     /// Zgody „zawsze w tym zakresie” (panel uprawnień); Broker niepodłączony — pusto.
@@ -117,6 +129,10 @@ pub trait BrokerPort: Send + Sync {
     /// Odwołanie zgody (tylko zawęża uprawnienia — bez okna Sędziego); `false` — nie ma takiej.
     async fn revoke_grant(&self, _grant: &str) -> Result<bool, AppError> {
         Ok(false)
+    }
+    /// Profil Dziecko (plan 50 §4.4): `None` — odczyt, inaczej zmiana (PIN sprawdza Sędzia).
+    async fn child_lock(&self, _: Option<ChildLockRequest>) -> Result<ChildLockState, AppError> {
+        Err(AppError::unavailable("Profil Dziecko", "safety-broker"))
     }
     /// Stan prośby o zmianę poziomu; `None` — Broker nieosiągalny albo stan nieznany (strażnik
     /// autonomii spróbuje później i niczego nie przyjmuje).

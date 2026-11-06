@@ -5,6 +5,7 @@
   import { ApprovalCard, agents, type AgentId } from '@alfa/ui-kit';
   import type { ApprovalPending } from '../../api/types';
   import { useApp } from '../../state/context';
+  import DenyFeedback from './DenyFeedback.svelte';
 
   interface Props {
     agent: AgentId;
@@ -63,6 +64,8 @@
     },
   }}
 />
+
+{#if approval.status === 'denied'}<DenyFeedback />{/if}
 
 {#if !approval.broker_window && approval.status === 'pending'}
   <p class="dev" role="note">

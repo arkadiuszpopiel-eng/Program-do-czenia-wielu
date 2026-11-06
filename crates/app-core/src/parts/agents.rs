@@ -112,8 +112,10 @@ impl Extra {
         if let Some(port) = &options.voice {
             return port.clone();
         }
-        let noise = noise_setting(&kernel.config);
-        let talk = super::voice_talk::talk_settings(&kernel.config);
+        let noise = app_voice::noise_setting(kernel.config.clone());
+        let talk = app_voice::talk_settings(
+            &(kernel.config.clone() as Arc<dyn core_config_contract::ConfigStore>),
+        );
         let base: Arc<dyn VoicePort> = match &self.audio {
             Some(audio) => Arc::new(
                 app_modules::voice::VoiceAdapter::new(audio.io(), self.tts.clone(), events.clone())
@@ -124,7 +126,7 @@ impl Extra {
         let factory: Option<Arc<dyn VoiceEngineFactory>> =
             match (&options.voice_engine, &self.audio) {
                 (Some(f), _) => Some(f.clone()),
-                (None, Some(audio)) => Some(Arc::new(with_device(
+                (None, Some(audio)) => Some(Arc::new(app_voice::SystemVoice::with_device_opt(
                     SystemVoice::new(
                         paths.clone(),
                         audio.io(),
@@ -175,37 +177,6 @@ impl voice_audio_contract::MediaClock for DeviceClock {
     }
 }
 
-/// Klucz ustawienia redukcji szumów mikrofonu (`off` / `standard` / `strong`).
-const NOISE_KEY: &str = "voice.noise_reduction";
-
-/// Ustawienie redukcji szumów śledzące konfigurację: test mikrofonu i rozmowa czytają je przy
-/// każdym starcie, więc zmiana w Ustawieniach działa bez restartu programu.
-fn noise_setting(
-    config: &Arc<core_config_impl::FileConfigStore>,
-) -> voice_dsp_contract::NoiseSetting {
-    use core_config_contract::{ConfigKey, ConfigStore, Scope};
-    use futures_util::StreamExt;
-
-    let setting = voice_dsp_contract::NoiseSetting::default();
-    let (config, shared) = (config.clone(), setting.clone());
-    tokio::spawn(async move {
-        let Ok(key) = ConfigKey::new(NOISE_KEY) else {
-            return;
-        };
-        let mut changes = config.watch(NOISE_KEY);
-        loop {
-            let value = config.get(&key, &Scope::Global).await.ok().flatten();
-            if let Some(text) = value.as_ref().and_then(|v| v.as_str()) {
-                shared.set(voice_dsp_contract::NoiseReduction::parse(text));
-            }
-            if changes.next().await.is_none() {
-                break;
-            }
-        }
-    });
-    setting
-}
-
 /// Serwery MCP użytkownika (`app-mcp`): lista i zgody w katalogu konfiguracji, wartości tajne
 /// w magazynie sekretów Jądra, programy szukane w PATH (`npx` → `npx.cmd`).
 pub(crate) fn mcp_hub(
@@ -248,16 +219,4 @@ pub(crate) async fn diag_app(
         app.spawn_auto();
     }
     app
-}
-
-/// Profil sprzętu dla głosu: dzierżawa Whispera wskazuje kartę z profilu (laptop z dwiema
-/// kartami); bez profilu — karta główna, jak wcześniej.
-fn with_device(
-    voice: SystemVoice,
-    device: Option<&Arc<dyn device_profile_contract::DeviceProfile>>,
-) -> SystemVoice {
-    match device {
-        Some(d) => voice.with_device(d.clone()),
-        None => voice,
-    }
 }

@@ -128,34 +128,32 @@ for (const theme of ['light', 'dark'] as const) {
     await chip.click();
     const menu = page.getByRole('menu', { name: 'Tryb pracy' });
     await expect(menu.getByRole('menuitemradio', { checked: true })).toContainText('Automatycznie');
-    await menu.getByRole('menuitemradio', { name: /Pytaj o wszystko/ }).click();
-    await expect(page.getByText('Tryb pracy: Pytaj o wszystko.')).toBeVisible();
-    const lowered = composer.getByRole('button', { name: /^Tryb pracy: Pytaj o wszystko/ });
+    await menu.getByRole('menuitemradio', { name: /Ręcznie/ }).click();
+    await expect(page.getByText('Tryb pracy: Ręcznie.')).toBeVisible();
+    const lowered = composer.getByRole('button', { name: /^Tryb pracy: Ręcznie/ });
     await expect(lowered).toBeVisible();
     await lowered.click();
-    await expect(menu.getByRole('menuitemradio', { checked: true })).toContainText(
-      'Pytaj o wszystko',
-    );
+    await expect(menu.getByRole('menuitemradio', { checked: true })).toContainText('Ręcznie');
   });
 }
 
-test('Pełna automatyka: znak w belce (także w Ustawieniach), bursztynowy żeton w pasku pisania', async ({
+test('Pełny dostęp: znak w belce (także w Ustawieniach), bursztynowy żeton w pasku pisania', async ({
   page,
 }) => {
   await openApp(page, { path: '/?autonomy=L4' });
   await waitForChat(page);
   const badge = page.locator('header.titlebar').getByRole('button', {
-    name: /^Włączona Pełna automatyka/,
+    name: /^Włączony Pełny dostęp/,
   });
   await expect(badge).toBeVisible();
   await expect(
-    page.locator('form.composer').getByRole('button', { name: /^Tryb pracy: Pełna automatyka/ }),
+    page.locator('form.composer').getByRole('button', { name: /^Tryb pracy: Pełny dostęp/ }),
   ).toBeVisible();
   await page.keyboard.press('Control+,');
   await expect(badge).toBeVisible();
   await badge.click();
   await expect(page.getByRole('menu', { name: 'Tryb pracy' })).toBeVisible();
-  await expectAccessible(page, 'znak Pełnej automatyki');
+  await expectAccessible(page, 'znak Pełnego dostępu');
 });
 
 // Przegląd 29.10: fokus po wyborze trybu z klawiatury wraca na żeton; menu Ustawień wysunięte w

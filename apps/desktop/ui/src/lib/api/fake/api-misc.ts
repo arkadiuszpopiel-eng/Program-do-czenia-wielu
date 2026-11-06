@@ -2,9 +2,10 @@
 import { CommandError } from '../command-error';
 import type { AlfaClient } from '../client';
 import type { AutonomyLevel, EventLevel } from '../types';
-import type { GrantView } from '../types-hub';
+import type { GrantView, MaxAccess } from '../types-hub';
 import type { FakeChat } from './api-chat';
 import { bootReport } from './api-boot';
+import { childLockFake } from './child-lock';
 import type { FakeCore } from './core';
 import { seedDevice } from './fixtures';
 export { voiceApi } from './api-voice';
@@ -154,13 +155,27 @@ export function filesApi(core: FakeCore): AlfaClient['files'] {
   };
 }
 
+const MAX_SCOPES: readonly MaxAccess[] = ['local', 'cloud', 'all'];
+
 export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
   // Jak Broker: obniżenie działa od razu (`applied`), podniesienie czeka w oknie Brokera.
-  // Poziom startowy z adresu (`?autonomy=L4` — podgląd znaku „Pełna automatyka” w belce).
+  // Poziom startowy z adresu (`?autonomy=L4` — podgląd znaku „Pełny dostęp” w belce).
   const start = new URLSearchParams(globalThis.location?.search ?? '').get('autonomy');
   let global: AutonomyLevel = ORDER.find((l) => l === start) ?? 'L3';
+  // „Max dostęp” z adresu (`?max=local|cloud|all` — podgląd włączonego przełącznika i znaku w belce).
+  const max = new URLSearchParams(globalThis.location?.search ?? '').get('max');
+  let maxAccess: MaxAccess | null = MAX_SCOPES.find((s) => s === max) ?? null;
   // Sesje z własnym poziomem; pozostałe pokazują poziom globalny (jak `session_autonomy` w rdzeniu).
   const own = new Set<string>();
+  // Profil Dziecko (`?child=`): kłódka obniża tryb i odrzuca podniesienia jak Sędzia.
+  const child = childLockFake(core);
+  const lockedOut = () =>
+    Promise.reject(
+      new CommandError(
+        'invalid_input',
+        'Sędzia Cieni: kłódka rodzica: ten tryb otwiera PIN rodzica',
+      ),
+    );
   // Zgody „zawsze w tym zakresie” (jak lista z Sędziego Cieni): jedna z terminem, jedna do odwołania.
   const sid = core.sessions[0]?.id ?? 's1';
   let grants: GrantView[] = [
@@ -181,40 +196,66 @@ export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
       until_ms: null,
     },
   ];
-  if (global !== 'L3')
-    for (const s of core.sessions) core.updateSession(s.id, { autonomy: global });
+  // Własne poziomy sesji (przed kłódką rodzica).
+  const ownLevel = new Map<string, AutonomyLevel>();
+  // Poziom obowiązuje: sesji (własny) albo globalny dla sesji bez własnego; kłódka profilu
+  // Dziecko obniża oba jak Sędzia.
+  const sync = () => {
+    for (const s of core.sessions) {
+      const level = child.cap(ownLevel.get(s.id) ?? global);
+      if (s.autonomy !== level) core.updateSession(s.id, { autonomy: level });
+    }
+  };
+  sync();
+  const apply = (level: AutonomyLevel, sid: string | null) => {
+    if (sid) {
+      own.add(sid);
+      ownLevel.set(sid, level);
+    } else global = level;
+    sync();
+  };
   return {
     get: (sid) =>
       core.reply({
-        global,
+        global: child.cap(global),
         // Jak rdzeń: poziom sesji tylko wtedy, gdy ustawiono jej własny.
         session: sid && own.has(sid) ? (core.session(sid)?.autonomy ?? null) : null,
         hello_enabled: false,
+        max_access: maxAccess,
       }),
     requestLevel: (level, sid) => {
       const current = sid ? (core.session(sid)?.autonomy ?? global) : global;
       if (ORDER.indexOf(level) > ORDER.indexOf(current)) {
+        if (child.locked() && ORDER.indexOf(level) > ORDER.indexOf('L1')) return lockedOut();
+        // Zgoda „w oknie Sędziego” — w testach E2E przez `window.__alfaApproveRaise()`.
+        if (globalThis.window) globalThis.window.__alfaApproveRaise = () => apply(level, sid);
         return core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') });
       }
-      if (sid) {
-        own.add(sid);
-        core.updateSession(sid, { autonomy: level });
-      } else {
-        global = level;
-        for (const s of core.sessions) {
-          if (!own.has(s.id)) core.updateSession(s.id, { autonomy: level });
-        }
-      }
+      apply(level, sid);
       return core.reply({ status: 'applied' as const, request_id: '' });
     },
     openApproval: () =>
       core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') }),
+    // Jak Sędzia: włączenie (także zmiana zasięgu) czeka na kartę, wyłączenie działa od razu.
+    requestMaxAccess: (scope) => {
+      if (scope !== null && child.locked()) return lockedOut();
+      if (scope !== null) {
+        return core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') });
+      }
+      maxAccess = null;
+      return core.reply({ status: 'applied' as const, request_id: '' });
+    },
     // `window.__alfaGrantsFault` (testy E2E): „list” — odczyt listy kończy się błędem łącza,
     // „gone” — zgoda zniknęła po stronie Sędziego (wygasła), zanim właściciel kliknął „Odwołaj”.
     grants: () =>
       globalThis.window?.__alfaGrantsFault === 'list'
         ? Promise.reject(new CommandError('unavailable', 'Atrapa: Sędzia Cieni nie odpowiada.'))
         : core.reply([...grants]),
+    childLock: (change) =>
+      child.childLock(change).then((state) => {
+        sync();
+        return state;
+      }),
     revokeGrant: (grantId) => {
       if (globalThis.window?.__alfaGrantsFault === 'gone') {
         grants = grants.filter((g) => g.id !== grantId);

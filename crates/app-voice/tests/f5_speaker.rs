@@ -108,7 +108,7 @@ async fn stranger_voice_is_rejected_for_risky_actions() {
         ),
         "{verdict:?}"
     );
-    // „Pełna automatyka” (decyzja właściciela 31.10): okno zgód nie pokazuje się wcale.
+    // „Pełny dostęp” (decyzja właściciela 31.10): okno zgód nie pokazuje się wcale.
     let verdict = evaluate(&f, AutonomyLevel::L4, &RiskPolicy::default());
     assert_eq!(verdict.verdict, Verdict::Proceed, "{verdict:?}");
 }
@@ -136,7 +136,7 @@ async fn owner_voice_follows_autonomy_and_destruction_asks_below_full_automation
             ..
         }
     ));
-    // „Pełna automatyka” (L4): zweryfikowany właściciel, pewne rozpoznanie — bez pytania
+    // „Pełny dostęp” (L4): zweryfikowany właściciel, pewne rozpoznanie — bez pytania
     // (decyzja właściciela 27.10); od 31.10 na L4 nie pyta nic poza blokadą Jądra.
     let verdict = evaluate(&delete, AutonomyLevel::L4, &RiskPolicy::default());
     assert_eq!(verdict.verdict, Verdict::Proceed, "{verdict:?}");

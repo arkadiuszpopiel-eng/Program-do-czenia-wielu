@@ -1930,12 +1930,12 @@
         },
         {
           "const": "L1",
-          "description": "Pytaj o wszystko — każda zmiana wymaga „tak”.",
+          "description": "Ręcznie — każda zmiana wymaga „tak”.",
           "type": "string"
         },
         {
           "const": "L2",
-          "description": "Pytaj o ryzykowne — usuwanie, egress, instalacja.",
+          "description": "Akceptuj edycje — zmiany w folderze pracy same; poza nim, usuwanie, egress, instalacja — pyta.",
           "type": "string"
         },
         {
@@ -3467,6 +3467,221 @@
         "at",
         "results",
         "overall"
+      ],
+      "type": "object"
+    },
+    "ChildLockRequest": {
+      "description": "Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni.",
+      "oneOf": [
+        {
+          "description": "Ustawienie PIN-u (zmiana wymaga starego).",
+          "properties": {
+            "new": {
+              "$ref": "#/$defs/SecretInput"
+            },
+            "old": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SecretInput"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "op": {
+              "const": "set_pin",
+              "type": "string"
+            }
+          },
+          "required": [
+            "op",
+            "old",
+            "new"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Włączenie albo wyłączenie profilu.",
+          "properties": {
+            "on": {
+              "type": "boolean"
+            },
+            "op": {
+              "const": "enable",
+              "type": "string"
+            },
+            "pin": {
+              "$ref": "#/$defs/SecretInput"
+            }
+          },
+          "required": [
+            "op",
+            "pin",
+            "on"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Otwarcie kłódki na `minutes` minut; `None` — do zamknięcia Alfy; z `session_id` — „do końca\nrozmowy” (tylko ta rozmowa, do przełączenia na inną).",
+          "properties": {
+            "minutes": {
+              "format": "uint32",
+              "minimum": 0,
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "op": {
+              "const": "open",
+              "type": "string"
+            },
+            "pin": {
+              "$ref": "#/$defs/SecretInput"
+            },
+            "session_id": {
+              "default": null,
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "op",
+            "pin",
+            "minutes",
+            "session_id"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Zamknięcie kłódki (bez PIN-u).",
+          "properties": {
+            "op": {
+              "const": "close",
+              "type": "string"
+            }
+          },
+          "required": [
+            "op"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Sprawdzenie PIN-u przed dziennikiem rodzica (bez zmiany stanu, ten sam limit prób).",
+          "properties": {
+            "op": {
+              "const": "verify",
+              "type": "string"
+            },
+            "pin": {
+              "$ref": "#/$defs/SecretInput"
+            }
+          },
+          "required": [
+            "op",
+            "pin"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Pełna treść rozmów w dzienniku rodzica (dziecko widzi stały znak).",
+          "properties": {
+            "on": {
+              "type": "boolean"
+            },
+            "op": {
+              "const": "transcripts",
+              "type": "string"
+            },
+            "pin": {
+              "$ref": "#/$defs/SecretInput"
+            }
+          },
+          "required": [
+            "op",
+            "pin",
+            "on"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "ChildLockState": {
+      "description": "Profil Dziecko (plan 50 §4.4): stan kłódki trybów pracy (bez PIN-u).",
+      "properties": {
+        "attempts_left": {
+          "format": "uint32",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "blocked_until_ms": {
+          "description": "Blokada po błędnych próbach do (ms od 1970).",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "conversation": {
+          "default": false,
+          "description": "Kłódka otwarta „do końca rozmowy” (tylko jedna rozmowa).",
+          "type": "boolean"
+        },
+        "conversation_id": {
+          "description": "Ta rozmowa (gdy rdzeń ją zna) — interfejs pokazuje kłódkę w każdej innej.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "open": {
+          "description": "Kłódka otwarta teraz PIN-em rodzica.",
+          "type": "boolean"
+        },
+        "open_until_ms": {
+          "description": "Do kiedy otwarta (ms od 1970); `None` — zamknięta albo do zamknięcia Alfy.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "pin_set": {
+          "type": "boolean"
+        },
+        "tamper_resistant": {
+          "default": false,
+          "description": "Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna.",
+          "type": "boolean"
+        },
+        "transcripts": {
+          "default": false,
+          "description": "Rodzic włączył pełną treść rozmów w dzienniku (dziecko widzi stały znak).",
+          "type": "boolean"
+        },
+        "unknown": {
+          "default": false,
+          "description": "Stan nieznany (zerwane łącze z Sędzią); interfejs pokazuje ostatni znany stan i „nieznany”.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "pin_set",
+        "enabled",
+        "open",
+        "attempts_left",
+        "tamper_resistant",
+        "unknown",
+        "transcripts",
+        "conversation"
       ],
       "type": "object"
     },
@@ -6953,6 +7168,15 @@
       ],
       "type": "object"
     },
+    "MaxAccess": {
+      "description": "Zasięg „Max dostęp” (plan 50 §8.1): bez pytań na modelach lokalnych, w chmurze albo wszystkich.",
+      "enum": [
+        "local",
+        "cloud",
+        "all"
+      ],
+      "type": "string"
+    },
     "McpConnState": {
       "description": "Stan połączenia z serwerem.",
       "oneOf": [
@@ -8992,6 +9216,17 @@
         },
         "hello_enabled": {
           "type": "boolean"
+        },
+        "max_access": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MaxAccess"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony albo Broker niepodłączony."
         },
         "session": {
           "anyOf": [
@@ -16308,6 +16543,26 @@
         "$ref": "#/$defs/ModulesView"
       }
     },
+    "permissions_child_lock": {
+      "args": [
+        {
+          "name": "change",
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ChildLockRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/ChildLockState"
+      }
+    },
     "permissions_get": {
       "args": [
         {
@@ -16360,6 +16615,26 @@
             "type": [
               "string",
               "null"
+            ]
+          }
+        }
+      ],
+      "result": {
+        "$ref": "#/$defs/BrokerIntentResult"
+      }
+    },
+    "permissions_request_max_access": {
+      "args": [
+        {
+          "name": "scope",
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/MaxAccess"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         }

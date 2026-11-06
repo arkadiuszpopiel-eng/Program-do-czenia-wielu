@@ -137,7 +137,9 @@ pub fn approval_outcome(broker: &dyn Broker, approval: &str) -> Option<ApprovalO
     match broker.approval_status(ApprovalId(id), &owner()) {
         Ok(ApprovalStatus::Pending) => Some(ApprovalOutcome::Pending),
         Ok(ApprovalStatus::Approved { .. }) => Some(ApprovalOutcome::Approved),
-        Ok(ApprovalStatus::Denied | ApprovalStatus::Expired)
+        Ok(
+            ApprovalStatus::Denied | ApprovalStatus::DeniedByJudge { .. } | ApprovalStatus::Expired,
+        )
         | Err(BrokerError::UnknownApproval(_) | BrokerError::Unauthorized(_)) => {
             Some(ApprovalOutcome::Rejected)
         }

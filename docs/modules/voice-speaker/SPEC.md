@@ -36,7 +36,7 @@ Zdarzenia (bez audio i embeddingu): `voice.speaker.enroll_started`, `enroll_samp
 - Eksport tylko z `ExportConsent` (jawna, ze znacznikiem czasu i celem); bez zgody → `ConsentRequired` + zdarzenie odmowy.
 - Usunięcie kasuje plik i klucz (crypto-shredding); po nim `verify` → `NotEnrolled`.
 - `verify` przed rejestracją / za krótka wypowiedź → błąd ⇒ tura **niezweryfikowana** (fail-closed). `speaker_verified = true` tylko przy progu ścisłym.
-- Destrukcja głosem wymaga potwierdzenia nie-głosem do L3 (reguła `VoiceDestructive` Jądra); na L4 („Pełna automatyka”, decyzja właściciela 2026-10-27) zweryfikowany głos właściciela przechodzi bez pytania — weryfikacja nie chroni przed odtworzeniem nagrania (anti-spoofing poza v1), to ryzyko L4 przyjęte świadomie.
+- Destrukcja głosem wymaga potwierdzenia nie-głosem do L3 (reguła `VoiceDestructive` Jądra); na L4 („Pełny dostęp”, decyzja właściciela 2026-10-27) zweryfikowany głos właściciela przechodzi bez pytania — weryfikacja nie chroni przed odtworzeniem nagrania (anti-spoofing poza v1), to ryzyko L4 przyjęte świadomie.
 - Model ładowany tylko po zgodności SHA-256 z manifestem.
 
 ## Zdolności / uprawnienia

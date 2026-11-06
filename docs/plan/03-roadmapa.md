@@ -241,14 +241,14 @@ Plan: [`50-tryby-zgod-jak-claude-codex.md`](50-tryby-zgod-jak-claude-codex.md) (
 | Nr | Zadanie | Stan | Data | Uwagi |
 | --- | --- | --- | --- | --- |
 | Z.0 | Badanie dokumentacji Claude Code i Codex, plan, decyzje właściciela | zrobione | 2026-11-03 | decyzje w §7 planu |
-| Z.1 | Menu 5 trybów + przełącznik Max dostęp | czeka | — | po Z.0 |
-| Z.2 | Poziom „Akceptuj edycje” w Sędzim Cieni | czeka | — | gałąź do przeglądu |
-| Z.3 | Okno zgody z 4 opcjami i zakresem | czeka | — | gałąź do przeglądu |
-| Z.4 | Model-sędzia dla „Automatycznie” | czeka | — | gałąź do przeglądu |
-| Z.5 | Plan jako tryb | czeka | — | po Z.1 |
-| Z.6 | Profil Dziecko z kłódkami i PIN-em rodzica | czeka | — | gałąź do przeglądu |
-| Z.7 | Dziennik rodzica pod PIN-em | czeka | — | po Z.6 |
-| Z.8 | Testy trybów, ataków i prawdziwej aplikacji | czeka | — | wszystkie |
+| Z.1 | Menu 5 trybów + przełącznik Max dostęp | zrobione | 2026-11-03 | 5 trybów (klawisze 1–5), czerwony przełącznik Max dostęp z zasięgiem, znak w belce; scalone 6.11 za zgodą właściciela; od 6.11 także Alt+M — następny tryb jak Shift+Tab w Claude Code |
+| Z.2 | Poziom „Akceptuj edycje” w Sędzim Cieni | zrobione | 2026-11-03 | scalone 6.11 za zgodą właściciela; folder pracy + ścieżki chronione; przegląd w świeżym kontekście — §8 planu 50 |
+| Z.3 | Okno zgody z 4 opcjami i zakresem | zrobione | 2026-11-03 | „Zezwól i przełącz na Automatycznie” w oknie Sędziego, opcja 4 po odmowie; scalone 6.11 za zgodą właściciela |
+| Z.4 | Model-sędzia dla „Automatycznie” | zrobione | 2026-11-05 | scalone 6.11 za zgodą właściciela; kierowca w rdzeniu, bezpiecznik 3/20, dziennik werdyktów na osi czasu; zapora poza modelem (`guard`) — Bielik 4.5B sam przepuścił 21/22 ataków, z zaporą 0/22 (`evals/Z4/judge`) |
+| Z.5 | Plan jako tryb | zrobione | 2026-11-03 | L0 = Plan: narzędzia odczytu, trzy odpowiedzi pod planem |
+| Z.6 | Profil Dziecko z kłódkami i PIN-em rodzica | zrobione | 2026-11-04 | kłódka w Sędzim (sufit L1), PIN Argon2id z blokadą; scalone 6.11; skrót PIN-u w prywatnym pliku Sędziego — zatwierdzone 6.11 (konto dziecka może zmieniać własny Menedżer poświadczeń, katalogu usługi nie) |
+| Z.7 | Dziennik rodzica pod PIN-em | zrobione | 2026-11-05 | scalone 6.11 za zgodą właściciela; tematy rozmów i działania z osi czasu (od 5.11 także zgody, odmowy, werdykty sędziego, zmiany trybu, Max dostęp i próby PIN-u); pełna treść rozmów włączana PIN-em (przełącznik w Sędzim, znak „Rodzic czyta” w belce); otwarcie „do końca rozmowy” (5.11 noc) |
+| Z.8 | Testy trybów, ataków i prawdziwej aplikacji | w toku | 2026-11-06 | tabela tryb × kategoria działania (`modes_matrix.rs`), ataki na kłódkę w Sędzim (głos, agentka, Max dostęp lokalny, zgadywanie PIN-u — `child_lock_attacks.rs`), kłódka w menu/palecie w każdym stylu i motywie; wstrzyknięcia do modelu-sędziego ACC-Z4-judge-04 (5.11, prawdziwy Bielik); prawdziwa aplikacja (6.11): kłódka w menu, wpisy w dzienniku rozmowy, „do końca rozmowy” z zamknięciem po zmianie rozmowy, Max dostęp odrzucony przy kłódce, obniżenie trybu z paska pisania; zostaje model-sędzia w prawdziwej aplikacji z modelem lokalnym |
 
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 

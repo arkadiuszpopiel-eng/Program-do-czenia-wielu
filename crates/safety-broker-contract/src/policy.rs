@@ -83,6 +83,9 @@ pub struct KernelPolicy {
     pub risk: RiskPolicy,
     /// Gdzie wymagane jest Windows Hello.
     pub hello_required_for: Vec<HelloRequirement>,
+    /// Model-sędzia trybu „Automatycznie” (plan 50 §4.3); brak w zapisanej polityce = domyślne.
+    #[serde(default)]
+    pub judge: crate::judge::JudgePolicy,
 }
 
 impl KernelPolicy {
@@ -119,6 +122,7 @@ impl KernelPolicy {
             deny_lists: DenyLists::baseline(),
             risk: RiskPolicy::default(),
             hello_required_for: Vec::new(),
+            judge: crate::judge::JudgePolicy::default(),
         })
     }
 
@@ -137,6 +141,11 @@ impl KernelPolicy {
             return Err("system_drive musi być małą literą a–z".into());
         }
         self.deny_lists.validate().map_err(|e| e.to_string())?;
+        self.judge.validate()?;
+        // Prośba musi przeżyć termin sędziego — inaczej wygasa, zanim zobaczy ją właściciel (przegląd 5.11).
+        if self.judge.enabled && self.approval_ttl_ms <= self.judge.timeout_ms {
+            return Err("approval_ttl_ms musi być dłuższy niż judge.timeout_ms".into());
+        }
         self.risk.validate()
     }
 

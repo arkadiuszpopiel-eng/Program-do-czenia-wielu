@@ -64,6 +64,19 @@ pub fn render_with(md: &str, opts: RenderOptions) -> String {
     blocks::render_document(md, opts)
 }
 
+/// Kod z bloku `block` odpowiedzi (`None` — blok bez kodu): język i treść (zapis i uruchomienie kodu z rozmowy).
+pub fn code_block(md: &str, block: u64) -> Option<(Option<String>, String)> {
+    let blocks = render_blocks(md, RenderOptions::default());
+    let code = blocks.iter().find(|b| b.id == block)?.code.first()?;
+    Some((code.lang.clone(), code.text.clone()))
+}
+
+/// Rozszerzenie pliku dla języka bloku kodu (tylko litery i cyfry; inaczej `txt`).
+pub fn code_extension(lang: Option<&str>) -> &str {
+    lang.filter(|l| !l.is_empty() && l.chars().all(|c| c.is_ascii_alphanumeric()))
+        .unwrap_or("txt")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

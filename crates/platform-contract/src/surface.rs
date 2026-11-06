@@ -12,8 +12,9 @@ use serde::{Deserialize, Serialize};
 use crate::error::PlatformError;
 use crate::input::InputSample;
 
-/// Maksymalna liczba przycisków.
-pub const MAX_BUTTONS: usize = 6;
+/// Maksymalna liczba przycisków: „Odmów”, „Zezwól tylko teraz”, „Zezwól i przełącz na
+/// Automatycznie” i cztery czasy zgody (plan 50 §4.2).
+pub const MAX_BUTTONS: usize = 7;
 /// Najmniejszy dozwolony identyfikator przycisku (poniżej są `IDOK`/`IDCANCEL` itp.).
 pub const MIN_BUTTON_ID: u16 = 100;
 /// Limit długości pojedynczego tekstu (znaki).
@@ -88,12 +89,12 @@ pub struct SurfaceView {
 }
 
 impl SurfaceView {
-    /// Walidacja: przyciski 1–6 o unikalnych id ≥ 100, fokus na istniejącym przycisku, limity
+    /// Walidacja: przyciski 1–7 o unikalnych id ≥ 100, fokus na istniejącym przycisku, limity
     /// tekstu, brak znaków sterujących (poza nową linią w szczegółach).
     pub fn validate(&self) -> Result<(), PlatformError> {
         let bad = |why: &str| Err(PlatformError::Unsupported(format!("widok okna: {why}")));
         if self.buttons.is_empty() || self.buttons.len() > MAX_BUTTONS {
-            return bad("od 1 do 6 przycisków");
+            return bad("od 1 do 7 przycisków");
         }
         let mut ids: Vec<u16> = self.buttons.iter().map(|b| b.id).collect();
         ids.sort_unstable();

@@ -11,6 +11,7 @@ use safety_broker_contract::{Broker, Capability, DeclaredFacts, PathScope};
 use tools_common_contract::{
     Authorization, BrokerGate, DenialReason, ToolCtx, ToolErrorKind, ToolManifest, ToolOutcome,
     UndoRef, UndoService, action_request, base_facts, paths, text, tool_event, with_summary,
+    workdir_links::escapes_workdir,
 };
 use tools_fs_contract::{EVENT_DENIED, EVENT_DENYLIST_HIT, EVENT_RESULT, FsToolsConfig};
 use undo_journal_contract::{StepCtx, StepId, UndoError, UndoJournal};
@@ -129,7 +130,15 @@ impl Core {
         let needed: Vec<Capability> = caps.iter().map(|(c, _)| c.clone()).collect();
         let requests = caps
             .into_iter()
-            .map(|(c, f)| action_request(ctx, c, with_summary(f, action)))
+            .map(|(c, mut f)| {
+                // Dowiązanie w folderze pracy prowadzące poza niego — dla Sędziego „poza folderem”.
+                if let Capability::FsRead(s) | Capability::FsWrite(s) = &c
+                    && escapes_workdir(s.canonical(), f.workdir.as_deref(), &self.env)
+                {
+                    f.workdir = None;
+                }
+                action_request(ctx, c, with_summary(f, action))
+            })
             .collect();
         let auths = match self.gate.authorize_all(requests, ctx).await {
             Ok(a) => a,

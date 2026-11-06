@@ -11,7 +11,7 @@ use crate::types::{AutonomyLevel, SttConfidence};
 pub enum RuleId {
     /// Twarda blokada Jądra (każdy poziom).
     KernelBlock,
-    /// Destrukcja zlecona głosem → potwierdzenie nie-głosem (≤ L3; „Pełna automatyka” — decyzja 27.10).
+    /// Destrukcja zlecona głosem → potwierdzenie nie-głosem (≤ L3; „Pełny dostęp” — decyzja 27.10).
     VoiceDestructive,
     /// Zmiana stanu zlecona głosem przy niskiej pewności STT (≤ L3; na L4 bez pytania — decyzja 31.10).
     VoiceLowConfidence,
@@ -27,6 +27,10 @@ pub enum RuleId {
     MutationNeedsYes,
     /// L2: usuwanie, egress, instalacja, sekrety, nieodwracalne.
     RiskyAtL2,
+    /// L2 („Akceptuj edycje”): zmiana poza folderem pracy rozmowy (plan 50).
+    OutsideWorkdir,
+    /// Zmiana ścieżki chronionej (≤ L3, nigdy „zawsze zezwalaj”; plan 50 §4.5).
+    ProtectedPath,
     /// Sesja `tainted` i wysokie ryzyko (≤ L3).
     TaintedHighRisk,
     /// Akcja na podstawie niezaufanej treści (≤ L3).
@@ -79,10 +83,10 @@ const fn rule(
     }
 }
 
-/// Tabela reguł w kolejności oceny. Na „Pełnej automatyce” (L4) działa tylko twarda blokada Jądra —
+/// Tabela reguł w kolejności oceny. Przy „Pełnym dostępie” (L4) działa tylko twarda blokada Jądra —
 /// okno zgód nie pokazuje się wcale, aż właściciel obniży poziom (decyzja właściciela 31.10).
 /// Reguły pilnujące obcej treści i głosu nigdy nie są `grantable`.
-pub const RULES: [RuleDescription; 15] = [
+pub const RULES: [RuleDescription; 17] = [
     rule(
         RuleId::KernelBlock,
         None,
@@ -145,6 +149,20 @@ pub const RULES: [RuleDescription; 15] = [
         true,
         false,
         "usuwanie, wysyłka, instalacja, sekrety i akcje nieodwracalne wymagają zgody",
+    ),
+    rule(
+        RuleId::OutsideWorkdir,
+        Some(AutonomyLevel::L2),
+        true,
+        false,
+        "zmiana plików lub polecenie poza folderem pracy rozmowy",
+    ),
+    rule(
+        RuleId::ProtectedPath,
+        Some(AutonomyLevel::L3),
+        false,
+        false,
+        "zmiana w ścieżce chronionej (.git, .alfa, .ssh, pliki startowe powłoki)",
     ),
     rule(
         RuleId::TaintedHighRisk,

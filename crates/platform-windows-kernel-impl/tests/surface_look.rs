@@ -25,7 +25,7 @@ fn broker_window_look_preview() {
         details: vec![
             detail("Kto", "Jądro Alfy"),
             detail("Dotyczy", "cała aplikacja"),
-            detail("Zmiana", "L3 „Automatycznie” → L4 „Pełna automatyka”"),
+            detail("Zmiana", "L3 „Automatycznie” → L4 „Pełny dostęp”"),
             detail("Ryzyko", "wysokie — tak (dziennik cofania)"),
             detail("Źródło polecenia", "Ty (tekst)"),
         ],

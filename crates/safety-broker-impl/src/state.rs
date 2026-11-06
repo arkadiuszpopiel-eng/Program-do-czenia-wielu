@@ -2,14 +2,15 @@
 
 use std::collections::{BTreeMap, VecDeque};
 
+use approval_judge_contract::JudgeFuse;
 use core_bus_contract::{AgentId, SessionId};
 use risk_classifier_contract::{
     AutonomyLevel, CommandOrigin, Destructiveness, Reversibility, RuleId, describe,
 };
 use safety_broker_contract::{
-    ActionRequest, ApprovalId, ApprovalRequest, AutonomyTable, AutonomyTarget, CapToken,
-    Capability, DeclaredFacts, Holder, KernelGuard, KernelPolicy, Nonce, PlanStep, SessionSecurity,
-    TokenId,
+    ActionRequest, ApprovalId, ApprovalRequest, AutonomyEntry, AutonomyTable, AutonomyTarget,
+    BrokerError, CapToken, Capability, DeclaredFacts, Holder, KernelGuard, KernelPolicy, Nonce,
+    PlanStep, SessionSecurity, TokenId,
 };
 
 use crate::keys::KeyRing;
@@ -44,9 +45,28 @@ pub(crate) enum PendingAction {
 /// Stan prośby.
 pub(crate) enum PendStatus {
     Pending,
+    /// Czeka na model-sędziego (niewidoczna w Broker-UI); po `deadline_ms` — `Pending` (karta właściciela).
+    AwaitingJudge {
+        deadline_ms: u64,
+    },
     Approved(Option<Box<CapToken>>),
     Denied,
+    /// Odmowa modelu-sędziego z powodem dla agentki.
+    DeniedByJudge(String),
     Expired,
+}
+
+impl PendStatus {
+    /// Prośba jeszcze nierozstrzygnięta (u właściciela albo u sędziego).
+    pub(crate) fn is_open(&self) -> bool {
+        matches!(self, Self::Pending | Self::AwaitingJudge { .. })
+    }
+}
+
+/// Bezpiecznik sędziego jednej sesji z bieżącym zadaniem (zmiana zadania zeruje licznik „w zadaniu”).
+pub(crate) struct SessionFuse {
+    pub fuse: JudgeFuse,
+    pub task: Option<String>,
 }
 
 /// Prośba z wyzwaniem.
@@ -140,6 +160,17 @@ pub(crate) struct State {
     pub approval_times: VecDeque<u64>,
     pub kernel_blocks: u64,
     pub denied_audit_window: (u64, u32),
+    /// Poziom globalny ustawiony w tym uruchomieniu zgodą z okna („Zezwól i przełącz na
+    /// Automatycznie”); kasowany przy każdej innej zmianie poziomu globalnego (przegląd 3.11).
+    pub switched_global: Option<AutonomyLevel>,
+    /// Poziomy bez sufitu profilu Dziecko przy ostatnim sprawdzeniu (kłódka otwarta albo profil
+    /// wyłączony) — przejście w kłódkę zamkniętą unieważnia to, co wydano bez niej.
+    pub unrestricted: bool,
+    /// Ostatnie pytanie kierowcy sędziego o kolejkę (znak życia; brak = prośby od razu do właściciela).
+    pub judge_seen_ms: Option<u64>,
+    /// Bezpieczniki sędziego per sesja (w pamięci; restart zaczyna od zamkniętych — sędzia nic nie
+    /// przepuszcza poza zgodą jednorazową, więc restart nie luzuje ochrony).
+    pub judge_fuses: BTreeMap<SessionId, SessionFuse>,
 }
 
 impl State {
@@ -159,7 +190,76 @@ impl State {
             approval_times: VecDeque::new(),
             kernel_blocks: 0,
             denied_audit_window: (0, 0),
+            switched_global: None,
+            unrestricted: true,
+            judge_seen_ms: None,
+            judge_fuses: BTreeMap::new(),
         }
+    }
+
+    /// Profil Dziecko (plan 50 §4.4): przy zamkniętej kłódce wyższe tryby i „Max dostęp” otwiera
+    /// tylko PIN rodzica — także karta zatwierdzona po zamknięciu.
+    pub(crate) fn check_child_lock(
+        &self,
+        target: &AutonomyTarget,
+        level: AutonomyLevel,
+        now: u64,
+    ) -> Result<(), BrokerError> {
+        let models = matches!(target, AutonomyTarget::Models { .. });
+        // Poziom rozmowy otwartej „do końca rozmowy” — z jej sufitem; reszta celów — z pełną kłódką.
+        let session = match target {
+            AutonomyTarget::Session { session } | AutonomyTarget::SessionAgent { session, .. } => {
+                Some(session)
+            }
+            _ => None,
+        };
+        if self
+            .autonomy
+            .ceiling_for(session, now)
+            .is_some_and(|c| level > c || models)
+        {
+            return Err(BrokerError::InvalidRequest(
+                "kłódka rodzica: ten tryb otwiera PIN rodzica".into(),
+            ));
+        }
+        Ok(())
+    }
+
+    /// Kłódka profilu Dziecko zamknęła się od ostatniego sprawdzenia (zamknięcie, włączenie profilu,
+    /// upływ terminu otwarcia): tokeny, plany i karty wydane bez sufitu przestają działać (nowy
+    /// klucz bez okna łaski) — kolejne działania przechodzą przez sufit. Zwraca liczbę tokenów.
+    pub(crate) fn sync_child(&mut self, now: u64) -> usize {
+        // Otwarcie „do końca rozmowy” to stan bez pełnej kłódki: jego zamknięcie też unieważnia tokeny.
+        let restricted =
+            self.autonomy.child_session().is_none() && self.autonomy.ceiling(now).is_some();
+        let was_unrestricted = std::mem::replace(&mut self.unrestricted, !restricted);
+        if !(restricted && was_unrestricted) {
+            return 0;
+        }
+        let revoked = self.tokens.len();
+        self.tokens.clear();
+        let _ = self.keys.wipe();
+        self.plans.clear();
+        for p in self.approvals.values_mut() {
+            if p.status.is_open() || matches!(p.status, PendStatus::Approved(Some(_))) {
+                p.status = PendStatus::Expired;
+            }
+        }
+        revoked
+    }
+
+    /// Ustawia poziom celu; zmiana globalna spoza okna zgody kasuje znacznik przełączenia.
+    pub(crate) fn set_level(&mut self, target: AutonomyTarget, entry: AutonomyEntry) {
+        if target == AutonomyTarget::Global {
+            self.switched_global = None;
+        }
+        self.autonomy.set(target, entry);
+    }
+
+    /// Przełączenie z okna zgody, jeśli nadal obowiązuje (wpis globalny bez terminu, ten poziom).
+    pub(crate) fn switched_global(&self) -> Option<AutonomyLevel> {
+        self.switched_global
+            .filter(|l| self.autonomy.standing_global() == Some(*l))
     }
 
     pub(crate) fn policy(&self) -> &KernelPolicy {
@@ -231,7 +331,12 @@ fn level_in(table: &AutonomyTable, target: &AutonomyTarget, now: u64) -> Autonom
             table.get(target, now).unwrap_or(global)
         }
         AutonomyTarget::SessionAgent { session, agent } => {
-            table.effective(session, Some(agent), now)
+            table.uncapped(session, Some(agent), now)
         }
+        // „Max dostęp”: poziom wpisu tego zasięgu; inny zasięg albo wyłączony — domyślny.
+        AutonomyTarget::Models { scope } => match table.max_access(now) {
+            Some((on, level)) if on == *scope => level,
+            _ => AutonomyLevel::default(),
+        },
     }
 }

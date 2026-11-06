@@ -15,6 +15,7 @@ contract-tests = []
 
 [dependencies]
 risk-classifier-contract = { path = "../risk-classifier-contract" }
+approval-judge-contract = { path = "../approval-judge-contract" }
 compliance-contract = { path = "../compliance-contract" }
 watchdog-contract = { path = "../watchdog-contract" }
 core-bus-contract.workspace = true
@@ -23,6 +24,8 @@ async-trait.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 schemars.workspace = true
+# PIN rodzica zerowany w pamięci przy zwolnieniu (profil Dziecko).
+zeroize = "1.9.0"
 thiserror.workspace = true
 
 [dev-dependencies]

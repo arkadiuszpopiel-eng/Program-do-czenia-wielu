@@ -23,6 +23,7 @@ pub mod netpath;
 pub mod paths;
 mod scripted;
 pub mod text;
+pub mod workdir_links;
 
 #[cfg(feature = "contract-tests")]
 pub mod contract_tests;
@@ -69,6 +70,8 @@ pub fn base_facts(manifest: &ToolManifest, ctx: &ToolCtx) -> DeclaredFacts {
     facts.reversible = manifest.reversible;
     facts.untrusted_input_in_args = ctx.untrusted_args;
     facts.summary = Some(manifest.title.clone());
+    facts.workdir = ctx.workdir.clone();
+    facts.model_location = ctx.model_location;
     facts
 }
 

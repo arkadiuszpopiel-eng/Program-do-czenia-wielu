@@ -37,6 +37,7 @@ mod executor;
 mod flow;
 mod handle;
 mod invalid;
+mod location;
 mod locks;
 mod prompt;
 mod registry;

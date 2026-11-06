@@ -60,7 +60,7 @@ pub async fn kernel_blocks_on_l4<B: FullBroker>(b: &B, clock: &ManualClock) {
     assert!(b.metrics().kernel_blocks >= 5);
 }
 
-/// Destrukcja zlecona głosem wymaga potwierdzenia nie-głosem do L3; na L4 („Pełna automatyka”)
+/// Destrukcja zlecona głosem wymaga potwierdzenia nie-głosem do L3; na L4 („Pełny dostęp”)
 /// przechodzi bez pytania (decyzja właściciela 27.10).
 pub async fn voice_destruction_asks_below_l4<B: FullBroker>(b: &B, clock: &ManualClock) {
     let voice = CommandOrigin::UserVoice {
@@ -78,7 +78,7 @@ pub async fn voice_destruction_asks_below_l4<B: FullBroker>(b: &B, clock: &Manua
     );
 }
 
-/// Sesja `tainted`: egress pyta do L3; na „Pełnej automatyce” (L4) przechodzi bez okna zgód
+/// Sesja `tainted`: egress pyta do L3; przy „Pełnym dostępie” (L4) przechodzi bez okna zgód
 /// (decyzja właściciela 31.10), a czekająca karta wygasa przy przejściu na L4. Taint jest
 /// monotoniczny i nie przechodzi na inne sesje.
 pub async fn tainted_egress_asks_up_to_l3_only<B: FullBroker>(b: &B, clock: &ManualClock) {

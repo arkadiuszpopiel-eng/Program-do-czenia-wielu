@@ -1,10 +1,14 @@
 <!--
-  Znak „Pełna automatyka” w belce. Tryb pracy wybiera się w pasku pisania (29.10), ale gdy agentki
+  Znak „Pełny dostęp” w belce. Tryb pracy wybiera się w pasku pisania (29.10), ale gdy agentki
   działają bez pytań, widać to zawsze — także w Ustawieniach. Klik otwiera menu trybów.
+  Włączony „Max dostęp” (plan 50 §8.1) ma pierwszeństwo: czerwony znak z zasięgiem. Zamknięta
+  kłódka profilu Dziecko (plan 50 §4.4) — znak z kłódką (Sędzia i tak obniża wtedy tryb).
 -->
 <script lang="ts">
   import { Popover } from '@alfa/ui-kit';
+  import Lock from '@lucide/svelte/icons/lock';
   import ShieldAlert from '@lucide/svelte/icons/shield-alert';
+  import Zap from '@lucide/svelte/icons/zap';
   import { useApp } from '../../state/context';
   import Lazy from './Lazy.svelte';
 
@@ -12,27 +16,47 @@
   const { t, tk } = app.i18n;
   const loadModes = () => import('./ModeMenu.svelte');
   const level = $derived(app.sessions.active?.autonomy ?? app.autonomy.global ?? 'L3');
+  const locked = $derived(app.autonomy.locked && !app.autonomy.openHere(app.sessions.active?.id));
+  const max = $derived(locked ? null : app.autonomy.maxAccess);
+  const label = $derived(
+    locked
+      ? t('child.badge')
+      : max
+        ? t('maxAccess.badge', { where: t(`maxAccess.scope.${max}`) })
+        : t('mode.badge'),
+  );
   let open = $state(false);
 </script>
 
-{#if level === 'L4'}
+<!-- Otwarte menu zostaje, gdy w nim wyłączono „Max dostęp” albo zszedł Pełny dostęp. -->
+{#if level === 'L4' || max || locked || open}
   <Popover label={t('mode.title')} bind:open width={340}>
     {#snippet trigger(props)}
       <button
         type="button"
         class="badge"
+        class:max
+        class:locked
         {...props}
-        aria-label={t('mode.badge')}
-        title={t('mode.badge')}
+        aria-label={label}
+        title={label}
       >
-        <ShieldAlert size={14} strokeWidth={1.75} aria-hidden="true" />
-        <span class="word">{tk('mode.L4.name')}</span>
+        {#if locked}
+          <Lock size={14} strokeWidth={2} aria-hidden="true" />
+          <span class="word">{t('child.badgeWord')}</span>
+        {:else if max}
+          <Zap size={14} strokeWidth={2} aria-hidden="true" />
+          <span class="word">{t('maxAccess.name')}</span>
+        {:else}
+          <ShieldAlert size={14} strokeWidth={1.75} aria-hidden="true" />
+          <span class="word">{tk('mode.L4.name')}</span>
+        {/if}
       </button>
     {/snippet}
     <Lazy
       load={loadModes}
       props={{
-        // Fokus wraca na znak (po zejściu z Pełnej automatyki znaku już nie ma — wtedy zostaje).
+        // Fokus wraca na znak (po zejściu z Pełnego dostępu znaku już nie ma — wtedy zostaje).
         onclose: () => {
           open = false;
           requestAnimationFrame(() =>
@@ -64,6 +88,22 @@
   .badge:hover,
   .badge[aria-expanded='true'] {
     background: color-mix(in srgb, var(--alfa-color-warning) 20%, transparent);
+  }
+  .badge.locked {
+    border-color: var(--alfa-color-border-strong);
+    background: var(--alfa-color-surface2);
+    color: var(--alfa-color-text);
+  }
+  .badge.max {
+    border-color: color-mix(in srgb, var(--alfa-color-error) 60%, transparent);
+    background: color-mix(in srgb, var(--alfa-color-error) 12%, transparent);
+    color: color-mix(in srgb, var(--alfa-color-error) 75%, var(--alfa-color-text));
+    box-shadow: 0 0 10px color-mix(in srgb, var(--alfa-color-error) 35%, transparent);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--alfa-color-error) 50%, transparent);
+  }
+  .badge.max:hover,
+  .badge.max[aria-expanded='true'] {
+    background: color-mix(in srgb, var(--alfa-color-error) 20%, transparent);
   }
   .badge:focus-visible {
     outline: var(--alfa-size-focus-ring) solid var(--alfa-color-focus);

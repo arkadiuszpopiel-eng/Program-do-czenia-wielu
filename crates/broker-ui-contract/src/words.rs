@@ -3,7 +3,9 @@
 //! i opis „Co to jest Sędzia Cieni?” pod przyciskiem „?”.
 
 use risk_classifier_contract::{AutonomyLevel, CommandOrigin, Reversibility, RuleId};
-use safety_broker_contract::{AdminOp, AutonomyTarget, Capability, KernelPolicy, ServiceAction};
+use safety_broker_contract::{
+    AdminOp, AutonomyTarget, Capability, KernelPolicy, ModelScope, ServiceAction,
+};
 
 use crate::card::sanitize;
 
@@ -16,10 +18,11 @@ Każde działanie agentki na Twoim komputerze — pliki, polecenia, programy, si
 systemu — najpierw trafia do niego. Sędzia ocenia ryzyko według trybu pracy z menu „Tryb pracy” \
 w pasku Alfy i albo przepuszcza działanie, albo pyta Cię w tym oknie. Zgodę dajesz tylko tutaj, \
 myszą albo klawiszem — agentka ani strona internetowa nie mogą kliknąć za Ciebie. Twarde blokady \
-Jądra (np. hasła przeglądarek, wyłączenie dziennika) działają zawsze. Na „Pełnej automatyce” to \
+Jądra (np. hasła przeglądarek, wyłączenie dziennika) działają zawsze. Przy „Pełnym dostępie” to \
 okno nie pokazuje się wcale, aż obniżysz tryb. „Zawsze w tym zakresie” pozwala na ten sam rodzaj \
 działań w tym samym miejscu przez 1 h, 3 h, dobę albo do odwołania — listę zgód i „Odwołaj” \
-znajdziesz w Ustawienia → Uprawnienia. Wszystko zapisuje się w dzienniku działań, \
+znajdziesz w Ustawienia → Uprawnienia. „Zezwól i przełącz na „Automatycznie”” zgadza się raz \
+i zmienia tryb pracy — potem Sędzia pyta już tylko o rzeczy ryzykowne. Wszystko zapisuje się w dzienniku działań, \
 a Ctrl+Shift+F12 zatrzymuje agentki natychmiast.";
 
 /// Rodzaj działania (rodzina zdolności).
@@ -106,11 +109,11 @@ pub fn reversible_pl(r: Reversibility) -> &'static str {
 /// Nazwa trybu pracy taka jak w menu „Tryb pracy” w pasku Alfy.
 pub fn mode_name_pl(l: AutonomyLevel) -> &'static str {
     match l {
-        AutonomyLevel::L0 => "Tylko podgląd",
-        AutonomyLevel::L1 => "Pytaj o wszystko",
-        AutonomyLevel::L2 => "Pytaj o ryzykowne",
+        AutonomyLevel::L0 => "Plan",
+        AutonomyLevel::L1 => "Ręcznie",
+        AutonomyLevel::L2 => "Akceptuj edycje",
         AutonomyLevel::L3 => "Automatycznie",
-        AutonomyLevel::L4 => "Pełna automatyka",
+        AutonomyLevel::L4 => "Pełny dostęp",
     }
 }
 
@@ -119,7 +122,9 @@ pub fn mode_note_pl(l: AutonomyLevel) -> &'static str {
     match l {
         AutonomyLevel::L0 => "agentki tylko czytają i podpowiadają, nic nie zmieniają",
         AutonomyLevel::L1 => "każda zmiana czeka na Twoje „tak”",
-        AutonomyLevel::L2 => "drobne rzeczy same; pytają przy usuwaniu, wysyłce i instalacji",
+        AutonomyLevel::L2 => {
+            "zmieniają pliki w folderze pracy same; pytają o resztę, usuwanie, wysyłkę i instalację"
+        }
         AutonomyLevel::L3 => "pracują same; pytają przy nieodwracalnych i po niezaufanej treści",
         AutonomyLevel::L4 => {
             "pracują same i o nic nie pytają — to okno nie pokaże się, aż obniżysz tryb"
@@ -145,6 +150,12 @@ pub fn reason_pl(rule: RuleId) -> &'static str {
         }
         RuleId::MutationNeedsYes => "W tym trybie każda zmiana czeka na Twoje „tak”.",
         RuleId::RiskyAtL2 => "W tym trybie usuwanie, wysyłka i instalacja czekają na Twoją zgodę.",
+        RuleId::OutsideWorkdir => {
+            "W trybie „Akceptuj edycje” zmiany poza folderem pracy rozmowy czekają na Twoją zgodę."
+        }
+        RuleId::ProtectedPath => {
+            "To ścieżka chroniona (np. .git, .alfa, .ssh albo plik startowy powłoki) — zmiana zawsze czeka na Twoją zgodę."
+        }
         RuleId::TaintedHighRisk => {
             "Sesja widziała niezaufaną treść, a to działanie jest ryzykowne."
         }
@@ -199,6 +210,16 @@ pub fn target_pl(t: &AutonomyTarget) -> String {
             name(agent.as_str()),
             raw(session.as_str())
         ),
+        AutonomyTarget::Models { scope } => scope_pl(*scope).into(),
+    }
+}
+
+/// Zasięg „Max dostęp” po polsku (okno Sędziego, plan 50 §8.1).
+pub fn scope_pl(scope: ModelScope) -> &'static str {
+    match scope {
+        ModelScope::Local => "Max dostęp: agentki na modelach lokalnych",
+        ModelScope::Cloud => "Max dostęp: agentki na modelach w chmurze",
+        ModelScope::All => "Max dostęp: wszystkie agentki, każdy model",
     }
 }
 

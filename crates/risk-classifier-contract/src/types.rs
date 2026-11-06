@@ -23,9 +23,9 @@ use serde::{Deserialize, Serialize};
 pub enum AutonomyLevel {
     /// Podgląd — tylko czyta i podpowiada.
     L0,
-    /// Pytaj o wszystko — każda zmiana wymaga „tak”.
+    /// Ręcznie — każda zmiana wymaga „tak”.
     L1,
-    /// Pytaj o ryzykowne — usuwanie, egress, instalacja.
+    /// Akceptuj edycje — zmiany w folderze pracy same; poza nim, usuwanie, egress, instalacja — pyta.
     L2,
     /// Bardzo wysoka (domyślny) — pyta przy nieodwracalnych poza zakresem i niezaufanej treści.
     #[default]
@@ -41,11 +41,11 @@ impl AutonomyLevel {
     /// Nazwa po polsku (do UI i audytu).
     pub fn name_pl(self) -> &'static str {
         match self {
-            Self::L0 => "Tylko podgląd",
-            Self::L1 => "Pytaj o wszystko",
-            Self::L2 => "Pytaj o ryzykowne",
+            Self::L0 => "Plan",
+            Self::L1 => "Ręcznie",
+            Self::L2 => "Akceptuj edycje",
             Self::L3 => "Automatycznie",
-            Self::L4 => "Pełna automatyka",
+            Self::L4 => "Pełny dostęp",
         }
     }
 }

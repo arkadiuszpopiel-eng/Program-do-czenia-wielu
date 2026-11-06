@@ -54,6 +54,7 @@ impl BrokerEngine {
     ) -> Result<(), BrokerError> {
         let now = self.now();
         let mut st = self.lock();
+        st.sync_child(now);
         let result = Self::check_token(&st, t, presenter, now).and_then(|()| {
             if !needed.is_subset_of(&t.cap) {
                 return Err(BrokerError::TokenRejected(
@@ -91,6 +92,7 @@ impl BrokerEngine {
         }
         let now = self.now();
         let mut st = self.lock();
+        st.sync_child(now);
         Self::check_token(&st, parent, presenter, now)?;
         if !req.capability.is_subset_of(&parent.cap) {
             return Err(BrokerError::NotAttenuated);

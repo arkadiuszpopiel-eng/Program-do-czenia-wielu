@@ -954,6 +954,60 @@ export interface CheckRun {
   readonly results: readonly CheckResult[];
 }
 
+/** Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni. */
+export type ChildLockRequest =
+  | {
+      readonly new: SecretInput;
+      readonly old: SecretInput | null;
+      readonly op: 'set_pin';
+    }
+  | {
+      readonly on: boolean;
+      readonly op: 'enable';
+      readonly pin: SecretInput;
+    }
+  | {
+      readonly minutes: number | null;
+      readonly op: 'open';
+      readonly pin: SecretInput;
+      readonly session_id: string | null;
+    }
+  | {
+      readonly op: 'close';
+    }
+  | {
+      readonly op: 'verify';
+      readonly pin: SecretInput;
+    }
+  | {
+      readonly on: boolean;
+      readonly op: 'transcripts';
+      readonly pin: SecretInput;
+    };
+
+/** Profil Dziecko (plan 50 §4.4): stan kłódki trybów pracy (bez PIN-u). */
+export interface ChildLockState {
+  readonly attempts_left: number;
+  /** Blokada po błędnych próbach do (ms od 1970). */
+  readonly blocked_until_ms?: number | null;
+  /** Kłódka otwarta „do końca rozmowy” (tylko jedna rozmowa). */
+  readonly conversation: boolean;
+  /** Ta rozmowa (gdy rdzeń ją zna) — interfejs pokazuje kłódkę w każdej innej. */
+  readonly conversation_id?: string | null;
+  readonly enabled: boolean;
+  /** Kłódka otwarta teraz PIN-em rodzica. */
+  readonly open: boolean;
+  /** Do kiedy otwarta (ms od 1970); `None` — zamknięta albo do zamknięcia Alfy. */
+  readonly open_until_ms?: number | null;
+  readonly pin_set: boolean;
+  /** Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna. */
+  readonly tamper_resistant: boolean;
+  /** Rodzic włączył pełną treść rozmów w dzienniku (dziecko widzi stały znak). */
+  readonly transcripts: boolean;
+  /** Stan nieznany (zerwane łącze z Sędzią); interfejs pokazuje ostatni znany stan i „nieznany”. */
+  readonly unknown: boolean;
+}
+
 /** Rozwiązanie kolizji. */
 export type CollisionResolution = 'keep_local' | 'take_imported' | 'keep_both';
 
@@ -1931,6 +1985,9 @@ export interface MarshalState {
   readonly translator: boolean;
 }
 
+/** Zasięg „Max dostęp” (plan 50 §8.1): bez pytań na modelach lokalnych, w chmurze albo wszystkich. */
+export type MaxAccess = 'local' | 'cloud' | 'all';
+
 /** Stan połączenia z serwerem. */
 export type McpConnState = 'disabled' | 'idle' | 'connected' | 'failed';
 
@@ -2493,6 +2550,8 @@ export type PanelId = 'agents' | 'timeline' | 'files' | 'memory' | 'screen' | 'v
 export interface PermissionsState {
   readonly global: AutonomyLevel;
   readonly hello_enabled: boolean;
+  /** Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony albo Broker niepodłączony. */
+  readonly max_access?: MaxAccess | null;
   readonly session: AutonomyLevel | null;
 }
 
@@ -4517,6 +4576,10 @@ export interface IpcCommands {
     readonly args: { readonly id: string; readonly enabled: boolean };
     readonly result: ModulesView;
   };
+  readonly permissions_child_lock: {
+    readonly args: { readonly change: ChildLockRequest | null };
+    readonly result: ChildLockState;
+  };
   readonly permissions_get: {
     readonly args: { readonly sessionId: string | null };
     readonly result: PermissionsState;
@@ -4531,6 +4594,10 @@ export interface IpcCommands {
   };
   readonly permissions_request_level: {
     readonly args: { readonly level: AutonomyLevel; readonly sessionId: string | null };
+    readonly result: BrokerIntentResult;
+  };
+  readonly permissions_request_max_access: {
+    readonly args: { readonly scope: MaxAccess | null };
     readonly result: BrokerIntentResult;
   };
   readonly permissions_revoke_grant: {

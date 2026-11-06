@@ -1,16 +1,21 @@
 <!--
-  Menu „Tryb pracy” (decyzja właściciela 27.10, od 29.10 w pasku pisania): cztery tryby jak w Claude
-  Code, po polsku — Tylko podgląd, Pytaj o wszystko, Automatycznie, Pełna automatyka. Tryb
+  Menu „Tryb pracy” (decyzja właściciela 27.10, od 29.10 w pasku pisania, od 3.11 pięć trybów na
+  zasadzie Claude Code i Codex — plan 50): Plan, Ręcznie, Akceptuj edycje,
+  Automatycznie, Pełny dostęp. Tryb
   obowiązuje we wszystkich rozmowach; podniesienie potwierdzasz raz w oknie Brokera i zostaje po
   restarcie. Zaznaczony jest poziom globalny odczytany z Brokera, a komunikat o zmianie pojawia
-  się dopiero, gdy Broker ją przyjął. Klawisze 1–4 wybierają tryb, strzałki przesuwają zaznaczenie.
+  się dopiero, gdy Broker ją przyjął. Klawisze 1–5 wybierają tryb, strzałki przesuwają zaznaczenie.
+  Na dole czerwony przełącznik „Max dostęp” (plan 50 §8.1). „Plan” (L0) obowiązuje tylko otwartą
+  rozmowę (Z.5); w rozmowie w trybie Plan wybór innego trybu zmienia poziom tej rozmowy.
 -->
 <script lang="ts">
   import Check from '@lucide/svelte/icons/check';
+  import Lock from '@lucide/svelte/icons/lock';
   import type { AutonomyLevel } from '../../api/types';
-  import { modeItems, requestMode } from '../../logic/work-mode';
-  import { showError } from '../../state/attempt';
+  import { modeItems } from '../../logic/work-mode';
   import { useApp } from '../../state/context';
+  import { behindLock as locked, modeView, switchMode } from '../../state/mode-switch';
+  import MaxAccessSwitch from './MaxAccessSwitch.svelte';
 
   interface Props {
     /** Zamyka menu po wyborze albo przejściu do Ustawień. */
@@ -21,10 +26,17 @@
   const app = useApp();
   const { t, tk } = app.i18n;
   const session = $derived(app.sessions.active);
-  const current = $derived<AutonomyLevel>(app.autonomy.global ?? session?.autonomy ?? 'L3');
+  // Bieżący tryb i zakres zmiany: Plan i „do końca rozmowy” dotyczą tej rozmowy (Z.5, Z.7).
+  const view = $derived(modeView(app));
+  const current = $derived(view.current);
+  const here = $derived(view.here);
   // Rozmowa z własnym poziomem (Ustawienia → Uprawnienia) — menu zmienia tryb globalny.
   const own = $derived(
-    session && app.autonomy.global && session.autonomy !== app.autonomy.global
+    session &&
+      !view.planning &&
+      !here &&
+      app.autonomy.global &&
+      session.autonomy !== app.autonomy.global
       ? session.autonomy
       : null,
   );
@@ -40,34 +52,11 @@
     (checked ?? list?.querySelector<HTMLElement>('[role="menuitemradio"]'))?.focus();
   });
 
-  async function choose(level: AutonomyLevel) {
-    onclose();
-    if (level === current) return;
-    try {
-      await requestMode(level, {
-        request: (l) => app.client.permissions.requestLevel(l, null),
-        readGlobal: () => app.autonomy.load(app.client.permissions),
-        notify: (event, l) => void report(event, l),
-      });
-    } catch (error) {
-      showError(app.toasts, error);
-    }
-  }
+  const behindLock = (level: AutonomyLevel) => locked(app, view, level);
 
-  /** Komunikat po zmianie — sukces dopiero po odczycie z Brokera, że poziom obowiązuje. */
-  async function report(event: 'applied' | 'requested' | 'raised', level: AutonomyLevel) {
-    const mode = tk(`mode.${level}.name`);
-    if (event === 'requested') {
-      app.toasts.show({ kind: 'info', message: t('mode.requested', { mode }) });
-      return;
-    }
-    const now = event === 'raised' ? level : await app.autonomy.load(app.client.permissions);
-    if (now === level || now === null) {
-      app.toasts.show({ kind: 'success', message: t(`mode.${event}`, { mode }) });
-    } else {
-      const current = tk(`mode.${now}.name`);
-      app.toasts.show({ kind: 'error', message: t('mode.notApplied', { mode, current }) });
-    }
+  function choose(level: AutonomyLevel) {
+    if (!behindLock(level)) onclose();
+    void switchMode(app, view, level);
   }
 
   function keydown(event: KeyboardEvent) {
@@ -109,20 +98,29 @@
         aria-checked={level === current}
         class="item"
         class:full={level === 'L4'}
+        class:locked={behindLock(level)}
+        aria-disabled={behindLock(level) ? true : undefined}
         onclick={() => void choose(level)}
       >
         <span class="text">
           <span class="name">{tk(`mode.${level}.name`)}</span>
-          <span class="desc">{tk(`mode.${level}.desc`)}</span>
+          <span class="desc"
+            >{behindLock(level) ? t('child.askParent') : tk(`mode.${level}.desc`)}</span
+          >
         </span>
         <span class="mark" aria-hidden="true">
-          {#if level === current}<Check size={16} strokeWidth={2} />{/if}
+          {#if level === current}<Check
+              size={16}
+              strokeWidth={2}
+            />{:else if behindLock(level)}<Lock size={14} strokeWidth={2} />{/if}
         </span>
         <span class="key" aria-hidden="true">{i + 1}</span>
       </button>
     {/each}
   </div>
+  {#if app.autonomy.locked && !here}<p class="note own">{t('child.lockedNote')}</p>{/if}
   {#if own}<p class="note own">{t('mode.sessionOwn', { mode: tk(`mode.${own}.name`) })}</p>{/if}
+  <MaxAccessSwitch />
   <p class="note">{t('mode.note')}</p>
   <button type="button" class="more" onclick={settings}>{t('mode.more')}</button>
 </div>
@@ -183,6 +181,11 @@
   }
   .full .name {
     color: var(--alfa-color-warning);
+  }
+  /* Profil Dziecko: tryb za kłódką rodzica — wyciszony, z kłódką zamiast znacznika. */
+  .locked .name,
+  .locked .mark {
+    color: var(--alfa-color-text-muted);
   }
   .desc,
   .note {

@@ -135,6 +135,8 @@ test('eksport, paczki, kopie, załączniki i propozycje: odmowa przed oknem syst
     ['attachments_add_dropped', { sessionId: 'brak-sesji' }],
     ['permissions_open_approval', { approvalId: 'brak' }],
     ['permissions_revoke_grant', { grantId: 'brak' }],
+    // Profil Dziecko: PIN spoza 4–8 cyfr odrzuca rdzeń, zanim dotrze do Sędziego.
+    ['permissions_child_lock', { change: { op: 'open', pin: '12', minutes: 1 } }],
     ['skills_propose', { skill: {} }],
     ['plugins_propose', { manifest: {}, wasmB64: 'AAAA' }],
   ];
@@ -145,6 +147,7 @@ test('eksport, paczki, kopie, załączniki i propozycje: odmowa przed oknem syst
   }
   // Lista zgód „zawsze w tym zakresie”: świeży profil testowy — lista albo opisana odmowa.
   await settled(main, 'permissions_grants', {});
+  await settled(main, 'permissions_child_lock', { change: null });
   // Wyłączenie mikrofonu rozmowy: bez silników głosu odmowa, z nimi — mikrofon wyłączony.
   await settled(main, 'voice_set_mic_enabled', { enabled: false });
 });

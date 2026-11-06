@@ -14,6 +14,7 @@ use safety_broker_contract::{
 use watchdog_contract::{Clock, JobTable};
 
 use crate::audit::AuditSink;
+use crate::child_store::{ChildStore, PinParams};
 use crate::grants::{GRANTS_FILE, GrantStore};
 use crate::keys::{KeyMode, KeyRing, mac};
 use crate::standing::StandingStore;
@@ -44,6 +45,10 @@ pub struct BrokerEngine {
     pub(crate) standing: Option<StandingStore>,
     /// Zgody „do odwołania” (`None` — bez zapisu, jak `standing`).
     pub(crate) grant_store: Option<GrantStore>,
+    /// Profil Dziecko (bez pliku — wyłączony, jak `standing`).
+    pub(crate) child: Mutex<ChildStore>,
+    /// Połączenia aplikacji (rola Jądra) — ostatnie rozłączenie zamyka kłódkę „do zamknięcia Alfy”.
+    pub(crate) core_clients: std::sync::atomic::AtomicUsize,
 }
 
 /// Maksymalne długości pól podmiotu.
@@ -74,6 +79,8 @@ impl BrokerEngine {
             env: config.env,
             standing: None,
             grant_store: None,
+            child: Mutex::new(ChildStore::load(None, PinParams::default())),
+            core_clients: std::sync::atomic::AtomicUsize::new(0),
         })
     }
 
@@ -100,13 +107,21 @@ impl BrokerEngine {
         self.restore_grants(&grants);
         self.grant_store = Some(grants);
         let store = StandingStore::new(path);
-        if let Some(level) = store.load() {
+        let saved = store.load();
+        let restored = [
+            saved.level.map(|level| (AutonomyTarget::Global, level)),
+            saved
+                .max_access
+                .map(|scope| (AutonomyTarget::Models { scope }, AutonomyLevel::L4)),
+        ];
+        for (target, level) in restored.into_iter().flatten() {
             let entry = AutonomyEntry {
                 level,
                 until_ms: None,
             };
-            self.lock().autonomy.set(AutonomyTarget::Global, entry);
-            let payload = serde_json::json!({ "target": AutonomyTarget::Global, "level": level, "origin": "restored" });
+            self.lock().autonomy.set(target.clone(), entry);
+            let payload =
+                serde_json::json!({ "target": target, "level": level, "origin": "restored" });
             // Audyt niedostępny przy starcie — poziom i tak obowiązuje (zatwierdził go właściciel).
             let _ = self.audit(EVENT_AUTONOMY_CHANGED, None, payload);
         }
@@ -114,12 +129,21 @@ impl BrokerEngine {
         self
     }
 
-    /// Utrwala poziom globalny bez terminu (błąd zapisu → wpis w Audycie; poziom w pamięci obowiązuje).
-    pub(crate) fn remember_global(&self, level: AutonomyLevel) {
-        if let Some(store) = &self.standing
-            && let Err(e) = store.save(level)
-        {
-            let payload = serde_json::json!({ "target": AutonomyTarget::Global, "level": level, "persist_error": e.to_string() });
+    /// Utrwala poziom globalny albo „Max dostęp” bez terminu (inne cele nie są zapamiętywane;
+    /// błąd zapisu → wpis w Audycie; poziom w pamięci obowiązuje).
+    pub(crate) fn remember(&self, target: &AutonomyTarget, level: AutonomyLevel) {
+        let Some(store) = &self.standing else {
+            return;
+        };
+        let result = match target {
+            AutonomyTarget::Global => store.save(level),
+            AutonomyTarget::Models { scope } => {
+                store.save_max_access((level > AutonomyLevel::default()).then_some(*scope))
+            }
+            _ => return,
+        };
+        if let Err(e) = result {
+            let payload = serde_json::json!({ "target": target, "level": level, "persist_error": e.to_string() });
             let _ = self.audit(EVENT_AUTONOMY_CHANGED, None, payload);
         }
     }

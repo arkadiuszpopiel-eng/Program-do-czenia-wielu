@@ -28,10 +28,7 @@ impl BrokerEngine {
         self.persist_grants(&st);
         st.plans.clear();
         for p in st.approvals.values_mut() {
-            if matches!(
-                p.status,
-                PendStatus::Pending | PendStatus::Approved(Some(_))
-            ) {
+            if p.status.is_open() || matches!(p.status, PendStatus::Approved(Some(_))) {
                 p.status = PendStatus::Expired;
             }
         }

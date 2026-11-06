@@ -27,7 +27,7 @@ impl Core {
             m.reversible,
             Destructiveness::Recoverable,
         )];
-        let auths = self.mutate_access(ctx, m, caps, &action).await?;
+        let auths = self.dir_access(ctx, m, caps, &action, Some(&path)).await?;
         let p = Core::path_buf(&path);
         let journal = self.journal.clone();
         Ok(self
@@ -66,7 +66,7 @@ impl Core {
             m.reversible,
             Destructiveness::Permanent,
         )];
-        let auths = self.mutate_access(ctx, m, caps, &action).await?;
+        let auths = self.dir_access(ctx, m, caps, &action, Some(&path)).await?;
         if auths.iter().all(|a| a.approval.is_none()) {
             let mut out = ToolOutcome::ok(
                 format!(

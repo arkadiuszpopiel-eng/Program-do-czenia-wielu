@@ -68,6 +68,7 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
     let os: Check = roundtrip::<Option<String>>;
     let b: Check = roundtrip::<bool>;
     let unit: Check = roundtrip::<()>;
+    let intent: Check = roundtrip::<BrokerIntentResult>;
     match command {
         "app_bootstrap" => (vec![], roundtrip::<AppBootstrap>),
         "app_complete_onboarding"
@@ -137,7 +138,7 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
         "turns_save_code" => (vec![("turnId", s), ("blockIndex", roundtrip::<u64>)], unit),
         "turns_run_code" => (
             vec![("turnId", s), ("blockIndex", roundtrip::<u64>)],
-            roundtrip::<BrokerIntentResult>,
+            intent,
         ),
         "turns_undo_step" => (vec![("undoToken", s)], unit),
         "agents_list" => (vec![("sessionId", s)], roundtrip::<Vec<AgentState>>),
@@ -254,9 +255,12 @@ fn spec(command: &str) -> (Vec<(&'static str, Check)>, Check) {
         "permissions_get" => (vec![("sessionId", os)], roundtrip::<PermissionsState>),
         "permissions_request_level" => (
             vec![("level", roundtrip::<AutonomyLevel>), ("sessionId", os)],
-            roundtrip::<BrokerIntentResult>,
+            intent,
         ),
-        "permissions_open_approval" => (vec![("approvalId", s)], roundtrip::<BrokerIntentResult>),
+        "permissions_request_max_access" => {
+            (vec![("scope", roundtrip::<Option<MaxAccess>>)], intent)
+        }
+        "permissions_open_approval" => (vec![("approvalId", s)], intent),
         "permissions_grants" => (vec![], roundtrip::<Vec<GrantView>>),
         "permissions_revoke_grant" => (vec![("grantId", s)], b),
         "models_local_list" => (vec![], roundtrip::<Vec<LocalModelInfo>>),
@@ -352,27 +356,19 @@ fn every_event_sample_roundtrips() {
 #[test]
 fn extra_result_variants_roundtrip() {
     let extra = load("extra.json");
-    let results = &extra["results"];
-    for v in results["ExportResult"].as_array().unwrap() {
-        roundtrip::<ExportResult>("ExportResult", v);
-    }
-    for v in results["InspectResult"].as_array().unwrap() {
-        roundtrip::<InspectResult>("InspectResult", v);
-    }
-    for v in results["ArtifactPreview"].as_array().unwrap() {
-        roundtrip::<ArtifactPreview>("ArtifactPreview", v);
-    }
-    for v in results["SystemStatus"].as_array().unwrap() {
-        roundtrip::<SystemStatus>("SystemStatus", v);
-    }
-    for v in results["PermissionsState"].as_array().unwrap() {
-        roundtrip::<PermissionsState>("PermissionsState", v);
-    }
-    for v in results["TestReport"].as_array().unwrap() {
-        roundtrip::<TestReport>("TestReport", v);
-    }
-    for v in results["DeviceProfile"].as_array().unwrap() {
-        roundtrip::<DeviceProfile>("DeviceProfile", v);
+    let checks: [(&str, Check); 7] = [
+        ("ExportResult", roundtrip::<ExportResult>),
+        ("InspectResult", roundtrip::<InspectResult>),
+        ("ArtifactPreview", roundtrip::<ArtifactPreview>),
+        ("SystemStatus", roundtrip::<SystemStatus>),
+        ("PermissionsState", roundtrip::<PermissionsState>),
+        ("TestReport", roundtrip::<TestReport>),
+        ("DeviceProfile", roundtrip::<DeviceProfile>),
+    ];
+    for (name, check) in checks {
+        for v in extra["results"][name].as_array().unwrap() {
+            check(name, v);
+        }
     }
 }
 

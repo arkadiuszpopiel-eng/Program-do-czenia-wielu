@@ -93,14 +93,18 @@ impl BrokerEngine {
         Self::ttl(&self.lock(), req.ttl_ms)?;
         let now = self.now();
         let mut st = self.lock();
+        st.sync_child(now);
         if req.origin == CommandOrigin::UntrustedContent || req.facts.untrusted_input_in_args {
             self.taint(&mut st, &req.holder, TaintSource::File);
         }
         let session = st.session(&req.holder.session);
         let facts = st.guard.derive_facts(&req, &session);
-        let level = st
-            .autonomy
-            .effective(&req.holder.session, req.holder.agent.as_ref(), now);
+        let level = st.autonomy.effective_for(
+            &req.holder.session,
+            req.holder.agent.as_ref(),
+            req.facts.model_location,
+            now,
+        );
         let verdict = self.classify(&st, &facts, level);
         match verdict.verdict {
             Verdict::HardBlock { rule } => Ok(self.kernel_block(&mut st, &req, rule)),
@@ -109,6 +113,8 @@ impl BrokerEngine {
                 non_voice,
                 grantable,
             } => {
+                // Profil Dziecko z zamkniętą kłódką: bez zgód stałych (zapisanych i nowych).
+                let grantable = grantable && st.autonomy.ceiling(now).is_none();
                 let by_plan = st.plans.iter().any(|p| {
                     now < p.until_ms
                         && p.session == req.holder.session
@@ -159,9 +165,17 @@ impl BrokerEngine {
                     explanation: verdict.explanation.clone(),
                     autonomy: Some(level),
                 };
+                // Tryb „Automatycznie”: model-sędzia zamiast właściciela (plan 50 §4.3, Z.4).
+                let judge =
+                    Self::routes_to_judge(&st, &req.holder, level, &verdict.rules, non_voice, now);
                 let action = PendingAction::Action(Box::new(req));
                 match self.open_approval(&mut st, subject, meta, action, now) {
-                    Ok(ticket) => Ok(Decision::NeedsApproval(ticket)),
+                    Ok(ticket) => {
+                        if judge {
+                            self.hand_to_judge(&mut st, ticket.id, now);
+                        }
+                        Ok(Decision::NeedsApproval(ticket))
+                    }
                     Err(BrokerError::AuditUnavailable(_)) => {
                         Ok(Decision::Deny(DenyReason::AuditUnavailable))
                     }
@@ -181,10 +195,12 @@ impl BrokerEngine {
         }
         let now = self.now();
         let mut st = self.lock();
+        st.sync_child(now);
         let session = st.session(&plan.holder.session);
-        let level = st
-            .autonomy
-            .effective(&plan.holder.session, plan.holder.agent.as_ref(), now);
+        let plan_level =
+            st.autonomy
+                .effective(&plan.holder.session, plan.holder.agent.as_ref(), now);
+
         let mut summaries = Vec::new();
         let mut shown = Vec::new();
         let mut meta_rules = Vec::new();
@@ -198,6 +214,12 @@ impl BrokerEngine {
                 ttl_ms: None,
             };
             let facts = st.guard.derive_facts(&req, &session);
+            let level = st.autonomy.effective_for(
+                &plan.holder.session,
+                plan.holder.agent.as_ref(),
+                step.facts.model_location,
+                now,
+            );
             let v = self.classify(&st, &facts, level);
             match v.verdict {
                 Verdict::HardBlock { rule } => {
@@ -250,7 +272,7 @@ impl BrokerEngine {
             hello_required: false,
             explanation: format!("Plan „{}”: kroków wymagających zgody: {asked}.", plan.title),
             rules: meta_rules,
-            autonomy: Some(level),
+            autonomy: Some(plan_level),
         };
         let action = PendingAction::Plan {
             holder: plan.holder,

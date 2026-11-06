@@ -6,12 +6,12 @@ use risk_classifier_contract::AutonomyLevel;
 use safety_broker_contract::{
     ActionRequest, ApprovalChallenge, ApprovalChannel, ApprovalDecision, ApprovalId,
     ApprovalStatus, AttenuateRequest, AutonomyChangeRequest, Broker, BrokerError, BrokerMetrics,
-    CapToken, Capability, ChangeOrigin, Decision, GrantInfo, Holder, KernelPolicy,
-    PhysicalInputProof, PlanDecision, PlanRequest, SessionSecurity, TaintSource, TokenId,
+    CapToken, Capability, ChangeOrigin, ChildLockChange, ChildLockView, Decision, GrantInfo,
+    Holder, JudgeRequest, JudgeResolution, KernelPolicy, PhysicalInputProof, PlanDecision,
+    PlanRequest, SessionSecurity, TaintSource, TokenId,
 };
 
 use crate::engine::BrokerEngine;
-use crate::state::PendStatus;
 
 #[async_trait]
 impl Broker for BrokerEngine {
@@ -106,21 +106,48 @@ impl Broker for BrokerEngine {
         self.revoke_grant_sync(id)
     }
 
+    fn child_lock(&self) -> ChildLockView {
+        self.child_view()
+    }
+
+    async fn change_child_lock(
+        &self,
+        change: ChildLockChange,
+    ) -> Result<ChildLockView, BrokerError> {
+        self.change_child_sync(change)
+    }
+
+    fn judge_queue(&self) -> Vec<JudgeRequest> {
+        self.judge_queue_sync()
+    }
+
+    async fn judge_resolve(
+        &self,
+        id: ApprovalId,
+        resolution: JudgeResolution,
+    ) -> Result<(), BrokerError> {
+        self.judge_resolve_sync(id, resolution)
+    }
+
     fn metrics(&self) -> BrokerMetrics {
         let now = self.now();
         let mut st = self.lock();
         Self::expire(&mut st, now);
         BrokerMetrics {
+            // Przy zamkniętej kłódce rodzica Max dostęp nie obowiązuje (D3 przeglądu 4.11).
+            max_access: st
+                .autonomy
+                .max_access(now)
+                .filter(|_| st.autonomy.ceiling(now).is_none())
+                .map(|(scope, _)| scope),
+            standing_global: self.standing.as_ref().and_then(|_| st.switched_global()),
             approvals_last_hour: st.approvals_last_hour(now),
             active_tokens: u32::try_from(
                 st.tokens.values().filter(|m| now < m.expires_at_ms).count(),
             )
             .unwrap_or(u32::MAX),
             pending_approvals: u32::try_from(
-                st.approvals
-                    .values()
-                    .filter(|p| matches!(p.status, PendStatus::Pending))
-                    .count(),
+                st.approvals.values().filter(|p| p.status.is_open()).count(),
             )
             .unwrap_or(u32::MAX),
             kernel_blocks: st.kernel_blocks,

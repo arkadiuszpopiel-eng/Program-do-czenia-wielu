@@ -4,16 +4,17 @@
     "project": "Alfa AI Program",
     "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
     "session_id": "b8c92890-d32a-48cf-afcf-c2baf7ce1924 (Alfa AI Laptop — jedyna rozmowa projektu od 1.11)",
-    "updated": "2026-11-02T05:15:00+01:00"
+    "updated": "2026-11-06T04:40:00+01:00"
   },
-  "current_state": "0.0.84 wgrana 2.11 2:40 z fe9afd2b (verify wersja 20/20). Po niej na main: b13ec164, 334aaa19, 3c1606f9, 78b9b1bf (+ dokumenty) — do następnej wersji z pełną bramką. Czysta kopia F:\\Kopie zapasowe programów Spopielony\\Alfa\\kopia-2026-11-02_0459 (dad50a25, 71 MB, SHA-256 5807/0).",
-  "session_goal": "Właściciel 1.11 ok. 19:50: „Posprzątaj, potem wykonaj zaległości, potem pracuj dalej nad poprawkami i ulepszeniami — wszelkie testy i poprawki do 5:00; pracujesz automatycznie, mnie nie będzie. Po 5:10/5:15 najpóźniej kopia na F: (Kopie zapasowe programów Spopielony), po kopii zapis pracy w pełnej dokumentacji w katalogu projektu i STOP.”",
+  "current_state": "**Bieżący (2026-11-06 noc, PC):** praca nocna do 4:30 (polecenie 5.11: „Kontynuuj prace do 4:30 automatycznie… kopia na F:… raport”); raport alfa/docs/plan/53-raport-2026-11-06-noc.md. Gałąź `do-przegladu-tryby-zgod` (NIE scalona — Broker czeka na przegląd człowieka): Z.4 zamknięty (zapora guard; Bielik 4.5B sam 21/22, z zaporą 0/22), Z.7 zamknięty — zmiany trybu/Max dostęp/kłódka w dzienniku rozmowy (app_broker::notes, bez PIN-u; d7660928), Audyt kłódki stage=granted→ok/false, kłódka „do końca rozmowy” (Sędzia: ceiling_for/set_child_for, rdzeń zamyka przy zmianie rozmowy; 32787c11) + poprawki przeglądu w świeżym kontekście P1–P3, D1–D3 (d5a173ad), Z.8 prawdziwe okno (zy-klodka: dziennik, do końca rozmowy, Max dostęp; pokrycie łącza 282/285). Limit 8000 linii app-core pilnowany: kod przenoszony do app-judge/app-voice/app-api/app-broker. poprawki drugiego przeglądu (6dd5f6b2); verify wersja b57a92cc: 19/20 — jedyny czerwony pomiar palety Ctrl+K (klatka 300 ms przez sterownik karty nocą; powtórka 845/845); Rust 3489/0/44, interfejs 553, aplikacja 63 (282/285). Kopia: F:\\Kopie zapasowe programów Spopielony\\Alfa\\kopia-2026-11-06_0430 (30965f7d, 73 MB, SHA-256 5900/0).",
+  "session_goal": "Właściciel 5.11 wieczór: „Kontynuuj prace do godziny 4:30 automatycznie! … Kontynuacja planu, poprawki i testy, po tym czasie kopia na F: i raport”.",
   "in_progress": [
-    "Następna wersja (0.0.85): pełne verify wersja dla zmian po 0.0.84 (pusty cwd, fs_read z poprawioną literówką, podpowiedzi powłoki, poprawki 2. przeglądu — append nie odblokowuje nadpisania).",
-    "Podpowiedź powłoki w zaufanej części wyniku (pole w ToolOutcome, tools-common-contract) — odłożone z przeglądu 2.11.",
-    "F3 na Bieliku: 15/35 najlepszy; pozostałe porażki to głównie granica modelu (przepisywanie nazw z literówkami, podwójnie kodowane cudzysłowy w treści JSON, zamiana tylko pierwszego wystąpienia)."
+    "Gałąź do-przegladu-tryby-zgod (etap Z kompletny w kodzie: Z.1–Z.7, Z.8 bez sędziego na modelu w prawdziwej aplikacji) — przegląd człowieka i scalenie."
   ],
-  "blocking_issues": [],
+  "blocking_issues": [
+    "Decyzja właściciela: profil Dziecko poza usługą Windows (ochrona umowna) — dopuścić z ostrzeżeniem czy wymagać usługi.",
+    "Decyzja przy przeglądzie: skrót PIN-u w pliku Sędziego zamiast Menedżera poświadczeń."
+  ],
   "next_session": [
     "Po decyzji właściciela: przegląd człowieka i scalenie gałęzi do-przegladu-broker-2026-10-28 (do 6407c88f; scalenie = nowa wersja z verify); ewentualnie wdrożenie docs/plan/43 (wyróżnianie czytanego zdania) i zmiana domyślnych paneli chowanych.",
     "Ctrl+Alt+Space zajęty przez inny program na PC (Szybkie pytanie Alfy) — właściciel może zmienić skrót; test laptop_voice losowy pod obciążeniem; sprawdzić też, czy UI mówi o tym właścicielowi (ostrzeżenie przy starcie od 0.0.71).",
@@ -44,13 +45,15 @@
       "alfa-docs (podgląd HTML)": 5180
     }
   },
-  "test_results": "verify wersja 0.0.84 (fe9afd2b) ZIELONE 20/20; widoczne testy 23/23; próba obowiązków 4/5 zielone + prices czeka na zgodę; F3 15/35 (815adb94), 13/35 (3c1606f9); testy crate'ów po 78b9b1bf zielone (tools-fs, tools-shell, agent-runtime) — wynik app-core/app-agents/app-tasks/app-chat w raporcie 49 §7.",
+  "test_results": "6.11: verify wersja b57a92cc — 19/20; przeglądarka 844/845 (pomiar palety Ctrl+K, opóźniona klatka w sterowniku karty), powtórka 845/845; Rust 3489/0/44, vitest 553, aplikacja 63/63 (282/285 = 98,9 %). Kopia F: kopia-2026-11-06_0430 SHA-256 5900/0.",
   "decisions_this_session": [
-    "2.11: crates/app-core/examples/ wycofany ze śledzenia (trafił przypadkiem do 4f31073b) — plik został na dysku.",
-    "2.11: fs_write overwrite istniejącego niepustego pliku wymaga pełnego odczytu w tym samym przebiegu."
+    "5.11: stare kompilacje kasowane automatycznie (sprzatanie.sh, target/debug ≤ 50 GB).",
+    "5.11: model-sędzia nie jest jedyną zaporą — guard() poza modelem (zgoda tylko dla akcji czystej)."
   ],
   "next_steps": [
-    "Raport 49 §5 — decyzje właściciela: `*` w analizatorze powłoki; prywatność przy przełączeniu z „tylko lokalnie”; klasa Krytyczki przy pracy modelu w chmurze; stała zgoda na hosty obowiązku „Kontrola cenników”; narzędzia Git w izolacji powłoki (padają: NtCreateDirectoryObject); trwałe usuwanie powłoką vs karta fs_delete_permanent; z raportu 48: zakres zgody „do odwołania”, etykieta „Wszystkie agentki w sesji”.",
-    "Ścieżki Anthropic (myślenie z cudzymi wywołaniami) i Gemini (thought_signature) — niesprawdzone bez kluczy."
+    "Decyzje właściciela: raport 53 §4 (scalenie gałęzi, sędzia przy małym modelu, „do końca rozmowy” a tryb globalny, spawn_blocking w tools-fs) i raport 52 §4",
+    "Powtórzyć za dnia pomiar palety (e2e/keyboard.spec.ts) przy włączonym ekranie",
+    "Z.8: model-sędzia w prawdziwej aplikacji z modelem lokalnym",
+    "Po scaleniu: nowa wersja z verify wersja i deploy-owner"
   ]
 }

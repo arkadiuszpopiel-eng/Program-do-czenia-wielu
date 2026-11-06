@@ -104,7 +104,7 @@
   <Lazy
     load={loadModes}
     props={{
-      // Po wyborze (klawisz 1–4, Enter) fokus wraca na żeton, nie ginie na stronie.
+      // Po wyborze (klawisz 1–5, Enter) fokus wraca na żeton, nie ginie na stronie.
       onclose: () => {
         modeOpen = false;
         requestAnimationFrame(() =>

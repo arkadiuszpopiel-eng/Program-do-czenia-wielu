@@ -10,6 +10,7 @@
 
 mod isolation;
 mod outcome;
+mod protected;
 mod run;
 mod skipped;
 

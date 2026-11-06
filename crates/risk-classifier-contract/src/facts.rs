@@ -39,6 +39,14 @@ pub struct ActionFacts {
     pub touches_private_data: bool,
     /// Twarda reguła Jądra wykryta przez Brokera (ścieżki, procesy, polecenia, deny-listy).
     pub kernel_rule: Option<KernelRule>,
+    /// Ścieżka akcji leży poza folderem pracy rozmowy (albo folderu nie podano) — tryb
+    /// „Akceptuj edycje” pyta wtedy o zmianę (plan 50, jak Codex „workspace-write”).
+    #[serde(default)]
+    pub outside_workdir: bool,
+    /// Ścieżka akcji jest chroniona (`.git`, `.alfa`, `.ssh`, pliki startowe powłoki…) — zmiana
+    /// nigdy bez pytania poza „Pełnym dostępem” (plan 50 §4.5, jak w Claude Code i Codex).
+    #[serde(default)]
+    pub protected_path: bool,
 }
 
 impl ActionFacts {
@@ -59,6 +67,8 @@ impl ActionFacts {
             untrusted_input_in_args: false,
             touches_private_data: false,
             kernel_rule: None,
+            outside_workdir: false,
+            protected_path: false,
         }
     }
 
@@ -137,6 +147,20 @@ impl ActionFacts {
     #[must_use]
     pub fn kernel(mut self, rule: KernelRule) -> Self {
         self.kernel_rule = Some(rule);
+        self
+    }
+
+    /// Ścieżka poza folderem pracy rozmowy.
+    #[must_use]
+    pub fn outside_workdir(mut self) -> Self {
+        self.outside_workdir = true;
+        self
+    }
+
+    /// Ścieżka chroniona.
+    #[must_use]
+    pub fn protected_path(mut self) -> Self {
+        self.protected_path = true;
         self
     }
 

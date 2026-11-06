@@ -8,6 +8,8 @@ use futures_util::StreamExt;
 use providers_contract::{ChatRequest, ContentBlock, Role, StopReason, TurnAccumulator};
 
 use crate::engine::{Engine, Next};
+use crate::location::model_location;
+
 use crate::prompt::{VERIFY_PROMPT, skipped, summary, system_prompt_for, verdict};
 
 impl Engine {
@@ -18,11 +20,14 @@ impl Engine {
         } else {
             crate::context::view(&self.cp.messages)
         };
+        let planning = self.planning();
         let mut req = ChatRequest::new(spec.model.clone(), messages)
-            .with_system(system_prompt_for(spec, self.cp.verifying));
-        req.tools = self
-            .registry
-            .specs(self.cp.verifying, &spec.goal, &self.cp.discovered_tools);
+            .with_system(system_prompt_for(spec, self.cp.verifying, planning));
+        req.tools = self.registry.specs(
+            self.cp.verifying || planning,
+            &spec.goal,
+            &self.cp.discovered_tools,
+        );
         if req.tools.iter().any(|t| t.name == crate::catalog::FIND) {
             req.system
                 .get_or_insert_with(String::new)
@@ -117,6 +122,10 @@ impl Engine {
             acc.push(&ev);
         }
         let turn = acc.finish();
+        self.model_location = Some(model_location(
+            provider.id().as_str(),
+            turn.model.as_deref(),
+        ));
         self.cp.usage.input_tokens += turn.usage.total_input();
         self.cp.usage.output_tokens += turn.usage.output_tokens;
         // Cena modelu, który faktycznie odpowiedział (`Started`/`ModelSwitched`; u Routera
@@ -336,7 +345,8 @@ impl Engine {
                 verified: ok,
             });
         }
-        if !self.cp.spec.verify {
+        // Plan nie jest jeszcze wykonaniem celu — bez samoweryfikacji i Krytyczki.
+        if !self.cp.spec.verify || self.planning() {
             return Next::Finish(RunOutcome::Completed {
                 summary: text,
                 verified: None,

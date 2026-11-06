@@ -1,0 +1,22 @@
+[package]
+name = "approval-judge-contract"
+description = "Kontrakt modelu-sędziego trybu „Automatycznie”: wejście, werdykt, kwalifikacja próśb, bezpiecznik, prompt i parser odpowiedzi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

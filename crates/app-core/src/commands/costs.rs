@@ -97,10 +97,7 @@ impl AppCore {
 
     /// `costs_summary`.
     pub async fn costs_summary(&self, session_id: Option<String>) -> Result<CostSummary, AppError> {
-        let id = match session_id {
-            Some(s) => Some(ids::session(&s)?),
-            None => None,
-        };
+        let id = session_id.as_deref().map(ids::session).transpose()?;
         Ok(self.cost_summary(id.as_ref()).await)
     }
 

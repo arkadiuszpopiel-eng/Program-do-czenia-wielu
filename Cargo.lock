@@ -562,6 +562,7 @@ dependencies = [
  "app-files",
  "app-gui",
  "app-health",
+ "app-judge",
  "app-mcp",
  "app-memory",
  "app-models",
@@ -574,6 +575,7 @@ dependencies = [
  "app-terminal",
  "app-updates",
  "app-voice",
+ "approval-judge-contract",
  "artifacts-contract",
  "artifacts-impl",
  "async-trait",
@@ -791,6 +793,26 @@ dependencies = [
  "tempfile",
  "tokio",
  "watchdog-contract",
+]
+
+[[package]]
+name = "app-judge"
+version = "0.0.84"
+dependencies = [
+ "approval-judge-contract",
+ "approval-judge-fake",
+ "approval-judge-impl",
+ "core-bus-contract",
+ "providers-contract",
+ "providers-local-impl",
+ "router-contract",
+ "router-impl",
+ "safety-broker-contract",
+ "serde",
+ "serde_json",
+ "sessions-contract",
+ "sessions-fake",
+ "tokio",
 ]
 
 [[package]]
@@ -1203,6 +1225,46 @@ dependencies = [
  "voice-wake-contract",
  "voice-wake-fake",
  "voice-wake-impl",
+]
+
+[[package]]
+name = "approval-judge-contract"
+version = "0.0.84"
+dependencies = [
+ "async-trait",
+ "proptest",
+ "risk-classifier-contract",
+ "schemars",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "approval-judge-fake"
+version = "0.0.84"
+dependencies = [
+ "approval-judge-contract",
+ "async-trait",
+ "risk-classifier-contract",
+ "tokio",
+]
+
+[[package]]
+name = "approval-judge-impl"
+version = "0.0.84"
+dependencies = [
+ "approval-judge-contract",
+ "approval-judge-fake",
+ "async-trait",
+ "core-bus-contract",
+ "core-registry-contract",
+ "futures-util",
+ "providers-contract",
+ "providers-fake",
+ "risk-classifier-contract",
+ "safety-broker-contract",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]
@@ -4876,9 +4938,9 @@ dependencies = [
 
 [[package]]
 name = "pulldown-cmark"
-version = "0.13.5"
+version = "0.13.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "278e9268c93b9e498a2da46c34d90ba93a3255eb99009646398f34bc73ab36eb"
+checksum = "3db2be46835f013dd3f4fa7f5f7402c537787b54ebb6fe2b94bbdd7e2669bb7b"
 dependencies = [
  "bitflags",
  "memchr",
@@ -5499,6 +5561,7 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 name = "safety-broker-contract"
 version = "0.0.84"
 dependencies = [
+ "approval-judge-contract",
  "async-trait",
  "compliance-contract",
  "core-bus-contract",
@@ -5511,6 +5574,7 @@ dependencies = [
  "thiserror",
  "tokio",
  "watchdog-contract",
+ "zeroize",
 ]
 
 [[package]]
@@ -5532,6 +5596,8 @@ dependencies = [
 name = "safety-broker-impl"
 version = "0.0.84"
 dependencies = [
+ "approval-judge-contract",
+ "argon2",
  "async-trait",
  "chrono",
  "compliance-contract",
@@ -6628,6 +6694,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
+ "tempfile",
  "thiserror",
  "tokio",
  "tokio-util",

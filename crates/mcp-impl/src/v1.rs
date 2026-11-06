@@ -168,6 +168,8 @@ impl V1Tools {
         ctx.origin = CommandOrigin::Agent;
         ctx.untrusted_args = true;
         ctx.label = format!("Most CLI: {}", who.label);
+        // Mosty CLI (Claude Code, Codex) to modele w chmurze — zasięg „Max dostęp: chmura”.
+        ctx.model_location = Some(safety_broker_contract::ModelLocation::Cloud);
         ctx.approval_timeout = self.approval_timeout;
         ctx.cancel = who.cancel.clone();
         ctx

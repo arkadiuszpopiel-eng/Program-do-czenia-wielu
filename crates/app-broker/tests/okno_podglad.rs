@@ -37,6 +37,7 @@ fn request(subject: ApprovalSubject, risk: RiskLevel, explanation: &str) -> Appr
         hello_required: false,
         rules: Vec::new(),
         autonomy: Some(AutonomyLevel::L3),
+        auto_switch: false,
         explanation: explanation.into(),
         created_at_ms: NOW,
         expires_at_ms: NOW + 600_000,
@@ -125,9 +126,14 @@ fn cards() -> Vec<(&'static str, ApprovalRequest)> {
             r"odczyt pliku C:\Users\Spopielony\Documents\notatki.txt",
         ),
         RiskLevel::Low,
-        "Tryb „Pytaj o wszystko” pyta przy każdym działaniu.",
+        "Tryb „Ręcznie” pyta przy każdym działaniu.",
     );
+    // Tryb „Ręcznie”: okno proponuje przełączenie na „Automatycznie” (plan 50 §4.2).
+    let mut switch = low.clone();
+    switch.autonomy = Some(AutonomyLevel::L1);
+    switch.auto_switch = true;
     vec![
+        ("przelacz", switch),
         ("usuniecie", delete),
         ("wysylka", egress),
         ("glos", voice),
@@ -166,7 +172,7 @@ fn judge_window_previews_in_both_themes() {
         }
     }
     // 150 % i niski ekran: stopka z przyciskami zostaje, wiersze odpadają od dołu.
-    let (_, req) = cards().remove(0);
+    let (_, req) = cards().remove(1);
     let view = view_of(
         &ApprovalCard::from_request(&req, NOW, CardOptions::default()),
         "",

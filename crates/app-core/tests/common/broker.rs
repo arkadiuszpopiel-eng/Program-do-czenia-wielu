@@ -27,6 +27,8 @@ pub struct Broker {
     pub approvals: Mutex<BTreeMap<String, ApprovalOutcome>>,
     /// Odczyty poziomu globalnego — każdy przebieg strażnika zaczyna się od jednego.
     pub polls: AtomicUsize,
+    /// Poziom globalny zapamiętany przez Sędziego (zgoda w jego oknie).
+    pub standing: Mutex<Option<AutonomyLevel>>,
     next: AtomicU64,
 }
 
@@ -90,7 +92,12 @@ impl BrokerPort for Broker {
         let session = session
             .map(|s| self.effective(Some(s.as_str())))
             .filter(|l| *l != global);
-        Some(AutonomyView { global, session })
+        Some(AutonomyView {
+            global,
+            session,
+            max_access: None,
+            standing_global: *self.standing.lock().unwrap(),
+        })
     }
     async fn request_level(
         &self,

@@ -154,6 +154,11 @@ impl Core {
             && !a.opaque_targets
             && !uses_profile_toolchain(command);
         let mut caps = vec![(Capability::ShellExec(cwd_scope), facts.clone())];
+        // Ścieżki chronione w katalogu roboczym (`.git\hooks`, `.npmrc`) — osobno, bo zakres
+        // katalogu by je ukrył (plan 50, przegląd 3.11).
+        for scope in crate::protected::scopes(command, cwd, &self.env) {
+            caps.push((Capability::ShellExec(scope), facts.clone()));
+        }
         for scope in outside {
             let mut f = facts.clone();
             f.reversible = Reversibility::No;

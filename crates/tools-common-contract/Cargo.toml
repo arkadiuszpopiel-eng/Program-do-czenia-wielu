@@ -30,6 +30,7 @@ tokio.workspace = true
 tokio-util = { version = "0.7.19", default-features = false }
 
 [dev-dependencies]
+tempfile = "3.27.0"
 safety-broker-fake = { path = "../safety-broker-fake" }
 watchdog-contract = { path = "../watchdog-contract" }
 proptest.workspace = true

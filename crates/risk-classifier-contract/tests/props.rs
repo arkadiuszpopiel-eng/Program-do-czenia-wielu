@@ -50,7 +50,7 @@ prop_compose! {
         egress in proptest::option::of((Just("host.example".to_owned()), any::<bool>())),
         destructive in prop_oneof![Just(Destructiveness::None), Just(Destructiveness::Recoverable), Just(Destructiveness::Permanent)],
         bulk in 1u32..20_000,
-        flags in any::<[bool; 4]>(),
+        flags in any::<[bool; 6]>(),
         origin in origin(),
         kernel in kernel(),
     ) -> ActionFacts {
@@ -67,6 +67,8 @@ prop_compose! {
         f.tainted = flags[1];
         f.untrusted_input_in_args = flags[2];
         f.touches_private_data = flags[3];
+        f.outside_workdir = flags[4];
+        f.protected_path = flags[5];
         f.kernel_rule = kernel;
         f
     }
@@ -111,7 +113,7 @@ proptest! {
     fn voice_destruction_never_proceeds_below_l4(f in facts()) {
         let p = RiskPolicy::default();
         if f.origin.is_voice() && f.destructive != Destructiveness::None && f.kernel_rule.is_none() {
-            // Na L4 („Pełna automatyka”) reguły głosu nie pytają — decyzja właściciela 27.10.
+            // Na L4 („Pełny dostęp”) reguły głosu nie pytają — decyzja właściciela 27.10.
             for a in AutonomyLevel::ALL.into_iter().filter(|a| *a != AutonomyLevel::L4) {
                 let v = evaluate(&f, a, &p).verdict;
                 prop_assert!(matches!(v, Verdict::Ask { non_voice: true, grantable: false }), "{:?}", v);
@@ -131,7 +133,7 @@ proptest! {
 
     #[test]
     fn l4_only_proceeds_or_hard_blocks(f in facts()) {
-        // „Pełna automatyka”: okno zgód nie pokazuje się wcale (decyzja właściciela 31.10).
+        // „Pełny dostęp”: okno zgód nie pokazuje się wcale (decyzja właściciela 31.10).
         let v = evaluate(&f, AutonomyLevel::L4, &RiskPolicy::default()).verdict;
         prop_assert!(matches!(v, Verdict::Proceed | Verdict::HardBlock { .. }), "{:?}", v);
     }
@@ -157,6 +159,8 @@ proptest! {
             ActionFacts { install: true, ..f.clone() },
             ActionFacts { bulk: f.bulk.saturating_mul(100), ..f.clone() },
             ActionFacts { kernel_rule: Some(KernelRule::AuditDisable), ..f.clone() },
+            ActionFacts { outside_workdir: true, ..f.clone() },
+            ActionFacts { protected_path: true, ..f.clone() },
         ];
         for v in variants {
             let s = strictness_all(&v);

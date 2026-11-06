@@ -21,6 +21,8 @@ platform-contract.workspace = true
 async-trait.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+# Przegląd drzewa przed usunięciem w wątku blokującym (`spawn_blocking`).
+tokio = { workspace = true, features = ["rt"] }
 
 [dev-dependencies]
 tools-fs-contract = { path = "../tools-fs-contract", features = ["contract-tests"] }

@@ -86,6 +86,9 @@ pub fn assess(facts: &ActionFacts, policy: &RiskPolicy) -> (RiskLevel, Vec<Strin
     if mutating && facts.scope == ScopeRelation::Outside {
         raise(RiskLevel::Medium, "poza zakresem sesji");
     }
+    if mutating && facts.protected_path {
+        raise(RiskLevel::Medium, "ścieżka chroniona");
+    }
     if facts.install {
         raise(RiskLevel::High, "instalacja oprogramowania");
     }
@@ -162,6 +165,12 @@ fn condition(id: RuleId, f: &ActionFacts, level: RiskLevel, policy: &RiskPolicy)
                 || matches!(f.class, ActionClass::SecretsRead | ActionClass::Admin)
                 || (mutating && f.effectively_irreversible())
         }
+        RuleId::OutsideWorkdir => {
+            mutating
+                && matches!(f.class, ActionClass::Write | ActionClass::Shell)
+                && (f.outside_workdir || f.scope == ScopeRelation::Outside)
+        }
+        RuleId::ProtectedPath => mutating && f.protected_path,
         RuleId::TaintedHighRisk => f.tainted && level >= RiskLevel::High,
         RuleId::UntrustedSource => mutating && f.untrusted_driven(),
         RuleId::IrreversibleOutside => {

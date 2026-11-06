@@ -7,6 +7,7 @@ use crate::core::AppCore;
 use crate::dto::{self, AlfaEvent, EventLevel, TimelineEvent, TimelineFilter, TimelineKind};
 use crate::error::AppError;
 use crate::ids;
+use crate::settings::keys;
 
 impl AppCore {
     /// Zapisuje wpis osi czasu sesji i wysyła `TimelineAppended`.
@@ -35,6 +36,27 @@ impl AppCore {
             tracing::warn!(error = %e, "zapis osi czasu nie powiódł się");
         }
         self.emit(AlfaEvent::TimelineAppended { event });
+    }
+
+    /// Wpis „audit” o zmianie bezpieczeństwa w rozmowie (`None` — aktywnej; bez niej — tylko Audyt).
+    pub(crate) async fn security_note(
+        &self,
+        session: Option<&SessionId>,
+        level: EventLevel,
+        title: String,
+    ) {
+        let session = match session {
+            Some(s) => Some(s.clone()),
+            None => self
+                .config_str(keys::ACTIVE_SESSION)
+                .await
+                .and_then(|a| ids::session(&a).ok()),
+        };
+        if let Some(session) = session
+            && self.ensure_session(&session).is_ok()
+        {
+            self.timeline_note(&session, TimelineKind::Audit, level, title, None);
+        }
     }
 
     /// `timeline_list`.

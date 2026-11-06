@@ -8,7 +8,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::approval::ApprovalId;
-use crate::autonomy::AutonomyTarget;
+use crate::autonomy::{AutonomyTarget, ModelLocation, ModelScope};
 use crate::capability::Capability;
 use crate::token::{CapToken, Holder, TokenId};
 
@@ -36,6 +36,18 @@ pub struct DeclaredFacts {
     /// Tylko do pokazania właścicielowi; o decyzji rozstrzygają zdolność i fakty powyżej.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub summary: Option<String>,
+    /// Folder pracy rozmowy (z kontekstu wywołania, nie od modelu). Broker liczy z niego fakt
+    /// „poza folderem pracy” dla trybu „Akceptuj edycje”; liczy się tylko część wspólna z
+    /// korzeniami profilu, więc szerszy folder nie daje więcej niż zakres sesji.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub workdir: Option<String>,
+    /// Gdzie działa model przebiegu (z kontekstu wywołania) — dla przełącznika „Max dostęp”.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model_location: Option<ModelLocation>,
+    /// Usuwany albo przenoszony katalog zawiera ścieżkę chronioną (np. `.git` podrepozytorium) —
+    /// sprawdza narzędzie na dysku; Sędzia traktuje wtedy działanie jak zmianę ścieżki chronionej.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub contains_protected: bool,
 }
 
 impl DeclaredFacts {
@@ -51,6 +63,9 @@ impl DeclaredFacts {
             touches_private_data: false,
             command: None,
             summary: None,
+            workdir: None,
+            model_location: None,
+            contains_protected: false,
         }
     }
 }
@@ -226,6 +241,14 @@ pub struct BrokerMetrics {
     pub pending_approvals: u32,
     /// Twarde blokady od startu.
     pub kernel_blocks: u64,
+    /// Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_access: Option<ModelScope>,
+    /// Poziom globalny ustawiony w tym uruchomieniu Sędziego zgodą z okna („Zezwól i przełącz
+    /// na Automatycznie”) i nadal obowiązujący; `None` — brak takiej zgody (także po restarcie
+    /// i po każdej innej zmianie poziomu globalnego).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub standing_global: Option<risk_classifier_contract::AutonomyLevel>,
 }
 
 /// Błędy Brokera.

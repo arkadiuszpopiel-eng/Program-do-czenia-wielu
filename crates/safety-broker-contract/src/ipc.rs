@@ -19,6 +19,8 @@ use crate::action::{
 use crate::approval::{ApprovalChallenge, ApprovalDecision, ApprovalId, ApprovalStatus, GrantInfo};
 use crate::autonomy::AutonomyTarget;
 use crate::capability::Capability;
+use crate::child::{ChildLockChange, ChildLockView};
+use crate::judge::{JudgeRequest, JudgeResolution};
 use crate::policy::KernelPolicy;
 use crate::proof::{InputSource, Nonce};
 use crate::token::{CapToken, Holder, TokenId};
@@ -196,6 +198,10 @@ pub enum Request {
         /// Numer zgody.
         id: u64,
     },
+    /// `Broker::child_lock` — jądro i Broker-UI.
+    ChildLock,
+    /// `Broker::change_child_lock` — tylko jądro (PIN wpisuje rodzic w interfejsie).
+    ChangeChildLock(ChildLockChange),
     /// `ApprovalChannel::pending` — tylko Broker-UI.
     PendingApprovals,
     /// `ApprovalChannel::resolve` — tylko Broker-UI.
@@ -214,6 +220,15 @@ pub enum Request {
     },
     /// Zapis zdarzenia do Audytu (Broker jedynym writerem; jądro i watchdog przekazują).
     AuditAppend(Box<Event>),
+    /// `Broker::judge_queue` — tylko jądro (kierowca modelu-sędziego).
+    JudgeQueue,
+    /// `Broker::judge_resolve` — tylko jądro (kierowca modelu-sędziego).
+    JudgeResolve {
+        /// Prośba.
+        id: ApprovalId,
+        /// Werdykt.
+        resolution: Box<JudgeResolution>,
+    },
 }
 
 impl Request {
@@ -233,8 +248,14 @@ impl Request {
             Self::SessionSecurity { .. } | Self::Autonomy { .. } => {
                 matches!(role, Core | Agent | BrokerUi)
             }
-            Self::RevokeHolder { .. } | Self::Grants | Self::RevokeGrant { .. } => role == Core,
+            Self::RevokeHolder { .. }
+            | Self::Grants
+            | Self::RevokeGrant { .. }
+            | Self::JudgeQueue
+            | Self::JudgeResolve { .. } => role == Core,
             Self::Metrics => matches!(role, Core | BrokerUi | Watchdog),
+            Self::ChildLock => matches!(role, Core | BrokerUi),
+            Self::ChangeChildLock(_) => role == Core,
             Self::PendingApprovals | Self::Resolve { .. } => role == BrokerUi,
             Self::KillAll { .. } => matches!(role, Core | BrokerUi | Watchdog),
             Self::AuditAppend(_) => matches!(role, Core | Watchdog),
@@ -272,6 +293,10 @@ pub enum Response {
     Grants(Vec<GrantInfo>),
     /// Czy odwołano (brak takiej zgody — `false`).
     Revoked(bool),
+    /// Stan profilu Dziecko.
+    ChildLock(ChildLockView),
+    /// Prośby czekające na model-sędziego.
+    JudgeQueue(Vec<JudgeRequest>),
     /// Raport kill-switcha.
     Killed(KillReport),
     /// Rekord Audytu (seq, hash).

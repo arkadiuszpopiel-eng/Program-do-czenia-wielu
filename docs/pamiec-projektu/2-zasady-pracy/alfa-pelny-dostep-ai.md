@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 526ab23b-611a-489a-a8a3-7c1153e69825
-  modified: 2026-10-20T12:46:49.605Z
+  modified: 2026-11-03T17:43:50.817Z
 ---
 
 2026-10-20 właściciel zażądał „pełnego dostępu AI do komputera, AI nie może być ograniczone”. Po wyjaśnieniu
@@ -29,6 +29,14 @@ pokrewna Trifecta też zostaje) — operacje administratora i niepewne polecenia
 zostaje; (3) tryb **globalny** dla wszystkich rozmów; (4) menu 4 trybów: „Tylko podgląd” (L0), „Pytaj o wszystko”
 (L1), „Automatycznie” (L3, domyślny), „Pełna automatyka” (L4). Bez trybów „Akceptuj edycje” i „Najpierw plan”.
 Kod Brokera/polityk: osobna gałąź do przeglądu właściciela.
+
+**Decyzja 2026-11-03 (zastępuje menu 4 trybów z 27.10; plan alfa/docs/plan/50):** zgody mają działać na tej samej
+zasadzie co Claude Code i Codex na PC — menu 5 trybów: Plan · Ręcznie · Akceptuj edycje (= Codex „Poproś o
+zatwierdzenie”) · Automatycznie (decyduje **model-sędzia**, bezpiecznik po 3 odmowach z rzędu) · Pełny dostęp (nigdy
+nie pyta); pod listą czerwony przełącznik z poświatą **„Max dostęp”** z wyborem lokalne/chmura/wszystkie (zero pytań);
+okno zgody z opcjami Tak / Tak i nie pytaj o <zakres> / Tak i przełącz na Automatycznie / Nie — zrób inaczej.
+**Tryb dziecka:** bez PIN-u tylko Plan i Ręcznie; reszta na kłódkę otwieraną wyłącznie **PIN-em rodzica**; dziennik
+rodzica pod PIN-em jak ADR 0029 (działania, tematy, alerty; pełna treść po jawnym włączeniu).
 
 **Decyzja 2026-10-31 (zastępuje pkt 2 z 27.10):** na „Pełnej automatyce” (L4) okno zgód **nie pokazuje się pod
 żadnym pozorem, aż właściciel obniży poziom** — także wysyłka po obcej treści (TaintedEgress, Trifecta) i obcy/niepewny

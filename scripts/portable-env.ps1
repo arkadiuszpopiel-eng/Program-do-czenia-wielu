@@ -34,6 +34,15 @@ if ((Test-Path -LiteralPath (Join-Path $rustup 'toolchains')) -and (Test-Path -L
     $alfaReport += "Rust: $cargo"
 } else { $alfaReport += 'Rust: systemowy (brak na dysku przenośnym)' }
 
+# PortableGit (oficjalne wydanie git-for-windows, bez instalacji) — dla komputerów bez Gita w systemie.
+# Tylko `cmd` i `bin` (git, bash, sh); `usr\bin` pomijamy, bo jego perl przesłoniłby Strawberry Perl.
+$gitDir = Join-Path $alfaTools 'git'
+if (-not (Get-Command 'git' -ErrorAction SilentlyContinue) -and (Test-Path -LiteralPath (Join-Path $gitDir 'cmd\git.exe'))) {
+    Add-AlfaPath (Join-Path $gitDir 'bin')
+    Add-AlfaPath (Join-Path $gitDir 'cmd')
+    $alfaReport += "Git: $gitDir"
+}
+
 # Strawberry Perl przed Perlem z Gita — skrypty OpenSSL (SQLCipher) wymagają Perla dla MSWin32.
 $perl = Join-Path $alfaTools 'StrawberryPerl'
 if (Test-Path -LiteralPath (Join-Path $perl 'perl\bin\perl.exe')) {

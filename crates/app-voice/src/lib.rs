@@ -26,6 +26,7 @@ mod system_f5;
 mod system_listen;
 mod system_selftest;
 mod talk;
+mod talk_config;
 mod tap;
 pub mod tuning;
 
@@ -39,4 +40,5 @@ pub use reply::{CHECK_WAIT, ChatReply, UNVERIFIED_CAP_PERMILLE, origin_of};
 pub use system::{MISSING_STT_MODEL, MISSING_STT_SIDECAR, MISSING_TTS, SystemVoice};
 pub use system_f5::CALIBRATION_FILE;
 pub use talk::{MAX_SILENCE_RANGE, THRESHOLD_RANGE, TalkSettings};
+pub use talk_config::{noise_setting, talk_settings};
 pub use tap::TapBus;

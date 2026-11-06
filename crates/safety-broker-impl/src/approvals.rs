@@ -44,6 +44,14 @@ impl BrokerEngine {
     ) -> Result<ApprovalTicket, BrokerError> {
         let nonce = st.keys.nonce().map_err(BrokerError::InvalidRequest)?;
         let id = ApprovalId(st.next_approval + 1);
+        // Nie po niezaufanej treści: wstrzyknięcie nie może ciągiem kart wymusić zmiany trybu.
+        let auto_switch = matches!(action, PendingAction::Action(_))
+            && !meta.tainted
+            && st.autonomy.ceiling(now).is_none()
+            && meta.autonomy.is_some_and(|l| l < AutonomyLevel::L3)
+            && st
+                .autonomy
+                .follows_global(&meta.holder.session, meta.holder.agent.as_ref(), now);
         let request = ApprovalRequest {
             id,
             holder: meta.holder,
@@ -58,6 +66,7 @@ impl BrokerEngine {
             rules: meta.rules,
             explanation: meta.explanation,
             autonomy: meta.autonomy,
+            auto_switch,
             created_at_ms: now,
             expires_at_ms: now.saturating_add(st.policy().approval_ttl_ms),
         };
@@ -89,8 +98,9 @@ impl BrokerEngine {
 
     /// Przeterminowane prośby → `Expired`.
     pub(crate) fn expire(st: &mut State, now: u64) {
+        st.sync_child(now);
         for p in st.approvals.values_mut() {
-            if matches!(p.status, PendStatus::Pending) && now >= p.request.expires_at_ms {
+            if p.status.is_open() && now >= p.request.expires_at_ms {
                 p.status = PendStatus::Expired;
             }
         }
@@ -101,6 +111,7 @@ impl BrokerEngine {
         let now = self.now();
         let mut st = self.lock();
         Self::expire(&mut st, now);
+        self.promote_judge_timeouts(&mut st, now);
         st.approvals
             .values()
             .filter(|p| matches!(p.status, PendStatus::Pending))
@@ -120,6 +131,7 @@ impl BrokerEngine {
         let now = self.now();
         let mut st = self.lock();
         Self::expire(&mut st, now);
+        self.promote_judge_timeouts(&mut st, now);
         let p = st
             .approvals
             .get_mut(&id)
@@ -128,11 +140,14 @@ impl BrokerEngine {
             return Err(BrokerError::Unauthorized("prośba innego podmiotu".into()));
         }
         Ok(match &mut p.status {
-            PendStatus::Pending => ApprovalStatus::Pending,
+            PendStatus::Pending | PendStatus::AwaitingJudge { .. } => ApprovalStatus::Pending,
             PendStatus::Approved(token) => ApprovalStatus::Approved {
                 token: token.take(),
             },
             PendStatus::Denied => ApprovalStatus::Denied,
+            PendStatus::DeniedByJudge(reason) => ApprovalStatus::DeniedByJudge {
+                reason: reason.clone(),
+            },
             PendStatus::Expired => ApprovalStatus::Expired,
         })
     }
@@ -157,6 +172,11 @@ impl BrokerEngine {
     }
 
     fn check_decision_shape(p: &Pending, decision: &ApprovalDecision) -> Result<(), BrokerError> {
+        if *decision == ApprovalDecision::AllowAndAutomatic && !p.request.auto_switch {
+            return Err(BrokerError::InvalidRequest(
+                "„przełącz na Automatycznie” nie dotyczy tej prośby".into(),
+            ));
+        }
         let ApprovalDecision::AllowInScope { scope, .. } = decision else {
             return Ok(());
         };
@@ -188,6 +208,7 @@ impl BrokerEngine {
         let now = self.now();
         let mut st = self.lock();
         Self::expire(&mut st, now);
+        let locked = st.autonomy.ceiling(now).is_some();
         let p = st
             .approvals
             .get_mut(&id)
@@ -202,6 +223,18 @@ impl BrokerEngine {
             }
         }
         Self::check_decision_shape(p, &decision)?;
+        // Kłódka rodzica (P1 przeglądu 4.11): bez zgód stałych i bez przełączenia trybu, także
+        // na karcie sprzed zamknięcia kłódki.
+        if locked
+            && matches!(
+                decision,
+                ApprovalDecision::AllowAndAutomatic | ApprovalDecision::AllowInScope { .. }
+            )
+        {
+            return Err(BrokerError::InvalidRequest(
+                "kłódka rodzica: ta odpowiedź wymaga PIN-u rodzica".into(),
+            ));
+        }
         let holder = p.request.holder.clone();
         if let Err(reason) = Self::check_proof(p, &proof, now) {
             p.status = PendStatus::Denied;
@@ -219,6 +252,10 @@ impl BrokerEngine {
             }
             return Err(e);
         }
-        self.apply_decision(&mut st, id, decision, now)
+        let approved = decision != ApprovalDecision::Deny;
+        let result = self.apply_decision(&mut st, id, decision, now);
+        // Zgoda właściciela zamyka bezpiecznik sędziego tej sesji (plan 50 §4.3).
+        self.owner_decided_fuse(&mut st, &holder, approved && result.is_ok());
+        result
     }
 }

@@ -230,3 +230,5 @@ if [ "${#FAILED[@]}" -gt 0 ]; then
   exit 3
 fi
 echo "gotowe: $DST"
+# Po kopii — sprzątanie starych kompilacji (właściciel 5.11).
+bash "$(dirname "$0")/sprzatanie.sh" || true

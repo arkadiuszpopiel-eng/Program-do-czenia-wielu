@@ -1,4 +1,4 @@
-//! Zapamiętany poziom globalny (decyzja właściciela 27.10, „Pełna automatyka” wybierana raz):
+//! Zapamiętany poziom globalny (decyzja właściciela 27.10, „Pełny dostęp” wybierany raz):
 //! L4 zatwierdzone w oknie Brokera przetrwa restart Brokera bez nowej karty; obniżenie kasuje
 //! zapis; poziom czasowy, poziom sesji i prośba agentki nie są zapamiętywane.
 

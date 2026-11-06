@@ -3,11 +3,12 @@
 
 use crate::core::AppCore;
 use crate::dto::{
-    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, PermissionsState,
+    AutonomyLevel, BrokerIntentResult, BrokerIntentStatus, BrokerStatusView, ChildLockRequest,
+    MaxAccess, PermissionsState,
 };
 use std::collections::BTreeMap;
 
-use app_broker::levels;
+use app_broker::{levels, notes};
 use sessions_contract::SessionId;
 
 use crate::error::AppError;
@@ -21,19 +22,28 @@ impl AppCore {
         &self,
         session_id: Option<String>,
     ) -> Result<PermissionsState, AppError> {
-        let session = match &session_id {
-            Some(s) => Some(ids::session(s)?),
-            None => None,
-        };
-        let (global, session) = match self.inner.broker.levels(session.as_ref()).await {
-            Some(view) => (view.global, view.session),
-            None => (self.autonomy().await, None),
+        let session = session_id.as_deref().map(ids::session).transpose()?;
+        let (global, session, max_access) = match self.inner.broker.levels(session.as_ref()).await {
+            Some(view) => (view.global, view.session, view.max_access),
+            None => (self.autonomy().await, None, None),
         };
         Ok(PermissionsState {
             global,
             session,
             hello_enabled: self.config_bool("permissions.hello", false).await,
+            max_access,
         })
+    }
+
+    /// `permissions_request_max_access` ⟶ Sędzia Cieni: włączenie — karta, `None` — wyłączenie.
+    pub async fn permissions_request_max_access(
+        &self,
+        scope: Option<MaxAccess>,
+    ) -> Result<BrokerIntentResult, AppError> {
+        let result = self.inner.broker.request_max_access(scope).await;
+        let (level, title) = notes::max_access_note(scope, &result);
+        self.security_note(None, level, title).await;
+        result
     }
 
     /// `permissions_request_level` ⟶ Broker: obniżenie od razu (`applied`), podniesienie —
@@ -43,15 +53,16 @@ impl AppCore {
         level: AutonomyLevel,
         session_id: Option<String>,
     ) -> Result<BrokerIntentResult, AppError> {
-        let session = match session_id {
-            Some(s) => Some(ids::session(&s)?),
-            None => None,
-        };
+        let session = session_id.as_deref().map(ids::session).transpose()?;
         let result = self
             .inner
             .broker
             .request_level(level, session.as_ref())
-            .await?;
+            .await;
+        let (note_level, title) = notes::level_note(level, session.is_some(), &result);
+        self.security_note(session.as_ref(), note_level, title)
+            .await;
+        let result = result?;
         if result.status == BrokerIntentStatus::OpenedBroker {
             // Podniesienie czeka na zgodę w oknie Brokera: strażnik przyjmie ten poziom, gdy
             // Broker potwierdzi zgodę na tę prośbę, zamiast cofać do zapamiętanego obniżenia.
@@ -68,6 +79,56 @@ impl AppCore {
     /// `permissions_grants` — zgody „zawsze w tym zakresie” z Sędziego Cieni (panel uprawnień).
     pub async fn permissions_grants(&self) -> Result<Vec<crate::dto::GrantView>, AppError> {
         Ok(self.inner.broker.grants().await)
+    }
+
+    /// `permissions_child_lock` — profil Dziecko (plan 50 §4.4): `None` — odczyt, inaczej zmiana;
+    /// PIN sprawdza wyłącznie Sędzia Cieni, rdzeń go nie zapisuje.
+    pub async fn permissions_child_lock(
+        &self,
+        change: Option<ChildLockRequest>,
+    ) -> Result<crate::dto::ChildLockState, AppError> {
+        // Opis liczony przed przekazaniem zmiany (PIN idzie do Sędziego Cieni, nigdy do wpisu).
+        let action = change.as_ref().map(notes::child_lock_action);
+        let changing = change.is_some();
+        // „Do końca rozmowy” — tylko rozmowa otwarta teraz w oknie (aktywna = istniejąca; przegląd 5.11, D2).
+        let conversation = match &change {
+            Some(ChildLockRequest::Open {
+                session_id: Some(id),
+                ..
+            }) => {
+                if self.config_str(keys::ACTIVE_SESSION).await.as_deref() != Some(id.as_str()) {
+                    return Err(AppError::invalid(notes::NOT_ACTIVE));
+                }
+                Some(id.clone())
+            }
+            _ => None,
+        };
+        let mut result = self.inner.broker.child_lock(change).await;
+        if let Ok(state) = &mut result {
+            let mut rt = self.rt();
+            let known = rt.child_conversation.take();
+            rt.child_conversation = notes::remembered(known, changing, state, conversation.clone());
+            state.conversation_id = rt.child_conversation.clone().filter(|_| state.conversation);
+        }
+        // Aktywna rozmowa zmieniła się w trakcie otwarcia — kłódka od razu zamknięta (D3).
+        if conversation.is_some() && result.is_ok() {
+            let active = self.config_str(keys::ACTIVE_SESSION).await;
+            if active != conversation {
+                self.end_conversation_lock(active.as_deref()).await;
+                result = Err(AppError::invalid(notes::CONVERSATION_CHANGED));
+            }
+        }
+        if changing && result.is_ok() {
+            // Poziomy rozmów zależą od kłódki — interfejs dostaje je od razu (przegląd 6.11, D-5).
+            self.announce_all_sessions().await;
+        }
+        if let Some(action) = action
+            && let Some((level, title)) =
+                notes::child_lock_note(action, result.as_ref().map(|_| ()))
+        {
+            self.security_note(None, level, title).await;
+        }
+        result
     }
 
     /// `permissions_revoke_grant` — odwołanie zgody (tylko zawęża — bez okna Sędziego).
@@ -88,23 +149,29 @@ impl AppCore {
         self.inner.broker.open_approval(&approval_id).await
     }
 
+    /// Kłódka otwarta „do końca rozmowy” zamyka się, gdy aktywna staje się inna rozmowa (albo żadna).
+    pub(crate) async fn end_conversation_lock(&self, active: Option<&str>) {
+        let open = self.rt().child_conversation.clone();
+        // Stan od Sędziego: rdzeń mógł zgubić rozmowę (zerwane łącze, wyścig odczytu) — przegląd P3, D-2.
+        let held = matches!(self.inner.broker.child_lock(None).await, Ok(s) if s.conversation);
+        if notes::should_close(open.as_deref(), held, active) {
+            let closed = Box::pin(self.permissions_child_lock(Some(ChildLockRequest::Close)));
+            if let Err(e) = closed.await {
+                tracing::warn!(error = %e, "zamknięcie kłódki po zmianie rozmowy nie powiodło się");
+            }
+        }
+    }
+
     /// Zapamiętane obniżenia: poziom globalny i poziomy sesji (sesje usunięte — pomijane).
     async fn remembered_levels(&self) -> (Option<AutonomyLevel>, BTreeMap<String, AutonomyLevel>) {
         let global = self.config_str(keys::AUTONOMY).await.and_then(|s| {
             serde_json::from_value::<AutonomyLevel>(serde_json::Value::String(s)).ok()
         });
-        (
-            global,
-            levels::parse_session_levels(self.config_list(SESSION_LEVELS).await),
-        )
-    }
-
-    /// Lista napisów z konfiguracji (brak albo inny typ — pusta).
-    async fn config_list(&self, key: &str) -> Vec<String> {
-        self.config_value(key)
-            .await
-            .and_then(|v| serde_json::from_value(v).ok())
-            .unwrap_or_default()
+        // Lista napisów (brak albo inny typ — pusta).
+        let sessions = self.config_value(SESSION_LEVELS).await;
+        let sessions = sessions.and_then(|v| serde_json::from_value(v).ok());
+        let sessions = levels::parse_session_levels(sessions.unwrap_or_default());
+        (global, sessions)
     }
 
     /// Zapisuje poziom globalny (`None`) albo sesji (wraca po restarcie aplikacji i Brokera)
@@ -153,6 +220,17 @@ impl AppCore {
         }
         let held = self.adopt_approved_raises().await;
         let (global, sessions) = self.remembered_levels().await;
+        // Zgoda z okna Sędziego („przełącz na Automatycznie”, plan 50 §4.2) — przyjęta, nie cofana.
+        let judged = view
+            .standing_global
+            .filter(|s| *s == view.global && global != Some(*s));
+        // Przyjęcie po świeżym odczycie (obniżenie z menu w trakcie przebiegu wygrywa); gdy czeka
+        // inna prośba o podniesienie — odłożone, a ten przebieg nie obniża poziomu globalnego.
+        let global = match judged {
+            Some(s) if self.inner.raises.is_empty() && self.adopt_judged(s).await => Some(s),
+            Some(_) => None,
+            None => global,
+        };
         // Zapamiętane L4, Broker na L3 (restart): informacja raz, przy 3. przebiegu z rzędu (ok. 15 s).
         let waiting = global == Some(AutonomyLevel::L4)
             && view.global == AutonomyLevel::L3
@@ -164,13 +242,7 @@ impl AppCore {
             rt.level_notice
         };
         if passes == 3 {
-            self.emit(crate::dto::AlfaEvent::Toast {
-                kind: crate::dto::ToastKind::Warning,
-                message: crate::dto::LocalizedText::new(
-                    "Po uruchomieniu obowiązuje L3 — zapamiętany L4 wymaga ponownego potwierdzenia: Ustawienia → Uprawnienia.",
-                    "After the restart L3 applies — the remembered L4 needs confirming again: Settings → Permissions.",
-                ),
-            });
+            self.emit(notes::l4_after_restart());
         }
         if let Some(level) = global
             && level < view.global
@@ -193,6 +265,13 @@ impl AppCore {
             }
         }
         true
+    }
+
+    /// Przyjmuje poziom z okna Sędziego, jeśli świeży odczyt nadal go potwierdza.
+    async fn adopt_judged(&self, level: AutonomyLevel) -> bool {
+        let fresh = self.inner.broker.levels(None).await;
+        fresh.is_some_and(|v| v.global == level && v.standing_global == Some(level))
+            && self.adopt_raise(None, level).await
     }
 
     /// Poziom obowiązujący sesję w Brokerze (`None` — Broker nieosiągalny).
@@ -256,7 +335,7 @@ impl AppCore {
         }
         tracing::info!(
             ?level,
-            "przyjęto podniesienie poziomu zatwierdzone w oknie Sędziego Cieni"
+            "przyjęto podniesienie zatwierdzone w oknie Sędziego Cieni"
         );
         true
     }

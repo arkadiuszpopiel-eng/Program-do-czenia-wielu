@@ -4,14 +4,14 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 [45-testy-ai.md](../plan/45-testy-ai.md). Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).
 
-**Razem: 603 funkcji, z testem 603 (100 %), w długu 0.**
+**Razem: 606 funkcji, z testem 606 (100 %), w długu 0.**
 
 | Rodzaj | Funkcji | Z testem | rdzeń | interfejs | przeglądarka | aplikacja | eval | przegląd ogólny |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Polecenia rdzenia | 283 | 283 (100 %) | 206 | 3 | 2 | 272 | 1 | 0 |
-| Polecenia palety i skróty | 62 | 62 (100 %) | 2 | 7 | 9 | 3 | 0 | 50 |
+| Polecenia rdzenia | 285 | 285 (100 %) | 208 | 3 | 2 | 274 | 1 | 0 |
+| Polecenia palety i skróty | 63 | 63 (100 %) | 2 | 7 | 9 | 3 | 0 | 51 |
 | Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 12 | 0 | 38 |
-| Ustawienia | 98 | 98 (100 %) | 14 | 12 | 7 | 9 | 2 | 98 |
+| Ustawienia | 98 | 98 (100 %) | 19 | 12 | 7 | 9 | 2 | 98 |
 | Narzędzia agentek | 81 | 81 (100 %) | 81 | 1 | 1 | 3 | 52 | 81 |
 | Zdarzenia rdzenia | 41 | 41 (100 %) | 35 | 25 | 5 | 1 | 1 | 41 |
 
@@ -166,10 +166,12 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `models_verify` | aplikacja, bieg aplikacji |  |
 | `modules_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `modules_set_enabled` | rdzeń, aplikacja, bieg aplikacji |  |
+| `permissions_child_lock` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_get` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_grants` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_open_approval` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_request_level` | rdzeń, aplikacja, bieg aplikacji |  |
+| `permissions_request_max_access` | rdzeń, aplikacja, bieg aplikacji |  |
 | `permissions_revoke_grant` | rdzeń, aplikacja, bieg aplikacji |  |
 | `pipelines_list` | rdzeń, aplikacja, bieg aplikacji |  |
 | `pipelines_remove` | rdzeń, aplikacja, bieg aplikacji |  |
@@ -336,6 +338,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `panel.screen` | przegląd ogólny |  |
 | `panel.voice` | przegląd ogólny |  |
 | `panel.tasks` | przegląd ogólny |  |
+| `mode.cycle` | przegląd ogólny |  |
 | `voice.mic` | rdzeń, przegląd ogólny |  |
 | `voice.ptt` | interfejs, przeglądarka | klawisz pola pisania |
 | `conversation.escape` | przeglądarka | klawisz pola pisania |
@@ -447,11 +450,11 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `voice.tts_voice_beta` | przegląd ogólny | Głos Bety |
 | `voice.tts_voice_gama` | przegląd ogólny | Głos Gamy |
 | `voice.tts_voice_delta` | przegląd ogólny | Głos Delty |
-| `voice.talk_smart_turn` | przegląd ogólny | Wyczucie końca wypowiedzi (Smart Turn) |
-| `voice.talk_turn_threshold` | przegląd ogólny | Pewność końca wypowiedzi |
-| `voice.talk_max_silence` | przegląd ogólny | Najdłuższe czekanie w ciszy |
-| `voice.talk_stt_engine` | przegląd ogólny | Silnik rozpoznawania mowy |
-| `voice.talk_language` | przegląd ogólny | Język rozpoznawania mowy |
+| `voice.talk_smart_turn` | rdzeń, przegląd ogólny | Wyczucie końca wypowiedzi (Smart Turn) |
+| `voice.talk_turn_threshold` | rdzeń, przegląd ogólny | Pewność końca wypowiedzi |
+| `voice.talk_max_silence` | rdzeń, przegląd ogólny | Najdłuższe czekanie w ciszy |
+| `voice.talk_stt_engine` | rdzeń, przegląd ogólny | Silnik rozpoznawania mowy |
+| `voice.talk_language` | rdzeń, przegląd ogólny | Język rozpoznawania mowy |
 | `voice.mode` | interfejs, przegląd ogólny | Włączanie mikrofonu |
 | `voice.show_pill` | przegląd ogólny | Pigułka głosowa |
 | `agents.max_steps` | rdzeń, interfejs, przegląd ogólny | Limit kroków zadania |

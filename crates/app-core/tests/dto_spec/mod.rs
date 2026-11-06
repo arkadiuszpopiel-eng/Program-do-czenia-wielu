@@ -6,6 +6,7 @@ use app_core::dto::*;
 use super::{Check, roundtrip};
 
 mod cameras;
+mod child;
 mod computer;
 mod files;
 mod models;
@@ -171,7 +172,8 @@ pub fn spec(command: &str) -> Option<Spec> {
                 .or_else(|| models::spec(other))
                 .or_else(|| files::spec(other))
                 .or_else(|| cameras::spec(other))
-                .or_else(|| series6::spec(other));
+                .or_else(|| series6::spec(other))
+                .or_else(|| child::spec(other));
         }
     };
     Some(found)

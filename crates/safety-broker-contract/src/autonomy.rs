@@ -8,6 +8,61 @@ use risk_classifier_contract::AutonomyLevel;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::child::ChildCeiling;
+
+/// Gdzie działa model przebiegu — z kontekstu wywołania (dostawca wybrany przez runtime), nigdy
+/// od modelu. Brak informacji Sędzia traktuje jak chmurę (plan 50 §8.1).
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ModelLocation {
+    /// Model na tym komputerze (llama.cpp, Ollama, LM Studio — dostawca `local`).
+    Local,
+    /// Model u dostawcy w Internecie (klucz API, most CLI).
+    Cloud,
+}
+
+impl ModelLocation {
+    /// Pochodzenie z identyfikatora modelu `dostawca:model` (Router) albo nazwy dostawcy:
+    /// lokalny tylko dostawca `local`; wszystko inne — chmura.
+    pub fn of_model(model: &str) -> Self {
+        let provider = model.split_once(':').map_or(model, |(p, _)| p);
+        if provider.trim().eq_ignore_ascii_case("local") {
+            Self::Local
+        } else {
+            Self::Cloud
+        }
+    }
+}
+
+/// Zasięg przełącznika „Max dostęp” (decyzja właściciela 3.11, plan 50 §7): żadnych pytań dla
+/// przebiegów na modelach lokalnych, w chmurze albo na wszystkich.
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ModelScope {
+    /// Modele lokalne.
+    Local,
+    /// Modele w chmurze (także mosty CLI). Działania bez informacji o modelu (wtyczki, zrzut
+    /// ekranu, MCP) obejmuje tylko `All` — przegląd 3.11, plan 50 §8.2.
+    Cloud,
+    /// Wszystkie modele.
+    All,
+}
+
+impl ModelScope {
+    /// Czy zasięg obejmuje przebieg o danym pochodzeniu (`None` = nieznane — tylko `All`).
+    pub fn covers(self, location: Option<ModelLocation>) -> bool {
+        match self {
+            Self::All => true,
+            Self::Local => location == Some(ModelLocation::Local),
+            Self::Cloud => location == Some(ModelLocation::Cloud),
+        }
+    }
+}
+
 /// Cel ustawienia poziomu.
 #[derive(
     Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
@@ -33,6 +88,12 @@ pub enum AutonomyTarget {
         /// Agentka.
         agent: AgentId,
     },
+    /// „Max dostęp” — przebiegi na modelach z zasięgu (najwyżej jeden wpis naraz; ponad
+    /// wszystkimi innymi wpisami, bo właściciel włączył go świadomie).
+    Models {
+        /// Zasięg.
+        scope: ModelScope,
+    },
 }
 
 /// Wpis: poziom z opcjonalnym terminem („na czas”).
@@ -46,15 +107,119 @@ pub struct AutonomyEntry {
 
 /// Tabela poziomów. Rozstrzyganie: `SessionAgent` → min(`Session`, `Agent`) → `Global` → L3.
 /// Minimum przy konflikcie sesji i agentki = sufit sesji (bezpieczniejsza interpretacja).
+/// Zamknięta kłódka profilu Dziecko ([`ChildCeiling`]) ogranicza każdy wynik, także „Max dostęp”.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AutonomyTable {
     entries: BTreeMap<AutonomyTarget, AutonomyEntry>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    child: Option<ChildCeiling>,
+    /// Kłódka otwarta „do końca rozmowy” — tylko dla tej sesji; każda inna ma sufit (plan 50 Z.7).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    child_session: Option<SessionId>,
 }
 
 impl AutonomyTable {
-    /// Ustawia wpis.
+    /// Profil Dziecko: sufit z kłódką (`None` — profil wyłączony).
+    pub fn set_child(&mut self, child: Option<ChildCeiling>) {
+        self.end_conversation();
+        self.child = child;
+    }
+
+    /// Kłódka otwarta tylko dla jednej rozmowy (inne sesje i działania bez sesji — z sufitem).
+    pub fn set_child_for(&mut self, child: ChildCeiling, session: SessionId) {
+        self.end_conversation();
+        self.child = Some(child);
+        self.child_session = Some(session);
+    }
+
+    /// Koniec otwarcia „do końca rozmowy”: podniesienia tej rozmowy ponad sufit przepadają — nie wracają
+    /// przy późniejszym otwarciu na czas ani po wyłączeniu profilu (przegląd 6.11, P-1).
+    fn end_conversation(&mut self) {
+        let Some(session) = self.child_session.take() else {
+            return;
+        };
+        let ceiling = self.child.map_or(crate::CHILD_CEILING, |c| c.level);
+        self.entries.retain(|t, e| {
+            let of = matches!(t, AutonomyTarget::Session { session: s }
+                | AutonomyTarget::SessionAgent { session: s, .. } if *s == session);
+            !of || e.level <= ceiling
+        });
+    }
+
+    /// Rozmowa, dla której kłódka jest otwarta („do końca rozmowy”).
+    #[must_use]
+    pub fn child_session(&self) -> Option<&SessionId> {
+        self.child_session.as_ref()
+    }
+
+    /// Profil Dziecko (sufit i otwarcie kłódki).
+    #[must_use]
+    pub fn child(&self) -> Option<ChildCeiling> {
+        self.child
+    }
+
+    /// Sufit obowiązujący teraz (kłódka zamknięta); `None` — brak ograniczenia. Kłódka otwarta tylko dla jednej rozmowy liczy się tu jako zamknięta: zgody stałe, przełączenie
+    /// z okna i poziom globalny dalej mają sufit.
+    #[must_use]
+    pub fn ceiling(&self, now_ms: u64) -> Option<AutonomyLevel> {
+        self.ceiling_for(None, now_ms)
+    }
+
+    /// Sufit obowiązujący sesję (`None` — działanie bez sesji).
+    #[must_use]
+    pub fn ceiling_for(&self, session: Option<&SessionId>, now_ms: u64) -> Option<AutonomyLevel> {
+        let other = |s: &SessionId| session != Some(s);
+        self.child
+            .filter(|c| c.is_locked(now_ms) || self.child_session.as_ref().is_some_and(other))
+            .map(|c| c.level)
+    }
+
+    fn capped(&self, level: AutonomyLevel, session: &SessionId, now_ms: u64) -> AutonomyLevel {
+        self.ceiling_for(Some(session), now_ms)
+            .map_or(level, |c| level.min(c))
+    }
+
+    /// Ustawia wpis. „Max dostęp” jest jednym przełącznikiem: nowy wpis `Models` zastępuje
+    /// poprzedni, a poziom nie wyższy niż domyślny go wyłącza.
     pub fn set(&mut self, target: AutonomyTarget, entry: AutonomyEntry) {
+        if matches!(target, AutonomyTarget::Models { .. }) {
+            self.entries
+                .retain(|t, _| !matches!(t, AutonomyTarget::Models { .. }));
+            if entry.level <= AutonomyLevel::default() {
+                return;
+            }
+        }
         self.entries.insert(target, entry);
+    }
+
+    /// Włączony „Max dostęp” (zasięg i poziom), gdy aktywny.
+    pub fn max_access(&self, now_ms: u64) -> Option<(ModelScope, AutonomyLevel)> {
+        self.entries.iter().find_map(|(t, e)| match t {
+            AutonomyTarget::Models { scope } if e.until_ms.is_none_or(|u| now_ms < u) => {
+                Some((*scope, e.level))
+            }
+            _ => None,
+        })
+    }
+
+    /// Poziom obowiązujący przebieg: jak [`AutonomyTable::effective`], a gdy „Max dostęp”
+    /// obejmuje pochodzenie modelu — nie niższy niż jego poziom.
+    pub fn effective_for(
+        &self,
+        session: &SessionId,
+        agent: Option<&AgentId>,
+        location: Option<ModelLocation>,
+        now_ms: u64,
+    ) -> AutonomyLevel {
+        let base = self.uncapped(session, agent, now_ms);
+        // Max dostęp tylko bez kłódki: otwarcie „do końca rozmowy” go nie włącza (przegląd 5.11, P1).
+        let level = match self.max_access(now_ms) {
+            Some((scope, level)) if scope.covers(location) && self.ceiling(now_ms).is_none() => {
+                base.max(level)
+            }
+            _ => base,
+        };
+        self.capped(level, session, now_ms)
     }
 
     /// Usuwa wpis (powrót do reguły ogólniejszej).
@@ -70,8 +235,18 @@ impl AutonomyTable {
             .map(|e| e.level)
     }
 
-    /// Poziom obowiązujący agentkę w sesji.
+    /// Poziom obowiązujący agentkę w sesji (z sufitem profilu Dziecko).
     pub fn effective(
+        &self,
+        session: &SessionId,
+        agent: Option<&AgentId>,
+        now_ms: u64,
+    ) -> AutonomyLevel {
+        self.capped(self.uncapped(session, agent, now_ms), session, now_ms)
+    }
+
+    /// Poziom bez sufitu profilu Dziecko (zapisany stan — do rozpoznania obniżenia).
+    pub fn uncapped(
         &self,
         session: &SessionId,
         agent: Option<&AgentId>,
@@ -103,55 +278,38 @@ impl AutonomyTable {
         }
     }
 
+    /// Podmiot bez własnego poziomu (sesji, agentki, agentki w sesji) — obowiązuje go tryb
+    /// globalny.
+    pub fn follows_global(
+        &self,
+        session: &SessionId,
+        agent: Option<&AgentId>,
+        now_ms: u64,
+    ) -> bool {
+        let own = |target: AutonomyTarget| self.get(&target, now_ms).is_some();
+        let session_own = own(AutonomyTarget::Session {
+            session: session.clone(),
+        });
+        let agent_own = agent.is_some_and(|a| {
+            own(AutonomyTarget::Agent { agent: a.clone() })
+                || own(AutonomyTarget::SessionAgent {
+                    session: session.clone(),
+                    agent: a.clone(),
+                })
+        });
+        !session_own && !agent_own
+    }
+
+    /// Wpis globalny bez terminu (zmiana właściciela).
+    pub fn standing_global(&self) -> Option<AutonomyLevel> {
+        self.entries
+            .get(&AutonomyTarget::Global)
+            .filter(|e| e.until_ms.is_none())
+            .map(|e| e.level)
+    }
+
     /// Wszystkie wpisy (do UI ustawień).
     pub fn entries(&self) -> Vec<(AutonomyTarget, AutonomyEntry)> {
         self.entries.iter().map(|(t, e)| (t.clone(), *e)).collect()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn entry(level: AutonomyLevel) -> AutonomyEntry {
-        AutonomyEntry {
-            level,
-            until_ms: None,
-        }
-    }
-
-    #[test]
-    fn resolution_order_and_expiry() {
-        let s = SessionId::new("s1");
-        let a = AgentId::new("delta");
-        let mut t = AutonomyTable::default();
-        assert_eq!(t.effective(&s, Some(&a), 0), AutonomyLevel::L3);
-        t.set(AutonomyTarget::Global, entry(AutonomyLevel::L4));
-        assert_eq!(t.effective(&s, Some(&a), 0), AutonomyLevel::L4);
-        t.set(
-            AutonomyTarget::Session { session: s.clone() },
-            entry(AutonomyLevel::L2),
-        );
-        t.set(
-            AutonomyTarget::Agent { agent: a.clone() },
-            entry(AutonomyLevel::L4),
-        );
-        assert_eq!(t.effective(&s, Some(&a), 0), AutonomyLevel::L2);
-        t.set(
-            AutonomyTarget::SessionAgent {
-                session: s.clone(),
-                agent: a.clone(),
-            },
-            AutonomyEntry {
-                level: AutonomyLevel::L4,
-                until_ms: Some(100),
-            },
-        );
-        assert_eq!(t.effective(&s, Some(&a), 99), AutonomyLevel::L4);
-        assert_eq!(t.effective(&s, Some(&a), 100), AutonomyLevel::L2);
-        assert_eq!(t.effective(&s, None, 0), AutonomyLevel::L2);
-        assert!(t.clear(&AutonomyTarget::Session { session: s.clone() }));
-        assert_eq!(t.effective(&s, Some(&a), 200), AutonomyLevel::L4);
-        assert_eq!(t.entries().len(), 3);
     }
 }

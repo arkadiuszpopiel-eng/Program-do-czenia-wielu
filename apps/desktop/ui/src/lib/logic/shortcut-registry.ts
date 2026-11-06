@@ -58,6 +58,8 @@ export const SHORTCUTS: readonly ShortcutDef[] = [
   app('panel.screen', 'panels', ['Alt+5']),
   app('panel.voice', 'panels', ['Alt+6']),
   app('panel.tasks', 'panels', ['Alt+7']),
+  // Tryb pracy po kolei (jak Shift+Tab w Claude Code): Ręcznie → Akceptuj edycje → Automatycznie → Plan.
+  app('mode.cycle', 'conversation', ['Alt+M'], { inInput: true }),
   app('voice.mic', 'voice', ['Ctrl+Shift+M']),
   app('voice.ptt', 'voice', ['Space'], { customizable: false }),
   app('conversation.escape', 'conversation', ['Esc'], { customizable: false, inInput: true }),

@@ -4,7 +4,8 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::common::LocalizedText;
+use super::SecretInput;
+use super::common::{AutonomyLevel, LocalizedText};
 
 /// Gdzie działa Broker (ADR 0003).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
@@ -107,4 +108,98 @@ pub struct GrantView {
     pub granted_at_ms: u64,
     /// Do kiedy; `None` — do odwołania.
     pub until_ms: Option<u64>,
+}
+
+/// Uprawnienia (PLAN §8.3).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct PermissionsState {
+    pub global: AutonomyLevel,
+    pub session: Option<AutonomyLevel>,
+    pub hello_enabled: bool,
+    /// Włączony „Max dostęp” (plan 50 §8.1); `None` — wyłączony albo Broker niepodłączony.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_access: Option<MaxAccess>,
+}
+
+/// Zasięg „Max dostęp” (plan 50 §8.1): bez pytań na modelach lokalnych, w chmurze albo wszystkich.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum MaxAccess {
+    Local,
+    Cloud,
+    All,
+}
+
+/// Stan intencji Brokera: `opened_broker` — prośba czeka w oknie Brokera; `applied` — zmiana
+/// niewymagająca zatwierdzenia (obniżenie poziomu) została zastosowana od razu.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum BrokerIntentStatus {
+    OpenedBroker,
+    Applied,
+}
+
+/// Wynik intencji Brokera.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct BrokerIntentResult {
+    pub status: BrokerIntentStatus,
+    pub request_id: String,
+}
+
+/// Profil Dziecko (plan 50 §4.4): stan kłódki trybów pracy (bez PIN-u).
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct ChildLockState {
+    pub pin_set: bool,
+    pub enabled: bool,
+    /// Kłódka otwarta teraz PIN-em rodzica.
+    pub open: bool,
+    /// Do kiedy otwarta (ms od 1970); `None` — zamknięta albo do zamknięcia Alfy.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub open_until_ms: Option<u64>,
+    /// Blokada po błędnych próbach do (ms od 1970).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub blocked_until_ms: Option<u64>,
+    pub attempts_left: u32,
+    /// Zapis kłódki poza zasięgiem konta dziecka; `false` — ochrona umowna.
+    #[serde(default)]
+    pub tamper_resistant: bool,
+    /// Stan nieznany (zerwane łącze z Sędzią); interfejs pokazuje ostatni znany stan i „nieznany”.
+    #[serde(default)]
+    pub unknown: bool,
+    /// Rodzic włączył pełną treść rozmów w dzienniku (dziecko widzi stały znak).
+    #[serde(default)]
+    pub transcripts: bool,
+    /// Kłódka otwarta „do końca rozmowy” (tylko jedna rozmowa).
+    #[serde(default)]
+    pub conversation: bool,
+    /// Ta rozmowa (gdy rdzeń ją zna) — interfejs pokazuje kłódkę w każdej innej.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub conversation_id: Option<String>,
+}
+
+/// Zmiana profilu Dziecko; PIN wpisuje rodzic, sprawdza go wyłącznie Sędzia Cieni.
+#[derive(Debug, Clone, Deserialize, schemars::JsonSchema)]
+#[serde(tag = "op", rename_all = "snake_case")]
+pub enum ChildLockRequest {
+    /// Ustawienie PIN-u (zmiana wymaga starego).
+    SetPin {
+        old: Option<SecretInput>,
+        new: SecretInput,
+    },
+    /// Włączenie albo wyłączenie profilu.
+    Enable { pin: SecretInput, on: bool },
+    /// Otwarcie kłódki na `minutes` minut; `None` — do zamknięcia Alfy; z `session_id` — „do końca
+    /// rozmowy” (tylko ta rozmowa, do przełączenia na inną).
+    Open {
+        pin: SecretInput,
+        minutes: Option<u32>,
+        #[serde(default)]
+        session_id: Option<String>,
+    },
+    /// Zamknięcie kłódki (bez PIN-u).
+    Close,
+    /// Sprawdzenie PIN-u przed dziennikiem rodzica (bez zmiany stanu, ten sam limit prób).
+    Verify { pin: SecretInput },
+    /// Pełna treść rozmów w dzienniku rodzica (dziecko widzi stały znak).
+    Transcripts { pin: SecretInput, on: bool },
 }

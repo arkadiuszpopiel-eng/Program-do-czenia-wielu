@@ -46,12 +46,35 @@ impl Core {
         )>,
         action: &str,
     ) -> Step<Vec<Authorization>> {
+        self.dir_access(ctx, m, caps, action, None).await
+    }
+
+    /// Jak [`Self::mutate_access`]; `dir` — usuwany albo przenoszony katalog: zawartość z `.git`
+    /// czy `.vscode` to dla Sędziego zmiana ścieżki chronionej (pierwsza zdolność).
+    pub(crate) async fn dir_access(
+        &self,
+        ctx: &ToolCtx,
+        m: &ToolManifest,
+        caps: Vec<(
+            Capability,
+            risk_classifier_contract::Reversibility,
+            Destructiveness,
+        )>,
+        action: &str,
+        dir: Option<&str>,
+    ) -> Step<Vec<Authorization>> {
+        let inside = match dir {
+            Some(d) => self.holds_protected(d, ctx.workdir.as_deref()).await,
+            None => false,
+        };
         let caps = caps
             .into_iter()
-            .map(|(cap, reversible, destructive)| {
+            .enumerate()
+            .map(|(i, (cap, reversible, destructive))| {
                 let mut f = self.facts(m, ctx);
                 f.reversible = reversible;
                 f.destructive = destructive;
+                f.contains_protected = inside && i == 0;
                 (cap, f)
             })
             .collect();
@@ -236,7 +259,7 @@ impl Core {
                 Destructiveness::None,
             ),
         ];
-        let auths = self.mutate_access(ctx, m, caps, &action).await?;
+        let auths = self.dir_access(ctx, m, caps, &action, Some(&from)).await?;
         let (f, t) = (Core::path_buf(&from), Core::path_buf(&to));
         let journal = self.journal.clone();
         Ok(self
@@ -317,12 +340,12 @@ impl Core {
         let action = format!("kopia „{from}” → „{to}”");
         let mut read_facts = self.facts(m, ctx);
         read_facts.reversible = risk_classifier_contract::Reversibility::Yes;
+        // Kopia katalogu z `.git` czy `.vscode` tworzy ścieżki chronione w celu.
+        let mut write_facts = self.facts(m, ctx);
+        write_facts.contains_protected = self.holds_protected(&from, ctx.workdir.as_deref()).await;
         let caps = vec![
             (Capability::FsRead(self.scope(&from, false)?), read_facts),
-            (
-                Capability::FsWrite(self.scope(&to, false)?),
-                self.facts(m, ctx),
-            ),
+            (Capability::FsWrite(self.scope(&to, false)?), write_facts),
         ];
         let auths = self.authorize(ctx, m, caps, &action).await?;
         let (f, t) = (Core::path_buf(&from), Core::path_buf(&to));

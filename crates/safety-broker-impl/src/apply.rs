@@ -24,6 +24,9 @@ fn system_holder() -> Holder {
     }
 }
 
+/// Tryb po „Zezwól i przełącz na Automatycznie” (plan 50 §4.2).
+const SWITCH_LEVEL: AutonomyLevel = AutonomyLevel::L3;
+
 impl BrokerEngine {
     pub(crate) fn apply_decision(
         &self,
@@ -66,6 +69,13 @@ impl BrokerEngine {
                 if let Some(rule) = st.guard.derive_facts(&req, &session).kernel_rule {
                     return Err(BrokerError::KernelBlock(rule));
                 }
+                // Przed tokenem: błąd Audytu zmiany trybu = odmowa całości (fail-closed); sam tryb
+                // zmienia się dopiero po zapisie tokenu (przegląd 3.11: odmowa nie zostawia L3).
+                let switch = if decision == ApprovalDecision::AllowAndAutomatic {
+                    self.audit_switch(st, &req.holder, id, now)?
+                } else {
+                    false
+                };
                 let ttl = Self::ttl(st, req.ttl_ms)?;
                 let expires = now.saturating_add(ttl);
                 let token = Self::mint(
@@ -79,6 +89,9 @@ impl BrokerEngine {
                 let payload = json!({ "token": token.id, "capability": token.cap, "via": "approval", "approval": id });
                 self.audit(EVENT_TOKEN_ISSUED, Some(&req.holder), payload)?;
                 Self::register(st, &token);
+                if switch {
+                    self.switch_to_automatic(st);
+                }
                 if let ApprovalDecision::AllowInScope { scope, until_ms } = decision {
                     // Termin przycinany do limitu polityki; „do odwołania” zostaje bez terminu
                     // (wybór właściciela w oknie — odwołanie w panelu uprawnień albo STOP).
@@ -124,13 +137,14 @@ impl BrokerEngine {
                 level,
                 until_ms,
             } => {
+                st.check_child_lock(&target, level, now)?;
                 let payload = json!({ "target": target, "level": level, "until_ms": until_ms, "approval": id });
                 self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;
                 // Podniesienie globalne bez terminu zostaje po restarcie (decyzja właściciela 27.10).
-                if target == AutonomyTarget::Global && until_ms.is_none() {
-                    self.remember_global(level);
+                if until_ms.is_none() {
+                    self.remember(&target, level);
                 }
-                st.autonomy.set(target, AutonomyEntry { level, until_ms });
+                st.set_level(target, AutonomyEntry { level, until_ms });
                 if level == AutonomyLevel::L4 {
                     Self::withdraw_full_auto(st, now);
                 }
@@ -146,24 +160,76 @@ impl BrokerEngine {
         }
     }
 
+    /// „Zezwól i przełącz na Automatycznie” (plan 50 §4.2): tryb globalny → L3, zapamiętany jak
+    /// zmiana z menu. Gdy w międzyczasie podmiot dostał własny poziom albo tryb globalny jest
+    /// już co najmniej L3 — sama zgoda, bez zmiany trybu.
+    /// Czy wybór „Zezwól i przełącz na Automatycznie” zmienia tryb (podmiot nadal bez własnego
+    /// poziomu, tryb globalny niższy niż L3) — wtedy zapis zmiany w Audycie.
+    fn audit_switch(
+        &self,
+        st: &State,
+        holder: &Holder,
+        id: ApprovalId,
+        now: u64,
+    ) -> Result<bool, BrokerError> {
+        let global = st
+            .autonomy
+            .get(&AutonomyTarget::Global, now)
+            .unwrap_or_default();
+        if global >= SWITCH_LEVEL
+            || !st
+                .autonomy
+                .follows_global(&holder.session, holder.agent.as_ref(), now)
+        {
+            return Ok(false);
+        }
+        let target = AutonomyTarget::Global;
+        let payload = json!({ "target": target, "level": SWITCH_LEVEL, "until_ms": null, "approval": id, "via": "approval_card" });
+        self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;
+        Ok(true)
+    }
+
+    /// Tryb globalny „Automatycznie” bez terminu, ze znacznikiem przełączenia z okna (rdzeń
+    /// przyjmuje go jako zapamiętany).
+    fn switch_to_automatic(&self, st: &mut State) {
+        let target = AutonomyTarget::Global;
+        self.remember(&target, SWITCH_LEVEL);
+        st.set_level(
+            target,
+            AutonomyEntry {
+                level: SWITCH_LEVEL,
+                until_ms: None,
+            },
+        );
+        st.switched_global = Some(SWITCH_LEVEL);
+    }
+
     /// Po przejściu na „Pełną automatykę” okno zgód nie pokazuje się wcale (właściciel 31.10):
     /// czekające karty działań i planów podmiotów, które teraz mają L4, wygasają od razu —
     /// ponowione działanie przejdzie bez pytania (twarda blokada Jądra działa dalej).
     fn withdraw_full_auto(st: &mut State, now: u64) {
-        let full = |st: &State, h: &Holder| {
-            st.autonomy.effective(&h.session, h.agent.as_ref(), now) == AutonomyLevel::L4
+        let full = |st: &State, h: &Holder, location| {
+            st.autonomy
+                .effective_for(&h.session, h.agent.as_ref(), location, now)
+                == AutonomyLevel::L4
         };
         let ids: Vec<ApprovalId> = st
             .approvals
             .iter()
-            .filter(|(_, p)| matches!(p.status, PendStatus::Pending))
+            .filter(|(_, p)| p.status.is_open())
             .filter(|(_, p)| {
                 matches!(
                     p.action,
                     Some(PendingAction::Action(_) | PendingAction::Plan { .. })
                 )
             })
-            .filter(|(_, p)| full(st, &p.request.holder))
+            .filter(|(_, p)| {
+                let location = match &p.action {
+                    Some(PendingAction::Action(a)) => a.facts.model_location,
+                    _ => None,
+                };
+                full(st, &p.request.holder, location)
+            })
             .map(|(id, _)| *id)
             .collect();
         for id in ids {
@@ -188,6 +254,7 @@ impl BrokerEngine {
     ) -> Result<Option<ApprovalId>, BrokerError> {
         let now = self.now();
         let mut st = self.lock();
+        st.sync_child(now);
         let current = st.current_level(&req.target, now);
         if req.until_ms.is_some_and(|u| u <= now) {
             return Err(BrokerError::InvalidRequest(
@@ -215,10 +282,10 @@ impl BrokerEngine {
                 level: req.level,
                 until_ms,
             };
-            if req.target == AutonomyTarget::Global && until_ms.is_none() {
-                self.remember_global(req.level);
+            if until_ms.is_none() {
+                self.remember(&req.target, req.level);
             }
-            st.autonomy.set(req.target.clone(), entry);
+            st.set_level(req.target.clone(), entry);
             let payload = json!({ "target": req.target, "from": current, "level": req.level, "origin": req.origin });
             self.audit(EVENT_AUTONOMY_CHANGED, None, payload)?;
             return Ok(None);
@@ -229,6 +296,7 @@ impl BrokerEngine {
             let _ = self.audit(EVENT_KERNEL_BLOCK, None, payload);
             return Err(BrokerError::KernelBlock(KernelRule::SelfEscalation));
         }
+        st.check_child_lock(&req.target, req.level, now)?;
         let hello = req.level == AutonomyLevel::L4
             && st
                 .policy()

@@ -21,7 +21,7 @@ use safety_broker_impl::service::{
     BrokerService, RoleBinding, RoleBindings, ServiceConfig, ServicePorts, UiLaunchConfig,
     open_audit,
 };
-use safety_broker_impl::{BrokerConfig, BrokerEngine, KeyMode};
+use safety_broker_impl::{BrokerConfig, BrokerEngine, CHILD_LOCK_FILE, KeyMode, PinParams};
 use watchdog_contract::{Clock, SystemClock};
 
 use crate::ChildLauncher;
@@ -118,10 +118,17 @@ pub fn build_engine(
         env: PathEnv::windows_profile(&config.user_profile),
         key_mode: KeyMode::Random,
     };
-    // Poziom globalny zatwierdzony przez właściciela przetrwa restart (decyzja 27.10).
+    // Poziom globalny zatwierdzony przez właściciela przetrwa restart (decyzja 27.10); obok
+    // profil Dziecko z kłódką i skrótem PIN-u rodzica (plan 50 §4.4).
     let standing = config.data_dir.join("autonomy-standing.json");
+    let child = config.data_dir.join(CHILD_LOCK_FILE);
     BrokerEngine::new(broker, clock, audit, processes)
-        .map(|engine| Arc::new(engine.with_standing_level(standing)))
+        .map(|engine| {
+            let engine = engine.with_standing_level(standing);
+            // Usługa na osobnym koncie: zapis kłódki poza zasięgiem konta dziecka.
+            let resistant = !config.dev_mode;
+            Arc::new(engine.with_child_lock(child, PinParams::default(), resistant))
+        })
         .map_err(|e| e.to_string())
 }
 

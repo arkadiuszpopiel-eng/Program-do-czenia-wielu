@@ -1,7 +1,7 @@
 - [Dwa komputery: PC i laptop](maszyna-stacjonarna-2026-10-17.md) — E: przenoszony między PC (AMD, 32 GB) i laptopem (NVIDIA + Intel UHD, 16 GB); różne F:, reguły maszyny; AppData tej sesji (MSIX) zwirtualizowane — instalacje przez Eksplorator
 - [Awaria 2026-10-17 i ciężkie zadania](awaria-2026-10-17-obciazenie.md) — brak pamięci + resety USB; PC -j6, laptop -j3, bez incremental; backup.sh naprawiony
 - [Alfa — uruchamianie u właściciela](alfa-uruchamianie-wlasciciela.md) — tylko skrót „Alfa” (Alfa-uruchomiona z oknem zgód); target/shell to build testowy (e2e, CDP), kopia właściciela z target/owner
-- [Alfa — sprzątanie target > 100 GB](alfa-sprzatanie-target-100gb.md) — gdy target przekroczy 100 GB: `cargo clean --profile dev` od razu (owner/shell zostają); 31.10 E: zapełniony
+- [Alfa — sprzątanie starych kompilacji](alfa-sprzatanie-target-100gb.md) — od 5.11 zawsze: scripts/sprzatanie.sh po verify i backup, target/debug ≤ 50 GB, powłoka tylko do target/shell
 - [Alfa — środowisko lokalne](alfa-srodowisko-lokalne.md) — kopia robocza na E:, portable-env, pułapki budowy (ukośniki w heredoc), sprzątanie target/ i miejsce przed verify
 - [Alfa — zasady pracy](alfa-zasady-pracy.md) — Codex nie recenzuje, najpierw porządek i katalogowanie, potem rozwój
 - [Alfa — weryfikacja UI](alfa-weryfikacja-ui.md) — każdy stan otwarty w każdym stylu i motywie, bez kontrolek systemowych, sprawdzać wielokrotnie
@@ -11,7 +11,7 @@
 - [Alfa — przegląd i historia zmian](alfa-przeglad-i-historia-zmian.md) — każde okno/panel/skrót, wagi w CHANGELOG, spis funkcji „wkrótce”
 - [Alfa — praca nocna](alfa-praca-nocna.md) — sesja do rana kończy się raportem, planem HTML i zbudowaną wersją; bez dźwięku w nocy
 - [Alfa — samodzielne testowanie](alfa-samodzielne-testowanie.md) — poziomy verify, instancja testowa, „nie sprawdziłem” tylko z trzech powodów; od 31.10 katalog funkcji + bramka „nowa funkcja bez testu” (plan 45)
-- [Alfa — pełny dostęp AI](alfa-pelny-dostep-ai.md) — 20.10 „Pełny dostęp”; 27.10 menu 4 trybów; 31.10 L4 = okno zgód NIGDY (bez wyjątków poza blokadą Jądra), Broker → „Sędzia Cieni” z „?”
+- [Alfa — pełny dostęp AI](alfa-pelny-dostep-ai.md) — 3.11: tryby jak Claude Code + Codex (5 trybów, model-sędzia, Max dostęp, kłódki dziecka na PIN — plan 50); L4 nigdy nie pyta; Broker → „Sędzia Cieni”
 - [Alfa — pamięć w repozytorium](alfa-pamiec-w-repozytorium.md) — kopia pamięci w alfa/docs/pamiec-projektu, `scripts/memory-sync.sh` na końcu sesji; na nowym PC najpierw przywrócić zasady z repo
 - [Alfa — silnik NextGO.Gray](alfa-silnik-nextgo.md) — katalog silnika tylko do odczytu (inny model); tools-engine od 0.0.74, ustawienie engine.nextgo.root
 - [Alfa — pulpit i panele 29.10](alfa-pulpit-panele-2026-10-29.md) — stan w pasku pisania, panele chowane w całości, wysuwane i przypinane; tryb pracy czyta poziom globalny

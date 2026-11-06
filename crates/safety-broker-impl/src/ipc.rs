@@ -18,6 +18,7 @@ use serde::de::DeserializeOwned;
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt, DuplexStream};
 use watchdog_contract::KillSwitch;
 
+use crate::child::CoreSession;
 use crate::engine::BrokerEngine;
 
 /// Błąd połączenia IPC.
@@ -149,6 +150,7 @@ impl BrokerServer {
         )
         .await?;
         let (role, client) = (hello.credential.role, hello.credential.client_id);
+        let _core = (role == ClientRole::Core).then(|| CoreSession::new(self.engine.clone()));
         while let Some(env) = read_frame::<_, Envelope<Request>>(&mut stream).await? {
             let body = if env.v != PROTOCOL_VERSION {
                 Response::Error(BrokerError::InvalidRequest(
@@ -267,6 +269,15 @@ impl BrokerServer {
             Request::Metrics => Ok(Response::Metrics(e.metrics())),
             Request::Grants => Ok(Response::Grants(e.grants())),
             Request::RevokeGrant { id } => e.revoke_grant(id).await.map(Response::Revoked),
+            Request::ChildLock => Ok(Response::ChildLock(e.child_lock())),
+            Request::JudgeQueue => Ok(Response::JudgeQueue(e.judge_queue())),
+            Request::JudgeResolve { id, resolution } => e
+                .judge_resolve(id, *resolution)
+                .await
+                .map(|()| Response::Ok),
+            Request::ChangeChildLock(change) => {
+                e.change_child_lock(change).await.map(Response::ChildLock)
+            }
             Request::PendingApprovals => Ok(Response::Pending(e.pending())),
             Request::Resolve {
                 id,

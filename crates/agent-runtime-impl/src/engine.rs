@@ -47,6 +47,8 @@ pub(crate) struct Engine {
     pub(crate) storage_error: Option<String>,
     pub(crate) approval_clock: Arc<crate::ApprovalClock>,
     waited_at_start: u64,
+    /// Gdzie działał model ostatniej tury (do kontekstu narzędzi — „Max dostęp”).
+    pub(crate) model_location: Option<safety_broker_contract::ModelLocation>,
 }
 
 impl Engine {
@@ -80,7 +82,17 @@ impl Engine {
             storage_error: None,
             approval_clock,
             waited_at_start,
+            model_location: None,
         }
+    }
+
+    /// Tryb „Plan” (plan 50 §4.1, Z.5): rozmowa na L0 — agentka bada narzędziami do odczytu
+    /// i przedstawia plan; zmiany dopiero po akceptacji właściciela (wyższy poziom rozmowy).
+    pub(crate) fn planning(&self) -> bool {
+        self.shared.ext.autonomy.as_ref().is_some_and(|o| {
+            o.level(&self.cp.spec.session, &self.cp.spec.agent)
+                == risk_classifier_contract::AutonomyLevel::L0
+        })
     }
 
     pub(crate) fn elapsed_ms(&self) -> u64 {

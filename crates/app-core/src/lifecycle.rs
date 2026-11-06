@@ -34,6 +34,7 @@ impl AppCore {
         // Zapamiętane obniżenia autonomii — od razu i pilnowane dalej (A-04).
         self.enforce_autonomy().await;
         self.spawn_autonomy_guard();
+        self.spawn_judge();
         self.inner
             .voice
             .attach(std::sync::Arc::new(crate::voice_chat::CoreVoiceChat::new(
@@ -47,6 +48,38 @@ impl AppCore {
         self.spawn_updates(self.inner.healthy_after);
         self.spawn_key_watch();
         self.inner.work.files.start();
+    }
+
+    /// Model-sędzia trybu „Automatycznie” (plan 50 §4.3): bez Brokera albo Routera nie startuje — Broker
+    /// pokazuje wtedy każdą prośbę właścicielowi.
+    fn spawn_judge(&self) {
+        let extra = &self.inner.extra;
+        let (Some(kernel), Some(routers)) = (&extra.broker, &extra.routers) else {
+            return;
+        };
+        let history: std::sync::Arc<dyn sessions_contract::SessionHistory> =
+            self.inner.sessions.clone();
+        // Dziennik werdyktów: wpis „audit” na osi czasu rozmowy (panel osi czasu, dziennik rodzica).
+        let core = self.clone();
+        let _stop = app_judge::spawn(
+            kernel.broker.clone(),
+            Some(&routers.local),
+            Some(&routers.hybrid),
+            history,
+            std::sync::Arc::new(app_judge::NoteLog(
+                move |session: &str, title, detail, warn| {
+                    use crate::dto::{EventLevel, TimelineKind};
+                    let level = if warn {
+                        EventLevel::Warn
+                    } else {
+                        EventLevel::Info
+                    };
+                    if let Ok(s) = crate::ids::session(session) {
+                        core.timeline_note(&s, TimelineKind::Audit, level, title, Some(detail));
+                    }
+                },
+            )),
+        );
     }
 
     /// Zadania: zdarzenia `scheduler.*`/`triggers.*`/`marshal.*` → UI, DND z `voice-wake` →
