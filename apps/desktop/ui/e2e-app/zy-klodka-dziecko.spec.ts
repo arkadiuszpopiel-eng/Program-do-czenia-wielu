@@ -53,6 +53,34 @@ test('profil Dziecko: kłódka w menu trybów, wyłączenie PIN-em', async ({ al
     const view = await call<{ global: string }>(main, 'permissions_get', { sessionId: null });
     expect(view.global <= 'L1').toBe(true);
     await main.keyboard.press('Escape');
+
+    // Z.7 „do końca rozmowy”: kłódka otwarta tylko dla aktywnej rozmowy; inna rozmowa ją zamyka.
+    const before = await call<{ active_session_id: string | null }>(main, 'app_bootstrap', {});
+    const [a, b] = [
+      await call<{ id: string }>(main, 'sessions_create', { template: 'empty' }),
+      await call<{ id: string }>(main, 'sessions_create', { template: 'empty' }),
+    ];
+    try {
+      await call(main, 'app_set_active_session', { sessionId: a.id });
+      const open = await call<ChildLock & { conversation: boolean; conversation_id?: string }>(
+        main,
+        'permissions_child_lock',
+        { change: { op: 'open', pin: PIN, minutes: null, session_id: a.id } },
+      );
+      expect(open.open && open.conversation).toBe(true);
+      expect(open.conversation_id).toBe(a.id);
+      await call(main, 'app_set_active_session', { sessionId: b.id });
+      const after = await call<ChildLock & { conversation: boolean }>(
+        main,
+        'permissions_child_lock',
+        {
+          change: null,
+        },
+      );
+      expect(after.open || after.conversation).toBe(false);
+    } finally {
+      await call(main, 'app_set_active_session', { sessionId: before.active_session_id });
+    }
   } finally {
     const off = await call<ChildLock>(main, 'permissions_child_lock', {
       change: { op: 'enable', pin: PIN, on: false },
