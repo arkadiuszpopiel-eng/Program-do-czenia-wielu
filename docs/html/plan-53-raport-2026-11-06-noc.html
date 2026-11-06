@@ -394,6 +394,17 @@ i bezpieczeństwo. <strong>Krytycznych: 0.</strong> Wszystkie znaleziska poprawi
 <p>Bez znalezisk: unieważnianie tokenów i kart przy każdej zmianie otwarcia, restart Sędziego (otwarcie nie
 przetrwa), zgody stałe i przełączenie z okna przy otwartej rozmowie, Audyt kłódki („poszerzenie dopiero po wpisie”
 nadal obowiązuje), brak PIN-u we wpisach dziennika, przeniesienia kodu bez zmiany zachowania.</p>
+<p><strong>Drugi przegląd — samych poprawek (6.11 ok. 2:30):</strong> krytycznych 0, poważne 1, drobne 5; wszystkie poprawione
+w 6dd5f6b2:</p>
+<ul>
+<li><strong>P-1 (poważne):</strong> podniesienie trybu rozmowy zatwierdzone w czasie otwarcia zostawało w tabeli Sędziego —
+po zamknięciu było przycięte, ale wracało, gdy rodzic później otworzył kłódkę na czas albo wyłączył profil.
+Teraz koniec otwarcia „do końca rozmowy” usuwa podniesienia tej rozmowy ponad sufit (test kontraktu).</li>
+<li><strong>D-1…D-5:</strong> zapis aktywnej rozmowy przed zamknięciem kłódki (wyścig), zamknięcie także gdy rdzeń nie zna
+rozmowy, a Sędzia trzyma otwarcie, odmowa zamiast nieaktualnego „otwarto” po zmianie rozmowy w trakcie,
+notka „menu zmienia tryb globalny” nie pokazuje się w otwartej rozmowie, poziomy rozmów ogłaszane po każdej
+zmianie kłódki.</li>
+</ul>
 <p>Wcześniejszy przegląd Z.4 (5.11 wieczorem): nic krytycznego, poprawki P1–P4 w fd67148a.</p>
 <h2 id="4-do-decyzji-wlasciciela">4. Do decyzji właściciela</h2>
 <ol>
