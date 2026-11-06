@@ -12,9 +12,9 @@
   import Check from '@lucide/svelte/icons/check';
   import Lock from '@lucide/svelte/icons/lock';
   import type { AutonomyLevel } from '../../api/types';
-  import { modeItems, requestMode } from '../../logic/work-mode';
-  import { showError } from '../../state/attempt';
+  import { modeItems } from '../../logic/work-mode';
   import { useApp } from '../../state/context';
+  import { behindLock as locked, modeView, switchMode } from '../../state/mode-switch';
   import MaxAccessSwitch from './MaxAccessSwitch.svelte';
 
   interface Props {
@@ -26,19 +26,17 @@
   const app = useApp();
   const { t, tk } = app.i18n;
   const session = $derived(app.sessions.active);
-  const planning = $derived(session?.autonomy === 'L0' ? session : null);
-  // Kłódka otwarta „do końca rozmowy” dla tej rozmowy — tryb zmienia się tylko w niej (Z.7).
-  const here = $derived(app.autonomy.openHere(session?.id));
-  const current = $derived<AutonomyLevel>(
-    planning
-      ? 'L0'
-      : here && session
-        ? session.autonomy
-        : (app.autonomy.global ?? session?.autonomy ?? 'L3'),
-  );
+  // Bieżący tryb i zakres zmiany: Plan i „do końca rozmowy” dotyczą tej rozmowy (Z.5, Z.7).
+  const view = $derived(modeView(app));
+  const current = $derived(view.current);
+  const here = $derived(view.here);
   // Rozmowa z własnym poziomem (Ustawienia → Uprawnienia) — menu zmienia tryb globalny.
   const own = $derived(
-    session && !planning && !here && app.autonomy.global && session.autonomy !== app.autonomy.global
+    session &&
+      !view.planning &&
+      !here &&
+      app.autonomy.global &&
+      session.autonomy !== app.autonomy.global
       ? session.autonomy
       : null,
   );
@@ -54,54 +52,11 @@
     (checked ?? list?.querySelector<HTMLElement>('[role="menuitemradio"]'))?.focus();
   });
 
-  /** Poziom w zakresie zmiany: rozmowy (Plan) albo globalny. */
-  async function readLevel(scope: string | null): Promise<AutonomyLevel | null> {
-    if (!scope) return app.autonomy.load(app.client.permissions);
-    const state = await app.client.permissions.get(scope);
-    return state.session ?? state.global;
-  }
+  const behindLock = (level: AutonomyLevel) => locked(app, view, level);
 
-  /** Tryb za kłódką rodzica (profil Dziecko, plan 50 §4.4): Plan i Ręcznie zostają otwarte. */
-  const behindLock = (level: AutonomyLevel) => app.autonomy.locked && !here && level > 'L1';
-
-  async function choose(level: AutonomyLevel) {
-    if (behindLock(level)) {
-      app.toasts.show({ kind: 'info', message: t('child.lockedNote') });
-      return;
-    }
-    onclose();
-    if (level === current) return;
-    // Plan i wyjście z Planu dotyczą otwartej rozmowy; bez rozmowy — poziomu globalnego.
-    const scope = session && (level === 'L0' || planning || here) ? session.id : null;
-    try {
-      await requestMode(level, {
-        request: (l) => app.client.permissions.requestLevel(l, scope),
-        readGlobal: () => readLevel(scope),
-        notify: (event, l) => void report(event, l, scope),
-      });
-    } catch (error) {
-      showError(app.toasts, error);
-    }
-  }
-
-  /** Komunikat po zmianie — sukces dopiero po odczycie z Brokera, że poziom obowiązuje. */
-  async function report(
-    event: 'applied' | 'requested' | 'raised',
-    level: AutonomyLevel,
-    scope: string | null,
-  ) {
-    const mode = tk(`mode.${level}.name`);
-    if (event === 'requested') {
-      app.toasts.show({ kind: 'info', message: t('mode.requested', { mode }) });
-      return;
-    }
-    const now = event === 'raised' ? level : await readLevel(scope);
-    if (now === level || now === null) {
-      app.toasts.show({ kind: 'success', message: t(`mode.${event}`, { mode }) });
-    } else {
-      const current = tk(`mode.${now}.name`);
-      app.toasts.show({ kind: 'error', message: t('mode.notApplied', { mode, current }) });
-    }
+  function choose(level: AutonomyLevel) {
+    if (!behindLock(level)) onclose();
+    void switchMode(app, view, level);
   }
 
   function keydown(event: KeyboardEvent) {

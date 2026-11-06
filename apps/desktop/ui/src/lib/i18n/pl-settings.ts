@@ -278,6 +278,7 @@ export const plSettings = {
   'shortcut.view.zoomIn': 'Powiększ',
   'shortcut.view.zoomOut': 'Pomniejsz',
   'shortcut.nav.back': 'Wstecz (poprzednie miejsce)',
+  'shortcut.mode.cycle': 'Następny tryb pracy (bez Pełnego dostępu)',
   'shortcut.nav.forward': 'Dalej (następne miejsce)',
   'shortcut.view.zoomReset': 'Rozmiar domyślny',
   'shortcut.panel.sessions': 'Panel Sesje',

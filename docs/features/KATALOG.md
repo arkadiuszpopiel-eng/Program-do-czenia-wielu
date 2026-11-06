@@ -4,12 +4,12 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 [45-testy-ai.md](../plan/45-testy-ai.md). Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).
 
-**Razem: 605 funkcji, z testem 605 (100 %), w długu 0.**
+**Razem: 606 funkcji, z testem 606 (100 %), w długu 0.**
 
 | Rodzaj | Funkcji | Z testem | rdzeń | interfejs | przeglądarka | aplikacja | eval | przegląd ogólny |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Polecenia rdzenia | 285 | 285 (100 %) | 208 | 3 | 2 | 274 | 1 | 0 |
-| Polecenia palety i skróty | 62 | 62 (100 %) | 2 | 7 | 9 | 3 | 0 | 50 |
+| Polecenia palety i skróty | 63 | 63 (100 %) | 2 | 7 | 9 | 3 | 0 | 51 |
 | Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 12 | 0 | 38 |
 | Ustawienia | 98 | 98 (100 %) | 19 | 12 | 7 | 9 | 2 | 98 |
 | Narzędzia agentek | 81 | 81 (100 %) | 81 | 1 | 1 | 3 | 52 | 81 |
@@ -338,6 +338,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `panel.screen` | przegląd ogólny |  |
 | `panel.voice` | przegląd ogólny |  |
 | `panel.tasks` | przegląd ogólny |  |
+| `mode.cycle` | przegląd ogólny |  |
 | `voice.mic` | rdzeń, przegląd ogólny |  |
 | `voice.ptt` | interfejs, przeglądarka | klawisz pola pisania |
 | `conversation.escape` | przeglądarka | klawisz pola pisania |

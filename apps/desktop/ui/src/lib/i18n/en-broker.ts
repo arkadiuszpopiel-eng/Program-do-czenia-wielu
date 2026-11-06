@@ -40,7 +40,7 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
     'The Shadow Judge is unavailable — this request cannot be approved now; the agent will be denied.',
   // Tryb pracy z paska tytułu (`ModeMenu`, decyzja 27.10).
   'titlebar.mode': 'Work mode: {mode}. Change mode',
-  'titlebar.modeTip': 'Agents’ work mode — click to change (1–5)',
+  'titlebar.modeTip': 'Agents’ work mode — click to change (1–5), or Alt+M: next mode',
   'mode.title': 'Work mode',
   'status.changeMode': 'Change work mode',
   'mode.L0.name': 'Plan',
