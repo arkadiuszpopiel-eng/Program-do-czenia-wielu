@@ -56,5 +56,8 @@ async fn tree_review_on_blocking_thread_still_finds_git() {
     assert!(asked(&out.status), "{out:?}");
     assert!(h.file(GIT).is_some());
     let plain = h.call_ctx(K::Delete, json!({"path": "src"}), &c).await;
-    assert!(!asked(&plain.status), "zwykły katalog bez pytania: {plain:?}");
+    assert!(
+        !asked(&plain.status),
+        "zwykły katalog bez pytania: {plain:?}"
+    );
 }
