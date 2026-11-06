@@ -41,6 +41,7 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   // Tryb pracy z paska tytułu (`ModeMenu`, decyzja 27.10).
   'titlebar.mode': 'Work mode: {mode}. Change mode',
   'titlebar.modeTip': 'Agents’ work mode — click to change (1–5), or Alt+M: next mode',
+  'shortcut.mode.cycle': 'Next work mode (never Full access)',
   'mode.title': 'Work mode',
   'status.changeMode': 'Change work mode',
   'mode.L0.name': 'Plan',

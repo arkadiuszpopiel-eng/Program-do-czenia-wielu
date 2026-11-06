@@ -39,6 +39,7 @@ export const plBroker = {
   // Tryb pracy z paska tytułu (`ModeMenu`, decyzja 27.10).
   'titlebar.mode': 'Tryb pracy: {mode}. Zmień tryb',
   'titlebar.modeTip': 'Tryb pracy agentek — kliknij, aby zmienić (1–5), albo Alt+M: następny tryb',
+  'shortcut.mode.cycle': 'Następny tryb pracy (bez Pełnego dostępu)',
   'mode.title': 'Tryb pracy',
   'status.changeMode': 'Zmień tryb pracy',
   'mode.L0.name': 'Plan',
