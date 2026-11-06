@@ -202,8 +202,8 @@ domowego, katalogu roboczego — twarda odmowa Jądra (już jest; Pełny dostęp
      (4.11 noc): usunięcie albo przeniesienie folderu pracy lub jego przodka to dla Sędziego ścieżka
      chroniona; narzędzia plikowe przeglądają usuwany katalog i zgłaszają fakt `contains_protected`
      (podrepozytorium `.git`, `.vscode`…; drzewo > 5000 wpisów albo nieczytelne — też), więc pyta także L3;
-     kopia takiego katalogu — tak samo (przegląd 4.11). Drobne otwarte: przegląd drzewa działa w wątku
-     asynchronicznym (do przeniesienia do `spawn_blocking`), duże drzewa (`node_modules`) pytają zawsze;
+     kopia takiego katalogu — tak samo (przegląd 4.11). Przegląd drzewa działa w wątku blokującym
+     tokio (`spawn_blocking`, 6.11); duże drzewa (`node_modules`) pytają zawsze;
   4. dowiązania (junction) w folderze pracy prowadzące poza niego — **poprawione** (4.11 noc): narzędzia
      plikowe rozwiązują dowiązania przy każdym wywołaniu (`tools_common_contract::workdir_links`); ścieżka,
      która przez dowiązanie wychodzi poza folder pracy, idzie do Sędziego bez folderu pracy — L2 pyta.

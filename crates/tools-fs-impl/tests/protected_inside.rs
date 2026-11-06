@@ -44,3 +44,17 @@ async fn deleting_a_tree_with_git_asks_even_on_automatic() {
     assert!(asked(&copied.status), "{copied:?}");
     assert!(h.file("/Users/ala/Documents/kopia/.git/config").is_none());
 }
+
+/// Przegląd drzewa w wątku blokującym (`spawn_blocking`, decyzja właściciela 6.11) — na środowisku
+/// wielowątkowym jak w aplikacji wynik ten sam: podrepozytorium pyta, zwykły katalog nie.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn tree_review_on_blocking_thread_still_finds_git() {
+    let h = harness(&[(GIT, "[core]"), (PLAIN, "fn b() {}")]);
+    let mut c = ctx();
+    c.approval_timeout = Duration::from_millis(50);
+    let out = h.call_ctx(K::Delete, json!({"path": "lib"}), &c).await;
+    assert!(asked(&out.status), "{out:?}");
+    assert!(h.file(GIT).is_some());
+    let plain = h.call_ctx(K::Delete, json!({"path": "src"}), &c).await;
+    assert!(!asked(&plain.status), "zwykły katalog bez pytania: {plain:?}");
+}

@@ -63,7 +63,10 @@ impl Core {
         action: &str,
         dir: Option<&str>,
     ) -> Step<Vec<Authorization>> {
-        let inside = dir.is_some_and(|d| self.holds_protected(d, ctx.workdir.as_deref()));
+        let inside = match dir {
+            Some(d) => self.holds_protected(d, ctx.workdir.as_deref()).await,
+            None => false,
+        };
         let caps = caps
             .into_iter()
             .enumerate()
@@ -339,7 +342,7 @@ impl Core {
         read_facts.reversible = risk_classifier_contract::Reversibility::Yes;
         // Kopia katalogu z `.git` czy `.vscode` tworzy ścieżki chronione w celu.
         let mut write_facts = self.facts(m, ctx);
-        write_facts.contains_protected = self.holds_protected(&from, ctx.workdir.as_deref());
+        write_facts.contains_protected = self.holds_protected(&from, ctx.workdir.as_deref()).await;
         let caps = vec![
             (Capability::FsRead(self.scope(&from, false)?), read_facts),
             (Capability::FsWrite(self.scope(&to, false)?), write_facts),
