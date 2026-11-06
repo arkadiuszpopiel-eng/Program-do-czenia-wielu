@@ -12,6 +12,42 @@ Waga pozycji: `[krytyczne]` (czerwone — bezpieczeństwo, prywatność, utrata 
 `[poważne]` (pomarańczowe — istotny błąd albo zabezpieczenie), bez znacznika — zwykła zmiana (zielone). Znacznik stoi
 na początku pozycji; program pokazuje go w Ustawienia → Aktualizacje → Historia zmian.
 
+## 0.0.85 — 2026-11-06
+
+Tryby pracy działają teraz jak w Claude Code i Codex: pięć trybów od Planu do Pełnego dostępu, zmiana jednym
+klawiszem (Alt+M), sędzia, który w trybie „Automatycznie” sam zatwierdza proste i bezpieczne działania, oraz profil
+Dziecko z kłódką i PIN-em rodzica.
+
+### Nowe
+
+- Menu „Tryb pracy” ma pięć trybów: Plan, Ręcznie, Akceptuj edycje, Automatycznie i Pełny dostęp (klawisze 1–5),
+  a Alt+M przełącza na następny tryb jak Shift+Tab w Claude Code — nigdy na Pełny dostęp.
+- Tryb „Akceptuj edycje”: agentka zmienia pliki w folderze pracy bez pytania, ale o ścieżki chronione (`.git`,
+  ustawienia edytora, skrypty startowe) i wszystko poza folderem pracy pyta zawsze.
+- Plan jako tryb: agentka tylko czyta i proponuje plan, a pod planem są trzy odpowiedzi — wykonaj, wykonaj
+  automatycznie albo popraw plan.
+- Okno zgody Sędziego Cieni ma cztery odpowiedzi, w tym „Zezwól i przełącz na Automatycznie”, oraz wybór zakresu
+  zgody.
+- [poważne] Model-sędzia w trybie „Automatycznie” zatwierdza sam tylko działania odwracalne i bez treści obcej;
+  resztę widzi właściciel. Zapora działa niezależnie od modelu — w próbie 22 ataków przepuściła 0.
+- Czerwony przełącznik „Max dostęp” z wyborem zasięgu, widoczny znak w belce.
+- Profil Dziecko: wyższe tryby i Max dostęp pod kłódką otwieraną PIN-em rodzica na czas albo „do końca rozmowy”;
+  dziennik rodzica (zgody, odmowy, zmiany trybu, próby PIN-u) pod PIN-em, pełna treść rozmów tylko po włączeniu
+  przez rodzica i ze znakiem „Rodzic czyta”.
+- Zmiany trybu, Max dostęp i operacje na kłódce są zapisywane w dzienniku rozmowy (bez PIN-u).
+
+### Poprawki
+
+- [poważne] Usunięcie, przeniesienie albo kopia katalogu z podrepozytorium `.git` czy `.vscode` pyta także
+  w trybie „Automatycznie”; przegląd katalogu nie wstrzymuje już pracy programu.
+- [poważne] Dowiązanie w folderze pracy prowadzące poza niego nie omija pytania o zgodę.
+
+### Testy
+
+- Tabela tryb × rodzaj działania, ataki na kłódkę (głos, agentka, zgadywanie PIN-u), wstrzyknięcia do
+  modelu-sędziego na prawdziwym Bieliku 4.5B, prawdziwe okno aplikacji (kłódka, dziennik, „do końca rozmowy”),
+  Alt+M w każdym stanie kłódki.
+
 ## 0.0.84 — 2026-11-02
 
 Agentka nie zastąpi już treści pliku, którego nie przeczytała, a model lokalny pewniej kończy zadania: prośby

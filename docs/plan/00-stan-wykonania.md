@@ -1,11 +1,11 @@
 # 00 — Stan wykonania
 
-Stan na **2026-10-30**, wersja programu **0.0.78** (noc 29/30.10, raport [`44`](44-raport-2026-10-30-noc.md); wgrywana
-do `Alfa-uruchomiona` bez uruchamiania — otwiera ją właściciel skrótem „Alfa”), gałąź `ccr-af4b63c6-3fyzaj`
-(commity lokalne, niewypchnięte). 0.0.73–0.0.77: przegląd zmian z 23–24.10, silnik NextGO.Gray, tryb pracy w belce,
-porządki interfejsu, styl Junior i czytane zdanie (raporty 39–42, CHANGELOG). 0.0.78: C2.3 zrobione — narzędzia
-modelu lokalnego sprawdzone na prawdziwym Bieliku 4.5B (F3 0/35 → 11/35 po poprawkach, `tool_request` zielony),
-C2.8 — historia wersji artefaktu w kanwie.
+Stan na **2026-11-06**, wersja programu **0.0.85**, gałąź `ccr-af4b63c6-3fyzaj` (commity lokalne, niewypchnięte).
+0.0.85: etap Z scalony za zgodą właściciela 6.11 — tryby zgód jak w Claude Code i Codex (5 trybów, Alt+M,
+Akceptuj edycje, Plan jako tryb, okno zgody z 4 opcjami, model-sędzia „Automatycznie” z zaporą poza modelem,
+Max dostęp, profil Dziecko z kłódką i dziennikiem rodzica; raporty 49–53, plan 50). 0.0.79–0.0.84: katalog funkcji
+i bramka „nowa funkcja bez testu”, zgody czasowe Sędziego, narzędzia plików na modelu lokalnym (CHANGELOG).
+Wcześniej — 0.0.78 (raport [`44`](44-raport-2026-10-30-noc.md)): C2.3 i C2.8.
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
