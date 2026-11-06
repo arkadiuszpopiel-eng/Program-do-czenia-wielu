@@ -366,3 +366,17 @@ poza repozytorium na E:, po próbie posprzątany. 29.10 wieczorem usunięto star
 aplikacji; Alfa nadal nie czyta tokenów (`~/.claude`, `~/.codex`), a sesje AI nie uruchamiają mostów CLI same.
 **Źródło:** rozmowa 1.11 rano.
 **Status:** Aktywna
+
+### [2026-11-06] Etap Z scalony; Alt+M; sędzia przy małym modelu; PIN w pliku Sędziego
+
+**Kontekst:** raport 53 §4 i raport 52 §4 — pytania o scalenie gałęzi `do-przegladu-tryby-zgod`, sędziego przy
+małym modelu lokalnym, zmianę trybów w rozmowie „do końca rozmowy”, `spawn_blocking` i przechowywanie PIN-u.
+**Decyzja (właściciel 6.11 rano):** „scalić gałąź tak”; sędzia zatwierdzający sam tylko proste, bezpieczne akcje —
+„ok”; w rozmowie „do końca rozmowy” tryby zmieniane w każdej chwili jak w Claude Code i Codex; „resztę wykonaj tak,
+by było ok”.
+**Wykonanie:** Alt+M — następny tryb (jak Shift+Tab w Claude Code; bez Pełnego dostępu), także w rozmowie
+„do końca rozmowy”; przegląd drzewa w `spawn_blocking`; skrót PIN-u (Argon2id) zostaje w prywatnym pliku Sędziego —
+Menedżer poświadczeń użytkownika może zmieniać samo konto dziecka, katalog usługi nie; profil Dziecko bez usługi
+Windows dopuszczony z ostrzeżeniem na karcie (ochrona umowna), usługa zalecana.
+**Źródło:** rozmowa 6.11 rano; raport 53.
+**Status:** Aktywna

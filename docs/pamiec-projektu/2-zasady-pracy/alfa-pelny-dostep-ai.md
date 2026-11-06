@@ -1,6 +1,6 @@
 ---
 name: alfa-pelny-dostep-ai
-description: "Decyzja właściciela 2026-10-20 — poziom „Pełny dostęp” AI do komputera bez pytań o zgodę; zostają wyłącznik, dziennik i ochrona przed poleceniami z obcych treści"
+description: "Pełny dostęp i tryby zgód jak Claude Code/Codex — od 6.11 etap Z scalony (0.0.85), Alt+M, sędzia przy małym modelu zatwierdzony"
 metadata:
   node_type: memory
   type: project
@@ -44,3 +44,9 @@ głos idą bez pytania („Zrób bez pytania”, wybrane świadomie po opisie ry
 Zostają tylko twarde blokady Jądra (odmowa bez okna), STOP Ctrl+Shift+F12 i dziennik. Ten sam dzień: Broker ma się
 w UI nazywać **„Sędzia Cieni”** z „?” w kółku (opis, co robi i do czego się odnosi); okno Brokera właściciel ocenia
 jako „tragiczne i niedokładne” i irytuje go, że zgłaszał to wiele razy — poprawiać gruntownie, nie punktowo.
+
+**Decyzja 2026-11-06 rano (stan):** etap Z (plan 50) **scalony** do `ccr-af4b63c6-3fyzaj` za zgodą właściciela
+(„scalić gałąź tak”) — wersja 0.0.85. Sędzia przy małym modelu lokalnym (sam zatwierdza tylko proste, odwracalne
+działania; zapora `guard()` poza modelem) — zatwierdzony. W rozmowie z kłódką „do końca rozmowy” tryby zmienia się
+w każdej chwili; Alt+M = następny tryb jak Shift+Tab w Claude Code (nigdy Pełny dostęp). Skrót PIN-u (Argon2id)
+zostaje w prywatnym pliku Sędziego, nie w Menedżerze poświadczeń.
