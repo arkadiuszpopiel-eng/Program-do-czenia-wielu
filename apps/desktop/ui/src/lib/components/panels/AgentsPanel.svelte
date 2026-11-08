@@ -14,6 +14,7 @@
   import { attempt } from '../../state/attempt';
   import { useApp } from '../../state/context';
   import WorkdirCard from './WorkdirCard.svelte';
+  import AgentInteraction from './AgentInteraction.svelte';
 
   interface Props {
     sessionId: string;
@@ -93,6 +94,7 @@
           >
         </div>
         {#if st?.activity}<p class="activity">{t('agents.now', { activity: st.activity })}</p>{/if}
+        <AgentInteraction agent={id} />
         <div class="roles-row">
           <div class="roles" aria-label={t('agents.roles')}>
             {#each st?.role_ids ?? [] as role (role)}

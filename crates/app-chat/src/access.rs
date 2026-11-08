@@ -62,6 +62,7 @@ impl ChatEngine {
         spec: &mut agent_runtime_contract::RunSpec,
         options: &mut agent_runtime_contract::RunOptions,
     ) {
+        self.apply_interaction(spec).await;
         spec.roles = self
             .agent_access(
                 &spec.session,
@@ -103,6 +104,15 @@ impl ChatEngine {
                     .agent_access(session, persona.id.as_str(), crew.roles.clone())
                     .await;
                 crew.persona_roles.insert(persona.id.clone(), roles);
+                match self.interaction_prompt(persona.id.as_str(), None).await {
+                    Some(instructions) => {
+                        crew.persona_instructions
+                            .insert(persona.id.clone(), instructions);
+                    }
+                    None => {
+                        crew.persona_instructions.remove(&persona.id);
+                    }
+                }
             }
         }
     }

@@ -8,7 +8,8 @@ use personas_contract::{PersonaId, builtin_roles};
 use tools_fs_contract::{FsToolKind, manifest};
 #[test]
 fn per_persona_profile_limits_native_delegation() {
-    let spec = spec_for("alfa", "conductor", &["fs_read", "fs_write"]);
+    let mut spec = spec_for("alfa", "conductor", &["fs_read", "fs_write"]);
+    spec.reply_style = Some("Styl rodzica nie przechodzi na potomkinię.".into());
     let mut opts = RunOptions {
         crew: Some(standard_crew(&[])),
         ..RunOptions::default()
@@ -24,6 +25,11 @@ fn per_persona_profile_limits_native_delegation() {
         .unwrap()
         .persona_roles
         .insert(PersonaId::new("delta"), vec![role]);
+    opts.crew
+        .as_mut()
+        .unwrap()
+        .persona_instructions
+        .insert(PersonaId::delta(), "Własny profil współpracy Delty.".into());
     let run = RunId::new("profile-test");
     let view = ParentView {
         run: &run,
@@ -43,11 +49,25 @@ fn per_persona_profile_limits_native_delegation() {
         max_steps: None,
     };
     let plan = plan_delegation(&view, &args, 3).unwrap();
+    assert_eq!(
+        plan.spec.reply_style.as_deref(),
+        Some("Własny profil współpracy Delty.")
+    );
     assert!(plan.spec.tools.is_empty());
     assert!(
         plan.spec
             .roles
             .iter()
             .all(|r| r.tools.is_empty() && r.read_only)
+    );
+    let mut standard = opts.clone();
+    standard.crew.as_mut().unwrap().persona_instructions.clear();
+    let view = ParentView {
+        options: &standard,
+        ..view
+    };
+    assert_eq!(
+        plan_delegation(&view, &args, 3).unwrap().spec.reply_style,
+        None
     );
 }

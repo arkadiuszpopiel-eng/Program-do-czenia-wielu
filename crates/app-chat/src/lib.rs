@@ -25,6 +25,7 @@ mod engine;
 mod finish;
 mod generate;
 mod history;
+mod interaction;
 mod offline;
 mod outcome;
 pub mod pipelines;

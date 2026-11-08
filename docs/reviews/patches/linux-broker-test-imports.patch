@@ -1,0 +1,9 @@
+diff --git a/crates/safety-broker-impl/tests/grants_review.rs b/crates/safety-broker-impl/tests/grants_review.rs
+index 16a8c524..8d7424ac 100644
+--- a/crates/safety-broker-impl/tests/grants_review.rs
++++ b/crates/safety-broker-impl/tests/grants_review.rs
+@@ -20 +20,3 @@ use safety_broker_impl::audit::MemoryAudit;
+-use watchdog_contract::{Clock, KillReason, KillSwitch, ManualClock};
++use watchdog_contract::{Clock, ManualClock};
++#[cfg(windows)]
++use watchdog_contract::{KillReason, KillSwitch};

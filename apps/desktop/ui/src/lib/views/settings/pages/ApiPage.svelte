@@ -151,7 +151,7 @@
             : t('api.summary.noAuto')}
         </p>
         <div>
-          <Button variant="ghost" size="sm" onclick={() => app.openSettings('providers')}
+          <Button wrap variant="ghost" size="sm" onclick={() => app.openSettings('providers')}
             >{t('api.toAccount')}</Button
           >
         </div>

@@ -105,6 +105,7 @@ pub(crate) async fn execute_child(
         rate,
         window,
     );
+    cx.core.apply_interaction(&mut spec).await;
     let choice = match crate::stage_route::choose(cx.core, cx.req, &spec).await {
         Ok(choice) => choice,
         Err(e) => return (Err(e), UsageTotals::default()),

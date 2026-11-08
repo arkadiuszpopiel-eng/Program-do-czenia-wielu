@@ -195,7 +195,7 @@
         <Avatar agent={id} size={40} speaking={app.speechAgent === id} decorative />
         <span class="name">{agents[id].name}</span>
         <span class="muted">{t(`voice.bible.${id}`)}</span>
-        <Button size="sm" variant="ghost" onclick={() => void preview(id)}
+        <Button wrap size="sm" variant="ghost" onclick={() => void preview(id)}
           >{t('voice.preview', { name: agents[id].name })}</Button
         >
       </li>
@@ -282,6 +282,7 @@
   }
   .voice {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--alfa-space-2);
   }
@@ -290,6 +291,7 @@
     font-weight: 600;
   }
   .voice .muted {
-    flex: 1;
+    flex: 1 1 120px;
+    min-width: 0;
   }
 </style>

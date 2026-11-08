@@ -1,0 +1,62 @@
+{
+  "model": "bielik-1.5b-v3.0-instruct-q8_0",
+  "platform": "Linux Cloud CPU; headless core, no microphone",
+  "results": [
+    {
+      "agent": "alfa",
+      "elapsed_ms": 24511,
+      "error": null,
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Jestem Jako i jestem gotowa pomóc."
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 18049,
+      "error": null,
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Delta jest gotowa pomóc, a jej imię brzmi: Darena. Jestem gotowa do współpracy."
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 20213,
+      "error": null,
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Gamá — gotowa do współpracy."
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 18487,
+      "error": null,
+      "mode": "standard",
+      "repeat": 1,
+      "text": "„Delta. Jestem gotowa pomóc i przedstawić się jako Delta.”"
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 2326,
+      "error": null,
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Jestem Krytyczka.Jestem gotowa pomóc."
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 10339,
+      "error": null,
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Cześć! Jestem Betta — jedna z agentek programu Alfa. Jestem gotowa pomóc w realizacji Twoich zadań. Moje imię to Betta."
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 2446,
+      "error": null,
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Gamma\nJestem gotowa pomóc."
+    }
+  ]
+}

@@ -12,6 +12,8 @@
     /** Kolor akcentu agentki dla wariantu primary/ghost. */
     agent?: AgentId;
     loading?: boolean;
+    /** Długi napis może zawinąć się w wąskiej karcie, zachowując całą treść. */
+    wrap?: boolean;
     icon?: Snippet;
     children?: Snippet;
   }
@@ -21,6 +23,7 @@
     size = 'md',
     agent,
     loading = false,
+    wrap = false,
     disabled = false,
     icon,
     children,
@@ -34,6 +37,7 @@
   {...rest}
   {type}
   class="btn {variant} {size} {className}"
+  class:wrap
   style:--accent={agent ? `var(--alfa-agent-${agent})` : undefined}
   style:--accent-fill={agent ? 'var(--accent)' : undefined}
   style:--accent-glow={agent ? 'none' : undefined}
@@ -75,6 +79,17 @@
   }
   .btn:active:not(:disabled) {
     transform: scale(0.98);
+  }
+  .wrap {
+    max-width: 100%;
+    min-width: 0;
+    padding-block: var(--alfa-space-1);
+    line-height: 1.3;
+    white-space: normal;
+  }
+  .wrap .label {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
   .btn:disabled {
     opacity: 0.5;

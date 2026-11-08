@@ -170,14 +170,16 @@
     min-width: 0;
     gap: var(--alfa-space-1);
     padding: 0 var(--alfa-space-2);
-    /* Karty, które nie mieszczą się w wąskim panelu, zawijają się do drugiego wiersza. Wcześniej
-       wypadały poza krawędź bez paska przewijania i nie dało się do nich dojść myszą. */
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
   .tab {
     position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     min-height: 32px;
-    padding: 0 var(--alfa-space-2);
+    padding: 0 var(--alfa-space-1);
     border: 0;
     background: transparent;
     color: var(--alfa-color-text-muted);

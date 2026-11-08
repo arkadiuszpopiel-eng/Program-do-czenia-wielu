@@ -96,6 +96,7 @@ impl Launch {
             roles: personas.roles(),
             models: BTreeMap::new(),
             persona_roles: BTreeMap::new(),
+            persona_instructions: BTreeMap::new(),
         })
     }
 

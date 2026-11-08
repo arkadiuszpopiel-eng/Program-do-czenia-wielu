@@ -1,6 +1,9 @@
 # personas — SPEC (v1: kontrakt zaimplementowany)
 
 ## Cel
+Profil współpracy Jarvis: [INTERACTION.md](INTERACTION.md) — wspólny lub osobny dla każdej persony,
+bez zmiany ról, uprawnień i sterowania mikrofonem.
+
 Cztery persony na start (Alfa, Beta, Gama, Delta: imię + głos + charakter + fraza + kolor) i **obsada ról** (Dyrygentka, Mówczyni, Myślicielka, Wykonawczyni, Koderka, Krytyczka, Badaczka, Strażniczka pamięci, Pisarka/Tłumaczka + własne) per sesja/zadanie/szablon; szablony obsad Standard/Solo/Kodowanie/Badania; zmiana obsady z UI, paska sesji, głosem lub przez Marszałka (PLAN §9.2, `docs/PERSONAS.md`).
 
 ## Fala i priorytet

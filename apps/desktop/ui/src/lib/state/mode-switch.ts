@@ -23,16 +23,14 @@ export interface ModeView {
   readonly scoped?: boolean;
 }
 
-export function modeView(app: AppState): ModeView {
+export function modeView(app: AppState, scope: 'global' | 'session' = 'global'): ModeView {
   const session = app.sessions.active;
   const planning = session?.autonomy === 'L0';
   const here = app.autonomy.openHere(session?.id);
-  const current: AutonomyLevel = planning
-    ? 'L0'
-    : here && session
-      ? session.autonomy
-      : (app.autonomy.global ?? session?.autonomy ?? 'L3');
-  return { current, sessionId: session?.id ?? null, planning, here };
+  const scoped = planning || here || (scope === 'session' && Boolean(session));
+  const current: AutonomyLevel =
+    scoped && session ? session.autonomy : (app.autonomy.global ?? session?.autonomy ?? 'L3');
+  return { current, sessionId: session?.id ?? null, planning, here, scoped };
 }
 
 /**

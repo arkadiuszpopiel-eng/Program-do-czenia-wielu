@@ -4,6 +4,7 @@ import type { SettingValue, SettingsPageDef } from '../types-system';
 import { SETTINGS_PART_A } from './settings-part-a';
 import { SETTINGS_PART_B } from './settings-part-b';
 import { AGENT_ACCESS_SETTINGS } from './settings-agent-access';
+import { INTERACTION_SETTINGS } from './settings-interaction';
 import { withContinuation } from './settings-continuation';
 import { L, page, select, text, toggle } from './settings-helpers';
 
@@ -106,7 +107,7 @@ export const SETTINGS_SCHEMA: readonly SettingsPageDef[] = [
   settings: withContinuation([
     ...p.settings,
     ...(EXTRA[p.id] ?? []),
-    ...(p.id === 'agents' ? AGENT_ACCESS_SETTINGS : []),
+    ...(p.id === 'agents' ? [...INTERACTION_SETTINGS, ...AGENT_ACCESS_SETTINGS] : []),
   ]),
 }));
 

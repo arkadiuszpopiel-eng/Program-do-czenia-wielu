@@ -17,6 +17,17 @@ agentka do wszystkiego), **Kodowanie**, **Badania**.
 - Kliknięcie awatara w pasku tytułu otwiera szczegóły agentki; komenda `/obsada` — zmianę obsady.
 - `@Delta` w wiadomości albo „Delta, …” głosem kieruje prośbę do wybranej agentki.
 
+## Jarvis dla każdej agentki
+
+W panelu **Agentki** (`Alt+1`) wybierz przy dowolnej agentce sposób współpracy **Jarvis**.
+Możesz włączyć go dla wszystkich albo tylko dla wybranych person. Opcja **Jak ustawienie wspólne**
+korzysta z wyboru w **Ustawienia → Agentki → Wspólny sposób współpracy**.
+
+Agentka ma odpowiadać zwięźle, podawać krótkie meldunki z dłuższej pracy i sprawdzać wynik zlecenia.
+Zachowuje swoje imię, role i głos. Zmiana działa od kolejnej odpowiedzi lub nowego zadania.
+Rozmowę głosową włączysz w panelu **Głos**; następnie zwróć się do agentki po imieniu.
+Jarvis korzysta z wybranego trybu zgód i dotychczasowych limitów zadania.
+
 ## Agentka, która działa na plikach
 
 Żeby agentka mogła porządkować pliki czy uruchamiać polecenia, sesja potrzebuje **katalogu roboczego** — karta
@@ -33,8 +44,8 @@ W trakcie pracy:
   a pod odpowiedzią karta „N kroków można cofnąć”;
 - polecenie, którego Alfa sama nie uruchomi, dostaje kartę **Uruchom w terminalu**: „Kopiuj polecenie” i „Otwórz
   terminal” — uruchamiasz je Ty;
-- karta **„czeka na zatwierdzenie”**: w tej wersji okna Sędziego Cieni nie ma, więc po upływie czasu agentka dostaje
-  odmowę i szuka innej drogi.
+- karta **„czeka na zatwierdzenie”**: przejdź do osobnego okna Sędziego Cieni, aby rozpatrzyć prośbę.
+  Gdy upłynie czas zgody lub Sędzia nie jest dostępny, prośba kończy się odmową.
 
 Limity zadania ustawisz w **Ustawienia → Agentki**: liczba kroków (domyślnie 40), czas (15 min), koszt, czas
 czekania na zatwierdzenie, liczba zadań naraz (4) i „Gotowe” dopiero po samoweryfikacji.

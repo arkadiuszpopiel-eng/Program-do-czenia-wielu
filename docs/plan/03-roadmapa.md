@@ -250,6 +250,19 @@ Plan: [`50-tryby-zgod-jak-claude-codex.md`](50-tryby-zgod-jak-claude-codex.md) (
 | Z.7 | Dziennik rodzica pod PIN-em | zrobione | 2026-11-05 | scalone 6.11 za zgodą właściciela; tematy rozmów i działania z osi czasu (od 5.11 także zgody, odmowy, werdykty sędziego, zmiany trybu, Max dostęp i próby PIN-u); pełna treść rozmów włączana PIN-em (przełącznik w Sędzim, znak „Rodzic czyta” w belce); otwarcie „do końca rozmowy” (5.11 noc) |
 | Z.8 | Testy trybów, ataków i prawdziwej aplikacji | w toku | 2026-11-08 | tabela tryb × kategoria działania (`modes_matrix.rs`), ataki na kłódkę w Sędzim (głos, agentka, Max dostęp lokalny, zgadywanie PIN-u — `child_lock_attacks.rs`), kłódka w menu/palecie w każdym stylu i motywie; wstrzyknięcia do modelu-sędziego ACC-Z4-judge-04 (5.11, prawdziwy Bielik); prawdziwa aplikacja (6.11): kłódka w menu, wpisy w dzienniku rozmowy, „do końca rozmowy” z zamknięciem po zmianie rozmowy, Max dostęp odrzucony przy kłódce, obniżenie trybu z paska pisania; zostaje model-sędzia w prawdziwej aplikacji z modelem lokalnym; 8.11: osiem testów integracyjnych składania sędziego (16 wariantów) + regresja pochodzenia najnowszej odpowiedzi — 49 testów zielonych, 1 pomiar lokalny pominięty; poprawione dziedziczenie pochodzenia ze starszej tury; [raport](../reviews/2026-11-08-z8-app-judge.md). Z.8 na Windows nadal otwarte |
 
+
+## Etap J — Jarvis dla każdej agentki i dalszy rozwój trybów
+
+Zlecenie właściciela 8.11; [plan nocny 54](54-jarvis-i-tryby-2026-11-08.md), [karta #22](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/22).
+
+| ID | Zadanie | Stan | Data | Uwagi |
+| --- | --- | --- | --- | --- |
+| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-08 | kod rozmowy, przebiegów, delegacji i zadań w tle; przegląd oraz próba sprzętowa otwarte |
+| J.2 | Panel Agentki: wybór Jarvisa i przejście do sterowania głosem | w toku | 2026-11-08 | 4 style × 2 motywy; testy na atrapach i axe |
+| J.3 | Zakres każdego z pięciu trybów i odporność na spóźnione odpowiedzi | w toku | 2026-11-08 | jawny wybór rozmowa / globalnie; Plan i kłódka zachowują zakres rozmowy; regresje wyścigu żądań |
+| J.4 | Próby wszystkich person na rzeczywistym modelu i w torze głosowym | w toku | 2026-11-08 | Linux Cloud CPU i syntetyczne audio; Windows i mikrofon pozostają osobną próbą |
+| J.5 | Regresje CI i raport nocny | w toku | 2026-11-08 | wyniki i dalsze zadania w raporcie do planu 54 |
+
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 
 Plan: [`41-tryb-dla-dzieci.md`](41-tryb-dla-dzieci.md) (zlecenie właściciela 27.10).

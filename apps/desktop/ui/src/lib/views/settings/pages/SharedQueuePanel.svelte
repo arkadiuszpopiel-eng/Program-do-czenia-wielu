@@ -132,7 +132,7 @@
         <QueueTiles queue={keys} {models} {saving} onsave={saveKeys} {code} {owner} />
       {/if}
       <div class="actions">
-        <Button variant="secondary" size="sm" disabled={saving} onclick={() => void compose()}
+        <Button wrap variant="secondary" size="sm" disabled={saving} onclick={() => void compose()}
           >{t('api.shared.compose')}</Button
         >
         {#if keys.length > 0}

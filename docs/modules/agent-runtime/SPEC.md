@@ -14,7 +14,7 @@ pub enum RunOutcome { Completed { summary, verified }, BudgetExceeded { budget }
 // v1
 pub struct RunOptions { parent: Option<RunId>, depth, grant: Option<RunGrant>, crew: Option<Crew>, inherited_taint, trusted_context, untrusted_context, label }
 pub struct RunGrant { tools, capabilities, read_only, budget, max_autonomy }   // attenuate(): potomek ≤ rodzic; is_within(); permits()
-pub struct Crew { cast: Cast, personas, roles, models: BTreeMap<RoleId, String> }
+pub struct Crew { cast: Cast, personas, roles, models: BTreeMap<RoleId, String>, persona_roles, persona_instructions }
 pub struct DelegateArgs { role, persona?, goal, tools?, max_steps? }           // narzędzie `delegate_task` (grupa ról `delegate`)
 pub struct AgentTaskPayload { spec: RunSpec, options: RunOptions }            // TaskSpec::payload dla schedulera
 pub struct RunReport { run, goal, outcome, done, not_done, undoable, verification, steering, tainted, usage, children } // from_events, total_usage, summary_pl
@@ -57,6 +57,10 @@ po cofnięciu nie trafia na nieznany wariant (punkty kontrolne go nie zawierają
 Brak własnych zdolności (tokeny per akcja). `inproc`, `on-demand`. RAM ≤ 10 MB per przebieg; narzut pętli ≤ 20 ms na krok.
 
 ## Integracja (`app-*`, opis — podpina sesja kompozycji)
+`Crew.persona_instructions` przypina profil współpracy każdej persony do nowych delegacji (8.11).
+Potomkini dostaje własny profil zamiast stylu odpowiedzi rodzica. Brak mapy w starszym checkpoincie
+oznacza pustą mapę; format wewnętrznego werdyktu Krytyczki pozostaje bez profilu współpracy.
+
 `Runtime::with_ext(deps, RuntimeExt{ locks: scheduler (SchedulerLite), autonomy: BrokerAutonomy(broker) })`; `start_with(spec, RunOptions{crew: obsada sesji z personas, models wg polityki ról})`; `RuntimeExecutor::new(&runtime, kurs)` jako wykonawczyni `ExecutorKind::Agent` w `SchedulerModule`; panel Agentki/Replay: `children` + `report` (kroki cofalne całego zadania, koszty).
 
 ## Testy akceptacyjne
