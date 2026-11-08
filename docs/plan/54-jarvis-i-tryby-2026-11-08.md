@@ -31,6 +31,11 @@ pozostają do sprawdzenia.
 Próba bez obciążenia i poprawka form imienia: [raport #31](../reviews/2026-11-08-jarvis-identity.md).
 CI149 ma osobne porażki Windows/UI/Linux; szczegóły w [raporcie nocnym](../reviews/2026-11-08-nightly-modes-jarvis.md).
 
+Aktualne ponowienie: [Rust988d13f3](../reviews/2026-11-08-rust-rerun.md) —3485 zaliczonych,
+1 nieudany,24 pominięte; pełne wszystkie76integracji. Nowa porażka #34: test kolejki a300ms
+okna Cofnij. [UI #32](../reviews/2026-11-08-ui-geometry.md) —23 nowych E2E i573 jednostkowe
+zaliczone, pełny E2E nowego źródła do wykonania. Menu mieści się w małym oknie i po powiększeniu.
+
 ## Zachowanie Jarvisa
 
 Opis: [kontrakt profilu](../modules/personas/INTERACTION.md). Panel **Agentki** (`Alt+1`)

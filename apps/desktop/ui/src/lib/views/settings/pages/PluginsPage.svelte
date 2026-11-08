@@ -262,7 +262,7 @@
 {#if view?.problems.length}
   <section class="wk-card" aria-labelledby="pl-problems">
     <h3 id="pl-problems">{t('plugins.problems')}</h3>
-    <ul class="wk-plain">
+    <ul class="wk-list">
       {#each view.problems as pr, i (i)}
         <li>
           <span class="wk-error">{tk(`plugins.problem.${pr.kind}`)}</span>

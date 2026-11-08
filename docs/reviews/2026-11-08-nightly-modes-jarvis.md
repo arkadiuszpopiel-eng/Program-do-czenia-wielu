@@ -47,6 +47,20 @@ Pełne logi robocze: `/workspace/scratch/`: `jarvis-core-voice.log`, `runtime-te
 Obrazy `jarvis-{classic,glass,next,junior}.png` pokazują panel w Cloud.
 Żaden z tych przebiegów nie jest odbiorem Windows/WebView2 ani odsłuchem prawdziwego mikrofonu.
 
+## Ukończone ponowienie Rust i nowe UI
+
+[Pełny Rust po #26–33](2026-11-08-rust-rerun.md), źródła988d13f3:
+**3485 zaliczonych / 1 nieudany / 24 pominięte**. Workspace bez app-core3282/0/22;
+app-core lib, wszystkie76 celów i doctesty203/1/2. Jedyna porażka dotyczy kolejki sesji w koszu
+z testowym oknem Cofnij300ms ([#34](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/34));
+przyczyna wymaga odtworzenia na kontrolowanym zegarze. Całość nie jest zielona. Chronione ostrzeżenie
+Brokera nadal blokuje pełny Clippy i CI; istniejąca łatka pozostaje do przeglądu człowieka.
+
+[Geometria menu i ustawień #32](2026-11-08-ui-geometry.md): **23/23 nowych E2E**, jednostkowe
+**573/573** bez obciążenia, Svelte0/0, lint/bundle/IPC/dokumentacja zaliczone. Menu pięciu trybów
+mieści się w niskim i wąskim oknie oraz po zmianie skali. Czerwone próby i zrzuty przed/po zachowane.
+Pełny E2E nowego źródła do wykonania; stare856/856 i CI149 pozostają osobnymi wynikami.
+
 ## Rzeczywisty model: próby niezaliczone
 
 Model: `Bielik-1.5B-v3.0-Instruct.Q8_0.gguf`, manifest `bielik-1.5b-v3.0-instruct-q8_0`.
@@ -111,7 +125,7 @@ Pełny Rust po zmianach nie był jeszcze ponowiony.
 0 problemów na atrapach; wzorzec niezmieniony. Jarvis/głos6/6, diagnostyka i manifesty4/4,
 app-agents32 zaliczone/3 pominięte. Ręczna zgoda w oknie Brokera pominięta, bez deklaracji odbioru.
 
-Dalej: ponowić pełny Rust,
+Dalej: odtworzyć i ustabilizować #34 bez wydłużania okna, wykonać pełny E2E nowego UI,
 wyjaśnić rozbieżności CI UI oraz problemy Windows. Nie uruchamiać LLM CPU równocześnie
 z testami czasowymi UI. Wymagany niezależny przegląd pozostaje otwarty; wersja 0.0.85, etap J w toku.
 Harmonogram ma cogodzinne wznowienia w Cloud; ostatnia iteracja o 07:00 UTC ma zebrać raport

@@ -30,6 +30,9 @@ Svelte 5 (runes), Bits UI, Lucide (SVG inline, tree-shaking), Storybook, Playwri
 - Kontrasty: tekst główny ≥ 7:1, pomocniczy ≥ 4,5:1, elementy UI ≥ 3:1; kolory agentek sprawdzane skryptem kontrastu i symulacją deuteranopii, odrębne od semantycznych.
 - Ruch tylko `transform`/`opacity`; `prefers-reduced-motion` i ustawienie „bez animacji" wyłączają ruch.
 - Motywy: jasny / ciemny / auto / wysoki kontrast (`forced-colors`); gęstość komfortowa/kompaktowa; zoom 80–200%.
+- Popover pozostaje w obszarze okna: poziome przesunięcie ograniczone do krawędzi, wysokość do miejsca nad/pod
+  przyciskiem, długa treść przewijana. Przeliczenia uwzględniają skalę CSS i zmianę rozmiaru okna;
+  każda kontrolka jest osiągalna myszą i klawiaturą, także menu pięciu trybów przy wysokości500px.
 - Cele kliknięcia ≥ 24 px; widoczny fokus 2 px; `aria-live` z throttlingiem; karta potwierdzenia jako `alertdialog` z pułapką fokusu.
 - Poprawne liczby mnogie PL i żeńskie formy w komponentach tekstowych (i18n od dnia 0).
 
