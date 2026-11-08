@@ -32,6 +32,10 @@ Werdykt wewnętrznej Krytyczki zachowuje dotychczasowy format.
 
 ## Rozwój każdego trybu
 
+Dalsza regresja: [Plan bez aktywnej rozmowy, karta #25](../reviews/2026-11-08-plan-without-session.md).
+Interfejs wymaga otwarcia rozmowy przed Planem; skrót bez rozmowy pomija Plan. Wyniki szerokich
+prób i ograniczenie dysku opisano w tym raporcie.
+
 | Tryb | Nowa możliwość w tej serii | Sprawdzenie |
 | --- | --- | --- |
 | Plan | jawnie pokazany zakres rozmowy; wyjście nadal dotyczy tej rozmowy | test zakresu i dotychczasowe testy menu |

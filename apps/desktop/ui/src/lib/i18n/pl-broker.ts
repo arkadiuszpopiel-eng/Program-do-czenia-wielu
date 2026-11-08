@@ -41,6 +41,7 @@ export const plBroker = {
   'titlebar.modeTip': 'Tryb pracy agentek — kliknij, aby zmienić (1–5), albo Alt+M: następny tryb',
   'shortcut.mode.cycle': 'Następny tryb pracy (bez Pełnego dostępu)',
   'mode.title': 'Tryb pracy',
+  'mode.needsSession': 'Otwórz rozmowę, aby włączyć tryb Plan. Plan dotyczy tylko tej rozmowy.',
   'status.changeMode': 'Zmień tryb pracy',
   'mode.L0.name': 'Plan',
   'mode.L0.desc': 'Najpierw plan, zmiany po Twojej akceptacji. Tylko ta rozmowa.',
@@ -53,14 +54,14 @@ export const plBroker = {
   'mode.L4.name': 'Pełny dostęp',
   'mode.L4.desc': 'Bez pytań. Wybierasz raz — zostaje po restarcie.',
   'mode.note':
-    'Dotyczy wszystkich rozmów. Podniesienie potwierdzasz raz w oknie Sędziego Cieni. Przy Pełnym dostępie okno Sędziego Cieni nie pokazuje się wcale, aż obniżysz tryb. Zawsze zostają: Ctrl+Shift+F12, dziennik i twarde blokady Jądra.',
+    'Dotyczy wybranego zakresu: tej rozmowy lub wszystkich rozmów. Plan dotyczy tylko tej rozmowy. Podniesienie potwierdzasz w oknie Sędziego Cieni. Przy Pełnym dostępie okno Sędziego Cieni nie pokazuje się wcale, aż obniżysz tryb. Zawsze zostają: Ctrl+Shift+F12, dziennik i twarde blokady Jądra.',
   'mode.more': 'Więcej w Ustawieniach → Uprawnienia',
   'mode.applied': 'Tryb pracy: {mode}.',
   'mode.requested': 'Potwierdź „{mode}” w oknie Sędziego Cieni — wystarczy raz.',
   'mode.raised': 'Tryb pracy: {mode} — zatwierdzony i zapamiętany.',
   'mode.notApplied': 'Sędzia Cieni nie przyjął trybu „{mode}” — obowiązuje „{current}”.',
   'mode.sessionOwn':
-    'Ta rozmowa ma własny tryb: {mode}. Wybór tutaj zmienia tryb pozostałych rozmów; tryb tej rozmowy zmienisz w Uprawnieniach.',
+    'Ta rozmowa ma własny tryb: {mode}. Aby zmienić tylko ją, wybierz zakres „Ta rozmowa”.',
   'mode.badge': 'Włączony Pełny dostęp — agentki działają bez pytań. Kliknij, aby zmienić tryb',
   // Odmowa z „powiedz agentce, co zrobić inaczej” (plan 50 §4.2).
   'approval.feedback.open': 'Powiedz agentce, co zrobić inaczej',

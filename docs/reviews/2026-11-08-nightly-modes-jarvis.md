@@ -6,6 +6,9 @@ i poprawka Linux w PR [#23](https://github.com/arkadiuszpopiel-eng/Program-do-cz
 Środowisko: Linux Cloud x86_64, 4 CPU, Rust 1.94.1, pnpm 10.33.0, Chromium Playwrighta.
 To raport autorski; wymagany przegląd przed scaleniem jest otwarty.
 
+Aktualizacja 21:03 UTC: stare procesy zakończyły się bez końcowego wyniku pełnego UI i Rust.
+Wznowienie oraz następna regresja: [Plan bez rozmowy](2026-11-08-plan-without-session.md).
+
 ## Zmiany do przeglądu
 
 - Ustawienie wspólne i cztery nadpisania profilu Standardowy / Jarvis; zapis i walidacja

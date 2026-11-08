@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { AutonomyLevel } from '../../api/types';
 import type { AppState } from '../../state/app.svelte';
-import { modeView, switchMode } from '../../state/mode-switch';
+import { modeView, nextMode, switchMode } from '../../state/mode-switch';
 import { stopModeWatch } from '../work-mode';
 
 function app(level: AutonomyLevel = 'L1', locked = false) {
@@ -21,6 +21,32 @@ function app(level: AutonomyLevel = 'L1', locked = false) {
 afterEach(stopModeWatch);
 
 describe('zakres pięciu trybów pracy', () => {
+  it('skrót bez rozmowy pomija Plan i wraca z Automatycznie do Ręcznie', () => {
+    const { state } = app();
+    Object.assign(state.sessions, { active: null });
+    const view = modeView(state);
+    expect(nextMode(state, { ...view, current: 'L1' })).toBe('L2');
+    expect(nextMode(state, { ...view, current: 'L2' })).toBe('L3');
+    expect(nextMode(state, { ...view, current: 'L3' })).toBe('L1');
+  });
+  it('Plan bez aktywnej rozmowy nie zmienia poziomu globalnego', async () => {
+    const { state, requestLevel } = app();
+    Object.assign(state.sessions, { active: null });
+    await switchMode(state, modeView(state), 'L0');
+    expect(requestLevel).not.toHaveBeenCalled();
+    expect(state.toasts.show).toHaveBeenCalledWith({ kind: 'info', message: 'mode.needsSession' });
+  });
+
+  it.each<AutonomyLevel>(['L1', 'L2', 'L4'])(
+    '%s bez aktywnej rozmowy nadal można wybrać globalnie',
+    async (level) => {
+      const { state, requestLevel } = app();
+      Object.assign(state.sessions, { active: null });
+      await switchMode(state, modeView(state), level);
+      expect(requestLevel).toHaveBeenCalledExactlyOnceWith(level, null);
+    },
+  );
+
   it('osobny wybór rozmowy pokazuje jej poziom, a globalny poziom całego programu', () => {
     const { state } = app('L2');
     expect(modeView(state, 'session').current).toBe('L2');
