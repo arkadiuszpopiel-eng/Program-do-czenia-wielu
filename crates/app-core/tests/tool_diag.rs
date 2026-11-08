@@ -161,6 +161,17 @@ async fn every_agent_tool_runs_with_valid_arguments_on_fakes() {
         }
     }
     report::write(&entries, &problems);
+    let ocr_requests = rig.ocr.requests();
+    assert_eq!(ocr_requests.len(), 1, "OCR używa wstrzykniętej atrapy");
+    assert!(
+        !ocr_requests[0].image.is_empty(),
+        "atrapa dostała obraz zrzutu"
+    );
+    assert!(
+        entries
+            .iter()
+            .any(|e| e.name == "vision_ocr" && e.text.contains("Atrapa OCR"))
+    );
     if update {
         report::write_baseline(&entries);
     }

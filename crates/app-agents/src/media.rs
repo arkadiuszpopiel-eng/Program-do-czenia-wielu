@@ -32,7 +32,7 @@ use tools_media_contract::{
 use tools_media_impl::{
     FfmpegConfig, FfmpegTranscoder, MediaTools, MediaToolsDeps, PlayerConfig, SpeakerPlayer,
 };
-use tools_vision_contract::{PrivacyLookup, VisionPrivacy, VisionToolsConfig};
+use tools_vision_contract::{OcrPort, PrivacyLookup, VisionPrivacy, VisionToolsConfig};
 use tools_vision_impl::{RouterDescriber, VisionTools, VisionToolsDeps};
 use undo_journal_contract::UndoJournal;
 use voice_audio_contract::AudioIo;
@@ -100,6 +100,7 @@ pub struct MediaPorts {
     vision: VisionRoutes,
     audio: Option<Arc<dyn AudioIo>>,
     exec: Option<Arc<dyn ExecPort>>,
+    ocr: Option<Arc<dyn OcrPort>>,
 }
 
 impl std::fmt::Debug for MediaPorts {
@@ -107,6 +108,7 @@ impl std::fmt::Debug for MediaPorts {
         f.debug_struct("MediaPorts")
             .field("ffmpeg", &self.ffmpeg)
             .field("audio", &self.audio.is_some())
+            .field("ocr_override", &self.ocr.is_some())
             .finish_non_exhaustive()
     }
 }
@@ -140,6 +142,7 @@ impl MediaPorts {
             vision: (None, None),
             audio: None,
             exec: None,
+            ocr: None,
         }
     }
 
@@ -171,6 +174,13 @@ impl MediaPorts {
         self
     }
 
+    /// Opcjonalny port OCR (diagnostyka na atrapach); brak pozostawia port Windows.
+    #[must_use]
+    pub fn ocr(mut self, ocr: Option<Arc<dyn OcrPort>>) -> Self {
+        self.ocr = ocr;
+        self
+    }
+
     /// Narzędzia `vision_*` i `media_*` nad Brokerem (rejestr kart), dziennikiem cofania i FS.
     pub fn tools(
         &self,
@@ -196,7 +206,9 @@ impl MediaPorts {
         let mut tools = VisionTools::new(VisionToolsDeps {
             desktop: self.desktop.clone(),
             capture: self.capture.clone(),
-            ocr: Arc::new(platform_windows_ocr_impl::WinOcr::new(config.max_pixels)),
+            ocr: self.ocr.clone().unwrap_or_else(|| {
+                Arc::new(platform_windows_ocr_impl::WinOcr::new(config.max_pixels))
+            }),
             describer: Arc::new(RouterDescriber::new(
                 normal,
                 local,

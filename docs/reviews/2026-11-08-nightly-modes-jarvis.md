@@ -107,7 +107,11 @@ na `25c4e788`: [zestaw wyników](artifacts/ci-149-results.json). Całość nie j
 w ukierunkowanych zakresach, Clippy zielone. Pierwszy przebieg55/1 zachowano i wyjaśniono.
 Pełny Rust po zmianach nie był jeszcze ponowiony.
 
-Dalej: rozwiązać `tool_diag` (#33), ponowić pełny Rust,
+[Kompozycja OCR/FFmpeg #33](2026-11-08-ocr-composition.md): 81 narzędzi +5 prób straży,
+0 problemów na atrapach; wzorzec niezmieniony. Jarvis/głos6/6, diagnostyka i manifesty4/4,
+app-agents32 zaliczone/3 pominięte. Ręczna zgoda w oknie Brokera pominięta, bez deklaracji odbioru.
+
+Dalej: ponowić pełny Rust,
 wyjaśnić rozbieżności CI UI oraz problemy Windows. Nie uruchamiać LLM CPU równocześnie
 z testami czasowymi UI. Wymagany niezależny przegląd pozostaje otwarty; wersja 0.0.85, etap J w toku.
 Harmonogram ma cogodzinne wznowienia w Cloud; ostatnia iteracja o 07:00 UTC ma zebrać raport

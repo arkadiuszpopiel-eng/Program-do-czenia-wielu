@@ -143,6 +143,7 @@ platform-apps-contract = { path = "../platform-apps-contract" }
 platform-apps-fake = { path = "../platform-apps-fake" }
 tools-net-fake = { path = "../tools-net-fake" }
 tools-engine-fake = { path = "../tools-engine-fake" }
+tools-vision-fake = { path = "../tools-vision-fake" }
 tools-system-contract = { path = "../tools-system-contract" }
 jsonschema = { version = "0.58.3", default-features = false }
 # Broker poza procesem z oknem zgód dla `tests/tool_approvals.rs` (ręczna zgoda właściciela).

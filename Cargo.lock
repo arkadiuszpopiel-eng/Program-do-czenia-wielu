@@ -651,6 +651,7 @@ dependencies = [
  "tools-engine-fake",
  "tools-net-fake",
  "tools-system-contract",
+ "tools-vision-fake",
  "tracing",
  "transfer-contract",
  "transfer-impl",
