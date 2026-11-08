@@ -15,13 +15,16 @@ na `9b8b7416`. [Raport katalogu i wyniki](../reviews/2026-11-08-catalog-platform
 | Kolejność | Zadanie | Stan |
 | --- | --- | --- |
 | 1 | Regresja Z.8: produkcyjna integracja modelu-sędziego, kontekst ostatniej odpowiedzi | kod i testy w PR #20, przegląd otwarty |
-| 2 | Każdy z pięciu trybów: jawny wybór zakresu rozmowa / globalnie, poprawny stan i zgody | implementacja i testy jednostkowe, pełny E2E w toku |
+| 2 | Każdy z pięciu trybów: jawny wybór zakresu rozmowa / globalnie, poprawny stan i zgody | implementacja; pełny lokalny E2E856/856, odrębne błędy CI otwarte |
 | 3 | Jarvis: ustawienie wspólne i osobne dla Alfy, Bety, Gamy i Delty | implementacja; testy rdzenia i UI |
-| 4 | Profil w delegacjach, zadaniach w tle i rozmowie głosowej | testy uzupełniające w toku |
-| 5 | Próba na prawdziwym modelu lokalnym, zapis surowych odpowiedzi i ograniczeń | pierwsze przebiegi niezaliczone; dalsza diagnoza |
+| 4 | Profil w delegacjach, zadaniach w tle i rozmowie głosowej | 6 testów rdzenia i syntetycznego głosu zaliczonych |
+| 5 | Próba na prawdziwym modelu lokalnym, zapis surowych odpowiedzi i ograniczeń | po #31:40/40 transport, Jarvis20/20 imion, 0/20 jednego zdania; jakość częściowa |
 | 6 | Regresje CI, szerokie testy, dokumentacja, katalog funkcji i draft PR | w toku |
 | 7 | Dalsze małe funkcje trybów i Jarvisa, każda z kryterium i testem | po sprawdzeniu bieżącej zmiany |
 | 8 | Raport końcowy: commity, wyniki, niezakończone punkty i kolejność dalszej pracy | na zakończenie okna pracy |
+
+Próba bez obciążenia i poprawka form imienia: [raport #31](../reviews/2026-11-08-jarvis-identity.md).
+CI149 ma osobne porażki Windows/UI/Linux; szczegóły w [raporcie nocnym](../reviews/2026-11-08-nightly-modes-jarvis.md).
 
 ## Zachowanie Jarvisa
 

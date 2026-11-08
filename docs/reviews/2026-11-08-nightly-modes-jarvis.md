@@ -64,8 +64,8 @@ ale z atrapami audio i portów Windows. Nie bada wykonywania narzędzi ani model
 
 Surowe częściowe odpowiedzi: [pierwsza próba](artifacts/jarvis-unbounded-partial.json)
 i [próba pod obciążeniem](artifacts/jarvis-loaded-partial.json).
-Brak błędu transportu nie oznacza poprawnej tożsamości ani wykonania zadania. Planowana próba
-40 odpowiedzi (4 persony × 2 profile × 5 powtórzeń) wymaga ponowienia bez konkurujących obciążeń.
+Brak błędu transportu nie oznacza poprawnej tożsamości ani wykonania zadania. Próba
+40 odpowiedzi (4 persony × 2 profile × 5 powtórzeń) została później ukończona bez konkurujących obciążeń; szczegóły poniżej.
 Test `jarvis_live.rs` jest jawnie pomijany w zwykłym CI i wymaga `ALFA_LIVE_*`.
 
 Po złożeniu poprawki katalogu sześć testów Jarvisa i syntetycznego głosu ponownie przeszło.
@@ -73,25 +73,38 @@ Ręczna próba modelu zapisuje teraz także autora tury, `truncated` i zużycie 
 jest sprawdzany względem adresatki. Pole `mentions_own_name` oznacza jedynie literalne wystąpienie
 imienia w tekście; nie stanowi semantycznej oceny tożsamości ani dowodu wykonania zadania.
 
+## Ukończona próba bez obciążenia i następny przyrost
+
+Na `e8baf1da` Bielik ukończył **40/40 tur w 215,88 s**, bez błędu transportu i obcięcia,
+autor zgodny w 40/40. Pozostały błędne formy „Betta” / „Gamma” i nadmiar zdań.
+[Raport form imienia](2026-11-08-jarvis-identity.md) zachowuje surowe odpowiedzi i opisuje poprawkę #31.
+Po poprawce #31 ta sama próba40/40: imię Jarvisa poprawne20/20, ale jedno zdanie0/20;
+pełna jakość nadal niezaliczona. Nie utożsamia powodzenia integracji z zaliczeniem jakości. UI jednostkowe po poprawce #25
+powtórzone bez obciążenia: **573/573**; wcześniejsze 572 zaliczone / 1 przekroczony budżet
+wyszukiwania pod obciążeniem pozostaje zapisanym niepowodzeniem. Lint i dokumentacja zaliczone.
+
 ## Niezależne problemy CI i dalsze kroki
 
-CI PR #20: zbudowano powłokę Windows, testy UI jednostkowe i część integracji; cały przebieg
-nie jest zielony. W logach znaleziono:
+Ukończone CI [#149](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42524101617)
+i [rehearsal #70](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42524101627)
+na `25c4e788`: [zestaw wyników](artifacts/ci-149-results.json). Całość nie jest zielona.
 
-- Linux: `parse_snapshot` — wydzielona poprawka w PR #23. Kolejne ostrzeżenie w testach
-  Brokera (`KillReason` / `KillSwitch` tylko na Windows) ma [gotową łatkę](patches/linux-broker-test-imports.patch).
-  `AGENTS.md` zakazuje commitów do Brokera bez przeglądu człowieka; łatka nie została zastosowana
-  do publikowanej gałęzi. Łatka ma format bez kontekstu (`git apply --unidiff-zero` po przeglądzie). Z tą lokalną kandydatką Clippy doszedł do następnego problemu w `live_mic.rs`;
-  nie oznacza to zielonego pełnego workspace.
-- Windows: dwa limity czasu `conductor_handoff`; polskie znaki w `exec_low` i `shell_utf8` zależne
-  od strony kodowej OEM. Trzeba odtworzyć na Windows i ustalić poprawny kontrakt kodowania.
-- UI: 842 zaliczone / 5 nieudanych — AltGr, dwa nakładania Junior, 360 px, dwa rzędy zakładek.
-  Poprawiono dwa ostatnie przypadki; pełny przebieg nowej gałęzi trwa.
-- Prawdziwa aplikacja Windows: 60 zaliczonych / 2 nieudane / 5 pominiętych — ukrywanie paneli
-  oraz odczyt atrybutu wskaźnika terminala. Wymaga osobnej diagnozy.
+- Windows Rust: **3504 zaliczone / 5 nieudanych / 45 pominiętych**. Dwa limity `conductor_handoff`,
+  `files::attachment_taint_reaches_broker_and_survives_restart` (brak Brokera w procesie),
+  polskie znaki w `exec_low` i `shell_utf8` zależne od strony kodowej OEM.
+- Linux: Clippy zatrzymany przez importy `KillReason` / `KillSwitch` w teście Brokera; testy pominięte.
+  [Gotowa łatka](patches/linux-broker-test-imports.patch) wymaga przeglądu człowieka zgodnie z
+  `AGENTS.md` i nie jest zastosowana do publikowanej gałęzi (`git apply --unidiff-zero` po przeglądzie).
+- UI Chromium CI: **852 zaliczone / 4 nieudane**. Radio zakresu rozmowy poza viewportem,
+  nakładanie opisów wtyczki w obu motywach Junior i pasek akcji API poza oknem 360 px.
+  Lokalny pełny przebieg **856/856** na `9b8b7416` jest osobnym wynikiem; różnice wymagają diagnozy.
+- Windows/WebView2 na runnerze GitHub: **60 zaliczonych / 2 nieudane / 5 pominiętych**.
+  Ukrywanie paneli zamyka stronę; brak atrybutu instancji testowej. To nie odbiór na sprzęcie właściciela.
+- Zielone: powłoka Tauri (build, Clippy, testy produkcyjne i e2e), cargo-deny, UI lint/typy/jednostkowe/
+  bundle/Storybook, silniki CPU na żywo, katalog URL/hash i instalatory PowerShell 5.1/7.
 
-Następna sesja: odczytać końce logów, zapisać wyniki, odtworzyć nowe błędy z regresją, potem
-wybrać kolejny mały punkt planu 54. Nie uruchamiać LLM CPU równocześnie z testami czasowymi UI.
-Reguły wymagają niezależnego przeglądu przed scaleniem; nie zamykano etapu J ani kryteriów sprzętowych,
-więc wersja pozostaje 0.0.85. Harmonogram nocny ma cogodzinne wznowienia w odziedziczonym środowisku
-Cloud; ostatnia iteracja o 07:00 UTC ma zebrać raport i zakończyć zmiany.
+Dalej: zachować wyniki próby #31, rozwiązać pozostałe fixture'y Linux #27–30 i `tool_diag`,
+wyjaśnić rozbieżności CI UI oraz problemy Windows. Nie uruchamiać LLM CPU równocześnie
+z testami czasowymi UI. Wymagany niezależny przegląd pozostaje otwarty; wersja 0.0.85, etap J w toku.
+Harmonogram ma cogodzinne wznowienia w Cloud; ostatnia iteracja o 07:00 UTC ma zebrać raport
+bez rozpoczynania nowych zmian.

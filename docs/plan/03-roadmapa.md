@@ -257,7 +257,7 @@ Zlecenie właściciela 8.11; [plan nocny 54](54-jarvis-i-tryby-2026-11-08.md), [
 
 | ID | Zadanie | Stan | Data | Uwagi |
 | --- | --- | --- | --- | --- |
-| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-08 | kod rozmowy, przebiegów, delegacji i zadań w tle; przegląd oraz próba sprzętowa otwarte |
+| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-08 | kod rozmowy, przebiegów, delegacji i zadań w tle; #31 Jarvis20/20 imion w próbie Bielika, jedno zdanie0/20; przegląd oraz próba sprzętowa otwarte |
 | J.2 | Panel Agentki: wybór Jarvisa i przejście do sterowania głosem | w toku | 2026-11-08 | 4 style × 2 motywy; testy na atrapach i axe |
 | J.3 | Zakres każdego z pięciu trybów i odporność na spóźnione odpowiedzi | w toku | 2026-11-08 | jawny wybór rozmowa / globalnie; Plan i kłódka zachowują zakres rozmowy; regresje wyścigu żądań; karta #25: Plan bez rozmowy nie zmienia poziomu globalnego, Alt+M pomija niedostępny Plan |
 | J.4 | Próby wszystkich person na rzeczywistym modelu i w torze głosowym | w toku | 2026-11-08 | Linux Cloud CPU i syntetyczne audio; Windows i mikrofon pozostają osobną próbą |

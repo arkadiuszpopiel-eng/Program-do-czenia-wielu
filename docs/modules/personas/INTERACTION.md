@@ -10,6 +10,8 @@ i krótkie meldunki. Dotyczy Alfy, Bety, Gamy, Delty i nowych person korzystają
 - `agents.interaction_mode` jest wspólnym ustawieniem domyślnym (domyślnie `standard`).
 - `agents.<id>.interaction_mode` dla person wbudowanych: `inherit` / `standard` / `jarvis`.
 - Jarvis zachowuje imię, głos, rodzaj żeński, role i pamięć persony. To nazwa sposobu współpracy.
+- Profil przekazuje imię i jego narzędnik z bieżącej persony, także własnej. Przy przedstawianiu się
+  model korzysta z tych form. Stosuje długość wskazaną przez właściciela; cechy i role opisuje na prośbę.
 - Agentka podaje krótki zamiar, wykonuje zlecone czynności dostępnymi narzędziami, a następnie meldunek
   z wynikiem sprawdzenia. Przy dłuższym zadaniu przekazuje krótkie informacje o postępie.
 - Głos korzysta z istniejących fraz wywoławczych i weryfikacji mówcy. Zmiana profilu nie otwiera mikrofonu.

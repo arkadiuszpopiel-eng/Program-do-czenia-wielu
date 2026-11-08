@@ -40,11 +40,11 @@ async fn each_persona_can_use_jarvis_independently_without_changing_permissions(
         .await
         .unwrap();
     let before = h.core.permissions_get(Some(session.clone())).await.unwrap();
-    for (agent, name) in [
-        ("alfa", "Alfa"),
-        ("beta", "Beta"),
-        ("gama", "Gama"),
-        ("delta", "Delta"),
+    for (agent, name, instrumental) in [
+        ("alfa", "Alfa", "Alfą"),
+        ("beta", "Beta", "Betą"),
+        ("gama", "Gama", "Gamą"),
+        ("delta", "Delta", "Deltą"),
     ] {
         let key = format!("agents.{agent}.interaction_mode");
         h.core
@@ -55,6 +55,12 @@ async fn each_persona_can_use_jarvis_independently_without_changing_permissions(
         let system = request.system.unwrap();
         assert!(system.contains(MARK), "{agent}");
         assert!(system.contains(name), "tożsamość {agent}");
+        assert!(
+            system.contains(&format!(
+                "Tożsamość tej agentki: imię „{name}”, forma „Jestem {instrumental}”."
+            )),
+            "jawne formy imienia {agent}"
+        );
         assert!(system.contains("rodzaju żeńskim"));
         assert!(request.tools.is_empty(), "profil nie dodaje narzędzi");
         h.core
@@ -176,6 +182,7 @@ async fn jarvis_reaches_agent_run_and_keeps_selected_reply_style() {
     let request = ask(&mut a.h, &a.sid, "delta").await;
     let system = request.system.unwrap();
     assert!(system.contains(MARK));
+    assert!(system.contains("imię „Delta”, forma „Jestem Deltą”"));
     assert!(system.contains("szczegółowo"));
     assert!(!request.tools.is_empty(), "przebieg z narzędziami");
     assert_eq!(a.h.core.agents_runs(a.sid).await.unwrap().len(), 1);
@@ -220,6 +227,13 @@ async fn delegate_gets_her_own_profile_and_parent_keeps_standard() {
             .unwrap_or_default()
             .contains(MARK),
         "delegacja zachowuje profil Delty"
+    );
+    assert!(
+        requests[1]
+            .system
+            .as_deref()
+            .unwrap_or_default()
+            .contains("imię „Delta”, forma „Jestem Deltą”")
     );
     assert!(
         !requests
@@ -268,4 +282,9 @@ async fn background_task_uses_assigned_personas_jarvis_profile() {
             .any(|r| r.system.as_deref().is_some_and(|s| s.contains(MARK))),
         "zadanie w tle dostaje profil Bety"
     );
+    assert!(requests.iter().any(|r| {
+        r.system
+            .as_deref()
+            .is_some_and(|s| s.contains("imię „Beta”, forma „Jestem Betą”"))
+    }));
 }

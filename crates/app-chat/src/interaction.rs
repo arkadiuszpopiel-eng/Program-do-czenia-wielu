@@ -1,6 +1,7 @@
 //! Sposób współpracy agentki (Jarvis): instrukcje rozmowy i przebiegu, bez zmiany uprawnień.
 
 use agent_runtime_contract::RunSpec;
+use personas_contract::Persona;
 
 use crate::ChatEngine;
 
@@ -9,7 +10,8 @@ const DEFAULT_KEY: &str = "agents.interaction_mode";
 
 /// Instrukcje są dodatkiem do tożsamości i ról, nie zastępują promptu persony.
 const JARVIS: &str = "Tryb współpracy Jarvis. Zachowujesz swoje imię, głos, charakter i rodzaj żeński. \
-Mów krótko i naturalnie, tak aby odpowiedź nadawała się również do odsłuchu. Na zlecenie właściciela \
+Mów krótko i naturalnie, tak aby odpowiedź nadawała się również do odsłuchu. Zachowaj długość \
+wskazaną w poleceniu właściciela. Cechy charakteru i role opisuj, gdy o nie zapyta. Na zlecenie właściciela \
 podaj krótki zamiar, wykonaj zadanie dostępnymi narzędziami i zamelduj wynik oraz sposób sprawdzenia. \
 Przy długim zadaniu dawaj krótkie meldunki postępu. Nie ogłaszaj wykonania bez wyniku narzędzia lub \
 weryfikacji. Jeśli brakuje informacji koniecznej do działania, zadaj jedno konkretne pytanie. \
@@ -25,14 +27,20 @@ fn resolve<'a>(personal: Option<&'a str>, common: Option<&'a str>) -> &'a str {
     }
 }
 
-fn append(system: Option<String>, jarvis: bool) -> Option<String> {
+fn append(system: Option<String>, jarvis: bool, identity: Option<(&str, &str)>) -> Option<String> {
     if !jarvis {
         return system;
     }
-    Some(match system {
+    let mut prompt = match system {
         Some(s) if !s.is_empty() => format!("{s}\n\n{JARVIS}"),
         _ => JARVIS.to_owned(),
-    })
+    };
+    if let Some((name, instrumental)) = identity {
+        prompt.push_str(&format!(
+            "\nTożsamość tej agentki: imię „{name}”, forma „Jestem {instrumental}”."
+        ));
+    }
+    Some(prompt)
 }
 
 impl ChatEngine {
@@ -51,15 +59,41 @@ impl ChatEngine {
         agent: &str,
         system: Option<String>,
     ) -> Option<String> {
-        append(system, self.jarvis_enabled(agent).await)
+        let enabled = self.jarvis_enabled(agent).await;
+        let persona = enabled
+            .then(|| {
+                self.inner
+                    .personas
+                    .personas()
+                    .into_iter()
+                    .find(|p| p.id.as_str() == agent)
+            })
+            .flatten();
+        append(system, enabled, persona.as_ref().map(identity))
+    }
+
+    pub(crate) async fn persona_interaction(
+        &self,
+        persona: &Persona,
+        system: Option<String>,
+    ) -> Option<String> {
+        append(
+            system,
+            self.jarvis_enabled(persona.id.as_str()).await,
+            Some(identity(persona)),
+        )
     }
 
     /// Profil współpracy nowego przebiegu; zachowuje specyfikację ról, narzędzi i budżetów.
     pub(crate) async fn apply_interaction(&self, spec: &mut RunSpec) {
         spec.reply_style = self
-            .interaction_prompt(spec.agent.as_str(), spec.reply_style.take())
+            .persona_interaction(&spec.persona, spec.reply_style.take())
             .await;
     }
+}
+
+fn identity(persona: &Persona) -> (&str, &str) {
+    (&persona.name, &persona.forms.instrumental)
 }
 
 #[cfg(test)]
@@ -79,10 +113,24 @@ mod tests {
     #[test]
     fn standard_is_unchanged_and_jarvis_preserves_identity_and_style() {
         let system = Some("Jesteś Betą. Odpowiadaj szczegółowo.".into());
-        assert_eq!(append(system.clone(), false), system);
-        let jarvis = append(system, true).unwrap_or_default();
+        assert_eq!(
+            append(system.clone(), false, Some(("Beta", "Betą"))),
+            system
+        );
+        let jarvis = append(system, true, Some(("Beta", "Betą"))).unwrap_or_default();
         assert!(jarvis.starts_with("Jesteś Betą. Odpowiadaj szczegółowo.\n\n"));
         assert!(jarvis.contains("Tryb współpracy Jarvis"));
         assert!(jarvis.contains("W trybie Plan"));
+        assert!(jarvis.ends_with("Tożsamość tej agentki: imię „Beta”, forma „Jestem Betą”."));
+    }
+
+    #[test]
+    fn identity_uses_custom_forms_and_missing_identity_is_not_invented() {
+        let mut persona = personas_contract::builtin_personas().remove(0);
+        persona.name = "Luna".into();
+        persona.forms.instrumental = "Luną".into();
+        let custom = append(None, true, Some(identity(&persona))).unwrap_or_default();
+        assert!(custom.ends_with("Tożsamość tej agentki: imię „Luna”, forma „Jestem Luną”."));
+        assert_eq!(append(None, true, None), Some(JARVIS.to_owned()));
     }
 }

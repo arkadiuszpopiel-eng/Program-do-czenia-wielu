@@ -104,7 +104,7 @@ impl ChatEngine {
                     .agent_access(session, persona.id.as_str(), crew.roles.clone())
                     .await;
                 crew.persona_roles.insert(persona.id.clone(), roles);
-                match self.interaction_prompt(persona.id.as_str(), None).await {
+                match self.persona_interaction(persona, None).await {
                     Some(instructions) => {
                         crew.persona_instructions
                             .insert(persona.id.clone(), instructions);

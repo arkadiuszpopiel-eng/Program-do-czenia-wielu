@@ -329,13 +329,15 @@ kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.</p>
 na <code>9b8b7416</code>. <a href="../reviews/2026-11-08-catalog-platform.md">Raport katalogu i wyniki</a> opisują poprawkę
 13 przypadków <code>app-models</code> (78 testów zaliczonych po zmianie) i pozostałe zadania.</p>
 <div class="tbl"><table><thead><tr><th>Kolejność</th><th>Zadanie</th><th>Stan</th></tr></thead><tbody><tr><td>1</td><td>Regresja Z.8: produkcyjna integracja modelu-sędziego, kontekst ostatniej odpowiedzi</td><td>kod i testy w PR #20, przegląd otwarty</td></tr>
-<tr><td>2</td><td>Każdy z pięciu trybów: jawny wybór zakresu rozmowa / globalnie, poprawny stan i zgody</td><td>implementacja i testy jednostkowe, pełny E2E w toku</td></tr>
+<tr><td>2</td><td>Każdy z pięciu trybów: jawny wybór zakresu rozmowa / globalnie, poprawny stan i zgody</td><td>implementacja; pełny lokalny E2E856/856, odrębne błędy CI otwarte</td></tr>
 <tr><td>3</td><td>Jarvis: ustawienie wspólne i osobne dla Alfy, Bety, Gamy i Delty</td><td>implementacja; testy rdzenia i UI</td></tr>
-<tr><td>4</td><td>Profil w delegacjach, zadaniach w tle i rozmowie głosowej</td><td>testy uzupełniające w toku</td></tr>
-<tr><td>5</td><td>Próba na prawdziwym modelu lokalnym, zapis surowych odpowiedzi i ograniczeń</td><td>pierwsze przebiegi niezaliczone; dalsza diagnoza</td></tr>
+<tr><td>4</td><td>Profil w delegacjach, zadaniach w tle i rozmowie głosowej</td><td>6 testów rdzenia i syntetycznego głosu zaliczonych</td></tr>
+<tr><td>5</td><td>Próba na prawdziwym modelu lokalnym, zapis surowych odpowiedzi i ograniczeń</td><td>po #31:40/40 transport, Jarvis20/20 imion, 0/20 jednego zdania; jakość częściowa</td></tr>
 <tr><td>6</td><td>Regresje CI, szerokie testy, dokumentacja, katalog funkcji i draft PR</td><td class="st st1">w toku</td></tr>
 <tr><td>7</td><td>Dalsze małe funkcje trybów i Jarvisa, każda z kryterium i testem</td><td>po sprawdzeniu bieżącej zmiany</td></tr>
 <tr><td>8</td><td>Raport końcowy: commity, wyniki, niezakończone punkty i kolejność dalszej pracy</td><td>na zakończenie okna pracy</td></tr></tbody></table></div>
+<p>Próba bez obciążenia i poprawka form imienia: <a href="../reviews/2026-11-08-jarvis-identity.md">raport #31</a>.
+CI149 ma osobne porażki Windows/UI/Linux; szczegóły w <a href="../reviews/2026-11-08-nightly-modes-jarvis.md">raporcie nocnym</a>.</p>
 <h2 id="zachowanie-jarvisa">Zachowanie Jarvisa</h2>
 <p>Opis: <a href="../modules/personas/INTERACTION.md">kontrakt profilu</a>. Panel <strong>Agentki</strong> (<code>Alt+1</code>)
 pozwala wybrać Standardowy / Jarvis / Jak ustawienie wspólne. Ustawienie wspólne znajduje się
