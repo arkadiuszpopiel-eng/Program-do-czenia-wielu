@@ -802,17 +802,22 @@ dependencies = [
  "approval-judge-contract",
  "approval-judge-fake",
  "approval-judge-impl",
+ "compliance-contract",
  "core-bus-contract",
+ "platform-fake",
  "providers-contract",
+ "providers-fake",
  "providers-local-impl",
  "router-contract",
  "router-impl",
  "safety-broker-contract",
+ "safety-broker-impl",
  "serde",
  "serde_json",
  "sessions-contract",
  "sessions-fake",
  "tokio",
+ "watchdog-contract",
 ]
 
 [[package]]
