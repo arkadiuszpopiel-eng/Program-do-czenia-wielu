@@ -68,6 +68,11 @@ Brak błędu transportu nie oznacza poprawnej tożsamości ani wykonania zadania
 40 odpowiedzi (4 persony × 2 profile × 5 powtórzeń) wymaga ponowienia bez konkurujących obciążeń.
 Test `jarvis_live.rs` jest jawnie pomijany w zwykłym CI i wymaga `ALFA_LIVE_*`.
 
+Po złożeniu poprawki katalogu sześć testów Jarvisa i syntetycznego głosu ponownie przeszło.
+Ręczna próba modelu zapisuje teraz także autora tury, `truncated` i zużycie tokenów. Autor tury
+jest sprawdzany względem adresatki. Pole `mentions_own_name` oznacza jedynie literalne wystąpienie
+imienia w tekście; nie stanowi semantycznej oceny tożsamości ani dowodu wykonania zadania.
+
 ## Niezależne problemy CI i dalsze kroki
 
 CI PR #20: zbudowano powłokę Windows, testy UI jednostkowe i część integracji; cały przebieg

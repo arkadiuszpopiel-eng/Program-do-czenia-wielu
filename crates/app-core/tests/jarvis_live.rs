@@ -151,13 +151,15 @@ async fn all_personas_on_local_model() {
                 let answer = saved.turns.iter().find(|t| t.id == turn).unwrap();
                 let elapsed_ms = started.elapsed().as_millis();
                 results.push(serde_json::json!({"agent":agent,"mode":mode,"repeat":repeat,"elapsed_ms":elapsed_ms,
-                    "text":answer.text,"error":answer.error,
+                    "text":answer.text,"error":answer.error,"response_author":answer.author,
+                    "truncated":answer.truncated,"usage":answer.usage,
                     "mentions_own_name": answer.text.to_lowercase().contains(agent)}));
                 if let Ok(path) = std::env::var("ALFA_LIVE_REPORT") {
                     let report = serde_json::json!({"model":model,"platform":"Linux Cloud CPU; headless core, no microphone", "max_tokens":96, "temperature":0.0, "results":results});
                     std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
                 }
                 assert!(answer.error.is_none(), "{agent}/{mode}: {:?}", answer.error);
+                assert_eq!(answer.author, agent, "autor zapisanej odpowiedzi");
                 assert!(
                     !answer.text.trim().is_empty(),
                     "{agent}/{mode}: pusta odpowiedź"
