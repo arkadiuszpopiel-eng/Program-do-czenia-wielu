@@ -2,8 +2,9 @@
 
 Karta [#22](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/22).
 Zlecenie właściciela: rozwijać i testować program w Cloud do rana, do 8:00; Jarvis dostępny
-dla każdej agentki. Roboczo przyjęto **9.11.2026, 08:00 Europe/Warsaw = 07:00 UTC**.
-Pytanie o strefę i szczegóły Jarvisa pozostaje otwarte. Odpowiedź właściciela ma pierwszeństwo.
+dla każdej agentki. Właściciel potwierdził termin: **9.11.2026 o 08:00**; zachowano interpretację
+czasu polskiego: **Europe/Warsaw = 07:00 UTC**. Szczegóły Jarvisa pozostają według roboczego
+kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
 
 ## Zakres i kolejność
 
