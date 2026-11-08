@@ -1,6 +1,11 @@
 # models — SPEC (v1, menedżer modeli i silników, `app-models`)
 
 ## Cel
+`catalog::builtin()` wybiera katalog hosta, a `catalog::builtin_for(Option<Target>)` pozwala jawnie
+sprawdzić dane innej platformy. Testy pakietów i fixture'ów Windows wybierają Windows x64 także
+na Linuxie; nie uruchamiają tych binarek. Metadane archiwów Windows zachowują nazwy `.exe`
+niezależnie od hosta. Brak znanego celu udostępnia wyłącznie pozycje przenośne.
+
 
 Jedno miejsce w aplikacji do pobrania, sprawdzenia i usunięcia wszystkiego, czego Alfa potrzebuje lokalnie: modele
 rozmowy (GGUF z `providers-local`), STT (whisper GGML), głosy TTS (Piper; Pocket — ręcznie), VAD (Silero), cechy

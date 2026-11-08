@@ -34,7 +34,7 @@ mod tests {
 
     #[test]
     fn every_catalog_item_has_a_complete_card() {
-        let items = crate::builtin();
+        let items = crate::catalog::builtin_for(Some(crate::catalog::Target::WINDOWS_X64));
         assert!(items.len() > 10);
         for item in &items {
             let Some(c) = card(&item.id) else {

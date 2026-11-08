@@ -22,7 +22,11 @@ mod common;
 use std::io::Write;
 
 use app_api::dto::{ModelItemState as S, TrustedHashes};
-use app_models::catalog::{ItemSpec, exe};
+use app_models::catalog::{ItemSpec, Target};
+
+fn exe(name: &str) -> String {
+    Target::WINDOWS_X64.executable(name)
+}
 use app_models::unpack::extract_tree;
 use common::http::Server;
 use common::{harness, options};
@@ -49,7 +53,7 @@ fn files(names: &[&str]) -> Vec<(String, &'static [u8])> {
 
 /// Pozycja z wbudowanego katalogu z adresami podmienionymi na lokalny serwer.
 fn local_copy(id: &str, server: &Server, archives: &[Vec<u8>]) -> ItemSpec {
-    let mut spec = app_models::builtin()
+    let mut spec = app_models::catalog::builtin_for(Some(Target::WINDOWS_X64))
         .into_iter()
         .find(|i| i.id == id)
         .unwrap_or_else(|| panic!("{id} w katalogu"));
@@ -170,7 +174,8 @@ async fn catalog_sidecars_install_from_release_like_archives() {
             "{id}: prefiks archiwum usunięty"
         );
     }
-    // Ścieżki, pod którymi szuka ich aplikacja (`AppPaths::sidecar`, app-modules / app-voice).
+    // Metadane archiwów Windows na każdym hoście. Tylko host Windows używa tych nazw
+    // w `AppPaths::sidecar`; Linux nie uznaje plików `.exe` za własne binarki.
     for (dir, file) in [
         ("llama-cpu", "llama-server"),
         ("llama-vulkan", "llama-server"),
@@ -178,7 +183,11 @@ async fn catalog_sidecars_install_from_release_like_archives() {
         ("whisper", "whisper-server"),
         ("piper", "piper"),
     ] {
-        assert!(h.paths.sidecar(dir, file).is_file(), "{dir}/{file}");
+        let installed = h.paths.sidecars().join(dir).join(exe(file));
+        let host = h.paths.sidecar(dir, file);
+        assert!(installed.is_file(), "{dir}/{}", exe(file));
+        assert_eq!(host == installed, cfg!(windows));
+        assert_eq!(host.is_file(), cfg!(windows));
     }
 }
 

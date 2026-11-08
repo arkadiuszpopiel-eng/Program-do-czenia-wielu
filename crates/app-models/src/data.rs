@@ -12,7 +12,12 @@
 use app_api::dto::ModelItemKind;
 
 use crate::catalog::Target;
-use crate::catalog::{FileSpec, Install, ItemSpec, Root, exe, note};
+use crate::catalog::{FileSpec, Install, ItemSpec, Root, note};
+
+/// Nazwy wymagane wewnątrz przypiętych archiwów Windows x64.
+fn windows_exe(name: &str) -> String {
+    Target::WINDOWS_X64.executable(name)
+}
 
 #[path = "data_speech.rs"]
 mod speech_items;
@@ -96,7 +101,7 @@ fn llama(backend: &str, asset: &str, (size, sha256): (u64, &str)) -> ItemSpec {
         }],
         Install::Tree {
             strip: String::new(),
-            require: vec![exe("llama-server")],
+            require: vec![windows_exe("llama-server")],
         },
         true,
         (
@@ -138,7 +143,7 @@ fn llama_cuda() -> ItemSpec {
         ],
         Install::Tree {
             strip: String::new(),
-            require: vec![exe("llama-server"), "cudart64_12.dll".into()],
+            require: vec![windows_exe("llama-server"), "cudart64_12.dll".into()],
         },
         false,
         (
@@ -170,7 +175,7 @@ fn whisper_cuda() -> ItemSpec {
         )],
         Install::Tree {
             strip: "Release/".into(),
-            require: vec![exe("whisper-server"), "cudart64_12.dll".into()],
+            require: vec![windows_exe("whisper-server"), "cudart64_12.dll".into()],
         },
         false,
         (
@@ -180,7 +185,9 @@ fn whisper_cuda() -> ItemSpec {
     )
 }
 
-fn sidecars() -> Vec<ItemSpec> {
+fn sidecars(host: Option<Target>) -> Vec<ItemSpec> {
+    // Instalacje ręczne wymagają binarki dla wybranego celu, nie dla hosta generatora.
+    let exe = |name: &str| host.map_or_else(|| name.to_owned(), |t| t.executable(name));
     vec![
         windows_x64(llama("vulkan", "vulkan", LLAMA_VULKAN_ZIP)),
         windows_x64(llama_cuda()),
@@ -202,7 +209,7 @@ fn sidecars() -> Vec<ItemSpec> {
             )],
             Install::Tree {
                 strip: "Release/".into(),
-                require: vec![exe("whisper-server")],
+                require: vec![windows_exe("whisper-server")],
             },
             false,
             (
@@ -227,7 +234,7 @@ fn sidecars() -> Vec<ItemSpec> {
             )],
             Install::Tree {
                 strip: "piper/".into(),
-                require: vec![exe("piper")],
+                require: vec![windows_exe("piper")],
             },
             false,
             (
@@ -272,7 +279,12 @@ fn sidecars() -> Vec<ItemSpec> {
 
 /// Pozycje głosu (STT, TTS, VAD, KWS, mówca) i sidecarów.
 pub fn voice_and_sidecars() -> Vec<ItemSpec> {
+    voice_and_sidecars_for(Target::host())
+}
+
+/// Dane katalogu dla jawnego celu (nazwy ręcznych instalacji też zależą od celu).
+pub fn voice_and_sidecars_for(host: Option<Target>) -> Vec<ItemSpec> {
     let mut out = speech();
-    out.extend(sidecars());
+    out.extend(sidecars(host));
     out
 }

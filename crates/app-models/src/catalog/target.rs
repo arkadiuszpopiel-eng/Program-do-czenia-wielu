@@ -34,6 +34,14 @@ pub struct Target {
 }
 
 impl Target {
+    /// Nazwa binarki dla celu, niezależnie od systemu odczytującego katalog.
+    pub fn executable(self, name: &str) -> String {
+        match self.os {
+            Os::Windows => format!("{name}.exe"),
+            _ => name.to_owned(),
+        }
+    }
+
     /// Windows na x86-64 — wszystkie dzisiejsze binarki katalogu.
     pub const WINDOWS_X64: Self = Self {
         os: Os::Windows,

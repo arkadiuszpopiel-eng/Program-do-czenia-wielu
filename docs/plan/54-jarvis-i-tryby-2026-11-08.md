@@ -8,6 +8,10 @@ kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
 
 ## Zakres i kolejność
 
+Aktualizacja po pełnej próbie: UI **856/856**; Rust **3461 zaliczonych / 20 nieudanych / 24 pominięte**
+na `9b8b7416`. [Raport katalogu i wyniki](../reviews/2026-11-08-catalog-platform.md) opisują poprawkę
+13 przypadków `app-models` (78 testów zaliczonych po zmianie) i pozostałe zadania.
+
 | Kolejność | Zadanie | Stan |
 | --- | --- | --- |
 | 1 | Regresja Z.8: produkcyjna integracja modelu-sędziego, kontekst ostatniej odpowiedzi | kod i testy w PR #20, przegląd otwarty |

@@ -39,8 +39,8 @@ Wznowienie oraz następna regresja: [Plan bez rozmowy](2026-11-08-plan-without-s
 | Svelte/TypeScript | 0 błędów, 0 ostrzeżeń | ponowiony przebieg po ostatnim porządku w UI |
 | Lint UI | zaliczone | pełny lint przed ostatnim usunięciem kontrolki; końcowy przebieg po E2E |
 | Format Rust, zależności, katalog funkcji, dokumentacja HTML | zaliczone | 1805 krawędzi, 611/611 funkcji z testem, 100 stron bez problemów |
-| Pełne UI E2E | w toku, 856 przypadków | wynik dopisać po zakończeniu |
-| `cargo test --locked --workspace` | w toku | wynik dopisać po zakończeniu |
+| Pełne UI E2E | **856/856**, 48,6 min | kompletna wznowiona próba na `9b8b7416` |
+| Pełny zakres Rust w partiach | **3461 zaliczonych / 20 nieudanych / 24 pominięte** | `9b8b7416`; [wyniki i dalsze poprawki](2026-11-08-catalog-platform.md) |
 
 Pełne logi robocze: `/workspace/scratch/`: `jarvis-core-voice.log`, `runtime-tests.log`,
 `clippy-nightly.log`, `ui-vitest-final.log`, `ui-e2e-all.log`, `rust-workspace-tests.log`.

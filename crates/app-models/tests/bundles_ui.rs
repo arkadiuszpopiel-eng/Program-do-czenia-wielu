@@ -7,8 +7,9 @@
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use app_api::dto::{BundleFitKind as F, LocalizedText, ModelBundle, ModelItem, ModelItemState};
+use app_models::ItemSpec;
 use app_models::bundles::{self, Machine};
-use app_models::{ItemSpec, builtin};
+use app_models::catalog::{Target, builtin_for};
 use device_profile_contract::GpuVendor;
 
 const BUNDLES_JSON: &str = concat!(
@@ -54,7 +55,10 @@ fn catalog_items() -> Vec<ModelItem> {
         card: None,
         license_card: None,
     };
-    builtin().iter().map(item).collect()
+    builtin_for(Some(Target::WINDOWS_X64))
+        .iter()
+        .map(item)
+        .collect()
 }
 
 #[test]
