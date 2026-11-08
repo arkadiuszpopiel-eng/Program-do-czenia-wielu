@@ -1,0 +1,22 @@
+# Poprawny manifest (wzór z docs/ARCHITECTURE.md §3.2)
+id = "voice-stt"
+version = "0.1.0"
+kind = "voice-engine"
+provides = ["voice-stt-contract@1"]
+requires = ["core-bus-contract@1", "voice-audio-contract@1", "device-profile-contract@1"]
+capabilities = ["fs.read(%LOCALAPPDATA%/Alfa/models/**)", "gpu.compute"]
+lifecycle = "on-demand"
+isolation = "process"
+config_schema = "schemas/voice-stt.config.schema.json"
+
+[budget]
+ram_mb = 1536
+cpu_pct = 40
+vram_mb = 2560
+
+[ui]
+settings_page = "ui/settings/voice-stt"
+
+[health]
+check = "ping"
+interval_s = 15

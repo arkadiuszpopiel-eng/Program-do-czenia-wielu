@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samodzielne testowanie — co pomijałem i jak to zamknąć — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/24-samodzielne-testowanie.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html" aria-current="page">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li><li><a href="plan-45-testy-ai.html">System pełnego automatycznego testowania przez AI</a></li><li><a href="plan-46-raport-2026-10-31-testy-ai.html">Raport z 31.10: system automatycznego testowania przez AI, ścieżki względne, wersja 0.0.79</a></li><li><a href="plan-47-raport-2026-11-01-noc.html">Raport z nocy 31.10/1.11: Sędzia Cieni, diagnostyka odporna na zawieszenie, wersja 0.0.81</a></li><li><a href="plan-48-raport-2026-11-01-rano.html">Raport 1.11 rano: zaległe inspekcje i testy</a></li><li><a href="plan-49-raport-2026-11-02-noc.html">Raport nocy 1/2.11: obowiązki modelu lokalnego i wymiana informacji między modelami</a></li><li><a href="plan-50-tryby-zgod-jak-claude-codex.html">50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)</a></li><li><a href="plan-51-raport-2026-11-03-wieczor.html">51 — Raport: wieczór 3.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-52-raport-2026-11-04-noc.html">52 — Raport: noc 3/4.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-53-raport-2026-11-06-noc.html">53 — Raport: noc 5/6.11 (etap Z — model-sędzia, dziennik rodzica, porządek kompilacji)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="features-katalog.html">Katalog funkcji i testów</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#1-co-pomijalem-rozliczenie">1. Co pomijałem — rozliczenie</a></li><li><a href="#2-co-sie-zmienia">2. Co się zmienia</a></li><li><a href="#3-reguly-pracy-obowiazuja-od-0-0-46">3. Reguły pracy (obowiązują od 0.0.46)</a></li><li><a href="#4-stan-wykonania">4. Stan wykonania</a></li></ul></aside><article><h1 id="samodzielne-testowanie-co-pomijalem-i-jak-to-zamknac">Samodzielne testowanie — co pomijałem i jak to zamknąć</h1>
+<p>Zlecenie właściciela z 2026-10-12: „zrób tak, żebyś mógł sam więcej testować — na razie dużo rzeczy pomijasz”.
+Ten dokument mówi, co dokładnie było pomijane, dlaczego, i co się zmienia. Stan wykonania jest w tabeli na końcu.</p>
+<h2 id="1-co-pomijalem-rozliczenie">1. Co pomijałem — rozliczenie</h2>
+<div class="tbl"><table><thead><tr><th>Co</th><th>Skala</th><th>Dlaczego pomijane</th><th>Czy da się bez właściciela</th></tr></thead><tbody><tr><td>Testy sprzętowe oznaczone „uruchamia maszyna użytkownika” (<code>#[ignore]</code>)</td><td>ok. 40 testów w 20 pakietach: prawdziwe audio, Silero, słowo wywoławcze, model mówcy, embeddingi, schowek, Kosz, skróty, pulpit (Notatnik), rejestr, Edge, Menedżer poświadczeń</td><td>traktowałem je jak testy „dla kogoś innego”; ten laptop <strong>jest</strong> maszyną użytkownika</td><td>tak, prawie wszystkie</td></tr>
+<tr><td>Pełne testy i linter całego projektu przy każdej wersji</td><td>945 programów testowych</td><td>czas i miejsce na dysku; puszczałem tylko pakiety, które zmieniałem</td><td>tak</td></tr>
+<tr><td>Polecenia rdzenia w prawdziwej aplikacji</td><td>229 poleceń; test prawdziwej aplikacji ma 18 scenariuszy i nikt nie liczył, ile poleceń one ćwiczą</td><td>brak pomiaru</td><td>tak</td></tr>
+<tr><td>Nowe funkcje w prawdziwej aplikacji</td><td>każda nowa funkcja miała test w przeglądarce na atrapie, ale rzadko scenariusz na prawdziwym rdzeniu</td><td>atrapa jest szybsza</td><td>tak</td></tr>
+<tr><td>Mowa przez prawdziwy głośnik i mikrofon, tłumienie echa, przerywanie głosem</td><td>cały tor akustyczny</td><td>„nie odtwarzam dźwięku” — słuszne w nocy, w dzień już nie</td><td>tak: komputer mówi nagraniem z głośnika, mikrofon słucha</td></tr>
+<tr><td>Jakość głosów</td><td>10 barw Supertonic, Piper</td><td>„ocena słuchem należy do właściciela”</td><td>częściowo: zrozumiałość (rozpoznanie własnej mowy), głośność, przesterowanie, przerwy — mierzalne; „czy ładny” — tylko właściciel</td></tr>
+<tr><td>Funkcje, których wynik pisze model</td><td>obowiązki, tłumacz reguł, streszczenia</td><td>próba ręczna, raz</td><td>tak: próba z automatyczną oceną „czy raport nie wychodzi poza dane”</td></tr>
+<tr><td>Pobieranie przez program</td><td>Qwen3-ASR 2,5 GB, <code>llama-server</code></td><td>rozmiar</td><td>tak — mieści się w stałej zgodzie do 3 GB</td></tr>
+<tr><td><code>cargo deny</code></td><td>zależności i licencje</td><td>brak narzędzia lokalnie</td><td>tak, po doinstalowaniu narzędzia</td></tr>
+<tr><td>Kamera</td><td>test sprzętowy</td><td>kamera laptopa odłączona sprzętowo</td><td><strong>nie</strong> — potrzebna Twoja ręka (zasłonka / klawisz)</td></tr>
+<tr><td>Karty AMD / Intel na żywo</td><td>odczyt sprzętu</td><td>brak takiej karty</td><td><strong>nie</strong> — tylko test na zapisanych odpowiedziach narzędzi</td></tr>
+<tr><td>Testy „do decyzji człowieka” (Broker, P3-02, P3-04, W3-09, PT-25)</td><td>5 testów</td><td>celowo czerwone do Twojej decyzji</td><td><strong>nie</strong> — to decyzje, nie testy</td></tr></tbody></table></div>
+<p>Wniosek: z kilkunastu pozycji „nie sprawdziłem” z ostatnich raportów naprawdę wymagają Ciebie trzy grupy:
+kamera, ocena „czy głos się podoba” i decyzje bezpieczeństwa. Resztę mogę i powinienem robić sam.</p>
+<h2 id="2-co-sie-zmienia">2. Co się zmienia</h2>
+<h3 id="2-1-trzy-poziomy-sprawdzenia-jeden-skrypt-jeden-raport">2.1 Trzy poziomy sprawdzenia — jeden skrypt, jeden raport</h3>
+<p><code>node scripts/verify.mjs &lt;poziom&gt;</code> uruchamia etapy po kolei, pilnuje miejsca na dysku i zapisuje wynik do
+<code>target/verify/&lt;wersja&gt;/raport.md</code> (oraz <code>raport.json</code>). Raport sam wypisuje, czego <strong>nie</strong> uruchomiono i z jakiego
+powodu — lista „nie sprawdziłem” przestaje być pisana z pamięci.</p>
+<div class="tbl"><table><thead><tr><th>Poziom</th><th>Kiedy</th><th>Etapy</th></tr></thead><tbody><tr><td><code>szybki</code></td><td>po każdej zmianie</td><td>formatowanie, linter i testy zmienionych pakietów, testy interfejsu, kontrola typów</td></tr>
+<tr><td><code>wersja</code></td><td>przed każdą wersją</td><td>linter i testy <strong>całego</strong> projektu, testy w przeglądarce, budowa, test prawdziwej aplikacji, pokrycie poleceń rdzenia, kontrola zależności</td></tr>
+<tr><td><code>sprzet</code></td><td>przed każdą budową dla właściciela (co 5 ulepszeń) i po zmianach w głosie, modelach, platformie</td><td>wszystkie testy sprzętowe, tor akustyczny, zrozumiałość głosów, próby funkcji modelowych, pobieranie przez program</td></tr></tbody></table></div>
+<h3 id="2-2-testy-sprzetowe-uruchamiane-naprawde">2.2 Testy sprzętowe — uruchamiane naprawdę</h3>
+<p><code>scripts/verify-hw.sh</code> ustawia zmienne (<code>ALFA_SILERO_VAD</code>, <code>ALFA_KWS_MODEL</code>, <code>ALFA_SPEAKER_MODEL</code>,
+<code>ALFA_EMBED_MODEL</code>, <code>ALFA_QWEN_*</code>, <code>ALFA_SMART_TURN_*</code>, <code>ALFA_LIVE_*</code>) na modele i silniki z <code>%LOCALAPPDATA%\Alfa</code>
+(tylko do odczytu) i uruchamia testy <code>--ignored</code> pakiet po pakiecie. Podział:</p>
+<ul>
+<li><strong>bez śladu na pulpicie</strong> (zawsze): audio, modele głosu, embeddingi, rejestr, procesy i usługi, wydajność Markdown;</li>
+<li><strong>dotykają pulpitu</strong> (schowek, Kosz, skróty, Notatnik, Edge, Menedżer poświadczeń): uruchamiane, gdy właściciel
+nie pracuje przy komputerze albo na polecenie; test schowka przywraca jego zawartość, pozostałe sprzątają po sobie;</li>
+<li><strong>wyłączone z biegu</strong>: testy „do decyzji człowieka” i testy wymagające ręcznej akcji (blokada ekranu, gra na
+pełnym ekranie, kamera) — raport wymienia je z powodem.</li>
+</ul>
+<h3 id="2-3-pokrycie-polecen-rdzenia-w-prawdziwej-aplikacji">2.3 Pokrycie poleceń rdzenia w prawdziwej aplikacji</h3>
+<ul>
+<li>Okno zapisuje nazwy poleceń, które wywołało; test prawdziwej aplikacji na końcu zrzuca tę listę, a
+<code>scripts/ipc-coverage.mjs</code> porównuje ją ze spisem poleceń i wypisuje nieprzećwiczone.</li>
+<li>Nowy scenariusz „przegląd poleceń”: każde polecenie odczytu bez argumentów jest wywoływane na prawdziwym rdzeniu
+i musi odpowiedzieć bez błędu w rozsądnym czasie.</li>
+<li>Reguła: nowa funkcja = scenariusz na prawdziwym rdzeniu, nie tylko na atrapie. Pokrycie nie może spaść między wersjami.</li>
+</ul>
+<h3 id="2-4-tor-akustyczny-komputer-rozmawia-sam-ze-soba">2.4 Tor akustyczny — komputer rozmawia sam ze sobą</h3>
+<p><code>scripts/voice-loop.mjs</code> na uruchomionej aplikacji (profil tymczasowy): włącza mikrofon, odtwarza z głośnika nagrane
+zdanie syntetycznym głosem i sprawdza, co program rozpoznał i czy odpowiedział. Trzy próby:</p>
+<ol>
+<li>zdanie z głośnika → rozpoznany tekst zgodny z oczekiwanym (próg błędu słów);</li>
+<li>agentka mówi → jej własny głos <strong>nie</strong> wraca jako wypowiedź użytkownika (tłumienie echa);</li>
+<li>zdanie z głośnika w trakcie mowy agentki → mowa się zatrzymuje (przerywanie głosem).</li>
+</ol>
+<p>Tylko w dzień (reguła „bez dźwięku w nocy” zostaje), na bieżącej głośności systemu — skrypt nie zmienia ustawień
+dźwięku; gdy mikrofon nie słyszy głośnika, mówi to wprost zamiast zaliczać.</p>
+<h3 id="2-5-zrozumialosc-glosow">2.5 Zrozumiałość głosów</h3>
+<p>Każda barwa mówi pięć zdań kontrolnych do pliku (bez głośnika), rozpoznawanie zamienia je z powrotem na tekst.
+Miary: odsetek błędnych słów, głośność, przesterowanie, długość ciszy na początku i końcu. To nie zastępuje ucha,
+ale wyłapuje głos niezrozumiały, za cichy albo ucięty — bez właściciela.</p>
+<h3 id="2-6-funkcje-ktorych-wynik-pisze-model">2.6 Funkcje, których wynik pisze model</h3>
+<p><code>scripts/trial.sh</code> (profil tymczasowy z kopią modelu) wchodzi do repozytorium razem ze scenariuszami obowiązków.
+Ocena automatyczna: każda liczba, data i nazwa w raporcie agentki musi występować w arkuszu faktów; raport
+z czymkolwiek spoza danych = próba czerwona.</p>
+<h2 id="3-reguly-pracy-obowiazuja-od-0-0-46">3. Reguły pracy (obowiązują od 0.0.46)</h2>
+<ol>
+<li>Wersja nie jest „gotowa” bez poziomu <code>wersja</code>; budowa dla właściciela — bez poziomu <code>sprzet</code>.</li>
+<li>„Nie sprawdziłem” wolno napisać tylko z jednym z trzech powodów: brak sprzętu, decyzja właściciela, ocena
+zmysłami właściciela. Każdy inny powód oznacza brakujący test, który trzeba dopisać.</li>
+<li>Raport dla właściciela bierze liczby z <code>raport.json</code>, nie z pamięci.</li>
+<li>Błąd znaleziony przez próbę na żywo dostaje test, który by go złapał (jak nazwy wyzwalaczy po restarcie w 0.0.45).</li>
+</ol>
+<h3 id="2-7-instancja-testowa-obok-uruchomionej-alfy">2.7 Instancja testowa obok uruchomionej Alfy</h3>
+<p>Dotąd każdy test prawdziwej aplikacji wymagał zamknięcia okna właściciela (jeden port, jedna instancja, ten sam plik
+programu). Od 0.0.46:</p>
+<ul>
+<li>powłoka testowa przyjmuje własny port (<code>ALFA_E2E_CDP_PORT</code>) i tryb instancji testowej (<code>ALFA_E2E_INSTANCE=1</code>) —
+wyłącznie w budowie z cechą <code>e2e</code>; budowa produkcyjna nadal pilnuje jednej instancji i nie otwiera portu;</li>
+<li>Alfa właściciela działa z osobnej kopii programu (<code>Alfa-uruchomiona/</code>, kładzie ją <code>scripts/deploy-owner.sh</code>),
+więc budowa i testy jej nie dotykają;</li>
+<li><code>scripts/verify-app.sh</code> buduje, uruchamia test prawdziwej aplikacji na profilu tymczasowym i liczy pokrycie
+poleceń; <code>scripts/trial/profile.sh</code> uruchamia instancję testową do prób (z kopią modelu albo bez).</li>
+</ul>
+<h2 id="4-stan-wykonania">4. Stan wykonania</h2>
+<div class="tbl"><table><thead><tr><th>Element</th><th>Stan</th></tr></thead><tbody><tr><td>Rozliczenie pominięć (ten dokument)</td><td>zrobione 2026-10-12</td></tr>
+<tr><td>Pełne testy i linter całego projektu dla 0.0.45</td><td>zrobione: linter bez uwag; 946 programów testowych, 2676 testów zielonych, 0 czerwonych, 33 pominięte (sprzętowe)</td></tr>
+<tr><td><code>scripts/verify-hw.mjs</code> i pierwszy bieg testów sprzętowych</td><td>zrobione: 12 etapów „cichych” — 11 zielonych, 1 pominięty (brak wytrenowanego modelu słowa wywoławczego). Pierwszy bieg znalazł błąd w kwarantannie pobrań (katalog w skróconej postaci <code>SPOPIE~1</code> brany za dowiązanie) — naprawiony z testem</td></tr>
+<tr><td>Instancja testowa obok Alfy właściciela</td><td>zrobione: test prawdziwej aplikacji przechodzi (19 z 19) przy uruchomionej Alfie właściciela</td></tr>
+<tr><td>Pokrycie poleceń rdzenia + scenariusz „przegląd poleceń”</td><td>zrobione: 38 poleceń odczytu sprawdzanych ze schematem łącza; pierwszy pomiar 62 z 228 (27,2 %); po scenariuszach cykli życia <strong>87 z 228 (38,2 %)</strong></td></tr>
+<tr><td>Ocena raportów z obowiązków (dane + forma) i skrypt prób</td><td>zrobione: pierwszy bieg wykrył odgrywanie ról we wszystkich czterech raportach (przepuszczone w 0.0.45); po poprawce polecenia 3 z 4 czyste, czwarty odrzucony błędnie przez oceniającego — poprawione</td></tr>
+<tr><td>Testy sprzętowe dotykające pulpitu (schowek, Kosz, skróty, Notatnik, Edge, poświadczenia)</td><td>do zrobienia — gdy właściciel nie pracuje przy komputerze</td></tr>
+<tr><td><code>scripts/verify.mjs</code> z jednym raportem</td><td>zrobione (poziomy szybki / wersja / sprzet)</td></tr>
+<tr><td>Tor akustyczny</td><td>zrobione (<code>scripts/trial/voice-loop.mjs</code>): pierwszy bieg — koniec wypowiedzi wykryty po 3 s, ale rozpoznanie przez głośnik i mikrofon laptopa złe (1 z 8 słów); próbka głosu z Ustawień wraca jako wypowiedź użytkownika</td></tr>
+<tr><td>Zrozumiałość głosów</td><td class="st st2">do zrobienia</td></tr>
+<tr><td>Pobranie Qwen3-ASR i <code>llama-server</code> przez program</td><td>zrobione — Qwen3-ASR (2,35 GB) i silnik <code>llama-server</code> na kartę NVIDIA (0,61 GB) pobrane, sprawdzone z przypiętymi sumami i oznaczone jako zainstalowane w 13 minut (<code>scripts/trial/download.mjs</code>)</td></tr>
+<tr><td><code>cargo deny</code> lokalnie</td><td>zrobione: narzędzie doinstalowane, etap „zależności” zielony od 0.0.47</td></tr>
+<tr><td>Pokrycie poleceń rdzenia ≥ 60 %</td><td>w toku: 119 z 228 (52,2 %); zostają konta (wymagają osobnego magazynu poświadczeń dla testów), tury rozmowy z modelem, umiejętności, wtyczki, kopie</td></tr>
+<tr><td>Izolacja instancji testowej (0.0.49)</td><td>sekrety pod <code>Alfa/test/…</code> (<code>app-modules::secrets::ScopedSecretStore</code>, włączane w powłoce tylko dla <code>ALFA_E2E_INSTANCE=1</code> w budowie <code>e2e</code>), własny <code>USERPROFILE</code>, środowisko bez zmiennych <code>*_API_KEY</code> (<code>e2e-app/run.ps1</code>, <code>scripts/trial/profile.sh</code>). Wada znaleziona sondą poleceń: katalogi sesji testowych powstawały w katalogu <code>Alfa\Sesje</code> właściciela</td></tr>
+<tr><td>Wady znalezione biegami 0.0.46–0.0.47</td><td>naprawione w 0.0.48: osierocone silniki po zamknięciu programu (<code>crates/lib-sidecar-guard</code>), próbka głosu łapana przez mikrofon, niestabilny test zwalniania modelu. Wyjaśnione: Whisper jest obowiązkowym zapasem strażnika rozpoznawania; słabe rozpoznanie przez głośnik i mikrofon to głównie akustyka laptopa (diagnostyka: <code>voice-audio-impl</code> test <code>capture_microphone_to_wav</code>)</td></tr></tbody></table></div>
+</article>
+<footer>Źródło: <code>docs/plan/24-samodzielne-testowanie.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

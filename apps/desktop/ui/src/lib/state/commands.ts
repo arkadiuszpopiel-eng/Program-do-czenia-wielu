@@ -1,0 +1,352 @@
+// Komendy okna głównego: jedno miejsce dla skrótów klawiszowych i palety poleceń.
+// Skróty globalne (Szybkie pytanie, STOP WSZYSTKIEGO) obsługuje rdzeń — nie ma ich tutaj.
+import { errorText } from '../api/command-error';
+import { reading } from './reading.svelte';
+import type { ConversationFormat } from '../api/types-files';
+import type { PanelId } from '../api/types-system';
+import { nextColumn, stepZoom } from '../logic/layout';
+import { COMPOSER_LOCAL } from '../logic/shortcut-registry';
+import { RESERVED, allowedInInput, chordFromEvent } from '../logic/shortcuts';
+import type { AppState } from './app.svelte';
+import { attempt, showError } from './attempt';
+import { copyConversation, exportConversation } from './exports';
+import { openTemplates } from './template-dialog.svelte';
+import { openBoard } from './board-dialog.svelte';
+import { openStats } from './stats-dialog.svelte';
+import { canvas, closeCanvas } from './canvas.svelte';
+import { openArena } from './arena.svelte';
+import { openTeach } from './teach-dialog.svelte';
+import { cycleView, nextMode, switchMode } from './mode-switch';
+
+const PANEL_COMMANDS: Readonly<Record<string, PanelId>> = {
+  'panel.agents': 'agents',
+  'panel.timeline': 'timeline',
+  'panel.files': 'files',
+  'panel.memory': 'memory',
+  'panel.screen': 'screen',
+  'panel.voice': 'voice',
+  'panel.tasks': 'tasks',
+};
+
+/** Dodatkowe polecenia palety (bez domyślnego skrótu). */
+export const EXTRA_COMMANDS = [
+  'action.theme',
+  'action.language',
+  'action.column',
+  'action.panels',
+  'action.transfer',
+  'action.accounts',
+  'action.autonomy',
+  'action.cast',
+  'action.stopGeneration',
+  'action.onboarding',
+  'action.exportMarkdown',
+  'action.exportHtml',
+  'action.exportJson',
+  'action.templates',
+  'action.help',
+  'action.board',
+  'action.stats',
+  'action.arena',
+  'action.copyConversation',
+  'action.teach',
+] as const;
+
+const EXPORT_FORMAT: Readonly<Record<string, ConversationFormat>> = {
+  'action.exportMarkdown': 'markdown',
+  'action.exportHtml': 'html',
+  'action.exportJson': 'json',
+};
+
+const ONBOARDING_ALLOWED = new Set([
+  'view.zoomIn',
+  'view.zoomOut',
+  'view.zoomReset',
+  'cheatsheet.open',
+]);
+
+/** Fokus na element, który może dopiero powstać (panel właśnie się otwiera): kilka klatek prób. */
+function focusById(id: string, attempts = 12): void {
+  requestAnimationFrame(() => {
+    const element = document.getElementById(id);
+    if (element) element.focus();
+    else if (attempts > 0) focusById(id, attempts - 1);
+  });
+}
+
+async function open(app: AppState, id: string | undefined): Promise<void> {
+  if (id) await app.openSession(id);
+}
+
+export function runCommand(app: AppState, id: string): void {
+  const sid = app.activeId;
+  const tab = PANEL_COMMANDS[id];
+  if (tab) {
+    app.openPanel(tab);
+    return;
+  }
+  const goto = /^session\.goto(\d)$/.exec(id);
+  if (goto?.[1]) {
+    void open(app, app.sessions.tab(Number(goto[1])));
+    return;
+  }
+  switch (id) {
+    case 'session.new':
+      void app.newSession();
+      break;
+    case 'session.switch':
+      // Pola ustawiane osobno: zmiana samego `open` nie przelicza listy pozycji palety.
+      app.palette.mode = 'sessions';
+      app.palette.open = true;
+      break;
+    case 'session.close':
+      if (sid) void open(app, app.sessions.close(sid));
+      break;
+    case 'session.reopen':
+      void open(app, app.sessions.reopen());
+      break;
+    case 'session.next':
+      void open(app, app.sessions.cycle(1));
+      break;
+    case 'session.prev':
+      void open(app, app.sessions.cycle(-1));
+      break;
+    case 'session.rename':
+      if (sid) {
+        app.sessions.renamingInTitle = true;
+        app.sessions.renamingId = sid;
+      }
+      break;
+    case 'search.everywhere':
+      app.view = 'chat';
+      // Pole szukania jest w liście sesji: pokazanie listy na średnim i wąskim oknie zamyka
+      // prawy panel (oba się nie mieszczą), a przy panelach chowanych — wysuwa listę.
+      app.layout.update(sid, { left_open: true });
+      focusById('alfa-sessions-search');
+      break;
+    case 'search.conversation':
+      app.findOpen = true;
+      focusById('alfa-find-input');
+      break;
+    case 'palette.open':
+      app.palette.mode = 'all';
+      app.palette.open = !app.palette.open;
+      break;
+    case 'cheatsheet.open':
+      app.cheatsheetOpen = !app.cheatsheetOpen;
+      break;
+    case 'help.open':
+      app.openSettings('help');
+      break;
+    case 'settings.open':
+      if (app.view === 'settings') app.closeSettings();
+      else app.openSettings();
+      break;
+    case 'view.focus':
+      app.layout.setFocus(!app.layout.focus);
+      break;
+    case 'nav.back':
+      void app.navigate(-1);
+      break;
+    case 'nav.forward':
+      void app.navigate(1);
+      break;
+    case 'view.zoomIn':
+    case 'view.zoomOut':
+    case 'view.zoomReset': {
+      const dir = id === 'view.zoomIn' ? 1 : id === 'view.zoomOut' ? -1 : 0;
+      const zoom = stepZoom(app.num('ui.zoom', 100), dir);
+      void app.setSetting('ui.zoom', zoom);
+      app.announcement = app.i18n.t('zoom.level', { pct: `${zoom}%` });
+      break;
+    }
+    case 'panel.sessions':
+      // W Ustawieniach Ctrl+B chowa i pokazuje ich menu (tam panelu Sesje nie ma); w bardzo wąskim
+      // oknie menu stoi nad stroną i się nie chowa — bez cichej zmiany zapamiętanego wyboru.
+      if (app.view !== 'settings') app.layout.toggleLeft(sid);
+      else if (app.layout.mode !== 'compact')
+        app.layout.setSettingsNav(!app.layout.settingsNavHidden);
+      break;
+    case 'panel.right':
+      app.layout.toggleRight(sid);
+      break;
+    case 'voice.mic': {
+      const on = app.micState === 'off' || app.micState === 'muted';
+      const before = app.micState;
+      app.micState = on ? 'listening' : 'off';
+      app.client.voice.setMicEnabled(on).catch((error: unknown) => {
+        app.micState = before;
+        app.toasts.show({ kind: 'warning', message: errorText(error) });
+      });
+      break;
+    }
+    case 'action.theme': {
+      const theme = app.str('ui.theme', 'auto');
+      const dark =
+        theme === 'dark' ||
+        (theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+      void app.setSetting('ui.theme', dark ? 'light' : 'dark');
+      break;
+    }
+    case 'action.language':
+      void app.setSetting('ui.locale', app.i18n.locale === 'pl' ? 'en' : 'pl');
+      break;
+    case 'action.column':
+      void app.setSetting('ui.column', nextColumn(app.str('ui.column', 'auto')));
+      break;
+    case 'action.panels':
+      // Panele chowane przy krawędziach (właściciel 27.10) — włączane jednym poleceniem z palety.
+      void app.setSetting('ui.panels_autohide', !app.bool('ui.panels_autohide', true));
+      break;
+    case 'action.transfer':
+      app.openSettings('transfer');
+      break;
+    case 'action.accounts':
+      app.openSettings('providers');
+      break;
+    case 'action.autonomy': {
+      // Menu „Tryb pracy” w pasku pisania (właściciel 29.10); w Ustawieniach albo przy schowanym
+      // przycisku — strona Uprawnienia.
+      const anchor = document.querySelector<HTMLElement>('.composer [data-level]');
+      if (app.view === 'chat' && anchor?.checkVisibility())
+        requestAnimationFrame(() => anchor.click());
+      else app.openSettings('permissions');
+      break;
+    }
+    case 'mode.cycle': {
+      const view = cycleView(app);
+      void switchMode(app, view, nextMode(app, view));
+      break;
+    }
+    case 'action.cast':
+      app.openPanel('agents');
+      break;
+    case 'action.stopGeneration':
+      void app.stopGeneration();
+      break;
+    case 'action.board':
+      openBoard();
+      break;
+    case 'action.stats':
+      openStats();
+      break;
+    case 'action.arena':
+      openArena(null);
+      break;
+    case 'action.teach':
+      openTeach();
+      break;
+    case 'action.copyConversation':
+      void copyConversation(app);
+      break;
+    case 'action.help':
+      app.openSettings('help');
+      break;
+    case 'action.templates':
+      openTemplates();
+      break;
+    case 'action.onboarding':
+      app.view = 'onboarding';
+      break;
+    case 'action.exportMarkdown':
+    case 'action.exportHtml':
+    case 'action.exportJson':
+      void exportConversation(app, sid, EXPORT_FORMAT[id] ?? 'markdown');
+      break;
+  }
+}
+
+function inEditable(target: EventTarget | null): boolean {
+  const element = target as Partial<Element> | null;
+  return (
+    typeof element?.closest === 'function' &&
+    element.closest('input, textarea, select, [contenteditable="true"]') !== null
+  );
+}
+
+/** Esc: kolejno zamknij menu/dialog → szufladę/widok → stop mowy → stop generowania. */
+export function escapeChain(app: AppState): boolean {
+  if (app.palette.open || app.cheatsheetOpen) return false;
+  if (app.findOpen) {
+    app.findOpen = false;
+    return true;
+  }
+  if (app.view === 'settings' && app.layout.settingsPeek) {
+    app.layout.settingsPeek = false;
+    return true;
+  }
+  if (app.view === 'settings') {
+    app.closeSettings();
+    return true;
+  }
+  // Kanwa artefaktów (C2.8): Esc także spoza kanwy (np. z pola pisania) zamyka ją przed panelami.
+  if (canvas.item) {
+    closeCanvas();
+    return true;
+  }
+  const sid = app.activeId;
+  const place = app.layout.placement(sid);
+  if (place.right === 'drawer' || place.right === 'sheet') {
+    app.layout.update(sid, { right_open: false });
+    return true;
+  }
+  if (place.left === 'drawer' || place.left === 'sheet') {
+    app.layout.update(sid, { left_open: false });
+    return true;
+  }
+  // Tylko naprawdę wysunięty panel; pozostałość `peek` (np. po zwężeniu okna) nie połyka Esc.
+  if (place.left === 'peek' || place.right === 'peek') {
+    app.layout.peek = null;
+    return true;
+  }
+  app.layout.peek = null;
+  if (app.layout.focus) {
+    app.layout.setFocus(false);
+    return true;
+  }
+  // Mowa agentki w rozmowie i czytanie wiadomości na głos (wyróżnione zdanie, plan 43).
+  if (app.micState === 'speaking' || reading.turnId !== null) {
+    void attempt(app.toasts, () => app.client.voice.stopSpeech());
+    return true;
+  }
+  if (app.voice.reading) {
+    app.voice.stopReading(app.client, (error) => showError(app.toasts, error));
+    return true;
+  }
+  if (app.conversation?.streaming) {
+    void app.stopGeneration();
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Boczne przyciski myszy: wstecz (3) i dalej (4) po odwiedzonych miejscach — jak w przeglądarce.
+ * Poza rozmową i Ustawieniami (start, wprowadzenie) nic nie robią.
+ */
+export function handleMouseNav(app: AppState, event: MouseEvent): void {
+  if (event.button !== 3 && event.button !== 4) return;
+  if (app.view !== 'chat' && app.view !== 'settings') return;
+  event.preventDefault();
+  void app.navigate(event.button === 3 ? -1 : 1);
+}
+
+export function handleKeydown(app: AppState, event: KeyboardEvent): void {
+  if (event.defaultPrevented || event.isComposing) return;
+  const chord = chordFromEvent(event);
+  if (!chord) return;
+  if (RESERVED[chord] === 'reload') {
+    event.preventDefault();
+    return;
+  }
+  if (chord === 'Esc') {
+    if (app.view !== 'onboarding' && escapeChain(app)) event.preventDefault();
+    return;
+  }
+  const def = app.keymap.get(chord);
+  if (!def || COMPOSER_LOCAL.has(def.id)) return;
+  if (app.view === 'onboarding' && !ONBOARDING_ALLOWED.has(def.id)) return;
+  if (inEditable(event.target) && !allowedInInput(chord, def)) return;
+  event.preventDefault();
+  runCommand(app, def.id);
+}

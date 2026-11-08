@@ -1,0 +1,33 @@
+// Ustawienia → Moduły (pl — źródło kluczy).
+export const plModules = {
+  'modules.title': 'Moduły',
+  'modules.intro':
+    'Alfa składa się z modułów: każdy dostarcza jedną część programu, ma budżet pamięci i procesora i własny stan. Moduły Jądra (zgody, nadzór, dziennik, aktualizacje) są chronione. Część modułów można wyłączyć, żeby oszczędzić pamięć — zmiana działa od następnego uruchomienia.',
+  'modules.summary': '{n} modułów · budżet pamięci włączonych: ok. {ram} GB',
+  'modules.restart': 'Zmiany zadziałają po ponownym uruchomieniu Alfy.',
+  'modules.search': 'Szukaj modułu',
+  'modules.optional': 'Moduły opcjonalne',
+  'modules.optionalHint':
+    'Bez nich rozmowa działa dalej; funkcje zależne pokażą „moduł niepodłączony”.',
+  'modules.all': 'Pozostałe moduły',
+  'modules.protected': 'Jądro — chroniony',
+  'modules.enabledFor': 'Moduł {id} włączony',
+  'modules.capabilities': 'zdolności',
+  'modules.ram': 'pamięć {mb} MB',
+  'modules.vram': 'karta {mb} MB',
+  'modules.state.ready': 'działa',
+  'modules.state.unloaded': 'czeka na użycie',
+  'modules.state.loading': 'uruchamia się',
+  'modules.state.degraded': 'działa z ograniczeniami',
+  'modules.state.failed': 'błąd',
+  'modules.state.disabled': 'wyłączony',
+  'modules.kind.service': 'usługa',
+  'modules.kind.tool': 'narzędzie',
+  'modules.kind.provider': 'dostawca modeli',
+  'modules.kind.voice-engine': 'silnik głosu',
+  'modules.kind.agent-pack': 'pakiet agentek',
+  'modules.kind.ui-panel': 'panel',
+  'modules.lifecycle.always': 'zawsze',
+  'modules.lifecycle.lazy': 'przy pierwszym użyciu',
+  'modules.lifecycle.on-demand': 'na żądanie',
+} as const;

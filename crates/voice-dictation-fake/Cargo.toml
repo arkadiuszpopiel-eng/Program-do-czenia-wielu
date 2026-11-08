@@ -1,0 +1,16 @@
+[package]
+name = "voice-dictation-fake"
+description = "Atrapa voice-dictation: wspólny automat z kontraktu na wirtualnych oknach w pamięci (bez platformy) — dla testów innych modułów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-dictation-contract = { path = "../voice-dictation-contract", features = ["contract-tests"] }
+platform-contract.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,18 @@
+[package]
+name = "voice-cmd-fake"
+description = "voice-cmd: deterministyczna atrapa (dokładne frazy gramatyki + trafienia z adnotacji)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-cmd-contract = { path = "../voice-cmd-contract" }
+
+[dev-dependencies]
+voice-cmd-contract = { path = "../voice-cmd-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

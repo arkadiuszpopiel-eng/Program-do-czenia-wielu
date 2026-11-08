@@ -1,0 +1,28 @@
+[package]
+name = "voice-s2s-contract"
+description = "Tryb speech-to-speech w chmurze (OpenAI Realtime / Gemini Live): kontrakt — klient i sesja, konfiguracja z tagiem prywatności, przerwanie z natywnym obcięciem (InterruptionRendering::NativeTruncate), zdarzenia „co poszło do chmury”"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait.workspace = true
+
+[lints]
+workspace = true

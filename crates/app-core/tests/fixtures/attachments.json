@@ -1,0 +1,249 @@
+[
+  {
+    "command": "attachments_add_camera",
+    "args": {
+      "sessionId": "s-api",
+      "cameraId": "usb-integrated"
+    },
+    "result": {
+      "added": [
+        {
+          "id": "att-muo3lago-19",
+          "session_id": "s-api",
+          "name": "kamera-usb-integrated-124500.png",
+          "bytes": 412000,
+          "mime": "image/png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-api\\in\\kamera-usb-integrated-124500.png",
+          "kind": "image",
+          "delivery": "full",
+          "tokens": 1640
+        }
+      ],
+      "rejected": [],
+      "staged": [
+        {
+          "id": "att-muo3lago-19",
+          "session_id": "s-api",
+          "name": "kamera-usb-integrated-124500.png",
+          "bytes": 412000,
+          "mime": "image/png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-api\\in\\kamera-usb-integrated-124500.png",
+          "kind": "image",
+          "delivery": "full",
+          "tokens": 1640
+        }
+      ]
+    }
+  },
+  {
+    "command": "attachments_list",
+    "args": {
+      "sessionId": "s-trip"
+    },
+    "result": []
+  },
+  {
+    "command": "attachments_pick",
+    "args": {
+      "sessionId": "s-trip"
+    },
+    "result": {
+      "added": [
+        {
+          "id": "att-muoilses-38",
+          "session_id": "s-trip",
+          "name": "raport-q3.pdf",
+          "bytes": 1240000,
+          "mime": "application/pdf",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\raport-q3.pdf",
+          "kind": "document",
+          "delivery": "metadata_only",
+          "tokens": 40
+        }
+      ],
+      "rejected": [],
+      "staged": [
+        {
+          "id": "att-muoilses-38",
+          "session_id": "s-trip",
+          "name": "raport-q3.pdf",
+          "bytes": 1240000,
+          "mime": "application/pdf",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\raport-q3.pdf",
+          "kind": "document",
+          "delivery": "metadata_only",
+          "tokens": 40
+        }
+      ]
+    }
+  },
+  {
+    "command": "attachments_paste",
+    "args": {
+      "sessionId": "s-trip"
+    },
+    "result": {
+      "added": [
+        {
+          "id": "att-muoilses-39",
+          "session_id": "s-trip",
+          "name": "wklejony-obraz-20260930-194518.png",
+          "bytes": 182000,
+          "mime": "image/png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
+          "kind": "image",
+          "delivery": "full",
+          "tokens": 1640
+        }
+      ],
+      "rejected": [],
+      "staged": [
+        {
+          "id": "att-muoilses-38",
+          "session_id": "s-trip",
+          "name": "raport-q3.pdf",
+          "bytes": 1240000,
+          "mime": "application/pdf",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\raport-q3.pdf",
+          "kind": "document",
+          "delivery": "metadata_only",
+          "tokens": 40
+        },
+        {
+          "id": "att-muoilses-39",
+          "session_id": "s-trip",
+          "name": "wklejony-obraz-20260930-194518.png",
+          "bytes": 182000,
+          "mime": "image/png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
+          "kind": "image",
+          "delivery": "full",
+          "tokens": 1640
+        }
+      ]
+    }
+  },
+  {
+    "command": "attachments_add_dropped",
+    "args": {
+      "sessionId": "s-trip"
+    },
+    "result": {
+      "added": [
+        {
+          "id": "att-muoilses-40",
+          "session_id": "s-trip",
+          "name": "notatki.md",
+          "bytes": 400000,
+          "mime": "text/markdown",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\notatki.md",
+          "kind": "text",
+          "delivery": "truncated",
+          "tokens": 25040
+        }
+      ],
+      "rejected": [
+        {
+          "name": "film.mp4",
+          "reason": "too_large"
+        }
+      ],
+      "staged": [
+        {
+          "id": "att-muoilses-38",
+          "session_id": "s-trip",
+          "name": "raport-q3.pdf",
+          "bytes": 1240000,
+          "mime": "application/pdf",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\raport-q3.pdf",
+          "kind": "document",
+          "delivery": "metadata_only",
+          "tokens": 40
+        },
+        {
+          "id": "att-muoilses-39",
+          "session_id": "s-trip",
+          "name": "wklejony-obraz-20260930-194518.png",
+          "bytes": 182000,
+          "mime": "image/png",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
+          "kind": "image",
+          "delivery": "full",
+          "tokens": 1640
+        },
+        {
+          "id": "att-muoilses-40",
+          "session_id": "s-trip",
+          "name": "notatki.md",
+          "bytes": 400000,
+          "mime": "text/markdown",
+          "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\notatki.md",
+          "kind": "text",
+          "delivery": "truncated",
+          "tokens": 25040
+        }
+      ]
+    }
+  },
+  {
+    "command": "attachments_remove",
+    "args": {
+      "sessionId": "s-trip",
+      "attachmentId": "att-muoilses-38"
+    },
+    "result": [
+      {
+        "id": "att-muoilses-39",
+        "session_id": "s-trip",
+        "name": "wklejony-obraz-20260930-194518.png",
+        "bytes": 182000,
+        "mime": "image/png",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
+        "kind": "image",
+        "delivery": "full",
+        "tokens": 1640
+      },
+      {
+        "id": "att-muoilses-40",
+        "session_id": "s-trip",
+        "name": "notatki.md",
+        "bytes": 400000,
+        "mime": "text/markdown",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\notatki.md",
+        "kind": "text",
+        "delivery": "truncated",
+        "tokens": 25040
+      }
+    ]
+  },
+  {
+    "command": "attachments_list",
+    "args": {
+      "sessionId": "s-trip"
+    },
+    "result": [
+      {
+        "id": "att-muoilses-39",
+        "session_id": "s-trip",
+        "name": "wklejony-obraz-20260930-194518.png",
+        "bytes": 182000,
+        "mime": "image/png",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\wklejony-obraz-20260930-194518.png",
+        "kind": "image",
+        "delivery": "full",
+        "tokens": 1640
+      },
+      {
+        "id": "att-muoilses-40",
+        "session_id": "s-trip",
+        "name": "notatki.md",
+        "bytes": 400000,
+        "mime": "text/markdown",
+        "path": "C:\\Users\\Ty\\Alfa\\Sesje\\s-trip\\in\\notatki.md",
+        "kind": "text",
+        "delivery": "truncated",
+        "tokens": 25040
+      }
+    ]
+  }
+]

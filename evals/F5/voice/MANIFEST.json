@@ -1,0 +1,23 @@
+{
+  "wave": "F5",
+  "set": "voice",
+  "version": 1,
+  "status": "proposed — wymaga akceptacji właściciela przed zamrożeniem (ACCEPTANCE §1)",
+  "created": "2026-10-02",
+  "files": {
+    "dictation-cases.json": "ca81375f4298e6d22088bcce5e920cfd7517b624ec00d20961966f5e759cf6e1",
+    "samples/wake.ndjson": "22a1b29a89ee6e52b8c72eb206a0509a519040dbcc82adf37f388afc4aab6cfb",
+    "samples/speaker.ndjson": "dda6120b22602c2591de4fa3754fd38720a10beae0eef6d1660469e9c7fa7837",
+    "wake-manifest.schema.json": "b41629d4b58cddfab93824b4180bfe1e503b60c024d6103729cb7ab2bb99476d",
+    "speaker-manifest.schema.json": "b0e90417b52f66149d0e593037a47a2d41c4daf097605ee7d76174dbbcf229de"
+  },
+  "thresholds": {
+    "F5-05": "FAR ≤ 1 / dzień (≥ 24 h tła PL)",
+    "F5-06": "FRR ≤ 5 % (≥ 200 pozytywów właściciela)",
+    "F5-07": "EER ≤ 3 %",
+    "F5-08": "FAR ≤ 0,1 % przy progu ścisłym (≥ 3000 prób obcych)",
+    "F5-10": "CI: 30/30 normalizacji; sprzęt: ≥ 95 % zgodności tekstu w 5 aplikacjach",
+    "F5-11": "czytanie zaznaczenia w 5 aplikacjach"
+  },
+  "corpus": "evals/corpus/f5/ — poza gitem; hashe podziału test: alfa-wake-eval freeze"
+}

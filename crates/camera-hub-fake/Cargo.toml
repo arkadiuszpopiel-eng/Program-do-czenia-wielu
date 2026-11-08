@@ -1,0 +1,20 @@
+[package]
+name = "camera-hub-fake"
+description = "Atrapa camera-hub: wirtualne kamery z ruchomym wzorem testowym, sterowane odłączenie, błąd i upływ bezczynności, licznik otwartych strumieni"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+camera-hub-contract = { path = "../camera-hub-contract" }
+async-trait.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+camera-hub-contract = { path = "../camera-hub-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

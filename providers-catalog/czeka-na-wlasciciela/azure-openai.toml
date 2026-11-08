@@ -1,0 +1,24 @@
+# providers-catalog/azure-openai.toml — konto firmowe (plan v6, zadanie C2.12), stan z 2026-10-18
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "azure-openai"
+display_name = "Azure OpenAI"
+kind = "chat"
+auth = "api_key"
+# Adres zależy od zasobu firmy (https://<zasób>.openai.azure.com) — podaje go użytkownik w kreatorze.
+base_url = "TODO"
+compat = "native"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "Zasób Azure OpenAI firmy (umowa z Microsoft): klucz w nagłówku api-key, żądania na /openai/deployments/{wdrożenie}/chat/completions?api-version=…; wdrożenia i wersję API podaje użytkownik przy koncie. Region i zasady danych zależą od zasobu [?]. Bez zmiennych środowiskowych: import nie zna adresu ani wdrożeń."
+
+[capabilities]
+vision = "unknown"
+tools = "unknown"
+streaming = true
+long_context = "unknown"
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

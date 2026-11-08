@@ -1,0 +1,57 @@
+[
+  {
+    "command": "prompt_templates_get",
+    "args": {},
+    "result": [
+      {
+        "id": "e-mail",
+        "name": "E-mail",
+        "text": "Napisz uprzejmy e-mail do {{adresat}} w sprawie: {{temat}}. Krótko, po polsku."
+      },
+      {
+        "id": "streszczenie",
+        "name": "Streszczenie",
+        "text": "Streść w 5 punktach:\n\n{{tekst}}"
+      }
+    ]
+  },
+  {
+    "command": "prompt_templates_set",
+    "args": {
+      "templates": [
+        {
+          "id": "e-mail",
+          "name": "E-mail",
+          "text": "Napisz uprzejmy e-mail do {{adresat}} w sprawie: {{temat}}. Krótko, po polsku."
+        },
+        {
+          "id": "streszczenie",
+          "name": "Streszczenie",
+          "text": "Streść w 5 punktach:\n\n{{tekst}}"
+        },
+        {
+          "id": "",
+          "name": "Plan dnia",
+          "text": "Ułóż plan dnia na {{dzień}} z zadaniami: {{zadania}}."
+        }
+      ]
+    },
+    "result": [
+      {
+        "id": "e-mail",
+        "name": "E-mail",
+        "text": "Napisz uprzejmy e-mail do {{adresat}} w sprawie: {{temat}}. Krótko, po polsku."
+      },
+      {
+        "id": "streszczenie",
+        "name": "Streszczenie",
+        "text": "Streść w 5 punktach:\n\n{{tekst}}"
+      },
+      {
+        "id": "plan-dnia",
+        "name": "Plan dnia",
+        "text": "Ułóż plan dnia na {{dzień}} z zadaniami: {{zadania}}."
+      }
+    ]
+  }
+]

@@ -1,0 +1,26 @@
+[package]
+name = "voice-vad-contract"
+description = "Wykrywanie mowy Voice Suite: kontrakt — trait Vad, automat decyzji (histereza, min. czasy, próg adaptacyjny), detektor energii, zdarzenia voice.vad.*"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-dsp-contract = { path = "../voice-dsp-contract" }
+core-bus-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

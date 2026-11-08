@@ -1,0 +1,29 @@
+[package]
+name = "tools-shell-contract"
+description = "tools-shell: kontrakt narzędzia powłoki — argumenty i wynik (JSON Schema), manifesty, heurystyki polecenia (destrukcja, instalacja, egress z hostami, ścieżki), konfiguracja powłok"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+platform-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

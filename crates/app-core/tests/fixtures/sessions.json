@@ -1,0 +1,764 @@
+[
+  {
+    "command": "sessions_list",
+    "args": {},
+    "result": [
+      {
+        "id": "s-q3",
+        "title": "Raport Q3",
+        "project": {
+          "id": "p-x",
+          "name": "Projekt X"
+        },
+        "pinned": true,
+        "archived": false,
+        "working": true,
+        "unread": false,
+        "updated_at": "2026-09-30T08:43:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid",
+        "turn_count": 7,
+        "created_at": "2026-09-29T08:43:00.000Z"
+      },
+      {
+        "id": "s-api",
+        "title": "Kod: API płatności",
+        "project": {
+          "id": "p-shop",
+          "name": "Sklep"
+        },
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-09-30T08:00:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid",
+        "turn_count": 2,
+        "created_at": "2026-09-29T08:00:00.000Z"
+      },
+      {
+        "id": "s-shop",
+        "title": "Zakupy na weekend",
+        "project": null,
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": true,
+        "updated_at": "2026-09-30T05:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid",
+        "turn_count": 2,
+        "created_at": "2026-09-29T05:45:00.000Z"
+      },
+      {
+        "id": "s-trip",
+        "title": "Plan wyjazdu do Gdańska",
+        "project": null,
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-09-29T06:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid",
+        "turn_count": 2,
+        "created_at": "2026-09-28T06:45:00.000Z"
+      },
+      {
+        "id": "s-db",
+        "title": "Migracja bazy",
+        "project": {
+          "id": "p-shop",
+          "name": "Sklep"
+        },
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-09-28T06:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid",
+        "turn_count": 2,
+        "created_at": "2026-09-27T06:45:00.000Z"
+      },
+      {
+        "id": "s-long",
+        "title": "Długa rozmowa (1000 wiadomości)",
+        "project": null,
+        "pinned": false,
+        "archived": false,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-09-27T08:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid",
+        "turn_count": 1000,
+        "created_at": "2026-09-26T08:45:00.000Z"
+      },
+      {
+        "id": "s-old",
+        "title": "Stare notatki",
+        "project": null,
+        "pinned": false,
+        "archived": true,
+        "working": false,
+        "unread": false,
+        "updated_at": "2026-08-31T08:45:00.000Z",
+        "tags": [],
+        "autonomy": "L3",
+        "profile": "hybrid",
+        "turn_count": 2,
+        "created_at": "2026-08-30T08:45:00.000Z"
+      }
+    ]
+  },
+  {
+    "command": "sessions_create",
+    "args": {
+      "template": "coding"
+    },
+    "result": {
+      "id": "s-munv0mw0-1",
+      "title": "Kodowanie",
+      "project": null,
+      "pinned": false,
+      "archived": false,
+      "working": false,
+      "unread": false,
+      "updated_at": "2026-09-30T08:45:00.000Z",
+      "tags": [],
+      "autonomy": "L3",
+      "profile": "hybrid",
+      "turn_count": 0,
+      "created_at": "2026-09-29T08:45:00.000Z"
+    }
+  },
+  {
+    "command": "sessions_rename",
+    "args": {
+      "sessionId": "s-munv0mw0-1",
+      "title": "API płatności — refaktor"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_set_pinned",
+    "args": {
+      "sessionId": "s-munv0mw0-1",
+      "pinned": true
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_set_archived",
+    "args": {
+      "sessionId": "s-munv0mw0-1",
+      "archived": false
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_remove",
+    "args": {
+      "sessionId": "s-munv0mw0-1"
+    },
+    "result": {
+      "token": "undo-munv0mw0-2",
+      "expires_at": "2026-09-30T08:45:10.000Z"
+    }
+  },
+  {
+    "command": "sessions_undo_remove",
+    "args": {
+      "token": "undo-munv0mw0-2"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_duplicate_as_template",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "id": "s-munv0mw0-3",
+      "title": "Raport Q3 (szablon)",
+      "project": {
+        "id": "p-x",
+        "name": "Projekt X"
+      },
+      "pinned": false,
+      "archived": false,
+      "working": false,
+      "unread": false,
+      "updated_at": "2026-09-30T08:45:00.000Z",
+      "tags": [],
+      "autonomy": "L3",
+      "profile": "hybrid",
+      "turn_count": 0,
+      "created_at": "2026-09-29T08:45:00.000Z"
+    }
+  },
+  {
+    "command": "sessions_export",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "status": "saved",
+      "path": "C:\\Users\\Ty\\Documents\\s-q3.alfa",
+      "files": 4,
+      "bytes": 18422
+    }
+  },
+  {
+    "command": "sessions_mark_read",
+    "args": {
+      "sessionId": "s-shop"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_save_draft",
+    "args": {
+      "sessionId": "s-q3",
+      "text": "Szkic: dopisz wnioski"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_get_draft",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": "Szkic: dopisz wnioski"
+  },
+  {
+    "command": "sessions_workdir",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "path": "C:\\Users\\Ty\\Alfa\\Sesje\\Raport Q3",
+      "default_path": "C:\\Users\\Ty\\Alfa\\Sesje\\Raport Q3"
+    }
+  },
+  {
+    "command": "sessions_choose_workdir",
+    "args": {
+      "sessionId": "s-trip",
+      "choice": "dialog"
+    },
+    "result": {
+      "path": "C:\\Users\\Ty\\Dokumenty\\Projekt",
+      "default_path": "C:\\Users\\Ty\\Alfa\\Sesje\\Plan wyjazdu do Gdańska"
+    }
+  },
+  {
+    "command": "sessions_choose_workdir",
+    "args": {
+      "sessionId": "s-trip",
+      "choice": "default"
+    },
+    "result": {
+      "path": "C:\\Users\\Ty\\Alfa\\Sesje\\Plan wyjazdu do Gdańska",
+      "default_path": "C:\\Users\\Ty\\Alfa\\Sesje\\Plan wyjazdu do Gdańska"
+    }
+  },
+  {
+    "command": "sessions_choose_workdir",
+    "args": {
+      "sessionId": "s-trip",
+      "choice": "none"
+    },
+    "result": {
+      "path": null,
+      "default_path": "C:\\Users\\Ty\\Alfa\\Sesje\\Plan wyjazdu do Gdańska"
+    }
+  },
+  {
+    "command": "sessions_search",
+    "args": {
+      "query": "raport"
+    },
+    "result": [
+      {
+        "session_id": "s-munv0mw0-3",
+        "title": "Raport Q3 (szablon)",
+        "snippet": "",
+        "turn_id": null
+      },
+      {
+        "session_id": "s-q3",
+        "title": "Raport Q3",
+        "snippet": "Zbierz dane do raportu Q3 z folderu Finanse/2026-Q3.",
+        "turn_id": "q1"
+      }
+    ]
+  },
+  {
+    "command": "sessions_set_project",
+    "args": {
+      "sessionId": "s-trip",
+      "project": "Wakacje"
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_set_project",
+    "args": {
+      "sessionId": "s-trip",
+      "project": null
+    },
+    "result": null
+  },
+  {
+    "command": "sessions_cards",
+    "args": {
+      "sessionIds": [
+        "s-q3",
+        "s-trip",
+        "s-nieznana"
+      ]
+    },
+    "result": [
+      {
+        "session_id": "s-q3",
+        "agents": [
+          "gama",
+          "delta",
+          "alfa"
+        ],
+        "snippet": "W skrócie: tak, warto. Najpierw zrób listę zadań na tydzień, potem przypisz im godziny.",
+        "snippet_author": "alfa",
+        "model": "gpt-4o-mini",
+        "cost": {
+          "minor": 115,
+          "currency": "PLN"
+        }
+      },
+      {
+        "session_id": "s-trip",
+        "agents": [
+          "alfa"
+        ],
+        "snippet": "Jasne. Rozpisałam to na trzy kroki: najpierw zbiorę dane, potem przygotuję szkic, a na końcu sprawdzę spójność liczb. Gdy coś będzie wymagało Twojej zgody, dam…",
+        "snippet_author": "alfa",
+        "model": "claude-opus-5-5",
+        "cost": {
+          "minor": 2,
+          "currency": "PLN"
+        }
+      }
+    ]
+  },
+  {
+    "command": "projects_list",
+    "args": {},
+    "result": [
+      {
+        "name": "Projekt X",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt X",
+        "session_count": 2
+      },
+      {
+        "name": "Sklep",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Sklep",
+        "session_count": 2
+      }
+    ]
+  },
+  {
+    "command": "projects_pick_dir",
+    "args": {},
+    "result": "C:\\Users\\Ty\\Dokumenty\\Projekt"
+  },
+  {
+    "command": "projects_save",
+    "args": {
+      "name": "Nowy Projekt",
+      "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt"
+    },
+    "result": [
+      {
+        "name": "Nowy Projekt",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt",
+        "session_count": 0
+      },
+      {
+        "name": "Projekt X",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt X",
+        "session_count": 2
+      },
+      {
+        "name": "Sklep",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Sklep",
+        "session_count": 2
+      }
+    ]
+  },
+  {
+    "command": "projects_rename",
+    "args": {
+      "oldName": "Nowy Projekt",
+      "newName": "Projekt Alfa"
+    },
+    "result": [
+      {
+        "name": "Projekt Alfa",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt",
+        "session_count": 0
+      },
+      {
+        "name": "Projekt X",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt X",
+        "session_count": 2
+      },
+      {
+        "name": "Sklep",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Sklep",
+        "session_count": 2
+      }
+    ]
+  },
+  {
+    "command": "projects_remove",
+    "args": {
+      "name": "Projekt Alfa"
+    },
+    "result": [
+      {
+        "name": "Projekt X",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Projekt X",
+        "session_count": 2
+      },
+      {
+        "name": "Sklep",
+        "workdir": "C:\\Users\\Ty\\Dokumenty\\Sklep",
+        "session_count": 2
+      }
+    ]
+  },
+  {
+    "command": "pipelines_list",
+    "args": {},
+    "result": [
+      {
+        "name": "ui-design",
+        "description": "Szkic/opis → wytyczne wizualne → architektura komponentów → kod React/Tailwind.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Styl i typografia",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Dobierz styl, kolory i typografię.\n\n{{input}}"
+          },
+          {
+            "title": "Architektura komponentów",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Zaprojektuj komponenty, stany i dostępność.\n\n{{prev}}"
+          },
+          {
+            "title": "Kod React/Tailwind",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wygeneruj finalny kod.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "code-review",
+        "description": "Implementacja → krytyczny przegląd → poprawki z testami.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Implementacja",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Przegląd",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "Zrób przegląd zmian.\n\n{{prev}}"
+          },
+          {
+            "title": "Poprawki",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wprowadź poprawki.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "research-report",
+        "description": "Badanie tematu → weryfikacja wiarygodności → zwięzły raport.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Badanie",
+            "role": "researcher",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Weryfikacja",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          },
+          {
+            "title": "Raport",
+            "role": "writer",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "command": "pipelines_save",
+    "args": {
+      "pipeline": {
+        "name": "Szkic do UI",
+        "description": "Styl → kod",
+        "builtin": false,
+        "stages": [
+          {
+            "title": "Styl",
+            "role": "thinker",
+            "persona": null,
+            "model": "openai:gpt-4o-mini",
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Kod",
+            "role": "coder",
+            "persona": "delta",
+            "model": null,
+            "goal": "Kod z: {{prev}}"
+          }
+        ]
+      },
+      "previousName": null
+    },
+    "result": [
+      {
+        "name": "Szkic do UI",
+        "description": "Styl → kod",
+        "builtin": false,
+        "stages": [
+          {
+            "title": "Styl",
+            "role": "thinker",
+            "persona": null,
+            "model": "openai:gpt-4o-mini",
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Kod",
+            "role": "coder",
+            "persona": "delta",
+            "model": null,
+            "goal": "Kod z: {{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "ui-design",
+        "description": "Szkic/opis → wytyczne wizualne → architektura komponentów → kod React/Tailwind.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Styl i typografia",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Dobierz styl, kolory i typografię.\n\n{{input}}"
+          },
+          {
+            "title": "Architektura komponentów",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Zaprojektuj komponenty, stany i dostępność.\n\n{{prev}}"
+          },
+          {
+            "title": "Kod React/Tailwind",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wygeneruj finalny kod.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "code-review",
+        "description": "Implementacja → krytyczny przegląd → poprawki z testami.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Implementacja",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Przegląd",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "Zrób przegląd zmian.\n\n{{prev}}"
+          },
+          {
+            "title": "Poprawki",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wprowadź poprawki.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "research-report",
+        "description": "Badanie tematu → weryfikacja wiarygodności → zwięzły raport.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Badanie",
+            "role": "researcher",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Weryfikacja",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          },
+          {
+            "title": "Raport",
+            "role": "writer",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "command": "pipelines_remove",
+    "args": {
+      "name": "Szkic do UI"
+    },
+    "result": [
+      {
+        "name": "ui-design",
+        "description": "Szkic/opis → wytyczne wizualne → architektura komponentów → kod React/Tailwind.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Styl i typografia",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Dobierz styl, kolory i typografię.\n\n{{input}}"
+          },
+          {
+            "title": "Architektura komponentów",
+            "role": "thinker",
+            "persona": null,
+            "model": null,
+            "goal": "Zaprojektuj komponenty, stany i dostępność.\n\n{{prev}}"
+          },
+          {
+            "title": "Kod React/Tailwind",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wygeneruj finalny kod.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "code-review",
+        "description": "Implementacja → krytyczny przegląd → poprawki z testami.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Implementacja",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Przegląd",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "Zrób przegląd zmian.\n\n{{prev}}"
+          },
+          {
+            "title": "Poprawki",
+            "role": "coder",
+            "persona": null,
+            "model": null,
+            "goal": "Wprowadź poprawki.\n\n{{prev}}"
+          }
+        ]
+      },
+      {
+        "name": "research-report",
+        "description": "Badanie tematu → weryfikacja wiarygodności → zwięzły raport.",
+        "builtin": true,
+        "stages": [
+          {
+            "title": "Badanie",
+            "role": "researcher",
+            "persona": null,
+            "model": null,
+            "goal": "{{input}}"
+          },
+          {
+            "title": "Weryfikacja",
+            "role": "critic",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          },
+          {
+            "title": "Raport",
+            "role": "writer",
+            "persona": null,
+            "model": null,
+            "goal": "{{prev}}"
+          }
+        ]
+      }
+    ]
+  }
+]

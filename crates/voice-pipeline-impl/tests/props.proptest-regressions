@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 9646bb60133442e771b0551bdb6d2738527157c4e82b4f3ef4f8c96d7d4b9f30 # shrinks to sc = Scenario { echo: false, speech: [(1742, 341, 4)], acts: [(0, Toggle), (0, Ptt(true)), (2391, Typed)] }
+cc 752798c7bc73606c17fc491636aa7bf49d631b8a094a20df2446685036df3b0f # shrinks to sc = Scenario { echo: false, speech: [(0, 250, 0)], acts: [(0, Deactivate), (6901, Ptt(true)), (6901, Ptt(false))] }

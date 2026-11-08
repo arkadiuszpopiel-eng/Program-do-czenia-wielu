@@ -1,0 +1,36 @@
+[package]
+name = "voice-audio-impl"
+description = "Implementacja voice-audio: WASAPI (crate wasapi, tryb współdzielony zdarzeniowy, IAudioClock) na Windows, Unsupported gdzie indziej; moduł publikujący zdarzenia urządzeń"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-audio-contract = { path = "../voice-audio-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+# ADR 0011: audio przez `wasapi` (MIT); zależy od `windows` 0.62 — tej samej wersji co platform-windows-impl.
+wasapi = "0.25.0"
+
+[dev-dependencies]
+voice-audio-contract = { path = "../voice-audio-contract", features = ["contract-tests"] }
+voice-audio-fake = { path = "../voice-audio-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio.workspace = true
+# Licznik alokacji dla testu ścieżki RT (MIT).
+stats_alloc = "0.1.10"
+
+[lints]
+workspace = true
+
+# Bez harnessu libtest: proces jednowątkowy, więc globalny licznik alokacji widzi wyłącznie
+# ścieżkę wątku RT (wątek główny libtest potrafi alokować w trakcie pomiaru pod obciążeniem CI).
+[[test]]
+name = "no_alloc"
+harness = false

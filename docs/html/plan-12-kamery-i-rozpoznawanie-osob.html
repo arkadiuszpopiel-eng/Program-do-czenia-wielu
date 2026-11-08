@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 — Kamery, rozpoznawanie osób i opis obrazu — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/12-kamery-i-rozpoznawanie-osob.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html" aria-current="page">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li><li><a href="plan-45-testy-ai.html">System pełnego automatycznego testowania przez AI</a></li><li><a href="plan-46-raport-2026-10-31-testy-ai.html">Raport z 31.10: system automatycznego testowania przez AI, ścieżki względne, wersja 0.0.79</a></li><li><a href="plan-47-raport-2026-11-01-noc.html">Raport z nocy 31.10/1.11: Sędzia Cieni, diagnostyka odporna na zawieszenie, wersja 0.0.81</a></li><li><a href="plan-48-raport-2026-11-01-rano.html">Raport 1.11 rano: zaległe inspekcje i testy</a></li><li><a href="plan-49-raport-2026-11-02-noc.html">Raport nocy 1/2.11: obowiązki modelu lokalnego i wymiana informacji między modelami</a></li><li><a href="plan-50-tryby-zgod-jak-claude-codex.html">50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)</a></li><li><a href="plan-51-raport-2026-11-03-wieczor.html">51 — Raport: wieczór 3.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-52-raport-2026-11-04-noc.html">52 — Raport: noc 3/4.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-53-raport-2026-11-06-noc.html">53 — Raport: noc 5/6.11 (etap Z — model-sędzia, dziennik rodzica, porządek kompilacji)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="features-katalog.html">Katalog funkcji i testów</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#co-ma-umiec-alfa-slowami-wlasciciela">Co ma umieć Alfa (słowami właściciela)</a></li><li><a href="#jak-to-wyglada-dla-uzytkownika">Jak to wygląda dla użytkownika</a></li><li><a href="#architektura-cztery-moduly">Architektura: cztery moduły</a></li><li><a href="#prywatnosc-i-bezpieczenstwo">Prywatność i bezpieczeństwo</a></li><li><a href="#prawo-nie-jest-to-porada-prawna">Prawo (nie jest to porada prawna)</a></li><li><a href="#sprzet-i-wydajnosc-do-pomiaru-nie-obietnice">Sprzęt i wydajność (do pomiaru, nie obietnice)</a></li><li><a href="#etapy">Etapy</a></li><li><a href="#decyzje-dla-wlasciciela">Decyzje dla właściciela</a></li></ul></aside><article><h1 id="12-kamery-rozpoznawanie-osob-i-opis-obrazu">12 — Kamery, rozpoznawanie osób i opis obrazu</h1>
+<p>Zlecenie właściciela z 2026-10-09. Ten dokument opisuje projekt — <strong>nic z niego nie jest jeszcze zbudowane</strong>.
+Zadania są w <a href="plan-03-roadmapa.html"><code>03-roadmapa.md</code></a> (grupa C3), technologie z etykietami pewności w
+<a href="plan-11-technologie-2026-10.html"><code>11-technologie-2026-10.md</code></a> (rozdział 10). Kod rozpoznawania osób powstanie dopiero
+po podpisaniu <a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025</a>, bo dotyczy danych biometrycznych.</p>
+<h2 id="co-ma-umiec-alfa-slowami-wlasciciela">Co ma umieć Alfa (słowami właściciela)</h2>
+<ol>
+<li>Obsługa kamer <strong>IP, Wi-Fi i USB</strong>, <strong>kilku naraz</strong>, przez osobny system do tego.</li>
+<li><strong>Rozpoznawanie zapisanego użytkownika albo kilku użytkowników</strong> — z pamięcią długoterminową: po ponownym
+uruchomieniu Alfa nadal wie, kto jest kim.</li>
+<li>Pamięć <strong>tego, o czym z daną osobą rozmawiała</strong>.</li>
+<li><strong>Rozpoznawanie tego, co jest na kamerze</strong>: na „opisz mi to, co widzisz” model opisuje obraz.</li>
+</ol>
+<h2 id="jak-to-wyglada-dla-uzytkownika">Jak to wygląda dla użytkownika</h2>
+<div class="tbl"><table><thead><tr><th>Sytuacja</th><th>Co robi Alfa</th></tr></thead><tbody><tr><td>„Opisz mi to, co widzisz”</td><td>bierze bieżącą klatkę z kamery aktywnej (albo wskazanej: „…na kamerze w kuchni”), opisuje ją po polsku; w rozmowie zostaje miniatura klatki, żeby było widać, na co patrzyła</td></tr>
+<tr><td>Siadasz przed komputerem</td><td>rozpoznaje Cię po twarzy, wita po imieniu i ma pod ręką pamięć rozmów z Tobą; nic nie mówi, jeśli wyłączysz powitania</td></tr>
+<tr><td>Przed kamerą siada inna zapisana osoba</td><td>przełącza „rozmówcę”: zwraca się do niej po imieniu i korzysta z jej pamięci, nie z Twojej</td></tr>
+<tr><td>Przed kamerą jest ktoś nieznany</td><td>traktuje go jako gościa: nie ujawnia pamięci osób zapisanych; może zaproponować zapisanie — tylko za wyraźną zgodą tej osoby</td></tr>
+<tr><td>„Kto jest przy drzwiach?”</td><td>opisuje obraz z kamery nazwanej „drzwi”; jeśli rozpoznaje zapisaną osobę, mówi kto to</td></tr>
+<tr><td>„Co się zmieniło w pokoju od rana?”</td><td>porównuje bieżącą klatkę z zapisanym opisem (bez przechowywania nagrań — patrz prywatność)</td></tr>
+<tr><td>Chcesz spokoju</td><td>jeden przełącznik wyłącza wszystkie kamery; skrót awaryjny <code>Ctrl+Shift+F12</code> też je zatrzymuje</td></tr></tbody></table></div>
+<p>W belce okna pojawia się wskaźnik kamery (jak wskaźnik mikrofonu): widać, czy którakolwiek kamera jest otwarta
+i kogo Alfa rozpoznaje jako rozmówcę.</p>
+<h2 id="architektura-cztery-moduly">Architektura: cztery moduły</h2>
+<p>Zgodnie z regułą projektu każdy moduł to trójka <code>-contract</code> / <code>-impl</code> / <code>-fake</code> i jednostronicowy SPEC.</p>
+<div class="tbl"><table><thead><tr><th>Moduł</th><th>Rola</th><th>Szkic SPEC</th></tr></thead><tbody><tr><td><code>camera-hub</code></td><td>„specjalny system kamer”: rejestr kamer, źródła (USB, sieć), kilka strumieni naraz, klatki na żądanie i podgląd, stan i błędy</td><td><a href="../modules/camera-hub/SPEC.md"><code>camera-hub</code></a></td></tr>
+<tr><td><code>vision-describe</code></td><td>opis obrazu: wybór modelu widzącego (lokalny albo w chmurze za zgodą), zapytanie o klatkę, odpowiedź tekstowa</td><td><a href="../modules/vision-describe/SPEC.md"><code>vision-describe</code></a></td></tr>
+<tr><td><code>person-recognition</code></td><td>wykrywanie twarzy, wzorce twarzy, zapisywanie osoby (za zgodą), dopasowanie „kto to” z progiem pewności</td><td><a href="../modules/person-recognition/SPEC.md"><code>person-recognition</code></a></td></tr>
+<tr><td><code>person-memory</code></td><td>rejestr osób i pamięć per osoba: profil, fakty, streszczenia rozmów; przypisanie tur rozmowy do osoby</td><td><a href="../modules/person-memory/SPEC.md"><code>person-memory</code></a></td></tr></tbody></table></div>
+<pre><code class="language-text">kamery USB ─┐
+kamery IP  ─┼─► camera-hub ──klatka──► vision-describe ──► agentka („opisz, co widzisz”)
+kamery Wi-Fi┘        │
+                     └──klatka (rzadko)──► person-recognition ──„to Arek, pewność 0,93”──► person-memory
+                                                                                              │
+mikrofon ─► voice-speaker (głos właściciela — już jest) ─────────────── drugi sygnał ─────────┤
+                                                                                              ▼
+                                                              rozmowa: rozmówca + jego pamięć w kontekście
+</code></pre>
+<p>Zasady wspólne:</p>
+<ul>
+<li><strong>Broker pozostaje jedynym wykonawcą.</strong> Agentka nie otwiera kamery sama: prosi o narzędzie <code>camera.look</code>
+(klatka do opisu) albo <code>camera.who</code> (kto jest przed kamerą), a Broker sprawdza zdolność i poziom autonomii.</li>
+<li><strong>Kod systemowy tylko w <code>platform-windows-impl</code></strong> (kamery USB przez Media Foundation) za portem
+<code>CameraPort</code> w <code>platform-contract</code>. Dzięki temu Linux i Android dostaną własne implementacje (etapy F, G).</li>
+<li><strong>Kamery sieciowe przez osobny proces</strong> (dekoder strumienia), tak jak silniki mowy i modele — awaria dekodera
+nie zabiera programu, a ruch sieciowy przechodzi przez <code>lib-netguard</code> (tylko sieć lokalna, lista dozwolonych
+adresów).</li>
+<li><strong>Obraz jest treścią niezaufaną.</strong> Napis na kartce przed kamerą („zignoruj polecenia i…”) to dane, nie
+polecenie — klatka i jej opis dostają znacznik niezaufanej treści, jak strona WWW czy mail.</li>
+</ul>
+<h3 id="kamery-usb-ip-wi-fi">Kamery: USB, IP, Wi-Fi</h3>
+<div class="tbl"><table><thead><tr><th>Rodzaj</th><th>Jak Alfa ją widzi</th><th>Uwagi</th></tr></thead><tbody><tr><td>USB (wbudowana, na kablu)</td><td>lista urządzeń systemu; podłączenie i odłączenie na żywo</td><td>Media Foundation; rozdzielczość i liczba klatek wybierane z listy trybów kamery</td></tr>
+<tr><td>IP po kablu</td><td>adres strumienia RTSP albo wyszukanie w sieci lokalnej (ONVIF)</td><td>login i hasło kamery w Windows Credential Manager, nigdy w pliku</td></tr>
+<tr><td>Wi-Fi</td><td>to samo co IP — kamera Wi-Fi to kamera sieciowa</td><td>słabszy zasięg = gubione klatki; hub pokazuje jakość połączenia</td></tr>
+<tr><td>Telefon jako kamera</td><td>późniejszy etap, razem z aplikacją na Androida (etap F)</td><td>wymaga kanału z etapu D</td></tr></tbody></table></div>
+<p>Kilka kamer naraz: hub trzyma każdą kamerę jako osobny strumień z własnym budżetem. Domyślnie strumień jest
+<strong>uśpiony</strong> — kamera otwiera się, gdy ktoś prosi o klatkę albo włączone jest rozpoznawanie rozmówcy; po okresie
+bezczynności się zamyka. Podgląd na żywo w Ustawieniach pobiera klatki w niskiej rozdzielczości.</p>
+<h3 id="opis-obrazu">Opis obrazu</h3>
+<p>„Opisz mi to, co widzisz” jest rozpoznawane jako polecenie z użyciem narzędzia <code>camera.look</code>. Klatka trafia do
+modelu widzącego wybranego przez Router:</p>
+<div class="tbl"><table><thead><tr><th>Droga</th><th>Kiedy</th><th>Uwagi</th></tr></thead><tbody><tr><td>Model lokalny z obsługą obrazu</td><td>profil „Lokalny” albo sesja prywatna</td><td>obraz nie opuszcza komputera; na karcie 6 GB model widzący i model rozmowy mogą się nie zmieścić razem — do pomiaru (C3.6)</td></tr>
+<tr><td>Model w chmurze z obsługą obrazu</td><td>profil „Hybryda” albo „Chmura”, po zgodzie na wysyłanie obrazu</td><td>dokładniejszy opis; <strong>obraz z kamery wychodzi do dostawcy</strong> — osobna zgoda, wyłączona domyślnie</td></tr></tbody></table></div>
+<p>W sesji prywatnej obraz nigdy nie idzie do chmury. Jeśli nie ma żadnego modelu widzącego, Alfa mówi o tym
+wprost i wskazuje, co pobrać albo włączyć.</p>
+<h3 id="rozpoznawanie-osob">Rozpoznawanie osób</h3>
+<ol>
+<li><strong>Zapisanie osoby</strong> (kreator w Ustawieniach): osoba podaje imię, wyraża zgodę i pokazuje twarz z kilku stron.
+Alfa zapisuje <strong>wzorzec twarzy</strong> (ciąg liczb), nie zdjęcia.</li>
+<li><strong>Rozpoznanie</strong>: co kilka sekund jedna klatka w małej rozdzielczości → wykrycie twarzy → wzorzec →
+porównanie z zapisanymi. Wynik ma pewność; poniżej progu osoba jest „nieznana”.</li>
+<li><strong>Dwa sygnały</strong>: twarz z kamery i głos z mikrofonu (moduł <code>voice-speaker</code> już rozpoznaje głos właściciela).
+Gdy oba wskazują tę samą osobę, pewność rośnie; gdy się różnią, Alfa pyta zamiast zgadywać.</li>
+</ol>
+<p><strong>Rozpoznanie twarzy nie jest zgodą ani hasłem.</strong> Nie odblokowuje akcji ryzykownych, nie zastępuje okna Brokera
+i nie podnosi poziomu autonomii — twarz da się podrobić zdjęciem. Służy wyłącznie personalizacji rozmowy.</p>
+<h3 id="pamiec-osob">Pamięć osób</h3>
+<p>Każda zapisana osoba ma w <code>person-memory</code>:</p>
+<div class="tbl"><table><thead><tr><th>Co</th><th>Przykład</th><th>Skąd</th></tr></thead><tbody><tr><td>Profil</td><td>imię, forma zwracania się, język, uwagi</td><td>kreator zapisu, potem poprawki z rozmów</td></tr>
+<tr><td>Fakty</td><td>„pracuje nad raportem Q3”, „nie lubi długich odpowiedzi”</td><td>wyciągane z rozmów jak dziś w pamięci Alfy, ale przypisane do osoby</td></tr>
+<tr><td>Streszczenia rozmów</td><td>„8 października: plan wyjazdu, ustalone daty”</td><td>po każdej rozmowie; zasila kontekst następnej</td></tr>
+<tr><td>Wzorce</td><td>twarz (i głos, jeśli osoba zapisała głos)</td><td>zaszyfrowane, klucz w Credential Manager</td></tr></tbody></table></div>
+<p>Pamięć jest trwała: żyje w bazie programu i wraca po uruchomieniu. Tury rozmowy dostają znacznik „kto mówił”
+(historia rozmowy pozostaje tylko do dopisywania — znacznik jest częścią tury, nie jej późniejszą edycją).
+Gdy rozmówcą jest osoba X, do kontekstu trafia pamięć X i wspólna; pamięć innych osób — nie.</p>
+<h2 id="prywatnosc-i-bezpieczenstwo">Prywatność i bezpieczeństwo</h2>
+<div class="tbl"><table><thead><tr><th>Zasada</th><th>Jak jest egzekwowana</th></tr></thead><tbody><tr><td>Kamery są domyślnie wyłączone</td><td>pierwsze włączenie przez kreator ze zgodą; każda kamera ma własny przełącznik</td></tr>
+<tr><td>Widać, że kamera działa</td><td>wskaźnik w belce i w pigułce głosowej; nie da się go ukryć ustawieniem</td></tr>
+<tr><td>Nagrania nie są przechowywane</td><td>hub nie zapisuje wideo; klatka żyje w pamięci do końca zapytania; w rozmowie zostaje miniatura, którą można usunąć z resztą sesji</td></tr>
+<tr><td>Wzorce twarzy tylko lokalnie</td><td>zaszyfrowane w bazie, klucz w Credential Manager; nie wchodzą do eksportu <code>.alfa</code>, logów ani diagnostyki</td></tr>
+<tr><td>Zapis tylko za zgodą osoby</td><td>kreator wymaga potwierdzenia przy kamerze; usunięcie osoby kasuje wzorce i jej pamięć</td></tr>
+<tr><td>Obraz do chmury tylko za osobną zgodą</td><td>przełącznik wyłączony domyślnie; nigdy w sesji prywatnej</td></tr>
+<tr><td>Agentki nie włączają kamer po cichu</td><td>narzędzia <code>camera.*</code> przez Brokera; zdolność <code>camera.view</code> nadawana per agentka</td></tr>
+<tr><td>Hasła kamer jak inne sekrety</td><td>Windows Credential Manager; adresy strumieni bez hasła w konfiguracji</td></tr>
+<tr><td>Kamera sieciowa nie jest furtką</td><td>tylko adresy sieci lokalnej z listy dozwolonych; dekoder w osobnym procesie bez dostępu do danych Alfy</td></tr></tbody></table></div>
+<p>Nowe zagrożenia do dopisania w <code>THREAT_MODEL.md</code> po akceptacji ADR 0025: podstawiona kamera albo strumień,
+polecenia ukryte w obrazie, zdjęcie zamiast twarzy, wyciek wzorców, podgląd przez cudzą agentkę lub wtyczkę,
+przejęta kamera sieciowa jako punkt wejścia do sieci.</p>
+<h2 id="prawo-nie-jest-to-porada-prawna">Prawo (nie jest to porada prawna)</h2>
+<ul>
+<li><strong>Wzorzec twarzy to dane biometryczne</strong> (RODO, art. 9). Do prywatnego użytku domowego RODO zwykle się nie
+stosuje, ale kamera obejmująca gości, współpracowników albo klatkę schodową to już inna sytuacja. Dlatego
+plan zakłada wyraźną zgodę każdej zapisywanej osoby i brak rozpoznawania osób niezapisanych.</li>
+<li><strong>AI Act</strong> zakazuje między innymi rozpoznawania emocji w miejscu pracy i szkole oraz budowania baz twarzy
+z niecelowanego pobierania zdjęć. Alfa tego nie robi: nie ocenia emocji i nie tworzy wzorców osób, które się
+nie zapisały. Punkt do potwierdzenia przez prawnika przed wydaniem publicznym.</li>
+<li>Zadania i pytania do prawnika: <a href="plan-10-zgodnosc-prawna.html"><code>10-zgodnosc-prawna.md</code></a>.</li>
+</ul>
+<h2 id="sprzet-i-wydajnosc-do-pomiaru-nie-obietnice">Sprzęt i wydajność (do pomiaru, nie obietnice)</h2>
+<p>Sprzęt bazowy: laptop i7-13620H, RTX 4050 z 6 GB, 16 GB RAM, obok karta zintegrowana.</p>
+<div class="tbl"><table><thead><tr><th>Zadanie</th><th>Gdzie liczone</th><th>Czego się spodziewamy</th><th>Stan</th></tr></thead><tbody><tr><td>Dekodowanie 2–4 strumieni</td><td>procesor / dekoder sprzętowy</td><td>mieści się, jeśli strumienie są uśpione poza zapytaniem</td><td>do pomiaru</td></tr>
+<tr><td>Wykrycie i wzorzec twarzy</td><td>procesor (ONNX Runtime)</td><td>ułamek sekundy na klatkę przy jednej klatce co kilka sekund</td><td>do pomiaru</td></tr>
+<tr><td>Opis obrazu lokalnie</td><td>karta główna</td><td><strong>wspólnie z modelem rozmowy może nie zmieścić się w 6 GB</strong> — wtedy model widzący ładuje się na czas zapytania</td><td>do pomiaru</td></tr>
+<tr><td>Lekkie zadania wizyjne</td><td>karta zintegrowana</td><td>możliwe po pobraniu silnika Vulkan (zadanie A.3i)</td><td>do sprawdzenia</td></tr></tbody></table></div>
+<h2 id="etapy">Etapy</h2>
+<div class="tbl"><table><thead><tr><th>Krok</th><th>Zakres</th><th>Wynik widoczny dla użytkownika</th></tr></thead><tbody><tr><td>1 (C3.1–C3.4)</td><td>port kamery, kamery USB, hub z wieloma kamerami, strona „Kamery”</td><td>lista kamer, podgląd, przełączniki, wskaźnik w belce</td></tr>
+<tr><td>2 (C3.5–C3.7)</td><td>kamery sieciowe, narzędzie <code>camera.look</code>, opis obrazu</td><td>„opisz mi to, co widzisz” działa</td></tr>
+<tr><td>3 (C3.8–C3.10)</td><td>wykrywanie twarzy, zapis osób, rozpoznanie rozmówcy</td><td>Alfa wita po imieniu, rozróżnia osoby</td></tr>
+<tr><td>4 (C3.11–C3.13)</td><td>pamięć per osoba, przypisanie tur, łączenie z głosem</td><td>Alfa pamięta, o czym z kim rozmawiała</td></tr>
+<tr><td>5 (C3.14–C3.15)</td><td>ewaluacja, pomiary na sprzęcie, przegląd bezpieczeństwa</td><td>kryteria <code>ACC-V6-camera-…</code> zaliczone na maszynie</td></tr></tbody></table></div>
+<p>Krok 1 i 2 nie dotykają biometrii i mogą ruszyć bez ADR 0025. Kroki 3 i 4 czekają na jego podpis.</p>
+<h2 id="decyzje-dla-wlasciciela">Decyzje dla właściciela</h2>
+<div class="tbl"><table><thead><tr><th>Decyzja</th><th>Opcje</th><th>Co blokuje</th></tr></thead><tbody><tr><td>Podpis pod ADR 0025 (biometria twarzy)</td><td>przyjąć / zmienić zasady / zrezygnować z rozpoznawania osób</td><td>C3.8–C3.13</td></tr>
+<tr><td>Czy obraz z kamery może iść do modelu w chmurze</td><td>nigdy / za zgodą per kamera (propozycja) / za zgodą globalną</td><td>C3.7</td></tr>
+<tr><td>Zgoda na pobranie modelu widzącego i modeli twarzy</td><td>rozmiar do ustalenia w C3.6 i C3.8</td><td>C3.6, C3.8</td></tr>
+<tr><td>Licencje modeli twarzy</td><td>kandydat: YuNet + SFace (OpenCV Zoo) — do potwierdzenia w plikach licencji; InsightFace odpada (tylko badania)</td><td>C3.8</td></tr>
+<tr><td>Progi akceptacji (trafność rozpoznania, fałszywe rozpoznania, czas opisu)</td><td>ustala właściciel</td><td>wyjście z C3</td></tr>
+<tr><td>Czy osoba nieznana może rozmawiać z Alfą</td><td>tak jako gość bez pamięci (propozycja) / tylko zapisani</td><td>C3.10</td></tr></tbody></table></div>
+</article>
+<footer>Źródło: <code>docs/plan/12-kamery-i-rozpoznawanie-osob.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Szczegóły produktów — Sklep testowy F6</title>
+</head>
+<body>
+<h1>Szczegóły produktów</h1>
+<table>
+<thead><tr><th scope="col">Produkt</th><th scope="col">Szczegóły</th></tr></thead>
+<tbody>
+<tr><td>Toster</td><td><button type="button" data-p="0">Pokaż szczegóły</button> <span></span></td></tr>
+<tr><td>Mikser ręczny</td><td><button type="button" data-p="1">Pokaż szczegóły</button> <span></span></td></tr>
+<tr><td>Odkurzacz</td><td><button type="button" data-p="2">Pokaż szczegóły</button> <span></span></td></tr>
+</tbody>
+</table>
+<script>
+// Numery katalogowe pojawiają się w drzewie dostępności dopiero po kliknięciu.
+const kody = ['UEwtMTEwNC1U', 'UEwtMjIwNy1L', 'UEwtMzMxNS1P'];
+for (const przycisk of document.querySelectorAll('button[data-p]')) {
+  przycisk.addEventListener('click', () => {
+    const cel = przycisk.nextElementSibling;
+    cel.textContent = 'Numer katalogowy: ' + atob(kody[Number(przycisk.dataset.p)]);
+  });
+}
+</script>
+</body>
+</html>

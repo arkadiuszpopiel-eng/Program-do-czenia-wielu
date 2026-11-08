@@ -1,0 +1,29 @@
+[package]
+name = "triggers-contract"
+description = "Wyzwalacze (F5): kontrakt — cron z polską strefą i DST, jednorazowe, interwały, zdarzenia (plik, wiadomość, koniec zadania), ręczne; właściciel, sufit uprawnień, limit częstości, okno ciszy, dziennik uruchomień, zakaz mostów CLI, taint; deterministyczny rdzeń"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane na `-impl` i `-fake`.
+contract-tests = ["dep:async-trait"]
+
+[dependencies]
+scheduler-contract = { path = "../scheduler-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+personas-contract = { path = "../personas-contract" }
+core-bus-contract.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait = { workspace = true, optional = true }
+
+[lints]
+workspace = true

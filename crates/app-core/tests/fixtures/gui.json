@@ -1,0 +1,205 @@
+[
+  {
+    "command": "gui_status",
+    "args": {},
+    "result": {
+      "available": true,
+      "reason": null,
+      "control": {
+        "session_id": "s-q3",
+        "agent": "delta",
+        "tool": "input_type_text",
+        "since": "2026-09-30T08:45:00.000Z"
+      },
+      "taken_over": false,
+      "actions": [
+        {
+          "id": 3,
+          "at": "2026-09-30T08:45:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "input_type_text",
+          "title": "Wpisz tekst",
+          "target": "notepad.exe",
+          "status": "running",
+          "summary": "Wpisz tekst (24 znaków)",
+          "duration_ms": null
+        },
+        {
+          "id": 2,
+          "at": "2026-09-30T08:44:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "screen_capture",
+          "title": "Zrzut ekranu",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Zrzut ekranu 640×360, zamaskowano 1",
+          "duration_ms": 120
+        },
+        {
+          "id": 1,
+          "at": "2026-09-30T08:43:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "window_focus",
+          "title": "Fokus okna",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Fokus okna",
+          "duration_ms": 120
+        }
+      ],
+      "screenshot": {
+        "at": "2026-09-30T08:44:00.000Z",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "width": 640,
+        "height": 360,
+        "masked": 1,
+        "black_frame": false
+      }
+    }
+  },
+  {
+    "command": "gui_screenshot",
+    "args": {},
+    "result": {
+      "info": {
+        "at": "2026-09-30T08:44:00.000Z",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "width": 640,
+        "height": 360,
+        "masked": 1,
+        "black_frame": false
+      },
+      "data_url": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iMzYwIiB2aWV3Qm94PSIwIDAgNjQwIDM2MCI+PHJlY3Qgd2lkdGg9IjY0MCIgaGVpZ2h0PSIzNjAiIGZpbGw9IiMyYjNhNGEiLz48cmVjdCB4PSIyNCIgeT0iMjQiIHdpZHRoPSIzNjAiIGhlaWdodD0iMjQwIiByeD0iNiIgZmlsbD0iI2Y0ZjRmNCIvPjxyZWN0IHg9IjI0IiB5PSIyNCIgd2lkdGg9IjM2MCIgaGVpZ2h0PSIyNCIgcng9IjYiIGZpbGw9IiNkOWQ5ZDkiLz48dGV4dCB4PSIzNiIgeT0iNDEiIGZvbnQtc2l6ZT0iMTIiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjMjIyIj5CZXogdHl0dWx1IC0gTm90YXRuaWs8L3RleHQ+PHRleHQgeD0iNDAiIHk9IjgwIiBmb250LXNpemU9IjEzIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmaWxsPSIjMjIyIj5MaXN0YSB6YWt1cG93OjwvdGV4dD48cmVjdCB4PSI0MDgiIHk9IjQwIiB3aWR0aD0iMjA4IiBoZWlnaHQ9IjI4MCIgZmlsbD0iIzAwMCIvPjx0ZXh0IHg9IjUxMiIgeT0iMTg0IiBmb250LXNpemU9IjEyIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZmlsbD0iI2JiYiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+emFtYXNrb3dhbm88L3RleHQ+PC9zdmc+"
+    }
+  },
+  {
+    "command": "gui_stop",
+    "args": {},
+    "result": {
+      "available": true,
+      "reason": null,
+      "control": null,
+      "taken_over": true,
+      "actions": [
+        {
+          "id": 3,
+          "at": "2026-09-30T08:45:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "input_type_text",
+          "title": "Wpisz tekst",
+          "target": "notepad.exe",
+          "status": "cancelled",
+          "summary": "Wpisz tekst — anulowano",
+          "duration_ms": null
+        },
+        {
+          "id": 2,
+          "at": "2026-09-30T08:44:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "screen_capture",
+          "title": "Zrzut ekranu",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Zrzut ekranu 640×360, zamaskowano 1",
+          "duration_ms": 120
+        },
+        {
+          "id": 1,
+          "at": "2026-09-30T08:43:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "window_focus",
+          "title": "Fokus okna",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Fokus okna",
+          "duration_ms": 120
+        }
+      ],
+      "screenshot": {
+        "at": "2026-09-30T08:44:00.000Z",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "width": 640,
+        "height": 360,
+        "masked": 1,
+        "black_frame": false
+      }
+    }
+  },
+  {
+    "command": "gui_release",
+    "args": {},
+    "result": {
+      "available": true,
+      "reason": null,
+      "control": null,
+      "taken_over": false,
+      "actions": [
+        {
+          "id": 3,
+          "at": "2026-09-30T08:45:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "input_type_text",
+          "title": "Wpisz tekst",
+          "target": "notepad.exe",
+          "status": "cancelled",
+          "summary": "Wpisz tekst — anulowano",
+          "duration_ms": null
+        },
+        {
+          "id": 2,
+          "at": "2026-09-30T08:44:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "screen_capture",
+          "title": "Zrzut ekranu",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Zrzut ekranu 640×360, zamaskowano 1",
+          "duration_ms": 120
+        },
+        {
+          "id": 1,
+          "at": "2026-09-30T08:43:00.000Z",
+          "session_id": "s-q3",
+          "agent": "delta",
+          "tool": "window_focus",
+          "title": "Fokus okna",
+          "target": "notepad.exe",
+          "status": "ok",
+          "summary": "Fokus okna",
+          "duration_ms": 120
+        }
+      ],
+      "screenshot": {
+        "at": "2026-09-30T08:44:00.000Z",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "width": 640,
+        "height": 360,
+        "masked": 1,
+        "black_frame": false
+      }
+    }
+  },
+  {
+    "command": "gui_desktop_grant",
+    "args": {
+      "sessionId": "s-q3",
+      "agent": "delta"
+    },
+    "result": {
+      "status": "opened_broker",
+      "request_id": "5"
+    }
+  }
+]

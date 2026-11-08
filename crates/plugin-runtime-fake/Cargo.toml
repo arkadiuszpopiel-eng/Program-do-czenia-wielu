@@ -1,0 +1,25 @@
+[package]
+name = "plugin-runtime-fake"
+description = "Atrapa wtyczek Wasm (F8-05): ten sam cykl życia z kontraktu, zachowania Rust zamiast Wasm per hash modułu, wirtualny zegar, nagrane zdarzenia i wywołania"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+plugin-runtime-contract = { path = "../plugin-runtime-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+semver.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+plugin-runtime-contract = { path = "../plugin-runtime-contract", features = ["contract-tests"] }
+safety-broker-contract = { path = "../safety-broker-contract" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

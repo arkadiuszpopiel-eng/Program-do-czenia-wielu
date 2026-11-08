@@ -1,0 +1,34 @@
+[package]
+name = "agent-backends-impl"
+description = "Mosty CLI Claude Code (stream-json, --permission-prompt-tool przez MCP Alfy) i Codex (app-server, zatwierdzenia) jako opaque worker w worktree; bramka zgodności, przypięte wersje"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+agent-backends-contract = { path = "../agent-backends-contract" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+compliance-contract = { path = "../compliance-contract" }
+core-bus-contract.workspace = true
+mcp-contract = { path = "../mcp-contract" }
+providers-contract = { path = "../providers-contract" }
+async-trait.workspace = true
+futures-util.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+# Hash pliku wykonywalnego CLI przy przypięciu (MIT OR Apache-2.0; wersja już w Cargo.lock).
+sha2 = "0.10.9"
+# `process` dodaje signal-hook-registry 1.4.8 (MIT OR Apache-2.0) na Unix.
+tokio = { workspace = true, features = ["process", "io-util", "rt", "time", "sync", "fs"] }
+
+[dev-dependencies]
+agent-backends-contract = { path = "../agent-backends-contract", features = ["contract-tests"] }
+core-registry-contract.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
+
+[lints]
+workspace = true

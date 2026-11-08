@@ -1,0 +1,196 @@
+{
+  "$id": "alfa://schemas/event.v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Event",
+  "description": "Zdarzenie magistrali Alfy (docs/PLAN.md §13), schemat v1.",
+  "type": "object",
+  "properties": {
+    "agent": {
+      "description": "Agentka, która wywołała zdarzenie.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AgentId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "cost": {
+      "description": "Koszt, jeśli dotyczy.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Cost"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "id": {
+      "description": "Unikatowy identyfikator zdarzenia.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "kind": {
+      "description": "Rodzaj zdarzenia (strumień).",
+      "$ref": "#/$defs/EventKind"
+    },
+    "level": {
+      "description": "Poziom.",
+      "$ref": "#/$defs/Level"
+    },
+    "payload": {
+      "description": "Ładunek (mały, inline). Duże dane idą jako referencja do `core-log`."
+    },
+    "prev_hash": {
+      "description": "Hash poprzedniego rekordu w łańcuchu (wypełnia writer logu / Broker, nie wydawca).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "run": {
+      "description": "Przebieg planu.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RunId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "session": {
+      "description": "Sesja, w której powstało zdarzenie.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SessionId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "span": {
+      "description": "Span (krok) wewnątrz przebiegu.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SpanId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ts": {
+      "description": "Znacznik czasu UTC nadania zdarzenia.",
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "id",
+    "ts",
+    "kind",
+    "level",
+    "payload"
+  ],
+  "x-schema-version": 1,
+  "$defs": {
+    "AgentId": {
+      "description": "Identyfikator agentki (persony), §9.",
+      "type": "string"
+    },
+    "Cost": {
+      "description": "Koszt związany ze zdarzeniem (wywołanie modelu, narzędzie płatne).",
+      "type": "object",
+      "properties": {
+        "input_tokens": {
+          "description": "Tokeny wejściowe.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "latency_ms": {
+          "description": "Opóźnienie wywołania w milisekundach, jeśli znane.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "micro_usd": {
+          "description": "Koszt w mikro-dolarach (1 USD = 1_000_000), bez przeliczenia na PLN.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "output_tokens": {
+          "description": "Tokeny wyjściowe.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "input_tokens",
+        "output_tokens",
+        "micro_usd"
+      ]
+    },
+    "EventKind": {
+      "description": "Rodzaj zdarzenia: audit | model_call | tool | gui | voice | diagnostics | ui albo nazwa własna modułu (`<moduł>.<obiekt>.<czynność>`).",
+      "type": "string",
+      "minLength": 1
+    },
+    "Level": {
+      "description": "Poziom zdarzenia (PLAN §13: TRACE…AUDIT). Kolejność rosnąca ważności.",
+      "oneOf": [
+        {
+          "description": "Ślad diagnostyczny (bardzo szczegółowy).",
+          "type": "string",
+          "const": "trace"
+        },
+        {
+          "description": "Informacje deweloperskie.",
+          "type": "string",
+          "const": "debug"
+        },
+        {
+          "description": "Zwykły przebieg pracy.",
+          "type": "string",
+          "const": "info"
+        },
+        {
+          "description": "Sytuacja nietypowa, ale obsłużona.",
+          "type": "string",
+          "const": "warn"
+        },
+        {
+          "description": "Błąd operacji.",
+          "type": "string",
+          "const": "error"
+        },
+        {
+          "description": "Zdarzenie audytowe — zapisuje wyłącznie Broker (PLAN §8.1).",
+          "type": "string",
+          "const": "audit"
+        }
+      ]
+    },
+    "RunId": {
+      "description": "Identyfikator przebiegu (jedno wykonanie planu w sesji).",
+      "type": "string"
+    },
+    "SessionId": {
+      "description": "Identyfikator sesji (okna rozmowy / zadania), §11.",
+      "type": "string"
+    },
+    "SpanId": {
+      "description": "Identyfikator spanu (krok wewnątrz przebiegu).",
+      "type": "string"
+    }
+  }
+}

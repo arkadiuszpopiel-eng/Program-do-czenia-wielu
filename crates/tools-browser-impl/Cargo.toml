@@ -1,0 +1,34 @@
+[package]
+name = "tools-browser-impl"
+description = "tools-browser: izolowana przeglądarka agentek przez BrowserPort — każdy host przez Brokera net.egress(host) (filtr per żądanie), deny-lista domen dostawców, treść niezaufana, bez haseł, pobrania w kwarantannie"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-browser-contract = { path = "../tools-browser-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+compliance-contract = { path = "../compliance-contract" }
+platform-apps-contract = { path = "../platform-apps-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+base64 = "0.22.1"
+
+[dev-dependencies]
+tools-browser-contract = { path = "../tools-browser-contract", features = ["contract-tests"] }
+platform-apps-fake = { path = "../platform-apps-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-fake = { path = "../core-bus-fake" }
+watchdog-contract = { path = "../watchdog-contract" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

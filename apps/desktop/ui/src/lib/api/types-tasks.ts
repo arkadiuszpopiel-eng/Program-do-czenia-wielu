@@ -1,0 +1,26 @@
+// DTO panelu Zadania (DAG, stan, postęp, sterowanie), Wyzwalaczy, Reguł Marszałka i kart
+// zgodności mostów CLI — odpowiedniki `app-api/src/dto/{tasks,bridges}.rs`.
+export type {
+  BridgeAccount,
+  BridgeAccountState,
+  BridgeCard,
+  BridgeLogin,
+  BridgeSource,
+  CronPreview,
+  MarshalProposalInfo,
+  MarshalRejected,
+  MarshalReport,
+  MarshalRuleInfo,
+  MarshalState,
+  NewTaskInput,
+  TaskClassKind,
+  TaskDep,
+  TaskInfo,
+  TaskOriginKind,
+  TaskResultKind,
+  TaskStateKind,
+  TriggerDraft,
+  TriggerInfo,
+  TriggerKindView,
+  TriggerRunInfo,
+} from './generated/ipc';

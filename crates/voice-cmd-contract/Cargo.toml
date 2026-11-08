@@ -1,0 +1,25 @@
+[package]
+name = "voice-cmd-contract"
+description = "Kontrakt voice-cmd: szybka ścieżka komend głosowych bez LLM (komendy, gramatyka PL/EN, reguła „nie”)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielony test kontraktowy uruchamiany przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+personas-contract = { path = "../personas-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,23 @@
+[package]
+name = "tools-fs-fake"
+description = "tools-fs: atrapa narzędzi plikowych — prawdziwe manifesty, walidacja argumentów, skryptowane wyniki bez we/wy (testy agent-runtime, UI)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-fs-contract = { path = "../tools-fs-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tools-fs-contract = { path = "../tools-fs-contract", features = ["contract-tests"] }
+safety-broker-contract = { path = "../safety-broker-contract" }
+tokio.workspace = true
+
+[lints]
+workspace = true

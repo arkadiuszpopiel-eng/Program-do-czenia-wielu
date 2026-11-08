@@ -1,0 +1,36 @@
+[package]
+name = "memory-consolidation-impl"
+description = "Konsolidacja pamięci (Strażniczka pamięci): adaptery — model lokalny przez ModelProvider, budżet tła przez cost-meter, stan maszyny przez device-profile; moduł zadania tła"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+memory-consolidation-contract = { path = "../memory-consolidation-contract" }
+memory-contract = { path = "../memory-contract" }
+providers-contract = { path = "../providers-contract" }
+cost-meter-contract = { path = "../cost-meter-contract" }
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+device-profile-contract = { path = "../device-profile-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+memory-fake = { path = "../memory-fake" }
+memory-consolidation-fake = { path = "../memory-consolidation-fake" }
+providers-fake = { path = "../providers-fake" }
+cost-meter-fake = { path = "../cost-meter-fake" }
+device-profile-fake = { path = "../device-profile-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+
+[lints]
+workspace = true

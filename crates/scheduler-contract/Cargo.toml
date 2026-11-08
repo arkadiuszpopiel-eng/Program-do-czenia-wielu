@@ -1,0 +1,31 @@
+[package]
+name = "scheduler-contract"
+description = "Pełny scheduler (F5): kontrakt — zadania jako DAG z warunkami, przydział agentek wg ról, zasoby wyłączne (nadzbiór scheduler-lite), priorytety, okna czasowe, budżety, ponowienia, steering, trwałość i zdarzenia scheduler.*; deterministyczny rdzeń decyzyjny"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na `-impl` i `-fake`) + skryptowany wykonawca.
+contract-tests = ["dep:tokio"]
+
+[dependencies]
+scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+personas-contract = { path = "../personas-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+agent-backends-contract = { path = "../agent-backends-contract" }
+cost-meter-contract = { path = "../cost-meter-contract" }
+core-bus-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait.workspace = true
+tokio = { workspace = true, optional = true }
+
+[lints]
+workspace = true

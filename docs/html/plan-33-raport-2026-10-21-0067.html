@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny) — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/33-raport-2026-10-21-0067.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html" aria-current="page">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li><li><a href="plan-45-testy-ai.html">System pełnego automatycznego testowania przez AI</a></li><li><a href="plan-46-raport-2026-10-31-testy-ai.html">Raport z 31.10: system automatycznego testowania przez AI, ścieżki względne, wersja 0.0.79</a></li><li><a href="plan-47-raport-2026-11-01-noc.html">Raport z nocy 31.10/1.11: Sędzia Cieni, diagnostyka odporna na zawieszenie, wersja 0.0.81</a></li><li><a href="plan-48-raport-2026-11-01-rano.html">Raport 1.11 rano: zaległe inspekcje i testy</a></li><li><a href="plan-49-raport-2026-11-02-noc.html">Raport nocy 1/2.11: obowiązki modelu lokalnego i wymiana informacji między modelami</a></li><li><a href="plan-50-tryby-zgod-jak-claude-codex.html">50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)</a></li><li><a href="plan-51-raport-2026-11-03-wieczor.html">51 — Raport: wieczór 3.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-52-raport-2026-11-04-noc.html">52 — Raport: noc 3/4.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-53-raport-2026-11-06-noc.html">53 — Raport: noc 5/6.11 (etap Z — model-sędzia, dziennik rodzica, porządek kompilacji)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="features-katalog.html">Katalog funkcji i testów</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#1-przyczyny">1. Przyczyny</a></li><li><a href="#2-co-zmienilem">2. Co zmieniłem</a></li><li><a href="#3-jak-to-sprawdzilem">3. Jak to sprawdziłem</a></li><li><a href="#4-czego-nie-sprawdzilem">4. Czego nie sprawdziłem</a></li><li><a href="#5-co-zostaje">5. Co zostaje</a></li></ul></aside><article><h1 id="raport-z-2026-10-21-wersja-0-0-67-komputer-stacjonarny">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</h1>
+<p>Zgłoszenia właściciela z 21.10: „znowu brak uprawnień” (zrzut strony Uprawnień z „Broker w procesie aplikacji”),
+„ma być zrobione raz na zawsze”, potem „pokazało okno i zatwierdziłem, ale zmiany nie ma”. Około 14:00 cel
+(/goal): „pracuj dalej nad poprawkami, ulepszeniami i nowymi wersjami” podczas nieobecności właściciela.</p>
+<h2 id="1-przyczyny">1. Przyczyny</h2>
+<div class="tbl"><table><thead><tr><th>Objaw</th><th>Przyczyna</th></tr></thead><tbody><tr><td>Każde podniesienie poziomu odrzucane</td><td>na komputerze stacjonarnym nie było skrótu do Alfy — uruchomiona była kopia testowa z <code>target/shell</code> (bez programów Jądra obok, Broker w procesie, bez okna zgód)</td></tr>
+<tr><td>L4 zatwierdzone, strona dalej pokazuje stary poziom</td><td>strona Uprawnień nie odświeżała poziomu po zgodzie, a rdzeń odnotowywał zgodę tylko po wcześniejszym obniżeniu (nowy profil — bez ogłoszenia)</td></tr>
+<tr><td>Przegląd 16 recenzentów (wysoka waga, potwierdzone dwa razy)</td><td>strażnik autonomii uznawał zgodność poziomu za zgodę: nowy Broker startuje z L3, więc prośba o L3 odrzucona albo bez decyzji i ponowne uruchomienie Alfy w ciągu 15 min nadpisywały obniżenie właściciela (także L0)</td></tr>
+<tr><td>Wgranie mogło odebrać głos</td><td>na tym komputerze nie ma pobranego ONNX Runtime — budowa zostawiała niepełne procesy poboczne mowy, a wgranie zastępowało nimi komplet właściciela</td></tr>
+<tr><td>Pamięć projektu w repozytorium cofnięta</td><td><code>memory-sync.sh</code> skopiował do repozytorium starsze wersje zasad z pamięci asystenta na PC (zasady dwóch maszyn, -j3 na laptopie, F: na laptopie, spis „Pełny dostęp”)</td></tr></tbody></table></div>
+<h2 id="2-co-zmienilem">2. Co zmieniłem</h2>
+<ul>
+<li><strong>Skrót „Alfa”</strong> (pulpit, menu Start) do <code>Alfa-uruchomiona\alfa-desktop.exe</code>, odświeżany przy każdym wgraniu;
+skrótu instalatora NSIS nie zmienia; błąd jednego miejsca nie blokuje drugiego. Kopia testowa mówi wprost, czym jest.</li>
+<li><strong>Zgoda w oknie Brokera:</strong> strona Uprawnień sama pokazuje nowy poziom (sprawdza co 2 s, do 10 min, poziom zakresu
+z prośby — nie aktywnej sesji; komunikat „zatwierdzony w oknie Brokera”).</li>
+<li><strong>Strażnik autonomii (bezpieczeństwo):</strong> podniesienie przyjmowane tylko, gdy Broker potwierdzi zgodę na tę
+konkretną prośbę (<code>BrokerPort::approval_outcome</code>, przez IPC z podmiotem, z którym Broker zapisuje prośby
+z interfejsu). Prośby czekające na zgodę tylko w pamięci procesu — nie przetrwają ponownego uruchomienia; dwie karty
+dla tego samego zakresu pamiętane osobno; nowa prośba budzi strażnika (przyjęcie w ciągu ~2 s, wcześniej do 15 s).
+Stary zapis w konfiguracji (<code>permissions.pending_raises</code>) usuwany przy starcie.</li>
+<li><strong>Wgranie:</strong> budowa testowa bierze ONNX Runtime z przypiętą sumą (z „Modeli lokalnych i silników” albo z kopii
+właściciela); przy niepełnym komplecie usuwa go, a <code>deploy-owner.sh</code> odmawia, zanim zamknie Alfę; błąd kopiowania nie
+zostawia właściciela bez Alfy (uruchamia to, co jest, i kończy kodem 1); commit w opisie kopii testowej.</li>
+<li><strong>Pamięć projektu:</strong> przywrócone nowsze wersje (u źródła i w repozytorium); <code>memory-sync.sh</code> wstrzymuje kopię, gdy
+zasada u źródła jest wcześniejszą zatwierdzoną wersją pliku w repozytorium (kod 3, polecenie przywrócenia).</li>
+<li><strong>Biblioteki z poprawkami bezpieczeństwa:</strong> <code>rustls-webpki</code> 0.103.16, <code>wasmtime</code> 36.0.19, <code>vite</code> 7.3.7.</li>
+<li>Test w przeglądarce obowiązków: pięć gotowych obowiązków (od 20.10 jest „Kontrola cenników”).</li>
+</ul>
+<h2 id="3-jak-to-sprawdzilem">3. Jak to sprawdziłem</h2>
+<ul>
+<li><strong>Przegląd w świeżym kontekście (2 rundy):</strong> 16 recenzentów w 5 wymiarach (strażnik, interfejs, skrypty, zależności,
+teksty) + sceptycy dla każdego znaleziska średniej i wyższej wagi; po poprawkach drugi przegląd (9 agentów) —
+5 potwierdzonych (po weryfikacji niska waga) i 13 niskich; poprawione wszystkie oprócz trzech opisanych niżej.</li>
+<li><strong>Strażnik:</strong> 4 testy podniesień (zgoda przyjęta i ogłoszona — także na nowym profilu; dwie karty jednego zakresu;
+prośba bez zgody nie nadpisuje obniżenia ani po ponownym uruchomieniu Brokera, ani aplikacji). Test luki celowo
+sprawdzony na atrapie, która każdą prośbę uznaje za zatwierdzoną — wtedy nie przechodzi. Stan prośby przez IPC
+z prawdziwą usługą Brokera i skryptowanym oknem zgód: czeka, zatwierdzona, odrzucona, nieznana, zerwane łącze.</li>
+<li><strong><code>verify wersja</code> na <code>0e54f5b9</code>:</strong> 15 zielonych, 3 czerwone, 1 nieuruchomiony (<code>graf</code> — brak <code>jq</code> na tym komputerze).<ul>
+<li>testy Rust: 3079 zielonych, 1 czerwony — <code>user_speech_preemption_under_5_ms</code> (najgorszy przypadek 7,9 ms przy limicie
+5 ms, pod obciążeniem całego biegu i równoległych testów przeglądarki innego projektu); osobno 3 razy zielony;</li>
+<li>przeglądarka (Chromium Playwrighta, brak Edge): 551 zielonych, 1 czerwony — <code>providers.spec.ts</code>: aplikacja nie
+wczytała się w 30 s (start pod obciążeniem); osobno 3/3;</li>
+<li><code>cargo deny</code>: tylko znane ostrzeżenia <code>zip</code> (RUSTSEC-2026-0367/0368/0369, czeka na Twoją decyzję);</li>
+<li>zielone: format, linter projektu i powłoki, testy powłoki, schematy, tokeny, lint, typy łącza i interfejsu,
+interfejs 478/478, prawdziwa aplikacja 47 (+1 pominięty), pokrycie łącza 259 z 273 (94,9 %), dokumenty, audyt npm, SBOM.</li>
+</ul>
+</li>
+<li><strong>Gotowa do wgrania:</strong> <code>target/shell/debug/alfa-desktop.exe</code> z <code>0e54f5b9</code> (commit w opisie wersji), komplet procesów
+pobocznych mowy (2 programy + ONNX Runtime z przypiętą sumą). Wgranie: <code>bash scripts/deploy-owner.sh</code>.</li>
+</ul>
+<h2 id="4-czego-nie-sprawdzilem">4. Czego nie sprawdziłem</h2>
+<ul>
+<li>Zgoda w oknie Brokera na Twoim koncie po wgraniu 0.0.67 (L4 → strona Uprawnień sama pokazuje L4 w ~2 s) — wymaga
+fizycznego kliknięcia właściciela; 0.0.67 nie jest wgrana (wgranie zamyka Alfę, decyzja Twoja). Na 0.0.66 zgoda
+przeszła rano (Broker potwierdził L4), a strona odświeżała się dopiero po przeładowaniu.</li>
+<li>Tryb usługi Brokera (Broker jako usługa Windows): prośba zatwierdzona dopiero po ponownym uruchomieniu Alfy zostanie
+cofnięta do zapamiętanego obniżenia — kierunek bezpieczny; na Twoim komputerze działa tryb przenośny.</li>
+<li>Testy sprzętowe (<code>verify sprzet</code>) — ta seria nie zmieniała głosu ani GPU.</li>
+</ul>
+<h2 id="5-co-zostaje">5. Co zostaje</h2>
+<ul>
+<li>Wgranie 0.0.67 (<code>scripts/deploy-owner.sh</code>) — po Twojej decyzji; potem L4 jeszcze raz w oknie Brokera.</li>
+<li>Przebieg agentki: styl odpowiedzi i temperatura z ustawień (dziś tylko zwykły czat) — w toku po tej wersji.</li>
+<li>Seria 7: poziom „Pełny dostęp” (decyzja z 20.10) — jeszcze nierozpoczęta; powstanie na osobnej gałęzi
+<code>do-przegladu-pelny-dostep</code>, a zmiany w Brokerze wymagają Twojej akceptacji.</li>
+<li>Decyzje właściciela bez zmian: <code>zip</code> 9 w aktualizatorze (RUSTSEC-2026-0367/0368/0369), instalacja Edge na tym
+komputerze (testy przeglądarki na silniku WebView2), ADR 0028, znak wodny mowy.</li>
+<li>Drobne z drugiego przeglądu (niska waga): nazwa sesji w komunikacie o zgodzie dla nieaktywnej sesji; zasada usunięta
+w repozytorium może wrócić ze starej pamięci drugiego komputera (<code>memory-sync</code>).</li>
+</ul>
+</article>
+<footer>Źródło: <code>docs/plan/33-raport-2026-10-21-0067.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

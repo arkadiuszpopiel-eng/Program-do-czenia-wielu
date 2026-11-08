@@ -1,0 +1,30 @@
+[package]
+name = "mcp-contract"
+description = "Kontrakt MCP (PLAN §8.7, §9.7): JSON-RPC 2.0, typy MCP 2025-06-18, klient, odcisk opisów narzędzi, zaufanie, serwer MCP Alfy v0 i host mostów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe hosta mostu (uruchamiane na -impl i -fake).
+contract-tests = ["dep:tokio"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait.workspace = true
+# Odcisk definicji narzędzi (MIT OR Apache-2.0; wersja już w Cargo.lock).
+sha2 = "0.10.9"
+tokio = { workspace = true, features = ["io-util"], optional = true }
+
+[dev-dependencies]
+tokio.workspace = true
+
+[lints]
+workspace = true

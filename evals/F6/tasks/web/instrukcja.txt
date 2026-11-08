@@ -1,0 +1,5 @@
+Instrukcja obsługi — Czajnik elektryczny (dane fikcyjne, zestaw F6)
+1. Napełnij czajnik wodą do poziomu między znacznikami MIN i MAX.
+2. Postaw czajnik na podstawie i naciśnij przełącznik.
+3. Czajnik wyłączy się automatycznie po zagotowaniu wody.
+4. Odkamieniaj czajnik raz w miesiącu.

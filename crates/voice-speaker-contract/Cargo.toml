@@ -1,0 +1,25 @@
+[package]
+name = "voice-speaker-contract"
+description = "Weryfikacja mówcy (właściciela): kontrakt — rejestracja ≥ 3 wypowiedzi, weryfikacja z progami zależnymi od ryzyka i pewnością, embedding, EER/FAR/FRR, sygnał do risk-classifier (CommandOrigin::UserVoice)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

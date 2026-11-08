@@ -1,0 +1,50 @@
+[package]
+name = "mcp-impl"
+description = "Klient MCP (stdio) z odciskiem opisów narzędzi i serwer MCP Alfy v0 (schowek, okna, approve) przez stdio-proxy i kanał lokalny z tokenem — bez TCP"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "alfa-mcp-proxy"
+path = "src/bin/alfa-mcp-proxy.rs"
+
+[dependencies]
+mcp-contract = { path = "../mcp-contract" }
+platform-contract.workspace = true
+# v1 (F6): rejestr (port), Broker (podmiot „most CLI”), narzędzia agentek UIA/zrzutów (trait `Tool`).
+platform-apps-contract = { path = "../platform-apps-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+core-bus-contract.workspace = true
+tokio-util = { version = "0.7.19", default-features = false }
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+# `process` dodaje signal-hook-registry 1.4.8 (MIT OR Apache-2.0) na Unix.
+tokio = { workspace = true, features = ["net", "io-util", "io-std", "process", "rt", "time", "sync"] }
+
+[dev-dependencies]
+mcp-contract = { path = "../mcp-contract", features = ["contract-tests"] }
+mcp-fake = { path = "../mcp-fake" }
+platform-fake = { path = "../platform-fake" }
+core-registry-contract.workspace = true
+platform-apps-fake = { path = "../platform-apps-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+tools-uia-fake = { path = "../tools-uia-fake" }
+tools-screen-fake = { path = "../tools-screen-fake" }
+tools-uia-contract = { path = "../tools-uia-contract" }
+tools-screen-contract = { path = "../tools-screen-contract" }
+compliance-contract = { path = "../compliance-contract" }
+core-bus-fake = { path = "../core-bus-fake" }
+watchdog-contract = { path = "../watchdog-contract" }
+tokio = { workspace = true, features = ["net", "io-util", "rt-multi-thread", "macros", "time"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,22 @@
+[package]
+name = "sessions-fake"
+description = "Sesje: deterministyczna atrapa w pamięci, sejf kluczy w pamięci, dostawca baz tymczasowych i fixture'y rozmów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+sessions-contract = { path = "../sessions-contract" }
+lib-sqlstore = { path = "../lib-sqlstore" }
+chrono.workspace = true
+tempfile = "3.27.0"
+
+[dev-dependencies]
+sessions-contract = { path = "../sessions-contract", features = ["contract-tests"] }
+proptest.workspace = true
+
+[lints]
+workspace = true

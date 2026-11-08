@@ -1,0 +1,21 @@
+[package]
+name = "watchdog-fake"
+description = "Atrapa watchdoga: rejestruje heartbeaty, awarie i akcje, kill-switch jako zdarzenie (bez zabijania), sterowany safe-mode"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+watchdog-contract = { path = "../watchdog-contract" }
+platform-contract.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+watchdog-contract = { path = "../watchdog-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

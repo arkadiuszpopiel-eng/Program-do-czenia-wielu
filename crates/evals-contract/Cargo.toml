@@ -1,0 +1,30 @@
+[package]
+name = "evals-contract"
+description = "Harness ewaluacji (F8): kontrakt — format zestawów (manifest, SHA-256 zamrożenia, podział dev/test/holdout), statystyka (bootstrap, porównanie wariantów), raporty JSON/Markdown i bramka ewaluacyjna z ukrytym holdoutem (tylko wynik zbiorczy)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane na `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+sha2 = "0.10.9"
+
+[dev-dependencies]
+proptest.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,19 @@
+[package]
+name = "voice-speaker-fake"
+description = "Atrapa voice-speaker: wspólny SpeakerEngine z kontraktu, deterministyczny model cech (histogram tonu podstawowego) zamiast ECAPA, profil w pamięci, głosy syntetyczne do testów i EER w CI"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-speaker-contract = { path = "../voice-speaker-contract", features = ["contract-tests"] }
+voice-audio-contract = { path = "../voice-audio-contract" }
+
+[dev-dependencies]
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+
+[lints]
+workspace = true

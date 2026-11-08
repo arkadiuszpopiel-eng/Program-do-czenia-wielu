@@ -1,0 +1,27 @@
+[package]
+name = "core-config-contract"
+description = "Kontrakt konfiguracji warstwowej: wspólna + nakładka per maszyna, klucze-ścieżki, zakresy, trait ConfigStore"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe konfiguracji uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = ["dep:futures-util"]
+
+[dependencies]
+core-bus-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait.workspace = true
+futures-core.workspace = true
+futures-util = { workspace = true, optional = true }
+
+[lints]
+workspace = true

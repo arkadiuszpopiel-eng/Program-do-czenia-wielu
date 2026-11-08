@@ -1,0 +1,40 @@
+[package]
+name = "lib-sqlstore"
+description = "Wspólna biblioteka danych (bez logiki modułu): szyfrowana baza SQLCipher z kluczem surowym, sqlite-vec, migracje, normalizacja tekstu PL do FTS"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+rusqlite.workspace = true
+sqlite-vec.workspace = true
+thiserror.workspace = true
+# Zerowanie klucza w pamięci przy drop (bez derive — ręczne `Drop`).
+zeroize = "1.9.0"
+# Losowy klucz 32 B z CSPRNG systemu (ta sama wersja, której używa już `uuid`).
+getrandom = "0.4.3"
+# Rozkład kanoniczny (NFD) do składania diakrytyków w `fold_pl`.
+unicode-normalization = "0.1.25"
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile = "3.27.0"
+
+# Linty jak w workspace z jednym wyjątkiem: `unsafe_code = "deny"` zamiast `forbid` (workspace ma `forbid`,
+# którego nie da się nadpisać lokalnie). Jedyne dozwolone `unsafe` to rejestracja sqlite-vec przez FFI
+# `sqlite3_auto_extension` w `src/open.rs` (`#[allow(unsafe_code)]` na jednej funkcji; ADR 0008, spike i).
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+
+[lints.clippy]
+too_many_lines = "warn"
+unwrap_used = "deny"
+expect_used = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "warn"

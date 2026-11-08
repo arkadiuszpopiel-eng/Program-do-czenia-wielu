@@ -1,0 +1,23 @@
+# providers-catalog/azure-speech.toml — szkic (PLAN.md §5.6), stan z 2026-09-30
+# Wartości "unknown"/"TODO" = nie potwierdzone w planie; weryfikacja przed użyciem (docs/compliance/subscription-routes.md §6).
+
+id = "azure-speech"
+display_name = "Azure Speech"
+kind = "tts"
+auth = "api_key"
+base_url = "TODO"
+compat = "native"
+privacy_tag = "unknown"
+jurisdiction = "unknown"
+terms_url = "TODO"
+compliance_status = "unverified"
+notes = "TTS pl-PL (§6.2). Region zależy od zasobu Azure — jurysdykcja ustawiana w konfiguracji [?]. STT Azure nie jest w planie (kind=tts)."
+
+[capabilities]
+vision = false
+tools = false
+streaming = "unknown"
+long_context = false
+
+# Cennik uzupełniany w konfiguracji użytkownika (%APPDATA%\Alfa\config), nie w kodzie ani w katalogu.
+[pricing]

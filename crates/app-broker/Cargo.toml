@@ -1,0 +1,45 @@
+[package]
+name = "app-broker"
+description = "Broker poza procesem aplikacji (kategoria app-*): klient IPC roli Core (potok z ACL, sprawdzenie serwera, limity czasu, bezpieczny stan po zerwaniu), Broker i kill-switch dla narzędzi agentek, okno zatwierdzeń i stan dla UI, uruchamianie alfa-broker (tryb przenośny) i alfa-watchdog, Broker w procesie (tryb deweloperski)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Wybór Brokera dla `AppOptions` (ADR 0003, PLAN §8.1–8.2, §8.6);
+# używa jej `app-core` (i przez reeksport — powłoka Tauri).
+[dependencies]
+app-api = { path = "../app-api" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+compliance-contract = { path = "../compliance-contract" }
+safety-broker-impl = { path = "../safety-broker-impl" }
+watchdog-contract = { path = "../watchdog-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+core-bus-contract.workspace = true
+core-log-contract.workspace = true
+core-registry-contract.workspace = true
+platform-contract.workspace = true
+platform-windows-kernel-impl = { path = "../platform-windows-kernel-impl" }
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["sync", "time", "rt"] }
+tracing.workspace = true
+
+[dev-dependencies]
+safety-broker-contract = { path = "../safety-broker-contract", features = ["contract-tests"] }
+safety-broker-fake = { path = "../safety-broker-fake" }
+broker-ui-contract = { path = "../broker-ui-contract" }
+broker-ui-impl = { path = "../broker-ui-impl" }
+broker-ui-fake = { path = "../broker-ui-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+platform-fake = { path = "../platform-fake" }
+tools-common-contract = { path = "../tools-common-contract" }
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time", "test-util"] }
+
+[lints]
+workspace = true

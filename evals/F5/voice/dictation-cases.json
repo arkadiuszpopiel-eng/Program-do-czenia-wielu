@@ -1,0 +1,158 @@
+{
+ "version": 1,
+ "criterion": "F5-10 (część CI: normalizacja odwrotna; zgodność wpisanego tekstu w 5 aplikacjach — self-hosted)",
+ "status": "proposed",
+ "threshold": "100% przypadków CI; F5-10 na sprzęcie: ≥ 95% zgodności tekstu",
+ "cases": [
+  {
+   "id": "interp-01",
+   "input": "Cześć Ania przecinek jutro mamy spotkanie kropka",
+   "expected": "Cześć Ania, jutro mamy spotkanie."
+  },
+  {
+   "id": "interp-02",
+   "input": "czy to działa znak zapytania",
+   "expected": "Czy to działa?"
+  },
+  {
+   "id": "interp-03",
+   "input": "super wykrzyknik nowa linia pozdrawiam",
+   "expected": "Super!\nPozdrawiam"
+  },
+  {
+   "id": "interp-04",
+   "input": "lista dwukropek mleko przecinek chleb",
+   "expected": "Lista: mleko, chleb"
+  },
+  {
+   "id": "interp-05",
+   "input": "Ania, przecinek jutro.",
+   "expected": "Ania, jutro."
+  },
+  {
+   "id": "interp-06",
+   "input": "pierwszy akapit kropka nowy akapit drugi akapit",
+   "expected": "Pierwszy akapit.\n\nDrugi akapit"
+  },
+  {
+   "id": "interp-07",
+   "input": "otwórz nawias uwaga zamknij nawias",
+   "expected": "(Uwaga)"
+  },
+  {
+   "id": "interp-08",
+   "input": "powiedział otwórz cudzysłów dobrze zamknij cudzysłów",
+   "expected": "Powiedział „dobrze”"
+  },
+  {
+   "id": "interp-09",
+   "input": "to jest myślnik ważne",
+   "expected": "To jest – ważne"
+  },
+  {
+   "id": "interp-10",
+   "input": "biało łącznik czerwony",
+   "expected": "Biało-czerwony"
+  },
+  {
+   "id": "interp-11",
+   "input": "no i trzy kropki",
+   "expected": "No i…"
+  },
+  {
+   "id": "interp-12",
+   "input": "napisz dosłownie kropka",
+   "expected": "Napisz kropka"
+  },
+  {
+   "id": "interp-13",
+   "input": "uwaga średnik test",
+   "expected": "Uwaga; test"
+  },
+  {
+   "id": "interp-14",
+   "input": "Kropka. Nowa linia. Dalej",
+   "expected": ".\nDalej"
+  },
+  {
+   "id": "num-01",
+   "input": "mam dwadzieścia trzy lata",
+   "expected": "Mam 23 lata"
+  },
+  {
+   "id": "num-02",
+   "input": "rok dwa tysiące dwadzieścia sześć",
+   "expected": "Rok 2026"
+  },
+  {
+   "id": "num-03",
+   "input": "jeden z nich przyszedł dwa razy",
+   "expected": "Jeden z nich przyszedł dwa razy"
+  },
+  {
+   "id": "num-04",
+   "input": "sto lat",
+   "expected": "Sto lat"
+  },
+  {
+   "id": "num-05",
+   "input": "piętnaście minut",
+   "expected": "15 minut"
+  },
+  {
+   "id": "num-06",
+   "input": "wynik trzy przecinek pięć",
+   "expected": "Wynik 3,5"
+  },
+  {
+   "id": "num-07",
+   "input": "rabat dwadzieścia procent",
+   "expected": "Rabat 20%"
+  },
+  {
+   "id": "num-08",
+   "input": "sto dwadzieścia osób",
+   "expected": "120 osób"
+  },
+  {
+   "id": "num-09",
+   "input": "pięciu ludzi i dziewiątej godzinie",
+   "expected": "Pięciu ludzi i dziewiątej godzinie"
+  },
+  {
+   "id": "num-10",
+   "input": "tysiąc dwieście złotych",
+   "expected": "1200 złotych"
+  },
+  {
+   "id": "num-11",
+   "input": "zero",
+   "expected": "Zero"
+  },
+  {
+   "id": "num-12",
+   "input": "trzy przecinek jabłka",
+   "expected": "Trzy, jabłka"
+  },
+  {
+   "id": "mix-01",
+   "input": "Spotkanie o piętnastej przecinek sala dwanaście kropka",
+   "expected": "Spotkanie o piętnastej, sala 12."
+  },
+  {
+   "id": "mix-02",
+   "input": "pytanie znak zapytania odpowiedź dwukropek czterdzieści dwa",
+   "expected": "Pytanie? Odpowiedź: 42"
+  },
+  {
+   "id": "num-13",
+   "input": "dwadzieścia, trzy",
+   "expected": "20, trzy"
+  },
+  {
+   "id": "num-14",
+   "input": "pokój numer czterdzieści dwa.",
+   "expected": "Pokój numer 42."
+  }
+ ]
+}

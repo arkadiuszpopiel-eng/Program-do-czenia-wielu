@@ -1,0 +1,55 @@
+[package]
+name = "app-safety"
+description = "Korzeń kompozycji procesów Jądra bezpieczeństwa: alfa-broker (usługa Brokera na named pipe z ACL), alfa-broker-ui (natywne okno zatwierdzeń), alfa-watchdog (kill-switch Ctrl+Shift+F12, Job Objects)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` = korzeń kompozycji (crates/README.md, scripts/check-deps.sh): jedyne miejsce, gdzie
+# logika usług z `safety-broker-impl` / `watchdog-impl` / `broker-ui-impl` spotyka się z
+# `platform-windows-impl`. Binarki nie mogą żyć w `-impl` (zależność `-impl` → cudzy `-impl`).
+[[bin]]
+name = "alfa-broker"
+path = "src/bin/alfa-broker.rs"
+
+[[bin]]
+name = "alfa-broker-ui"
+path = "src/bin/alfa-broker-ui.rs"
+
+[[bin]]
+name = "alfa-watchdog"
+path = "src/bin/alfa-watchdog.rs"
+
+[dependencies]
+safety-broker-contract = { path = "../safety-broker-contract" }
+safety-broker-impl = { path = "../safety-broker-impl" }
+broker-ui-contract = { path = "../broker-ui-contract" }
+broker-ui-impl = { path = "../broker-ui-impl" }
+watchdog-contract = { path = "../watchdog-contract" }
+watchdog-impl = { path = "../watchdog-impl" }
+compliance-contract = { path = "../compliance-contract" }
+platform-contract.workspace = true
+platform-windows-impl = { path = "../platform-windows-impl" }
+platform-windows-kernel-impl = { path = "../platform-windows-kernel-impl" }
+# Watchdog → launcher: rollback wersji po pętli awarii (`WatchdogSignal`).
+updater-impl = { path = "../updater-impl" }
+semver.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+# Dziennik diagnostyczny procesów Jądra (plik rotowany, redakcja sekretów; `start_logs`).
+app-logs = { path = "../app-logs" }
+tracing.workspace = true
+
+[dev-dependencies]
+# Format komunikatów watchdoga = parser aplikacji (`app_broker::notice`).
+app-broker = { path = "../app-broker" }
+platform-fake = { path = "../platform-fake" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract", features = ["contract-tests"] }
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

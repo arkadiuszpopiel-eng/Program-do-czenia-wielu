@@ -1,0 +1,22 @@
+[package]
+name = "ui-terminal-contract"
+description = "ui-terminal (F4): kontrakt wbudowanego terminala ConPTY do logowania w CLI mostów — sterowany wyłącznie przez użytkownika (gest UI), strumień VT prosto do UI (bez magistrali, logów i pamięci), zamknięcie zabija drzewo procesów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = []
+
+[dependencies]
+platform-contract.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,54 @@
+{
+  "_": "Wspólna tabela dla rdzenia (SecretString::from_input) i interfejsu (cleanKey). {key} = klucz poniżej. To nie jest prawdziwy klucz.",
+  "key": "test-klucz-XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "cleaned": [
+    "  {key}\r\n",
+    "\"{key}\"",
+    "'{key}'",
+    "„{key}”",
+    "`{key}`",
+    "OPENAI_API_KEY={key}",
+    "OPENAI_API_KEY=\"{key}\"",
+    "\"OPENAI_API_KEY={key}\"",
+    "export OPENAI_API_KEY=\"{key}\"",
+    "set OPENAI_API_KEY={key}",
+    "setx OPENAI_API_KEY \"{key}\"",
+    "$env:OPENAI_API_KEY=\"{key}\"",
+    "openai_api_key={key}",
+    "OPENAI_API_KEY: {key}",
+    "\"apiKey\": \"{key}\",",
+    "Bearer {key}",
+    "bearer {key}",
+    "Authorization: Bearer {key}",
+    "{key};",
+    "{key}​",
+    "﻿{key}",
+    "​\"{key}\"",
+    "{key} ",
+    "‪{key}‬",
+    "{key}",
+    "OPENAI_API_KEY={key}\r\n"
+  ],
+  "rejected": [
+    "",
+    "   ",
+    "Mój klucz: {key}",
+    "{key} (mój klucz)",
+    "{key} {key}",
+    "to jest zdanie, nie klucz",
+    "klucz-zażółć-gęślą-jaźń-XXXXXXXXXXXX",
+    "OPENAI_API_KEY={key}\nANTHROPIC_API_KEY={key}",
+    "{key}\n{key}",
+    "{key}\nmoj drugi wiersz"
+  ],
+  "unchanged": [
+    "abc=def==",
+    "a=b",
+    "AbC-123_x.y/z+w==",
+    "ZZZZKEY=",
+    "sk-or-v1-abc:def",
+    "ZZZZZZZZZZZZKEY==",
+    "apikey:XXXXXXXXXXXX",
+    "token:abc"
+  ]
+}

@@ -1,0 +1,31 @@
+[package]
+name = "voice-dsp-impl"
+description = "Implementacja voice-dsp: AEC3 (sonora, czysty Rust) z referencją = własny TTS, RNNoise (nnnoiseless), AGC, kalibracja pętli (rustfft)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-dsp-contract = { path = "../voice-dsp-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+# Port WebRTC AEC3 w czystym Rust (BSD-3-Clause); bez feature `examples` (cpal).
+sonora = { version = "0.2.0", default-features = false }
+# RNNoise w czystym Rust (BSD-3-Clause); bez domyślnych feature'ów (CLI, dasp).
+nnnoiseless = { version = "0.5.2", default-features = false }
+# FFT do kalibracji pętli (MIT OR Apache-2.0).
+rustfft = "6.4.1"
+
+[dev-dependencies]
+voice-dsp-contract = { path = "../voice-dsp-contract", features = ["contract-tests"] }
+voice-audio-fake = { path = "../voice-audio-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,40 @@
+[package]
+name = "lib-embed"
+description = "Wspólna biblioteka (bez logiki modułu): lokalny embedder tekstu ONNX (tract-onnx + tokenizers) dla search — manifest z SHA-256, pooling, normalizacja L2, prefiksy E5, wsady, wątek tła, dzierżawa model-residency, instalator modeli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Zabawkowy model ONNX + tokenizer do testów innych crate'ów (np. eval `memory-impl`).
+testkit = ["dep:prost"]
+
+[dependencies]
+search-contract = { path = "../search-contract" }
+model-residency-contract = { path = "../model-residency-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+# Inferencja ONNX w czystym Rust (jak voice-vad-impl; ADR 0004 — bez binariów ONNX Runtime).
+tract-onnx = "0.23.8"
+sha2 = "0.10.9"
+regex.workspace = true
+unicode-normalization = "0.1.25"
+# Klastry grafemów dla normalizatora `Precompiled` (zgodność z HF/SentencePiece dla tekstu NFD).
+unicode-segmentation = "1.13.3"
+# Zapis protobuf ONNX w `testkit` (ta sama wersja co w tract-onnx).
+prost = { version = "0.14.4", optional = true }
+
+[dev-dependencies]
+# Własny `testkit` w testach integracyjnych (samozależność dev — dozwolona przez cargo).
+lib-embed = { path = ".", features = ["testkit"] }
+prost = "0.14.4"
+tempfile = "3.27.0"
+flate2 = { version = "1.1.10", default-features = false, features = ["rust_backend"] }
+
+[lints]
+workspace = true

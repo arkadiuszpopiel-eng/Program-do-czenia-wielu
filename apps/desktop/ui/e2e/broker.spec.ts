@@ -1,0 +1,163 @@
+import { expect, test, type Page } from '@playwright/test';
+import { expectAccessible, openApp, waitForChat } from './helpers';
+
+// Broker poza procesem (ADR 0003) na atrapie backendu: stan w Ustawieniach (usługa / tryb
+// przenośny), baner bezpiecznego stanu po zerwaniu łącza, karta „czeka na zatwierdzenie" tylko
+// przenosi do okna Brokera (nigdy nie zatwierdza w WebView), kill-switch bez watchdoga.
+
+async function openPermissions(page: Page) {
+  await page.keyboard.press('Control+,');
+  const name = 'Uprawnienia i bezpieczeństwo';
+  await page
+    .getByRole('navigation', { name: 'Sekcje ustawień' })
+    .getByRole('button', { name })
+    .click();
+  await expect(page.getByRole('heading', { name, level: 2 })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Sędzia Cieni (Jądro bezpieczeństwa)' }),
+  ).toBeVisible();
+}
+
+for (const theme of ['light', 'dark'] as const) {
+  test.describe(`Sędzia Cieni — motyw ${theme}`, () => {
+    test('usługa: karta przenosi do okna Sędziego Cieni, stan w Ustawieniach', async ({ page }) => {
+      await openApp(page, { theme });
+      await waitForChat(page);
+      await expect(page.getByRole('region', { name: 'Stan Sędziego Cieni' })).toHaveCount(0);
+      await expect(page.getByText('Zatwierdzasz tylko w oknie Sędziego Cieni.')).toBeVisible();
+      await page.getByRole('button', { name: /Otwórz w oknie Sędziego Cieni/ }).click();
+      await expect(page.getByText('Przeniesiono do okna Sędziego Cieni')).toBeVisible();
+      // Karta nie ma przycisku zatwierdzenia — tylko przeniesienie.
+      await expect(page.getByRole('button', { name: /^Zatwierdź|^Zezwól/ })).toHaveCount(0);
+      await openPermissions(page);
+      await expect(page.getByText('Usługa Sędziego Cieni na osobnym koncie Windows')).toBeVisible();
+      await expect(page.getByText('· Połączono')).toBeVisible();
+      await expect(page.getByText(/Izolacja: pełna/)).toBeVisible();
+      await expect(page.getByText(/obsługuje watchdog, poza aplikacją/)).toBeVisible();
+      await expectAccessible(page, `Sędzia Cieni usługa ${theme}`);
+    });
+
+    test('tryb przenośny: jawnie słabsza izolacja', async ({ page }) => {
+      await openApp(page, { theme, scenario: 'broker-portable' });
+      await waitForChat(page);
+      await openPermissions(page);
+      await expect(
+        page.getByText('Tryb przenośny — Sędzia Cieni bez osobnego konta'),
+      ).toBeVisible();
+      await expect(page.getByText(/słabsza izolacja/)).toBeVisible();
+      await expect(page.getByText(/Izolacja: słabsza/)).toBeVisible();
+      await expect(page.getByText(/Instaluje ją raz administrator/)).toBeVisible();
+      await expectAccessible(page, `Sędzia Cieni przenośny ${theme}`);
+    });
+
+    test('zerwanie łącza: baner bezpiecznego stanu, karta nie przenosi', async ({ page }) => {
+      await openApp(page, { theme, scenario: 'broker-lost' });
+      await waitForChat(page);
+      const region = page.getByRole('region', { name: 'Stan Sędziego Cieni' });
+      const alert = region.getByRole('alert');
+      await expect(alert).toContainText('Połączenie z Sędzią Cieni zerwane');
+      await expect(alert).toContainText('wszystko, co wymaga zgody, jest odrzucane');
+      await expect(region.getByRole('button', { name: 'Ukryj komunikat' })).toHaveCount(0);
+      await expect(
+        page.getByText(/Sędzia Cieni jest niedostępny — tej prośby nie da się/),
+      ).toBeVisible();
+      // Opis z przyczyną pada raz (wcześniej baner powtarzał to samo zdanie), a karta nie udaje,
+      // że okno Brokera da się otworzyć.
+      // Liczymy wystąpienia w tekście, nie elementy — zdanie powtórzone w jednym akapicie też jest błędem.
+      const repeats = ((await alert.innerText()).match(/bezpieczny stan/gi) ?? []).length;
+      expect(repeats, 'zdanie o bezpiecznym stanie pada raz').toBe(1);
+      await expect(alert).toContainText('proces Sędziego Cieni zakończył działanie');
+      await expect(page.getByRole('button', { name: /Otwórz w oknie Sędziego Cieni/ })).toHaveCount(
+        0,
+      );
+      await expectAccessible(page, `Sędzia Cieni zerwany ${theme}`);
+      await region.getByRole('button', { name: 'Szczegóły' }).click();
+      await expect(page.getByText('· Połączenie zerwane — bezpieczny stan')).toBeVisible();
+      await expect(page.getByText(/Okno zatwierdzeń: niedostępne/)).toBeVisible();
+    });
+
+    test('bez watchdoga: baner awaryjnego kill-switcha do ukrycia', async ({ page }) => {
+      await openApp(page, { theme, scenario: 'broker-no-watchdog' });
+      await waitForChat(page);
+      const region = page.getByRole('region', { name: 'Stan Sędziego Cieni' });
+      await expect(region).toContainText('Watchdog nie działa');
+      await expectAccessible(page, `Sędzia Cieni bez watchdoga ${theme}`);
+      await region.getByRole('button', { name: 'Ukryj komunikat' }).click();
+      await expect(region).toHaveCount(0);
+    });
+
+    test('tryb deweloperski: baner informacyjny wyłączany w Ustawieniach', async ({ page }) => {
+      await openApp(page, { theme, scenario: 'broker-dev' });
+      await waitForChat(page);
+      const region = page.getByRole('region', { name: 'Stan Sędziego Cieni' });
+      await expect(region).toContainText('Tryb deweloperski');
+      await openPermissions(page);
+      const toggle = page.getByRole('switch', { name: 'Pokazuj baner trybu deweloperskiego' });
+      await expect(toggle).toBeChecked();
+      await expectAccessible(page, `Sędzia Cieni dev — ustawienie ${theme}`);
+      await toggle.click();
+      await expect(toggle).not.toBeChecked();
+      await page.getByRole('button', { name: 'Wróć do rozmowy' }).click();
+      await waitForChat(page);
+      await expect(region).toHaveCount(0);
+    });
+  });
+}
+// Zgody „zawsze w tym zakresie” (31.10): czas wybiera właściciel w oknie Sędziego Cieni, tu tylko
+// lista i „Odwołaj” (odwołanie zawęża, więc działa od razu). Atrapa ma zgodę na 3 h i do odwołania.
+for (const theme of ['light', 'dark'] as const) {
+  test(`zgody „zawsze w tym zakresie”: lista i odwołanie — ${theme}`, async ({ page }) => {
+    await openApp(page, { theme });
+    await waitForChat(page);
+    await openPermissions(page);
+    const card = page.getByRole('region', {
+      name: 'Zgody „zawsze w tym zakresie”',
+    });
+    await expect(card.getByText('połączenie z internetem: strona example.com')).toBeVisible();
+    await expect(card.getByText(/^Delta · do /)).toBeVisible();
+    await expect(card.getByText('Wszystkie agentki w sesji · do odwołania')).toBeVisible();
+    await expectAccessible(page, `zgody ${theme}`);
+    // Nadawanie zgód — wyłącznie okno Sędziego: w karcie nie ma żadnego „Zezwól”.
+    await expect(card.getByRole('button', { name: /Zezwól|Nadaj/ })).toHaveCount(0);
+    await card
+      .getByRole('button', {
+        name: 'Odwołaj zgodę: połączenie z internetem: strona example.com',
+      })
+      .click();
+    await expect(page.getByText('Zgoda odwołana — Sędzia Cieni znów zapyta.')).toBeVisible();
+    await expect(card.getByText('połączenie z internetem: strona example.com')).toHaveCount(0);
+    await card.getByRole('button', { name: /^Odwołaj zgodę: odczyt plików/ }).click();
+    await expect(
+      card.getByText('Brak zgód — o każde takie działanie Sędzia Cieni zapyta.'),
+    ).toBeVisible();
+  });
+}
+
+// Zgoda udzielona w oknie Sędziego: po powrocie do okna Alfy lista zgód jest czytana od nowa
+// (`slow-core` zapisuje każde wywołanie atrapy w `window.__alfaCalls`).
+test('zgody „zawsze w tym zakresie”: odświeżenie po powrocie do okna', async ({ page }) => {
+  await openApp(page, { scenario: 'slow-core' });
+  await waitForChat(page);
+  await openPermissions(page);
+  const calls = () =>
+    page.evaluate(
+      () => (window.__alfaCalls ?? []).filter((c) => c.name === 'permissions.grants').length,
+    );
+  // Liczba odczytów ustalona (pierwszy efekt karty i zmiana stanu Sędziego po wolnym starcie
+  // też czytają listę) — dopiero wtedy fokus; inaczej test przechodziłby bez obsługi fokusu.
+  let settled = -1;
+  await expect
+    .poll(
+      async () => {
+        const now = await calls();
+        const same = now > 0 && now === settled;
+        settled = now;
+        return same;
+      },
+      { intervals: [700] },
+    )
+    .toBe(true);
+  const before = await calls();
+  await page.evaluate(() => window.dispatchEvent(new Event('focus')));
+  await expect.poll(calls).toBe(before + 1);
+});

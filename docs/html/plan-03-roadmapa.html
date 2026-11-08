@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>03 — Roadmapa (dokument żywy) — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/03-roadmapa.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html" aria-current="page">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li><li><a href="plan-45-testy-ai.html">System pełnego automatycznego testowania przez AI</a></li><li><a href="plan-46-raport-2026-10-31-testy-ai.html">Raport z 31.10: system automatycznego testowania przez AI, ścieżki względne, wersja 0.0.79</a></li><li><a href="plan-47-raport-2026-11-01-noc.html">Raport z nocy 31.10/1.11: Sędzia Cieni, diagnostyka odporna na zawieszenie, wersja 0.0.81</a></li><li><a href="plan-48-raport-2026-11-01-rano.html">Raport 1.11 rano: zaległe inspekcje i testy</a></li><li><a href="plan-49-raport-2026-11-02-noc.html">Raport nocy 1/2.11: obowiązki modelu lokalnego i wymiana informacji między modelami</a></li><li><a href="plan-50-tryby-zgod-jak-claude-codex.html">50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)</a></li><li><a href="plan-51-raport-2026-11-03-wieczor.html">51 — Raport: wieczór 3.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-52-raport-2026-11-04-noc.html">52 — Raport: noc 3/4.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-53-raport-2026-11-06-noc.html">53 — Raport: noc 5/6.11 (etap Z — model-sędzia, dziennik rodzica, porządek kompilacji)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="features-katalog.html">Katalog funkcji i testów</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#etap-a-domkniecie-windows-v1-mvp">Etap A — Domknięcie Windows v1 (MVP)</a></li><li><a href="#etap-b-szwy-modularnosci">Etap B — Szwy modularności</a></li><li><a href="#etap-c-funkcje-windows-po-mvp">Etap C — Funkcje Windows po MVP</a></li><li><a href="#etap-p-przeniesienie-funkcji-z-delty-ai">Etap P — Przeniesienie funkcji z Delty AI</a></li><li><a href="#etap-u-wielu-uzytkownikow">Etap U — Wielu użytkowników</a></li><li><a href="#etap-z-tryby-zgod-jak-w-claude-code-i-codex">Etap Z — Tryby zgód jak w Claude Code i Codex</a></li><li><a href="#etap-k-alfa-dla-dzieci-nauka-zabawa-podglad-rodzica">Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica</a></li><li><a href="#etap-d-host-bez-okna-i-protokol-zdalny">Etap D — Host bez okna i protokół zdalny</a></li><li><a href="#etap-e-panel-www">Etap E — Panel WWW</a></li><li><a href="#etap-f-android-15">Etap F — Android 15+</a></li><li><a href="#etap-g-linux">Etap G — Linux</a></li><li><a href="#etap-h-badawcze-bez-terminu-bez-zobowiazania">Etap H — Badawcze (bez terminu, bez zobowiązania)</a></li><li><a href="#decyzje-wlasciciela-ktore-blokuja-zadania">Decyzje właściciela, które blokują zadania</a></li><li><a href="#dziennik-roadmapy">Dziennik roadmapy</a></li></ul></aside><article><h1 id="03-roadmapa-dokument-zywy">03 — Roadmapa (dokument żywy)</h1>
+<p><strong>24.10.2026 — poprawki lokalne 0.0.72:</strong> limit 500 kroków i wspólny budżet
+orkiestracji, profile narzędzi każdej agentki, przebudowa Pipeline z doborem modeli
+etapów, menu obsady i ustawienia po prawej. Wgrane do kopii właściciela;
+testy i natywna weryfikacja: <a href="../repairs-2026-10-24/REPORT.md">raport</a>.</p>
+<p><strong>24.10.2026 — dostęp do narzędzi:</strong> mały pakiet startowy, <code>tools_find</code>,
+krótkie komendy <code>tool_call</code>, odtwarzanie odkrytych schematów i wspólny selektor
+estymacji Routera/runtime: <a href="../tool-routing-2026-10-24/REPORT.md">raport i pomiary</a>.</p>
+<p>Ostatnia aktualizacja: <strong>2026-10-22</strong> (wersja programu 0.0.72; ostatni raport: <a href="plan-38-raport-2026-10-22-0072.html"><code>38-raport-2026-10-22-0072.md</code></a>). Obraz całości: <a href="plan-16-plan-zbiorczy.html"><code>16-plan-zbiorczy.md</code></a>. Statusy: patrz <a href="index.html"><code>README.md</code></a>.
+Stan kryteriów akceptacji żyje w <a href="status.html"><code>../STATUS.md</code></a>; tu są zadania i etapy.</p>
+<p>Zasada kolejności: <strong>etap A ma pierwszeństwo</strong>. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
+Etapy C–G startują po zamknięciu MVP (A.8) — z wyjątkiem zadań oznaczonych „można wcześniej”. Technicznie etap G
+(Linux) wymaga tylko etapu B; o tym, czy ruszy przed D–F, decyduje właściciel.</p>
+<pre><code>A (MVP Windows) ══▶ P (funkcje Delty) ══▶ C (funkcje Windows)
+   │                    └▶ U (wielu użytkowników) ─┐
+   └▶ B (szwy) ─▶ D (host i protokół) ◀────────────┘ ─▶ E (panel WWW) ─▶ F (Android)
+        └───────────────────────────────▶ G (Linux)               H (badawcze — bez terminu)
+</code></pre>
+<h2 id="etap-a-domkniecie-windows-v1-mvp">Etap A — Domknięcie Windows v1 (MVP)</h2>
+<p>Szczegółowe zadania: <a href="kontynuacja.html"><code>../KONTYNUACJA.md</code></a> §6, etapy 0–3. Tutaj tylko stan zbiorczy.</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>A.0</td><td>Porządek w środowisku i repozytorium (KONTYNUACJA etap 0)</td><td class="st st1">w toku</td><td>—</td><td>zostało: <code>gh auth login</code> (właściciel), przegląd gałęzi Dependabota, pełne <code>gates.ps1 -Full</code></td></tr>
+<tr><td>A.1</td><td>Skalowanie i układ interfejsu 1280–3840 px</td><td class="st st0">zrobione</td><td>2026-10-08</td><td>wersja 0.0.2; testy e2e i test w prawdziwej aplikacji</td></tr>
+<tr><td>A.2</td><td>Naprawy z przeglądów rdzenia, narzędzi i stanu interfejsu</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.2; lista w <code>CHANGELOG.md</code></td></tr>
+<tr><td>A.3</td><td>Style interfejsu „Szkło” i „Next” (jasny i ciemny)</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.3; <code>e2e/skins.spec.ts</code></td></tr>
+<tr><td>A.3a</td><td>Własne listy wyboru i pozostałe kontrolki w stylu Alfy (bez kontrolek systemowych)</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.4; błąd zgłoszony przez właściciela; testy listy otwartej w 6 kombinacjach + prawdziwa aplikacja</td></tr>
+<tr><td>A.3b</td><td>Okno „Co nowego” ze skrótem poprawek z dziennika zmian</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.5; zgłoszenie właściciela; test pilnuje wpisu dla każdej wersji</td></tr>
+<tr><td>A.3c</td><td>Przegląd zmian 0.0.1–0.0.5 w świeżym kontekście i naprawa ustaleń</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.6; 3 przeglądy (interfejs, Rust, skrypty i testy), 0 krytycznych; raport: <code>docs/reviews/2026-10-09-przeglad-0.0.1-0.0.5.md</code></td></tr>
+<tr><td>A.3d</td><td>Dodawanie klucza API: diagnoza przyczyny, sprzątanie wklejonego klucza, wymiana i wyłączanie konta</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.7; zgłoszenie właściciela („401 Klucz odrzucony”); 3 przeglądy w świeżym kontekście; bez próby z prawdziwym kluczem; raport: <code>docs/reviews/2026-10-09-przeglad-kluczy-api.md</code></td></tr>
+<tr><td>A.3e</td><td>Naprawy po pierwszej próbie 0.0.7 na laptopie: wybór modelu rozmowy, strona „API i kolejki modeli”, redukcja szumów, koniec wypowiedzi w rozmowie głosowej, filtr zmyślonych wywołań narzędzi</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.8; pięć zgłoszeń właściciela; zegar potoku sprawdzony na mikrofonie laptopa</td></tr>
+<tr><td>A.3f</td><td>Porządkowanie interfejsu, krok 1: przejścia konto ↔ kolejki modeli, przełącznik szczegółów odpowiedzi</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.9; dalsze kroki wymagają wskazań właściciela (lista propozycji w raporcie sesji)</td></tr>
+<tr><td>A.3g</td><td>Własne menu kontekstowe i podpowiedzi (bez elementów systemowych), kolejka modeli jako kafelki do przenoszenia, nowe nazwy stron ustawień modeli, osobna strona „Mosty CLI”</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.10; zgłoszenia właściciela</td></tr>
+<tr><td>A.3h</td><td>Własna belka okna z paskiem LED i przyciskami okna, nawigacja Ustawień od nowa (ikony, zwijane grupy, szukanie z licznikami, klawiatura, wąskie okno)</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.11; zgłoszenia właściciela; bez Snap Layouts po najechaniu</td></tr>
+<tr><td>A.3i</td><td>Kilka kart graficznych: role kart, przypinanie modelu do karty głównej, lekki dostawca lokalny na karcie zintegrowanej (klasa „streszczenia”)</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.11 (kod i testy); praca na karcie zintegrowanej niesprawdzona na sprzęcie — wymaga silnika Vulkan (zgoda właściciela na pobranie)</td></tr>
+<tr><td>A.3j</td><td>Belka: obsada agentek, mikrofon i stan (profil, autonomia, koszt) od nowa, objaśnienie stanu</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.12; zgłoszenie właściciela</td></tr>
+<tr><td>A.3k</td><td>Znak Alfy: ikona programu i znak z nazwą na belce okna</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.13; zgłoszenie właściciela</td></tr>
+<tr><td>A.3l</td><td>Belka z torem paska LED, ekran ładowania, żywe awatary agentek z ustami w rytm mowy (zdarzenie <code>SpeechLevel</code>), strojenie mowy w „Głos” (styl, tempo, pauzy, różnice głosów)</td><td class="st st0">zrobione</td><td>2026-10-09</td><td>wersja 0.0.14; brzmienie do oceny właściciela; inne głosy niż Piper „Gosia” — osobna decyzja</td></tr>
+<tr><td>A.4</td><td>Pierwsza rozmowa z modelem lokalnym na laptopie (KONTYNUACJA etap 1)</td><td class="st st1">w toku</td><td>2026-10-09</td><td>pakiet (silniki i model) pobrał właściciel przy 0.0.8 — zgoda na ok. 6 GB już nie blokuje; model lokalny odpowiada (próby obowiązków 0.0.45, 0.0.52–0.0.53, <code>verify sprzet</code> 0.0.62 — raporty 26 i 27); zamyka P2</td></tr>
+<tr><td>A.5</td><td>Głos na żywo: dyktowanie i czytanie</td><td class="st st1">w toku</td><td>2026-10-09</td><td>silniki z pakietu pobrane przy 0.0.8 i zmierzone na laptopie; rozmowa żywą mową czeka na ocenę słuchem właściciela</td></tr>
+<tr><td>A.6</td><td>Pomiary MVP na sprzęcie, F0–F3 (KONTYNUACJA etap 2)</td><td class="st st3">czeka</td><td>—</td><td>po A.4</td></tr>
+<tr><td>A.7</td><td>Decyzje bezpieczeństwa: B-01…B-08, S-01…S-04, S-06, C-02, C-03, R-05, P-…</td><td class="st st3">czeka</td><td>—</td><td>właściciel; pakiet gotowy: <a href="../reviews/2026-10-10-pakiet-decyzji-wlasciciela.md"><code>reviews/2026-10-10-pakiet-decyzji-wlasciciela.md</code></a> (44 decyzje z rekomendacjami)</td></tr>
+<tr><td>A.8</td><td>Wdrożenie decyzji i przegląd Jądra, wejście na <code>main</code> (KONTYNUACJA etap 3)</td><td class="st st3">czeka</td><td>—</td><td>po A.7</td></tr>
+<tr><td>A.9</td><td>System pełnego automatycznego testowania przez AI: katalog każdej funkcji, bramka „nowa funkcja bez testu”, przeglądy ogólne, instancja testowa z pełnym dostępem</td><td class="st st1">w toku</td><td>2026-10-31</td><td>polecenie właściciela 31.10; opis: <a href="plan-45-testy-ai.html"><code>45-testy-ai.md</code></a>. Zrobione: katalog 601 funkcji z kodu (6 rodzajów), spis 81 narzędzi agentek z rdzenia, bramka w <code>verify</code>, przeglądy ogólne palety (atrapa) i ustawień (prawdziwy rdzeń), test klawiszy pola pisania; dług 36 → 31 → 6 (99 % funkcji z testem, 0.0.79, raport <a href="plan-46-raport-2026-10-31-testy-ai.html">46</a>). Instancja testowa na „Pełnej automatyce” — scalona po przeglądzie właściciela 31.10 (<code>b5f7787c</code>), przebieg L4 w każdym <code>verify wersja</code> (zielony). Dług katalogu 0 (601 z 601, Spacja PTT podłączona). Przegląd ogólny narzędzi (manifest, odrzucanie błędnych argumentów) i zdarzeń (każda próbka w oknie) — <a href="plan-45-testy-ai.html">45 §6.4</a>. Diagnostyka narzędzi: każde z 81 narzędzi wywołane z poprawnymi argumentami na rdzeniu z samymi atrapami i poziomem L4, raport <code>target/verify/narzedzia</code>, wzorzec wyników i próby straży — <a href="plan-45-testy-ai.html">45 §6.5</a>.</td></tr>
+<tr><td>A.10</td><td>Okno zgód „Sędzia Cieni”: nowa nazwa, dokładna treść, „?” z opisem, na „Pełnej automatyce” okno nie pokazuje się wcale</td><td class="st st3">czeka</td><td>2026-10-31</td><td>polecenie właściciela 31.10 („okno tragiczne i niedokładne”). Gałąź <code>do-przegladu-sedzia-cieni</code> (Jądro i polityki — scalenie po przeglądzie właściciela). Zrobione: L4 tylko „wykonaj” albo twarda blokada, zatwierdzenie L4 wycofuje czekające prośby; karta z konkretem od narzędzia („Co dokładnie”), miejscem po ludzku i trybem pracy w „Dlaczego pytam”, bez odliczania; okno rysowane i mierzone prawdziwą czcionką, „?” (F1), podgląd w pliku w obu motywach (<code>target/verify/okno-sedziego</code>).</td></tr></tbody></table></div>
+<p><strong>Wyjście:</strong> scenariusz MVP 6/6 na laptopie, każde kryterium F0–F3 z wynikiem z maszyny, <code>main</code> zawiera
+zweryfikowany kod. To jest „Alfa 0.1”.</p>
+<h2 id="etap-b-szwy-modularnosci">Etap B — Szwy modularności</h2>
+<p>Bez nowych funkcji dla użytkownika; każde zadanie kończy się tym, że wszystkie dotychczasowe testy są zielone.</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>B.1</td><td>Generator typów TS z Rust (ADR 0013) + kontrola w CI</td><td class="st st0">zrobione</td><td>2026-10-29</td><td>etap 1 w 0.0.21: <code>app-api/src/schema.rs</code> (schemars) → <code>packages/schemas/ipc.v1.json</code> → <code>scripts/gen-ipc-types.mjs</code> → <code>ui/src/lib/api/generated/ipc.ts</code>, typowane <code>call</code> w <code>tauri-client.ts</code>; bramka i CI. <strong>Etap 2 (2026-10-29):</strong> ręczne kopie typów łącza w <code>types*.ts</code> usunięte (ok. 4000 → 615 linii; pliki tylko przekazują typy generowane i dokładają typy samego interfejsu), <code>compat.ts</code> zbędny; ręczna kopia typu z Rusta zatrzymuje generator. Decyzja: zawężenie po stronie okna — tabela generatora (<code>AgentId</code>, <code>Author</code>, <code>ModelPurpose</code>, <code>ModelTier</code>, <code>GpuRole</code>; 14 pól) sprawdza, że schemat daje napis; pola tury zmieniane z delt strumienia bez <code>readonly</code>; ramka kanału terminala w schemacie (ADR 0013 „Wdrożenie”)</td></tr>
+<tr><td>B.2</td><td>Numery sekwencji zdarzeń i wznowienie „od <code>seq</code>”</td><td class="st st0">zrobione</td><td>2026-10-11</td><td>wersja 0.0.19; <code>app-api/src/event_log.rs</code> (numer przy wysłaniu, ramka <code>EventFrame</code> z <code>prev</code>/<code>seq</code>/<code>epoch</code>, bufor 1024 ramek / 8192 zdarzeń), polecenie <code>events_resume</code>, <code>ui/src/lib/api/event-sequencer.ts</code>; pole <code>offset</code> w <code>TextDelta</code> zamyka ustalenie o deltach w czasie wczytywania rozmowy; rozmiar bufora to wartość robocza — próg ustali właściciel po pomiarach (ADR 0019)</td></tr>
+<tr><td>B.3</td><td>Błędy strukturalne na łączu (<code>code</code>, <code>message</code>, <code>details</code>)</td><td class="st st0">zrobione</td><td>2026-10-11</td><td>wersja 0.0.19; <code>app-api/src/details.rs</code> (filtr sekretów), powłoka odsyła obiekt <code>AppError</code> zamiast napisu, <code>CommandError.details</code> w interfejsie; szczegóły wypełniają na razie błędy sesji, kont, ustawień, pamięci, kamer i modułów niepodłączonych — kolejne miejsca przy okazji zmian</td></tr>
+<tr><td>B.4</td><td>Fabryka platform <code>platform-select</code> i mapa zdolności hosta</td><td class="st st3">czeka</td><td>—</td><td>ADR 0018</td></tr>
+<tr><td>B.5</td><td>Oznaczenie poleceń <code>local_only</code> i odpowiedniki dla klientów zdalnych</td><td class="st st0">zrobione</td><td>2026-10-29</td><td>przegląd 281 poleceń: 31 oznaczonych w <code>crates/app-api/data/local-only.json</code> (okno systemu, <code>asset:</code>, ścieżka hosta, okna/schowek/terminal hosta) z odpowiednikiem dla klienta zdalnego (polecenie, zadanie D.1/D.5/D.6 albo „tylko lokalnie” z powodem) i 16 pól DTO ze ścieżką hosta; tabela w schemacie i w TS (<code>LOCAL_ONLY_COMMANDS</code>), moduł <code>app_api::local_only</code>; testy spójności. Odmowa klientowi zdalnemu — z bramą D.1</td></tr>
+<tr><td>B.6</td><td>Katalog silników i modeli z wymiarem system / architektura</td><td class="st st0">zrobione</td><td>2026-10-29</td><td><code>app-models/src/catalog/target.rs</code> (<code>Target</code> = system + procesor, <code>Target::host()</code>), pole <code>ItemSpec::targets</code>: binarki silników z wydań Windows oznaczone <code>Windows x64</code>, modele i wagi wspólne; <code>builtin()</code> pomija pozycje spoza tego komputera; test pilnuje, że każda pobierana binarka ma cel. Linux/ARM64 = nowe wiersze z archiwami i sumami (G)</td></tr>
+<tr><td>B.7</td><td>Kontrakty Brokera niezależne od systemu (ścieżki, powłoki, tożsamość)</td><td class="st st3">czeka</td><td>—</td><td>ADR 0018 + przegląd właściciela; po A.7</td></tr>
+<tr><td>B.8</td><td>Zmienne środowiskowe i ścieżki w binarkach Jądra przez <code>AppPaths</code></td><td class="st st3">czeka</td><td>—</td><td>obszar Jądra — przegląd właściciela</td></tr>
+<tr><td>B.9</td><td>Drobne: <code>app-bridges/src/app.rs:227</code> (powłoka dla systemów innych niż Windows)</td><td class="st st0">zrobione</td><td>2026-10-29</td><td><code>app_api::ports::default_terminal_shell()</code> — <code>pwsh</code> na Windows, <code>sh</code> gdzie indziej (było <code>cmd</code> poza Windows); używają go logowanie mostów i „Uruchom w terminalu” bez wskazanej powłoki; powłoka okna zna <code>sh</code>, otwarcie terminala poza Windows czeka na port platformy (B.4)</td></tr></tbody></table></div>
+<p><strong>Wyjście:</strong> <code>cargo test --workspace</code> na Windows i Ubuntu zielone; korzeń kompozycji nie zawiera nazw
+<code>platform_windows_*</code>; typy TS generowane.</p>
+<h2 id="etap-c-funkcje-windows-po-mvp">Etap C — Funkcje Windows po MVP</h2>
+<h3 id="c1-z-planu-v5-kontynuacja-etapy-4-8">C1 — z planu v5 (KONTYNUACJA etapy 4–8)</h3>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>C1.1</td><td>Jakość głosu (WER PL, przerwania, cztery głosy)</td><td class="st st3">czeka</td><td>—</td><td>korpus nagrań od właściciela; cztery głosy — grupa C5</td></tr>
+<tr><td>C1.1a</td><td>Głos agentek z chmury jako opcja (adapter mowy przez konto API, zapas lokalny, nigdy w sesji prywatnej)</td><td class="st st3">czeka</td><td>—</td><td>po grupie C5 — właściciel wybrał 2026-10-11 głos lokalny (koszt chmury); ADR 0026</td></tr>
+<tr><td>C1.2</td><td>Mosty CLI, klucze i dostawcy chmurowi na żywo</td><td class="st st3">czeka</td><td>—</td><td>logowanie i klucze — właściciel</td></tr>
+<tr><td>C1.3</td><td>Sterowanie komputerem (UIA, ekran, wejście)</td><td class="st st3">czeka</td><td>—</td><td>po decyzji P2-01</td></tr>
+<tr><td>C1.4</td><td>Pamięć i transfer: recall@5, migracje, round-trip <code>.alfa</code></td><td class="st st3">czeka</td><td>—</td><td>recall możliwy zaraz po A.4</td></tr>
+<tr><td>C1.5</td><td>Samonaprawa, wtyczki, pentest, audyt WCAG</td><td class="st st4">planowane</td><td>—</td><td></td></tr></tbody></table></div>
+<h3 id="c2-nowe-opis-04-nowe-funkcje-md">C2 — nowe (opis: <a href="plan-04-nowe-funkcje.html"><code>04-nowe-funkcje.md</code></a>)</h3>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>C2.1</td><td>Zestaw ewaluacyjny po polsku w CI (poprawność wywołań narzędzi, wierność RAG, ataki, WER, czas, VRAM)</td><td class="st st1">w toku</td><td>2026-10-11</td><td>0.0.22: szkic <code>evals/V6/pl-core</code> (36 przypadków: narzędzia, wierność wobec źródła, wstrzyknięcia; status <code>proposed</code>, test integralności w <code>evals-impl/tests/repo_suites.rs</code>). <strong>Zostaje:</strong> akceptacja i progi właściciela, wariant runnera uruchamiający model z narzędziami, pomiary sprzętowe (WER, czas, VRAM)</td></tr>
+<tr><td>C2.2</td><td>Modele na 6 GB: Bielik-Minitron-7B v3, Qwen3.5-4B; tryb wielu modeli w <code>llama-server</code></td><td class="st st4">planowane</td><td>—</td><td>po A.4; pomiar przed wpisaniem do pakietów</td></tr>
+<tr><td>C2.3</td><td>Wymuszanie poprawnego JSON wywołań narzędzi schematem (gramatyka)</td><td class="st st0">zrobione</td><td>2026-10-29</td><td>seria 5 (0.0.64): model lokalny z narzędziami dostaje <code>response_format</code> ze schematem koperty (<code>{&quot;response&quot;, &quot;tool_call&quot;?: {name, parameters}}</code> — tekst i opcjonalnie wywołanie) — <code>llama-server</code> b11559 zamienia go na gramatykę, więc argumenty zawsze pasują do schematu narzędzia, niezależnie od szablonu czatu Bielika (<code>providers-local-impl</code>: <code>schema.rs</code>, <code>envelope.rs</code>); argumenty niezgodne albo ucięte → błąd z prośbą o ponowienie zamiast wykonania z <code>{}</code> (<code>agent-runtime-impl/src/invalid.rs</code>, wszyscy dostawcy); ustawienie „Poprawne wywołania narzędzi (model lokalny)” (<code>engines.llm.tool_schema</code>, domyślnie włączone); źródła b11559: <code>docs/vendor/llama-cpp.md</code>. <strong>Pomiar na prawdziwym modelu 2026-10-29</strong> (laptop RTX 4050, <code>llama-cuda</code> b11559, Bielik 4.5B Q8_0, <code>eval_tools.rs --ignored</code>): gramatyka trzyma schemat w każdym wywołaniu, ale stara koperta dawała 0/35 (wywołanie wpisane do <code>response</code>). Poprawki 0.0.78: wywołanie jako wybór na początku koperty (<code>anyOf</code>), samoweryfikacja zwraca odpowiedź i ignoruje wywołania doklejone do werdyktu, backend stały bez profilu urządzenia, ścieżki względne w prompcie, Windows PowerShell bez PS 7, podpowiedź przy powtórzonym wywołaniu → <strong>11/35</strong> (<code>fs</code> 9/24, <code>shell</code> 2/11), z temperaturą 0,2 przy narzędziach 10–12/35 w dwóch przebiegach (raport 44). Format JSON zaliczony; skuteczność zadań ogranicza model 4,5B — próg F3-07 (ADR 14) do ustalenia przez człowieka, <code>tool_request</code> z <code>live_catalog.rs</code> (Bielik 4.5B, <code>llama-server</code> b11559 CPU, pobrany z katalogu na E:) — wywołanie wykonane, 26,9 s</td></tr>
+<tr><td>C2.4</td><td>Bielik-Guard jako dodatkowy klasyfikator w Brokerze</td><td class="st st3">czeka</td><td>—</td><td>obszar Jądra — decyzja właściciela</td></tr>
+<tr><td>C2.5</td><td>MCP: obsługa specyfikacji 2026-07-28 obok dotychczasowej</td><td class="st st4">planowane</td><td>—</td><td>SDK <code>rmcp</code>; każda akcja nadal przez Brokera</td></tr>
+<tr><td>C2.6</td><td>Umiejętności w formacie Agent Skills (<code>SKILL.md</code>) z przypięciem sumy i przeglądem</td><td class="st st0">zrobione</td><td>—</td><td>seria 2, punkt 10: import <code>SKILL.md</code> (nagłówek YAML, treść → przepis z parametrem <code>zadanie</code> i testem akceptacyjnym) przez kwarantannę i zatwierdzenie z hashem; narzędzia innych programów nie są przenoszone</td></tr>
+<tr><td>C2.7</td><td>Zadania zaplanowane z budżetem uprawnień („gdy komputer włączony i bezczynny”)</td><td class="st st0">zrobione</td><td>—</td><td>seria 2, punkt 6: w formularzu wyzwalacza „tylko gdy komputer bezczynny” i budżet zadania (kroki, minuty, koszt) — w granicach polityki Marszałka; moduły <code>scheduler</code>, <code>triggers</code> już były</td></tr>
+<tr><td>C2.8</td><td>Kanwa artefaktów (Markdown, HTML, SVG w izolowanej ramce)</td><td class="st st0">zrobione</td><td>2026-10-29</td><td>seria 6 (0.0.65): „Otwórz w kanwie” dla bloków <code>html</code>/<code>svg</code>/<code>markdown</code>, długich odpowiedzi z nagłówkami i plików HTML/SVG/MD z panelu Pliki; kanwa obok rozmowy (wąskie okno — arkusz) z kartami Podgląd/Źródło, kopiowaniem, zapisem istniejącymi ścieżkami (blok kodu, eksport wiadomości, plik sesji), limitem 512 KB, klawiaturą i <code>Esc</code>. HTML/SVG: dokument zsanitowany w Rust (<code>lib_markdown::artifact_document</code>: biała lista układu i SVG, bez skryptów, ramek, formularzy i handlerów, adresy tylko <code>#…</code> i <code>data:image</code>; w samym CSS — atrybuty <code>style</code>, prezentacji SVG i treść <code>&lt;style&gt;</code> — <code>url(…)</code>/<code>@import</code>/<code>image-set(</code>/<code>src(</code> do sieci zneutralizowane, a wartości z ucieczkami CSS odrzucone, tekst dokumentu bez zmian; to warstwa uzupełniająca) wyłącznie w ramce <code>sandbox=&quot;&quot;</code> (bez skryptów i bez <code>allow-same-origin</code>); główną kontrolą pobrań jest CSP okna dziedziczona przez ramkę (dopuszcza też lokalne <code>asset:</code> — do przeglądu przy CSP). Kanwa zostawia rozmowie ≥ 480 px (lewy panel zwija się do paska, w razie potrzeby prawy się chowa), zamyka się przy zmianie sesji i gdy tura źródłowa znika ze ścieżki; Markdown z renderera wiadomości. Komenda <code>canvas_render</code> (backend <code>app_files::canvas::render_canvas</code>) — do podpięcia w rdzeniu. Komenda <code>canvas_render</code> podłączona w app-core i IPC. <strong>Historia wersji (2026-10-29):</strong> kolejne odpowiedzi na widocznej ścieżce rozmowy z artefaktem tego samego rodzaju i o tym samym tytule to wersje jednego artefaktu (<code>ui/src/lib/logic/canvas-versions.ts</code>; bez zapisu — rozmowa append-only, więc wersje wynikają z tur); w kanwie przełącznik „Wersja N z M” (poprzednia/następna, fokus zostaje na przełączniku) i karta Zmiany — porównanie wierszy z poprzednią wersją (najdłuższy wspólny podciąg, do 2000 wierszy na wersję, kontekst 3 wiersze, reszta zwinięta); artefakt bez tytułu i plik z panelu Pliki nie mają historii. Testy: vitest <code>canvas-versions.test.ts</code>, e2e <code>canvas.spec.ts</code> (przełącznik, Zmiany, fokus; axe i kontrast w 4 stylach × 2 motywach). Poza zakresem punktu: artefakty interaktywne (skrypty w ramce wymagałyby zmiany CSP — decyzja właściciela)</td></tr>
+<tr><td>C2.9</td><td>Oznaczanie treści wygenerowanych przez AI (art. 50 AI Act)</td><td class="st st0">zrobione</td><td>—</td><td>seria 1, punkty 3–4: informacja o AI przy pierwszym uruchomieniu i stale pod polem wpisywania; eksport MD/HTML ze znakiem „AI” (z modelem) i znacznikiem maszynowym (YAML, meta, IPTC); karty modeli katalogu lokalnego (pochodzenie, przeznaczenie, ograniczenia, licencja, „tworzy treść AI”) z testem kompletności. Modele w chmurze opisuje ich dostawca — w odpowiedziach i eksporcie widać dostawcę i model. Zob. <a href="plan-10-zgodnosc-prawna.html"><code>10</code></a></td></tr>
+<tr><td>C2.10</td><td>SBOM, polityka zgłaszania podatności, kontakt bezpieczeństwa (CRA)</td><td class="st st1">w toku</td><td>—</td><td>seria 2, punkt 1: SBOM CycloneDX (<code>scripts/sbom.mjs</code>, etap <code>sbom</code> w <code>verify wersja</code>), <code>SECURITY.md</code> z terminami CRA (24 h / 72 h / 14 dni); zostaje kontakt bezpieczeństwa — decyzja właściciela przed wydaniem publicznym; seria 5 (0.0.64), punkt <code>zip9</code>: <code>zip</code> 9.0.5 (RUSTSEC-2026-0367/0368/0369) jako zależność workspace w <code>app-files</code>, <code>app-models</code>, <code>app-updates</code>, <code>transfer-impl</code> + testy regresji trzech klas; <code>updater-impl</code> przechodzi po przeglądzie człowieka (do tego czasu <code>cargo deny</code> czerwony przez <code>zip</code> 8.6.0 tylko tam)</td></tr>
+<tr><td>C2.11</td><td>Dokumenty: wyciąganie tekstu z PDF i DOCX w Rust; skany — opcjonalny dodatek</td><td class="st st0">zrobione</td><td>—</td><td>seria 2, punkt 2: DOCX, XLSX i PPTX → tekst dla modelu (czysty Rust: <code>zip</code> + skaner XML, limity przeciw bombom zip; od 0.0.64 <code>zip</code> 9, dowiązania w archiwum nigdy nie są rozwiązywane — test); seria 5 (0.0.64): PDF → tekst stron po kolei (<code>lopdf</code> do struktury i odszyfrowania pustym hasłem, własny interpreter treści, <code>ToUnicode</code> i <code>Differences</code> — polskie znaki, odstępy z położenia napisów; limity: 25 MB, 500 tys. obiektów, 1000 stron, rozpakowane dane, operacje, głębokość formularzy, 100 000 znaków, 10 s w osobnym wątku; PDF z hasłem, skan, plik uszkodzony — notka dla modelu; strumienie obiektów, odszyfrowanie i pośrednie <code>/Length</code> po naszej stronie z budżetem — ścieżki <code>lopdf</code> bez limitów omijamy; ryzyka szczątkowe (czas procesora wrogiego pliku w odłączonym wątku, <code>panic = &quot;abort&quot;</code>) w <code>docs/vendor/lopdf.md</code>). Skany (OCR) — opcjonalny dodatek, osobno</td></tr>
+<tr><td>C2.11a</td><td>OpenRouter: uwierzytelnione sprawdzenie klucza (<code>GET /api/v1/key</code>) zamiast „nie da się sprawdzić z góry”</td><td class="st st0">zrobione</td><td>2026-10-14</td><td>0.0.50: „Testuj połączenie” przy koncie OpenRouter wysyła uwierzytelnione <code>GET /api/v1/key</code> (<code>providers-api-impl/src/openai/mod.rs</code>, test <code>tests/openrouter_key.rs</code>); w roadmapie oznaczone 2026-10-29 przy przeglądzie</td></tr>
+<tr><td>C2.12</td><td>Klucze dla firm: nagłówki organizacji i projektu (OpenAI), Azure OpenAI (adres zasobu, wdrożenie, wersja API)</td><td class="st st0">zrobione</td><td>2026-10-18</td><td>wersja 0.0.64 (seria 5): <code>Account.enterprise</code> w hubie (sprawdzanie <code>EnterpriseSettings::checked</code>, ta sama tabela przypadków w interfejsie), nagłówki <code>OpenAI-Organization</code>/<code>OpenAI-Project</code>, adapter <code>AzureOpenAiProvider</code> (<code>api-key</code>, <code>/openai/deployments/{wdrożenie}/…?api-version=</code>), wpis katalogu <code>azure-openai</code>, pola w kreatorze; testy na serwerze fixture — <strong>niesprawdzone na prawdziwym zasobie Azure ani koncie z projektem OpenAI</strong>; 0.0.65 (seria 6): zmiana ustawień istniejącego konta — <code>AccountsHub::set_enterprise</code> (kontrakt, impl, fake, zdarzenie <code>accounts.enterprise.changed</code>), komenda <code>accounts_set_enterprise</code> (<code>app_models::accounts::enterprise</code>, podłączona w app-core i IPC), formularz „Ustawienia dla firm” na karcie konta, <code>base_url</code> w DTO konta (adres zasobu Azure w formularzu) — <strong>niesprawdzone w prawdziwej aplikacji ani na prawdziwym zasobie</strong></td></tr>
+<tr><td>C2.13</td><td>Sieć firmowa: serwer pośredniczący i własny urząd certyfikacji dla połączeń z dostawcami</td><td class="st st3">czeka</td><td>—</td><td>dotyka <code>lib-netguard</code> i polityk sieci — decyzja właściciela</td></tr>
+<tr><td>C2.14</td><td>Okresowe sprawdzanie kluczy w tle, wiek klucza i przypomnienie o wymianie</td><td class="st st0">zrobione</td><td>2026-10-11</td><td>wersja 0.0.20; <code>app-core/src/parts/key_watch.rs</code> (pętla co 10 min, odstęp z <code>accounts.check_interval_hours</code>), <code>Account.key_saved_at</code> w hubie, przypomnienie liczy interfejs (<code>accounts.key_max_age_days</code>); test listą modeli — bez tokenów; niesprawdzone u prawdziwego dostawcy</td></tr>
+<tr><td>C2.15</td><td>Konto zapasowe: przełączenie na inne konto tego samego dostawcy, gdy pierwsze nie ma środków albo jest ograniczane</td><td class="st st0">zrobione</td><td>2026-10-11</td><td>wersja 0.0.20; <code>app-core/src/parts/backup_account.rs</code>, <code>app-modules/src/route/accounts.rs</code> (odstawienie konta po limicie), <code>RouterCore::reset_health</code>; komunikat w oknie i wpis w logu — <strong>w osi czasu widać dostawcę, nie konto</strong> (do dopisania przy C2.16); tura z błędem nie jest ponawiana sama</td></tr>
+<tr><td>C2.16</td><td>Dziennik operacji na kluczach (dodanie, wymiana, wyłączenie, usunięcie, wynik testu) bez treści klucza</td><td class="st st3">czeka</td><td>—</td><td>audyt jest w Jądrze — decyzja właściciela</td></tr>
+<tr><td>C2.17</td><td>Import kluczy ze zmiennych środowiskowych: przycisk w interfejsie i polecenie rdzenia</td><td class="st st0">zrobione</td><td>2026-10-10</td><td>wersja 0.0.16; polecenie <code>accounts_import_env</code> i raport w „Konta i klucze API”; nieuruchamiane na prawdziwych zmiennych</td></tr></tbody></table></div>
+<p><strong>Wyjście:</strong> każda funkcja ma kryterium w <code>ACCEPTANCE.md</code> (progi ustala właściciel) i wynik ze sprzętu.</p>
+<h3 id="c3-kamery-rozpoznawanie-osob-i-opis-obrazu-opis-12-kamery-i-rozpoznawanie-osob-md">C3 — kamery, rozpoznawanie osób i opis obrazu (opis: <a href="plan-12-kamery-i-rozpoznawanie-osob.html"><code>12-kamery-i-rozpoznawanie-osob.md</code></a>)</h3>
+<p>Zlecenie właściciela z 2026-10-09. Kolejność: najpierw kamery i opis obrazu (bez biometrii), potem osoby.</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>C3.1</td><td>Port kamery w <code>platform-contract</code> (<code>CameraPort</code>) i atrapa: lista urządzeń, tryby, strumień, podłączanie na żywo</td><td class="st st0">zrobione</td><td>2026-10-10</td><td>wersja 0.0.16; <code>platform-contract/src/camera.rs</code>, atrapa w <code>platform-fake</code></td></tr>
+<tr><td>C3.2</td><td>Kamery USB na Windows (Media Foundation)</td><td class="st st1">w toku</td><td>—</td><td>kod w <code>platform-windows-impl/src/camera/</code> (wersja 0.0.16); <strong>niesprawdzone na prawdziwej kamerze</strong> — kamera laptopa odłączona sprzętowo</td></tr>
+<tr><td>C3.3</td><td>Hub kamer: rejestr, kilka strumieni naraz, usypianie, klatka na żądanie, podgląd, przełącznik główny i kill-switch</td><td class="st st0">zrobione</td><td>2026-10-10</td><td>wersja 0.0.16; moduł <code>camera-hub</code> (contract, fake, impl), testy na atrapie portu; zdarzenia magistrali i kamery sieciowe — dalej</td></tr>
+<tr><td>C3.4</td><td>Strona Ustawień „Kamery” i wskaźnik kamery w belce oraz pigułce głosowej</td><td class="st st0">zrobione</td><td>2026-10-10</td><td>wersja 0.0.16; strona „Kamery”, wskaźnik w belce i w pigułce głosowej (0.0.18); 3 style × 2 motywy</td></tr>
+<tr><td>C3.5</td><td>Kamery sieciowe: RTSP, wyszukiwanie ONVIF w sieci lokalnej, hasła w Credential Manager, dekoder w osobnym procesie</td><td class="st st2">do zrobienia</td><td>—</td><td>zgoda właściciela 2026-10-11 na bibliotekę dekodującą obraz i pracę w sieci lokalnej; zmiany w <code>lib-netguard</code> nadal z przeglądem właściciela</td></tr>
+<tr><td>C3.6</td><td>Model widzący lokalnie: wybór modelu, pomiar pamięci karty razem z modelem rozmowy na 6 GB</td><td class="st st3">czeka</td><td>—</td><td>zgoda właściciela na pobranie modelu; technologia do sprawdzenia (<a href="plan-11-technologie-2026-10.html"><code>11</code></a>)</td></tr>
+<tr><td>C3.7</td><td>Narzędzie <code>camera.look</code> i opis obrazu („opisz mi to, co widzisz”): droga lokalna i chmurowa za zgodą, miniatura w rozmowie</td><td class="st st1">w toku</td><td>—</td><td>0.0.16: zdjęcie z kamery jako załącznik (przycisk); 0.0.17: prośba „opisz mi to, co widzisz” w tekście sama dołącza zdjęcie (<code>logic/camera-look.ts</code>). Dalej: to samo w rozmowie głosowej i narzędzie <code>camera.look</code> dla agentek (zdolność Brokera — decyzja właściciela)</td></tr>
+<tr><td>C3.8</td><td>Wykrywanie twarzy i wzorzec twarzy (ONNX Runtime na procesorze); wybór modeli po sprawdzeniu licencji</td><td class="st st3">czeka</td><td>—</td><td>podpis ADR 0025; zgoda na pobranie modeli</td></tr>
+<tr><td>C3.9</td><td>Rejestr osób i kreator „Zapisz osobę” (zgoda, imię, trzy ujęcia); wzorce zaszyfrowane, klucz w Credential Manager</td><td class="st st3">czeka</td><td>—</td><td>podpis ADR 0025; moduły <code>person-recognition</code>, <code>person-memory</code></td></tr>
+<tr><td>C3.10</td><td>Rozpoznanie rozmówcy: kto jest przed kamerą, próg pewności, gość bez pamięci, narzędzie <code>camera.who</code>, powitanie po imieniu</td><td class="st st3">czeka</td><td>—</td><td>po C3.8–C3.9</td></tr>
+<tr><td>C3.11</td><td>Pamięć per osoba: profil, fakty ze źródłem, streszczenie każdej rozmowy; trwała po restarcie</td><td class="st st3">czeka</td><td>—</td><td>podpis ADR 0025; opiera się na istniejącym module <code>memory</code></td></tr>
+<tr><td>C3.12</td><td>Przypisanie tur do osoby („kto mówił”) i pamięć rozmówcy w kontekście; strona Ustawień „Osoby”</td><td class="st st3">czeka</td><td>—</td><td>historia pozostaje tylko do dopisywania</td></tr>
+<tr><td>C3.13</td><td>Łączenie twarzy z głosem (<code>voice-speaker</code>): zgodność podnosi pewność, rozbieżność = pytanie</td><td class="st st3">czeka</td><td>—</td><td>po C3.10</td></tr>
+<tr><td>C3.14</td><td>Zestaw ewaluacyjny: sceny do opisu, osoby do rozróżnienia, napisy-ataki w kadrze, zdjęcie zamiast twarzy</td><td class="st st4">planowane</td><td>—</td><td>zestaw ataków do <code>evals/</code> — zatwierdza właściciel</td></tr>
+<tr><td>C3.15</td><td>Pomiary na sprzęcie i przegląd bezpieczeństwa w świeżym kontekście; kryteria <code>ACC-V6-camera-…</code>, <code>-vision-…</code>, <code>-person-…</code></td><td class="st st4">planowane</td><td>—</td><td>progi ustala właściciel</td></tr></tbody></table></div>
+<p><strong>Wyjście z C3:</strong> „opisz mi to, co widzisz” działa na laptopie właściciela z co najmniej dwiema kamerami naraz;
+Alfa rozpoznaje zapisane osoby po restarcie i pamięta, o czym z każdą rozmawiała; żadne kryterium prywatności
+z ADR 0025 nie jest złamane (testy w prawdziwej aplikacji).</p>
+<h3 id="c4-strony-ustawien-oznaczone-wkrotce-spis-14-funkcje-wkrotce-md">C4 — strony Ustawień oznaczone „wkrótce” (spis: <a href="plan-14-funkcje-wkrotce.html"><code>14-funkcje-wkrotce.md</code></a>)</h3>
+<p>Zgłoszenie właściciela z 2026-10-11: funkcje ze znakiem „wkrótce” mają być zapisane w planie. Test
+<code>app-core/tests/soon_inventory.rs</code> pilnuje, żeby każda taka strona miała tu zadanie.</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>C4.1</td><td>Strona „Router i reguły”: klasy zadań i zapas w oknie, tagi prywatności i jurysdykcji</td><td class="st st0">zrobione</td><td>—</td><td>seria 1, punkt 10: klasy zadań i zapas — „Dobór modelu” (0.0.51); tagi prywatności i jurysdykcji — sekcja „Gdzie trafiają dane” (<code>compliance_routes</code>, decyzje tą samą funkcją co Router). Tylko odczyt: edycja reguł zostaje przy Jądrze (decyzja właściciela)</td></tr>
+<tr><td>C4.2</td><td>Strona „Logi i prywatność”: retencja i redakcja logów, widok „co poszło do chmury”</td><td class="st st3">czeka</td><td>—</td><td>widok czyta audyt i tagi prywatności — obszar Jądra; zakres uzgodnić z właścicielem</td></tr>
+<tr><td>C4.3</td><td>Strona „Moduły”: lista modułów ze stanem, włącz / wyłącz, budżety RAM i CPU</td><td class="st st0">zrobione</td><td>—</td><td>seria 1, punkt 1; bez Brokera, watchdoga, audytu i kill-switcha (reguła twarda); część danych jest w „Zdrowie systemu”</td></tr>
+<tr><td>C4.4</td><td>Strona „Zaawansowane”: edytor surowy TOML ze sprawdzaniem schematu, flagi eksperymentalne</td><td class="st st0">zrobione</td><td>—</td><td>seria 1, punkt 2; zapis przez magazyn konfiguracji z pełną walidacją; klucze Jądra i sekrety odrzucone, plik przywrócony</td></tr></tbody></table></div>
+<p><strong>Wyjście z C4:</strong> w nawigacji Ustawień nie ma znaku „wkrótce”; każda strona przechodzi przegląd w trzech stylach
+i dwóch motywach.</p>
+<h3 id="c5-glos-lokalny-wysokiej-jakosci-opis-15-glos-lokalny-md">C5 — głos lokalny wysokiej jakości (opis: <a href="plan-15-glos-lokalny.html"><code>15-glos-lokalny.md</code></a>)</h3>
+<p>Decyzja właściciela z 2026-10-11: lepszy głos ma być lokalny, nie z chmury. <strong>Grupa wchłonięta przez zadanie P1</strong>
+(głos w konfiguracji Delty: Supertonic 3 z 6 krokami i wyprzedzeniem o dwa zdania); zadania niżej zostają jako ślad.</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>C5.1</td><td>Licencje i źródła u źródła: pliki LICENSE silników i wag, stan znaku wodnego, pochodzenie wpisu „Pocket TTS PL”</td><td class="st st0">zrobione</td><td>2026-10-21</td><td>seria 8: <a href="../vendor/licencje-modeli-i-silnikow.md"><code>docs/vendor/licencje-modeli-i-silnikow.md</code></a> — 24 pozycje u wydawców (5 agentów + krytyk), rozbieżności z kartami, znak wodny (Pocket TTS i Supertonic — brak), pochodzenie „Pocket TTS PL” (model społeczności). W kodzie: telemetria ONNX Runtime ograniczona (wyłączana po starcie procesów mowy; zostaje zdarzenie startowe), przypięte rewizje i sumy SHA-256 wszystkich pozycji do pobrania (test-strażnik katalogu), tekst licencji Open RAIL-M obok Supertonic 3. <strong>Czeka na właściciela:</strong> Regulamin bielik.ai v1.1, Qwen Research License (Bielik 4.5B), DirectML (licencja Microsoftu), Open RAIL-M Supertonic — wpisanie zakazów z Załącznika A do licencji Alfy (kopia LICENSE już instalowana), FFmpeg (kompilacje GPL), WeSpeaker, openWakeWord i głos Piper Gosia (komercyjnie nieustalone), biblioteka ONNX Runtime bez telemetrii, potwierdzenie kart (<code>confirmed</code>)</td></tr>
+<tr><td>C5.2</td><td>Stanowisko pomiarowe głosu i odsłuch: 20 zdań po polsku, pierwszy dźwięk, szybkość, pamięć karty</td><td class="st st1">w toku</td><td>—</td><td>zgoda na pobranie 2026-10-11; Supertonic 3, Piper i Chatterbox (RTX 4050) zmierzone — dokument 15, §5a; <strong>czeka na odsłuch właściciela</strong> (<code>alfa-glos-proba/odsluch.html</code>)</td></tr>
+<tr><td>C5.3</td><td>Silnik Chatterbox Multilingual jako proces poboczny bez Pythona (<code>chatterbox.cpp</code>) za <code>TtsBackend</code></td><td class="st st3">czeka</td><td>—</td><td>pakiet producenta za wolny (4,8 s na zdanie); wymaga odsłuchu, potem pomiaru <code>chatterbox.cpp</code> (osobna zgoda na budowę ze źródeł)</td></tr>
+<tr><td>C5.4</td><td>Głos szybki na procesorze: próba Supertonic 3 (<code>tract</code> albo proces poboczny); do tego czasu Piper</td><td class="st st3">czeka</td><td>—</td><td>zgoda na pobranie; licencja wag Open RAIL-M przeczytana w C5.1 (kopia instalowana od 0.0.68); repozytorium archiwalne</td></tr>
+<tr><td>C5.5</td><td>Automatyczny wybór poziomu głosu (wolna karta, bateria, budżet opóźnienia) i ustawienie w zakładce „Głos”</td><td class="st st4">planowane</td><td>—</td><td>po C5.3</td></tr>
+<tr><td>C5.6</td><td>Cztery głosy wzorcowe agentek z krótkich próbek</td><td class="st st3">czeka</td><td>—</td><td>decyzja właściciela: skąd próbki; nigdy głos prawdziwej osoby bez jej zgody</td></tr>
+<tr><td>C5.7</td><td>Karta licencji każdego silnika i głosu w programie; oznaczenie mowy syntetycznej (znak wodny)</td><td class="st st1">w toku</td><td>2026-10-18</td><td>karty licencji zrobione (seria 5, 0.0.64): <code>app-models/data/license-cards.json</code> — 24 pozycje katalogu i 13 głosów (licencja, autor, użycie komercyjne, wskazanie autora, uwagi, „do potwierdzenia przez człowieka”), test kompletności, rozwijana „Karta licencji” w „Modele lokalne i silniki” (e2e 3 style × 2 motywy, EN); <strong>znak wodny czeka na decyzję właściciela</strong> (w kartach głosów jako sprawa otwarta); łączy się z C2.9 i C2.10 (SBOM)</td></tr></tbody></table></div>
+<p><strong>Wyjście z C5:</strong> właściciel w odsłuchu 20 zdań ocenia głos jako wyraźnie lepszy od Pipera; cztery agentki mają
+różne głosy; pierwszy dźwięk mieści się w budżecie z <code>docs/VOICE.md</code> na laptopie bazowym; rozmowa nie urywa się,
+gdy karta jest zajęta (przełączenie na poziom szybki).</p>
+<h3 id="c6-alfa-zna-komputer-i-jego-narzedzia-polecenie-wlasciciela-2026-10-15">C6 — Alfa zna komputer i jego narzędzia (polecenie właściciela 2026-10-15)</h3>
+<p>Właściciel: „funkcje, które pozwalają korzystać w pełni z przeglądarek, pisać programy, testować … system serwerów MCP,
+by Alfa mogła tworzyć i dostosowywać się do warunków na maszynie” oraz „system diagnostyki komputera, bardzo dokładny,
+z zapisem parametrów i testami systemów”.</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>C6.1</td><td>Znajomość zainstalowanych programów (<code>system_software</code>) i opis maszyny w zasadach agentek</td><td class="st st0">zrobione</td><td>2026-10-15</td><td>0.0.58; prawdziwy laptop: 23 programy w 1,6 s</td></tr>
+<tr><td>C6.2</td><td>Serwery MCP użytkownika: przepisy, zgody z odciskiem, zmienne tajne w Menedżerze poświadczeń, Broker</td><td class="st st0">zrobione</td><td>2026-10-15</td><td>0.0.58; <code>app-mcp</code>, <code>mcp_tools</code>/<code>mcp_call</code>; przepis Playwright = pełna przeglądarka</td></tr>
+<tr><td>C6.3</td><td>Diagnostyka komputera <code>pc-diag</code>: zapis parametrów, zdarzenia awarii, testy, historia, raport, narzędzie</td><td class="st st0">zrobione</td><td>2026-10-15</td><td>0.0.58; sonda i testy sprawdzone na prawdziwym sprzęcie (bez testu dysku E: — dysk USB)</td></tr>
+<tr><td>C6.4</td><td>Przeglądarka Alfy: przewijanie, klawisze, listy wyboru, historia, czekanie na tekst, konsola i błędy JS</td><td class="st st0">zrobione</td><td>2026-10-15</td><td>0.0.59; test na prawdziwym Edge z lokalnym serwerem HTTP</td></tr>
+<tr><td>C6.5</td><td>Narzędzia programisty: Git (stan, różnice, historia, gałęzie, zatwierdzenie — odczyt), uruchamianie testów z czytelnym wynikiem</td><td class="st st0">zrobione</td><td>2026-10-15</td><td>0.0.59; <code>tools-dev</code>; prawdziwy git i cargo w teście na żywo</td></tr>
+<tr><td>C6.6</td><td>Każda karta graficzna: NVIDIA, AMD, Intel (osobne i zintegrowane), komputer bez karty — wykrywanie, klasa, pakiety, pomiar pamięci, mowa</td><td class="st st1">w toku</td><td>2026-10-18</td><td>polecenie właściciela. Zrobione: flaga zintegrowanej z DXCore, LUID, sterownik; AMD/Intel z lokalnym modelem od 6 GB jak NVIDIA; APU z rezerwą ≥ 6 GB liczone jak karta; klasa „karta zintegrowana”; pomiar pamięci i programów na karcie licznikami Windows (bez <code>nvidia-smi</code>); AMD/Intel — Qwen3-ASR przez <code>llama-server</code> Vulkan w pakietach 5 i 4 (whisper.cpp nie wydaje wersji Vulkan); głos Supertonic na karcie przez DirectML (karta z własną pamięcią ≥ 12 GB, ADR 0028 — proponowany). Zmierzone na RX 9070 XT: Qwen3-ASR 0,16–0,23 s na zdanie, 2878 MB; Supertonic 0,58 s zamiast 0,95 s na zdanie, 538 MB. Osobny budżet pamięci na kartę w <code>model-residency</code> (18.10): pula każdej karty z profilu (<code>GpuLayout::from_profile</code>; karta zintegrowana obok osobnej — pamięć z RAM), wspólny RAM, dzierżawa wskazuje kartę (<code>LeaseRequest::gpu</code>, brak — główna), maszyna z jedną kartą bez zmian (test równoważności); testy: dwie osobne karty, Intel UHD + RTX 4050, APU, własności na trzech kartach. Klienci wskazują kartę (0.0.65) — gotowe na poziomie API, w aplikacji działa dziś tylko model rozmowy: karta serwera <code>llama-server</code> (przypięta albo główna; budżet warstw z puli tej karty). Whisper wskaże kartę backendu (CUDA/Vulkan) po wpięciu <code>SystemVoice::with_device</code> w rdzeniu (do tego czasu <code>gpu: None</code>); głos DirectML — <code>tts_lease_request(…, dml, …)</code> to funkcja API bez wywołującego (Supertonic i Qwen3-ASR nie zakładają dzierżaw); VAD i embedder na procesorze. Zmiana sprzętu przelicza budżet i pule (<code>set_hardware</code>) w kroku zadania tła po <code>refresh()</code>; zdarzenia <code>device.*</code> są obsłużone, ale nieaktywne, dopóki nikt nie wywołuje <code>poll_changes</code>; zmiana kolejności adapterów (ten sam numer, inna karta) odbiera dzierżawy wskazujące numer karty; testy: laptop UHD + RTX (STT na CUDA i model na karcie 1, VAD na CPU), dwie karty AMD (mowa na B nie blokuje rozmowy na A), zmiana sprzętu. <strong>Zostaje:</strong> podpis ADR 0028 i licencji DirectML, próba na laptopie z kartą zintegrowaną i na APU AMD (także przypinania Qwen3-ASR do karty przy dwóch kartach — kod i testy są), dzierżawy Qwen3-ASR i Supertonic w aplikacji (dziś poza zarządcą), wpięcie <code>SystemVoice::with_device</code> w rdzeniu i publikacja <code>device.changed</code> (<code>poll_changes</code>), dalsze kroki po próbie na sprzęcie (Qwen3-ASR na karcie AMD/Intel poniżej 12 GB, gdy model rozmowy z niej nie korzysta — dziś na procesorze; model pomocniczy na karcie zintegrowanej; rezerwa 1,5 GB na mowę, gdy mowa liczy na innej karcie)</td></tr></tbody></table></div>
+<h2 id="etap-p-przeniesienie-funkcji-z-delty-ai">Etap P — Przeniesienie funkcji z Delty AI</h2>
+<p>Opis: <a href="plan-17-przeniesienie-z-delty.html"><code>17-przeniesienie-z-delty.md</code></a>. Decyzja właściciela z 2026-10-11: Alfa jest programem docelowym; z Delty AI 0.8.35 przenosimy system rozmowy
+i mowy oraz wszystkie brakujące funkcje. P1 i P2 mają pierwszeństwo — zamykają A.5 i A.4.</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>P0</td><td>Dokumenty: specyfikacja głosu Delty ze stałymi i macierz wszystkich funkcji Delty (ok. 400 pozycji) z decyzją dla każdej</td><td class="st st0">zrobione</td><td>2026-10-11</td><td>dokumenty 16, 17, 19 (specyfikacja głosu), 20 i 21 (macierz); do przeglądu właściciela; uzupełniane, gdy przy pracy wyjdzie pominięta funkcja</td></tr>
+<tr><td>P1</td><td>Rozmowa i mowa: Supertonic 3, 17 głosów, Qwen3-ASR, zabezpieczenia rozpoznawania, bezpiecznik, Smart Turn, ekran „Rozmowa na żywo”</td><td class="st st1">w toku</td><td>—</td><td>0.0.30: silnik Supertonic 3 jako sidecar Rust (<code>lib-supertonic</code>), cztery barwy agentek, pozycja katalogu z sumami; pomiar 0,97 s na zdanie. 0.0.31: wybór barwy dla każdej agentki w Ustawieniach (10 barw); wyprzedzenie syntezy Alfa już ma (kolejka 16 zdań). Pomiar Qwen3-ASR na laptopie: 0,44 s na zdanie (dokument 19, §2) — ale <strong>wymaga nowszego <code>llama-server</code></strong> niż wydanie 6710 w katalogu Alfy. 0.0.32: silnik <code>llama.cpp</code> b11559 w katalogu z przypiętymi sumami. 0.0.33: Qwen3-ASR ze strażnikiem, bezpiecznikiem i Whisperem jako zapasem (<code>voice-stt-impl</code>: <code>qwen.rs</code>, <code>guard.rs</code>, <code>breaker.rs</code>, <code>fallback.rs</code>). 0.0.34: Smart Turn v3.2 jako sidecar <code>alfa-smart-turn</code> (<code>lib-smart-turn</code>, klient w <code>voice-turn-impl/src/smart_turn.rs</code>), czasy rozmowy 250 / 350 / 2000 ms, model i biblioteka ONNX Runtime w katalogu pobrań. 0.0.35: karta „Silniki rozmowy” ze stanem strażnika i zamknięciem bezpiecznika (<code>voice_engines</code>), cztery ustawienia rozmowy (<code>voice.talk_*</code>), wybór karta / procesor wg wolnej pamięci karty, zwalnianie silnika po bezczynności, nowe silniki w pakietach, pisownia imion z rozpoznawania mowy. 0.0.37: liczniki Smart Turn. 0.0.38: wybór silnika rozpoznawania wg zajętości karty, mały Whisper na procesor. 0.0.39: próba na prawdziwym mikrofonie (bez mowy człowieka). 0.0.41: „Sprawdź silniki” (próba rozpoznawania, końca wypowiedzi i głosu bez mikrofonu). 0.0.42: język rozpoznawania mowy w ustawieniach (domyślnie polski). 0.0.43: zwarta karta silników w panelu „Głos”. <strong>Zostaje:</strong> próba z żywą mową i tłumieniem echa (właściciel), kula stanu i miernik w nagłówku rozmowy, głosy Pipera z parametrami, głos Edge jako opcja (połączenie z siecią — przegląd właściciela)</td></tr>
+<tr><td>P2</td><td>Modele lokalne: Sklep modeli, rozkład na karty, dopasowanie do pamięci karty, poprawki szablonów, warianty silnika, panel System</td><td class="st st1">w toku</td><td>—</td><td>zamyka A.4; łączy się z C2.2. 0.0.35: nowe silniki głosu w pakietach, wybór karta / procesor wg wolnej pamięci karty. 0.0.36: monitor kart graficznych na żywo (<code>device_gpu_live</code>, karty NVIDIA). 0.0.39: ocena „mieści się na karcie” przy modelach rozmowy. <strong>Zostaje:</strong> Sklep modeli, rozkład na karty, pięć stopni awaryjnego startu, poprawki szablonów, warianty silnika z wycofaniem, panel System, monitor dla kart AMD / Intel</td></tr>
+<tr><td>P3</td><td>Nawigacja i powłoka: menu kołowe, doki, okna odczepiane, pulpit kafelkowy, Wstecz / Dalej, tabela skrótów</td><td class="st st1">w toku</td><td>—</td><td>obok obecnej nawigacji Alfy 0.0.37: „Wstecz / Dalej” (Alt+←, Alt+→, boczne przyciski myszy, 50 miejsc). 0.0.42: wyszukiwarka w ściągawce skrótów. <strong>Zostaje:</strong> menu kołowe, doki, okna odczepiane, pulpit kafelkowy, ekran startowy</td></tr>
+<tr><td>P4</td><td>Rozmowa: karty z profilem, Tablica, Tryb skupienia, Arena, załączniki z czytnikami, archiwum i eksporty, szablony</td><td class="st st1">w toku</td><td>—</td><td>seria 1, punkty 8–9: eksport JSON, szablony promptów; seria 2, punkty 5, 7, 8: styl odpowiedzi i swoboda, Tablica (przypięte odpowiedzi), archiwum (okres, liczba wiadomości). Tryb skupienia był już wcześniej. Seria 3: statystyki rozmowy, wyszukiwanie i eksport Tablicy, zapamiętany tryb skupienia, „Zapisz jako szablon”, szablony jako JSON; seria 4: „Kopiuj rozmowę (Markdown)”, statystyki z menu sesji; seria 6: Arena — ta sama wiadomość do dwóch modeli (przypięcie w Routerze), odpowiedzi jako gałęzie obok siebie z czasem, tokenami i kosztem, „Wybierz tę odpowiedź” (<code>turns_arena_answer</code>, <code>turns_select_branch</code> podłączone w app-core i IPC). Dalej: karty z profilem. Łączy się z C2.8 Seria 6: widok kart rozmów w panelu Sesje (lista ↔ karty: obsada, ostatnia wiadomość, model, koszt). Seria 8 (po 0.0.67): styl odpowiedzi i swoboda także w przebiegach agentek — rozmowa z agentką z narzędziami, zadania w tle, umiejętności (<code>RunSpec.reply_style</code>/<code>temperature</code>); podprzebiegi delegowania tylko ze swobodą, bez stylu; Krytyczka i tura samoweryfikacji bez stylu i z temperaturą modelu; Dyrygentka zna poziom autonomii rozmowy i nie zapowiada zgód, których poziom nie wymaga.</td></tr>
+<tr><td>P5</td><td>Sieć i wiedza: wyszukiwanie, głębokie badanie, wiadomości, „Naucz”, polecenia bez modelu, tłumaczenie, instrukcja</td><td class="st st1">w toku</td><td>—</td><td>seria 1, punkty 5–7: polecenia bez modelu, quiz, własne polecenia z testerem; seria 2, punkty 3 i 9: wbudowana instrukcja (Ustawienia → Instrukcja, wyszukiwanie), tłumaczenie odpowiedzi PL/EN; seria 3: przeliczanie jednostek, rachunki na datach, <code>F1</code> z instrukcją, trafienia z instrukcji w wyszukiwaniu Ustawień, polecenia jako JSON; seria 4: liczby słownie i rzymskie, procenty, lata przestępne, wybór z listy, liczenie znaków, podpowiedź „Bez modelu” w polu pisania; seria 6: „Naucz Alfę” (tekst, plik txt/md/pdf/docx albo rozmowa → fakty w pamięci ze źródłem; tekst i plik jako treść niezaufana tylko w zakresie sesji; cofnięcie nauki). Dalej: wyszukiwanie w sieci, wiadomości, okna i programy bez modelu</td></tr>
+<tr><td>P6</td><td>Osoby: baza osób, rozpoznawanie twarzy i głosu, pamięć per osoba</td><td class="st st4">planowane</td><td>—</td><td>ADR 0025 przyjęty 2026-10-11; realizuje C3.8–C3.13; łączy się z etapem U</td></tr>
+<tr><td>P7</td><td>Komputer: sterowanie do poziomu Delty przez Brokera, menedżer procesów, spis urządzeń, ekran uprawnień</td><td class="st st3">czeka</td><td>—</td><td>realizuje C1.3; zmiany zdolności Brokera — przegląd właściciela</td></tr>
+<tr><td>P8</td><td>Twórczość: Studio obrazu, dostawcy obrazów, tryb hybrydowy, Galeria, Studio opowieści, Audio, menedżer kamer</td><td class="st st4">planowane</td><td>—</td><td>modele obrazu: pobrania powyżej 3 GB za osobną zgodą</td></tr>
+<tr><td>P9</td><td>Awatar: 2D / 2.5D / 3D / VRM, emocje, ruch ust (12 kształtów), osobne okno</td><td class="st st4">planowane</td><td>—</td><td></td></tr>
+<tr><td>P10</td><td>Odtwarzanie multimediów i sterowanie głosem (bez biblioteki)</td><td class="st st4">planowane</td><td>—</td><td>pobieranie z serwisów — osobna decyzja właściciela</td></tr>
+<tr><td>P11</td><td>Przepływy, role i przepływ wieloagentowy, edytor persony, laboratorium treningu, pulpit testowy, personalizacja</td><td class="st st4">planowane</td><td>—</td><td>łączy się z C1.5</td></tr>
+<tr><td>P12</td><td>Agentki programistki: pisanie, uruchamianie i budowanie oprogramowania w katalogu projektu, rozmowa między agentkami w trakcie pracy, dobór modelu do trudności zadania</td><td class="st st1">w toku</td><td>—</td><td>zlecenie właściciela 2026-10-11; nadrzędny przycisk „Pełne uprawnienia” jak w Claude Code i Codex (szybki włącznik poziomu L4, włącza tylko człowiek, stale widoczny); zmiana w Brokerze — przegląd właściciela Dobór modelu według trudności — zrobiony w 0.0.51.</td></tr>
+<tr><td>P13</td><td>Dyski sieciowe i chmurowe: podłączanie (SMB / NAS, WebDAV, SFTP, S3, OneDrive, Google Drive, Dropbox), przeglądanie i praca agentek na plikach, kopie zapasowe z harmonogramem, wersjami i przywracaniem</td><td class="st st4">planowane</td><td>—</td><td>zlecenie właściciela 2026-10-11; pełne uprawnienia do tworzenia kopii; hasła i tokeny w Menedżerze poświadczeń; dotyka <code>lib-netguard</code> — przegląd właściciela</td></tr>
+<tr><td>P14</td><td>Obowiązki codzienne agentek: przypisanie agentki do stałego zadania (poczta, kalendarz, przegląd wiadomości, przypomnienia, porządki w plikach, raport dnia) z harmonogramem, budżetem i raportem</td><td class="st st1">w toku</td><td>—</td><td>zlecenie właściciela 2026-10-11; rozwija C2.7 i moduły <code>scheduler</code>, <code>triggers</code>; łączniki poczty i kalendarza — nowe. 0.0.40: cztery gotowe obowiązki (przegląd dnia, podsumowanie, porządki, koszty) wypełniające formularz wyzwalacza; poczta i kalendarz czekają na łączniki. 0.0.44: wzory ukryte po próbie na lokalnym modelu (zmyślony raport). 0.0.45: rdzeń dokleja do zadania w tle arkusz faktów (zadania, wyzwalacze, koszty, katalog roboczy), próba na lokalnym modelu dała raporty zgodne z danymi — wzory WRÓCIŁY</td></tr></tbody></table></div>
+<p><strong>Wyjście z P:</strong> każda pozycja macierzy funkcji Delty ma stan „jest / przeniesione / odrzucone z powodem”, a to,
+co przeniesione, ma test i wynik z laptopa właściciela.</p>
+<h2 id="etap-u-wielu-uzytkownikow">Etap U — Wielu użytkowników</h2>
+<p>Opis: <a href="plan-18-wielu-uzytkownikow.html"><code>18-wielu-uzytkownikow.md</code></a>. Zlecenie właściciela z 2026-10-11: konta i logowanie na wszystkich celach. Projekt decyzji: ADR 0027.</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>U.0</td><td>Podpis właściciela pod ADR 0027</td><td class="st st3">czeka</td><td>—</td><td>zmienia model uprawnień — obszar Jądra</td></tr>
+<tr><td>U.1</td><td>Moduł kont: rejestr, role, logowanie lokalne (Windows Hello, klucz dostępu, PIN), blokada</td><td class="st st3">czeka</td><td>—</td><td>po U.0</td></tr>
+<tr><td>U.2</td><td>Rozdzielenie danych na konta i migracja dotychczasowych danych na konto właściciela</td><td class="st st3">czeka</td><td>—</td><td>po U.1</td></tr>
+<tr><td>U.3</td><td>Klucze API, limity kosztów i poziom autonomii na konto</td><td class="st st3">czeka</td><td>—</td><td>po U.1</td></tr>
+<tr><td>U.4</td><td>Broker: konto w prośbie o zgodę, ograniczenia roli, dziennik z kontem</td><td class="st st3">czeka</td><td>—</td><td>przegląd właściciela</td></tr>
+<tr><td>U.5</td><td>Okno: ekran logowania, przełącznik kont w belce, strona Ustawień „Użytkownicy”</td><td class="st st3">czeka</td><td>—</td><td>po U.1</td></tr>
+<tr><td>U.6</td><td>Role Dziecko i Gość: filtr treści, brak pamięci gościa</td><td class="st st3">czeka</td><td>—</td><td>po U.2</td></tr>
+<tr><td>U.7</td><td>Połączenie z bazą osób: rozpoznanie głosu i twarzy wybiera konto</td><td class="st st3">czeka</td><td>—</td><td>po U.2 i P6</td></tr>
+<tr><td>U.8</td><td>Konta w dostępie zdalnym: parowanie urządzenia z kontem, logowanie w panelu WWW i w telefonie</td><td class="st st3">czeka</td><td>—</td><td>po U.1, D.2, E.3, F.2</td></tr>
+<tr><td>U.9</td><td>Testy ataków (przejęcie sesji, podniesienie roli, dostęp do cudzych danych) i przegląd w świeżym kontekście</td><td class="st st4">planowane</td><td>—</td><td></td></tr></tbody></table></div>
+<p><strong>Wyjście z U:</strong> dwie osoby korzystają z jednej Alfy na komputerze i z dwóch telefonów, nie widząc swoich danych;
+dziecko nie uruchomi działania w systemie; właściciel odbiera dostęp jednym kliknięciem.</p>
+<h2 id="etap-z-tryby-zgod-jak-w-claude-code-i-codex">Etap Z — Tryby zgód jak w Claude Code i Codex</h2>
+<p>Plan: <a href="plan-50-tryby-zgod-jak-claude-codex.html"><code>50-tryby-zgod-jak-claude-codex.md</code></a> (zlecenie właściciela 3.11).</p>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>Z.0</td><td>Badanie dokumentacji Claude Code i Codex, plan, decyzje właściciela</td><td class="st st0">zrobione</td><td>2026-11-03</td><td>decyzje w §7 planu</td></tr>
+<tr><td>Z.1</td><td>Menu 5 trybów + przełącznik Max dostęp</td><td class="st st0">zrobione</td><td>2026-11-03</td><td>5 trybów (klawisze 1–5), czerwony przełącznik Max dostęp z zasięgiem, znak w belce; scalone 6.11 za zgodą właściciela; od 6.11 także Alt+M — następny tryb jak Shift+Tab w Claude Code</td></tr>
+<tr><td>Z.2</td><td>Poziom „Akceptuj edycje” w Sędzim Cieni</td><td class="st st0">zrobione</td><td>2026-11-03</td><td>scalone 6.11 za zgodą właściciela; folder pracy + ścieżki chronione; przegląd w świeżym kontekście — §8 planu 50</td></tr>
+<tr><td>Z.3</td><td>Okno zgody z 4 opcjami i zakresem</td><td class="st st0">zrobione</td><td>2026-11-03</td><td>„Zezwól i przełącz na Automatycznie” w oknie Sędziego, opcja 4 po odmowie; scalone 6.11 za zgodą właściciela</td></tr>
+<tr><td>Z.4</td><td>Model-sędzia dla „Automatycznie”</td><td class="st st0">zrobione</td><td>2026-11-05</td><td>scalone 6.11 za zgodą właściciela; kierowca w rdzeniu, bezpiecznik 3/20, dziennik werdyktów na osi czasu; zapora poza modelem (<code>guard</code>) — Bielik 4.5B sam przepuścił 21/22 ataków, z zaporą 0/22 (<code>evals/Z4/judge</code>)</td></tr>
+<tr><td>Z.5</td><td>Plan jako tryb</td><td class="st st0">zrobione</td><td>2026-11-03</td><td>L0 = Plan: narzędzia odczytu, trzy odpowiedzi pod planem</td></tr>
+<tr><td>Z.6</td><td>Profil Dziecko z kłódkami i PIN-em rodzica</td><td class="st st0">zrobione</td><td>2026-11-04</td><td>kłódka w Sędzim (sufit L1), PIN Argon2id z blokadą; scalone 6.11; skrót PIN-u w prywatnym pliku Sędziego — zatwierdzone 6.11 (konto dziecka może zmieniać własny Menedżer poświadczeń, katalogu usługi nie)</td></tr>
+<tr><td>Z.7</td><td>Dziennik rodzica pod PIN-em</td><td class="st st0">zrobione</td><td>2026-11-05</td><td>scalone 6.11 za zgodą właściciela; tematy rozmów i działania z osi czasu (od 5.11 także zgody, odmowy, werdykty sędziego, zmiany trybu, Max dostęp i próby PIN-u); pełna treść rozmów włączana PIN-em (przełącznik w Sędzim, znak „Rodzic czyta” w belce); otwarcie „do końca rozmowy” (5.11 noc)</td></tr>
+<tr><td>Z.8</td><td>Testy trybów, ataków i prawdziwej aplikacji</td><td class="st st1">w toku</td><td>2026-11-06</td><td>tabela tryb × kategoria działania (<code>modes_matrix.rs</code>), ataki na kłódkę w Sędzim (głos, agentka, Max dostęp lokalny, zgadywanie PIN-u — <code>child_lock_attacks.rs</code>), kłódka w menu/palecie w każdym stylu i motywie; wstrzyknięcia do modelu-sędziego ACC-Z4-judge-04 (5.11, prawdziwy Bielik); prawdziwa aplikacja (6.11): kłódka w menu, wpisy w dzienniku rozmowy, „do końca rozmowy” z zamknięciem po zmianie rozmowy, Max dostęp odrzucony przy kłódce, obniżenie trybu z paska pisania; zostaje model-sędzia w prawdziwej aplikacji z modelem lokalnym</td></tr></tbody></table></div>
+<h2 id="etap-k-alfa-dla-dzieci-nauka-zabawa-podglad-rodzica">Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica</h2>
+<p>Plan: <a href="plan-41-tryb-dla-dzieci.html"><code>41-tryb-dla-dzieci.md</code></a> (zlecenie właściciela 27.10).</p>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>K.0</td><td>Decyzje właściciela: przedziały wieku, czytanie rozmów, chmura; ADR „Konta dzieci”</td><td class="st st0">zrobione</td><td>2026-10-29</td><td><a href="adr-0029-konta-dzieci.html">ADR 0029</a></td></tr>
+<tr><td>K.1</td><td>Rola Dziecko w Jądrze i Brokerze, twarde blokady, testy ataków</td><td class="st st3">czeka</td><td>—</td><td>po U.1, U.4, U.6</td></tr>
+<tr><td>K.2</td><td>Lokalny filtr treści (wejście i wyjście), progi według wieku, zamrożony zestaw testów</td><td class="st st3">czeka</td><td>—</td><td>po K.1</td></tr>
+<tr><td>K.3</td><td>Styl „Junior”: wygląd, głos, wyróżnianie czytanego zdania, dźwięki</td><td class="st st0">zrobione</td><td>2026-10-29</td><td>styl, wyróżnianie (obie fazy), Uproszczony ekran; wymuszenie dla roli Dziecko — K.1; odsłuch — właściciel</td></tr>
+<tr><td>K.4</td><td>Nauka: ścieżki, ćwiczenia do poziomu, odznaki, raport dla rodzica</td><td class="st st3">czeka</td><td>—</td><td>po K.2, K.3</td></tr>
+<tr><td>K.5</td><td>Zabawa i twórczość: zagadki, opowieści, piaskownica silnika gier</td><td class="st st3">czeka</td><td>—</td><td>po K.2 i <code>tools-engine</code></td></tr>
+<tr><td>K.6</td><td>Strona „Dzieci” w Ustawieniach: limity czasu i kosztów, chmura, czytanie rozmów</td><td class="st st3">czeka</td><td>—</td><td>po K.1</td></tr>
+<tr><td>K.7</td><td>Podgląd z telefonu i panelu WWW: aktywność, alerty, „Zawołaj rodzica”, zgody</td><td class="st st3">czeka</td><td>—</td><td>po K.6, D.2, E.3, F.2, U.8</td></tr>
+<tr><td>K.8</td><td>Zgodność RODO, przegląd prawny i przegląd w świeżym kontekście</td><td class="st st3">czeka</td><td>—</td><td>po K.1–K.7</td></tr></tbody></table></div>
+<h2 id="etap-d-host-bez-okna-i-protokol-zdalny">Etap D — Host bez okna i protokół zdalny</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>D.0</td><td>Podpis właściciela pod ADR 0019–0023</td><td class="st st3">czeka</td><td>—</td><td>bez tego nie powstaje kod</td></tr>
+<tr><td>D.1</td><td><code>remote-gateway</code>: sesje klientów, ACL, ramki, wznowienie</td><td class="st st3">czeka</td><td>—</td><td>po B.1–B.3, B.5</td></tr>
+<tr><td>D.2</td><td><code>device-pairing</code>: QR, klucze urządzeń, lista, odwołanie</td><td class="st st3">czeka</td><td>—</td><td></td></tr>
+<tr><td>D.3</td><td><code>remote-relay</code>: przekaźnik szyfrogramu + obraz kontenera + instrukcja</td><td class="st st3">czeka</td><td>—</td><td></td></tr>
+<tr><td>D.4</td><td>Kanał E2E (wzorzec Noise) i test „przekaźnik nie widzi treści”</td><td class="st st3">czeka</td><td>—</td><td></td></tr>
+<tr><td>D.5</td><td>Dowód zgody z urządzenia sparowanego w Brokerze</td><td class="st st3">czeka</td><td>—</td><td>ADR 0022; przegląd właściciela</td></tr>
+<tr><td>D.6</td><td><code>AlfaClient</code> po kanale zdalnym (TypeScript)</td><td class="st st3">czeka</td><td>—</td><td>trzecia implementacja obok Tauri i atrapy</td></tr>
+<tr><td>D.7</td><td><code>host-headless</code>: binarka <code>alfa-host</code></td><td class="st st3">czeka</td><td>—</td><td>drugi krok — najpierw brama w procesie aplikacji</td></tr>
+<tr><td>D.8</td><td>Aktualizacja modelu zagrożeń i test „żadnego nasłuchu” dla nowych modułów</td><td class="st st3">czeka</td><td>—</td><td></td></tr>
+<tr><td>D.9</td><td>Zestaw ataków na dostęp zdalny (pisze sesja-recenzentka)</td><td class="st st3">czeka</td><td>—</td><td></td></tr></tbody></table></div>
+<p><strong>Wyjście:</strong> drugi komputer łączy się z hostem przez przekaźnik, prowadzi rozmowę, zatwierdza działanie; zrywane
+połączenie wznawia się bez utraty zdarzeń; test dowodzi, że przekaźnik widzi tylko szyfrogram.</p>
+<h2 id="etap-e-panel-www">Etap E — Panel WWW</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>E.1</td><td>Układ interfejsu na wąski ekran (od 360 px)</td><td class="st st0">zrobione</td><td>2026-10-16</td><td>seria 3, punkt 8: rozmowa, panele, okna dialogowe, pasek tytułu i wszystkie strony Ustawień sprawdzone testami przy 400 i 360 px</td></tr>
+<tr><td>E.2</td><td><code>web-panel</code>: budowa PWA z tego samego kodu Svelte</td><td class="st st4">planowane</td><td>—</td><td></td></tr>
+<tr><td>E.3</td><td>Logowanie kluczem dostępu (passkey) i parowanie przeglądarki</td><td class="st st4">planowane</td><td>—</td><td></td></tr>
+<tr><td>E.4</td><td>Zgody w panelu z potwierdzeniem kluczem dostępu</td><td class="st st4">planowane</td><td>—</td><td>po D.5</td></tr>
+<tr><td>E.5</td><td>Powiadomienia push bez treści („obudź i pobierz”)</td><td class="st st4">planowane</td><td>—</td><td></td></tr>
+<tr><td>E.6</td><td>Tryb bez komputera w przeglądarce</td><td class="st st3">czeka</td><td>—</td><td>ADR 0023 — kwestia przechowywania klucza API</td></tr>
+<tr><td>E.7</td><td>Hosting panelu i polityka bezpieczeństwa treści (CSP)</td><td class="st st4">planowane</td><td>—</td><td></td></tr></tbody></table></div>
+<p><strong>Wyjście:</strong> z przeglądarki w telefonie i na obcym komputerze da się zrobić wszystko, co pozwala mapa zdolności
+hosta; audyt dostępności (axe) zielony na 360 px i 1280 px.</p>
+<h2 id="etap-f-android-15">Etap F — Android 15+</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>F.1</td><td>Projekt Tauri mobile, budowa APK w CI</td><td class="st st4">planowane</td><td>—</td><td>Tauri 2.x; <code>crate-type</code> już przygotowany</td></tr>
+<tr><td>F.2</td><td><code>platform-android</code>: magazyn kluczy, biometria, powiadomienia</td><td class="st st4">planowane</td><td>—</td><td>wtyczki Kotlin tam, gdzie brak gotowych</td></tr>
+<tr><td>F.3</td><td>Parowanie aparatem (QR)</td><td class="st st4">planowane</td><td>—</td><td></td></tr>
+<tr><td>F.4</td><td>Pilot 100 %: rozmowa, agentki, pliki hosta, zgody, STOP</td><td class="st st4">planowane</td><td>—</td><td>po D i E.1</td></tr>
+<tr><td>F.5</td><td>Głos w telefonie: mikrofon i głośnik telefonu, przetwarzanie na hoście</td><td class="st st4">planowane</td><td>—</td><td>usługa pierwszoplanowa</td></tr>
+<tr><td>F.6</td><td><code>offline-client</code>: rozmowa przez API bez hosta + scalenie po powrocie</td><td class="st st3">czeka</td><td>—</td><td>ADR 0023</td></tr>
+<tr><td>F.7</td><td>Testy na urządzeniu i w emulatorze, kryteria akceptacji</td><td class="st st4">planowane</td><td>—</td><td>telefon testowy — właściciel</td></tr>
+<tr><td>F.8</td><td>Publikacja (APK do pobrania; sklep — decyzja właściciela)</td><td class="st st4">planowane</td><td>—</td><td></td></tr></tbody></table></div>
+<p><strong>Wyjście:</strong> telefon sparowany w mniej niż minutę; pełna obsługa z telefonu; po wyłączeniu komputera rozmowa
+działa przez model chmurowy i po powrocie pojawia się w historii na komputerze.</p>
+<h2 id="etap-g-linux">Etap G — Linux</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Zadanie</th><th>Stan</th><th>Data</th><th>Uwagi</th></tr></thead><tbody><tr><td>G.1</td><td><code>platform-linux</code> — podstawa: pliki z koszem, procesy, schowek, sekrety (Secret Service)</td><td class="st st4">planowane</td><td>—</td><td>po B.4</td></tr>
+<tr><td>G.2</td><td>Powłoka: analizator POSIX w kontrakcie i Jądrze</td><td class="st st3">czeka</td><td>—</td><td>po B.7; przegląd właściciela</td></tr>
+<tr><td>G.3</td><td>Jądro poza procesem: usługa użytkownika, gniazdo Unix z kontrolą UID</td><td class="st st3">czeka</td><td>—</td><td>przegląd właściciela</td></tr>
+<tr><td>G.4</td><td>Okno zgód na Linuksie i dowód fizycznego wejścia</td><td class="st st5">badawcze</td><td>—</td><td>Wayland nie daje prostego odpowiednika — patrz <a href="plan-06-linux.html"><code>06</code></a></td></tr>
+<tr><td>G.5</td><td>Audio (PipeWire) i głos</td><td class="st st4">planowane</td><td>—</td><td></td></tr>
+<tr><td>G.6</td><td>Skróty globalne, zasobnik, okna (portale XDG)</td><td class="st st4">planowane</td><td>—</td><td></td></tr>
+<tr><td>G.7</td><td>Silniki: llama.cpp i whisper.cpp dla Linuksa (CUDA, Vulkan, CPU)</td><td class="st st4">planowane</td><td>—</td><td>po B.6</td></tr>
+<tr><td>G.8</td><td>Pakiety: deb i rpm, potem Flatpak; test WebKitGTK na karcie NVIDIA w CI</td><td class="st st4">planowane</td><td>—</td><td></td></tr>
+<tr><td>G.9</td><td>Sterowanie komputerem (AT-SPI, portale)</td><td class="st st5">badawcze</td><td>—</td><td></td></tr></tbody></table></div>
+<p><strong>Wyjście:</strong> scenariusz MVP 6/6 na Ubuntu LTS z kartą NVIDIA; zdolności niedostępne są ukryte, nie zepsute.</p>
+<h2 id="etap-h-badawcze-bez-terminu-bez-zobowiazania">Etap H — Badawcze (bez terminu, bez zobowiązania)</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Temat</th><th>Stan</th><th>Uwagi</th></tr></thead><tbody><tr><td>H.1</td><td>Mały model na telefonie (LiteRT-LM / llama.cpp, Gemma 4 E2B)</td><td class="st st5">badawcze</td><td>decyzja właściciela z 2026-10-09: model lokalny tylko na komputerze — temat odłożony</td></tr>
+<tr><td>H.2</td><td>MCP Apps (interfejsy narzędzi w izolowanej ramce)</td><td class="st st5">badawcze</td><td>po C2.5 i C2.8</td></tr>
+<tr><td>H.3</td><td>Rozmowa głosowa w pełnym dupleksie po polsku</td><td class="st st5">badawcze</td><td>dziś brak modelu lokalnego na 6 GB</td></tr>
+<tr><td>H.4</td><td>Akceleracja NPU (Windows ML / Foundry Local)</td><td class="st st5">badawcze</td><td>drugi format modeli obok GGUF</td></tr>
+<tr><td>H.5</td><td>Alfa jako serwer MCP / agent ACP dla edytorów</td><td class="st st5">badawcze</td><td></td></tr>
+<tr><td>H.6</td><td>Protokół A2A</td><td class="st st5">badawcze</td><td>dziś mało przydatny w programie dla jednej osoby</td></tr>
+<tr><td>H.7</td><td>Synchronizacja pełna (CRDT: Loro / Automerge)</td><td class="st st5">badawcze</td><td>tylko jeśli tryb pilota okaże się niewystarczający</td></tr></tbody></table></div>
+<h2 id="decyzje-wlasciciela-ktore-blokuja-zadania">Decyzje właściciela, które blokują zadania</h2>
+<div class="tbl"><table><thead><tr><th>Decyzja</th><th>Blokuje</th></tr></thead><tbody><tr><td><del>Zgoda na pobranie pakietu modeli (ok. 6 GB)</del> — rozstrzygnięte: pakiet pobrał właściciel przy 0.0.8 (2026-10-09), model lokalny odpowiada (raporty 26 i 27); dalsze pobrania — zgoda stała do 3 GB z 2026-10-11, większe w wierszu „Pobrania powyżej 3 GB”</td><td>już nie blokuje (dawniej A.4, A.5, A.6, C1.4, C2.2)</td></tr>
+<tr><td><code>gh auth login</code> i wypchnięcie commitów</td><td>A.0, A.8</td></tr>
+<tr><td>Ustalenia bezpieczeństwa (B-…, S-…, C-…, R-…, P-…)</td><td>A.7, A.8, B.7</td></tr>
+<tr><td>Podpis pod ADR 0017–0018</td><td>B.4, B.7, G</td></tr>
+<tr><td>Podpis pod ADR 0019–0023</td><td>D, E, F</td></tr>
+<tr><td>ADR 0024 — licencja silnika mowy</td><td>C1.1 (wybór głosu), C5.3 (dołączenie do wydania), wydanie publiczne</td></tr>
+<tr><td>ADR 0026 — głos z chmury jako opcja</td><td>C1.1a</td></tr>
+<tr><td>ADR 0027 — konta, logowanie i role</td><td>etap U</td></tr>
+<tr><td>Pobieranie multimediów z serwisów internetowych</td><td>część P10</td></tr>
+<tr><td>Pobrania powyżej 3 GB (modele obrazu, duże modele rozmowy) — poniżej tej granicy zgoda stała z 2026-10-11</td><td>części P2 i P8</td></tr>
+<tr><td>Znak wodny w mowie syntetycznej; skąd głosy wzorcowe agentek</td><td>C5.6, C5.7</td></tr>
+<tr><td>Czy obraz z kamery może iść do modelu w chmurze</td><td>C3.7 (droga chmurowa)</td></tr>
+<tr><td>Zgoda na pobranie modelu widzącego i modeli twarzy</td><td>C3.6, C3.8</td></tr>
+<tr><td>Zakres widoku „co poszło do chmury” (czyta audyt i tagi prywatności)</td><td>C4.2</td></tr>
+<tr><td>Podpis ADR 0028 — DirectML opcjonalnie dla głosu Supertonic (karta z własną pamięcią ≥ 12 GB, jawny powrót na procesor) i Qwen3-ASR przez Vulkan na AMD/Intel; przy „nie” pozycje DirectML i flaga <code>--dml</code> są usuwane</td><td>zakończenie C6.6 — część DirectML (kod w 0.0.63, ADR <a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">0028</a> proponowany)</td></tr>
+<tr><td>Licencja DirectML — §2a dopuszcza zbieranie danych diagnostycznych przez Microsoft; pozycja katalogu <code>directml</code> ma <code>confirmed: false</code></td><td>zakończenie C6.6 — część DirectML (pozycja w pakietach głosu bez znaczka „Do potwierdzenia przez człowieka”)</td></tr>
+<tr><td>DirectML na karcie zintegrowanej obok osobnej (ADR 0028, pytanie 3) — dziś wyłączone, bo niezmierzone</td><td>C6.6 — tylko pomiar i włączenie DirectML na karcie zintegrowanej (laptop, Intel UHD Graphics); reszta próby C6.6 na laptopie (wykrywanie DXCore/PDH, główna karta NVIDIA, klasa „karta zintegrowana”, Qwen3-ASR/whisper na CUDA, DirectML wyłączony przy 6 GB) niezablokowana</td></tr>
+<tr><td>Progi liczbowe zestawu <code>evals/V6/pl-core</code> (zestaw zaakceptowany do pracy 2026-10-11)</td><td>C2.1 (bramka w CI)</td></tr>
+<tr><td>Progi nowych kryteriów w <code>ACCEPTANCE.md</code></td><td>wyjście z C, D, E, F, G</td></tr></tbody></table></div>
+<h2 id="dziennik-roadmapy">Dziennik roadmapy</h2>
+<div class="tbl"><table><thead><tr><th>Data</th><th>Zmiana</th></tr></thead><tbody><tr><td>2026-10-22</td><td>Wersja 0.0.72 („0.0.71B”; raport <a href="plan-38-raport-2026-10-22-0072.html">38</a>): start bez okna konsoli, dziennik rozruchu w programie z sygnałem, watchdog bez fałszywego błędu i bez utraty skrótu przy restarcie Brokera.</td></tr>
+<tr><td>2026-10-27</td><td>Przegląd zmian z 23–24.10 (raport <a href="plan-39-przeglad-2026-10-27.html">39</a>): 11 poprawek, w tym obejście wykrycia sieci w <code>cmd</code>; decyzje dla właściciela (konto zapasowe, commit i 0.0.73).</td></tr>
+<tr><td>2026-10-27</td><td>Wersja 0.0.74: połączenie z silnikiem gier NextGO.Gray (moduł <code>tools-engine</code>, 15 narzędzi przez Brokera, <a href="../modules/tools-engine/SPEC.md">SPEC</a>); test na prawdziwym silniku, katalog silnika tylko do odczytu.</td></tr>
+<tr><td>2026-10-28</td><td>Wersja 0.0.75 (raport <a href="plan-42-raport-2026-10-28-noc.html">42</a>): 9 uwag właściciela do interfejsu — tryb pracy w belce, okno Brokera bez odliczania, symetryczna belka i pasek pisania, panele chowane ze znacznikami, mówiące awatary z literami, okno Pipeline&#39;ów; plan etapu K (<a href="plan-41-tryb-dla-dzieci.html">41</a>).</td></tr>
+<tr><td>2026-10-29</td><td>Decyzje właściciela: panele chowane domyślnie; wyróżnianie czytanego zdania (plan <a href="plan-43-czytane-zdanie.html">43</a>, faza 1 wprowadzona — przycisk „Przeczytaj na głos”); etap K: przyjęte propozycje K.0 (<a href="adr-0029-konta-dzieci.html">ADR 0029</a>).</td></tr>
+<tr><td>2026-10-29</td><td>Styl „Junior” dla dzieci (K.3): ciepłe kolory, okrągłe kształty, interfejs ×1,15, propozycja wolniejszej mowy i dźwięków; sprawdzany w każdym teście stylów (<a href="plan-41-tryb-dla-dzieci.html">41</a>).</td></tr>
+<tr><td>2026-10-29</td><td>K.3 domknięte: wyróżnianie czytanego zdania także w rozmowie głosowej (plan <a href="plan-43-czytane-zdanie.html">43</a>, faza 2), „Uproszczony ekran” (mniej przycisków, wskaźniki zawsze widoczne), Junior w teście prawdziwego okna; przegląd w świeżym kontekście — bez poważnych ustaleń.</td></tr>
+<tr><td>2026-10-29</td><td>Etap B: B.6 (katalog silników z wymiarem system / architektura) i B.9 (powłoka terminala istniejąca na danym systemie) zrobione</td></tr>
+<tr><td>2026-10-29</td><td>Etap B: B.1 etap 2 (typy interfejsu tylko z generatora) i B.5 (polecenia <code>local_only</code> z odpowiednikami zdalnymi) zrobione</td></tr>
+<tr><td>2026-10-22</td><td>Wersja 0.0.71 (seria 11 i poprawki poranne; raport <a href="plan-37-raport-2026-10-22-0071.html">37</a>): koszt zadań agentek pod faktycznym dostawcą i kontem, „Zmień klucz” przywraca konto, komunikat braku klucza, wywołania narzędzi bez numeracji, ostrzeżenie limitu z właściwym zakresem, szybsze cofanie.</td></tr>
+<tr><td>2026-10-22</td><td>Wersja 0.0.70 (seria 10 — 10 punktów; raport <a href="plan-36-raport-2026-10-22-0070.html">36</a>): limity kosztów kont, blokada Routera według kosztu minimalnego, Gemini (narzędzia równoległe, cennik), limity wyjścia OpenAI, błędy agentek z nazwą dostawcy, kreator bez przypinania, panel Pliki, blok kodu, cofanie starych kroków powłoki.</td></tr>
+<tr><td>2026-10-22</td><td>Wersja 0.0.69 (seria 9 — 14 punktów; raport <a href="plan-35-raport-2026-10-22-0069.html">35</a>): pełna praca przez API (narzędzia u dostawców zgodnych z OpenAI, offline, test kluczy, termin Routera, nazwy dostawców i brak środków w błędach) i lokalnie (zapis bez psucia plików, limit wyjścia, budżet tokenów, koszt, snapshot powłoki, limit zadań cargo); kopia właściciela bez portu CDP 9222; informacja o L4 po restarcie.</td></tr>
+<tr><td>2026-10-21</td><td>Wersja 0.0.68 (seria 8 komplet — 10 punktów; raport <a href="plan-34-raport-2026-10-21-0068.html">34</a>): punkty niżej + przypięte sumy całego katalogu modeli i licencja Open RAIL-M obok Supertonic 3.</td></tr>
+<tr><td>2026-10-21</td><td>Seria 8, punkty 1–7 (po 0.0.67, weszły do 0.0.68): C5.1 licencje u źródła (dokument w <code>docs/vendor/</code>, telemetria ONNX Runtime ograniczona — wyłączana po starcie, Bielik z hashem i przypiętą rewizją); P4 styl odpowiedzi i swoboda także w przebiegach agentek (rozmowa z agentką z narzędziami, zadania w tle, umiejętności; Krytyczka, samoweryfikacja i delegowanie bez stylu); Dyrygentka zna poziom autonomii rozmowy — opis z tabeli reguł Brokera; adapter Anthropic: temperatura tylko bez myślenia (Claude 4.6); test wywłaszczenia scheduler-lite odporny na obciążenie (95. percentyl + górny limit).</td></tr>
+<tr><td>2026-10-21</td><td>Wersja 0.0.67 (komputer stacjonarny, raport <a href="plan-33-raport-2026-10-21-0067.html">33</a>): skrót „Alfa” do kopii z oknem zgód; L4 zatwierdzone w oknie Brokera widać od razu; strażnik autonomii przyjmuje podniesienie tylko po zgodzie potwierdzonej przez Brokera (luka z przeglądu 16 recenzentów); wgranie bez utraty głosu; łatki <code>rustls-webpki</code>, <code>wasmtime</code>, <code>vite</code>; pamięć projektu przywrócona, <code>memory-sync</code> wstrzymuje starą pamięć drugiego komputera; <code>verify</code> bez Edge — Chromium.</td></tr>
+<tr><td>2026-10-20</td><td>Wersja 0.0.66 (raport <a href="plan-32-raport-2026-10-20-0066.html">32</a>): okno Brokera u właściciela (Jądro obok Alfy, tryb przenośny), narzędzia agentek bez ręcznego wyboru katalogu, Dyrygentka wie, kto działa na komputerze, błędy dostawcy w zadaniach agentek, okno zgód (próbka wejścia), cennik modeli (89 modeli 11 dostawców) i obowiązek „Kontrola cenników”.</td></tr>
+<tr><td>2026-10-20</td><td>Wersja 0.0.65 (seria 6): C2.8 kanwa artefaktów, P4 Arena i karty rozmów, P5 „Naucz Alfę”, C2.12 edycja ustawień firm, C6.6 karty w modułach mowy, miejsce w <code>app-core</code>, kolejne polecenia w prawdziwej aplikacji; naprawa regresji obowiązków (narzędzie przekazania w zadaniach z arkuszem faktów).</td></tr>
+<tr><td>2026-10-18</td><td>Wersja 0.0.64 (seria 5, laptop): C2.11 PDF, C2.3 JSON narzędzi w modelu lokalnym, C5.7 karty licencji, C2.12 nagłówki OpenAI (Azure czeka na rejestr zgodności), C6.6 budżet pamięci na kartę i sprawdzenie laptopa iGPU + NVIDIA, <code>zip</code> 9 (updater czeka na przegląd), skrypty pamięci i kopii, porządek dokumentów.</td></tr>
+<tr><td>2026-10-18</td><td>C6.6 (noc 17/18.10, raport <a href="plan-28-raport-nocny-2026-10-18.html">28</a>): trzy kolejne przeglądy w świeżym kontekście (15 + 14 + 4 poprawki, m.in. rezerwa APU liczona raz, pomiar pamięci głównej karty także przy kilku kartach NVIDIA, ocena „mieści się na karcie” jak w rdzeniu, lista kart nie co 20 ms); poza C6.6: <code>ammonia</code> 4.2.4 (RUSTSEC-2026-0373), lista wyboru od pierwszego kliknięcia; testy w przeglądarce 467/467 (Chromium Playwrighta — na tym komputerze nie ma Edge), pokrycie łącza w prawdziwej aplikacji 89 % (235 z 264).</td></tr>
+<tr><td>2026-10-17</td><td>C6.6 — pobrane i dodane: ONNX Runtime 1.23.0 z DirectML i DirectML 1.15.4 (NuGet, sumy zgodne z katalogiem NuGet) jako pozycje katalogu; <code>alfa-supertonic --dml</code> z jawnym powrotem na procesor; głos na karcie przy karcie z własną pamięcią ≥ 12 GB; na AMD/Intel Qwen3-ASR także w pakietach 5 i 4. Pomiary na RX 9070 XT w ADR 0028 (proponowany).</td></tr>
+<tr><td>2026-10-17</td><td>C6.6 (w toku): Alfa ma działać na kartach NVIDIA, AMD i Intel oraz na grafice zintegrowanej. Wykrywanie bierze „zintegrowana” od sterownika (APU AMD z 4 GB z BIOS-u nie udaje osobnej karty), zapisuje LUID i wersję sterownika; karty AMD/Intel dostają lokalny model od 6 GB jak NVIDIA (bez wymogu liczby wątków; „mocna” nadal: NVIDIA od 12 GB, inne od 20 GB — ciężki głos na CUDA); nowa klasa „karta zintegrowana” (mały model na karcie przez Vulkan); mała osobna karta liczy rozpoznawanie mowy; pakiety: zintegrowana karta → silnik Vulkan, laptop NVIDIA z kartą zintegrowaną → także <code>llama-vulkan</code>; wolna pamięć i programy na karcie z liczników Windows dla każdego producenta (wcześniej tylko <code>nvidia-smi</code>); poprawione opisy profili głosu na starcie.</td></tr>
+<tr><td>2026-10-16</td><td>Wersja 0.0.62 (serie 3 i 4): polecenia bez modelu — jednostki, daty, lata przestępne, liczby słownie i rzymskie, procenty, wybór z listy, liczenie znaków; podpowiedź „Bez modelu” w polu pisania; kopiowanie rozmowy z notą AI; <code>F1</code> z instrukcją i trafienia z instrukcji w wyszukiwaniu Ustawień; szablony i własne polecenia jako JSON; statystyki rozmowy; wyszukiwanie i eksport Tablicy; zapamiętany tryb skupienia; „Zapisz jako szablon”; E.1 — układ na wąskie okno od 360 px.</td></tr>
+<tr><td>2026-10-16</td><td>Wersja 0.0.61 (seria 2): instrukcja w programie, Tablica, tekst z DOCX/XLSX/PPTX, styl odpowiedzi i swoboda, budżet wyzwalaczy, archiwum rozmów, tłumaczenie odpowiedzi, import SKILL.md, SECURITY.md i SBOM; poprawki po przeglądzie serii 1.</td></tr>
+<tr><td>2026-10-15</td><td>Wersja 0.0.60 (seria 1): polecenia bez modelu, quiz, własne polecenia z testerem, szablony promptów, eksport JSON, oznaczanie treści AI (AI Act), mapa przepływu danych, strony Moduły i Zaawansowane.</td></tr>
+<tr><td>2026-10-15</td><td>Wersja 0.0.59: C6.4 — przeglądarka Alfy przewija, naciska klawisze, wybiera z list, wraca/odświeża, czeka na tekst i czyta konsolę z błędami skryptów (test na prawdziwym Edge); C6.5 — <code>tools-dev</code>: <code>dev_git</code> (odczyt repozytorium) i <code>dev_test</code> (testy cargo / npm / pnpm / yarn / pytest / go / dotnet z podsumowaniem i nazwami niezaliczonych).</td></tr>
+<tr><td>2026-10-15</td><td>Wersja 0.0.58: C6.1–C6.3 — Alfa zna zainstalowane programy (<code>system_software</code>), serwery MCP użytkownika (Ustawienia → Serwery MCP, przepisy Playwright / Chrome DevTools / pliki / Git / GitHub, zgody z odciskiem opisu, zmienne tajne w Menedżerze poświadczeń, wywołania przez Brokera), diagnostyka komputera (Ustawienia → Diagnostyka komputera: parametry, zdarzenia awarii z kodami BSOD, błędy przypisane do dysku, testy procesora / pamięci / dysku / sieci, historia z porównaniem, raport, narzędzie <code>system_diagnostics</code>). Na laptopie właściciela diagnostyka wykazała: BSOD 0x116 (sterownik karty graficznej), 4 nieoczekiwane wyłączenia i 200 błędów dysku E: (mostek USB Realtek RTL9210B).</td></tr>
+<tr><td>2026-10-15</td><td>Wersja 0.0.53: decyzje z dokumentu 25 rozstrzygnięte na polecenie właściciela — izolacja poleceń powłoki integralnością Low (zapis tylko w katalogu roboczym, test na prawdziwych procesach), macierz dowodów generowana od 0.0.51, wpis Antigravity zatwierdzony, budżet Markdown dotrzymany przez czyszczenie w wątkach (7,8 ms); wasmtime 36.0.18 (RUSTSEC-2026-0363); pokrycie łącza w prawdziwej aplikacji 71,8 % (bramka 70 %).</td></tr>
+<tr><td>2026-10-14</td><td>Wersja 0.0.52: okno Ustawienia → Stan połączeń (konta API, mosty CLI z planem i stanem logowania, modele, głos, Broker, sieć, mikrofon; „Sprawdź wszystko”); <code>bridges_check</code> — oficjalne polecenie stanu CLI, bez danych konta; sprawdzenie po „Gotowe” w oknie logowania; Antigravity (Google AI Pro bez klucza API): logowanie w terminalu Alfy i most <code>agy</code> (szara trasa, domyślnie wyłączona, ostrzeżenie o regulaminie, piaskownica, bez automatycznej zgody); blokady <code>.agy</code>/<code>.gemini</code>; poprawka regresji próby obowiązków. Do przeglądu właściciela: zmiana wpisu <code>agy-antigravity</code> w rejestrze zgodności (dokument 25 §3).</td></tr>
+<tr><td>2026-10-14</td><td>Wersja 0.0.51: dobór modelu według trudności (P12 — część: ocena trudności, szczeble modeli, podnoszenie po odrzuceniu przez Krytyczkę, Krytyczka na lekkim modelu, klasa roli przy delegacji, strona „Dobór modelu”); poprawki audytu zewnętrznego A-01…A-17 (STOP WSZYSTKIEGO niepełne, strażnik autonomii, watchdog po restarcie Brokera, ponawianie cofania, analiza poleceń powłoki, widok Brokera, odcisk procesów pobocznych, edycja propozycji pamięci, zależności, bramki verify = CI, bramka rozmiaru, lock powłoki). Do przeglądu właściciela: izolacja procesu poleceń powłoki (token, prawa plików i sieci).</td></tr>
+<tr><td>2026-10-14</td><td>Wersja 0.0.50: test klucza OpenRoutera (<code>GET /key</code>, limit i zużycie przy koncie); wspólna kolejka modeli wszystkich kont (zakładka „Wszystkie konta”, <code>model-queues.json</code>, pierwszeństwo przed kolejkami kont w Routerze).</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.49: przebudowany kreator pierwszego uruchomienia (lista kroków z postępem, karty wyboru, stała stopka), opisy dostawców bez surowych znaczników; instancja testowa z własnymi wpisami w magazynie poświadczeń, własnym katalogiem użytkownika i bez zmiennych z kluczami.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.48: naprawy wad znalezionych testami — silniki poboczne zamykane przy wyjściu z programu (i sprzątane po awarii), próbka głosu nie wraca jako wypowiedź, stabilny test zwalniania modelu; zbadane rozpoznanie przez głośnik i mikrofon laptopa; pobieranie Qwen3-ASR i <code>llama-server</code> samym programem.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.47: P14 — ostatni wynik wyzwalacza z raportem, koszty z poprzednich dni w danych dla agentki; P1 — pasek rozmowy na żywo; testy — pokrycie poleceń rdzenia 52 %, tor akustyczny. Znalezione wady do naprawy: osierocony <code>llama-server</code> po zamknięciu, słabe rozpoznawanie przez głośnik i mikrofon laptopa, próbka głosu łapana przez mikrofon.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.46: samodzielne testowanie (dokument <a href="plan-24-samodzielne-testowanie.html"><code>24</code></a>) — poziomy sprawdzenia z raportem, testy sprzętowe na laptopie, instancja testowa obok Alfy właściciela, pokrycie poleceń rdzenia 38 %; naprawione: kwarantanna pobrań a nazwy 8.3, forma raportów z obowiązków.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.45: Historia zmian — dziesięć ostatnich wersji i zakładka „Starsze”, ta sama lista w oknie „Co nowego”; P14 — arkusz faktów dla zadań w tle i powrót gotowych obowiązków (próba na lokalnym modelu); P1 — kula stanu rozmowy w panelu „Głos”; P2 — wyszukiwarka, kolejność i miejsce na dysku w katalogu modeli.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.44: P14 — gotowe obowiązki ukryte po próbie na lokalnym modelu (raport z wymyślonymi danymi); pobieranie nowych pozycji samym programem sprawdzone na świeżym profilu.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.43: P1 — karta silników w bocznym panelu „Głos”; test płynności strumienia doprecyzowany — testy w przeglądarce 324 z 324. Raport nocy: dokument <a href="plan-23-raport-nocny-2026-10-12.html"><code>23</code></a>.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.42: P1 — język rozpoznawania mowy w ustawieniach; P3 — wyszukiwarka w ściągawce skrótów. Pełne testy projektu zielone (945 programów testowych).</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.41: P1 — „Sprawdź silniki”: próba każdego silnika rozmowy z czasem i przyczyną błędu.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.40: P14 — gotowe obowiązki codzienne agentek (cztery szablony z harmonogramem i przypisaną agentką).</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.39: P2 — ocena „mieści się na karcie” przy modelach rozmowy; P1 — próba potoku rozmowy na prawdziwym mikrofonie (po cichu).</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.38: P1 — wybór silnika rozpoznawania wg zajętości karty (pomiary: Qwen3-ASR 0,26 s na karcie, 2,4 s na procesorze; Whisper turbo 54 s na procesorze), mały model Whisper jako zapas na procesor.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.37: P3 — „Wstecz / Dalej” po odwiedzonych miejscach; P1 — liczniki modelu Smart Turn na karcie „Silniki rozmowy”.</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.36: P2 — karty graficzne na żywo na stronie „Urządzenia” (pamięć, obciążenie, temperatura, moc, programy; silniki Alfy oznaczone).</td></tr>
+<tr><td>2026-10-12</td><td>Wersja 0.0.35: P1 — karta „Silniki rozmowy” (stan strażnika, bezpiecznik, telemetria), ustawienia rozmowy, wybór karta / procesor dla Qwen3-ASR wg wolnej pamięci, nowe silniki głosu w pakietach.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.34: P1 — koniec wypowiedzi oceniany modelem Smart Turn v3.2 (osobny proces z ONNX Runtime; zgodność z wzorcem wydawcy; 25–45 ms na ocenę); model i biblioteka w katalogu pobrań.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.33: P1 — rozpoznawanie mowy Qwen3-ASR ze strażnikiem jakości, bezpiecznikiem i silnikiem zapasowym; model w katalogu pobrań.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.32: silnik <code>llama.cpp</code> b11559 w katalogu pobrań (wymagany przez Qwen3-ASR), sumy SHA-256 przypięte; pomiar rozpoznawania 0,43 s na zdanie. Decyzja właściciela: aplikację budować co pięć dużych ulepszeń albo na polecenie.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.31: P1 — wybór barwy głosu dla każdej agentki (ustawienia <code>voice.tts_voice_*</code>).</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.30: plan zatwierdzony przez właściciela; start P1 — głos Supertonic 3 (sidecar <code>alfa-supertonic</code>, cztery barwy agentek, model w katalogu pobrań).</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.29: P0 zrobione (specyfikacja głosu — dokument <a href="plan-19-specyfikacja-glosu-delty.html"><code>19</code></a>, macierz — <a href="plan-20-macierz-delty-czesc-1.html"><code>20</code></a>, <a href="plan-21-macierz-delty-czesc-2.html"><code>21</code></a>); nowe grupy P12 (agentki programistki z przyciskiem „Pełne uprawnienia”), P13 (dyski sieciowe i chmurowe, kopie), P14 (obowiązki codzienne); nowości z rynku R1–R13 (dokument <a href="plan-22-nowosci-2026-10.html"><code>22</code></a>); macierz porównana ze zrzutami menu Delty.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.28: plan zbiorczy (dokument <a href="plan-16-plan-zbiorczy.html"><code>16</code></a>), nowy etap P — przeniesienie funkcji z Delty AI (dokument <a href="plan-17-przeniesienie-z-delty.html"><code>17</code></a>) i nowy etap U — wielu użytkowników (dokument <a href="plan-18-wielu-uzytkownikow.html"><code>18</code></a>, ADR 0027). Decyzje właściciela: Alfa programem docelowym, ADR 0025 przyjęty, stała zgoda na pobrania do 3 GB.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.27: poprawki z przeglądu paneli bocznych i nakładek w skali 1:1 — kolejność kart zgodna ze skrótami <code>Alt+1…7</code>, pole wiadomości w Zadaniach, opis polecenia <code>/pamięć</code>.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.26: pierwszy pomiar głosów na laptopie bazowym (C5.2 w toku) — Chatterbox z pakietu producenta i Supertonic 3 są za wolne do rozmowy, decyzja po odsłuchu; poprawki z przeglądu stron Ustawień w pełnej skali i nowa reguła bramki (niezdefiniowane zmienne stylów).</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.25: dodatek o głosie lokalnym (dokument <a href="plan-15-glos-lokalny.html"><code>15</code></a>) i nowa grupa C5. Decyzja właściciela: lepszy głos lokalnie (Chatterbox Multilingual + głos szybki na procesorze), chmura (C1.1a) na koniec kolejki.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.24: zautomatyzowany przegląd okien, paneli i skrótów (<code>e2e/review-sweep.spec.ts</code>, raport w <code>docs/reviews/2026-10-11-przeglad-okien-i-skrotow.md</code>); naprawione szukanie w sesjach na oknie szerokości laptopa.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.23: historia zmian w Aktualizacjach (wagi krytyczna / poważna / zwykła), spis funkcji „wkrótce” (dokument <a href="plan-14-funkcje-wkrotce.html"><code>14</code></a>) i nowa grupa C4. Zgoda właściciela na: kamery sieciowe (C3.5), <code>schemars</code> w generatorze typów (B.1), dalszą pracę nad zestawem <code>evals/V6/pl-core</code> (C2.1).</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.22: C2.1 — szkic zestawu ewaluacyjnego po polsku (<code>evals/V6/pl-core</code>), do akceptacji właściciela. C3.5 (kamery sieciowe) wstrzymane: wymaga nowej zależności do dekodowania obrazu — decyzja właściciela.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.21: B.1 etap 1 — schemat łącza i typy TS generowane z Rusta, kontrola zgodności w kompilacji, bramce i CI.</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.20: C2.14 (sprawdzanie kluczy w tle, wiek klucza) i C2.15 (konto zapasowe tego samego dostawcy).</td></tr>
+<tr><td>2026-10-11</td><td>Wersja 0.0.19: B.2 (numery zdarzeń, wznowienie, pozycja w deltach tekstu) i B.3 (błędy z kodem i szczegółami docierają do okna także w prawdziwej aplikacji). 226 poleceń.</td></tr>
+<tr><td>2026-10-10</td><td>Wersja 0.0.16 (noc bez właściciela): kamery USB — port, hub, strona „Kamery”, wskaźnik, zdjęcie jako załącznik (C3.1–C3.4, część C3.7); import kluczy ze zmiennych (C2.17); pakiet decyzji A.7; podsumowanie i dalsze kroki w dokumencie <a href="plan-13-podsumowanie-i-dalsze-kroki.html"><code>13</code></a>.</td></tr>
+<tr><td>2026-10-09</td><td>Zlecenie właściciela: grupa C3 — kamery (USB, IP, Wi-Fi, kilka naraz), rozpoznawanie zapisanych osób z pamięcią długoterminową, opis obrazu na polecenie. Dokument <a href="plan-12-kamery-i-rozpoznawanie-osob.html"><code>12</code></a>, cztery szkice SPEC, projekt ADR 0025. Tylko plan — kod nie powstał.</td></tr>
+<tr><td>2026-10-09</td><td>Wersja 0.0.8: naprawy po próbie na laptopie (A.3e) — rozmowa przez API, kolejki modeli, głos. Właściciel pobrał silniki głosu i model lokalny: pierwsza rozmowa lokalna i nasłuch działają (A.4/A.5 w toku).</td></tr>
+<tr><td>2026-10-09</td><td>Wersja 0.0.7: dodawanie klucza API od nowa (A.3d); zadania C2.12–C2.17 (klucze dla firm) dopisane do planu.</td></tr>
+<tr><td>2026-10-09</td><td>Wersja 0.0.6: naprawy po przeglądzie zmian 0.0.1–0.0.5 (A.3c); numer wersji zmienia skrypt.</td></tr>
+<tr><td>2026-10-09</td><td>Wersja 0.0.4: listy wyboru i inne kontrolki rysowane przez Alfę (A.3a).</td></tr>
+<tr><td>2026-10-09</td><td>Powstanie planu v6. Etapy A.1–A.3 wpisane jako zrobione (wersje 0.0.2 i 0.0.3). Cztery decyzje właściciela o dostępie zdalnym.</td></tr>
+<tr><td>2026-10-31</td><td>A.9 — system automatycznego testowania przez AI (<a href="plan-45-testy-ai.html">45</a>): katalog funkcji z kodu i bramka „nowa funkcja bez testu” w <code>verify</code>, przeglądy ogólne obejmujące funkcje przyszłe, gałąź do przeglądu z instancją testową na „Pełnej automatyce”. Ścieżki względne w wynikach narzędzi plikowych (<code>tools-fs-impl</code>: lista, odczyt, stan, wyszukiwanie, zapis, przeniesienie, kopia, katalog, Kosz) — w katalogu roboczym zadania model dostaje ścieżkę względną, <code>data</code> zostaje bezwzględne (poprawka po pomiarze C2.3: model przepisywał „Temp” jako „Tepm”). Spłata długu katalogu do zera (601 z 601): testy Esc, wklejania bez formatu, klawiszy globalnych (polecenie budowy testowej <code>e2e_global_shortcut</code>, bez wstrzykiwania klawiszy w sesję właściciela) i podłączona Spacja PTT (<code>voice.ptt</code> nie działała w oknie). Przegląd ogólny wszystkich narzędzi agentek i zdarzeń rdzenia (§6.4). Diagnostyka narzędzi (§6.5): rdzeń testowy z atrapą każdego portu maszyny (<code>AppOptions::tool_ports</code>), każde narzędzie wywołane naprawdę (72 z 81 <code>ok</code>, 9 wyjaśnionych), 5 prób straży, raport w <code>verify</code>.</td></tr>
+<tr><td>2026-10-31</td><td>A.10 — okno zgód przemianowane na „Sędzia Cieni” (UI PL/EN; identyfikatory bez zmian), przycisk „?” z opisem, nowe okno Win32 z tekstem rysowanym i mierzonym czcionką (długie ścieżki łamane, przyciski według napisów, stopka zawsze widoczna), dokładna treść karty (konkret od narzędzia, miejsce po ludzku, tryb pracy), na L4 okno nie pokazuje się wcale (decyzja właściciela; także obcy głos i wysyłka po niezaufanej treści). Na gałęzi do przeglądu.</td></tr>
+<tr><td>2026-11-01</td><td>Wersja 0.0.81 (raport <a href="plan-47-raport-2026-11-01-noc.html">47</a>): czas zgody „zawsze w tym zakresie” wybierany w oknie Sędziego Cieni (1 h, 3 h, 24 h, do odwołania) i lista zgód z „Odwołaj” w Ustawieniach (0.0.80); diagnostyka komputera bez zawieszenia na kartach sieciowych i z częściowym wynikiem po limicie; „Co dokładnie” dla mostów, wtyczek, podglądu pulpitu i rejestru; A.9: dwa ukryte błędy testów prawdziwej aplikacji, pokrycie łącza 97,5 %.</td></tr>
+<tr><td>2026-11-01</td><td>Inspekcje poranne (raport <a href="plan-48-raport-2026-11-01-rano.html">48</a>): opis „Co dokładnie” odporny na znaki niewidoczne, panel zgód nie udaje braku zgód, karty sieciowe programowe bez fałszywego kabla, limit 10 s na zapytanie diagnostyki, okna wyboru pliku w testach prawdziwej aplikacji (pokrycie 99,3 %); poprawki zgód czasowych na gałęzi <code>do-przegladu-zgody-2026-11-01</code>.</td></tr>
+<tr><td>2026-11-02</td><td>Noc (raport <a href="plan-49-raport-2026-11-02-noc.html">49</a>, wersja 0.0.83): obowiązki na Bieliku 4.5B — przegląd poranny, podsumowanie, porządki, koszty zielone; wymiana między modelami — przełączenie przy przepełnieniu kontekstu, skracanie starszych wyników narzędzi, pamięć i obrazy w zadaniu agentki, rzeczywiste okno kontekstu; pomiar F3 12/35 (pliki 10/24).</td></tr>
+<tr><td>2026-11-02</td><td>Noc, cd. (raport 49, wersja 0.0.84): nadpisanie pliku dopiero po pełnym odczycie (model zastępował umowę jednym zdaniem), cel w prośbach weryfikacji i poprawki, szablony zamiast wartości odrzucane, literówki w ścieżkach, Kosz jako cel, pusty <code>cwd</code>, podpowiedzi powłoki; dwa przeglądy w świeżym kontekście; pomiar F3 16/35 (pliki 13/24) na <code>78b9b1bf</code>.</td></tr></tbody></table></div>
+<h3 id="2026-10-24-trwala-kontynuacja-zadan-i-kolejki-wszystkich-kont">2026-10-24 — trwała kontynuacja zadań i kolejki wszystkich kont</h3>
+<p>Wdrożenie lokalne z zapisami szyfrowanych checkpointów, zgodą na kolejne pule kroków/czasu/oczekiwania, odtwarzaniem Dyrygentki i pipeline oraz poprawionym routingiem i ograniczaniem kontekstu narzędzi. Dowody, rollback i granice weryfikacji: <a href="../task-continuity-2026-10-24/REPORT.md">raport</a>. Testy deterministyczne i HTTP lokalne, bez pomiaru płatnych API i godzinnej sesji na rzeczywistych modelach.</p>
+<h3 id="2026-10-24-regresja-delegate-task-dla-modelu-spoza-mapy-mozliwosci">2026-10-24 — regresja delegate_task dla modelu spoza mapy możliwości</h3>
+<p>Naprawiono rozstrzyganie efektywnych możliwości modeli i wybór narzędzi Dyrygentki także przez dozwolone fallbacki. Nowe testy pełnego rdzenia, Routera i HTTP potwierdzają Alfa → Delta → fs_list → Alfa. <a href="../conductor-capabilities-2026-10-24/REPORT.md">Dowody i podmiana programu</a>.</p>
+<h3 id="2026-10-24-kontekst-wybranego-projektu-w-zadaniach-modeli">2026-10-24 — kontekst wybranego projektu w żądaniach modeli</h3>
+<p>Naprawiono brak nazwy projektu i aktywnego katalogu w żądaniu Dyrygentki oraz przekazanie kontekstu do wykonawczyń. Potwierdzono kontekst Alfy i Delty w HTTP, odczyt treści README z wybranego katalogu, zmianę projektu i wyłączenie dostępu. <a href="../project-context-2026-10-24/REPORT.md">Dowody i wdrożenie</a>.</p>
+<h3 id="2026-10-24-falszywa-prosba-o-wysylke-z-regexu-obj-bin">2026-10-24 — fałszywa prośba o wysyłkę z regexu obj|bin</h3>
+<p>Naprawiono klasyfikację literalnego wzorca PowerShell jako hosta UNC. Zachowane są rzeczywiste UNC, URL i kontrole L4. 40 testów parsera/narzędzia, w tym sesja tainted na L4 bez dodatkowej zgody dla lokalnego filtra oraz wymagana zgoda dla realnego uploadu. <a href="../shell-regex-2026-10-24/REPORT.md">Dowody i wdrożenie</a>.</p>
+<h3 id="2026-10-24-przekazywanie-wynikow-logi-i-wznowienie-po-komendzie-powloki">2026-10-24 — przekazywanie wyników, logi i wznowienie po komendzie powłoki</h3>
+<p>Naprawiono utratę raportu Delty u kolejnej agentki, rozpoznawanie odmowy/anulowania i hostowy wyciąg komend. Poprawiono proweniencję celu custom-child oraz zgodny wstecznie odczyt Commit.posts, który blokował dziennik i narzędzia po restarcie. 148 testów pakietów i 25 rdzenia, w tym pełny restart z zachowanym wynikiem i bez powtórzenia Delty. <a href="../conductor-handoff-2026-10-24/REPORT.md">Raport, zakres potwierdzenia i wdrożenie</a>.</p>
+</article>
+<footer>Źródło: <code>docs/plan/03-roadmapa.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

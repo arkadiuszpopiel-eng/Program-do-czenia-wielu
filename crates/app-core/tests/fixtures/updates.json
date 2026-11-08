@@ -1,0 +1,281 @@
+[
+  {
+    "command": "updates_status",
+    "args": {},
+    "result": {
+      "phase": "idle",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": null,
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": null,
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_whats_new",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "updates_check",
+    "args": {},
+    "result": {
+      "phase": "available",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T19:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_download",
+    "args": {},
+    "result": {
+      "phase": "downloading",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": null,
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T19:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_cancel",
+    "args": {},
+    "result": {
+      "phase": "available",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": {
+        "downloaded": 12058624,
+        "total": 48234496,
+        "resumed": false
+      },
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T19:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_download",
+    "args": {},
+    "result": {
+      "phase": "downloading",
+      "current": "0.1.0-f1",
+      "channel": "stable",
+      "mode": "ask",
+      "available": {
+        "version": "0.2.0",
+        "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+      },
+      "progress": {
+        "downloaded": 12058624,
+        "total": 48234496,
+        "resumed": false
+      },
+      "ready": null,
+      "previous": null,
+      "last_check": "2026-09-30T19:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_restart",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "updates_whats_new",
+    "args": {},
+    "result": {
+      "version": "0.2.0",
+      "notes": "Co nowego w 0.2.0:\n- Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji.\n- Strona „O programie\" z licencjami zależności.\n- Szybsze wyszukiwanie w sesjach."
+    }
+  },
+  {
+    "command": "updates_dismiss_whats_new",
+    "args": {},
+    "result": null
+  },
+  {
+    "command": "updates_rollback",
+    "args": {},
+    "result": {
+      "phase": "ready",
+      "current": "0.2.0",
+      "channel": "stable",
+      "mode": "ask",
+      "available": null,
+      "progress": null,
+      "ready": "0.1.0-f1",
+      "previous": "0.2.0",
+      "last_check": "2026-09-30T19:45:03.200Z",
+      "error": null,
+      "restart_blocked": null
+    }
+  },
+  {
+    "command": "updates_about",
+    "args": {},
+    "result": {
+      "version": "0.2.0",
+      "channel": "stable",
+      "build_date": null,
+      "commit": null,
+      "target": "windows-x86_64",
+      "updates_configured": true,
+      "licenses_generated_at": "2026-10-03",
+      "licenses": [
+        {
+          "name": "minisign-verify",
+          "version": "0.3.0",
+          "license": "MIT",
+          "source": "cargo"
+        },
+        {
+          "name": "reqwest",
+          "version": "0.12.28",
+          "license": "MIT OR Apache-2.0",
+          "source": "cargo"
+        },
+        {
+          "name": "tauri",
+          "version": "2.12.0",
+          "license": "Apache-2.0 OR MIT",
+          "source": "cargo"
+        },
+        {
+          "name": "zip",
+          "version": "8.6.0",
+          "license": "MIT",
+          "source": "cargo"
+        },
+        {
+          "name": "bits-ui",
+          "version": "2.19.3",
+          "license": "MIT",
+          "source": "npm"
+        },
+        {
+          "name": "svelte",
+          "version": "5.57.1",
+          "license": "MIT",
+          "source": "npm"
+        }
+      ]
+    }
+  },
+  {
+    "command": "updates_history",
+    "args": {},
+    "result": [
+      {
+        "version": "0.2.0",
+        "date": "2026-10-12",
+        "summary": "Aktualizacje z wznawianiem pobierania i strona „O programie\".",
+        "items": [
+          {
+            "section": "Aktualizacje",
+            "severity": "serious",
+            "text": "Aktualizacje z wznawianiem pobierania i automatycznym powrotem do poprzedniej wersji."
+          },
+          {
+            "section": "Interfejs",
+            "severity": "normal",
+            "text": "Strona „O programie\" z licencjami zależności."
+          },
+          {
+            "section": "Interfejs",
+            "severity": "normal",
+            "text": "Szybsze wyszukiwanie w sesjach."
+          }
+        ]
+      },
+      {
+        "version": "0.1.0-f1",
+        "date": "2026-10-04",
+        "summary": "Klucze API pod opieką i pewniejsze kopie zapasowe.",
+        "items": [
+          {
+            "section": "Kopie zapasowe",
+            "severity": "critical",
+            "text": "Kopia zapasowa nie powstaje w wersji nieszyfrowanej, gdy nie da się odczytać hasła."
+          },
+          {
+            "section": "Konta i klucze API",
+            "severity": "serious",
+            "text": "Zły klucz u Google i xAI jest pokazywany jako zły klucz, a nie „błąd połączenia”."
+          },
+          {
+            "section": "Konta i klucze API",
+            "severity": "normal",
+            "text": "Sprawdzanie kluczy w tle: co 24 godziny Alfa sprawdza każde włączone konto, bez zużycia tokenów."
+          },
+          {
+            "section": "Konta i klucze API",
+            "severity": "normal",
+            "text": "Wiek klucza: przy każdym koncie widać, ile dni ma zapisany klucz."
+          }
+        ]
+      },
+      {
+        "version": "0.0.9",
+        "date": "2026-09-28",
+        "summary": "Porządki w interfejsie.",
+        "items": [
+          {
+            "section": "Interfejs",
+            "severity": "serious",
+            "text": "Ekran ładowania nie może już zostać na zawsze: błąd startu jest na nim pokazywany."
+          },
+          {
+            "section": "Interfejs",
+            "severity": "normal",
+            "text": "Szczegóły pod odpowiedzią (model, tokeny, koszt, czas) można wyłączyć w Ustawieniach → Wygląd."
+          },
+          {
+            "section": "Głos",
+            "severity": "normal",
+            "text": "Głośność mowy: głośność głosu agentek niezależnie od głośności systemu."
+          }
+        ]
+      },
+      {
+        "version": "0.0.8",
+        "date": null,
+        "summary": "Pierwszy stan uruchamialny.",
+        "items": []
+      }
+    ]
+  }
+]

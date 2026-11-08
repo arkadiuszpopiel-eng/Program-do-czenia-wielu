@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "app_version": "0.1.0",
+  "kind": "export",
+  "created_at": "2026-06-02T08:00:00Z",
+  "source_machine": {
+    "id": "01J9Z8K3M6Q2X7V4W1N5R8T0YB",
+    "name": "desktop",
+    "os": "Windows 11 Pro 24H2",
+    "hw_class": "standard-amd"
+  },
+  "scope": {
+    "keys": [
+      "config.common",
+      "sessions"
+    ],
+    "sessions": [
+      "s-f1"
+    ],
+    "counts": {
+      "sessions": 1,
+      "turns": 5,
+      "documents": 1,
+      "memory_entries": 0,
+      "artifacts": 0,
+      "secrets": 0
+    }
+  },
+  "content": [
+    {
+      "path": "config/common/agents.toml",
+      "sha256": "73688561dbff6f1c2a63bc5986b0c2ac5d8795560d8dc915ffeb267b2f848d34",
+      "bytes": 48
+    },
+    {
+      "path": "sessions/s-f1/session.json",
+      "sha256": "7585e1fa862d421f1c7e4b36417ce3bd085689b8d871dd4f649ad9a69b82c7b1",
+      "bytes": 650
+    },
+    {
+      "path": "sessions/s-f1/turns.ndjson",
+      "sha256": "e7b684c3845a61f64609d612c5165ed0b292cf133cdddb0a4e9f2b8e8ee921e8",
+      "bytes": 1458
+    }
+  ],
+  "content_sha256": "94b2a04915d52d6b0db914e09fd15d81e8e254e74c11b97e517fab4fa4286d11",
+  "encryption": null,
+  "notes": "Eksport F1 (schemat 1.0.0) — fixture migracji",
+  "redactions": 0
+}

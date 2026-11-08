@@ -1,0 +1,219 @@
+//! Rejestr możliwości modeli jednego dostawcy: konfiguracja > Models API > tabela znanych > ostrożne domyślne.
+
+use std::collections::BTreeMap;
+use std::sync::RwLock;
+
+use providers_contract::{
+    ChatRequest, Cost, CostEstimate, InterruptionRendering, ModelCapabilities, ModelInfo, Pricing,
+    ProviderCapabilities, Usage,
+};
+
+use lib_openai_compat::ProviderProfile;
+
+/// Funkcja „znanych modeli" adaptera.
+pub(crate) type KnownModels = fn(&str) -> Option<ModelCapabilities>;
+
+/// Rejestr możliwości.
+#[derive(Debug)]
+pub(crate) struct ModelRegistry {
+    configured: BTreeMap<String, ModelCapabilities>,
+    discovered: RwLock<BTreeMap<String, ModelCapabilities>>,
+    known: KnownModels,
+    fallback: ModelCapabilities,
+}
+
+impl ModelRegistry {
+    pub fn new(
+        configured: BTreeMap<String, ModelCapabilities>,
+        known: KnownModels,
+        fallback: ModelCapabilities,
+    ) -> Self {
+        Self {
+            configured,
+            discovered: RwLock::default(),
+            known,
+            fallback,
+        }
+    }
+
+    fn discovered(&self) -> BTreeMap<String, ModelCapabilities> {
+        self.discovered
+            .read()
+            .map(|g| g.clone())
+            .unwrap_or_else(|p| p.into_inner().clone())
+    }
+
+    /// Możliwości modelu.
+    pub fn caps(&self, model: &str) -> ModelCapabilities {
+        if let Some(c) = self.configured.get(model) {
+            return c.clone();
+        }
+        if let Some(c) = self.discovered().get(model) {
+            return c.clone();
+        }
+        (self.known)(model).unwrap_or_else(|| self.fallback.clone())
+    }
+
+    /// Wszystkie znane modele (skonfigurowane + wykryte).
+    pub fn all(&self) -> BTreeMap<String, ModelCapabilities> {
+        let mut all = self.discovered();
+        all.extend(self.configured.iter().map(|(k, v)| (k.clone(), v.clone())));
+        all
+    }
+
+    /// Zapamiętuje możliwości wykryte przez Models API.
+    pub fn learn(&self, models: &[ModelInfo]) {
+        let mut guard = self.discovered.write().unwrap_or_else(|p| p.into_inner());
+        for m in models {
+            if let Some(c) = &m.capabilities {
+                guard.insert(m.id.clone(), c.clone());
+            }
+        }
+    }
+
+    /// Opis możliwości dostawcy.
+    pub fn provider_capabilities(&self, profile: &ProviderProfile) -> ProviderCapabilities {
+        ProviderCapabilities {
+            provider: profile.id.clone(),
+            default_model: profile.default_model.clone(),
+            models: self.all(),
+            interruption: InterruptionRendering::AppendNote,
+            privacy: profile.privacy.clone(),
+        }
+    }
+
+    /// Oszacowanie kosztu z cennika profilu.
+    pub fn estimate_cost(
+        &self,
+        profile: &ProviderProfile,
+        req: &ChatRequest,
+    ) -> Option<CostEstimate> {
+        let pricing = price(profile, &req.model)?;
+        let max_out = profile.output_limit(req.params.max_tokens, &self.caps(&req.model));
+        Some(pricing.estimate(req, u64::from(max_out)))
+    }
+}
+
+/// Koszt z cennika profilu.
+pub(crate) fn cost(profile: &ProviderProfile, model: &str, usage: &Usage) -> Option<Cost> {
+    price(profile, model).map(|p| p.cost(usage))
+}
+
+/// Cennik modelu: dokładna nazwa, a gdy jej nie ma — bez przyrostka daty wydania, który API
+/// zwraca w odpowiedzi (`gpt-5-2025-08-07`, `claude-haiku-4-5-20251001`), przy cenniku
+/// z aliasami (przegląd 2026-10-21: koszt agentki liczony z modelu z odpowiedzi wychodził 0).
+fn price<'a>(profile: &'a ProviderProfile, model: &str) -> Option<&'a Pricing> {
+    // Lista modeli Google podaje identyfikatory z przedrostkiem `models/`, cennik — bez niego.
+    let bare = model.strip_prefix("models/").unwrap_or(model);
+    [model, bare].into_iter().find_map(|m| {
+        profile
+            .pricing
+            .get(m)
+            .or_else(|| profile.pricing.get(undated(m)?))
+    })
+}
+
+/// Nazwa bez przyrostka `-RRRRMMDD` albo `-RRRR-MM-DD`.
+fn undated(model: &str) -> Option<&str> {
+    let digits = |s: &str, n: usize| s.len() == n && s.bytes().all(|c| c.is_ascii_digit());
+    if let Some((head, day)) = model.rsplit_once('-')
+        && digits(day, 8)
+    {
+        return Some(head);
+    }
+    let mut parts = model.rsplitn(4, '-');
+    let (day, month, year, head) = (parts.next()?, parts.next()?, parts.next()?, parts.next()?);
+    (digits(day, 2) && digits(month, 2) && digits(year, 4)).then_some(head)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use providers_contract::{Message, Pricing, ThinkingSupport};
+
+    fn known(m: &str) -> Option<ModelCapabilities> {
+        (m == "k").then(|| ModelCapabilities {
+            thinking: ThinkingSupport::AlwaysOn,
+            ..ModelCapabilities::default()
+        })
+    }
+
+    #[test]
+    fn dated_model_ids_use_the_alias_price() {
+        let mut profile = ProviderProfile::new("p");
+        for alias in ["gpt-5", "claude-haiku-4-5"] {
+            profile.pricing.insert(
+                alias.into(),
+                Pricing {
+                    input_per_mtok_usd: 1.0,
+                    output_per_mtok_usd: 2.0,
+                    cache_read_per_mtok_usd: None,
+                    cache_write_per_mtok_usd: None,
+                },
+            );
+        }
+        let usage = Usage {
+            input_tokens: 1_000_000,
+            ..Usage::default()
+        };
+        for model in [
+            "gpt-5",
+            "gpt-5-2025-08-07",
+            "claude-haiku-4-5-20251001",
+            "models/gpt-5",
+        ] {
+            assert_eq!(
+                cost(&profile, model, &usage).map(|c| c.nano_usd),
+                Some(1_000_000_000),
+                "{model}"
+            );
+        }
+        assert!(cost(&profile, "gpt-5-mini", &usage).is_none());
+        assert!(cost(&profile, "gpt-5-2025", &usage).is_none());
+    }
+
+    #[test]
+    fn precedence_and_learning() {
+        let configured = BTreeMap::from([(
+            "c".to_owned(),
+            ModelCapabilities {
+                tools: true,
+                ..ModelCapabilities::default()
+            },
+        )]);
+        let reg = ModelRegistry::new(configured, known, ModelCapabilities::default());
+        assert!(reg.caps("c").tools);
+        assert_eq!(reg.caps("k").thinking, ThinkingSupport::AlwaysOn);
+        assert_eq!(reg.caps("x"), ModelCapabilities::default());
+        reg.learn(&[ModelInfo {
+            id: "k".into(),
+            display_name: None,
+            created: None,
+            capabilities: Some(ModelCapabilities {
+                vision: true,
+                ..ModelCapabilities::default()
+            }),
+        }]);
+        assert!(reg.caps("k").vision, "Models API wygrywa z tabelą znanych");
+        assert_eq!(reg.all().len(), 2);
+        let mut profile = ProviderProfile::new("p");
+        profile.pricing.insert(
+            "c".into(),
+            Pricing {
+                input_per_mtok_usd: 1.0,
+                output_per_mtok_usd: 1.0,
+                cache_read_per_mtok_usd: None,
+                cache_write_per_mtok_usd: None,
+            },
+        );
+        let req = ChatRequest::new("c", vec![Message::user_text("abcd")]);
+        let est = reg.estimate_cost(&profile, &req).unwrap();
+        assert_eq!(est.max_output_tokens, 8_192);
+        assert!(cost(&profile, "c", &Usage::default()).is_some());
+        assert!(
+            reg.estimate_cost(&profile, &ChatRequest::new("x", vec![]))
+                .is_none()
+        );
+        assert_eq!(reg.provider_capabilities(&profile).provider.as_str(), "p");
+    }
+}

@@ -1,0 +1,41 @@
+[package]
+name = "app-health"
+description = "„Zdrowie systemu” w aplikacji (kategoria app-*): Diagnosta (diagnostician-impl nad konfiguracją, rejestrem i plikami danych Alfy; Jądro tylko przez Brokera), Ulepszacz (improver-impl z propozycjami modelu lokalnego przez Router i bramką holdoutu), evale (evals-impl: katalog z integralnością, HoldoutGate), komendy health_*/improver_*/evals_* i zdarzenie HealthChanged"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate). Składa `diagnostician-impl`, `improver-impl`, `evals-impl`; używa jej `app-core`.
+[dependencies]
+app-api = { path = "../app-api" }
+diagnostician-contract = { path = "../diagnostician-contract" }
+diagnostician-impl = { path = "../diagnostician-impl" }
+improver-contract = { path = "../improver-contract" }
+improver-impl = { path = "../improver-impl" }
+evals-contract = { path = "../evals-contract" }
+evals-impl = { path = "../evals-impl" }
+watchdog-contract = { path = "../watchdog-contract" }
+providers-contract = { path = "../providers-contract" }
+sessions-contract = { path = "../sessions-contract" }
+core-bus-contract.workspace = true
+core-config-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+core-bus-impl = { path = "../core-bus-impl" }
+core-registry-impl = { path = "../core-registry-impl" }
+core-config-fake = { path = "../core-config-fake" }
+tempfile = "3.27.0"
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

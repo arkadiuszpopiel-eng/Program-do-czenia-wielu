@@ -1,0 +1,59 @@
+[package]
+name = "voice-pipeline-impl"
+description = "voice-pipeline: runtime potoku głosu składający kontrakty voice-* (mikrofon → DSP/AEC → reguła echa → VAD → STT → komendy/koniec tury → dialog → odpowiedź → persona → TTS → wyjście), ProviderReply, zestaw F2"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-pipeline-contract = { path = "../voice-pipeline-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-dsp-contract = { path = "../voice-dsp-contract" }
+voice-vad-contract = { path = "../voice-vad-contract" }
+voice-stt-contract = { path = "../voice-stt-contract" }
+voice-turn-contract = { path = "../voice-turn-contract" }
+voice-cmd-contract = { path = "../voice-cmd-contract" }
+voice-dialog-contract = { path = "../voice-dialog-contract" }
+voice-persona-contract = { path = "../voice-persona-contract" }
+voice-tts-contract = { path = "../voice-tts-contract" }
+voice-wake-contract = { path = "../voice-wake-contract" }
+voice-speaker-contract = { path = "../voice-speaker-contract" }
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+model-residency-contract = { path = "../model-residency-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+futures-core.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+sha2 = "0.10.9"
+device-profile-contract = { path = "../device-profile-contract" }
+
+[dev-dependencies]
+voice-pipeline-contract = { path = "../voice-pipeline-contract", features = ["contract-tests"] }
+voice-audio-fake = { path = "../voice-audio-fake" }
+voice-dsp-fake = { path = "../voice-dsp-fake" }
+voice-vad-fake = { path = "../voice-vad-fake" }
+voice-stt-fake = { path = "../voice-stt-fake" }
+voice-turn-fake = { path = "../voice-turn-fake" }
+voice-cmd-fake = { path = "../voice-cmd-fake" }
+voice-persona-fake = { path = "../voice-persona-fake" }
+voice-tts-fake = { path = "../voice-tts-fake" }
+voice-wake-fake = { path = "../voice-wake-fake" }
+voice-speaker-fake = { path = "../voice-speaker-fake" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+scheduler-lite-fake = { path = "../scheduler-lite-fake" }
+model-residency-fake = { path = "../model-residency-fake" }
+providers-fake = { path = "../providers-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+core-registry-contract.workspace = true
+proptest.workspace = true
+
+[lints]
+workspace = true

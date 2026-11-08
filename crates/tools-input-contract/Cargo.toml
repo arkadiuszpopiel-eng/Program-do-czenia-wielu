@@ -1,0 +1,26 @@
+[package]
+name = "tools-input-contract"
+description = "tools-input: kontrakt narzędzi wejścia syntetycznego agentek — tekst Unicode, skróty, kliknięcia, przewijanie; nigdy do okien Alfy/Brokera, przerwanie przy fizycznym wejściu użytkownika, limit tempa"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+platform-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

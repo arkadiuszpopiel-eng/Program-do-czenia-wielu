@@ -1,0 +1,30 @@
+// Diagnostyka komputera (Ustawienia → Diagnostyka komputera; komendy `diag_*`). Typy kontraktu
+// `pc-diag` (Rust) — przekazane z `generated/ipc.ts`. Pola bez odczytu (brak uprawnień,
+// brak czujnika) są `null`, nie zgadywane.
+
+export type {
+  BatteryDiag,
+  CheckKind,
+  CheckResult,
+  CheckRun,
+  CpuDiag,
+  DiagProgress,
+  DiagView,
+  DiskDiag,
+  EventCount,
+  EventKind,
+  EventLine,
+  EventSummary,
+  GpuDiag,
+  Health,
+  MachineDiag,
+  MediaKind,
+  MemDiag,
+  MemModule,
+  Metric,
+  NetDiag,
+  Snapshot,
+  ThermalDiag,
+  Verdict,
+  VolumeDiag,
+} from './generated/ipc';

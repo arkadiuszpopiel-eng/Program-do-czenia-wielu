@@ -1,0 +1,148 @@
+# 11 — Technologie, stan na 2026-10-09
+
+Przegląd wykonany 2026-10-09. Świat AI zmienia się co kilka tygodni, więc każda pozycja ma etykietę pewności,
+a przed rozpoczęciem zadania, które od niej zależy, trzeba ją sprawdzić ponownie.
+
+| Etykieta | Znaczenie                                                                                           |
+| -------- | --------------------------------------------------------------------------------------------------- |
+| **P**    | potwierdzone tego dnia w źródle pierwotnym (rejestr pakietów, strona modelu, dokumentacja projektu) |
+| **W**    | znane ze źródeł wtórnych (artykuły, zestawienia) — do potwierdzenia przed wdrożeniem                |
+| **U**    | niesprawdzone w tym przeglądzie — wiedza ogólna, wymaga sprawdzenia                                 |
+
+## 1. Uruchamianie modeli lokalnie
+
+| Technologia                                           | Stan                                                                                                                                                                                                     | Pewność | Źródło                                             | Wniosek dla Alfy                        |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------- | --------------------------------------- |
+| llama.cpp `llama-server`                              | wywołania narzędzi (`--jinja`), obraz/dźwięk przez libmtmd (eksperymentalne), tryb routera wielu modeli, usypianie bezczynnych, gramatyki i JSON Schema, `/v1/embeddings`, `/v1/rerank`, `/v1/responses` | P       | README serwera w repozytorium `ggml-org/llama.cpp` | zostaje jedynym silnikiem v1 (ADR 0014) |
+| Wbudowane narzędzia i MCP w `llama-server`            | istnieją (`--tools`, `--mcp-servers-config`), z ostrzeżeniem autorów                                                                                                                                     | P       | jw.                                                | **nie włączać** — omijają Brokera       |
+| DirectML                                              | tryb podtrzymania, bez nowych funkcji                                                                                                                                                                    | P       | learn.microsoft.com/windows/ai/directml            | nie planować                            |
+| Windows ML / Foundry Local                            | Windows ML ogólnie dostępne od 2025-09; Foundry Local od 2026-04                                                                                                                                         | P       | blogi Microsoft (Windows Developer, Foundry)       | opcja na później dla układów NPU (H.4)  |
+| mistral.rs, candle, Ollama, LM Studio (tryb bez okna) | istnieją i są rozwijane                                                                                                                                                                                  | W       | —                                                  | nie zmieniamy silnika                   |
+| vLLM, ONNX Runtime GenAI, ExecuTorch, MLC             | —                                                                                                                                                                                                        | U       | —                                                  | poza zakresem                           |
+
+## 2. Modele mieszczące się w 6 GB
+
+| Model                                         | Dane                                                           | Pewność              | Źródło                           | Rola                                      |
+| --------------------------------------------- | -------------------------------------------------------------- | -------------------- | -------------------------------- | ----------------------------------------- |
+| Bielik-Minitron-7B v3.0 Instruct              | GGUF: Q4_K_M 4,5 GB, Q5_K_M 5,29 GB; Apache 2.0                | P                    | huggingface.co/speakleash        | polski czat domyślny                      |
+| Bielik-11B v3.0 Instruct                      | Apache 2.0; ok. 6,7 GB w Q4 (szacunek)                         | P / W                | jw.                              | tryb „wolniej, ale lepiej”                |
+| Bielik-Guard 0.1B / 0.5B                      | klasyfikatory bezpieczeństwa                                   | P                    | jw.                              | drugi strażnik w Brokerze (C2.4)          |
+| Qwen3.5 — 0.8B / 2B / 4B / 9B                 | opublikowane 2026-02-27/28                                     | P (istnienie i daty) | API Hugging Face, konto `Qwen`   | 4B: narzędzia i obraz                     |
+| Qwen3.5 — licencja, kontekst, wizja           | Apache 2.0, 262 tys. tokenów, wizja wbudowana                  | W                    | artificialanalysis.ai            | potwierdzić na karcie modelu              |
+| Gemma 4 — E2B / E4B / 12B / 26B / 31B         | E2B i E4B od 2026-03-02; 12B od 2026-05-23; oficjalne GGUF QAT | P (istnienie i daty) | API Hugging Face, konto `google` | E4B: wejście dźwiękowe (eksperyment)      |
+| Gemma 4 — licencja Apache 2.0, dźwięk i obraz | —                                                              | W                    | the-decoder.com, datanorth.ai    | potwierdzić                               |
+| PLLuM (rodzina 2512)                          | Llama-PLLuM-8B i 70B; licencje różne                           | P (2025-12)          | huggingface.co/CYFRAGOVPL        | sprawdzić licencję wariantu przed użyciem |
+
+Nie potwierdziliśmy: natywnego wywoływania narzędzi w Bieliku v3 (stąd C2.3 — wymuszanie schematem) ani
+istnienia Bielika v3 mniejszego niż 5 mld parametrów (istotne dla telefonu — H.1).
+
+## 3. Standardy agentów
+
+| Standard                     | Stan                                                                                                                                                       | Pewność  | Źródło                                                     | Wniosek                                                            |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------- | ------------------------------------------------------------------ |
+| MCP, specyfikacja 2026-07-28 | przebudowa niezgodna wstecz: bezstanowa, bez `initialize`, obowiązkowe `server/discover`, zadania jako rozszerzenie; wycofywane: Roots, Sampling, HTTP+SSE | P        | modelcontextprotocol.io/specification/2026-07-28/changelog | obsłużyć obie wersje (C2.5); nie budować na funkcjach wycofywanych |
+| MCP Apps                     | rozszerzenie oficjalne (SEP-1865)                                                                                                                          | P        | modelcontextprotocol.io/seps/1865                          | H.2                                                                |
+| SDK Rust `rmcp`              | 3.5.1 (2026-10-05)                                                                                                                                         | P        | crates.io                                                  | używać                                                             |
+| Zarządzanie MCP              | Agentic AI Foundation (Linux Foundation) od 2025-12                                                                                                        | P        | blog.modelcontextprotocol.io                               | standard stabilny organizacyjnie                                   |
+| Agent Skills (`SKILL.md`)    | otwarty standard od 2025-12, ok. 40 klientów                                                                                                               | W        | agentskills.io, zestawienia                                | format umiejętności Alfy (C2.6)                                    |
+| AGENTS.md                    | konwencja powszechna                                                                                                                                       | W        | —                                                          | już używamy                                                        |
+| A2A                          | wersja 1.0 w 2026, w AAIF od 2026-08                                                                                                                       | W        | aaif.io                                                    | odłożone (H.6)                                                     |
+| ACP (protokół agent–edytor)  | Zed, JetBrains                                                                                                                                             | P (2025) | zed.dev/acp                                                | H.5                                                                |
+| OpenAI: Assistants API       | wyłączone 2026-08-26; zostaje Responses API                                                                                                                | P        | community.openai.com                                       | adaptery tylko na Responses / Chat                                 |
+
+## 4. Głos
+
+| Technologia                            | Stan                                                                           | Pewność | Źródło                                     | Wniosek                                           |
+| -------------------------------------- | ------------------------------------------------------------------------------ | ------- | ------------------------------------------ | ------------------------------------------------- |
+| Whisper large-v3 / turbo (whisper.cpp) | najlepszy otwarty model dla polskiego wg badania z 2026-03                     | P       | arxiv.org/abs/2603.02246                   | punkt odniesienia                                 |
+| NVIDIA Parakeet-TDT-0.6b-v3            | 25 języków w tym polski (WER ok. 7,3 % na FLEURS), CC-BY-4.0                   | P       | huggingface.co/nvidia/parakeet-tdt-0.6b-v3 | kandydat — rozstrzyga pomiar na własnym korpusie  |
+| Silero VAD v6                          | dostępny w ONNX                                                                | W       | —                                          | już używamy Silero                                |
+| Piper — głosy polskie                  | `gosia`, `darkman`, `mc_speech` i inne                                         | P       | huggingface.co/rhasspy/piper-voices        | zostaje                                           |
+| Piper — licencja                       | pierwotne repozytorium zarchiwizowane 2025-10 (W); następca na GPL-3.0 (P)     | P / W   | github.com/OHF-Voice/piper1-gpl            | **ADR 0024**; zostaje tylko jako zapas            |
+| Chatterbox Multilingual V3             | 500 mln parametrów, 23 języki z polskim, MIT; własny głos z próbki 5–10 s      | P       | github.com/resemble-ai/chatterbox          | głos „naturalny” — [dokument 15](15-glos-lokalny.md) |
+| `chatterbox.cpp` (ggml)                | Chatterbox bez Pythona: procesor, CUDA, Vulkan; strumień dźwięku; MIT          | P       | github.com/gianni-cor/chatterbox.cpp       | sposób uruchomienia; brak wydań — przypiąć commit |
+| Supertonic 3                           | 99 mln parametrów, 31 języków z polskim, ONNX; wagi OpenRAIL-M; archiwum 2026-09 | P     | github.com/supertone-inc/supertonic        | głos „szybki” — po próbie i lekturze licencji     |
+| Pocket TTS (Kyutai)                    | 100 mln parametrów, procesor, MIT; 6 języków, **bez polskiego**                | P / W   | kyutai.org/tts                             | badawczo (otwarty przepis treningu)               |
+| Qwen3-TTS                              | Apache-2.0, 10 języków, bez polskiego                                          | P       | huggingface.co/Qwen                        | nie                                               |
+| XTTS v2, F5-TTS, Fish Speech, Higgs v3 | wagi tylko do użytku niekomercyjnego                                           | W       | —                                          | nie                                               |
+| Kokoro, Kyutai TTS 1.6B, Moonshine     | bez polskiego                                                                  | W / P   | kyutai.org                                 | nie                                               |
+| Pełny dupleks (PersonaPlex, Moshi)     | angielski, 16–24 GB                                                            | W       | —                                          | H.3                                               |
+| Słowo wywoławcze                       | Porcupine: koniec darmowego planu 2026-06; openWakeWord: ostatnie wydanie 2024 | W       | —                                          | opcja eksperymentalna; domyślnie „naciśnij i mów” |
+
+## 5. Pamięć i wyszukiwanie
+
+| Technologia                                                  | Stan                                                           | Pewność                          | Wniosek                                                         |
+| ------------------------------------------------------------ | -------------------------------------------------------------- | -------------------------------- | --------------------------------------------------------------- |
+| Wyszukiwanie hybrydowe (FTS5 + wektory, RRF) + reranker      | praktyka powszechna                                            | W                                | już tak działa moduł `search`                                   |
+| sqlite-vec                                                   | wyszukiwanie pełne stabilne; indeksy przybliżone w wersji alfa | P (github.com/asg017/sqlite-vec) | zostaje (ADR 0008); wystarcza do ok. 100 tys. fragmentów        |
+| LanceDB                                                      | wbudowana, Rust, Apache 2.0                                    | P (docs.lancedb.com)             | zapas za portem, gdy skala urośnie                              |
+| Embeddery: Qwen3-Embedding 0.6B, EmbeddingGemma-300m, BGE-M3 | dostępne lokalnie                                              | P (2025)                         | wybór po pomiarze recall@5 po polsku                            |
+| Docling, MarkItDown                                          | rozwijane; oba w Pythonie                                      | W                                | tylko jako opcjonalny dodatek (ADR 0004: bez Pythona w rdzeniu) |
+
+## 6. Sterowanie komputerem i bezpieczeństwo agentów
+
+| Temat                                                    | Stan                                                                                    | Pewność                      | Wniosek                                     |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------- | ------------------------------------------- |
+| Modele GUI o otwartych wagach                            | ok. 66–77 % OSWorld-Verified (dane autorów), słabo przenoszą się między zestawami       | W                            | nie obiecywać autonomii na 6 GB             |
+| Podejście: najpierw drzewo dostępności, zrzut jako zapas | praktyka wspólna dla Playwright MCP i Chrome DevTools MCP                               | W                            | zgodne z projektem `tools-uia`              |
+| OWASP Top 10 dla aplikacji agentowych 2026 (ASI01–ASI10) | opublikowane 2025-12                                                                    | W (genai.owasp.org)          | mapować na obrony Brokera w zestawie ataków |
+| OWASP LLM Top 10, wydanie 2026                           | opublikowane ok. 2026-08                                                                | W                            | przeczytać oryginał przed pentestem (C1.5)  |
+| Wstrzykiwanie poleceń                                    | nierozwiązane; obrona architektoniczna (plan-potem-wykonanie, znakowanie treści, zgody) | P (arxiv.org/abs/2506.08837) | zgodne z modelem Brokera                    |
+| Warstwa agentowa w Windows 11                            | podgląd, domyślnie wyłączona                                                            | W                            | obserwować                                  |
+
+## 7. Wiele platform
+
+| Technologia                       | Stan                                                               | Pewność | Źródło                                    | Wniosek                          |
+| --------------------------------- | ------------------------------------------------------------------ | ------- | ----------------------------------------- | -------------------------------- |
+| Tauri                             | 2.12.2 (2026-10-09); Android i iOS stabilne od 2.0                 | P       | crates.io, tauri.app                      | zostajemy przy 2.x               |
+| Tauri 3                           | alfa (środowisko CEF)                                              | W       | —                                         | nie planować (AGENTS.md)         |
+| Tauri na Linuksie                 | WebKitGTK; udokumentowane kłopoty z kartami NVIDIA                 | P       | v2.tauri.app/develop/debug/linux-graphics | test w CI (G.8)                  |
+| Tauri na Androidzie — praca w tle | brak gotowej wtyczki usługi pierwszoplanowej                       | U       | —                                         | własne wtyczki Kotlin (F.2, F.5) |
+| LiteRT-LM, AICore / Gemini Nano   | dostępne na wybranych telefonach                                   | P       | developers.google.com                     | H.1                              |
+| Flatpak / AppImage / deb          | Flatpak niesie własne środowisko; AppImage bywa kruchy z WebKitGTK | W       | —                                         | deb i rpm najpierw               |
+
+## 8. Dostęp zdalny i dane między urządzeniami
+
+| Technologia                                                                     | Stan                                                                         | Pewność | Źródło               | Wniosek                                 |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------- | -------------------- | --------------------------------------- |
+| iroh                                                                            | 1.3.0 (2026-09-28); połączenia po kluczu publicznym, QUIC, własny przekaźnik | P       | crates.io            | opcja dla klientów natywnych            |
+| Noise (`snow`), WebAuthn / klucze dostępu, WebRTC, Tailscale, Cloudflare Tunnel | dojrzałe, powszechnie używane                                                | U       | —                    | sprawdzić wersje i ograniczenia przed D |
+| Web Push w Chrome na Androidzie                                                 | działa; synchronizacja okresowa tylko dla zainstalowanych PWA                | P       | developer.chrome.com | powiadomienia bez treści (E.5)          |
+| Loro                                                                            | 1.16.2 (2026-09-21)                                                          | P       | crates.io            | H.7                                     |
+| Automerge 3                                                                     | znacznie mniejsze zużycie pamięci                                            | P       | automerge.org        | H.7                                     |
+
+## 9. Trendy w asystentach (do porównania zakresu)
+
+Źródła wtórne (**W**). W 2026 roku wiodące asystenty mają: zadania zaplanowane i agentów w tle, pamięć, którą
+użytkownik może przeglądać i kasować, łączniki MCP, umiejętności w formacie `SKILL.md`, kanwę / artefakty,
+podział pracy na podagentów, zgody i dziennik działań. Alfa ma już w kodzie odpowiedniki większości (harmonogram,
+pamięć z inspektorem, MCP, umiejętności, Broker z dziennikiem); plan v6 dodaje brakujące (C2.5–C2.8).
+Wyróżnik Alfy, który jest realny na sprzęcie bazowym: działanie w całości lokalnie po polsku i jawny Broker.
+
+## 10. Kamery i obraz (przegląd z 2026-10-10)
+
+Pierwszy przegląd źródeł dla grupy C3, wykonany wyszukiwarką 2026-10-10. Większość wyników to źródła wtórne (kopie
+repozytoriów, strony pakietów) — etykieta **W**; przed kodem każdą pozycję trzeba potwierdzić w źródle pierwotnym.
+
+| Technologia | Stan | Pewność | Źródło | Wniosek dla Alfy |
+| --- | --- | --- | --- | --- |
+| Media Foundation (kamery USB na Windows) | użyte w kodzie 0.0.16 (`platform-windows-impl/src/camera/`) | U (działanie na sprzęcie niesprawdzone) | — | próba na prawdziwej kamerze: zadanie C3.2 |
+| `retina` — klient RTSP w Rust | wersja 0.4.15 (2025-10); H.264 i H.265, uwierzytelnianie basic i digest, RTP po TCP; używany w Moonfire NVR; autor zaznacza braki i nierówne pokrycie testami; licencja wg kopii repozytorium: Apache-2.0 | W | github.com/scottlamb/retina, crates.io | kandydat do C3.5 zamiast `ffmpeg`: odbiór strumienia w Rust; **dekodowanie H.264 do klatek to osobny temat** (retina tylko rozpakowuje strumień) — potrzebny dekoder (Media Foundation albo `ffmpeg`) |
+| ONVIF (wyszukiwanie i opis kamer w sieci) | standard branżowy | U | — | tylko sieć lokalna; zakres uzgodnić z regułą „bez nasłuchu” |
+| Obraz w `llama-server` | obsługa przez `libmtmd` od 2025-05; model + osobny plik projektora (`--mmproj`), wejście przez `/chat/completions`; autorzy ostrzegają o intensywnych zmianach | P | github.com/ggml-org/llama.cpp `docs/multimodal.md` | droga lokalna opisu obrazu (C3.6): przypiąć wersję silnika, zmierzyć pamięć na 6 GB |
+| Modele lokalne z wejściem obrazowym | dokumentacja wymienia m.in. Gemma 3 (4B), SmolVLM, Qwen2-VL, Pixtral | W | jw. | wybór po pomiarze jakości po polsku i pamięci (C3.6) |
+| Modele chmurowe z wejściem obrazowym | dostępne u głównych dostawców | U | — | droga za zgodą; sprawdzić ceny i zasady przechowywania obrazów |
+| YuNet (wykrywanie twarzy) + SFace (wzorzec twarzy), OpenCV Zoo | pliki ONNX; repozytorium na Apache-2.0 z zastrzeżeniem „sprawdź licencję każdego modelu”; kopie podają MIT dla YuNet i Apache-2.0 dla SFace | W | github.com/opencv/opencv_zoo | **kandydat do C3.8** — licencje pozwalają na użycie w produkcie, do potwierdzenia w plikach LICENSE obu modeli |
+| InsightFace `buffalo_*` | kod na MIT, ale **modele tylko do badań niekomercyjnych** | W (dokumentacja projektu i PyPI) | pypi.org/project/insightface | **nie używać** w Alfie |
+| Wykrywanie żywej twarzy (ochrona przed zdjęciem) | istnieją modele i metody | U | — | decyzja w SPEC v1 `person-recognition` |
+
+## Do sprawdzenia przed wdrożeniem
+
+1. Bielik v3: długość kontekstu, zachowanie przy wywołaniach narzędzi, tok/s na RTX 4050.
+2. Polskie zestawy do oceny wyszukiwania (PIRB, MTEB-pl) — wybór embeddera i rerankera.
+3. Praca w tle i usługa pierwszoplanowa w Tauri na Androidzie.
+4. Głos lokalny: treść licencji OpenRAIL-M wag Supertonic 3, znak wodny w `chatterbox.cpp`, licencje
+   poszczególnych głosów Pipera, jakość polskiej mowy i opóźnienie na RTX 4050 (zadania C5.1 i C5.2).
+5. Oryginalne teksty: OWASP LLM Top 10 2026, rozporządzenia z [`10-zgodnosc-prawna.md`](10-zgodnosc-prawna.md).
+6. Wersje i ograniczenia: `snow`, biblioteki WebAuthn, WebRTC w WebView Androida.
+7. Dokładny numer wydania llama.cpp, w którym są tryb routera i `/v1/rerank` — przed podbiciem wersji silnika.

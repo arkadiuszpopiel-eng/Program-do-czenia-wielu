@@ -1,0 +1,180 @@
+//! Specyfikacje komend F5–F7 dla `dto_roundtrip.rs` (projekt sesji, pamięć, zadania, wyzwalacze,
+//! Marszałek, mosty CLI): typy argumentów (camelCase jak w `TauriAlfaClient`) i wyniku.
+
+use app_core::dto::*;
+
+use super::{Check, roundtrip};
+
+mod cameras;
+mod child;
+mod computer;
+mod files;
+mod models;
+mod plugins;
+mod series6;
+mod updates;
+mod voice;
+
+type Spec = (Vec<(&'static str, Check)>, Check);
+
+fn memory(command: &str) -> Option<Spec> {
+    let s: Check = roundtrip::<String>;
+    let item: Check = roundtrip::<MemoryItem>;
+    let target: Check = roundtrip::<MemoryForgetTarget>;
+    Some(match command {
+        "memory_status" => (vec![], roundtrip::<MemoryStatus>),
+        "memory_scopes" => (vec![], roundtrip::<Vec<MemoryScopeInfo>>),
+        "memory_inspect" => (
+            vec![("query", roundtrip::<MemoryQuery>)],
+            roundtrip::<MemoryPage>,
+        ),
+        "memory_explain" => (vec![("entryId", s)], roundtrip::<MemoryExplanation>),
+        "memory_edit" => (
+            vec![("entryId", s), ("edit", roundtrip::<MemoryEdit>)],
+            item,
+        ),
+        "memory_set_pinned" => (vec![("entryId", s), ("pinned", roundtrip::<bool>)], item),
+        "memory_approve" => (vec![("entryId", s)], item),
+        "memory_promote" => (
+            vec![("entryId", s), ("to", roundtrip::<MemoryScopeRef>)],
+            item,
+        ),
+        "memory_forget_preview" => (vec![("target", target)], roundtrip::<MemoryForgetPreview>),
+        "memory_forget" => (vec![("target", target)], roundtrip::<MemoryForgetReport>),
+        "memory_journal" => (vec![("scope", s)], roundtrip::<Vec<MemoryJournalEntry>>),
+        "memory_undo" => (
+            vec![("scope", s), ("changeId", s)],
+            roundtrip::<MemoryUndoResult>,
+        ),
+        "memory_consolidate_now" => (vec![], roundtrip::<ConsolidationReport>),
+        _ => return None,
+    })
+}
+
+fn tasks(command: &str) -> Option<Spec> {
+    let s: Check = roundtrip::<String>;
+    let os: Check = roundtrip::<Option<String>>;
+    let unit: Check = roundtrip::<()>;
+    let task: Check = roundtrip::<TaskInfo>;
+    Some(match command {
+        "tasks_list" => (vec![], roundtrip::<Vec<TaskInfo>>),
+        "tasks_create" => (vec![("input", roundtrip::<NewTaskInput>)], task),
+        "tasks_cancel" => (vec![("taskId", s)], roundtrip::<Vec<String>>),
+        "tasks_retry" => (vec![("taskId", s)], task),
+        "tasks_steer" => (vec![("taskId", s), ("text", s)], unit),
+        "tasks_pause" | "tasks_resume" => (vec![("taskId", s)], unit),
+        "triggers_list" => (vec![], roundtrip::<Vec<TriggerInfo>>),
+        "triggers_create" => (
+            vec![("draft", roundtrip::<TriggerDraft>)],
+            roundtrip::<TriggerInfo>,
+        ),
+        "triggers_remove" => (vec![("triggerId", s)], unit),
+        "triggers_set_enabled" => (vec![("triggerId", s), ("enabled", roundtrip::<bool>)], unit),
+        "triggers_fire_now" => (vec![("triggerId", s)], roundtrip::<TriggerRunInfo>),
+        "triggers_log" => (vec![("triggerId", os)], roundtrip::<Vec<TriggerRunInfo>>),
+        "triggers_preview_cron" => (vec![("expr", s)], roundtrip::<CronPreview>),
+        "marshal_state" => (vec![], roundtrip::<MarshalState>),
+        "marshal_propose" => (
+            vec![
+                ("text", s),
+                ("drafts", roundtrip::<Option<Vec<serde_json::Value>>>),
+            ],
+            roundtrip::<MarshalProposalInfo>,
+        ),
+        "marshal_approve" => (
+            vec![("proposalId", roundtrip::<u64>)],
+            roundtrip::<Vec<MarshalRuleInfo>>,
+        ),
+        "marshal_reject" => (vec![("proposalId", roundtrip::<u64>)], unit),
+        "marshal_revoke" => (vec![("ruleId", s)], unit),
+        "marshal_report" => (vec![], roundtrip::<MarshalReport>),
+        _ => return None,
+    })
+}
+
+/// Specyfikacja komendy z fal F5–F7 (`None` — komenda spoza tej części).
+pub fn spec(command: &str) -> Option<Spec> {
+    let s: Check = roundtrip::<String>;
+    let os: Check = roundtrip::<Option<String>>;
+    let card: Check = roundtrip::<BridgeCard>;
+    let found: Spec = match command {
+        "sessions_set_project" => (vec![("sessionId", s), ("project", os)], roundtrip::<()>),
+        "bridges_list" => (
+            vec![("refresh", roundtrip::<bool>)],
+            roundtrip::<Vec<BridgeCard>>,
+        ),
+        "bridges_set_enabled" => (vec![("routeId", s), ("enabled", roundtrip::<bool>)], card),
+        "bridges_set_schedule" => (vec![("bridge", s), ("perDay", roundtrip::<u32>)], card),
+        "bridges_pin" => (vec![("bridge", s), ("version", os)], card),
+        "bridges_open_login" => (vec![("bridge", s)], roundtrip::<BridgeLogin>),
+        "bridges_check" => (vec![("bridge", s)], card),
+        "bridges_mark_login" => (vec![("bridge", s), ("plan", os)], card),
+        "broker_status" => (vec![], roundtrip::<BrokerStatusView>),
+        "mcp_list" => (vec![], roundtrip::<Vec<McpServerView>>),
+        "diag_state" | "diag_snapshot" => (vec![], roundtrip::<DiagView>),
+        "diag_run" => (
+            vec![("tests", roundtrip::<Vec<String>>)],
+            roundtrip::<CheckRun>,
+        ),
+        "diag_cancel" => (vec![], roundtrip::<()>),
+        "modules_list" => (vec![], roundtrip::<ModulesView>),
+        "modules_set_enabled" => (
+            vec![("id", s), ("enabled", roundtrip::<bool>)],
+            roundtrip::<ModulesView>,
+        ),
+        "config_raw_get" => (vec![], roundtrip::<RawConfig>),
+        "config_raw_check" => (vec![("text", s)], roundtrip::<u32>),
+        "config_raw_save" => (vec![("layer", s), ("text", s)], roundtrip::<RawConfig>),
+        "quick_commands_get" => (vec![], roundtrip::<QuickCommandsView>),
+        "quick_commands_set" => (
+            vec![("commands", roundtrip::<Vec<CustomCommand>>)],
+            roundtrip::<QuickCommandsView>,
+        ),
+        "quick_commands_test" => (vec![("message", s)], roundtrip::<QuickTest>),
+        "prompt_templates_get" => (vec![], roundtrip::<Vec<PromptTemplate>>),
+        "compliance_routes" => (vec![], roundtrip::<DataRoutesView>),
+        "help_topics" => (vec![], roundtrip::<Vec<HelpTopic>>),
+        "help_page" => (vec![("id", s)], roundtrip::<HelpPage>),
+        "help_search" => (vec![("query", s)], roundtrip::<Vec<HelpHit>>),
+        "board_list" => (vec![], roundtrip::<Vec<BoardItem>>),
+        "board_pin" => (
+            vec![("sessionId", s), ("turnId", s)],
+            roundtrip::<Vec<BoardItem>>,
+        ),
+        "board_unpin" => (vec![("id", s)], roundtrip::<Vec<BoardItem>>),
+        "prompt_templates_set" => (
+            vec![("templates", roundtrip::<Vec<PromptTemplate>>)],
+            roundtrip::<Vec<PromptTemplate>>,
+        ),
+        "diag_runs" => (
+            vec![("limit", roundtrip::<u32>)],
+            roundtrip::<Vec<CheckRun>>,
+        ),
+        "diag_export" => (vec![], roundtrip::<String>),
+        "mcp_save" => (
+            vec![("input", roundtrip::<McpServerInput>)],
+            roundtrip::<McpServerView>,
+        ),
+        "mcp_remove" => (vec![("id", s)], roundtrip::<()>),
+        "mcp_tools" => (vec![("id", s)], roundtrip::<McpServerTools>),
+        "mcp_revoke" => (vec![("id", s), ("tool", s)], roundtrip::<McpServerTools>),
+        "mcp_approve" => (
+            vec![("id", s), ("tool", s), ("fingerprint", s)],
+            roundtrip::<McpServerTools>,
+        ),
+        other => {
+            return memory(other)
+                .or_else(|| tasks(other))
+                .or_else(|| computer::spec(other))
+                .or_else(|| updates::spec(other))
+                .or_else(|| voice::spec(other))
+                .or_else(|| plugins::spec(other))
+                .or_else(|| models::spec(other))
+                .or_else(|| files::spec(other))
+                .or_else(|| cameras::spec(other))
+                .or_else(|| series6::spec(other))
+                .or_else(|| child::spec(other));
+        }
+    };
+    Some(found)
+}

@@ -1,0 +1,34 @@
+[package]
+name = "device-profile-impl"
+description = "device-profile: detekcja sprzętu przez HardwarePort (Windows) lub sysinfo (inne OS), stabilny MachineId, rekomendacja profilu głosu i budżetu rezydencji, zdarzenia device.*"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+device-profile-contract = { path = "../device-profile-contract" }
+platform-contract.workspace = true
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+# Ta sama wersja co w innych crate'ach workspace (Cargo.lock); do [workspace.dependencies] przy ADR.
+sha2 = "0.10.9"
+
+# Poza Windows sondą jest sysinfo (CPU/RAM); na Windows sprzęt czyta platform-windows-impl
+# przez HardwarePort (jedyny crate z windows-rs). Tylko feature `system`.
+[target.'cfg(not(windows))'.dependencies]
+sysinfo = { version = "0.38.4", default-features = false, features = ["system"] }
+
+[dev-dependencies]
+device-profile-contract = { path = "../device-profile-contract", features = ["contract-tests"] }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio.workspace = true
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

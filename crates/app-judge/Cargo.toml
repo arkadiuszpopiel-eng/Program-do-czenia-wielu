@@ -1,0 +1,33 @@
+[package]
+name = "app-judge"
+description = "Korzeń kompozycji modelu-sędziego: kontekst z historii sesji, sędziowie na Routerze (lokalny i hybrydowy), pętla kierowcy"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# `app-*` (crates/README.md, scripts/check-deps.sh): część korzenia kompozycji wydzielona z `app-core`
+# (limit 8 000 linii na crate); składa approval-judge-impl z Routerem, Brokerem i historią sesji.
+[dependencies]
+approval-judge-contract = { path = "../approval-judge-contract" }
+approval-judge-impl = { path = "../approval-judge-impl" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+sessions-contract = { path = "../sessions-contract" }
+providers-contract = { path = "../providers-contract" }
+router-contract = { path = "../router-contract" }
+router-impl = { path = "../router-impl" }
+core-bus-contract.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+sessions-fake = { path = "../sessions-fake" }
+approval-judge-fake = { path = "../approval-judge-fake" }
+# Eval ACC-Z4-judge-04 na modelu lokalnym (test `#[ignore]`) — app-judge jest korzeniem składania.
+providers-local-impl = { path = "../providers-local-impl" }
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

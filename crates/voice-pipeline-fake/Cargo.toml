@@ -1,0 +1,24 @@
+[package]
+name = "voice-pipeline-fake"
+description = "Atrapa voice-pipeline: skryptowany potok bez audio (faza, mówiąca, transkrypt, prefiks, zdarzenia na osi czasu; wejścia UI zmieniają mikrofon i agentkę)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-pipeline-contract = { path = "../voice-pipeline-contract" }
+voice-dialog-contract = { path = "../voice-dialog-contract" }
+voice-wake-contract = { path = "../voice-wake-contract" }
+personas-contract = { path = "../personas-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+voice-pipeline-contract = { path = "../voice-pipeline-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

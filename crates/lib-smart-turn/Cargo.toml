@@ -1,0 +1,26 @@
+[package]
+name = "lib-smart-turn"
+description = "Sidecar końca wypowiedzi Smart Turn v3.2 (ONNX Runtime na procesorze, osobny proces): cechy log-mel jak w Whisperze i protokół JSON-lines po stdio"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "alfa-smart-turn"
+path = "src/main.rs"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+base64 = "0.22.1"
+rustfft = "6.4.1"
+# ONNX Runtime ładowany dynamicznie z pliku obok sidecara (ten sam plik co dla `alfa-supertonic`).
+# ADR 0004: ONNX Runtime wolno uruchamiać w osobnym procesie, nie w procesie Alfy.
+ort = { version = "=2.0.0-rc.10", default-features = false, features = ["std", "load-dynamic"] }
+
+[lints]
+workspace = true

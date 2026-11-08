@@ -1,0 +1,255 @@
+# Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)
+
+Polecenia: „Alfa ma działać na kartach AMD i Nvidia i iGPU różnego typu, więc musi być to dopracowane”, potem
+„pobierz to, co potrzeba, i dodaj do programu, i zapisz odpowiednio wszystko w dokumentacji”, „najwyższa precyzja”,
+a na noc: „pracuj dalej do 3:30, potem kopia bezpieczeństwa na dysk F: (katalog Alfa)”. Praca na **nowym
+komputerze**: Ryzen 7 5700X3D, Radeon RX 9070 XT 16 GB, 32 GB RAM (dysk E: z projektem przeniesiony z laptopa).
+Wersji 0.0.63 **nie wgrałam** do `Alfa-uruchomiona` (tam nadal 0.0.62) — to Twoja decyzja po lekturze.
+
+## 1. Najważniejsze w pięciu punktach
+
+- **Karty AMD, Intel i zintegrowane są obsługiwane na równi z NVIDIA**: wykrywanie od sterownika (DXCore), te same
+  progi pamięci, klasa „karta zintegrowana”, pakiety z silnikiem Vulkan, pomiar pamięci kart bez `nvidia-smi`.
+- **Mowa na AMD/Intel liczy na karcie**: Qwen3-ASR przez `llama-server` Vulkan — na RX 9070 XT 0,16–0,23 s na zdanie
+  (wcześniej Whisper na procesorze, ok. 54 s na zdanie na laptopie). Whisper nie ma oficjalnej wersji Vulkan. Na karcie
+  AMD/Intel poniżej 12 GB Qwen3-ASR liczy na procesorze (ok. 2,4 s), a karta zostaje dla modelu rozmowy.
+- **Głos Supertonic na karcie przez DirectML** (pobrane z NuGet Microsoftu, sumy zgodne z katalogiem NuGet):
+  0,58 s zamiast 0,95 s na zdanie, 538 MB pamięci karty; włącza się na karcie z ≥ 12 GB. **ADR 0028 do podpisu.**
+- **Osiem przeglądów kodu** (agenty AI, każde znalezisko sprawdzane przez 3 sceptyków), w tym całościowy przegląd
+  wszystkich zmian od 0.0.62: usterki potwierdzone i poprawione, m.in. podwójne liczenie rezerwy pamięci APU
+  i Qwen3-ASR obok modelu rozmowy na karcie AMD/Intel 6–11 GB (rozdziały 8–13).
+- **Awaria komputera o 20:31** (brak pamięci + resety mostka USB dysku E:): dyski, repozytorium i pliki sprawdzone —
+  nic nie stracone. Ciężkie zadania od tej pory z ograniczeniem równoległości.
+
+## 2. Co doszło (commity na gałęzi `ccr-af4b63c6-3fyzaj`, niewypchnięte)
+
+| Commit     | Co                                                                                                         |
+| ---------- | ---------------------------------------------------------------------------------------------------------- |
+| `6ff0c311` | Wykrywanie (LUID, zintegrowana, sterownik), klasy niezależne od producenta, klasa Integrated, PDH, pakiety |
+| `72c4e1cb` | 0.0.63: DirectML dla Supertonic, Qwen3-ASR na AMD/Intel, APU z dużą rezerwą, 15 poprawek po przeglądzie    |
+| `55bc0f06` | Qwen3-ASR przypięty do głównej karty przy kilku kartach Vulkan                                             |
+| `d02237bd` | `verify.mjs` na tym komputerze: Git Bash zamiast aliasu WSL                                                |
+| `0011a06b` | 14 poprawek po drugim przeglądzie, raport, poprawka znacznika w dzienniku zmian, `backup.sh`               |
+| `c3ec80fb` | Poprawki po trzecim przeglądzie (rozdział 8), uzupełnienie raportu                                         |
+| `87a4a156` | Raport: wynik `verify` (rozdział 9), poprawki po czwartym przeglądzie; zasady pracy przywrócone w pamięci   |
+| `7698da68` | `ammonia` 4.2.4, lista wyboru od pierwszego kliknięcia, testy strony Urządzenia — rozdział 10             |
+| `fce4fa7d` | Raport: końcowa budowa z `7698da68`; pamięć projektu                                                       |
+| `206c3796` | Katalog crate'ów odświeżony (`scripts/catalog.mjs`)                                                        |
+| `7b544ab5` | Poprawki raportu po piątym przeglądzie (liczby budżetu rozmiaru, ta tabela)                                |
+| `03d45dd0` | Dodatkowa kopia na F: o 0:54 (raport, pamięć)                                                              |
+| `e91b1ef3`, `059b9283` | Prawdziwa aplikacja: 37 kolejnych poleceń łącza — pokrycie 198 → 235 z 264 (89 %)              |
+| `cf6c2212`, `eaa08262` | Dziennik zmian, stan wykonania, raport, dziennik roadmapy                                       |
+| `c24da9ad` | Poprawki po całościowym przeglądzie (rozdział 11)                                                          |
+| `ba880bcf` | Druga wersja poprawki Qwen3-ASR — rezerwa 3 GB (rozdział 12, odrzucona)                                    |
+| `96588e5b` | Decyzja końcowa: reguła 12 GB, teksty kompromisu i autotestu (rozdział 13) — **wersja zbudowana**          |
+| `b41325ed`, (ten) | Raport: końcowy `verify` (rozdział 14), pamięć projektu                                             |
+
+Szczegóły dla użytkownika: [historia zmian](../../CHANGELOG.md) (0.0.63). Decyzja: [ADR 0028](../ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md).
+
+## 3. Jak to sprawdziłam
+
+- **Na RX 9070 XT**: odczyt DXCore (sterownik 32.0.31041.1004) i liczników PDH (1189 MB zajęte, 22 programy);
+  Supertonic procesor kontra DirectML — 3 przebiegi × 5 zdań (30,7 s mowy), stan ustalony RTF 0,154–0,159 kontra
+  0,094–0,108; powrót na procesor przy bibliotece bez DirectML i przy nieistniejącej karcie; Qwen3-ASR na Vulkan —
+  4 zdania wypowiedziane przez Supertonic: 3 identyczne, w jednym zła forma wyrazu („Zapisałem” zamiast „Zapisałam”
+  — mówiła barwa męska); `llama-server --list-devices` widzi kartę pod tą samą nazwą co DXGI.
+- **Testy**: Rust w 14 zmienionych crate'ach 546/0, cały workspace w `verify wersja` 2893/1 (ten jeden — mój błąd
+  formatu w dzienniku zmian, poprawiony, test zielony); vitest 393/393; svelte-check 0 błędów; clippy czysty.
+- **`verify wersja` 0.0.63** (commit `d02237bd`, 61 min): 13 zielonych, 5 czerwonych, 1 nieuruchomiony — testy
+  workspace (wyżej) i rozdział 4.
+
+## 4. Czego nie sprawdziłam albo nie przeszło (i dlaczego)
+
+| Etap / sprawa              | Stan                                                                                                                                                                       | Co dalej                                                                                                                                                                                                                                                                                                                                                                             |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Lint interfejsu i skryptów | czerwony: mój commit `d02237bd` wydłużył `scripts/verify.mjs` do 409 linii (limit 400)                                                                                     | poprawione w następnym commicie — wybór powłoki i otoczenia etapów przeniesiony do nowego `scripts/verify-shell.mjs` (37 linii), `verify.mjs` ma teraz 377 linii; lint zielony (rozdział 7)                                                                                                                                                                                          |
+| Testy w przeglądarce (E2E) | nie wystartowały: `verify` uruchamia je w **Edge** (`PW_CHANNEL=msedge`), a **na tym komputerze nie ma Edge**; Chromium Playwrighta jest w złej wersji (1228 zamiast 1194) | etap `verify` odblokuje tylko instalacja Edge; te same testy uruchomiłam ręcznie na Chromium Playwrighta (`pnpm exec playwright install chromium` w `apps/desktop/ui`, potem `pnpm build` i `pnpm test:e2e`): **467/467** po dwóch poprawkach — rozdział 10                                                                                                                          |
+| Prawdziwa aplikacja        | **37 z 38**, pokrycie łącza 75 %; czerwony test okna logowania Claude Code (34 s)                                                                                          | zbadane: na tym komputerze **nie ma Claude Code**, a test zakładał, że jest (przycisk logowania pokazuje się zawsze). Test sprawdza teraz wykrycie narzędzia przez rdzeń; komunikat programu mówi wprost „Nie znaleziono programu Claude Code (claude) na tym komputerze — zainstaluj go…” zamiast mylącego „…po podłączeniu modułu ui-terminal”. Wynik ponownego biegu — rozdział 7 |
+| `cargo deny`               | czerwony: **nowe ostrzeżenia bezpieczeństwa** `ammonia 4.2.3` (RUSTSEC-2026-0373) i `zip 8.6.0` (RUSTSEC-2026-0367/0368/0369), opublikowane po 16.10                       | `ammonia 4.2.4` (zgodna łatka) — **zrobione** po północy, rozdział 10; `zip 9` to nowa wersja główna — Alfa nie używa podatnych funkcji (własne rozpakowywanie odrzuca dowiązania i nie przenosi SUID), więc to osobne zadanie; **0.0.64, punkt `zip9`**: `zip` 9.0.5 poza `updater-impl` (ten po przeglądzie człowieka), testy regresji trzech klas                                 |
+| Graf zależności            | `jq` nie ma na tym komputerze                                                                                                                                              | sprawdziłam tymi samymi regułami bez `jq`: 1733 krawędzie, 0 naruszeń                                                                                                                                                                                                                                                                                                                |
+| Sprzęt                     | laptop z grafiką zintegrowaną, APU AMD, karty Intel, DirectML na NVIDIA — brak tych maszyn                                                                                 | próby na sprzęcie                                                                                                                                                                                                                                                                                                                                                                    |
+
+## 5. Decyzje dla Ciebie
+
+1. **ADR 0028** — DirectML dla głosu (opcjonalnie, karta ≥ 12 GB) i Qwen3-ASR przez Vulkan na AMD/Intel: podpis.
+2. **Licencja DirectML** — dopuszcza zbieranie danych diagnostycznych przez Microsoft (§2a); pozycja ma znaczek
+   „Do potwierdzenia przez człowieka”.
+3. **Pobrania**: `ammonia 4.2.4` — zrobione po północy w ramach Twojej stałej zgody na pobrania do 3 GB (rozdział 10);
+   Edge (etap `verify` testów w przeglądarce) — instalacja programu w systemie należy do Ciebie; `zip` 9 (nowa wersja
+   główna) — osobne zadanie.
+4. **Wgranie 0.0.63** do `Alfa-uruchomiona` (`scripts/deploy-owner.sh`) — zbudowana i sprawdzona z `21897bf0`
+   (rozdział 14).
+5. **Resztki starego `node_modules`** w `Alfa AI Program\stare-node_modules-acl-2026-10-17` (1447 plików starej
+   instalacji Windows) — usunąć z uprawnieniami administratora (`takeown /f … /r` i usunięcie), jeśli chcesz.
+6. **Osobny budżet pamięci na kartę** (C6.6) — dopiero on pozwoli liczyć mowę na małej karcie AMD/Intel obok modelu
+   rozmowy albo wtedy, gdy model rozmowy z karty nie korzysta (rozdział 13); potrzebna próba na karcie 6–8 GB.
+
+## 6. Porządki i kopie
+
+- Usunięte (odtwarzalne): stare artefakty kompilacji ok. 97 GB (E: był pełny — 0 GB), w tym 5,5 GB starej kompilacji
+  powłoki (za Twoją zgodą), moje pliki testowe; scalona gałąź `seria3`. `PLAN/`, próby głosu i kopie na F: zostały.
+- O 23:05 na E: zostało znów tylko 8 GB: wieczorne kompilacje testów zostawiły w `target\debug` 170 GB — każda zmiana
+  ustawień kompilacji tworzy pełny nowy komplet plików testowych obok starego. `verify` pominął przez to etapy Rust
+  (próg miejsca). Usunęłam tylko odtwarzalne pozostałości: starsze wersje plików testowych, które ma już nowsza
+  kompilacja (722 programy z symbolami), i pamięć podręczną kompilacji przyrostowej (od awarii kompiluję bez niej)
+  — zwolnione 130 GB, wolne 138 GB.
+- Kopia zabezpieczająca `F:\Alfa\kopia-2026-10-17_2115` (po commicie 0.0.63): 5837 sum zgodnych, paczka git pełna.
+  Kolejna o 3:30. Skrypt `backup.sh` naprawiony (na tym komputerze paczka git po cichu się nie tworzyła).
+- Dodatkowa kopia `F:\Alfa\kopia-2026-10-18_0054` (356 MB, stan `7b544ab5`) — na wypadek ponownej awarii przed
+  3:30: 5853 sumy zgodne, paczka git z pełną historią, gałąź w paczce = bieżący commit.
+- Po końcowym `verify` (02:52) ta sama reguła sprzątania: 495 starszych duplikatów programów testowych z symbolami —
+  zwolnione 52,9 GB, na E: wolne 140,8 GB (Twoja zasada: po wersji sprzątać `target/debug/deps`, `build` zostaje).
+
+## 7. Po poprawkach drugiego przeglądu
+
+- Rust w 10 dotkniętych crate'ach 339/0 i `app-terminal` zielone; clippy workspace i powłoki czysty; vitest 393/393;
+  lint, rozmiary i typy interfejsu zielone.
+- Prawdziwa aplikacja (`scripts/verify-app.sh`, zbudowana od nowa): **37 zielonych, test logowania Claude Code
+  pominięty** (brak narzędzia), pokrycie łącza 198 z 264 (75 %), kod wyjścia 0. Skrypt etapu kopiuje bibliotekę
+  ONNX Runtime z `%LOCALAPPDATA%/Alfa/sidecars/onnxruntime` — na tym komputerze jej nie ma (brak danych Alfy), więc
+  instancja testowa działała bez niej; bez wpływu na wynik.
+
+## 8. Trzeci przegląd (poprawki z commitu `0011a06b`)
+
+Te same zasady (3 obszary, każde znalezisko u 3 sceptyków): 10 zgłoszeń, 5 utrzymanych (jedno podwójne) —
+wszystkie poprawione:
+
+- **Lista kart co 20 ms**: widok silników w trakcie dyktowania i czytania na głos odczytywał karty (DXGI i DXCore)
+  przy każdym takcie, choć miał tylko przed pierwszym złożeniem rozpoznawania mowy (`map_or` liczył wartość domyślną
+  zawsze) — teraz leniwie.
+- **Dwie karty NVIDIA**: wolna pamięć była brana z karty z największą wolną pamięcią, nie z głównej (na której liczy
+  Qwen3-ASR) — przy jednej karcie NVIDIA (laptop RTX 4050) bez zmian; przy kilku — wiersz głównej karty po nazwie,
+  a bez pasującego wiersza liczniki systemu dla tej karty.
+- **Ocena „mieści się na karcie”** na stronie modeli: przy APU z dużą rezerwą obok karty osobnej brała rezerwę APU,
+  a model rozmowy trafia na kartę osobną — teraz ta sama reguła co w rdzeniu.
+- **Ten raport**: brakowało czerwonego etapu lint (tabela w rozdziale 4) i tego, że etap `verify` testów
+  w przeglądarce wymaga Edge.
+- Przy okazji (zgłoszenie odrzucone przez 2 z 3 sceptyków, bo to nie regresja): angielski komunikat braku programu
+  nadal zaczynał się od „This feature becomes available once its module is connected” — kod błędu to teraz
+  „nie znaleziono”.
+
+Po poprawkach (`c3ec80fb`): clippy i testy trzech dotkniętych crate'ów 86/0, vitest `card-fit` 4/4, lint zielony.
+Czwarty przegląd tego commitu (2 obszary): kod bez uwag; 2 drobne poprawki tego raportu (liczba linii przy złym
+pliku, zaniżony rozmiar pobrania Chromium) — wprowadzone.
+
+## 9. `verify wersja` po trzecim przeglądzie (commit `c3ec80fb`, 23:26–23:59; końcowy — rozdział 14)
+
+**16 zielonych, 2 czerwone, 1 nieuruchomiony.** Testy całego projektu: 1003 programy, **2897 zielonych, 0 czerwonych**,
+40 pominiętych; powłoka Tauri zielona; interfejs 394/394; prawdziwa aplikacja 37 zielonych (test logowania Claude Code
+pominięty), pokrycie łącza 198 z 264 (75 %); formatowanie, lintery, schematy, typy, plan HTML, `pnpm audit`, SBOM —
+zielone. Czerwone — te same przyczyny co w rozdziale 4: testy w przeglądarce (brak Edge; budowa i budżet rozmiaru
+przeszły) i `cargo deny` (`ammonia`, `zip`). Nieuruchomiony: graf zależności (brak `jq`).
+
+## 10. Po północy (18.10)
+
+- **Twoje zasady pracy z laptopa** (zgody na pobrania, praca nocna, weryfikacja UI i inne) nie były w pamięci asystenta
+  na tym komputerze — `memory-sync.sh` jako lustro skasowałby je z kopii w repozytorium. Przywróciłam je u źródła
+  z kopii w `docs/pamiec-projektu/2-zasady-pracy` i zapisałam, jak to sprawdzać na nowej maszynie.
+- **`ammonia` 4.2.4** (łatka RUSTSEC-2026-0373) — pobrana z crates.io w ramach Twojej stałej zgody na pobrania do 3 GB,
+  oba pliki `Cargo.lock`; w pliku powłoki cargo przy okazji ujednolicił zależność `cssparser-macros` z `syn` 3 na już
+  obecny `syn` 2 (żaden nowy crate). `cargo deny`: zostały tylko 3 ostrzeżenia `zip`; sprawdziłam w kodzie, że Alfa nie
+  woła podatnego `ZipArchive::extract` (własne rozpakowywanie w `app-models` i `updater-impl` odrzuca dowiązania).
+  Testy `lib-markdown`, `app-chat`, `app-files` 63/0, `app-updates`, `app-modules`, `app-core` 186/0, clippy czysty.
+- **Testy w przeglądarce na Chromium Playwrighta** (pobrany: wersja 1194 z `cdn.playwright.dev`, ok. 530 MB na C:,
+  poza repozytorium — także w ramach stałej zgody): pierwszy bieg 464/466. Dwa czerwone — dwa prawdziwe błędy:
+  - test strony Urządzenia szukał starego napisu „Odczyt na żywo działa dziś dla kart NVIDIA…”, który sama zmieniłam
+    w `6ff0c311` (pomiar działa już dla każdego producenta) — poprawiony test w przeglądarce i w prawdziwej aplikacji
+    (tam nie było go widać, bo karta RX 9070 XT daje miernik);
+  - **lista wyboru pomijała klik w pierwszych 0,3 s po wczytaniu okna** (zabezpieczenie przed ponownym otwarciem
+    liczyło od zera, a nie od ostatniego zamknięcia) — na szybkim komputerze test archiwum klikał po 190–250 ms
+    i lista się nie otwierała. Zmierzone, poprawione w `ui-kit` (`Select.svelte`), nowy test cofa zegar strony do zera
+    tuż przed kliknięciem — na starej kompilacji czerwony, po poprawce zielony.
+  - Po poprawkach: **467/467** (5 min), budżet rozmiaru zielony — okno główne JS 145,3 z 150 KB i CSS 13,7 z 30 KB,
+    szybkie pytanie 37,7 z 40 KB, pigułka głosowa 7,9 z 8,0 KB (gzip; pigułka i okno główne blisko granicy), vitest 394/394, `svelte-check` 0,
+    lint zielony.
+- **Piąty przegląd** (commit `7698da68`, 2 obszary, każde znalezisko u 3 sceptyków): 5 zgłoszeń, 2 utrzymane —
+  oba w tym raporcie (liczba przy budżecie rozmiaru była sumą modułów leniwych spoza budżetu; tabela commitów
+  w rozdziale 2 bez ostatnich wpisów) — poprawione. Kod bez uwag.
+- **Pokrycie łącza w prawdziwej aplikacji: 198 → 235 z 264 (75 % → 89 %)** — nowy plik
+  `e2e-app/z-commands-2.spec.ts` (37 poleceń): Kreator agentek (podgląd, test na sucho, zapis tego samego hasha),
+  nadpisanie skrótu z zakazami AltGr i STOP WSZYSTKIEGO, odmowy dla nieistniejących celów — dla każdego polecenia
+  sprawdziłam w kodzie rdzenia, że odmowa pada przed oknem systemowym, Brokerem, siecią, magazynem sekretów
+  i otwarciem pliku. Nieprzećwiczone 29: dźwięk i mikrofon, kamera, schowek, zrzuty ekranu, okna systemowe,
+  aktualizacje z sieci, model językowy, hasło kopii (Menedżer poświadczeń Windows jest wspólny z Twoim kontem) —
+  tych w nocy celowo nie ruszam.
+- **Całościowy przegląd wszystkich zmian od 0.0.62** (rozdział 11).
+- **Zbudowana wersja** (Twoja zasada pracy nocnej; o 00:37 z commitu `7698da68`, a na koniec z `96588e5b` —
+  rozdział 14): prawdziwa aplikacja jako instancja testowa wtedy 37 zielonych, 1 pominięty (brak Claude Code),
+  pokrycie łącza 198 z 264 (75 %). Do `Alfa-uruchomiona` jej nie wgrałam — decyzja 4 w rozdziale 5 (ADR 0028
+  i licencja DirectML czekają na Ciebie; pakiety z głosem Supertonic na karcie ≥ 12 GB, jak Twój RX 9070 XT,
+  zawierają DirectML).
+
+## 11. Całościowy przegląd (wszystkie zmiany od 0.0.62, 01:00–01:30)
+
+Wcześniejsze przeglądy szły commit po commicie; ten patrzył na całość (3 obszary: przepływ kart od wykrycia do
+interfejsu, odporność procesów, kontrakty), każde znalezisko u 3 sceptyków. 13 zgłoszeń, 9 utrzymanych (jedno
+podwójne) — wszystkie poprawione:
+
+- **[poważne] Qwen3-ASR na karcie AMD/Intel 6–11 GB obok modelu rozmowy** — dwie zmiany 0.0.63 razem: karta AMD/Intel
+  od 6 GB dostaje model rozmowy na karcie, a pakiety „Bardzo dobry” i „Dobry” — Qwen3-ASR. Qwen3-ASR (ok. 2,9 GB)
+  ładował się pierwszy, a model rozmowy zostawia na mowę tylko 1,5 GB (rozmiar Whispera) — razem ok. 7 GB na karcie
+  6 GB. Poprawka: na karcie Vulkan poniżej 12 GB Qwen3-ASR liczy na procesorze (`stt::qwen_free`). Jej losy
+  w kolejnych przeglądach — rozdziały 12 i 13 (zostaje ta reguła).
+- **250 ms czekania przed startem dyktowania i rozmowy** na kartach AMD/Intel: pomiar wolnej pamięci robił pełny
+  odczyt liczników (dwie próbki obciążenia co 250 ms i nazwy procesów) na wątku asynchronicznym. Nowy odczyt samej
+  pamięci (`HardwarePort::gpu_memory`) — jedna próbka, bez czekania.
+- **Czytanie na głos**: widok silników nadal odczytywał listę kart co 20 ms, gdy plan rozpoznawania mowy jeszcze nie
+  powstał — teraz lista kart z pamięcią na 30 s.
+- **Głos po usunięciu procesorowego ONNX Runtime** (przy zainstalowanym DirectML): argumenty wskazywały usunięty plik
+  i każde zdanie startowało proces od nowa — klucz pamięci podręcznej widzi teraz także wersję procesorową.
+- **Dwie takie same karty**: profil brał ostatnią, pomiar pamięci i głos — pierwszą; teraz wszędzie pierwszą.
+- **Nagłówek pakietów** w Ustawieniach brał największą kartę (np. APU 8 GB zamiast RTX 8 GB, dla którego rdzeń składa
+  pakiety) — teraz ta sama kolejność co rdzeń.
+- **Ocena modeli na samej grafice zintegrowanej**: strona pisała „liczy procesor”, a model rozmowy liczy na karcie
+  zintegrowanej — teraz ta sama część pamięci co rdzeń (najwyżej ćwierć RAM i 4 GB).
+- **SPEC modułu `models`** opisywał skład pakietów sprzed 0.0.63 — uzupełniony; także ADR 0028 i SPEC `voice-stt`
+  (próg 12 GB dla Qwen3-ASR na Vulkanie).
+
+## 12. Przegląd poprawek całościowego przeglądu (01:40–01:55) i druga wersja (odrzucona — rozdział 13)
+
+Przegląd commitu `c24da9ad` (2 obszary, 3 sceptyków): 11 zgłoszeń, 9 utrzymanych. Najważniejsze — **moja pierwsza
+poprawka była za szeroka**: Qwen3-ASR na procesorze na każdej karcie Vulkan poniżej 12 GB spowalniał mowę także tam,
+gdzie model rozmowy w ogóle nie korzysta z karty (klasa „nieznana”: karta AMD/Intel 4–5 GB albo 6–11 GB przy RAM
+poniżej 16 GB, rozmowa przez API), i tam, gdzie oba modele się mieszczą (Bielik 1.5B + Qwen3-ASR na 8 GB). Druga
+wersja miała trafić w przyczynę: **gdy Qwen3-ASR liczy przez Vulkan na tej samej karcie, model rozmowy zostawia mu
+3 GB** (`stt::chat_stt_reserve_mb`, `QWEN_VULKAN_RESERVE_MB`) zamiast 1,5 GB na Whispera. Na karcie 6 GB: model 4.5B
+ok. 2,4 GB na karcie + Qwen3-ASR 2,9 GB + zapas 0,8 GB ≈ 6,0 GB z 6,1 GB; na 8 GB — ok. 8,0 GB z 8,2 GB. Mowa zostaje
+szybka (na karcie), a część warstw modelu 4.5B na kartach 6–8 GB liczy procesor (odpowiedzi trochę wolniejsze).
+Laptop z NVIDIA (Qwen3-ASR przez CUDA) — bez zmian; to samo zjawisko na NVIDIA ≥ 8 GB w „Wzorcowym” jest sprzed 0.0.63
+i zostaje w zadaniu „osobny budżet pamięci na kartę”.
+
+Pozostałe utrzymane (dokumenty): komunikat autotestu i opisy w ADR 0028, SPEC-ach i dzienniku zmian po pierwszej
+wersji poprawki (wrócone do stanu zgodnego z kodem), „kilkanaście razy szybciej” niezgodne z liczbami (usunięte),
+pierwsze zdanie pozycji o dwóch kartach ucinane w oknie „Co nowego” na dwukropku (przeredagowane), streszczenie tego
+raportu (rozdział 1) i skład pakietów w SPEC `models` (uzupełniony o Qwen3-ASR, Supertonic, Smart Turn i ONNX Runtime).
+Testy: `app-modules` i `app-voice` 83/0 (nowy test rezerwy: Vulkan — 3 GB, CUDA obok — bez zmian), clippy czysty.
+
+## 13. Ósmy przegląd i decyzja końcowa (02:00–02:25)
+
+Przegląd drugiej wersji (rezerwa 3 GB, commit `ba880bcf`): 5 zgłoszeń, 4 utrzymane, w tym trzy poważne — rezerwa
+(3000 MB) jest mniejsza niż próg Qwen3-ASR (3200 MB wolnej pamięci), więc gdy model rozmowy wczyta się pierwszy, mowa
+i tak trafia na procesor, a model rozmowy traci 17–40 warstw na karcie bez żadnej korzyści; rezerwa liczy się raz przy
+starcie programu (pakiet zainstalowany w trakcie sesji — stara rezerwa 1,5 GB); nie widzi ustawienia „tylko Whisper”.
+Na kartach 6–8 GB dzielenie karty przez dwa modele bez osobnego budżetu pamięci na kartę jest za kruche, a takiej karty
+nie mam do pomiaru. **Decyzja: zostaje reguła z rozdziału 11** — na karcie Vulkan poniżej 12 GB Qwen3-ASR liczy na
+procesorze (ok. 2,4 s na zdanie, ponad 20 razy szybciej niż Whisper na procesorze w 0.0.62), karta w całości dla
+modelu rozmowy — bez przepełnienia pamięci karty i bez spowolnienia rozmowy. Ograniczenie zapisane w kodzie, ADR 0028
+i SPEC `voice-stt`: na małej karcie, z której model rozmowy nie korzysta (klasa „nieznana”, rozmowa przez API), mowa
+mogłaby liczyć na karcie — do zadania „osobny budżet pamięci na kartę” (C6.6).
+
+Przy okazji poprawione teksty widoczne dla Ciebie: kompromis klasy „nieznana” mówił „rozpoznawanie mowy na karcie”
+także dla AMD/Intel (Whisper nie ma tam wersji Vulkan, a Qwen3-ASR liczy na karcie od 12 GB) — teraz zależnie od
+producenta; komunikat autotestu podaje regułę 12 GB jako możliwą przyczynę mowy na procesorze. Testy: `app-modules`
+i `app-voice` 83/0, `device-profile-contract` 12/0, clippy czysty.
+
+## 14. Końcowy `verify wersja` (commit `96588e5b`, 02:20–02:44) i testy w przeglądarce
+
+**16 zielonych, 2 czerwone, 1 nieuruchomiony.** Testy całego projektu: 1003 programy, **2898 zielonych, 0 czerwonych**,
+40 pominiętych; powłoka Tauri zielona; interfejs 395/395; prawdziwa aplikacja (zbudowana od nowa z `96588e5b`)
+**41 zielonych** (test logowania Claude Code pominięty), pokrycie łącza **235 z 264 (89 %)**; formatowanie, lintery,
+schematy, typy, plan HTML, `pnpm audit`, SBOM — zielone. Czerwone — znane przyczyny: testy w przeglądarce w etapie
+`verify` (brak Edge; budowa i budżet rozmiaru przeszły) i `cargo deny` (już tylko 3 ostrzeżenia `zip`). Nieuruchomiony:
+graf zależności (brak `jq`). Te same testy w przeglądarce uruchomione zaraz potem na Chromium Playwrighta:
+**467/467** (4,9 min). Na koniec (02:55) dwa zdania dziennika zmian poprawione pod regułę 12 GB (`21897bf0`, testy
+dziennika 13/0) i aplikacja zbudowana od nowa: **41 zielonych**, pokrycie 235 z 264. Wersja do wgrania:
+`alfa/target/shell/debug/alfa-desktop.exe` z `21897bf0` (kod jak w `96588e5b`, inny tylko tekst „Co nowego”).

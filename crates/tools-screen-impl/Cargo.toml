@@ -1,0 +1,37 @@
+[package]
+name = "tools-screen-impl"
+description = "tools-screen: zrzut okna/monitora/obszaru na żądanie przez Brokera (gui.control) i ScreenCapturePort z maskowaniem, PNG base64, taint"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-screen-contract = { path = "../tools-screen-contract" }
+tools-window-contract = { path = "../tools-window-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+# Kodowanie PNG dla modelu (ta sama wersja co tools-clipboard-impl, już w Cargo.lock).
+base64 = "0.22.1"
+
+[dev-dependencies]
+tools-screen-contract = { path = "../tools-screen-contract", features = ["contract-tests"] }
+platform-fake = { path = "../platform-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+compliance-contract = { path = "../compliance-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+proptest.workspace = true
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

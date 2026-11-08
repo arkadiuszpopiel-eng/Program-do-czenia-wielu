@@ -1,0 +1,37 @@
+import { defineConfig, devices } from '@playwright/test';
+
+// Testy E2E na zbudowanym UI (`pnpm build`) z atrapą backendu (`?scenario=…`):
+// axe (WCAG 2.2 AA — 0 naruszeń critical/serious), klawiatura, budżety klatek.
+export default defineConfig({
+  testDir: './e2e',
+  // 60 s na test: kilka przebiegów axe w jednym teście przy przeciążonej maszynie przekraczało 30 s
+  // (2026-10-15: losowe przekroczenia w różnych plikach). Budżety czasu działań mają własne progi.
+  timeout: 60_000,
+  fullyParallel: true,
+  // PW_WORKERS=4: mniej przeglądarek naraz na słabszej maszynie (laptop 16 GB dławi się przy
+  // domyślnych 8 i testy z budżetem czasu padają z przyczyn niezwiązanych z kodem).
+  ...(process.env['PW_WORKERS'] ? { workers: Number(process.env['PW_WORKERS']) } : {}),
+  reporter: [['list']],
+  use: {
+    baseURL: 'http://127.0.0.1:4173',
+    viewport: { width: 1280, height: 800 },
+    locale: 'pl-PL',
+  },
+  projects: [
+    {
+      name: 'chromium',
+      // PW_CHANNEL=msedge: systemowy Edge (silnik WebView2) zamiast pobranej przeglądarki Playwrighta.
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        ...(process.env['PW_CHANNEL'] ? { channel: process.env['PW_CHANNEL'] } : {}),
+      },
+    },
+  ],
+  webServer: {
+    command: 'pnpm exec vite preview --port 4173 --strictPort --host 127.0.0.1',
+    url: 'http://127.0.0.1:4173',
+    reuseExistingServer: !process.env['CI'],
+    timeout: 60_000,
+  },
+});

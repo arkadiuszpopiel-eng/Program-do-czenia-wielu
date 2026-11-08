@@ -1,0 +1,18 @@
+[package]
+name = "device-profile-fake"
+description = "Atrapa device-profile: profile z fixture'ów (baseline, desktop, laptop), sterowane zdarzenia zasilania, pełnego ekranu i hot-plug"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+device-profile-contract = { path = "../device-profile-contract" }
+
+[dev-dependencies]
+device-profile-contract = { path = "../device-profile-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

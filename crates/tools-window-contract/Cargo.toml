@@ -1,0 +1,31 @@
+[package]
+name = "tools-window-contract"
+description = "tools-window: kontrakt narzędzi okien agentek (lista, fokus, położenie, stan) i wspólna bramka GUI (gui.control(aplikacja), strażnik okien Alfy/Brokera, weryfikacja po akcji, mapowanie błędów GUI) dla tools-uia/input/screen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+platform-fake = { path = "../platform-fake" }
+
+[lints]
+workspace = true

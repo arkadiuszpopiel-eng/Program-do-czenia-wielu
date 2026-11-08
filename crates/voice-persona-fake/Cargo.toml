@@ -1,0 +1,18 @@
+[package]
+name = "voice-persona-fake"
+description = "voice-persona: deterministyczna atrapa (biblie z fixture'ów, normalizator tabelowy, plan bez stylów)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-persona-contract = { path = "../voice-persona-contract" }
+
+[dev-dependencies]
+voice-persona-contract = { path = "../voice-persona-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

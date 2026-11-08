@@ -1,0 +1,25 @@
+[package]
+name = "marshal-fake"
+description = "Marszałek (F5): deterministyczna atrapa — ten sam rdzeń co -impl, tłumacz z nagranymi odpowiedziami (record/replay), wirtualny zegar, nagrane zdarzenia"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+marshal-contract = { path = "../marshal-contract", features = ["contract-tests"] }
+core-bus-contract.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+safety-broker-contract = { path = "../safety-broker-contract" }
+scheduler-contract = { path = "../scheduler-contract" }
+async-trait.workspace = true
+proptest.workspace = true
+serde.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true

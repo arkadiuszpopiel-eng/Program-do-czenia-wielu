@@ -1,0 +1,204 @@
+[
+  {
+    "command": "permissions_get",
+    "args": {
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "global": "L3",
+      "session": "L3",
+      "hello_enabled": false
+    }
+  },
+  {
+    "command": "permissions_get",
+    "args": {
+      "sessionId": null
+    },
+    "result": {
+      "global": "L3",
+      "session": null,
+      "hello_enabled": false,
+      "max_access": "all"
+    }
+  },
+  {
+    "command": "permissions_request_level",
+    "args": {
+      "level": "L4",
+      "sessionId": "s-q3"
+    },
+    "result": {
+      "status": "opened_broker",
+      "request_id": "br-muo1g480-17"
+    }
+  },
+  {
+    "command": "permissions_request_level",
+    "args": {
+      "level": "L1",
+      "sessionId": null
+    },
+    "result": {
+      "status": "applied",
+      "request_id": ""
+    }
+  },
+  {
+    "command": "permissions_request_max_access",
+    "args": {
+      "scope": "local"
+    },
+    "result": {
+      "status": "opened_broker",
+      "request_id": "br-max-1"
+    }
+  },
+  {
+    "command": "permissions_request_max_access",
+    "args": {
+      "scope": null
+    },
+    "result": {
+      "status": "applied",
+      "request_id": ""
+    }
+  },
+  {
+    "command": "permissions_open_approval",
+    "args": {
+      "approvalId": "ap-1"
+    },
+    "result": {
+      "status": "opened_broker",
+      "request_id": "br-muo1g480-18"
+    }
+  },
+  {
+    "command": "permissions_grants",
+    "args": {},
+    "result": [
+      {
+        "id": "1",
+        "session_id": "s-q3",
+        "agent": "delta",
+        "scope": "połączenie z internetem: strona example.com",
+        "granted_at_ms": 1793476000000,
+        "until_ms": 1793486800000
+      },
+      {
+        "id": "2",
+        "session_id": "s-q3",
+        "agent": null,
+        "scope": "odczyt plików: folder Dokumenty (z podfolderami)",
+        "granted_at_ms": 1793390000000,
+        "until_ms": null
+      }
+    ]
+  },
+  {
+    "command": "permissions_revoke_grant",
+    "args": {
+      "grantId": "2"
+    },
+    "result": true
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": null
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": true,
+      "open": false,
+      "attempts_left": 5,
+      "tamper_resistant": false,
+      "unknown": false,
+      "transcripts": false,
+      "conversation": false
+    }
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": {
+        "op": "open",
+        "pin": "2468",
+        "minutes": 60
+      }
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": true,
+      "open": true,
+      "open_until_ms": 1793479600000,
+      "attempts_left": 5,
+      "tamper_resistant": false,
+      "unknown": false,
+      "transcripts": false,
+      "conversation": false
+    }
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": {
+        "op": "set_pin",
+        "old": null,
+        "new": "2468"
+      }
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": false,
+      "open": false,
+      "blocked_until_ms": 1793477000000,
+      "attempts_left": 0,
+      "tamper_resistant": false,
+      "unknown": false,
+      "transcripts": false,
+      "conversation": false
+    }
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": {
+        "op": "verify",
+        "pin": "2468"
+      }
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": true,
+      "open": false,
+      "attempts_left": 5,
+      "tamper_resistant": false,
+      "unknown": false,
+      "transcripts": false,
+      "conversation": false
+    }
+  },
+  {
+    "command": "permissions_child_lock",
+    "args": {
+      "change": {
+        "op": "open",
+        "pin": "2468",
+        "minutes": null,
+        "session_id": "s-1"
+      }
+    },
+    "result": {
+      "pin_set": true,
+      "enabled": true,
+      "open": true,
+      "attempts_left": 5,
+      "tamper_resistant": false,
+      "unknown": false,
+      "transcripts": false,
+      "conversation": true
+    }
+  }
+]

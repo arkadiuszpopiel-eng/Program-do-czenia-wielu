@@ -1,0 +1,25 @@
+[package]
+name = "voice-dsp-contract"
+description = "DSP mikrofonu Voice Suite: kontrakt — AEC z własną referencją TTS, NS, AGC, szum otoczenia, pewność AEC, kalibracja pętli, zdarzenia voice.dsp.*"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+voice-audio-contract = { path = "../voice-audio-contract" }
+core-bus-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

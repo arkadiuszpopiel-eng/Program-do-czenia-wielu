@@ -1,0 +1,214 @@
+[
+  {
+    "command": "quick_commands_get",
+    "args": {},
+    "result": {
+      "commands": [
+        {
+          "id": "dobranoc",
+          "name": "Dobranoc",
+          "phrases": [
+            "dobranoc",
+            "idę spać"
+          ],
+          "mode": "exact",
+          "reply": "Dobranoc! Do jutra.",
+          "enabled": true,
+          "priority": 0
+        }
+      ],
+      "builtins": [
+        {
+          "title": "Rachunki: działania, procenty i zmiana procentowa, potęgi, pierwiastki, liczby słowami",
+          "examples": [
+            "Ile to jest 7 razy 8?",
+            "20% z 150"
+          ]
+        },
+        {
+          "title": "Literowanie jednego słowa",
+          "examples": [
+            "Przeliteruj rower"
+          ]
+        },
+        {
+          "title": "Kostka, moneta, liczba losowa, wybór z podanej listy",
+          "examples": [
+            "Rzuć kostką",
+            "wybierz jedno: pizza, sushi, żurek"
+          ]
+        },
+        {
+          "title": "Data i godzina z zegara komputera",
+          "examples": [
+            "Która godzina?"
+          ]
+        },
+        {
+          "title": "Quiz z tabliczki mnożenia (10 pytań, „koniec” przerywa)",
+          "examples": [
+            "Przepytaj mnie z tabliczki mnożenia"
+          ]
+        },
+        {
+          "title": "Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni, lata przestępne",
+          "examples": [
+            "Ile dni do 24 grudnia?",
+            "Jaki dzień tygodnia był 1 stycznia 2000?"
+          ]
+        },
+        {
+          "title": "Przeliczanie jednostek: długość, masa, objętość, temperatura, prędkość, czas",
+          "examples": [
+            "Ile to 5 km w milach?",
+            "ile cm ma cal"
+          ]
+        },
+        {
+          "title": "Liczby słownie (także kwoty jak na fakturze) i liczby rzymskie",
+          "examples": [
+            "1234 słownie",
+            "2026 rzymskimi"
+          ]
+        },
+        {
+          "title": "Liczenie znaków, liter i słów w podanym tekście (SMS, wpis, tytuł)",
+          "examples": [
+            "policz znaki: Ala ma kota"
+          ]
+        }
+      ],
+      "enabled": true
+    }
+  },
+  {
+    "command": "quick_commands_test",
+    "args": {
+      "message": "Ile to jest 7 razy 8?"
+    },
+    "result": {
+      "source": "builtin",
+      "name": "rachunek",
+      "reply": "7 × 8 = **56**"
+    }
+  },
+  {
+    "command": "quick_commands_set",
+    "args": {
+      "commands": [
+        {
+          "id": "dobranoc",
+          "name": "Dobranoc",
+          "phrases": [
+            "dobranoc",
+            "idę spać"
+          ],
+          "mode": "exact",
+          "reply": "Dobranoc! Do jutra.",
+          "enabled": true,
+          "priority": 0
+        },
+        {
+          "id": "",
+          "name": "Zanotuj",
+          "phrases": [
+            "zanotuj"
+          ],
+          "mode": "starts",
+          "reply": "Zapisuję: {reszta}",
+          "enabled": true,
+          "priority": 0
+        }
+      ]
+    },
+    "result": {
+      "commands": [
+        {
+          "id": "dobranoc",
+          "name": "Dobranoc",
+          "phrases": [
+            "dobranoc",
+            "idę spać"
+          ],
+          "mode": "exact",
+          "reply": "Dobranoc! Do jutra.",
+          "enabled": true,
+          "priority": 0
+        },
+        {
+          "id": "zanotuj",
+          "name": "Zanotuj",
+          "phrases": [
+            "zanotuj"
+          ],
+          "mode": "starts",
+          "reply": "Zapisuję: {reszta}",
+          "enabled": true,
+          "priority": 0
+        }
+      ],
+      "builtins": [
+        {
+          "title": "Rachunki: działania, procenty i zmiana procentowa, potęgi, pierwiastki, liczby słowami",
+          "examples": [
+            "Ile to jest 7 razy 8?",
+            "20% z 150"
+          ]
+        },
+        {
+          "title": "Literowanie jednego słowa",
+          "examples": [
+            "Przeliteruj rower"
+          ]
+        },
+        {
+          "title": "Kostka, moneta, liczba losowa, wybór z podanej listy",
+          "examples": [
+            "Rzuć kostką",
+            "wybierz jedno: pizza, sushi, żurek"
+          ]
+        },
+        {
+          "title": "Data i godzina z zegara komputera",
+          "examples": [
+            "Która godzina?"
+          ]
+        },
+        {
+          "title": "Quiz z tabliczki mnożenia (10 pytań, „koniec” przerywa)",
+          "examples": [
+            "Przepytaj mnie z tabliczki mnożenia"
+          ]
+        },
+        {
+          "title": "Rachunki na datach: dni do daty i od daty, dzień tygodnia, data za N dni, lata przestępne",
+          "examples": [
+            "Ile dni do 24 grudnia?",
+            "Jaki dzień tygodnia był 1 stycznia 2000?"
+          ]
+        },
+        {
+          "title": "Przeliczanie jednostek: długość, masa, objętość, temperatura, prędkość, czas",
+          "examples": [
+            "Ile to 5 km w milach?",
+            "ile cm ma cal"
+          ]
+        },
+        {
+          "title": "Liczby słownie (także kwoty jak na fakturze) i liczby rzymskie",
+          "examples": [
+            "1234 słownie",
+            "2026 rzymskimi"
+          ]
+        },
+        {
+          "title": "Liczenie znaków, liter i słów w podanym tekście (SMS, wpis, tytuł)",
+          "examples": [
+            "policz znaki: Ala ma kota"
+          ]
+        }
+      ],
+      "enabled": true
+    }
+  }
+]

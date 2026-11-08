@@ -1,0 +1,29 @@
+[package]
+name = "voice-tts-contract"
+description = "Synteza mowy Voice Suite: kontrakt — strumień fragmentów PCM ze znacznikami słów, styl, łańcuch fallback per agentka, chunker PL, głosy v0, zdarzenia voice.tts.*"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+voice-audio-contract = { path = "../voice-audio-contract" }
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+core-bus-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true

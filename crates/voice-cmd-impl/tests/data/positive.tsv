@@ -1,0 +1,115 @@
+# Zamrożony zestaw POZYTYWNY voice-cmd (F2). Kolumny: faza<TAB>wypowiedź<TAB>oczekiwana komenda.
+# faza: speaking | thinking | silent. Zmiana pliku wymaga nowej sumy w SHA256SUMS i przeglądu człowieka.
+speaking	stop	stop
+speaking	Stop!	stop
+speaking	stój	stop
+speaking	Stój.	stop
+speaking	stop stop	stop
+speaking	stop, proszę	stop
+speaking	proszę, stop	stop
+speaking	dobra, stop	stop
+speaking	Alfa, stop	stop
+speaking	hej, stop	stop
+speaking	stop już	stop
+speaking	sztop	stop
+speaking	stob	stop
+speaking	zatrzymaj się	stop
+speaking	przestań	stop
+speaking	przestań mówić	stop
+speaking	dość	stop
+speaking	wystarczy	stop
+speaking	cisza	stop
+speaking	stop it	stop
+thinking	stop	stop
+thinking	Stop, proszę.	stop
+speaking	czekaj	wait
+speaking	Czekaj!	wait
+speaking	czekaj chwilę	wait
+speaking	zaczekaj	wait
+speaking	poczekaj moment	wait
+speaking	poczekaj sekundkę	wait
+speaking	chwileczkę	wait
+speaking	moment	wait
+speaking	hej, czekaj	wait
+speaking	wait	wait
+speaking	hold on	wait
+speaking	wait a second	wait
+speaking	pauza	pause
+speaking	zrób pauzę	pause
+speaking	wstrzymaj	pause
+speaking	pause	pause
+speaking	pałza	pause
+silent	wznów	resume
+silent	kontynuuj	resume
+silent	kontynułuj	resume
+silent	mów dalej	resume
+silent	dalej	resume
+silent	możesz kontynuować	resume
+silent	no dalej	resume
+silent	wznow	resume
+silent	resume	resume
+silent	continue	resume
+silent	go on	resume
+silent	powtórz	repeat
+silent	powtórz proszę	repeat
+silent	powtórz to	repeat
+silent	powtórz jeszcze raz	repeat
+silent	możesz powtórzyć	repeat
+silent	czy możesz powtórzyć	repeat
+silent	jeszcze raz	repeat
+silent	repeat	repeat
+silent	say that again	repeat
+silent	powtoz	repeat
+speaking	głośniej	volume_up
+speaking	mów głośniej	volume_up
+speaking	zrób głośniej	volume_up
+speaking	podgłośnij	volume_up
+speaking	glosniej	volume_up
+speaking	louder	volume_up
+speaking	volume up	volume_up
+speaking	ciszej	volume_down
+speaking	mów ciszej	volume_down
+speaking	ścisz	volume_down
+speaking	przycisz	volume_down
+speaking	quieter	volume_down
+speaking	volume down	volume_down
+silent	wycisz mikrofon	mute_mic
+silent	wyłącz mikrofon	mute_mic
+silent	wycisz mikrofon proszę	mute_mic
+silent	mute the microphone	mute_mic
+silent	mute mic	mute_mic
+speaking	anuluj	cancel
+speaking	anuluj to	cancel
+thinking	anuluj	cancel
+speaking	nieważne	cancel
+speaking	zostaw to	cancel
+speaking	cancel	cancel
+speaking	never mind	cancel
+silent	przełącz na Deltę	switch:delta
+silent	przełącz na Betę	switch:beta
+silent	przełącz na Gamę	switch:gama
+silent	przełącz na Alfę	switch:alfa
+silent	przełącz się na Deltę	switch:delta
+silent	zmień na Gamę	switch:gama
+silent	przełącz do Bety	switch:beta
+silent	daj Deltę	switch:delta
+silent	switch to Beta	switch:beta
+silent	przełącz na deltę proszę	switch:delta
+silent	przelacz na delte	switch:delta
+silent	przełącz proszę na Alfę	switch:alfa
+silent	Delta, przejmij	switch:delta
+silent	nie przeszkadzać	dnd
+silent	nie przeszkadzaj	dnd
+silent	tryb nie przeszkadzać	dnd
+silent	włącz nie przeszkadzać	dnd
+silent	do not disturb	dnd
+speaking	stop wszystko	stop_all
+silent	stop wszystko	stop_all
+speaking	zatrzymaj wszystko	stop_all
+speaking	stop everything	stop_all
+speaking	stop all	stop_all
+speaking	wyłącz wszystko	stop_all
+speaking	nie	no
+speaking	Nie.	no
+speaking	nie nie	no
+speaking	nie, nie	no

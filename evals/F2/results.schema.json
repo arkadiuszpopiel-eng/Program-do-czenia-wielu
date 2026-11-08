@@ -1,0 +1,182 @@
+{
+  "$defs": {
+    "CommandKind": {
+      "description": "Rodzaj komendy (bez danych) — klucz reguł gramatyki.",
+      "oneOf": [
+        {
+          "const": "stop",
+          "description": "Zob. [`VoiceCommand::Stop`].",
+          "type": "string"
+        },
+        {
+          "const": "wait",
+          "description": "Zob. [`VoiceCommand::Wait`].",
+          "type": "string"
+        },
+        {
+          "const": "pause",
+          "description": "Zob. [`VoiceCommand::Pause`].",
+          "type": "string"
+        },
+        {
+          "const": "resume",
+          "description": "Zob. [`VoiceCommand::Resume`].",
+          "type": "string"
+        },
+        {
+          "const": "repeat",
+          "description": "Zob. [`VoiceCommand::Repeat`].",
+          "type": "string"
+        },
+        {
+          "const": "cancel",
+          "description": "Zob. [`VoiceCommand::Cancel`].",
+          "type": "string"
+        },
+        {
+          "const": "volume_up",
+          "description": "Zob. [`VoiceCommand::VolumeUp`].",
+          "type": "string"
+        },
+        {
+          "const": "volume_down",
+          "description": "Zob. [`VoiceCommand::VolumeDown`].",
+          "type": "string"
+        },
+        {
+          "const": "mute_mic",
+          "description": "Zob. [`VoiceCommand::MuteMic`].",
+          "type": "string"
+        },
+        {
+          "const": "switch_persona",
+          "description": "Zob. [`VoiceCommand::SwitchPersona`] (wymaga slotu `{persona}`).",
+          "type": "string"
+        },
+        {
+          "const": "do_not_disturb",
+          "description": "Zob. [`VoiceCommand::DoNotDisturb`].",
+          "type": "string"
+        },
+        {
+          "const": "stop_all",
+          "description": "Zob. [`VoiceCommand::StopAll`].",
+          "type": "string"
+        },
+        {
+          "const": "no",
+          "description": "Zob. [`VoiceCommand::No`].",
+          "type": "string"
+        }
+      ]
+    },
+    "InterruptIntent": {
+      "description": "Klasa intencji przerwania (PLAN §6.5, VOICE.md §9).",
+      "oneOf": [
+        {
+          "const": "correction",
+          "description": "„nie, chodziło mi o…”.",
+          "type": "string"
+        },
+        {
+          "const": "addition",
+          "description": "„a jeszcze…”.",
+          "type": "string"
+        },
+        {
+          "const": "clarify",
+          "description": "„czyli…?”.",
+          "type": "string"
+        },
+        {
+          "const": "topic_change",
+          "description": "„zostaw, powiedz mi o…”.",
+          "type": "string"
+        },
+        {
+          "const": "stop_cancel",
+          "description": "„stop”, „zostaw to”.",
+          "type": "string"
+        },
+        {
+          "const": "continue",
+          "description": "„dalej”, „kontynuuj”.",
+          "type": "string"
+        },
+        {
+          "const": "backchannel",
+          "description": "„mhm”, „tak” — nie przerwanie.",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Wynik jednej pozycji manifestu.",
+  "properties": {
+    "command": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CommandKind"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Wykryta komenda szybka."
+    },
+    "heard_words": {
+      "description": "Usłyszany prefiks wg potoku (słowa).",
+      "format": "uint",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "hypothesis": {
+      "description": "Transkrypt końcowy STT.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "description": "Identyfikator pozycji manifestu.",
+      "type": "string"
+    },
+    "intent": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/InterruptIntent"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Sklasyfikowana intencja przerwania."
+    },
+    "interrupted": {
+      "description": "Czy wypowiedź w trakcie mowy agentki ją przerwała (twardy stop).",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "reaction_ms": {
+      "description": "Reakcja: wykrycie komendy − początek słowa (ms).",
+      "format": "uint64",
+      "minimum": 0,
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "title": "ItemResult",
+  "type": "object"
+}

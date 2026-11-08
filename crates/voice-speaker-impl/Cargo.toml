@@ -1,0 +1,45 @@
+[package]
+name = "voice-speaker-impl"
+description = "Implementacja voice-speaker: embedding mówcy (ECAPA/WeSpeaker ONNX) przez tract-onnx z manifestem SHA-256, profil szyfrowany XChaCha20-Poly1305 kluczem z Credential Manager (crypto-shredding), runner EER"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-speaker-contract = { path = "../voice-speaker-contract" }
+voice-dsp-contract = { path = "../voice-dsp-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-wake-contract = { path = "../voice-wake-contract" }
+sessions-contract = { path = "../sessions-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+# Inferencja ONNX w czystym Rust (jak voice-vad-impl; ADR 0004).
+tract-onnx = "0.23.8"
+sha2 = "0.10.9"
+# Szyfrowanie profilu (jak transfer-impl): XChaCha20-Poly1305, losowe nonce, zerowanie.
+chacha20poly1305 = { version = "0.10.1", default-features = false, features = ["alloc"] }
+getrandom = "0.4.3"
+zeroize = "1.9.0"
+
+[[bin]]
+name = "alfa-speaker-eval"
+path = "src/bin/alfa-speaker-eval.rs"
+
+[dev-dependencies]
+voice-speaker-contract = { path = "../voice-speaker-contract", features = ["contract-tests"] }
+voice-speaker-fake = { path = "../voice-speaker-fake" }
+sessions-fake = { path = "../sessions-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio.workspace = true
+prost = "0.14.4"
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

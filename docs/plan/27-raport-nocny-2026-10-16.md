@@ -1,0 +1,111 @@
+# Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)
+
+Praca od ok. 19:00 do 5:00 na Twoje polecenie: „zacznij dalsze etapy i nie buduj wersji co jeden punkt tylko co 10”,
+a potem: „jak to skończysz i zrobisz testy, zacznij kolejne punkty — i tak do 4:30; o tej godzinie ma być działająca
+wersja, testy, plan HTML ze stanem pracy; kopia bezpieczeństwa na dysku F: gotowa na 5:00”. Ostatnia zbudowana,
+sprawdzona i wgrana wersja to **0.0.62** — pełne `verify wersja` 19/19 i `verify sprzet` zielone (rozdział 3);
+wgrana pierwszy raz o 4:40 (10 min po terminie), końcowa budowa o 5:44. Ten dokument mówi, co doszło, jak to
+sprawdziłem, czego nie sprawdziłem i co zostaje.
+
+## 1. Najważniejsze w pięciu punktach
+
+- **Cztery serie po dziesięć punktów** (0.0.60: seria 1, 0.0.61: seria 2, 0.0.62: serie 3 i 4) — wersja budowana
+  co dziesięć punktów, nie po każdym.
+- **Alfa odpowiada sama, bez modelu i bez kosztu, na dużo więcej pytań**: rachunki i procenty, jednostki, daty
+  i lata przestępne, liczby słownie (kwoty jak na fakturze) i rzymskie, losowanie i wybór z listy, liczenie znaków,
+  quiz z tabliczki mnożenia, własne polecenia — także bez internetu. Pod polem pisania widać, kiedy tak będzie.
+- **Instrukcja w programie** (`F1`), Tablica przypiętych odpowiedzi, statystyki rozmowy, szablony promptów,
+  eksport i kopia rozmowy z oznaczeniem treści AI (AI Act), tekst z dokumentów Word, Excel i PowerPoint dla modelu.
+- **Wąskie okno** (od 360 px) sprawdzone testami na wszystkich stronach; poprawiony pasek tytułu i strona kont.
+- **Kopia bezpieczeństwa** całego projektu na dysku F: (`F:\Alfa\kopia-…`) z sumami kontrolnymi i instrukcją
+  odtworzenia.
+
+## 2. Co doszło
+
+| Wersja | Co doszło dla użytkownika |
+| ------ | ------------------------- |
+| 0.0.60 | Polecenia bez modelu, quiz, własne polecenia z testerem, szablony promptów, eksport JSON, oznaczanie treści AI, mapa przepływu danych, strony Moduły i Zaawansowane |
+| 0.0.61 | Instrukcja w programie, Tablica, tekst z DOCX/XLSX/PPTX, styl odpowiedzi i swoboda, budżet wyzwalaczy, archiwum rozmów, tłumaczenie odpowiedzi, import SKILL.md, SECURITY.md i SBOM; poprawki po przeglądzie serii 1 |
+| 0.0.62 | Jednostki, daty, lata przestępne, liczby słownie i rzymskie, procenty, wybór z listy, liczenie znaków; `F1`; trafienia z instrukcji w Ustawieniach; JSON szablonów i poleceń; statystyki rozmowy; wyszukiwanie i eksport Tablicy; kopia rozmowy; zapamiętany tryb skupienia; „Zapisz jako szablon”; wąskie okno; poprawki po przeglądzie serii 3 |
+
+Szczegóły każdej pozycji — [historia zmian](../../CHANGELOG.md) (w programie: Ustawienia → Aktualizacje → Historia
+zmian).
+
+## 3. Jak to sprawdziłem
+
+- **Każda seria** przed wersją: testy modułów Rust zmienionych w serii, testy interfejsu (vitest), typy i lint,
+  testy w przeglądarce dla nowych okien i stron w **trzech stylach i dwóch motywach** (dostępność axe i kontrast),
+  a nowe polecenia rdzenia — także w **prawdziwej aplikacji** (instancja testowa obok Twojej Alfy).
+- **Przegląd kodu w świeżym kontekście** (osobny agent) po seriach 1, 3 i 4 — znalezione błędy poprawione tej nocy
+  (lista w historii zmian, sekcje „Poprawki po przeglądzie”). Najważniejszy z serii 4: „liczenie znaków” i „wybór
+  z listy” przechwytywały zwykłe pytania („Ile liter ma alfabet polski?”, „Wybierz coś na obiad, jestem głodny”)
+  i odpowiadały bez sensu zamiast oddać je modelowi. Przerwałem dla tego pierwszy bieg weryfikacji 0.0.62 (był na
+  początku), poprawiłem (tekst do policzenia i lista tylko po dwukropku albo w cudzysłowie, te pytania są teraz
+  w teście „zwykłe pytania idą do modelu”) i uruchomiłem pełny bieg od nowa.
+- **0.0.60** — pełne `verify wersja`: 17 z 19 etapów zielonych za pierwszym razem; 2 czerwone były techniczne
+  (formatowanie, plik zgodności typów) — poprawione; prawdziwa aplikacja 36/36, pokrycie łącza 74 %. Wgrana o 20:13.
+- **0.0.61** — `verify wersja` do testów w przeglądarce: Rust 2858 zielonych i 1 czerwony (test terminala
+  z czekaniem 50 ms przy obciążonej maszynie — poprawiony w 0.0.62), interfejs 381, przeglądarka 437. Bieg
+  zatrzymałem przed etapem prawdziwej aplikacji, bo 0.0.62 (z serią 2) i tak go przechodzi — oszczędność ok. 35 min
+  przed terminem. 0.0.61 nie była wgrywana osobno.
+- **0.0.62** — `verify wersja` (start 2:05, maszyna mocno obciążona — etap testów Rust trwał godzinę):
+  - zielone: spójność wersji, formatowanie, graf modułów, linter, linter powłoki, testy powłoki, schematy JSON,
+    tokeny wyglądu, typy łącza, typy interfejsu, testy interfejsu **393/393**;
+  - testy Rust: **2871 zielonych, 1 czerwony**, 40 pominiętych (sprzętowe) — czerwony był test diagnostyki
+    pamięci: pod pełną kompilacją kopiowanie wyszło 1,9 GB/s, więc diagnostyka uczciwie oceniła „wolno”, a test
+    oczekiwał „dobrze”. Poprawiłem test (zły wzorzec pamięci nadal go oblewa), testy modułu 5/5 zielone;
+  - lint: 1 naruszenie (separator „·” przyklejony do tekstu w nowej podpowiedzi) — poprawione przed budową
+    aplikacji, ponowny pełny lint zielony;
+  - testy w przeglądarce: pierwszy bieg przerwałem po 41 min, żeby zdążyć z wersją na 4:30; ponowny pełny bieg —
+    **465 zielonych, 1 czerwony** (budżet rozmiaru zielony) — czerwony to test kreatora i panelu konta otwartych
+    naraz: w pełnym biegu 16,6 s i przekroczenie czasu, uruchomiony osobno zielony w 7,4 s (obciążenie maszyny,
+    nie błąd; ten plik nie był zmieniany tej nocy);
+  - **prawdziwa aplikacja: 38/38 zielonych, pokrycie łącza 197 z 264 poleceń (74,6 %)** — w tym nowy scenariusz
+    serii 3 i 4 (polecenia bez modelu na prawdziwym rdzeniu, zapis trybu skupienia);
+  - zależności i licencje (`cargo deny`), audyt pakietów JS, SBOM (767 składników) — zielone.
+- **Końcowy bieg 0.0.62 jednym przebiegiem** (po poprawkach testu diagnostyki, lintu i czekania na start atrapy;
+  commit `47121474`, maszyna bez dodatkowego obciążenia, 5:07–5:44): **ZIELONY — 19 z 19 etapów**. Testy Rust
+  **2872 zielonych, 0 czerwonych** (40 pominiętych — sprzętowe), interfejs **393/393**, przeglądarka **466/466**,
+  prawdziwa aplikacja **38/38**, pokrycie łącza **197 z 264 (74,6 %)**, zależności, audyt pakietów i SBOM zielone.
+  Raport: `target/verify/0.0.62/raport-wersja.md`. Ten bieg zastępuje opis wcześniejszych, przerywanych biegów
+  powyżej — zostawiam je, bo pokazują, co poprawiłem po drodze.
+- **`verify sprzet` 0.0.62** (5:46–5:57): **ZIELONY** — testy sprzętowe na tym laptopie: wykrywanie mowy,
+  koniec wypowiedzi, rozpoznawanie mowy, rozmowa, mikrofon, rozpoznawanie mówcy, embeddingi, system, rejestr,
+  Markdown, pobieranie (słowo wywoławcze pominięte — brak nagrań kontrolnych); próby obowiązków na **modelu
+  lokalnym** z oceną: poranna (150 s), wieczorna (99 s), porządki (76 s), koszty (22 s) — wszystkie zielone. Bez
+  dźwięku i bez sterowania pulpitem (opcje `--dzwiek` i `--pulpit` wyłączone, jak nakazuje praca nocna).
+- Ostatni czerwony test w przeglądarce padał przed sprawdzeniem czegokolwiek: przy równoległej kompilacji atrapa
+  programu startowała dłużej niż 15 s. Czekanie na start wydłużyłem do 30 s (szybkość startu mierzą osobne testy
+  z budżetem czasu).
+- Wgranie do `Alfa-uruchomiona`: pierwsze **04:40**, końcowej budowy z biegu 19/19 — **5:44**; dziennik startu: `wersja=0.0.62`, bez błędów (dwa ostrzeżenia znane
+  z poprzednich dni: skrót `Ctrl+Alt+Space` zajęty, Broker w procesie w kopii właściciela).
+
+## 4. Czego nie sprawdziłem
+
+- **Wygląd nowych okien i stron** (statystyki rozmowy, Tablica z wyszukiwaniem, wklejanie JSON, podpowiedź „Bez
+  modelu”, wąskie okno) — testy sprawdziły dostępność, kontrast i to, że nic nie wychodzi poza okno, w trzech
+  stylach i dwóch motywach; czy się podobają — Twoja ocena.
+- **Kontakt bezpieczeństwa** w `SECURITY.md` — czeka na Twoją decyzję (nie wpisałem adresu).
+
+## 5. Co zostaje
+
+- **C2.10** — kontakt bezpieczeństwa w `SECURITY.md`: czeka na Twoją decyzję (adres nie jest wpisany).
+- **C2.11** — tekst z PDF: wymaga nowej biblioteki (pobranie i sprawdzenie `cargo deny`); DOCX/XLSX/PPTX działają.
+- **P4** — karty rozmów z profilem, Arena (porównanie modeli).
+- **P5** — wyszukiwanie w sieci, wiadomości, „Naucz”; polecenia bez modelu — dalsze rodzaje (np. przypomnienia
+  wymagają akcji, więc idą przez agentkę i Brokera).
+- Kolejne serie po dziesięć punktów według [roadmapy](03-roadmapa.md).
+
+## 6. Kopia bezpieczeństwa
+
+Katalog **`F:\Alfa\kopia-2026-10-16_0449`** (355 MB, 5848 plików), gotowy o 4:51:
+
+- `alfa.bundle` — pełna historia repozytorium, wszystkie gałęzie (`git bundle verify`: kompletna historia);
+- `alfa/` — kopia katalogu roboczego bez plików kompilacji; `Alfa-uruchomiona/` — wgrany program 0.0.62;
+- `memory/`, `.remember/`, `pamiec-claude/`, `PLAN/`, `audyt-2026-10-14/` — pamięć projektu, notatki, plan, audyt;
+- `SHA256SUMS.txt` — sumy wszystkich plików, sprawdzone po zapisie (`sha256sum -c`: zgodne);
+- `ODTWORZENIE.md` — jak odtworzyć projekt z kopii.
+
+Pierwsza próba (`kopia-2026-10-16_0447`, 14 MB — tylko paczka git) nie skopiowała katalogów: Git Bash zamieniał
+przełączniki `robocopy` na ścieżki. Poprawiłem skrypt `scripts/backup.sh` i powtórzyłem kopię; niepełnego katalogu
+nie usuwałem (decyzja należy do Ciebie). Kolejna kopia: `bash scripts/backup.sh` (domyślnie `F:\Alfa`).

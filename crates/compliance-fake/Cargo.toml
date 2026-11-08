@@ -1,0 +1,21 @@
+[package]
+name = "compliance-fake"
+description = "Atrapa modułu zgodności: rejestr w pamięci, sterowana data „dziś” i statusy tras, ta sama logika decyzji co -impl"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+compliance-contract = { path = "../compliance-contract" }
+async-trait.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+compliance-contract = { path = "../compliance-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

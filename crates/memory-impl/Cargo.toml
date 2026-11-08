@@ -1,0 +1,41 @@
+[package]
+name = "memory-impl"
+description = "Pamięć: implementacja v0 i F7 — silnik memory-contract na szyfrowanych bazach (sesja, projekt, agentka, globalna), recall przez search, kaskada forget z zatarciem, adapter transfer, zestaw recall@k"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+memory-contract = { path = "../memory-contract" }
+search-contract = { path = "../search-contract" }
+sessions-contract = { path = "../sessions-contract" }
+lib-sqlstore = { path = "../lib-sqlstore" }
+transfer-contract = { path = "../transfer-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+uuid = { workspace = true, features = ["v7"] }
+serde.workspace = true
+schemars.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+memory-contract = { path = "../memory-contract", features = ["contract-tests"] }
+memory-fake = { path = "../memory-fake" }
+proptest.workspace = true
+semver.workspace = true
+search-fake = { path = "../search-fake" }
+# Eval F7-02 z embedderem ONNX (`ALFA_F7_EMBEDDER`) i ścieżka z zabawkowym modelem (`testkit`) na CI.
+lib-embed = { path = "../lib-embed", features = ["testkit"] }
+tempfile = "3.27.0"
+sessions-fake = { path = "../sessions-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+
+[lints]
+workspace = true

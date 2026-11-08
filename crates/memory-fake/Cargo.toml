@@ -1,0 +1,20 @@
+[package]
+name = "memory-fake"
+description = "Pamięć: deterministyczne atrapy — v0 w pamięci oraz silnik F7 z memory-contract nad magazynem w pamięci (dopasowanie rdzeni, wirtualny zegar, licznik kaskady)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+memory-contract = { path = "../memory-contract" }
+lib-sqlstore = { path = "../lib-sqlstore" }
+chrono.workspace = true
+
+[dev-dependencies]
+memory-contract = { path = "../memory-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

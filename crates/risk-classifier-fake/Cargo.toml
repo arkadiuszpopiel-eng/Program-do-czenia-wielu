@@ -1,0 +1,18 @@
+[package]
+name = "risk-classifier-fake"
+description = "Atrapa klasyfikatora ryzyka: werdykty skryptowane per narzędzie (bez możliwości zdjęcia twardych blokad Jądra), rejestr wywołań"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+
+[dev-dependencies]
+risk-classifier-contract = { path = "../risk-classifier-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

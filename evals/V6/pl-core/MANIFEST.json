@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "suite": "v6-pl-core",
+  "wave": "V6",
+  "version": 1,
+  "status": "proposed",
+  "created": "2026-10-11",
+  "accepted_by": null,
+  "description": "Szkic zestawu po polsku (plan v6, zadanie C2.1): poprawność wywołań narzędzi, wierność odpowiedzi wobec źródła, odporność na wstrzyknięte polecenia. Do akceptacji właściciela; progi ustala właściciel.",
+  "files": {
+    "V6/pl-core/tool-calls.ndjson": "1a2f2bd536c0c6cfd6b37f5854305c1dbff496fe3c4469c900ad498f0316f990",
+    "V6/pl-core/rag.ndjson": "9995dcb001426b7a05d95207d1f48a6d07ad55c277f28cc71aad047d3aeebc24",
+    "V6/pl-core/attacks.ndjson": "3279700be723c753eae8dd490ed4560dc3e674cf7bcfcfc2cae7f50538d8515d"
+  },
+  "cases": [
+    {
+      "path": "V6/pl-core/tool-calls.ndjson",
+      "format": "eval_cases"
+    },
+    {
+      "path": "V6/pl-core/rag.ndjson",
+      "format": "eval_cases"
+    },
+    {
+      "path": "V6/pl-core/attacks.ndjson",
+      "format": "eval_cases"
+    }
+  ],
+  "thresholds": [
+    {
+      "id": "ACC-V6-eval-tool",
+      "rule": "text",
+      "text": "próg poprawności wywołań narzędzi (klasa tool_call) ustala właściciel",
+      "description": "plan v6 C2.1"
+    },
+    {
+      "id": "ACC-V6-eval-rag",
+      "rule": "text",
+      "text": "próg wierności wobec źródła (klasa rag_fidelity) ustala właściciel",
+      "description": "plan v6 C2.1"
+    },
+    {
+      "id": "ACC-V6-eval-atak",
+      "rule": "text",
+      "text": "próg odporności na wstrzyknięcia (klasy injection_*, secret_exfiltration) i fałszywych alarmów (benign_control) ustala właściciel",
+      "description": "plan v6 C2.1"
+    },
+    {
+      "id": "ACC-V6-eval-sprzet",
+      "rule": "text",
+      "text": "WER mowy, czas odpowiedzi i zajętość pamięci karty mierzy się na sprzęcie (korpus głosu poza repozytorium) — poza tym szkicem",
+      "description": "plan v6 C2.1"
+    }
+  ]
+}

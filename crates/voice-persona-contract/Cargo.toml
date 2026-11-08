@@ -1,0 +1,25 @@
+[package]
+name = "voice-persona-contract"
+description = "Kontrakt voice-persona: biblie głosu, słownik wymowy, normalizator PL, chunker TTS, planista stylu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielony test kontraktowy uruchamiany przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+personas-contract = { path = "../personas-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

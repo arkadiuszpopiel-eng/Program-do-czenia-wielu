@@ -1,0 +1,25 @@
+[package]
+name = "scheduler-lite-impl"
+description = "Scheduler zasobów wyłącznych: implementacja modułu (zegar tokio, timer terminów, zdarzenia scheduler.lease.* na magistrali)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+scheduler-lite-contract = { path = "../scheduler-lite-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+scheduler-lite-contract = { path = "../scheduler-lite-contract", features = ["contract-tests"] }
+personas-contract = { path = "../personas-contract" }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

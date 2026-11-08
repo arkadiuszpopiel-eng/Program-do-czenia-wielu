@@ -1,0 +1,28 @@
+[package]
+name = "tools-media-contract"
+description = "tools-media: kontrakt narzędzi multimediów agentek — informacje z nagłówków (lib-media, bez ffmpeg), konwersje przez opcjonalny sidecar ffmpeg (Transcoder, lista zamknięta formatów, nowy plik przez dziennik cofania) i odtwarzanie dźwięku przez voice-audio w kolejce mówienia (AudioPlayer)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+lib-media = { path = "../lib-media" }
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+thiserror.workspace = true
+tokio-util = { version = "0.7.19", default-features = false }
+
+[lints]
+workspace = true

@@ -1,0 +1,147 @@
+# search — SPEC (szkic v0)
+
+## Cel
+Wyszukiwanie pełnotekstowe (FTS5) i wektorowe (sqlite-vec) w tej samej szyfrowanej bazie per sesja; „szukaj w rozmowie" i „szukaj wszędzie" jako funkcja UI dla właściciela; embeddingi lokalne (PLAN §1.2, §10, §14.8).
+
+## Fala i priorytet
+F1 (FTS w sesjach, wyszukiwanie sesji). Wektory i embeddingi wielojęzyczne dla pamięci — F1 v0 (`recall`), pełne w F7. P0.
+
+## Kontrakt (szkic Rust)
+```rust
+// search-contract — SZKIC
+pub struct Doc { pub id: DocId, pub session: SessionId, pub kind: DocKind /* Turn | MemoryEntry | Artifact */,
+                 pub text: String, pub ts: Timestamp, pub meta: Meta }
+pub struct Query { pub text: String, pub sessions: SessionSet /* One | All(owner_only) */,
+                   pub mode: Mode /* Fts | Vector | Hybrid */, pub limit: usize, pub filters: Filters }
+pub struct Hit { pub doc: DocId, pub session: SessionId, pub score: f32, pub snippet: String }
+pub trait Search: Send + Sync {
+    fn index(&self, doc: Doc) -> Result<()>;
+    fn remove(&self, id: DocId) -> Result<()>;                 // kaskada z forget/delete
+    fn query(&self, q: Query, caller: Caller) -> Result<Vec<Hit>>;
+}
+pub trait Embedder: Send + Sync { fn embed(&self, texts: &[String]) -> Result<Vec<Vector>>; fn dims(&self) -> usize; }
+```
+Zdarzenia: `search.indexed`, `search.removed`, `search.query` (tylko Diagnostics, bez treści), `search.embedder.loaded/unloaded`.
+
+## Zależności
+`core-bus/config/log-contract`, `sessions-contract` (dostęp do bazy sesji), `model-residency-contract` (F2, ładowanie embeddera). Silnik: SQLite + FTS5 + sqlite-vec (ADR 8; zgodność z SQLCipher — spike i).
+
+## Niezmienniki
+- Indeks żyje w bazie sesji: brak osobnego, nieszyfrowanego indeksu; usunięcie klucza sesji unieważnia indeks.
+- `SessionSet::All` dozwolone wyłącznie dla `Caller::Owner` (UI); agentka (`Caller::Agent`) widzi tylko własną sesję/zakres pamięci (PLAN §10: wyszukiwanie między sesjami nigdy nie jest narzędziem agentki).
+- Embedder lokalny; brak wysyłania tekstu do chmury bez tagu prywatności zezwalającego i jawnej konfiguracji.
+- Wyniki są deterministyczne dla tego samego indeksu i zapytania (stabilne sortowanie).
+
+## Zdolności / uprawnienia
+Brak własnych (działa na bazach otwartych przez `sessions`).
+
+## Izolacja
+`inproc`, `lazy`; embedder przez `model-residency` (ONNX na CPU), zwalniany po bezczynności.
+
+## Budżet zasobów
+FTS zapytanie ≤ 30 ms na 100k tur; wyniki palety ≤ 16 ms/znak (z `ui-shell`); embedder ≤ 300 MB RAM, ładowany na żądanie.
+
+## Konfiguracja (klucze TOML)
+`[search] mode = "hybrid"`, `snippet_chars = 160`, `[search.embedder] model = "<do ustalenia w F1>"`, `idle_unload = "5m"`.
+
+## Wkład do UI
+`Ctrl+F` (w rozmowie), `Ctrl+Shift+F` (wszędzie), wyszukiwarka panelu Sesje, paleta `Ctrl+K`, Inspektor pamięci (F7).
+
+## Testy akceptacyjne
+- `ACC-F1-search-01`: test kontraktowy — index/remove/query, tryby Fts/Vector/Hybrid na `-fake` i `-impl`.
+- `ACC-F1-search-02`: izolacja — `Caller::Agent` z sesji A nie dostaje trafień z sesji B (0/1000 prób).
+- `ACC-F1-search-03`: kaskada — po `remove`/usunięciu sesji 0 trafień.
+- `ACC-F7-search-04`: recall@5 ≥ 0,85 na ≥ 200 zapytaniach PL (zestaw zamrożony).
+
+## Fake
+`search-fake`: indeks w pamięci (proste dopasowanie + kosinus na wektorach z fixture'ów), deterministyczne wyniki; fake embedder zwraca wektory z hasha tekstu.
+
+## Otwarte pytania
+- Wybór modelu embeddingów wielojęzycznych (jakość PL) — pomiar w F1/F7, do ustalenia w SPEC v1.
+- Tokenizacja FTS5 dla polskiego (unicode61 + stemming?) — do ustalenia w SPEC v1.
+
+## Zmiany po implementacji (F1, `search-contract/-impl/-fake`, 2026-09-30)
+- Kontrakt synchroniczny. `Search::remove(session, id)` wymaga sesji (indeks żyje w bazie sesji). Nowy trait
+  **`TxIndexer`** (`prepare`, `index_in`, `remove_in`) — indeksowanie w transakcji modułu zapisującego dane
+  (`sessions` przy `append_turn`, `memory` przy `remember`/`forget`); zapis i indeks są atomowe.
+- `DocId { kind: Turn | Memory | Artifact, key }`; `Query { text, sessions: One | Many | All, mode, limit,
+  kinds }`; `Hit.snippet` to **dane strukturalne** `Snippet { text, highlights: [start, end) w znakach }` —
+  bez HTML (UI tylko wstawia tekst).
+- `SessionSet::Many/All` wyłącznie dla `Caller::Owner` (funkcja UI `Ctrl+Shift+F`, otwiera wiele baz przez
+  `SessionDbProvider`); agentka — tylko `One(własna)` (`authorize`, test 0/1000).
+- FTS5: jedna kolumna z tekstem złożonym `lib_sqlstore::fold_pl` (`ł→l` + NFD), tokenizer `unicode61
+  remove_diacritics 2`; zapytanie: każde słowo cytowane z prefiksem (`"zolc"*`), AND; ranking bm25.
+  Stemming PL — nadal otwarte (F7).
+- Wektory: `vec0` z metryką kosinusową, **osobna tabela na rodzaj dokumentu** (kNN z filtrem nie gubi rzadkich
+  wpisów pamięci), `chunk_size=128` (mniejsza prealokacja w małych sesjach). Identyfikator/wymiar embeddera
+  zapisany w bazie; zmiana → `EmbedderMismatch` (reindeksacja — później).
+- Hybryda: RRF (k = 60) po top max(4·limit, 20) z każdej listy; porządek deterministyczny.
+- Embedder: w v0 tylko trait + deterministyczna atrapa `search_fake::HashEmbedder` (trygramy + słowa → FNV-1a
+  → 64 wym.). Produkcyjny embedder lokalny (ONNX) — F7; do tego czasu kompozycja musi dostarczyć `Embedder`.
+- Artefakty (`DocKind::Artifact`) nie są jeszcze indeksowane przez `artifacts`.
+- Zdarzenia: `search.query` (Debug, tylko liczniki), `search.removed`.
+- Pomiary (debug): 1000 dokumentów, FTS 0,5–1,1 ms, kNN 0,6–1,8 ms, hybryda 1,0–2,8 ms; indeksowanie 1000
+  dokumentów, każdy we własnej transakcji: 0,8–0,96 s (0,51 s z kodem C w `opt-level = 3`).
+
+## Zmiany dla `memory` F7 (2026-10-01; addytywne)
+- **`TxSearcher::query_in(conn, label, &ConnQuery)`** — zapytanie w połączeniu modułu-właściciela bazy (pamięć w bazie
+  zakresu projektu/agentki/globalnego albo sesji), bez `authorize` (moduł sam sprawdził uprawnienia); `label` trafia do
+  `Hit::session`. `ConnQuery { text, vector_text, mode, limit, kinds, match_any }`: osobny tekst FTS i embeddingu,
+  `match_any = true` → FTS „dowolne słowo” (`"a"* OR "b"*`, ranking bm25) — recall pamięci po rdzeniach.
+- **`TxIndexer::compact_in(conn)`** (domyślnie nic) — w `-impl` FTS5 `optimize`: słowa usuniętych dokumentów znikają
+  z segmentów indeksu (test: surowe tabele bez słowa po `remove_in` + `compact_in`); `vec0` zeruje wektor sam.
+- Atrapa: `FakeSearch` implementuje `TxSearcher` (indeks w pamięci po etykiecie). Kontrakt: `tx_search_suite`
+  (AND/OR, osobny tekst embeddingu, rodzaje, etykieta, usunięcie, zatarcie) na `-fake` i `-impl`.
+
+## Zmiany F7-02 — embedder ONNX i przebudowa wektorów (2026-10-03; addytywne)
+- **`Embedder::embed_query`** (domyślnie = `embed`): zapytania przez stronę zapytań modeli asymetrycznych (E5:
+  `query: `), dokumenty przez `embed` (`passage: `). Produkcyjny embedder: `lib-embed::OnnxEmbedder` (ONNX przez
+  `tract-onnx`, własny tokenizer Unigram zgodny z HF, wątek tła, dzierżawa `model-residency`; `crates/lib-embed`).
+- **Generacje wektorów:** `search_meta.embedder` (+ `vec_gen`) = embedder aktywnych tabel `vec0`; inny embedder →
+  **przebudowa w tle zamiast `EmbedderMismatch`**: nowe tabele `search_vec_<rodzaj>_g<N>` z wymiarem bieżącego
+  embeddera, kursor `search_meta.cursor`; zapisy w trakcie trafiają do generacji docelowej; **zapytania `Vector`
+  i `Hybrid` działają jak `Fts`**, aż przebudowa się skończy (stare wektory nieużywane); koniec kursora → atomowe
+  przełączenie generacji i usunięcie starych tabel; powrót do poprzedniego embeddera → porzucenie generacji
+  docelowej. Migracja `0002`: `search_vec_missing(id, gen)` — uwaga dla `updater` (wersje obok siebie): starsza
+  wersja aplikacji po tej migracji zgłosi `UnknownMigration` w bazach sesji (ogólna kwestia migracji, F7-08).
+- **`TxIndexer::reindex_step(&Db, batch)`** (domyślnie „nic do zrobienia”): krok w trzech fazach — odczyt partii
+  w blokadzie, **embedding bez blokady bazy** (FTS i zapisy nie czekają na model), zapis w transakcji tylko przy
+  niezmienionym stanie, z pominięciem dokumentów zmienionych/usuniętych w międzyczasie; trwały kursor →
+  wznawianie. **`TxIndexer::vector_status_in`** → `VectorStatus::{Ready{embedder, missing}, Rebuilding{from, to,
+  done, total}}`; `ReindexProgress{embedded, done, total, finished}`.
+- **Embedder niedostępny** (brak RAM, błąd modelu) przy zapisie → dokument w FTS, brak wektora w
+  `search_vec_missing` (zdarzenie `search.vector.missing`), zapis danych się nie wycofuje; uzupełnia go krok
+  przebudowy. Błąd embeddera zapytania → zapytanie spada do FTS (bez błędu).
+- `-impl`: `SqliteSearch::{vector_status, reindex_db, reindex_all, spawn_reindex}` + `ReindexSource` (bazy spoza
+  `SessionDbProvider`, np. zakresy pamięci), `ReindexOptions{batch, pause}`, `ReindexHandle{cancel, snapshot,
+  join}` (`drop` = anuluj); zdarzenia `search.reindex.{started,progress,done}` — tylko liczniki i etykieta bazy.
+- `-fake`: `FakeSearch::with_embedder` (eval F7-02 z prawdziwym modelem w `memory-impl`); błąd embeddera →
+  dokument bez wektora, zapytanie bez wektora → FTS.
+- Testy (`search-impl/tests/reindex.rs`): `HashEmbedder` 64 → embedder 8 wym. (FTS w trakcie, zapisy/usunięcia
+  w trakcie, postęp monotoniczny, stare tabele usunięte), wznowienie po restarcie, porzucenie, awaria embeddera,
+  dokument zmieniony w trakcie embeddingu, wątek tła po sesjach + źródle dodatkowym ze zdarzeniami bez treści,
+  property-based: dowolny przeplot zapisów/usunięć/kroków/zmian embeddera/awarii zbiega do „1 wektor na dokument,
+  0 brakujących, tylko tabele aktywnej generacji”.
+- Budżet embeddera: `multilingual-e5-small` fp32 — pomiar na modelu o tym kształcie (losowe wagi, `--release`,
+  4 vCPU): RSS ~525 MB, ładowanie 2,5 s, zapytanie 29 ms, dokument ~57 ms, 512 tokenów 0,72 s (`ram_mb = 640`
+  w katalogu) — powyżej wstępnych 300 MB; wariant int8 (~118 MB) do sprawdzenia na prawdziwym pliku. Przebudowa:
+  domyślnie 4 dokumenty na krok (zapis tury czeka w kolejce modelu ≤ ~0,25 s).
+
+## Zmiany — embedder w aplikacji (2026-10-04; addytywne)
+- **`SqliteSearch::set_embedder` / `embedder()`**: wymiana embeddera w działającej usłudze (wybór modelu w UI) bez
+  przebudowy obiektu — każda operacja (zapis, usunięcie, zapytanie, krok przebudowy, `TxIndexer::*`) bierze
+  **migawkę** embeddera na początku, więc stan generacji i wektory jednej operacji pochodzą od tego samego modelu;
+  zmiana w trakcie kroku przebudowy kończy krok bez zapisu (`now.same(&state)`). Test:
+  `tests/reindex_props.rs::swapping_embedder_in_place_rebuilds_and_switches_queries`.
+- Konfiguracja: `[search.embedder] model = "multilingual-e5-small" | "lexical"` (brak = model domyślny, używany, gdy
+  jest zainstalowany). Kompozycja (`app-models`, SPEC `models`): `startup_embedder` przy budowie `search`
+  (`OnnxEmbedder` ładowany leniwie albo leksykalny), po starcie `preload` z dzierżawą `model-residency`
+  i `spawn_reindex` (pełny przebieg najwyżej raz na 7 dni dla tego samego embeddera) dla baz sesji + baz zakresów pamięci (`ScopeSource`: `ScopeDbs::known()` bez zakresów sesji,
+  etykieta `index_label`); komendy `embed_model_activate`, `search_reindex_start/cancel/status`, zdarzenie UI
+  `ReindexStatus` (liczniki). `app-modules::LateIndexer` przekazuje `compact_in`, `vector_status_in`, `reindex_step`.
+
+## Fala 5
+- Uwaga o `search` 0002 i wersjach obok siebie (powyżej) — rozwiązana w `lib_sqlstore::migrate` (m-23): starsza wersja
+  otwiera bazę z nieznaną nowszą migracją bez zmian, w trybie tylko do odczytu (albo normalnie, gdy migracja jest
+  oznaczona jako addytywna przez `migrate_with`). Zasady migracji addytywnych: `docs/modules/sessions/SPEC.md`
+  („Fala 5”). `search-impl` bez zmian; `sessions-impl` toleruje błąd `prepare` indeksu na bazie tylko do odczytu.

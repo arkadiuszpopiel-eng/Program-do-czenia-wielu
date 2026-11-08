@@ -1,0 +1,20 @@
+[package]
+name = "artifacts-fake"
+description = "Artefakty: deterministyczna atrapa rejestru w pamięci (migawki treści w RAM, rejestr intencji zamiast Eksploratora)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+artifacts-contract = { path = "../artifacts-contract" }
+chrono.workspace = true
+
+[dev-dependencies]
+artifacts-contract = { path = "../artifacts-contract", features = ["contract-tests"] }
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

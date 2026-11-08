@@ -1,0 +1,23 @@
+[package]
+name = "tools-shell-fake"
+description = "tools-shell: atrapa narzędzia powłoki — prawdziwe manifesty, walidacja argumentów, skryptowane wyniki poleceń bez uruchamiania procesów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-shell-contract = { path = "../tools-shell-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tools-shell-contract = { path = "../tools-shell-contract", features = ["contract-tests"] }
+safety-broker-contract = { path = "../safety-broker-contract" }
+tokio.workspace = true
+
+[lints]
+workspace = true

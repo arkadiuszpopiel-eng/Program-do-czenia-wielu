@@ -1,0 +1,32 @@
+[package]
+name = "improver-contract"
+description = "Ulepszacz (F8): kontrakt — pierścienie zmian R0–R3, strażnik granic (lista dozwolonych kluczy, zakaz Jądra, prywatności, budżetów, uprawnień, egressu i progów evals), propozycje z oceną w piaskownicy i na holdoucie, wdrożenie przez core-config z automatycznym rollbackiem"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane na `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+core-config-contract.workspace = true
+core-log-contract.workspace = true
+evals-contract = { path = "../evals-contract" }
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+tokio.workspace = true
+
+[lints]
+workspace = true

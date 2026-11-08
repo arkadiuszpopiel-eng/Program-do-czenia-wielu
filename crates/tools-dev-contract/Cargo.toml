@@ -1,0 +1,25 @@
+[package]
+name = "tools-dev-contract"
+description = "tools-dev: kontrakt narzędzi programisty agentek — dev_git (odczyt repozytorium: stan, różnice, historia, gałęzie, zatwierdzenie) i dev_test (wykrycie rodzaju projektu, testy z podsumowaniem i nazwami nieudanych); bezpieczne argumenty dla cmd.exe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

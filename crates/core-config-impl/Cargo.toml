@@ -1,0 +1,36 @@
+[package]
+name = "core-config-impl"
+description = "Konfiguracja warstwowa jądra na plikach TOML: JSON Schema modułów, kernel.* tylko przez Broker, zapis atomowy, historia, przeładowanie na żywo"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+core-config-contract.workspace = true
+core-bus-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-stream.workspace = true
+toml.workspace = true
+tracing.workspace = true
+# Bez domyślnych funkcji: żadnego pobierania `$ref` przez HTTP ani z plików (bez reqwest/rustls).
+jsonschema = { version = "0.58.3", default-features = false }
+notify = "8.2.0"
+
+[dev-dependencies]
+core-config-contract = { workspace = true, features = ["contract-tests"] }
+core-bus-fake = { path = "../core-bus-fake" }
+core-registry-contract.workspace = true
+futures-util.workspace = true
+proptest.workspace = true
+tempfile = "3.27.0"
+
+[lints]
+workspace = true

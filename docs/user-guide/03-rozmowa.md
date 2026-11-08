@@ -1,0 +1,213 @@
+# Rozmowa, gałęzie i sesje
+
+## Pisanie wiadomości
+
+- `Ctrl+N` albo „Nowa rozmowa” zaczyna sesję. Na pustym ekranie są trzy podpowiedzi na start.
+- `Enter` wysyła, `Shift+Enter` dodaje nową linię (zamianę włączysz w **Ustawienia → Skróty → Enter wysyła
+  wiadomość**). Niewysłany tekst zostaje zapamiętany jako szkic tej sesji.
+- `↑` w pustym polu — popraw ostatnią wiadomość; `Ctrl+↑`/`Ctrl+↓` — wcześniej wysłane; `Ctrl+Shift+V` — wklej bez
+  formatowania.
+- **@imię** (np. `@Delta`) kieruje wiadomość do konkretnej agentki. Bez tego odpowiada Dyrygentka.
+- **/komendy**: `/obsada` (zmień obsadę agentek), `/model` (profil modelu), `/eksport` (sesja do pliku `.alfa`),
+  `/ustawienia`, `/skupienie`, `/nowa`.
+- Chipy przy polu pokazują adresatkę i profil modelu — kliknij, żeby zmienić.
+- `Esc` albo „Stop” zatrzymuje odpowiedź w trakcie.
+- **Załączniki**: spinacz przy polu (okno wyboru plików), wklejenie pliku albo obrazu (`Ctrl+V`) albo przeciągnięcie
+  plików na okno. Alfa kopiuje je do katalogu sesji (`…\Alfa\Sesje\<nazwa>\in`) i pokazuje jako chipy z rozmiarem
+  i szacunkiem tokenów; przy dużych załącznikach — także udziałem w oknie kontekstu i szacunkiem kosztu. Limity:
+  10 plików w wiadomości, 25 MB na plik, 100 MB razem. Obraz do 5 MB model widzi w całości, tekst (do 100 000 znaków)
+  jako dane, nie polecenia; z dokumentów DOCX, XLSX, PPTX i PDF — wyciągnięty tekst (niżej); z innych plików
+  (np. archiwa) model dostaje tylko nazwę, typ i rozmiar. Pliki z danych
+  Alfy i katalogów z poświadczeniami (np. `.claude`, `.codex`, profile przeglądarek) są odrzucane. Po wysłaniu
+  załączniki są w panelu **Pliki**. Wiadomość może składać się z samych załączników.
+- Zrzut ekranu prosto z pola wiadomości — **jeszcze niedostępny**.
+
+## Odpowiedź
+
+Odpowiedź pojawia się na bieżąco. Zwinięty blok „Myślenie · czas” oznacza, że model najpierw się zastanawiał.
+Kroki narzędzi (gdy agentka działa na plikach) są zwinięte do jednej linii — kliknij, żeby rozwinąć. Pod odpowiedzią
+widać model, liczbę tokenów, koszt i czas.
+
+Bloki kodu mają przyciski: **Kopiuj kod**, **Zapisz jako plik**, **Zawijaj wiersze**. Kodu z rozmowy Alfa nie
+uruchamia sama — skopiuj go i uruchom w terminalu albo zleć to agentce (narzędzie powłoki, za zgodą według poziomu).
+
+## Kanwa artefaktów
+
+Gdy agentka odda stronę HTML, rysunek SVG albo notatkę Markdown (blok kodu `html`, `svg`, `markdown`), na pasku
+bloku jest przycisk **Otwórz w kanwie**. Długą odpowiedź z nagłówkami (dokument) otworzysz w kanwie przyciskiem
+**Otwórz odpowiedź w kanwie** na pasku akcji wiadomości, a plik HTML, SVG albo Markdown z panelu **Pliki** —
+przyciskiem **Otwórz w kanwie** na karcie pliku.
+
+Kanwa stoi obok rozmowy (w wąskim oknie — jako arkusz nad treścią). Rozmowa zachowuje czytelną szerokość:
+gdy brakuje miejsca, panel Sesje zwija się do paska ikon, a w razie potrzeby panel boczny chowa się, dopóki
+kanwa jest otwarta. Przejście do innej rozmowy albo ponowienie odpowiedzi, z której pochodzi artefakt, zamyka
+kanwę. Kanwa ma dwie karty:
+
+- **Podgląd** — Markdown jak w wiadomościach; strona HTML i rysunek SVG w izolowanej ramce: bez skryptów, bez
+  dostępu do Alfy i bez pobierania czegokolwiek z sieci (obrazki tylko wbudowane w plik, linki tylko wewnątrz
+  dokumentu). Przyciski, animacje i skrypty strony w podglądzie nie działają — to świadome zabezpieczenie.
+- **Źródło** — tekst artefaktu (ponad limit — jego początek z uwagą o ucięciu).
+
+Przyciski: **Kopiuj źródło**, **Zapisz jako plik** (to samo okno zapisu co przy bloku kodu, eksporcie wiadomości
+albo w panelu Pliki) i **Zamknij kanwę**. Klawiatura: strzałki przełączają karty, `Esc` zamyka kanwę i wraca do
+przycisku, którym ją otwarto. Podgląd ma limit 512 KB — większy artefakt skopiujesz albo zapiszesz jako plik.
+
+## Akcje wiadomości
+
+Najedź na wiadomość albo przejdź do niej klawiszem `Tab`:
+
+- **Kopiuj** (Markdown) i **Kopiuj jako tekst**,
+- **Przeczytaj na głos** — głosem agentki, która napisała odpowiedź (wymaga silnika mowy, zobacz [Głos](04-glos.md)),
+- **Ponów** — nowa wersja odpowiedzi; także **Ponów modelem lokalnym** / **w chmurze**,
+- **Edytuj i wyślij ponownie** (Twoje wiadomości),
+- **Kontynuuj** — dokończ odpowiedź uciętą limitem długości,
+- **Zapamiętaj** — w tej sesji, w projekcie, globalnie albo u agentki (zobacz [Pamięć](06-pamiec.md)),
+- ocena „Dobra odpowiedź” / „Słaba odpowiedź”, **Szczegóły → Oś czasu**, **Ukryj z widoku**,
+- **Eksportuj wiadomość do Markdown / HTML / JSON** (menu „Więcej akcji”),
+- **Przetłumacz na angielski** / **na polski** — nowa prośba w tej rozmowie z samym przekładem,
+- **Przypnij do tablicy** — kopia odpowiedzi trafia na **Tablicę** (do 40 przypięć z różnych rozmów; paleta
+  `Ctrl+K` → **Pokaż Tablicę**: wyszukiwanie, otwórz rozmowę, kopiuj, odepnij, „Kopiuj wszystko (Markdown)”),
+- **Zapisz jako szablon promptu** (Twoje wiadomości) — treść trafia do szablonów, nazwa z pierwszej linii.
+- **Porównaj modele (Arena)** (Twoje wiadomości i odpowiedzi na nie) — zobacz „Arena: porównanie dwóch modeli” niżej.
+
+Pod polem pisania pojawia się dopisek **„Bez modelu: …”**, gdy wpisana wiadomość dostanie odpowiedź od razu,
+bez modelu (polecenie wbudowane, własne albo quiz).
+
+**Statystyki rozmowy** (paleta `Ctrl+K` → „Statystyki rozmowy”) pokazują dla bieżącej ścieżki: liczbę wiadomości
+i słów, czas czytania, tokeny, koszt odpowiedzi, średni czas odpowiedzi, użycia narzędzi, okres, inne wersje
+(gałęzie po „edytuj” i „ponów”) oraz modele — z kopią jako Markdown. Całą bieżącą rozmowę skopiujesz do schowka paletą → **Kopiuj rozmowę (Markdown)** — z oznaczeniem
+wiadomości wygenerowanych przez AI, jak w eksporcie.
+
+Styl odpowiedzi (zwięźle, szczegółowo, prostym językiem, formalnie) i swobodę (precyzyjnie, zrównoważenie, twórczo)
+ustawisz w Ustawienia → Ogólne; „Automatycznie” zostawia to personie agentki i modelowi.
+
+Załączniki DOCX, XLSX, PPTX i PDF trafiają do modelu jako wyciągnięty tekst (akapity, slajdy, komórki arkuszy,
+strony PDF po kolei z nagłówkami „--- Strona N ---”) — jak pliki tekstowe, oznaczone jako treść z zewnątrz; chip
+załącznika pokazuje, czy tekst idzie w całości, czy ucięty. Z PDF Alfa czyta tekst z polskimi znakami, odstępami
+między słowami i podziałem na wiersze (tabele — jako wiersze tekstu). Limity na plik PDF: 100 000 znaków,
+1000 stron i 10 sekund; dłuższy tekst kończy się dopiskiem, do której strony udało się dojść. Wyjątki:
+
+- **PDF zabezpieczony hasłem** — model dostaje tylko wyjaśnienie. Otwórz plik z hasłem, zapisz kopię bez
+  zabezpieczenia i załącz ją ponownie. PDF z samymi ograniczeniami właściciela (np. zakaz drukowania), który
+  otwiera się bez hasła, Alfa czyta normalnie.
+- **Skan bez warstwy tekstowej** (same obrazy stron) — model dostaje tylko wyjaśnienie; rozpoznawanie tekstu
+  ze skanów (OCR) będzie osobnym, opcjonalnym dodatkiem. W PDF mieszanym strony-obrazy są oznaczone
+  „[strona bez tekstu — obraz albo skan]”.
+- **PDF uszkodzony albo zbyt złożony** (bardzo dużo obiektów, ogromne strumienie) — wyjaśnienie zamiast tekstu,
+  żeby wrogi plik nie zablokował Alfy.
+
+Całą rozmowę (widoczną gałąź, bez wiadomości ukrytych) wyeksportujesz z menu sesji albo z palety `Ctrl+K`:
+**Eksportuj rozmowę do Markdown** / **do HTML** / **do JSON**. Plik HTML jest samodzielny: bez skryptów i zasobów
+z sieci, z fontami systemowymi — można go otworzyć w przeglądarce i wydrukować do PDF. JSON służy do dalszej obróbki
+(autor, rola, czas, model, treść, załączniki). Wiadomości agentek są w każdym formacie oznaczone jako wygenerowane
+przez sztuczną inteligencję — czytelnie i w metadanych.
+
+## Gałęzie: nic nie jest nadpisywane
+
+Historia rozmowy jest tylko dopisywana. Gdy klikniesz **Ponów**, nowa odpowiedź staje obok starej — przełączasz je
+strzałkami „Wariant 2 z 3”. Gdy **edytujesz** swoją wiadomość, powstaje nowa gałąź rozmowy od tego miejsca; poprzednia
+zostaje i wrócisz do niej strzałkami „Gałąź 1 z 2”. **Ukryj z widoku** tylko chowa wiadomość — w dzienniku zostaje.
+
+## Arena: porównanie dwóch modeli
+
+Paleta `Ctrl+K` → **Porównaj modele (Arena)** (ostatnia Twoja wiadomość) albo „Więcej akcji” przy wiadomości →
+**Porównaj modele (Arena)**. Wybierasz dwa modele z listy, którą zna Router: modele z kont API i modele lokalne
+(domyślnie jeden lokalny i jeden z chmury, jeśli masz oba). **Porównaj** wysyła tę samą wiadomość do obu modeli —
+odpowiedzi powstają po kolei (najpierw model A, potem B) i stają obok siebie z **czasem odpowiedzi**, **tokenami**
+(wejście / wyjście) i **kosztem**; szybsza i tańsza dostają oznaczenie. Nic nie ocenia odpowiedzi za Ciebie.
+
+Każda odpowiedź to nowa wersja (gałąź) pod Twoją wiadomością — wcześniejsze odpowiedzi zostają. **Wybierz tę
+odpowiedź** ustawia jej gałąź jako bieżącą: dalsza rozmowa idzie od niej, a pozostałe wersje przełączysz strzałkami.
+Obie odpowiedzi liczą się do kosztów i limitów jak zwykłe wiadomości; prywatność sesji, Sędzia Cieni i limity działają
+tak samo. Jeśli wybrany model nie może odpowiedzieć (limit kosztów, sesja tylko lokalna, awaria), przy nim pojawia
+się błąd albo dopisek „Odpowiedział model zastępczy”. **Zatrzymaj** przerywa bieżącą odpowiedź i nie uruchamia
+kolejnej. Arena porównuje same modele — bez narzędzi agentek i bez mostów CLI.
+
+## Wyszukiwanie
+
+- `Ctrl+F` — szukaj w bieżącej rozmowie (strzałki: następny, poprzedni wynik).
+- `Ctrl+Shift+F` — szukaj we wszystkich sesjach (wyszukiwarka w panelu Sesje). Polskie znaki są opcjonalne:
+  „zolc” znajdzie „żółć”.
+
+## Sesje
+
+Panel Sesje (`Ctrl+B`) ma grupy: Przypięte, Bez projektu i Archiwum. Pole **Pokaż rozmowy** zawęża listę do
+dzisiejszych albo z ostatnich 7 lub 30 dni; podpowiedź przy rozmowie pokazuje liczbę wiadomości i datę założenia. Kropka przy sesji oznacza, że coś w niej
+pracuje w tle; wyróżnienie — nieprzeczytane odpowiedzi. Menu sesji (prawy przycisk albo „…”):
+
+- **Zmień nazwę** (`F2`; nazwa nadaje się też sama z pierwszych wiadomości),
+- **Przypnij**, **Archiwizuj**, **Duplikuj jako szablon**,
+- **Eksportuj do .alfa** — pojedyncza sesja do pliku,
+- **Usuń** — przez 10 sekund możesz kliknąć „Cofnij”. Potem sesja znika na zawsze: jej baza jest zaszyfrowana,
+  a klucz zostaje zniszczony.
+
+Każda sesja ma osobną, zaszyfrowaną bazę i osobną pamięć — agentka w jednej sesji nie widzi treści innej.
+
+### Karty rozmów
+
+Przyciski **Lista** i **Karty** w nagłówku panelu Sesje przełączają widok. Wybór zostaje na tym komputerze — po
+ponownym uruchomieniu panel otwiera się tak, jak go zostawiłeś. Karta pokazuje nazwę rozmowy, awatary agentek,
+które w niej odpowiadały (w nowej rozmowie — obsadę), profil (Lokalny / Hybryda / Chmura) i model ostatniej
+wybranej odpowiedzi, początek ostatniej wiadomości jako zwykły tekst (bez formatowania i kodu), czas ostatniej aktywności,
+łączny koszt rozmowy w złotych (po tym samym kursie co w szczegółach kosztów; model lokalny nic nie kosztuje),
+znaczniki **Przypięta** i **Archiwum**, a w tych dwóch grupach także nazwę projektu. Menu „…” na karcie ma te same
+pozycje co na liście.
+
+Klawiatura: strzałki przechodzą między kartami w grupie (w wąskim oknie karty stoją w jednej kolumnie); strzałka
+w dół z ostatniego rzędu przechodzi do następnej grupy, w górę z pierwszego — do poprzedniej. `Home` i `End` —
+pierwsza i ostatnia karta, `Enter` otwiera rozmowę, `F2` zmienia nazwę, `Delete` usuwa (z „Cofnij”). Gdy szczegóły
+kart nie dadzą się wczytać, nad kartami pojawia się komunikat z **Ponów**, a karty pokazują to, co jest na liście.
+
+## Szablony promptów
+
+Często powtarzane prośby zapiszesz jako szablon w Ustawienia → Szablony promptów, ze zmiennymi w podwójnych
+klamrach, np. „Napisz e-mail do {{adresat}} w sprawie {{temat}}”. Paleta `Ctrl+K` → **Wstaw szablon promptu** (albo
+przycisk **Użyj** przy szablonie) otwiera okno: wybierasz szablon, uzupełniasz zmienne, widzisz podgląd i wstawiasz
+tekst do pola wpisywania. Nic nie wysyła się samo — sprawdzasz i wysyłasz. Puste zmienne zostają w tekście
+do poprawienia. **Kopiuj jako JSON** i **Wklej z JSON…** przenoszą szablony (i własne polecenia) między
+komputerami albo do kopii — wklejone pozycje dopisują się do listy po sprawdzeniu.
+
+## Polecenia bez modelu
+
+Na proste polecenia Alfa odpowiada sama, od razu, bez modelu i bez kosztu — także bez internetu:
+
+- **rachunki** — „Ile to jest 7 razy 8?”, „oblicz (2+3)*4”, „20% z 150”, „pierwiastek z 81”, także liczby słowami;
+  procenty: „Ile procent to 25 z 200?”, „O ile procent wzrosło z 80 do 100?”;
+- **literowanie** — „Przeliteruj rower”, „jak się literuje słowo żółw”;
+- **losowanie** — „Rzuć kostką”, „orzeł czy reszka?”, „wylosuj liczbę od 1 do 10”, „wybierz jedno: pizza, sushi,
+  żurek” (2–20 pozycji po przecinku, „albo” albo „lub”);
+- **data i godzina** — „Która godzina?”, „Jaki dziś dzień?” (z zegara komputera);
+- **rachunki na datach** — „Ile dni do 24 grudnia?”, „Ile dni minęło od 1 września?”, „Jaki dzień tygodnia był
+  1 stycznia 2000?”, „Jaka data będzie za 30 dni?”, „Jaki dzień będzie jutro?”; data bez roku to najbliższa
+  w przód (do) albo w tył (od); także „Czy 2028 jest rokiem przestępnym?” i „Ile dni ma luty 2028?”;
+- **przeliczanie jednostek** — „Ile to 5 km w milach?”, „Zamień 30 stopni Celsjusza na Fahrenheita”, „Ile cm ma
+  cal?”, „100 km/h na m/s”: długość, masa, objętość, temperatura, prędkość i czas (jednostki z różnych grup trafią
+  do modelu);
+- **liczby słownie i rzymskie** — „1234 słownie”, „Zapisz 1999,99 zł słownie” (jak na fakturze: „… złotych
+  99/100”), „2026 rzymskimi”, „rzymskie MCMXC”;
+- **liczenie znaków i słów** — „Policz znaki: …”, „Ile słów ma „…”” (długość SMS-a, wpisu, tytułu);
+- **quiz z tabliczki mnożenia** — „Przepytaj mnie z tabliczki mnożenia (przez 7)”: 10 pytań, odpowiadasz liczbą
+  (także słowami albo głosem), „koniec” przerywa z podsumowaniem; inna wiadomość kończy quiz.
+
+Pełną listę z przykładami i testerem otworzysz paletą `Ctrl+K` → **Polecenia bez modelu**. Polecenie musi być
+całą wiadomością — „ile kosztuje 5 jabłek” czy „która godzina w Tokio” trafią do modelu.
+
+**Własne polecenia** dodasz w Ustawienia → Polecenia bez modelu: fraza → stała odpowiedź, np. „dobranoc” →
+„Dobranoc! Do jutra.”. Dopasowanie: cała wiadomość, początek (dalszy tekst wstawisz jako `{reszta}`, np. „Zanotuj:
+kupić mleko” → „Zapisuję: kupić mleko”), fraza w środku albo wyrażenie regularne. Tester na tej stronie pokazuje,
+kto odpowie na wpisaną wiadomość — własne polecenie, wbudowane, quiz czy model. Tam też wyłączysz polecenia
+bez modelu.
+
+## Brak internetu
+
+Gdy nie ma połączenia, wiadomość do modelu w chmurze czeka w kolejce („W kolejce — wyślę po odzyskaniu
+połączenia”), a model lokalny odpowiada dalej. Polecenia bez modelu (rachunki, data, losowanie) działają od razu. Baner u góry ma przycisk „Ponów teraz”.
+
+## Panele Pliki i Oś czasu
+
+- **Pliki** (`Alt+3`) — pliki oddane przez agentki w tej sesji, z wersjami i podglądem. Akcje: Otwórz, Pokaż
+  w Eksploratorze, Kopiuj plik; dla plików tekstowych (także SVG) — Zapisz jako; pliki HTML, SVG i Markdown — także
+  Otwórz w kanwie.
+- **Oś czasu** (`Alt+2`) — zdarzenia sesji (modele, narzędzia, audyt, głos, diagnostyka) z filtrami rodzaju
+  i poziomu. Przełącznik **Replay** pokazuje pracę agentek krok po kroku (zobacz
+  [Agentki i zadania](05-agentki-i-zadania.md)).

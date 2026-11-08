@@ -1,0 +1,34 @@
+[package]
+name = "tools-window-impl"
+description = "tools-window: lista okien, fokus, położenie i stan przez Brokera (gui.control) i DesktopPort, z odmową wobec okien Alfy/Brokera i weryfikacją po zmianie"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-window-contract = { path = "../tools-window-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+tools-window-contract = { path = "../tools-window-contract", features = ["contract-tests"] }
+platform-fake = { path = "../platform-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+compliance-contract = { path = "../compliance-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+proptest.workspace = true
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

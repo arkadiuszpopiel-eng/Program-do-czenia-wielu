@@ -1,0 +1,24 @@
+[package]
+name = "camera-hub-impl"
+description = "camera-hub: rejestr kamer nad CameraPort, przełącznik główny i per kamera, strumienie usypiane po bezczynności, kilka kamer naraz, klatka na żądanie bez zapisu na dysk"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+camera-hub-contract = { path = "../camera-hub-contract" }
+platform-contract.workspace = true
+async-trait.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+camera-hub-contract = { path = "../camera-hub-contract", features = ["contract-tests"] }
+core-registry-contract.workspace = true
+platform-fake = { path = "../platform-fake" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

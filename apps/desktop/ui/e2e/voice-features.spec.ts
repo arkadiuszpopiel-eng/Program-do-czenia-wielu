@@ -1,0 +1,182 @@
+import { expect, test, type Page } from '@playwright/test';
+import { expectAccessible, openApp, waitForChat } from './helpers';
+
+async function settings(page: Page, section: string) {
+  const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
+  if (!(await nav.isVisible())) await page.keyboard.press('Control+,');
+  await nav.getByRole('button', { name: section, exact: true }).click();
+  await expect(page.getByRole('heading', { name: section, level: 2 })).toBeVisible();
+}
+
+for (const theme of ['light', 'dark'] as const) {
+  test.describe(`głos F5 — motyw ${theme}`, () => {
+    test('panel Głos: test słowa wywoławczego, kreator rejestracji, dyktowanie, czytanie', async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 1600, height: 900 });
+      await openApp(page, { theme });
+      await waitForChat(page);
+      await page.keyboard.press('Alt+6');
+      await expect(page.getByRole('tab', { name: 'Głos', selected: true })).toBeVisible();
+      // Zwarta karta silników jest pod ręką także w panelu: stan i bezpiecznik, bez kafli telemetrii.
+      const engines = page.getByTestId('voice-engines-panel');
+      await expect(engines.getByText('Qwen3-ASR', { exact: true })).toBeVisible();
+      await expect(engines.getByTestId('voice-breaker')).toHaveText('Silnik główny odstawiony');
+      await expect(engines.getByText('Typowy czas')).toHaveCount(0);
+      await engines.getByRole('button', { name: 'Zamknij bezpiecznik' }).click();
+      await expect(engines.getByTestId('voice-breaker')).toHaveText('Silnik główny pracuje');
+      await expect(page.getByText('Słowa wywoławcze wyłączone.')).toBeVisible();
+      await expect(page.getByText(/Nieskalibrowane — brak pomiaru FAR\/FRR/)).toBeVisible();
+      await expect(page.getByText('Wymaga klucza', { exact: true })).toBeVisible();
+      await expectAccessible(page, `panel głos ${theme}`);
+
+      // Test słowa wywoławczego: bramka właściciela bez profilu odrzuca wykrycie.
+      await page.getByRole('button', { name: 'Testuj słowo wywoławcze' }).click();
+      await expect(page.getByText(/Odrzucone przez bramkę właściciela: 1/)).toBeVisible();
+      await page.getByRole('button', { name: 'Zakończ test' }).click();
+
+      // Kreator: 3 frazy z wskaźnikiem jakości → profil.
+      await page.getByRole('button', { name: 'Zarejestruj mój głos' }).click();
+      await expect(page.getByText('Przeczytaj na głos:')).toBeVisible();
+      for (let i = 0; i < 3; i += 1) {
+        await page.getByRole('button', { name: 'Nagraj frazę' }).click();
+        await expect(page.getByText(/Nagrywam/)).toBeVisible();
+        await page.getByRole('button', { name: 'Zakończ nagranie' }).click();
+        await expect(page.getByText(/Ostatnia fraza: dobra/)).toBeVisible();
+      }
+      await expectAccessible(page, `kreator ${theme}`);
+      await page.getByRole('button', { name: 'Zakończ rejestrację' }).click();
+      await expect(page.getByText('Głos zarejestrowany (fraz: 3).')).toBeVisible();
+
+      // Dyktowanie z odliczaniem i podglądem.
+      await page.getByRole('button', { name: 'Dyktuj za 3 s' }).click();
+      await expect(page.getByText(/Przejdź do okna docelowego/)).toBeVisible();
+      await expect(page.getByText('Dyktuję do: notepad.exe')).toBeVisible({ timeout: 6_000 });
+      await expect(page.getByText('dzień dobry kropka')).toBeVisible();
+      await expectAccessible(page, `dyktowanie ${theme}`);
+      await page.getByRole('button', { name: 'Zakończ dyktowanie' }).click();
+      await expect(page.getByText('Dyktowanie wyłączone.')).toBeVisible();
+
+      // Czytanie schowka: sterowanie z klawiatury, Esc zatrzymuje.
+      await page.getByRole('button', { name: 'Czytaj schowek' }).click();
+      await expect(page.getByRole('toolbar', { name: 'Czytanie na głos' })).toBeVisible();
+      const pause = page.getByRole('button', { name: 'Pauza', exact: true });
+      await pause.focus();
+      await page.keyboard.press('Enter');
+      await expect(page.getByRole('button', { name: 'Wznów' })).toBeVisible();
+      await expectAccessible(page, `czytanie ${theme}`);
+      await page.getByRole('button', { name: 'Wznów' }).click();
+      await page.keyboard.press('Escape');
+      await expect(page.getByText('Nic nie jest czytane.')).toBeVisible();
+    });
+
+    test('Ustawienia → Głos: jawne włączenie z potwierdzeniem ryzyka, profile, tempo', async ({
+      page,
+    }) => {
+      await openApp(page, { theme });
+      await waitForChat(page);
+      await settings(page, 'Głos');
+      const enable = page.getByRole('switch', { name: 'Włącz słowa wywoławcze' });
+      await expect(enable).toBeVisible();
+      await expect(enable).toHaveAttribute('aria-checked', 'false');
+      await expectAccessible(page, `ustawienia głos ${theme}`);
+
+      // Bramka właściciela bez profilu — wyłączamy ją, potem włączenie wymaga potwierdzenia ryzyka.
+      await page.getByRole('switch', { name: /Tylko mój głos budzi Alfę/ }).click();
+      await enable.click();
+      const dialog = page.getByRole('alertdialog', {
+        name: 'Włączyć nieskalibrowane słowa wywoławcze?',
+      });
+      await expect(dialog).toBeVisible();
+      await expectAccessible(page, `ryzyko ${theme}`);
+      await dialog.getByRole('button', { name: 'Włącz na własne ryzyko' }).click();
+      await expect(page.getByRole('switch', { name: 'Włącz słowa wywoławcze' })).toHaveAttribute(
+        'aria-checked',
+        'true',
+      );
+      await expect(page.getByText('Nasłuchuję słów wywoławczych.').first()).toBeVisible();
+
+      await page.getByLabel('Program').fill('C:\\Windows\\notepad.exe');
+      await page.getByRole('button', { name: 'Zapisz profil' }).click();
+      await expect(page.getByRole('button', { name: 'Usuń profil notepad.exe' })).toBeVisible();
+      await page.getByLabel('Program').fill('notepad');
+      await page.getByRole('button', { name: 'Zapisz profil' }).click();
+      await expect(page.getByText('Podaj nazwę programu, np. notepad.exe.')).toBeVisible();
+
+      await expect(
+        page.getByRole('switch', { name: 'Wymagaj weryfikacji głosu dla akcji ryzykownych' }),
+      ).toHaveAttribute('aria-checked', 'true');
+      await expect(page.getByRole('slider', { name: /Tempo czytania/ })).toBeVisible();
+      await expectAccessible(page, `ustawienia głos po zmianach ${theme}`);
+    });
+
+    test('Ustawienia → Głos: silniki rozmowy, zamknięcie bezpiecznika z klawiatury', async ({
+      page,
+    }) => {
+      await openApp(page, { theme });
+      await waitForChat(page);
+      await settings(page, 'Głos');
+      const card = page.getByTestId('voice-engines');
+      await expect(card.getByRole('heading', { name: 'Silniki rozmowy' })).toBeVisible();
+      await expect(card.getByText('Qwen3-ASR', { exact: true })).toBeVisible();
+      await expect(card.getByText('zapas: Whisper')).toBeVisible();
+      await expect(card.getByText('Smart Turn', { exact: true })).toBeVisible();
+      await expect(card.getByTestId('voice-turn-stats')).toHaveText(
+        'ocen: 31 · ostatnia pewność 93 % · 26 ms',
+      );
+      await expect(card.getByText('Supertonic 3 · mówi')).toBeVisible();
+      await expect(card.getByText('Pocket TTS · do pobrania')).toBeVisible();
+      await expect(card.getByTestId('voice-breaker')).toHaveText('Silnik główny odstawiony');
+      await expect(card.getByText(/rozpoznaje Whisper\. Następna próba .* za 18 s/)).toBeVisible();
+      await expectAccessible(page, `silniki rozmowy otwarty ${theme}`);
+
+      const reset = card.getByRole('button', { name: 'Zamknij bezpiecznik' });
+      await reset.focus();
+      await page.keyboard.press('Enter');
+      await expect(card.getByTestId('voice-breaker')).toHaveText('Silnik główny pracuje');
+      await expect(reset).toHaveCount(0);
+      await expect(card.getByText('0 / 3')).toBeVisible();
+      await expect(card.getByText('280 ms')).toBeVisible();
+      await card.getByRole('button', { name: 'Odśwież' }).click();
+      await expect(card.getByTestId('voice-breaker')).toHaveText('Silnik główny pracuje');
+
+      // „Sprawdź silniki”: trzy wyniki z czasem; nic nie jest odtwarzane.
+      await expect(card.getByTestId('voice-self-test')).toHaveCount(0);
+      await card.getByRole('button', { name: 'Sprawdź silniki' }).click();
+      const result = card.getByTestId('voice-self-test');
+      await expect(result.getByRole('listitem')).toHaveCount(3);
+      await expect(result.getByText('działa', { exact: true })).toHaveCount(3);
+      await expect(result.getByText('2,5 s')).toBeVisible();
+      await expect(result.getByText('Qwen3-ASR wczytany na karcie graficznej')).toBeVisible();
+      await expectAccessible(page, `silniki rozmowy zamknięty ${theme}`);
+    });
+
+    test('Ustawienia → Głos: brakujące silniki prowadzą do katalogu modeli', async ({ page }) => {
+      await openApp(page, { theme, scenario: 'no-mic' });
+      await waitForChat(page);
+      await settings(page, 'Głos');
+      const card = page.getByTestId('voice-engines');
+      await expect(card.getByText('Długość ciszy i tekst')).toBeVisible();
+      await expect(
+        card.getByText(/Qwen3-ASR\) włączy się po pobraniu: model Qwen3-ASR 1\.7B\./),
+      ).toBeVisible();
+      await expect(
+        card.getByText(
+          /Smart Turn włączy się po pobraniu: model Smart Turn v3\.2, biblioteka ONNX Runtime\./,
+        ),
+      ).toBeVisible();
+      await expect(card.getByTestId('voice-guard')).toHaveCount(0);
+      await card.getByRole('button', { name: 'Sprawdź silniki' }).click();
+      const result = card.getByTestId('voice-self-test');
+      await expect(result.getByText('nie działa', { exact: true })).toHaveCount(1);
+      await expect(
+        result.getByText('brak plików Smart Turn — działa ocena z tekstu'),
+      ).toBeVisible();
+      await expectAccessible(page, `silniki rozmowy braki ${theme}`);
+      await card.getByRole('button', { name: 'Otwórz „Modele lokalne i silniki”' }).click();
+      await expect(
+        page.getByRole('heading', { name: 'Modele lokalne i silniki', level: 2 }),
+      ).toBeVisible();
+    });
+  });
+}

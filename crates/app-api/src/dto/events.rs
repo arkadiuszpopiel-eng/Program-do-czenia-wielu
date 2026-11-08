@@ -1,0 +1,303 @@
+//! Zdarzenia `alfa://events` (paczka `AlfaEvent[]`, batch co klatkę) — odpowiednik `types-system.ts`.
+
+use serde::{Deserialize, Serialize};
+
+use super::agents::{AgentRun, ReplayStep, VoiceStatus};
+use super::broker::BrokerStatusView;
+use super::cameras::CamerasState;
+use super::common::LocalizedText;
+use super::gui::GuiStatus;
+use super::health::HealthOverall;
+use super::hub::{Account, LocalDownloadState};
+use super::models::{ModelItem, ReindexView};
+use super::panels::{ActivityInfo, AgentState, CostSummary, TimelineEvent};
+use super::sessions::{
+    ApprovalPending, RenderedBlock, SessionSummary, ToolStep, Turn, TurnError, TurnStatus,
+    TurnUsage,
+};
+use super::system::{SystemStatus, VoicePillState};
+use super::tasks::{MarshalReport, TaskInfo, TriggerRunInfo};
+use super::updates::UpdatesView;
+use super::voice_features::VoiceFeatures;
+
+/// Powód zakończenia strumienia.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum StopReason {
+    End,
+    Refusal,
+    ToolUse,
+    MaxTokens,
+    Cancelled,
+}
+
+/// Rodzaj komunikatu rdzenia.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum ToastKind {
+    Info,
+    Success,
+    Warning,
+    Error,
+}
+
+/// Zdarzenie rdzeń → UI.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+#[serde(tag = "type")]
+pub enum AlfaEvent {
+    TurnAppended {
+        session_id: String,
+        turn: Box<Turn>,
+    },
+    TurnStatus {
+        session_id: String,
+        turn_id: String,
+        status: TurnStatus,
+    },
+    TextDelta {
+        session_id: String,
+        turn_id: String,
+        text: String,
+        blocks: Vec<RenderedBlock>,
+        /// Długość tekstu tury przed tą deltą (w jednostkach UTF-16, jak `String.length` w JS):
+        /// klient pomija część, którą już ma (np. z migawki `turns_list`), i wykrywa lukę.
+        #[serde(default)]
+        offset: u64,
+    },
+    ThinkingDelta {
+        session_id: String,
+        turn_id: String,
+        elapsed_ms: u64,
+        done: bool,
+    },
+    ToolCall {
+        session_id: String,
+        turn_id: String,
+        step: ToolStep,
+    },
+    ApprovalPending {
+        session_id: String,
+        turn_id: String,
+        approval: ApprovalPending,
+    },
+    Usage {
+        session_id: String,
+        turn_id: String,
+        usage: TurnUsage,
+    },
+    Stop {
+        session_id: String,
+        turn_id: String,
+        reason: StopReason,
+    },
+    Error {
+        session_id: String,
+        turn_id: String,
+        error: TurnError,
+    },
+    SessionUpdated {
+        session: SessionSummary,
+    },
+    SessionRemoved {
+        session_id: String,
+    },
+    AgentsChanged {
+        session_id: String,
+        agents: Vec<AgentState>,
+    },
+    ActivityChanged {
+        session_id: String,
+        activity: Option<ActivityInfo>,
+    },
+    CostsChanged {
+        session_id: String,
+        costs: CostSummary,
+    },
+    SystemStatusChanged {
+        status: SystemStatus,
+    },
+    TimelineAppended {
+        event: TimelineEvent,
+    },
+    AccountChanged {
+        account: Account,
+    },
+    MicLevel {
+        /// Poziom 0–1 po redukcji szumów (to, co słyszy rozpoznawanie mowy).
+        level: f64,
+        /// Poziom surowy z mikrofonu (test mikrofonu) — widać, ile tła odcięto.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        raw: Option<f64>,
+    },
+    /// Poziom mowy agentki z głośnika (0–1) — awatar rusza ustami w tym rytmie.
+    SpeechLevel {
+        /// Agentka, która mówi (puste przy ciszy po przerwaniu).
+        agent: String,
+        level: f64,
+    },
+    /// Zdanie, które właśnie słychać przy czytaniu wiadomości na głos — okno wyróżnia je w treści
+    /// (plan 43). Wysyłane w chwili, gdy zdanie zaczyna brzmieć; `index == of` z pustym `text` —
+    /// czytanie tej tury się skończyło.
+    SpeechSegment {
+        /// Czytana tura.
+        turn_id: String,
+        /// Numer zdania (od 0).
+        index: u32,
+        /// Liczba zdań w czytanym tekście.
+        of: u32,
+        /// Tekst mówiony zdania (bez znaczników; kod zastąpiony opisem).
+        text: String,
+    },
+    VoicePill {
+        state: VoicePillState,
+    },
+    Toast {
+        kind: ToastKind,
+        message: LocalizedText,
+    },
+    /// Przejdź do sesji (zasobnik, protokół `alfa://session/…`, powiadomienie, Szybkie pytanie).
+    OpenSession {
+        session_id: String,
+    },
+    /// Przebieg agentki: start, zmiana stanu, zużycie, koniec (nagłówek bez kroków).
+    AgentRunUpdated {
+        session_id: String,
+        run: AgentRun,
+    },
+    /// Krok przebiegu (Replay na żywo): start, koniec, „czeka na zatwierdzenie", cofnięcie.
+    AgentStep {
+        session_id: String,
+        run_id: String,
+        step: ReplayStep,
+    },
+    /// Stan trybu głosowego (dostępność, mikrofon, tryb PTT, aktywna agentka).
+    VoiceStatusChanged {
+        status: VoiceStatus,
+    },
+    /// Postęp pobierania modelu lokalnego (onboarding, Ustawienia).
+    LocalModelProgress {
+        model_id: String,
+        state: LocalDownloadState,
+        bytes: u64,
+        total: Option<u64>,
+        error: Option<String>,
+    },
+    /// Pamięć zmieniona (zapamiętanie, edycja, zapomnienie, porządkowanie) — odśwież Inspektor.
+    MemoryChanged {
+        scope_key: Option<String>,
+    },
+    /// Zadanie schedulera: zgłoszone, zmiana stanu, postęp, zakończenie.
+    TaskUpdated {
+        task: TaskInfo,
+    },
+    /// Uruchomienie wyzwalacza (dziennik).
+    TriggerFired {
+        run: TriggerRunInfo,
+    },
+    /// Raport dzienny Marszałka (relacjonuje Dyrygentka; powiadomienie natywne).
+    MarshalReportReady {
+        report: MarshalReport,
+    },
+    /// Computer use: kto steruje, ostatnie akcje, przejęcie (pasek tytułu, panel „Ekran") — bez pikseli.
+    GuiActivity {
+        status: GuiStatus,
+    },
+    /// Biblioteka umiejętności zmieniona (propozycja z pamięci, import, zatwierdzenie).
+    SkillsChanged {
+        skill_id: Option<String>,
+    },
+    /// „Zdrowie systemu" zmienione (incydent, naprawa, propozycja Ulepszacza, werdykt bramki).
+    HealthChanged {
+        overall: HealthOverall,
+        pending: u32,
+    },
+    /// Stan aktualizacji: sprawdzanie, pobieranie (postęp), gotowa do restartu, błąd.
+    UpdateStatus {
+        status: UpdatesView,
+    },
+    /// Stan Brokera zmieniony (połączono, tryb przenośny, zerwanie — bezpieczny stan, watchdog).
+    BrokerStatus {
+        status: BrokerStatusView,
+    },
+    /// Głos rozszerzony F5 (słowa wywoławcze, weryfikacja właściciela, dyktowanie, czytanie):
+    /// zmiana stanu — panel Głos i Ustawienia → Głos (bez audio i bez czytanego tekstu).
+    VoiceFeaturesChanged {
+        features: Box<VoiceFeatures>,
+    },
+    /// Menedżer modeli: postęp pobierania pliku pozycji (co ≥ 200 ms albo 1 %).
+    ModelProgress {
+        item_id: String,
+        file: String,
+        done: u64,
+        total: Option<u64>,
+    },
+    /// Menedżer modeli: zmiana stanu pozycji (kolejka, pobieranie, zgoda TOFU, instalacja, błąd).
+    ModelChanged {
+        item: Box<ModelItem>,
+    },
+    /// Przebudowa wektorów w tle po zmianie embeddera (tylko liczniki, bez treści).
+    ReindexStatus {
+        status: ReindexView,
+    },
+    /// Kamery: zmiana listy, stanu strumienia, przełącznika albo nazwy (bez obrazu).
+    CamerasChanged {
+        state: CamerasState,
+    },
+}
+
+/// Ramka zdarzeń `alfa://events`: paczka z numerami kolejnymi (plan v6 B.2, ADR 0019).
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct EventFrame {
+    /// Wersja ramki.
+    pub v: u8,
+    /// Znacznik uruchomienia rdzenia (numery z innego uruchomienia nic nie znaczą).
+    pub epoch: String,
+    /// `seq` poprzedniej ramki (0 — to pierwsza); inna wartość niż ostatnia znana klientowi
+    /// oznacza zgubioną ramkę.
+    pub prev: u64,
+    /// Numer ostatniego zdarzenia w tej ramce.
+    pub seq: u64,
+    /// Zdarzenia w kolejności.
+    pub events: Vec<AlfaEvent>,
+}
+
+impl std::ops::Deref for EventFrame {
+    type Target = Vec<AlfaEvent>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.events
+    }
+}
+
+/// Wynik `events_resume`: brakujące ramki albo informacja, że trzeba wczytać stan od nowa.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, schemars::JsonSchema)]
+pub struct EventsResume {
+    /// Znacznik bieżącego uruchomienia rdzenia.
+    pub epoch: String,
+    /// `seq` ostatniej wydanej ramki.
+    pub latest_seq: u64,
+    /// `false` — brakujących ramek nie da się już odtworzyć (inne uruchomienie albo wypadły
+    /// z bufora); klient wczytuje stan od nowa i liczy od `latest_seq`.
+    pub complete: bool,
+    /// Ramki po `after_seq`, w kolejności.
+    pub frames: Vec<EventFrame>,
+}
+
+impl AlfaEvent {
+    /// Zdarzenie postępu pobierania modelu lokalnego.
+    pub fn local_progress(
+        model_id: &str,
+        state: LocalDownloadState,
+        bytes: u64,
+        total: Option<u64>,
+        error: Option<String>,
+    ) -> Self {
+        Self::LocalModelProgress {
+            model_id: model_id.to_owned(),
+            state,
+            bytes,
+            total,
+            error,
+        }
+    }
+}

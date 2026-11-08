@@ -1,0 +1,21 @@
+[package]
+name = "memory-consolidation-fake"
+description = "Konsolidacja pamięci: atrapy portów — skryptowany konsolidator, budżet o stałym werdykcie, sterowany stan maszyny"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+memory-consolidation-contract = { path = "../memory-consolidation-contract" }
+async-trait.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+memory-contract = { path = "../memory-contract" }
+tokio.workspace = true
+
+[lints]
+workspace = true

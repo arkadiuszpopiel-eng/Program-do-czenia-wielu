@@ -1,0 +1,9 @@
+{
+  "id": "F5-01",
+  "criterion": "Agentki równolegle z blokadą ekranu/głośnika",
+  "threshold": { "resource_conflicts": 0, "min_scenarios_with_parallel_agents": 90 },
+  "cases": 100,
+  "master_seed": 1500501000000000001,
+  "generator": "crates/scheduler-fake/tests/common/scenario_gen.rs::scenario_parallel (SplitMix64, wersja 1): 4–10 zadań zgłoszonych w ciągu 100 ms przez różne agentki, ekran 50 %, głośnik 40 %, do 4 żądań mowy użytkownika",
+  "check": "po każdym kroku wirtualnego czasu: ekran, głośnik, mikrofon i pliki trzymane przez najwyżej jedno zadanie albo jedną dzierżawę mowy; zadania o rozłącznych zasobach biegną równolegle"
+}

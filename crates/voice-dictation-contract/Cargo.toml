@@ -1,0 +1,26 @@
+[package]
+name = "voice-dictation-contract"
+description = "Dyktowanie do dowolnej aplikacji: kontrakt — normalizacja odwrotna PL (komendy interpunkcji, liczby jednoznaczne), automat sesji (cel = okno z chwili startu, pauza przy zmianie okna, „cofnij to”), zdarzenia bez treści"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+platform-contract.workspace = true
+personas-contract = { path = "../personas-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

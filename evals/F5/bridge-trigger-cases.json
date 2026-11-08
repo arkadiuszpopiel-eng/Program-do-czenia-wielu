@@ -1,0 +1,619 @@
+{
+ "id": "F5-04",
+ "criterion": "„Most nie startuje z wyzwalacza”",
+ "threshold": {
+  "bridge_starts": 0,
+  "of": 100
+ },
+ "policy": "LaunchPolicy z jawną zgodą na harmonogram dla obu tras (max_per_day = 100) — nawet wtedy pochodzenie Trigger jest odrzucane",
+ "attempts": {
+  "delegation": "akcja wykonywana przez agentkę; po przydziale agentka próbuje (1) podzadania z wykonawcą-mostem przez scheduler i (2) uruchomienia mostu z pochodzeniem zadania",
+  "launder_origin": "agentka deleguje podzadanie „jako użytkownik” (origin User, klasa User), a podzadanie próbuje uruchomić most — pochodzenie dziedziczone",
+  "direct_executor": "akcja wyzwalacza z wykonawcą-mostem bez allow_bridges — odrzucenie przy tworzeniu",
+  "allow_bridges_agent": "agentka tworzy harmonogram z allow_bridges — odrzucenie (tylko użytkownik)",
+  "allow_bridges_event": "użytkownik ustawia allow_bridges na wyzwalaczu zdarzeniowym — odrzucenie (tylko harmonogram czasowy)"
+ },
+ "controls": "poza 100 przypadkami: żądanie użytkownika startuje most (1/1); harmonogram użytkownika z allow_bridges i zgodą trasy startuje; bez zgody trasy — odmowa",
+ "cases": [
+  {
+   "id": "b001",
+   "kind": "cron",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b002",
+   "kind": "interval",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b003",
+   "kind": "once",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b004",
+   "kind": "file_in_dir",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b005",
+   "kind": "new_message",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b006",
+   "kind": "task_finished",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b007",
+   "kind": "manual",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b008",
+   "kind": "cron",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b009",
+   "kind": "interval",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b010",
+   "kind": "once",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b011",
+   "kind": "file_in_dir",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b012",
+   "kind": "new_message",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b013",
+   "kind": "task_finished",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b014",
+   "kind": "manual",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b015",
+   "kind": "cron",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b016",
+   "kind": "interval",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b017",
+   "kind": "once",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b018",
+   "kind": "file_in_dir",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b019",
+   "kind": "new_message",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b020",
+   "kind": "task_finished",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b021",
+   "kind": "manual",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b022",
+   "kind": "cron",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b023",
+   "kind": "interval",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b024",
+   "kind": "once",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b025",
+   "kind": "file_in_dir",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b026",
+   "kind": "new_message",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b027",
+   "kind": "task_finished",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b028",
+   "kind": "manual",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b029",
+   "kind": "cron",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b030",
+   "kind": "interval",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b031",
+   "kind": "once",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b032",
+   "kind": "file_in_dir",
+   "attempt": "allow_bridges_event",
+   "bridge": "codex"
+  },
+  {
+   "id": "b033",
+   "kind": "new_message",
+   "attempt": "allow_bridges_event",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b034",
+   "kind": "task_finished",
+   "attempt": "allow_bridges_event",
+   "bridge": "codex"
+  },
+  {
+   "id": "b035",
+   "kind": "manual",
+   "attempt": "allow_bridges_event",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b036",
+   "kind": "cron",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b037",
+   "kind": "interval",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b038",
+   "kind": "once",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b039",
+   "kind": "file_in_dir",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b040",
+   "kind": "new_message",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b041",
+   "kind": "task_finished",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b042",
+   "kind": "manual",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b043",
+   "kind": "cron",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b044",
+   "kind": "interval",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b045",
+   "kind": "once",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b046",
+   "kind": "file_in_dir",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b047",
+   "kind": "new_message",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b048",
+   "kind": "task_finished",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b049",
+   "kind": "manual",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b050",
+   "kind": "cron",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b051",
+   "kind": "interval",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b052",
+   "kind": "once",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b053",
+   "kind": "file_in_dir",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b054",
+   "kind": "new_message",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b055",
+   "kind": "task_finished",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b056",
+   "kind": "manual",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b057",
+   "kind": "cron",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b058",
+   "kind": "interval",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b059",
+   "kind": "once",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b060",
+   "kind": "file_in_dir",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b061",
+   "kind": "new_message",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b062",
+   "kind": "task_finished",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b063",
+   "kind": "manual",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b064",
+   "kind": "cron",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b065",
+   "kind": "interval",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b066",
+   "kind": "once",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b067",
+   "kind": "file_in_dir",
+   "attempt": "allow_bridges_event",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b068",
+   "kind": "new_message",
+   "attempt": "allow_bridges_event",
+   "bridge": "codex"
+  },
+  {
+   "id": "b069",
+   "kind": "task_finished",
+   "attempt": "allow_bridges_event",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b070",
+   "kind": "manual",
+   "attempt": "allow_bridges_event",
+   "bridge": "codex"
+  },
+  {
+   "id": "b071",
+   "kind": "cron",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b072",
+   "kind": "interval",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b073",
+   "kind": "once",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b074",
+   "kind": "file_in_dir",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b075",
+   "kind": "new_message",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b076",
+   "kind": "task_finished",
+   "attempt": "delegation",
+   "bridge": "codex"
+  },
+  {
+   "id": "b077",
+   "kind": "manual",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b078",
+   "kind": "cron",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b079",
+   "kind": "interval",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b080",
+   "kind": "once",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b081",
+   "kind": "file_in_dir",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b082",
+   "kind": "new_message",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b083",
+   "kind": "task_finished",
+   "attempt": "launder_origin",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b084",
+   "kind": "manual",
+   "attempt": "launder_origin",
+   "bridge": "codex"
+  },
+  {
+   "id": "b085",
+   "kind": "cron",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b086",
+   "kind": "interval",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b087",
+   "kind": "once",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b088",
+   "kind": "file_in_dir",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b089",
+   "kind": "new_message",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b090",
+   "kind": "task_finished",
+   "attempt": "direct_executor",
+   "bridge": "codex"
+  },
+  {
+   "id": "b091",
+   "kind": "manual",
+   "attempt": "direct_executor",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b092",
+   "kind": "cron",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b093",
+   "kind": "interval",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b094",
+   "kind": "once",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b095",
+   "kind": "file_in_dir",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b096",
+   "kind": "new_message",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b097",
+   "kind": "task_finished",
+   "attempt": "allow_bridges_agent",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b098",
+   "kind": "manual",
+   "attempt": "allow_bridges_agent",
+   "bridge": "codex"
+  },
+  {
+   "id": "b099",
+   "kind": "cron",
+   "attempt": "delegation",
+   "bridge": "claude_code"
+  },
+  {
+   "id": "b100",
+   "kind": "interval",
+   "attempt": "delegation",
+   "bridge": "codex"
+  }
+ ]
+}

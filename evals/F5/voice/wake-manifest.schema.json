@@ -1,0 +1,210 @@
+{
+  "$defs": {
+    "Conditions": {
+      "description": "Warunki nagrania.",
+      "properties": {
+        "distance_m": {
+          "default": null,
+          "description": "Odległość od mikrofonu (m).",
+          "format": "float",
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "environment": {
+          "description": "`quiet` / `noise` / `speakers` / `tv` / `podcast` / `conversation`.",
+          "type": "string"
+        },
+        "machine": {
+          "description": "`desktop` / `laptop` / `synthetic`.",
+          "type": "string"
+        },
+        "mic": {
+          "description": "`usb` / `builtin` / `headset` / `virtual`.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "machine",
+        "environment",
+        "mic"
+      ],
+      "type": "object"
+    },
+    "Segment": {
+      "description": "Fragment pliku (ms) — okno, w którym ma paść wykrycie pozytywu.",
+      "properties": {
+        "end_ms": {
+          "description": "Koniec frazy.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "start_ms": {
+          "description": "Początek frazy.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start_ms",
+        "end_ms"
+      ],
+      "type": "object"
+    },
+    "Split": {
+      "description": "Podział.",
+      "oneOf": [
+        {
+          "const": "dev",
+          "description": "Strojenie (progi, histereza).",
+          "type": "string"
+        },
+        {
+          "const": "test",
+          "description": "Ocena (zamrażany hashem).",
+          "type": "string"
+        }
+      ]
+    },
+    "SynthRecipe": {
+      "description": "Przepis próbki syntetycznej (CI): cisza/szum, potem ton (atrapa „frazy”) albo mowa syntetyczna.",
+      "properties": {
+        "kind": {
+          "description": "`tone` (fraza atrapy: ton o `tone_hz`) albo `speech` (mowa syntetyczna, tło).",
+          "type": "string"
+        },
+        "lead_secs": {
+          "default": 0.0,
+          "description": "Cichy szum przed (s).",
+          "format": "float",
+          "type": "number"
+        },
+        "secs": {
+          "description": "Długość części głównej (s).",
+          "format": "float",
+          "type": "number"
+        },
+        "seed": {
+          "default": 0,
+          "description": "Ziarno.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "tone_hz": {
+          "default": 0.0,
+          "description": "Częstotliwość tonu (Hz).",
+          "format": "float",
+          "type": "number"
+        }
+      },
+      "required": [
+        "kind",
+        "secs"
+      ],
+      "type": "object"
+    },
+    "WakeItemKind": {
+      "description": "Rodzaj pozycji.",
+      "oneOf": [
+        {
+          "const": "wake_positive",
+          "description": "Fraza wywoławcza właściciela (FRR).",
+          "type": "string"
+        },
+        {
+          "const": "wake_background",
+          "description": "Tło bez frazy (FAR).",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Pozycja manifestu.",
+  "properties": {
+    "audio": {
+      "default": null,
+      "description": "Plik WAV 16 kHz mono (względnie wobec `--audio-root`, bez `..`).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "conditions": {
+      "$ref": "#/$defs/Conditions",
+      "description": "Warunki."
+    },
+    "id": {
+      "description": "Unikalny identyfikator `[a-z0-9._-]`.",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/WakeItemKind",
+      "description": "Rodzaj."
+    },
+    "note": {
+      "default": null,
+      "description": "Uwagi.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "persona": {
+      "default": null,
+      "description": "Adresatka pozytywu (`alfa`, `delta`, własne imię z Kreatora).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "phrase": {
+      "default": null,
+      "description": "Wypowiedziana fraza.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "segment": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Segment"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Gdzie w pliku jest fraza."
+    },
+    "split": {
+      "$ref": "#/$defs/Split",
+      "description": "Podział."
+    },
+    "synth": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SynthRecipe"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Przepis syntetyczny (zamiast `audio`)."
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "split",
+    "conditions"
+  ],
+  "title": "WakeItem",
+  "type": "object"
+}

@@ -1,0 +1,39 @@
+[
+  {
+    "command": "sessions_export_conversation",
+    "args": {
+      "sessionId": "s-trip",
+      "format": "markdown",
+      "turnId": null
+    },
+    "result": {
+      "status": "saved",
+      "path": "C:\\Users\\Ty\\Documents\\Plan wyjazdu do Gdańska 2026-09-30.md",
+      "files": 1,
+      "bytes": 402
+    }
+  },
+  {
+    "command": "sessions_export_conversation",
+    "args": {
+      "sessionId": "s-q3",
+      "format": "html",
+      "turnId": "q3"
+    },
+    "result": {
+      "status": "saved",
+      "path": "C:\\Users\\Ty\\Documents\\Raport Q3 2026-09-30.html",
+      "files": 1,
+      "bytes": 1474
+    }
+  },
+  {
+    "command": "canvas_render",
+    "args": {
+      "kind": "svg",
+      "source": "<svg xmlns=\"http://www.w3.org/2000/svg\"/>",
+      "lang": "pl"
+    },
+    "result": "<!doctype html><html lang=\"pl\"><head><meta charset=\"utf-8\"><style>:root{color-scheme:light dark}body{margin:0;padding:16px;font:15px/1.5 system-ui,'Segoe UI',sans-serif;overflow-wrap:anywhere}img,svg{max-width:100%;height:auto}table{border-collapse:collapse}</style></head><body><svg xmlns=\"http://www.w3.org/2000/svg\"/></body></html>"
+  }
+]

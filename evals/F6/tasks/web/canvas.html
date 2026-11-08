@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Panel bez opisu</title>
+<style>
+body { margin: 0; background: #f4f4f4; }
+canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="panel" width="900" height="560"></canvas>
+<script>
+// Przyciski narysowane na płótnie: brak węzłów dostępności (trasa wizja + wejście).
+const przyciski = [
+  { x: 90, y: 380, w: 200, h: 80, kolor: '#c62828', napis: 'Anuluj' },
+  { x: 610, y: 120, w: 200, h: 80, kolor: '#2e7d32', napis: 'OK' },
+  { x: 350, y: 250, w: 200, h: 80, kolor: '#1565c0', napis: 'Pomoc' },
+];
+const ctx = document.getElementById('panel').getContext('2d');
+ctx.font = 'bold 32px system-ui, sans-serif';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+for (const p of przyciski) {
+  ctx.fillStyle = p.kolor;
+  ctx.fillRect(p.x, p.y, p.w, p.h);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(p.napis, p.x + p.w / 2, p.y + p.h / 2);
+}
+document.getElementById('panel').addEventListener('click', (e) => {
+  const r = e.target.getBoundingClientRect();
+  const x = e.clientX - r.left;
+  const y = e.clientY - r.top;
+  const trafiony = przyciski.find((p) => x >= p.x && x <= p.x + p.w && y >= p.y && y <= p.y + p.h);
+  if (trafiony) {
+    document.title = 'Kliknięto: ' + trafiony.napis;
+  }
+});
+</script>
+</body>
+</html>

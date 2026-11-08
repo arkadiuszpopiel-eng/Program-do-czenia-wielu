@@ -1,0 +1,23 @@
+[package]
+name = "agent-runtime-fake"
+description = "agent-runtime: atrapa — przebiegi ze skryptu zdarzeń (plan, kroki, prośby o zatwierdzenie, pętla, budżet) na wirtualnym zegarze, steering i anulowanie (testy UI, voice-dialog, broker-ui)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+agent-runtime-contract = { path = "../agent-runtime-contract" }
+async-trait.workspace = true
+tokio.workspace = true
+tokio-util = { version = "0.7.19", default-features = false }
+
+[dev-dependencies]
+agent-runtime-contract = { path = "../agent-runtime-contract", features = ["contract-tests"] }
+safety-broker-contract = { path = "../safety-broker-contract" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

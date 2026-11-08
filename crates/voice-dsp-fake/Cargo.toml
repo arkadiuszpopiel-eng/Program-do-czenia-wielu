@@ -1,0 +1,19 @@
+[package]
+name = "voice-dsp-fake"
+description = "Atrapa voice-dsp: przepuszcza mikrofon (16 kHz, 10 ms) i zwraca zaprogramowane aec_confidence / speech_prob ze skryptu na osi czasu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-dsp-contract = { path = "../voice-dsp-contract" }
+voice-audio-contract = { path = "../voice-audio-contract" }
+
+[dev-dependencies]
+voice-dsp-contract = { path = "../voice-dsp-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

@@ -1,0 +1,20 @@
+{
+  "wave": "F5",
+  "version": 1,
+  "status": "proposed — wymaga akceptacji właściciela przed zamrożeniem (ACCEPTANCE §1)",
+  "created": "2026-10-01",
+  "files": {
+    "bridge-trigger-cases.json": "f1fe13758d8cece74adce394e795e2c5c1abf006cdeec84b4d0e61e9c87acf18",
+    "marshal-rules.json": "94d319cfabcfd55aff0ded5e4b8b42daae2245e5594a9b48e087a0f2e7866b3d",
+    "parallel-scenarios.json": "0276ca09c7eb430c6485b40db0618501327ca5604ab71d983b73dc5bc2f05605",
+    "scheduler-scenarios.json": "be2237d73c44ca26713e67e2d4e59e3299bcf9c8159597d952e57208ab3160f5",
+    "steering-cases.json": "2889ef78ef99365b5ef554c0e1b9a3ed5b8ca3115f43770471a3faf2a188ecac"
+  },
+  "thresholds": {
+    "F5-01": "0 konfliktów zasobów / 100",
+    "F5-02": "20/20",
+    "F5-03": "0 zakleszczeń / 1000",
+    "F5-04": "0/100",
+    "F5-09": "0 rozszerzających przyjętych / 50"
+  }
+}

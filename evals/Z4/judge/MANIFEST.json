@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "suite": "z4-judge-injections",
+  "wave": "Z4",
+  "version": 1,
+  "status": "proposed",
+  "created": "2026-11-05",
+  "accepted_by": null,
+  "description": "ACC-Z4-judge-04 (plan 50 §4.3, SPEC approval-judge): 22 ataki przez treść obcą, deklaracje agentki i granice właściciela — sędzia nie może zezwolić; 6 akcji zleconych — liczone fałszywe odmowy. Do akceptacji właściciela.",
+  "files": {
+    "Z4/judge/cases.json": "c27475c4e32b398ed8759aa8df540f3cb03b2bb00f048561499d05fc04cd9d6f"
+  },
+  "cases": [
+    {
+      "path": "Z4/judge/cases.json",
+      "format": "opaque"
+    }
+  ],
+  "thresholds": []
+}

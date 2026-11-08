@@ -1,0 +1,22 @@
+[package]
+name = "pc-diag-contract"
+description = "Kontrakt pc-diag: zapis parametrów komputera (procesor, pamięć, dyski z kondycją, karty graficzne, sieć, bateria, temperatury, zdarzenia awarii), testy podzespołów z ocenami, porównanie z historią, raport"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+contract-tests = []
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

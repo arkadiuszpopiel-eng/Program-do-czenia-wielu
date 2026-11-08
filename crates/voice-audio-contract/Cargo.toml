@@ -1,0 +1,30 @@
+[package]
+name = "voice-audio-contract"
+description = "Wejście/wyjście audio Voice Suite: kontrakt — ramki PCM z czasem urządzenia, urządzenia i hot-plug, strumienie, mikser bez alokacji (SPSC), ducking, normalizacja, resampler, WAV, sygnały testowe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` (sprzęt) i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+personas-contract = { path = "../personas-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+# Kolejki SPSC bez blokad i bez alokacji w wątku RT (MIT OR Apache-2.0).
+rtrb = "0.4.0"
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,197 @@
+/* WYGENEROWANE z src/tokens/tokens.json przez scripts/build-tokens.mjs — nie edytuj. */
+
+:root {
+  --alfa-font-sans: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+  --alfa-font-mono: 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  --alfa-font-size-xs: 12px;
+  --alfa-font-size-sm: 13px;
+  --alfa-font-size-md: 14px;
+  --alfa-font-size-lg: 16px;
+  --alfa-font-size-xl: 20px;
+  --alfa-font-size-2xl: 24px;
+  --alfa-font-size-3xl: 32px;
+  --alfa-leading-text: 1.5;
+  --alfa-leading-heading: 1.25;
+  --alfa-leading-tight: 1.2;
+  --alfa-weight-regular: 400;
+  --alfa-weight-semibold: 600;
+  --alfa-space-1: 4px;
+  --alfa-space-2: 8px;
+  --alfa-space-3: 12px;
+  --alfa-space-4: 16px;
+  --alfa-space-6: 24px;
+  --alfa-space-8: 32px;
+  --alfa-space-12: 48px;
+  --alfa-radius-control: 6px;
+  --alfa-radius-card: 10px;
+  --alfa-radius-overlay: 16px;
+  --alfa-radius-full: 9999px;
+  --alfa-size-titlebar: 44px;
+  --alfa-size-hit-target: 24px;
+  --alfa-size-control: 32px;
+  --alfa-size-sidebar-min: 240px;
+  --alfa-size-sidebar-max: 320px;
+  --alfa-size-sidebar-rail: 48px;
+  --alfa-size-panel-min: 300px;
+  --alfa-size-panel-max: 520px;
+  --alfa-size-reading-column: 560px;
+  --alfa-size-reading-column-wide: 760px;
+  --alfa-size-focus-ring: 2px;
+  --alfa-duration-fast: 120ms;
+  --alfa-duration-panel: 180ms;
+  --alfa-duration-orb: 240ms;
+  --alfa-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --alfa-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  color-scheme: light;
+  --alfa-color-bg: #fafafb;
+  --alfa-color-surface: #ffffff;
+  --alfa-color-surface2: #f1f2f5;
+  --alfa-color-surface3: #e7e9ee;
+  --alfa-color-border: #e2e4ea;
+  --alfa-color-border-strong: #bdc1cc;
+  --alfa-color-text: #1a1c22;
+  --alfa-color-text-muted: #5b6070;
+  --alfa-color-text-subtle: #626878;
+  --alfa-color-text-on-accent: #ffffff;
+  --alfa-color-focus: #2f5bff;
+  --alfa-color-scrim: rgba(20, 22, 30, 0.32);
+  --alfa-agent-alfa: #c63d2f;
+  --alfa-agent-alfa-soft: #fbe9e6;
+  --alfa-agent-beta: #0d7a5f;
+  --alfa-agent-beta-soft: #e1f5ee;
+  --alfa-agent-gama: #4f46e5;
+  --alfa-agent-gama-soft: #e9e8fd;
+  --alfa-agent-delta: #0e7490;
+  --alfa-agent-delta-soft: #dff3f8;
+  --alfa-color-success: #127436;
+  --alfa-color-warning: #8a5a00;
+  --alfa-color-error: #b91c1c;
+  --alfa-color-info: #1d4ed8;
+  --alfa-color-risk-low: #127436;
+  --alfa-color-risk-medium: #8a5a00;
+  --alfa-color-risk-high: #b91c1c;
+  --alfa-shadow-1: 0 1px 2px rgba(20, 22, 30, 0.06);
+  --alfa-shadow-2: 0 2px 8px rgba(20, 22, 30, 0.08), 0 1px 2px rgba(20, 22, 30, 0.04);
+  --alfa-shadow-3: 0 12px 32px rgba(20, 22, 30, 0.14), 0 2px 6px rgba(20, 22, 30, 0.06);
+  --alfa-elevation-border: 1px solid var(--alfa-color-border);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --alfa-color-bg: #131417;
+    --alfa-color-surface: #1b1c21;
+    --alfa-color-surface2: #23252c;
+    --alfa-color-surface3: #2c2f38;
+    --alfa-color-border: #2e313a;
+    --alfa-color-border-strong: #424652;
+    --alfa-color-text: #edeef2;
+    --alfa-color-text-muted: #a7acbb;
+    --alfa-color-text-subtle: #8a8f9e;
+    --alfa-color-text-on-accent: #131417;
+    --alfa-color-focus: #8fb0ff;
+    --alfa-color-scrim: rgba(0, 0, 0, 0.5);
+    --alfa-agent-alfa: #f59a84;
+    --alfa-agent-alfa-soft: #3a221e;
+    --alfa-agent-beta: #4fd9a4;
+    --alfa-agent-beta-soft: #16302a;
+    --alfa-agent-gama: #a5b4fc;
+    --alfa-agent-gama-soft: #25263f;
+    --alfa-agent-delta: #5eead4;
+    --alfa-agent-delta-soft: #163036;
+    --alfa-color-success: #4ade80;
+    --alfa-color-warning: #fbbf24;
+    --alfa-color-error: #f87171;
+    --alfa-color-info: #7da9ff;
+    --alfa-color-risk-low: #4ade80;
+    --alfa-color-risk-medium: #fbbf24;
+    --alfa-color-risk-high: #f87171;
+    --alfa-shadow-1: none;
+    --alfa-shadow-2: none;
+    --alfa-shadow-3: none;
+    --alfa-elevation-border: 1px solid var(--alfa-color-border);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --alfa-color-bg: #131417;
+  --alfa-color-surface: #1b1c21;
+  --alfa-color-surface2: #23252c;
+  --alfa-color-surface3: #2c2f38;
+  --alfa-color-border: #2e313a;
+  --alfa-color-border-strong: #424652;
+  --alfa-color-text: #edeef2;
+  --alfa-color-text-muted: #a7acbb;
+  --alfa-color-text-subtle: #8a8f9e;
+  --alfa-color-text-on-accent: #131417;
+  --alfa-color-focus: #8fb0ff;
+  --alfa-color-scrim: rgba(0, 0, 0, 0.5);
+  --alfa-agent-alfa: #f59a84;
+  --alfa-agent-alfa-soft: #3a221e;
+  --alfa-agent-beta: #4fd9a4;
+  --alfa-agent-beta-soft: #16302a;
+  --alfa-agent-gama: #a5b4fc;
+  --alfa-agent-gama-soft: #25263f;
+  --alfa-agent-delta: #5eead4;
+  --alfa-agent-delta-soft: #163036;
+  --alfa-color-success: #4ade80;
+  --alfa-color-warning: #fbbf24;
+  --alfa-color-error: #f87171;
+  --alfa-color-info: #7da9ff;
+  --alfa-color-risk-low: #4ade80;
+  --alfa-color-risk-medium: #fbbf24;
+  --alfa-color-risk-high: #f87171;
+  --alfa-shadow-1: none;
+  --alfa-shadow-2: none;
+  --alfa-shadow-3: none;
+  --alfa-elevation-border: 1px solid var(--alfa-color-border);
+}
+
+@media (forced-colors: active) {
+  :root {
+    --alfa-color-bg: Canvas;
+    --alfa-color-surface: Canvas;
+    --alfa-color-surface2: Canvas;
+    --alfa-color-surface3: Canvas;
+    --alfa-color-border: CanvasText;
+    --alfa-color-border-strong: CanvasText;
+    --alfa-color-text: CanvasText;
+    --alfa-color-text-muted: CanvasText;
+    --alfa-color-text-subtle: CanvasText;
+    --alfa-color-text-on-accent: HighlightText;
+    --alfa-color-focus: Highlight;
+    --alfa-agent-alfa: Highlight;
+    --alfa-agent-alfa-soft: Canvas;
+    --alfa-agent-beta: Highlight;
+    --alfa-agent-beta-soft: Canvas;
+    --alfa-agent-gama: Highlight;
+    --alfa-agent-gama-soft: Canvas;
+    --alfa-agent-delta: Highlight;
+    --alfa-agent-delta-soft: Canvas;
+    --alfa-color-success: CanvasText;
+    --alfa-color-warning: CanvasText;
+    --alfa-color-error: CanvasText;
+    --alfa-color-info: CanvasText;
+    --alfa-color-risk-low: CanvasText;
+    --alfa-color-risk-medium: CanvasText;
+    --alfa-color-risk-high: CanvasText;
+    --alfa-shadow-1: none;
+    --alfa-shadow-2: none;
+    --alfa-shadow-3: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --alfa-duration-fast: 0ms;
+    --alfa-duration-panel: 0ms;
+    --alfa-duration-orb: 0ms;
+  }
+}
+
+:root[data-motion='off'] {
+  --alfa-duration-fast: 0ms;
+  --alfa-duration-panel: 0ms;
+  --alfa-duration-orb: 0ms;
+}

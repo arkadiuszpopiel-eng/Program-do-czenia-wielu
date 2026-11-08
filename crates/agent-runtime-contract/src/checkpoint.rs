@@ -1,0 +1,184 @@
+//! Checkpointy przebiegu: pełny stan pętli w punkcie atomowym (historia append-only, kroki,
+//! zużycie, taint, proweniencja, wywołania w toku) — wznowienie po restarcie bez ponownego
+//! wykonania przerwanych akcji.
+
+use std::collections::BTreeMap;
+use std::sync::{Arc, Mutex};
+
+use core_bus_contract::RunId;
+use providers_contract::{Message, RouteHint, ToolUse};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
+
+use safety_broker_contract::TaintSource;
+
+use crate::event::{RunOutcome, UsageTotals};
+use crate::options::RunOptions;
+use crate::spec::RunSpec;
+
+/// Wersja formatu checkpointu.
+pub const CHECKPOINT_VERSION: u32 = 1;
+
+/// Stan pętli w punkcie atomowym.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct Checkpoint {
+    /// Wersja formatu.
+    pub version: u32,
+    /// Przebieg.
+    pub run: RunId,
+    /// Numer checkpointu (rośnie).
+    pub seq: u64,
+    /// Specyfikacja.
+    pub spec: RunSpec,
+    /// Historia przebiegu (append-only; bez promptu systemowego).
+    pub messages: Vec<Message>,
+    /// Zużycie (kroki, tokeny, koszt, czas).
+    pub usage: UsageTotals,
+    /// Cumulative actual routed model usage; retained across restart for account attribution.
+    #[serde(default)]
+    pub model_usage: BTreeMap<String, (u64, u64, Option<u64>)>,
+    /// Sesja widziała niezaufaną treść.
+    pub tainted: bool,
+    /// Treść zaufana (cel, wiadomości właściciela) — małymi literami, z limitem.
+    pub trusted_text: String,
+    /// Treść niezaufana (wyniki narzędzi) — małymi literami, z limitem.
+    pub untrusted_text: String,
+    /// Wywołania narzędzi zlecone, ale bez zapisanego wyniku (restart w trakcie).
+    pub pending: Vec<ToolUse>,
+    /// Wersja dziennika operacji (0 w starszych zapisach).
+    #[serde(default)]
+    pub journal_version: u8,
+    /// Rozpoczęte operacje; brak wyniku oznacza stan wymagający sprawdzenia.
+    #[serde(default)]
+    pub started_pending: std::collections::BTreeSet<String>,
+    /// Wyniki utrwalone po każdej operacji, zanim zakończy się cała paczka.
+    #[serde(default)]
+    pub completed_pending: BTreeMap<String, providers_contract::ToolResult>,
+    /// Pre-execution failures which require a narrower call before retrying.
+    #[serde(default)]
+    pub failed_preflight: std::collections::BTreeSet<String>,
+    /// Denied operations cannot be retried through model escalation.
+    #[serde(default)]
+    pub denied_calls: std::collections::BTreeSet<String>,
+    /// Odciski ostatnich wywołań (detektor pętli).
+    pub recent_calls: Vec<String>,
+    /// Faza weryfikacji.
+    pub verifying: bool,
+    /// Rundy weryfikacji.
+    pub verify_rounds: u32,
+    /// Plan już ogłoszony.
+    pub planned: bool,
+    /// Pauza.
+    pub paused: bool,
+    /// Wynik (przebieg zakończony).
+    pub finished: Option<RunOutcome>,
+    /// Opcje v1 (delegacja, Krytyczka, koperta uprawnień, pochodzenie); domyślne = v0.
+    #[serde(default)]
+    pub options: RunOptions,
+    /// Pierwsze źródło niezaufanej treści (taint dziedziczony przez podprzebiegi).
+    #[serde(default)]
+    pub taint_source: Option<TaintSource>,
+    /// Zużycie podprzebiegów (delegacje, Krytyczka) — liczone do budżetu tego przebiegu.
+    #[serde(default)]
+    pub delegated: UsageTotals,
+    /// Wskazówka trasy przebiegu (klasa roli, sprawdzanie, podniesienie po odrzuceniu).
+    #[serde(default)]
+    pub route: RouteHint,
+    /// Model (`dostawca:model`), który napisał ostatnią odpowiedź przebiegu.
+    #[serde(default)]
+    pub answer_model: Option<String>,
+    /// Odpowiedź sprawdzana w samoweryfikacji — wynik przebiegu po werdykcie (nie tekst werdyktu).
+    #[serde(default)]
+    pub verified_answer: Option<String>,
+    /// Definicje odnalezione w katalogu, zachowane po wznowieniu przebiegu.
+    #[serde(default)]
+    pub discovered_tools: Vec<String>,
+}
+
+impl Checkpoint {
+    /// Stan początkowy dla specyfikacji.
+    pub fn initial(run: RunId, spec: RunSpec) -> Self {
+        Self::with_options(run, spec, RunOptions::default())
+    }
+
+    /// Stan początkowy z opcjami v1 (taint i proweniencja odziedziczone po rodzicu).
+    pub fn with_options(run: RunId, spec: RunSpec, options: RunOptions) -> Self {
+        let taint_source = options.inherited_taint.clone();
+        let trusted_text = options.trusted_context.clone();
+        let untrusted_text = options.untrusted_context.clone();
+        Self {
+            version: CHECKPOINT_VERSION,
+            run,
+            seq: 0,
+            spec,
+            messages: Vec::new(),
+            usage: UsageTotals::default(),
+            model_usage: BTreeMap::new(),
+            tainted: taint_source.is_some(),
+            trusted_text,
+            untrusted_text,
+            pending: Vec::new(),
+            journal_version: 1,
+            started_pending: Default::default(),
+            completed_pending: Default::default(),
+            failed_preflight: Default::default(),
+            denied_calls: Default::default(),
+            recent_calls: Vec::new(),
+            verifying: false,
+            verify_rounds: 0,
+            planned: false,
+            paused: false,
+            finished: None,
+            options,
+            taint_source,
+            delegated: UsageTotals::default(),
+            route: RouteHint::default(),
+            answer_model: None,
+            verified_answer: None,
+            discovered_tools: Vec::new(),
+        }
+    }
+}
+
+/// Błąd magazynu checkpointów.
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+#[error("magazyn checkpointów: {0}")]
+pub struct CheckpointError(pub String);
+
+/// Magazyn checkpointów (w sesji: katalog przebiegów; w testach: pamięć).
+pub trait CheckpointStore: Send + Sync {
+    /// Zapisuje (zastępuje poprzedni) checkpoint przebiegu — atomowo.
+    fn save(&self, checkpoint: &Checkpoint) -> Result<(), CheckpointError>;
+    /// Ostatni checkpoint przebiegu.
+    fn latest(&self, run: &RunId) -> Result<Option<Checkpoint>, CheckpointError>;
+    /// Przebiegi z checkpointem (rosnąco).
+    fn runs(&self) -> Result<Vec<RunId>, CheckpointError>;
+}
+
+/// Magazyn w pamięci (współdzielony między „restartami” w testach przez `Clone`).
+#[derive(Debug, Clone, Default)]
+pub struct MemCheckpointStore {
+    inner: Arc<Mutex<BTreeMap<RunId, Checkpoint>>>,
+}
+
+impl MemCheckpointStore {
+    fn lock(&self) -> std::sync::MutexGuard<'_, BTreeMap<RunId, Checkpoint>> {
+        self.inner.lock().unwrap_or_else(|p| p.into_inner())
+    }
+}
+
+impl CheckpointStore for MemCheckpointStore {
+    fn save(&self, checkpoint: &Checkpoint) -> Result<(), CheckpointError> {
+        self.lock()
+            .insert(checkpoint.run.clone(), checkpoint.clone());
+        Ok(())
+    }
+
+    fn latest(&self, run: &RunId) -> Result<Option<Checkpoint>, CheckpointError> {
+        Ok(self.lock().get(run).cloned())
+    }
+
+    fn runs(&self) -> Result<Vec<RunId>, CheckpointError> {
+        Ok(self.lock().keys().cloned().collect())
+    }
+}

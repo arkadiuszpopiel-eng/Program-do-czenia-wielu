@@ -1,0 +1,19 @@
+# Manifest modułu voice-speaker (docs/modules/voice-speaker/SPEC.md). Schemat: packages/schemas/module-manifest.v1.json
+id = "voice-speaker"
+version = "0.1.0"
+kind = "voice-engine"
+provides = ["voice-speaker-contract@1"]
+requires = ["core-bus-contract@1", "voice-dsp-contract@1", "sessions-contract@1", "risk-classifier-contract@1"]
+capabilities = []
+lifecycle = "lazy"
+isolation = "inproc"
+
+[budget]
+# SPEC: ECAPA/WeSpeaker na CPU — model ~20–30 MB, embedding 3 s audio ≤ 100 ms na baseline (do pomiaru);
+# liczony raz na wypowiedź (nie strumieniowo), więc średnie CPU niskie.
+ram_mb = 80
+cpu_pct = 3
+
+[health]
+check = "ping"
+interval_s = 60

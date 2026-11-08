@@ -1,0 +1,319 @@
+// Atrapa: aplikacja, agentki, koszty, ustawienia, oś czasu, pliki, uprawnienia, urządzenia, głos, system.
+import { CommandError } from '../command-error';
+import type { AlfaClient } from '../client';
+import type { AutonomyLevel, EventLevel } from '../types';
+import type { GrantView, MaxAccess } from '../types-hub';
+import type { FakeChat } from './api-chat';
+import { bootReport } from './api-boot';
+import { childLockFake } from './child-lock';
+import type { FakeCore } from './core';
+import { seedDevice } from './fixtures';
+export { voiceApi } from './api-voice';
+import { fakePricing, parsePriceUpdate } from './pricing';
+import { SETTINGS_SCHEMA, defaultValues } from './settings-schema';
+
+const LEVELS: readonly EventLevel[] = ['trace', 'debug', 'info', 'warn', 'error', 'audit'];
+const ORDER: readonly AutonomyLevel[] = ['L0', 'L1', 'L2', 'L3', 'L4'];
+
+export function appApi(core: FakeCore): AlfaClient['app'] {
+  return {
+    bootstrap: () =>
+      core.reply({
+        app_version: '0.1.0-f1',
+        locale: core.settings['ui.locale'] === 'en' ? 'en' : 'pl',
+        onboarding_done: core.onboardingDone,
+        machine_name: 'DESKTOP-ALFA',
+        settings: core.settings,
+        layout: core.layout,
+        active_session_id: core.activeSession,
+        shortcut_overrides: core.shortcutOverrides,
+      }),
+    completeOnboarding: () => {
+      core.onboardingDone = true;
+      return core.reply(undefined);
+    },
+    openSystemSettings: () => core.reply(undefined),
+    saveLayout: (layout) => {
+      core.layout = layout;
+      return core.reply(undefined);
+    },
+    setActiveSession: (id) => {
+      core.activeSession = id;
+      return core.reply(undefined);
+    },
+  };
+}
+
+export function agentsApi(core: FakeCore, chat: FakeChat): AlfaClient['agents'] {
+  return {
+    list: (sid) => core.reply(core.agentsOf(sid)),
+    setRoles: (sid, agent, roleIds) => core.reply(core.setAgent(sid, agent, { role_ids: roleIds })),
+    applyCast: (sid, template) => {
+      const cast = chat.castFor(template);
+      core.agents[sid] = core.agentsOf(sid).map((a) => ({ ...a, role_ids: cast[a.id] }));
+      core.emit([{ type: 'AgentsChanged', session_id: sid, agents: core.agents[sid] ?? [] }]);
+      return core.reply(undefined);
+    },
+    runs: (sid) => core.reply(core.runs.list(sid)),
+    steer: (sid, text) => {
+      try {
+        core.runs.steer(sid, text);
+      } catch (error) {
+        return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+      }
+      return core.reply(undefined);
+    },
+    openTerminal: (stepId) => {
+      const step = core.runs.stepById(stepId);
+      if (step?.intent?.kind !== 'open_in_terminal')
+        return Promise.reject(new Error('Ten krok nie proponuje uruchomienia w terminalu.'));
+      return core.reply(undefined);
+    },
+  };
+}
+
+export function costsApi(core: FakeCore, chat: FakeChat): AlfaClient['costs'] {
+  return {
+    summary: (sid) => core.reply(chat.costs(sid)),
+    setMonthlyLimit: (enabled, monthly) => {
+      core.limit = { enabled, monthly: { minor: monthly.minor, currency: 'PLN' } };
+      const sid = core.activeSession;
+      core.emit([{ type: 'CostsChanged', session_id: sid ?? '', costs: chat.costs(sid) }]);
+      return core.reply(undefined);
+    },
+    pricing: () => core.reply(fakePricing.view([], false)),
+    applyPricing: (text, save) => {
+      const update = parsePriceUpdate(text);
+      if (!update) {
+        const msg = 'cennik: tekst nie zawiera żadnej poprawnej ceny ([[price]])';
+        return Promise.reject(new CommandError('invalid_input', msg));
+      }
+      return core.reply(fakePricing.apply(update, save));
+    },
+  };
+}
+
+export function settingsApi(core: FakeCore): AlfaClient['settings'] {
+  return {
+    schema: () => core.reply(SETTINGS_SCHEMA),
+    values: () => core.reply(core.settings),
+    set: (key, value) => {
+      core.settings[key] = value;
+      return core.reply(undefined);
+    },
+    reset: (key) => {
+      const value = defaultValues()[key] ?? '';
+      core.settings[key] = value;
+      return core.reply(value);
+    },
+    setShortcut: (actionId, chord) => {
+      if (chord === null) delete core.shortcutOverrides[actionId];
+      else core.shortcutOverrides[actionId] = chord;
+      return core.reply(undefined);
+    },
+  };
+}
+
+export function timelineApi(core: FakeCore): AlfaClient['timeline'] {
+  return {
+    list: (sid, filter) => {
+      const min = LEVELS.indexOf(filter.min_level);
+      const events = core.timeline.filter(
+        (e) =>
+          e.session_id === sid &&
+          (filter.kinds.length === 0 || filter.kinds.includes(e.kind)) &&
+          LEVELS.indexOf(e.level) >= min,
+      );
+      return core.reply(events);
+    },
+  };
+}
+
+export function filesApi(core: FakeCore): AlfaClient['files'] {
+  return {
+    list: (sid) => core.reply(core.artifacts.filter((a) => a.session_id === sid)),
+    preview: (id) => {
+      const artifact = core.artifacts.find((a) => a.id === id);
+      if (!artifact) return core.reply({ kind: 'none' as const });
+      if (artifact.mime === 'text/csv') {
+        return core.reply({
+          kind: 'text' as const,
+          text: 'segment;przychod;koszty\nB2B;2 914 000;1 802 300\nB2C;1 898 300;1 304 600',
+          truncated: false,
+        });
+      }
+      if (artifact.mime === 'text/markdown') {
+        return core.reply({
+          kind: 'text' as const,
+          text: '# Notatki\n\n- sprawdzić kurs EUR z 30.09\n- dopisać notę o różnicy 0,3%',
+          truncated: false,
+        });
+      }
+      return core.reply({ kind: 'none' as const });
+    },
+    act: () => core.reply(undefined),
+  };
+}
+
+const MAX_SCOPES: readonly MaxAccess[] = ['local', 'cloud', 'all'];
+
+export function permissionsApi(core: FakeCore): AlfaClient['permissions'] {
+  // Jak Broker: obniżenie działa od razu (`applied`), podniesienie czeka w oknie Brokera.
+  // Poziom startowy z adresu (`?autonomy=L4` — podgląd znaku „Pełny dostęp” w belce).
+  const start = new URLSearchParams(globalThis.location?.search ?? '').get('autonomy');
+  let global: AutonomyLevel = ORDER.find((l) => l === start) ?? 'L3';
+  // „Max dostęp” z adresu (`?max=local|cloud|all` — podgląd włączonego przełącznika i znaku w belce).
+  const max = new URLSearchParams(globalThis.location?.search ?? '').get('max');
+  let maxAccess: MaxAccess | null = MAX_SCOPES.find((s) => s === max) ?? null;
+  // Sesje z własnym poziomem; pozostałe pokazują poziom globalny (jak `session_autonomy` w rdzeniu).
+  const own = new Set<string>();
+  // Profil Dziecko (`?child=`): kłódka obniża tryb i odrzuca podniesienia jak Sędzia.
+  const child = childLockFake(core);
+  const lockedOut = () =>
+    Promise.reject(
+      new CommandError(
+        'invalid_input',
+        'Sędzia Cieni: kłódka rodzica: ten tryb otwiera PIN rodzica',
+      ),
+    );
+  // Zgody „zawsze w tym zakresie” (jak lista z Sędziego Cieni): jedna z terminem, jedna do odwołania.
+  const sid = core.sessions[0]?.id ?? 's1';
+  let grants: GrantView[] = [
+    {
+      id: '1',
+      session_id: sid,
+      agent: 'delta',
+      scope: 'połączenie z internetem: strona example.com',
+      granted_at_ms: Date.now() - 600_000,
+      until_ms: Date.now() + 3 * 3_600_000,
+    },
+    {
+      id: '2',
+      session_id: sid,
+      agent: null,
+      scope: 'odczyt plików: folder c:\\users\\spopielony\\documents (z podfolderami)',
+      granted_at_ms: Date.now() - 86_400_000,
+      until_ms: null,
+    },
+  ];
+  // Własne poziomy sesji (przed kłódką rodzica).
+  const ownLevel = new Map<string, AutonomyLevel>();
+  // Poziom obowiązuje: sesji (własny) albo globalny dla sesji bez własnego; kłódka profilu
+  // Dziecko obniża oba jak Sędzia.
+  const sync = () => {
+    for (const s of core.sessions) {
+      const level = child.cap(ownLevel.get(s.id) ?? global);
+      if (s.autonomy !== level) core.updateSession(s.id, { autonomy: level });
+    }
+  };
+  sync();
+  const apply = (level: AutonomyLevel, sid: string | null) => {
+    if (sid) {
+      own.add(sid);
+      ownLevel.set(sid, level);
+    } else global = level;
+    sync();
+  };
+  return {
+    get: (sid) =>
+      core.reply({
+        global: child.cap(global),
+        // Jak rdzeń: poziom sesji tylko wtedy, gdy ustawiono jej własny.
+        session: sid && own.has(sid) ? (core.session(sid)?.autonomy ?? null) : null,
+        hello_enabled: false,
+        max_access: maxAccess,
+      }),
+    requestLevel: (level, sid) => {
+      const current = sid ? (core.session(sid)?.autonomy ?? global) : global;
+      if (ORDER.indexOf(level) > ORDER.indexOf(current)) {
+        if (child.locked() && ORDER.indexOf(level) > ORDER.indexOf('L1')) return lockedOut();
+        // Zgoda „w oknie Sędziego” — w testach E2E przez `window.__alfaApproveRaise()`.
+        if (globalThis.window) globalThis.window.__alfaApproveRaise = () => apply(level, sid);
+        return core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') });
+      }
+      apply(level, sid);
+      return core.reply({ status: 'applied' as const, request_id: '' });
+    },
+    openApproval: () =>
+      core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') }),
+    // Jak Sędzia: włączenie (także zmiana zasięgu) czeka na kartę, wyłączenie działa od razu.
+    requestMaxAccess: (scope) => {
+      if (scope !== null && child.locked()) return lockedOut();
+      if (scope !== null) {
+        return core.reply({ status: 'opened_broker' as const, request_id: core.nextId('br') });
+      }
+      maxAccess = null;
+      return core.reply({ status: 'applied' as const, request_id: '' });
+    },
+    // `window.__alfaGrantsFault` (testy E2E): „list” — odczyt listy kończy się błędem łącza,
+    // „gone” — zgoda zniknęła po stronie Sędziego (wygasła), zanim właściciel kliknął „Odwołaj”.
+    grants: () =>
+      globalThis.window?.__alfaGrantsFault === 'list'
+        ? Promise.reject(new CommandError('unavailable', 'Atrapa: Sędzia Cieni nie odpowiada.'))
+        : core.reply([...grants]),
+    childLock: (change) =>
+      child.childLock(change).then((state) => {
+        sync();
+        return state;
+      }),
+    revokeGrant: (grantId) => {
+      if (globalThis.window?.__alfaGrantsFault === 'gone') {
+        grants = grants.filter((g) => g.id !== grantId);
+        return core.reply(false);
+      }
+      const before = grants.length;
+      grants = grants.filter((g) => g.id !== grantId);
+      return core.reply(grants.length < before);
+    },
+  };
+}
+
+export function deviceApi(core: FakeCore): AlfaClient['device'] {
+  return {
+    profile: () => core.reply(seedDevice(core.scheduler.now())),
+    measure: () => core.reply(seedDevice(core.scheduler.now())),
+    gpuLive: () =>
+      core.reply(
+        core.scenario === 'no-mic'
+          ? { available: false, cards: [], processes: [] }
+          : {
+              available: true,
+              cards: [
+                {
+                  index: 0,
+                  name: 'NVIDIA GeForce RTX 4050 Laptop GPU',
+                  total_mb: 6141,
+                  used_mb: 3420,
+                  free_mb: 2721,
+                  load_pct: 37,
+                  temp_c: 61,
+                  power_w: 48,
+                },
+              ],
+              processes: [
+                { pid: 4242, name: 'llama-server.exe', used_mb: 2610, alfa: true },
+                { pid: 5120, name: 'alfa-desktop.exe', used_mb: 180, alfa: true },
+                { pid: 12696, name: 'explorer.exe', used_mb: null, alfa: false },
+              ],
+            },
+      ),
+  };
+}
+
+export function systemApi(core: FakeCore, chat: FakeChat): AlfaClient['system'] {
+  return {
+    status: () => core.reply(core.status),
+    bootReport: () => core.reply(bootReport(core)),
+    // Przeglądarka z atrapą ma własny schowek (w programie czyta go rdzeń).
+    clipboardText: () =>
+      typeof navigator !== 'undefined' && navigator.clipboard
+        ? navigator.clipboard.readText().then((text) => text || null)
+        : Promise.resolve(null),
+    // Jak rdzeń (0.0.69): „Ponów” zawsze próbuje wysłać kolejkę; offline wraca z błędu sieci.
+    retryQueue: () => {
+      core.setStatus({ online: true });
+      chat.flushQueue();
+      return core.reply(undefined);
+    },
+  };
+}

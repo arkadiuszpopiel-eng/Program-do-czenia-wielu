@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alfa — ocena zdolności do kontynuacji i plan dalszych prac — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/KONTYNUACJA.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li><li><a href="plan-45-testy-ai.html">System pełnego automatycznego testowania przez AI</a></li><li><a href="plan-46-raport-2026-10-31-testy-ai.html">Raport z 31.10: system automatycznego testowania przez AI, ścieżki względne, wersja 0.0.79</a></li><li><a href="plan-47-raport-2026-11-01-noc.html">Raport z nocy 31.10/1.11: Sędzia Cieni, diagnostyka odporna na zawieszenie, wersja 0.0.81</a></li><li><a href="plan-48-raport-2026-11-01-rano.html">Raport 1.11 rano: zaległe inspekcje i testy</a></li><li><a href="plan-49-raport-2026-11-02-noc.html">Raport nocy 1/2.11: obowiązki modelu lokalnego i wymiana informacji między modelami</a></li><li><a href="plan-50-tryby-zgod-jak-claude-codex.html">50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)</a></li><li><a href="plan-51-raport-2026-11-03-wieczor.html">51 — Raport: wieczór 3.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-52-raport-2026-11-04-noc.html">52 — Raport: noc 3/4.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-53-raport-2026-11-06-noc.html">53 — Raport: noc 5/6.11 (etap Z — model-sędzia, dziennik rodzica, porządek kompilacji)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html" aria-current="page">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="features-katalog.html">Katalog funkcji i testów</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#1-werdykt">1. Werdykt</a></li><li><a href="#2-co-sprawdzilem-w-tej-sesji">2. Co sprawdziłem w tej sesji</a></li><li><a href="#3-czego-nie-wiedzialem-przed-ta-sesja-a-ma-znaczenie">3. Czego nie wiedziałem przed tą sesją, a ma znaczenie</a></li><li><a href="#4-co-moge-robic-a-czego-nie">4. Co mogę robić, a czego nie</a></li><li><a href="#5-zasada-na-dalsza-czesc-projektu">5. Zasada na dalszą część projektu</a></li><li><a href="#6-plan">6. Plan</a></li><li><a href="#7-ryzyka">7. Ryzyka</a></li><li><a href="#8-decyzje-wlasciciela">8. Decyzje właściciela</a></li><li><a href="#9-trzy-najblizsze-sesje">9. Trzy najbliższe sesje</a></li></ul></aside><article><h1 id="alfa-ocena-zdolnosci-do-kontynuacji-i-plan-dalszych-prac">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</h1>
+<p>Stan na 2026-10-07 (wieczór), laptop RTX 4050; decyzje właściciela i postęp Etapu 0 dopisane 2026-10-08.
+Autor: Claude (Opus 5.5), sesja lokalna na Windows.
+<strong>Aktualizacja 2026-10-09:</strong> etapy 0–8 z tego dokumentu są etapem A i częścią C1 planu v6 —
+<a href="plan-03-roadmapa.html"><code>plan/03-roadmapa.md</code></a>; stan wykonania: <a href="plan-00-stan-wykonania.html"><code>plan/00-stan-wykonania.md</code></a>.
+Liczby w rozdz. 2 to stan z 2026-10-07; aktualne podaje <a href="../CATALOG.md"><code>CATALOG.md</code></a> (241 crate&#39;ów, 2514 testów, 16 ADR-ów
+i 8 projektów).
+Źródła: repozytorium <code>alfa</code> (gałąź <code>ccr-af4b63c6-3fyzaj</code>, commit <code>75fee0d</code>), <code>docs/STATUS.md</code>, przeglądy w
+<code>docs/reviews/</code>, dzisiejsze logi Alfy z <code>%LOCALAPPDATA%\Alfa\logs</code> oraz bramki uruchomione w tej sesji.</p>
+<h2 id="1-werdykt">1. Werdykt</h2>
+<p><strong>Tak — jestem w stanie dalej rozwijać ten program i prowadzić prace nad nim.</strong> Kod jest czytelnie podzielony,
+ma kontrakty, atrapy i testy, a dokumentacja (<code>AGENTS.md</code>, <code>STATUS.md</code>, SPEC-i, ADR-y) pozwala wejść w dowolny
+moduł bez znajomości historii. W tej sesji zbudowałem i przetestowałem fragment workspace&#39;u na tej maszynie.</p>
+<p>Trzy zastrzeżenia, od których zależy, czy to „tak&quot; będzie coś warte:</p>
+<ol>
+<li><strong>Wąskim gardłem nie jest już pisanie kodu, tylko sprawdzanie go na prawdziwym sprzęcie.</strong> Z 108 kryteriów
+akceptacji 38 jest zielonych — wszystkie na atrapach i w CI. 57 czeka na pomiar na sprzęcie, korpusie albo
+kluczu, 11 nie ma zestawu lub implementacji, 2 czekają na Twoją akceptację. Pierwszy prawdziwy test (dziś)
+od razu znalazł błędy, których CI nie widziało.</li>
+<li><strong>Części pracy nie zrobię z definicji</strong>: nagrań, odsłuchów, logowania do CLI, zgód UAC, fizycznych kliknięć
+w oknie Brokera i — co najważniejsze — zatwierdzania zmian Jądra bezpieczeństwa. To ostatnie jest celowe:
+reguły projektu zabraniają, żeby AI zatwierdzała własne zmiany w zabezpieczeniach.</li>
+<li><strong>„Prowadzenie&quot; oznacza ciągłość przez pliki, nie przez pamięć.</strong> Nie działam między sesjami. Stan projektu
+musi żyć w <code>docs/STATUS.md</code> i <code>memory/</code>, a każdą sesję zaczynasz Ty.</li>
+</ol>
+<h2 id="2-co-sprawdzilem-w-tej-sesji">2. Co sprawdziłem w tej sesji</h2>
+<h3 id="rozmiar-i-dojrzalosc">Rozmiar i dojrzałość</h3>
+<div class="tbl"><table><thead><tr><th>Miara</th><th>Wartość</th></tr></thead><tbody><tr><td>Kod Rust</td><td>ok. 373 tys. linii w 2065 plikach, 242 crate&#39;y (ok. 100 modułów)</td></tr>
+<tr><td>Kod interfejsu (Svelte 5 + TS)</td><td>ok. 46 tys. linii</td></tr>
+<tr><td>Testy Rust (<code>#[test]</code>)</td><td>2537</td></tr>
+<tr><td>Historia</td><td>128 commitów w 8 dni (30.09 – 7.10), wszystkie autorstwa „Claude&quot;</td></tr>
+<tr><td>Dokumentacja</td><td>plan v5 (120 KB), 15 ADR-ów, 77 SPEC-ów modułów, 3 przeglądy bezpieczeństwa, przewodnik użytkownika</td></tr>
+<tr><td>Limity z <code>AGENTS.md</code></td><td>3 pliki Rust przekraczają 400 linii (406–436); trafienia <code>TODO</code> to tylko wartości zastępcze w danych testowych</td></tr></tbody></table></div>
+<p>Macierz akceptacji z <code>docs/STATUS.md</code> (stan z 6.10):</p>
+<div class="tbl"><table><thead><tr><th>Fala</th><th>✅ CI/atrapy</th><th>🟡 czeka na sprzęt/korpus/klucz</th><th>⛔ brak</th><th>⚖️ decyzja</th></tr></thead><tbody><tr><td>F0 Fundament</td><td>4</td><td>13</td><td>0</td><td>2</td></tr>
+<tr><td>F1 Czat</td><td>7</td><td>6</td><td>0</td><td>0</td></tr>
+<tr><td>F2 Głos</td><td>2</td><td>12</td><td>0</td><td>0</td></tr>
+<tr><td>F3 Bezpieczeństwo (MVP)</td><td>6</td><td>5</td><td>2</td><td>0</td></tr>
+<tr><td>F4 Mosty i MCP</td><td>3</td><td>5</td><td>0</td><td>0</td></tr>
+<tr><td>F5 Agentki + głos rozsz.</td><td>5</td><td>7</td><td>0</td><td>0</td></tr>
+<tr><td>F6 Computer use</td><td>1</td><td>3</td><td>4</td><td>0</td></tr>
+<tr><td>F7 Pamięć</td><td>5</td><td>2</td><td>1</td><td>0</td></tr>
+<tr><td>F8 Samonaprawa</td><td>5</td><td>0</td><td>1</td><td>0</td></tr>
+<tr><td>F9 Dopieszczenie</td><td>0</td><td>4</td><td>3</td><td>0</td></tr>
+<tr><td><strong>Razem</strong></td><td><strong>38</strong></td><td><strong>57</strong></td><td><strong>11</strong></td><td><strong>2</strong></td></tr></tbody></table></div>
+<h3 id="bramki-uruchomione-tutaj">Bramki uruchomione tutaj</h3>
+<div class="tbl"><table><thead><tr><th>Bramka</th><th>Kopia <code>E:\…\alfa</code> (ta sesja)</th><th>Kopia <code>D:\alfa</code></th></tr></thead><tbody><tr><td><code>cargo test</code> — 7 crate&#39;ów rdzenia¹</td><td><strong>122 testy, 0 porażek</strong> (7 min od zera)</td><td>nie uruchamiałem</td></tr>
+<tr><td>vitest (interfejs)</td><td>nie startuje (<code>ERR_MODULE_NOT_FOUND</code>)</td><td><strong>219/219</strong></td></tr>
+<tr><td>svelte-check</td><td>291 błędów (zepsute <code>node_modules</code>)</td><td><strong>0 błędów</strong></td></tr>
+<tr><td><code>cargo fmt --all -- --check</code></td><td>błąd systemu 206 (za długa linia poleceń)</td><td>ten sam błąd</td></tr>
+<tr><td><code>cargo deny</code>, <code>cargo clippy</code>, pełny workspace</td><td>nie uruchomione²</td><td>nie uruchomione</td></tr>
+<tr><td>Stan CI na GitHubie</td><td>niesprawdzony — <code>gh</code> nie jest zalogowany</td><td></td></tr></tbody></table></div>
+<p>¹ <code>router-impl</code>, <code>safety-broker-impl</code>, <code>undo-journal-impl</code>, <code>tools-fs-impl</code>, <code>risk-classifier-contract</code>,
+<code>sessions-impl</code>, <code>memory-impl</code>. Potwierdziłem po nazwach, że przeszły testy, na które powołuje się STATUS
+(m.in. <code>zero_successful_attacks</code>, <code>kill_switch_p95_under_200ms</code>, <code>chain_of_10k_events_verifies_and_survives_reopen</code>,
+<code>random_sequences_are_fully_undoable</code>, <code>tainted_egress_never_proceeds_even_on_l4</code>,
+<code>fifty_trials_5xx_and_timeout_switch_within_2s_without_loss</code>). To próbka, nie cały workspace.</p>
+<p>² <code>cargo-deny</code> nie jest zainstalowany. Pełne <code>cargo test --workspace</code> potrzebuje według komentarza w <code>Cargo.toml</code>
+ponad 25 GB na wyniki kompilacji, a na dyskach D: i E: jest po ok. 30 GB wolnego (94 % zajęte).</p>
+<h3 id="co-pokazal-dzisiejszy-test-na-laptopie-z-logow-alfy">Co pokazał dzisiejszy test na laptopie (z logów Alfy)</h3>
+<ul>
+<li>Aplikacja startuje, moduły wstają w poprawnej kolejności, wykrywa sprzęt (<code>laptop-cuda</code>, profil głosu D).</li>
+<li><strong>Model lokalny ani razu nie odpowiedział.</strong> Pobrany jest Bielik 1.5B, Whisper turbo i embedder e5-small, ale
+katalog <code>sidecars</code> jest pusty — brakuje <code>llama-server.exe</code>. Router pięć razy wybrał model lokalny, katalog
+<code>model_calls</code> jest pusty. W logu co 15 minut wraca ostrzeżenie „start na GPU nieudany — fallback na CPU&quot;,
+choć przyczyną jest brak pliku, a nie karta.</li>
+<li>Skrót <code>Ctrl+Alt+Space</code> (Szybkie pytanie) jest zajęty przez inny program — rejestracja pada przy każdym starcie.</li>
+<li>Czytanie na głos odmówiło (<code>unsupported</code>) — brak silnika TTS.</li>
+<li>Tryb deweloperski: Broker działa w procesie aplikacji, watchdog nie działa. To oczekiwane, ale znaczy, że
+izolacja Brokera nie była jeszcze sprawdzona na żadnej maszynie.</li>
+<li>Trzy ostatnie commity dnia to poprawki po tym teście (kreator kluczy, uprawnienia okna — „pakiety działały
+tylko w atrapie&quot;, zrzuty ekranu). To dobry sygnał co do tempa napraw i zły co do wiarygodności samych atrap.</li>
+</ul>
+<h2 id="3-czego-nie-wiedzialem-przed-ta-sesja-a-ma-znaczenie">3. Czego nie wiedziałem przed tą sesją, a ma znaczenie</h2>
+<ol>
+<li><strong>Były trzy kopie kodu na tym samym commicie</strong>: <code>D:\alfa</code> (tam Alfa była budowana i uruchamiana), kopia na
+dysku przenośnym <code>E:\PROGRAMY W CZASIE PRAC\Alfa AI Program\alfa</code> i migawka ZIP z GitHuba obok niej. Kopia
+na E: miała zepsute <code>node_modules</code> (kopiowanie zamieniło dowiązania pnpm na zwykłe katalogi). Decyzją
+właściciela kopią roboczą jest E: — patrz rozdz. 8.
+<strong>Stan po porządkach 2026-10-09:</strong> została jedna kopia — robocza na E:. <code>D:\alfa</code>, <code>D:\alfa-narzedzia</code> i migawka ZIP
+trafiły do Kosza (za zgodą właściciela, po sprawdzeniu, że nie zawierają niczego spoza GitHuba).</li>
+<li><strong>README kłamie o stanie projektu</strong>: „Faza planowania… Nie ma jeszcze kodu&quot;.</li>
+<li><strong>Cały kod leży na jednej gałęzi, 127 commitów przed <code>main</code>.</strong> <code>main</code> ma jeden pusty commit. Reguła „jedna
+sesja = jeden moduł = jeden worktree = jedna karta&quot; i przegląd drugiego modelu nie są widoczne w historii:
+wszystkie commity ma jeden autor, a przeglądy istnieją tylko jako dokumenty w <code>docs/reviews/</code>. Nie potrafię
+z repozytorium potwierdzić, że GPT-6 Sol cokolwiek recenzował.</li>
+<li><strong>Zmiany Jądra nie przeszły wymaganego przeglądu człowieka</strong> (bramka #7). Według własnych reguł projektu
+nie mogą trafić na <code>main</code>, dopóki ich nie zatwierdzisz.</li>
+<li><strong>Otwarte decyzje bezpieczeństwa</strong>: m.in. P-03 (powłoka agentek startuje z uprawnieniami użytkownika zamiast
+obniżonych, ocena 7,5), P-08 (procesy Jądra bez weryfikacji podpisu), P3-01 (Broker po restarcie traci stan
+bezpieczeństwa), P3-04 (pliki wykonywalne sidecarów bez przypiętych sum), P2-01 (strażnik okien WebView2 —
+warunek włączenia computer use).</li>
+<li><strong>Ryzyko dla maszyny docelowej (AMD, bez CUDA).</strong> W wydaniach whisper.cpp nie ma wersji Vulkan
+<code>whisper-server</code>, więc na desktopie rozpoznawanie mowy liczy procesor. Próba generalna na 4 rdzeniach dała
+53 s na 2,1 s mowy modelem <code>small</code>. Desktop jest szybszy, ale to wymaga pomiaru, zanim głos na baseline
+uznamy za wykonalny w budżecie 2 s.</li>
+<li><strong>Lokalne bramki nie działają na Windows w całości</strong>: <code>cargo fmt --all</code> pada na długości linii poleceń
+przy 242 crate&#39;ach, a Git Bash podstawia własnego Perla przed Strawberry (budowa OpenSSL pada, dopóki nie
+poprawi się <code>PATH</code>).</li>
+<li><code>docs/STATUS.md</code> ma datę 6.10 i nie zawiera ustaleń z dzisiejszego testu. W przewodniku laptop jest opisany
+jako i7-13700H, faktycznie to i7-13620H.</li>
+</ol>
+<h2 id="4-co-moge-robic-a-czego-nie">4. Co mogę robić, a czego nie</h2>
+<div class="tbl"><table><thead><tr><th>Obszar</th><th>Ja</th><th>Ty</th></tr></thead><tbody><tr><td>Kod, testy, refaktoryzacja, dokumentacja, CI</td><td>w całości</td><td>—</td></tr>
+<tr><td>Budowa i uruchamianie Alfy na tym laptopie, czytanie logów</td><td>tak</td><td>—</td></tr>
+<tr><td>Pomiary na laptopie: tok/s, czas do pierwszego tokenu, RAM, VRAM, start, kill-switch, recall pamięci</td><td>tak (to jest maszyna „laptop CUDA&quot; z planu)</td><td>podłączony zasilacz</td></tr>
+<tr><td>Sterowanie prawdziwą aplikacją w testach (build <code>e2e</code>, Playwright przez CDP)</td><td>tak</td><td>—</td></tr>
+<tr><td>Pomiary na desktopie AMD</td><td>tylko jeśli sesja ruszy na desktopie</td><td>uruchomienie sesji tam</td></tr>
+<tr><td>Instalator NSIS, tryb przenośny Brokera</td><td>budowa i testy automatyczne</td><td>kliknięcia w oknie Brokera (z założenia fizyczne)</td></tr>
+<tr><td>Usługa Brokera, helper <code>uiAccess</code>, klucz minisign, certyfikat</td><td>przygotowanie instrukcji i skryptów</td><td>UAC, wygenerowanie i przechowanie kluczy</td></tr>
+<tr><td>Korpus głosu, odsłuchy, testy akustyczne</td><td>runnery, protokoły, liczenie wyników</td><td>nagrania i oceny</td></tr>
+<tr><td>Mosty <code>claude</code> / <code>codex</code>, klucze API</td><td>kod, nagrywanie fixture&#39;ów po zalogowaniu</td><td>logowanie, podanie kluczy w Alfie</td></tr>
+<tr><td>Przegląd zmian Jądra i decyzje bezpieczeństwa</td><td>pakiet do przeglądu, rekomendacje, wdrożenie decyzji</td><td><strong>decyzja i akceptacja</strong></td></tr>
+<tr><td>Niezależny przegląd kodu</td><td>świeży kontekst tego samego modelu — to nie jest niezależność, o którą chodzi w planie</td><td>uruchomienie Codexa, jeśli ma recenzować</td></tr>
+<tr><td>Zamrażanie zestawów <code>evals/</code>, zmiany <code>AGENTS.md</code> i progów</td><td>szkice</td><td>akceptacja</td></tr></tbody></table></div>
+<h2 id="5-zasada-na-dalsza-czesc-projektu">5. Zasada na dalszą część projektu</h2>
+<p><strong>Najpierw stabilizacja MVP, potem rozbudowa.</strong> Projekt powstał wszerz: wszystkie fale F0–F9 mają kod, żadna nie
+jest zamknięta na sprzęcie. Dopisywanie kolejnych funkcji teraz powiększa niesprawdzony obszar. Proponuję:</p>
+<ul>
+<li>Do zamknięcia Etapu 3 nie zaczynamy nowych modułów ani funkcji — tylko naprawy, pomiary i brakujące zestawy.</li>
+<li>Kryterium uznajemy za spełnione dopiero po przebiegu na prawdziwej maszynie. W <code>STATUS.md</code> rozdzielamy
+„✅ CI&quot; i „✅ sprzęt (laptop / desktop)&quot;.</li>
+<li>Każdy błąd znaleziony na sprzęcie dostaje test, który by go złapał — najlepiej w teście prawdziwej aplikacji
+(<code>e2e-app</code>), bo dzisiejsze błędy przeszły właśnie przez atrapy.</li>
+<li>Jedna sesja = jeden cel z listy niżej. Na końcu sesji aktualizuję <code>docs/STATUS.md</code> i <code>memory/</code>.</li>
+</ul>
+<h2 id="6-plan">6. Plan</h2>
+<p>Etapy są w kolejności wykonania. „Wyjście&quot; to warunek, po którym etap uznajemy za zamknięty. Liczby sesji to
+szacunek, nie zobowiązanie.</p>
+<h3 id="etap-0-porzadek-w-srodowisku-i-repozytorium-1-2-sesje">Etap 0 — Porządek w środowisku i repozytorium (1–2 sesje)</h3>
+<div class="tbl"><table><thead><tr><th>#</th><th>Zadanie</th><th>Stan (aktualizacja 2026-10-09)</th></tr></thead><tbody><tr><td>0.1</td><td>Jedna kopia robocza: dysk przenośny E:.</td><td><strong>zrobione</strong> — <code>node_modules</code> naprawione, narzędzia (Rust 1.94, Node.js + pnpm, Strawberry Perl, magazyn pnpm) skopiowane do <code>alfa-narzedzia</code>, <code>scripts/portable-env.ps1</code> i <code>.sh</code></td></tr>
+<tr><td>0.2</td><td>Zwolnić miejsce na E: (26 GB wolnego, 95 % zajęte). Kandydaci: skopiowane z D: wyniki kompilacji powłoki (36 GB, do odtworzenia budową), migawka ZIP z GitHuba, nieużywana kopia <code>D:\alfa</code>.</td><td><strong>zrobione 2026-10-09</strong> (zgoda właściciela): stare wyniki kompilacji usunięte <code>cargo clean</code> (36 GB na E:, 37 GB na D: oraz 37 GB ukrytej kopii repozytorium w magazynie pnpm), stare katalogi i migawka w Koszu; E: 107 GB wolnego, D: 59 GB</td></tr>
+<tr><td>0.3</td><td><code>gh auth login</code>, żeby sesja widziała CI, PR-y i gałęzie Dependabota.</td><td>czeka na właściciela</td></tr>
+<tr><td>0.4</td><td>Bramki lokalne na Windows jednym poleceniem.</td><td><strong>zrobione</strong> — <code>scripts/gates.ps1</code>; poprawione <code>check-deps.sh</code> (CRLF z jq), <code>check-css.mjs</code> i <code>check-svelte5.mjs</code> (ścieżki Windows i ze spacjami). Brakuje <code>cargo-deny</code></td></tr>
+<tr><td>0.5</td><td>Czyste drzewo git po budowie.</td><td><strong>zrobione</strong> dla <code>permissions/autogenerated/</code> (<code>.gitignore</code>); <code>src-tauri/Cargo.lock</code> do sprawdzenia przy następnej budowie powłoki</td></tr>
+<tr><td>0.6</td><td>README i STATUS zgodne ze stanem.</td><td><strong>zrobione</strong> — README, <code>docs/README.md</code> (mapa), dopisek w STATUS; podział „✅ CI / ✅ sprzęt” wejdzie z pierwszymi pomiarami</td></tr>
+<tr><td>0.7</td><td>Przejrzeć 19 gałęzi Dependabota i 2 gałęzie Copilota.</td><td>czeka na 0.3</td></tr>
+<tr><td>0.8</td><td>Katalog modułów i crate&#39;ów.</td><td><strong>zrobione</strong> — <code>docs/CATALOG.md</code> generowany przez <code>scripts/catalog.mjs</code>, z listą niespójności</td></tr>
+<tr><td>0.9</td><td>Reguła recenzji zgodna z praktyką (bez Codexa).</td><td><strong>zrobione</strong> — ADR 0016, <code>AGENTS.md</code>, <code>AI_WORKFLOW.md</code>, odsyłacz w PLAN §4</td></tr>
+<tr><td>0.10</td><td>Uporządkować niespójności z katalogu: 62 crate&#39;y bez README, 3 pliki ponad 400 linii, 7 crate&#39;ów <code>-impl</code> bez <code>module.toml</code>, SPEC dla <code>example-module</code>.</td><td><strong>zrobione 2026-10-08/09</strong> poza dwiema pozycjami: <code>core-bus-impl</code> bez <code>module.toml</code> (Jądro — decyzja właściciela) i brak SPEC dla <code>example-module</code></td></tr>
+<tr><td>0.11</td><td>Pierwsza pełna budowa powłoki na E: w środowisku przenośnym i zielony komplet <code>gates.ps1 -Full</code>.</td><td>częściowo: powłoka zbudowana na E: (wersje 0.0.2 i 0.0.3), bramki szybkie zielone; <code>gates.ps1 -Full</code> (clippy, cały workspace, cargo-deny) nieuruchomione</td></tr></tbody></table></div>
+<p>Wyjście: jedna kopia robocza, komplet bramek lokalnych przechodzi jednym poleceniem, drzewo git czyste po budowie,
+STATUS i README zgodne z rzeczywistością, katalog bez niespójności.</p>
+<h3 id="etap-1-pierwsza-prawdziwa-rozmowa-na-laptopie-2-3-sesje">Etap 1 — Pierwsza prawdziwa rozmowa na laptopie (2–3 sesje)</h3>
+<p>Stan na 2026-10-09: zadania 1.1 i 1.2 zrobione w kodzie i w testach (commit <code>e594e61</code>), niesprawdzone jeszcze
+w działającej aplikacji; 1.3 — ostrzeżenie o zajętym skrócie widać w aplikacji; 1.4 czeka na decyzję R-05 i zgodę
+na pobranie pakietu (ok. 6 GB); 1.5–1.6 częściowo — testy prawdziwej aplikacji <code>e2e-app</code> 11/11, bez odpowiedzi modelu
+i bez głosu. Poza planem doszły poprawki skalowania interfejsu — opis w <code>docs/STATUS.md</code> (dopisek).</p>
+<div class="tbl"><table><thead><tr><th>#</th><th>Zadanie</th><th>Kryteria</th></tr></thead><tbody><tr><td>1.1</td><td>Model bez silnika: pobranie modelu ma prowadzić do pobrania pasującego <code>llama-server</code> (pakiet albo wyraźny krok), a wiadomość bez silnika ma dawać konkretny błąd w rozmowie z przyciskiem „Pobierz silnik&quot;.</td><td>F1-03</td></tr>
+<tr><td>1.2</td><td>Poprawić diagnostykę: brak pliku wykonywalnego to nie „fallback na CPU&quot;; bez ponawiania co 15 minut, gdy przyczyna jest trwała.</td><td>—</td></tr>
+<tr><td>1.3</td><td>Zajęty skrót globalny: widoczne ostrzeżenie i propozycja innego skrótu zamiast cichego wpisu w logu.</td><td>F1-12</td></tr>
+<tr><td>1.4</td><td>Zainstalować silniki (CUDA + CPU na zapas, Piper, Silero) przez menedżer, przypiąć sumy SHA-256 zgodne z tabelą z próby generalnej.</td><td>P3-04, pkt 11 listy człowieka</td></tr>
+<tr><td>1.5</td><td>Przejść części 4–9 listy <code>11-pierwszy-test-na-pc.md</code> — ja automatem przez build <code>e2e</code> i logi, Ty tylko to, co wymaga głosu i uszu.</td><td>F1-03, F3-01, F3-02</td></tr>
+<tr><td>1.6</td><td>Każdy znaleziony błąd → test w <code>e2e-app</code> (prawdziwa aplikacja). Rozszerzyć próbę generalną o scenariusz „model + silnik + odpowiedź&quot;.</td><td>—</td></tr></tbody></table></div>
+<p>Wyjście: rozmowa tekstowa z Bielikiem na karcie, zmierzone tok/s i czas do pierwszego tokenu; odpowiedź czytana
+na głos; „Cofnij&quot; po zadaniu na plikach; <code>Ctrl+Shift+F12</code> zatrzymuje generowanie. Wyniki wpisane do STATUS.</p>
+<h3 id="etap-2-pomiary-mvp-na-sprzecie-f0-f3-4-6-sesji-twoje-bramki">Etap 2 — Pomiary MVP na sprzęcie, F0–F3 (4–6 sesji + Twoje bramki)</h3>
+<div class="tbl"><table><thead><tr><th>#</th><th>Zadanie</th><th>Kryteria</th><th>Kto</th></tr></thead><tbody><tr><td>2.1</td><td>Spike f: RAM drzewa procesów (1 i 3 okna) → budżety do ADR.</td><td>F0-11, F1-08, F5-12</td><td>ja (laptop), desktop osobno</td></tr>
+<tr><td>2.2</td><td>Spike h: whisper CUDA 1 h, tok/s modeli 1.5B/4.5B, RTF TTS → progi.</td><td>F0-12, F0-13, F1-03, F3-07</td><td>ja</td></tr>
+<tr><td>2.3</td><td>Budżety UI ze śladu CDP (composer, 1000 wiadomości, panele) i Private WS po 500 wiadomościach.</td><td>F1-06, F1-09</td><td>ja</td></tr>
+<tr><td>2.4</td><td>Eval narzędzi fs/shell na lokalnym modelu (35 zadań). Wynik pokaże, czy mały model w ogóle nadaje się na agentkę — to rozstrzyga kształt MVP „bez kluczy&quot;.</td><td>F3-07</td><td>ja; próg ustalasz Ty</td></tr>
+<tr><td>2.5</td><td>Instalator NSIS, tryb przenośny Brokera, watchdog jako osobny proces; kill-switch z audio i Job Objects pod obciążeniem, 50 prób.</td><td>F3-01, F3-10, luka nr 1</td><td>ja; kliknięcia w oknie Brokera — Ty</td></tr>
+<tr><td>2.6</td><td>Test wstrzykniętych kliknięć do Broker-UI na żywym pulpicie (<code>kernel_windows.rs</code>).</td><td>F0-16, F3-04</td><td>ja uruchamiam, Ty nie dotykasz myszy</td></tr>
+<tr><td>2.7</td><td>Napisać <code>evals/F3/mvp-scenario.md</code> i przejść scenariusz MVP bez kluczy.</td><td>F3-12</td><td>ja + Ty</td></tr>
+<tr><td>2.8</td><td>Zestaw red-team prompt injection (≥ 100). Powinien go napisać ktoś inny niż autor obron — najlepiej Codex; inaczej ja w świeżym kontekście, z zaznaczeniem tego ograniczenia.</td><td>F3-05</td><td>do decyzji</td></tr>
+<tr><td>2.9</td><td>Te same pomiary na desktopie AMD (Vulkan), w tym STT na procesorze.</td><td>F0-03, F2-01, ryzyko nr 6</td><td>sesja na desktopie</td></tr>
+<tr><td>2.10</td><td>Korpus głosu, odsłuchy, akustyka.</td><td>F0-08…10, F2-03…10, F2-14</td><td>Ty nagrywasz, ja liczę</td></tr></tbody></table></div>
+<p>Wyjście: każde kryterium F0–F3 ma wynik z prawdziwej maszyny (spełnione albo niespełnione z liczbą), scenariusz
+MVP 6/6 na laptopie. Jeśli 2.4 albo 2.9 wypadną źle, wracamy do planu z decyzją (większy model, inny silnik STT,
+zmiana baseline) zamiast iść dalej.</p>
+<h3 id="etap-3-dlug-bezpieczenstwa-i-wejscie-na-main-3-5-sesji-twoj-przeglad">Etap 3 — Dług bezpieczeństwa i wejście na <code>main</code> (3–5 sesji + Twój przegląd)</h3>
+<div class="tbl"><table><thead><tr><th>#</th><th>Zadanie</th><th>Kto</th></tr></thead><tbody><tr><td>3.1</td><td>Pakiet do przeglądu Jądra: dla <code>safety-broker</code>, <code>broker-ui</code>, <code>watchdog</code>, <code>updater</code>, <code>app-safety</code>, <code>core-*</code> — co robi, granice zaufania, lista poprawek SR/SR2/SR3 z testami, pytania kontrolne. Uporządkowane od najwyższego ryzyka, tak żeby dało się to przeczytać w kilka wieczorów.</td><td>ja</td></tr>
+<tr><td>3.2</td><td>Decyzje: P-01, P-03, P-05, P-08, P-09, P2-01, P2-03, P2-06, P2-07, P2-10, P3-01…P3-04. Do każdej przygotuję opcje, koszt i rekomendację.</td><td>Ty</td></tr>
+<tr><td>3.3</td><td>Wdrożenie decyzji z testami regresji. Moja kolejność: P3-01 (trwały stan Brokera — dziś restart otwiera zabezpieczenia), P-03 (obniżone uprawnienia powłoki), P3-04 (przypięte sumy sidecarów), P2-01 (przed computer use).</td><td>ja</td></tr>
+<tr><td>3.4</td><td>Akceptacja ADR-ów 1–15 i makiet 1–3.</td><td>Ty</td></tr>
+<tr><td>3.5</td><td>Strategia gałęzi: scalić obecną gałąź do <code>main</code> po przeglądzie Jądra, potem krótkie gałęzie na zadanie i PR-y z CI. Urealnić <code>AGENTS.md</code>: jeśli drugi model nie recenzuje, reguła ma to mówić wprost (zmianę zatwierdzasz Ty).</td><td>Ty decydujesz, ja wykonuję</td></tr>
+<tr><td>3.6</td><td>Zamrozić gotowe zestawy <code>evals/</code> (F2 test, F3 tools, F5, F8) z hashami.</td><td>ja szkic, Ty akceptujesz</td></tr></tbody></table></div>
+<p>Wyjście: <code>main</code> zawiera zweryfikowane MVP, żadne ustalenie z przeglądów nie jest otwarte bez decyzji, zestawy MVP
+zamrożone. <strong>To jest koniec MVP w rozumieniu planu.</strong></p>
+<h3 id="etap-4-jakosc-glosu-po-korpusie-3-4-sesje">Etap 4 — Jakość głosu (po korpusie; 3–4 sesje)</h3>
+<p>WER PL, komendy stop/anuluj, backchannel, fałszywe przerwania, prefiks usłyszany, intencje przerwań (F2-03…09);
+dobór modelu STT dla ścieżki bez CUDA; odrębność czterech głosów (F2-10); budżet VRAM z LLM + STT + TTS (F2-13);
+potem słowa wywoławcze i weryfikacja mówcy (F5-05…08), dyktowanie i czytanie w 5 aplikacjach (F5-10, F5-11).</p>
+<h3 id="etap-5-mosty-cli-klucze-i-dostawcy-chmurowi-2-3-sesje-po-twoim-logowaniu">Etap 5 — Mosty CLI, klucze i dostawcy chmurowi (2–3 sesje po Twoim logowaniu)</h3>
+<p>Spike b na prawdziwych <code>claude</code> i <code>codex</code> (F0-05…07), nagranie fixture&#39;ów (F4-08), postęp i anulowanie (F4-01, F4-02),
+prośby o uprawnienia w oknie Brokera (F4-03), monitor odczytów tokenów (F4-04); adaptery API na żywo (F1-02),
+profile głosu B/C (F2-02), spike g i domknięcie ADR 0006.</p>
+<h3 id="etap-6-computer-use-4-6-sesji-dopiero-po-p2-01">Etap 6 — Computer use (4–6 sesji; dopiero po P2-01)</h3>
+<p>Helper <code>uiAccess</code> (F6-07), runner zestawu 60 zadań i VM (F6-01), macierz aplikacja × trasa (F6-03), 100 scenariuszy
+deny-list (F6-05), 50 prób zakazu sterowania oknami Alfy (F6-06), Przejmij/Pauza/Stop (F6-08), benchmark
+zewnętrzny, jeśli jest dostępny (F6-02). Wymaga „mózgu&quot;: klucza API albo mostu.</p>
+<h3 id="etap-7-pamiec-i-transfer-2-3-sesje">Etap 7 — Pamięć i transfer (2–3 sesje)</h3>
+<p>recall@5 na prawdziwym e5-small — model jest już pobrany na laptopie, więc to mogę zmierzyć od razu po Etapie 1
+(F7-02); runner migracji w CI i powrót do starszej wersji (F7-08); pełny round-trip <code>.alfa</code> między maszynami
+(F1-10, F7-06); harmonogram kopii zapasowych w aplikacji (F7-07).</p>
+<h3 id="etap-8-samonaprawa-wtyczki-dopieszczenie-3-5-sesji">Etap 8 — Samonaprawa, wtyczki, dopieszczenie (3–5 sesji)</h3>
+<p>Zamrożony zestaw złośliwych wtyczek (F8-05), izolacja runnera holdoutu (P2-10), pentest według listy 53 punktów
+(F9-01), powtórka red-teamu na całości (F9-07), skrypt pokrycia dokumentacji dla 60 manifestów (F9-06), pełny audyt
+WCAG 2.2 AA (F9-05), bateria (F9-04), własny pasek tytułu z Mica i generator typów TS (ADR 13).</p>
+<h3 id="kolejnosc-i-zaleznosci">Kolejność i zależności</h3>
+<pre><code>Etap 0 ─▶ Etap 1 ─▶ Etap 2 ─▶ Etap 3 ══ koniec MVP ══▶ Etap 5 ─▶ Etap 6
+                      │                                  Etap 7 (F7-02 możliwe już po Etapie 1)
+                      └─ korpus (Ty) ─▶ Etap 4           Etap 8
+</code></pre>
+<p>Etapy 4, 5, 7 i 8 są od siebie niezależne — kolejność po MVP ustalasz według tego, czego najbardziej potrzebujesz.</p>
+<h2 id="7-ryzyka">7. Ryzyka</h2>
+<div class="tbl"><table><thead><tr><th>Ryzyko</th><th>Skutek</th><th>Co z tym robimy</th></tr></thead><tbody><tr><td>Atrapy przepuszczają błędy integracji (potwierdzone dziś)</td><td>„Zielone&quot; kryteria okazują się czerwone na sprzęcie</td><td>Etap 1–2 przed nowymi funkcjami; każdy błąd → test na prawdziwej aplikacji</td></tr>
+<tr><td>Mały model lokalny nie radzi sobie z narzędziami</td><td>MVP „bez kluczy&quot; nie spełni F3-07 i F3-12</td><td>Pomiar w 2.4 wcześnie; decyzja o progu albo o większym modelu</td></tr>
+<tr><td>STT na desktopie AMD za wolne</td><td>Głos na baseline poza budżetem</td><td>Pomiar w 2.9; opcje: własna budowa whisper.cpp z Vulkanem, mniejszy model, inny silnik</td></tr>
+<tr><td>Przegląd Jądra to dużo czytania dla jednej osoby</td><td>Zator przed <code>main</code></td><td>Pakiet 3.1 uporządkowany według ryzyka, w porcjach</td></tr>
+<tr><td>Brak faktycznie niezależnego recenzenta</td><td>Błędy wspólne dla autora i recenzenta</td><td>Codex do przeglądów Jądra i zestawów red-team albo jawne przyjęcie ograniczenia</td></tr>
+<tr><td>Zakres planu v5 jest bardzo szeroki jak na program dla jednej osoby</td><td>Rozproszenie, nic nie jest skończone</td><td>Zasada z rozdz. 5; po MVP wybierasz jeden etap naraz</td></tr>
+<tr><td>Mało miejsca na dyskach</td><td>Budowa pada (<code>os error 112</code>), brak pełnych testów lokalnie</td><td>Zadanie 0.2</td></tr>
+<tr><td>Ciągłość między sesjami</td><td>Powtarzanie ustaleń, rozjazd dokumentów z kodem</td><td>STATUS i <code>memory/</code> aktualizowane na końcu każdej sesji</td></tr></tbody></table></div>
+<h2 id="8-decyzje-wlasciciela">8. Decyzje właściciela</h2>
+<p>Podjęte 2026-10-07/08:</p>
+<div class="tbl"><table><thead><tr><th>Pytanie</th><th>Decyzja</th></tr></thead><tbody><tr><td>Kopia robocza</td><td>Dysk przenośny <strong>E:</strong> (<code>E:\PROGRAMY W CZASIE PRAC\Alfa AI Program\alfa</code>); narzędzia obok w <code>alfa-narzedzia</code></td></tr>
+<tr><td>Kolejność prac</td><td>Najpierw porządek i doprowadzenie obecnego etapu do wysokiego poziomu; bez nowych funkcji</td></tr>
+<tr><td>Recenzja przez Codexa</td><td>Nie — zapis w dokumentach był błędem (ADR 0016)</td></tr></tbody></table></div>
+<p>Otwarte:</p>
+<ol>
+<li><del>Miejsce na E:</del> — rozwiązane 2026-10-09 (107 GB wolnego).</li>
+<li><strong><code>gh auth login</code></strong> — bez tego sesja nie widzi CI, PR-ów ani gałęzi Dependabota i nie wypchnie commitów.</li>
+<li><del>Commit zmian porządkowych</del> — zatwierdzone lokalnie.</li>
+<li><strong>Zgoda na pobranie pakietu modeli (ok. 6 GB)</strong> — bez niej nie da się sprawdzić rozmowy z modelem ani głosu.</li>
+<li><strong>Ustalenia bezpieczeństwa</strong> czekające na decyzję — lista w <a href="plan-03-roadmapa.html"><code>plan/03-roadmapa.md</code></a>,
+„Decyzje właściciela, które blokują zadania”.</li>
+<li><strong>Projekty ADR 0017–0024</strong> (plan v6) — do podpisu.</li>
+</ol>
+<p>Podjęte 2026-10-09 (plan v6): dostęp zdalny przez przekaźnik z szyfrowaniem end-to-end; zgody zdalne dla wszystkich
+poziomów ryzyka; telefon i panel WWW jako pilot ze 100 % funkcji, bez komputera — rozmowa przez model chmurowy;
+plan v6 obok planu v5. Szczegóły: <a href="plan-01-wizja-i-zasady.html"><code>plan/01-wizja-i-zasady.md</code></a>.</p>
+<h2 id="9-trzy-najblizsze-sesje">9. Trzy najbliższe sesje</h2>
+<ol>
+<li><strong>Porządek</strong> (Etap 0): bramki lokalne jednym poleceniem, czyste drzewo po budowie, README i STATUS zgodne
+ze stanem, pamięć projektu wypełniona.</li>
+<li><strong>Model odpowiada</strong> (1.1–1.4): naprawa ścieżki „model bez silnika&quot;, instalacja silników z przypiętymi sumami,
+pierwsza odpowiedź Bielika na karcie z pomiarem.</li>
+<li><strong>Lista kontrolna automatem</strong> (1.5–1.6): części 4–9 przewodnika przez build <code>e2e</code>, nowe testy prawdziwej
+aplikacji, wyniki w STATUS.</li>
+</ol>
+</article>
+<footer>Źródło: <code>docs/KONTYNUACJA.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

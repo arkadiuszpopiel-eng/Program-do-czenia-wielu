@@ -1,0 +1,26 @@
+[package]
+name = "tools-system-contract"
+description = "tools-system: kontrakt narzędzi systemowych agentek — procesy (lista, szczegóły, zakończenie z tożsamością i strażnikiem celów), usługi (lista, start/stop przez system.admin), Dziennik zdarzeń (Application/System, filtr, redakcja), zmienne środowiskowe (odczyt z ukryciem sekretów, zapis użytkownika z cofaniem), zasilanie/wyświetlacze/audio; wynik = treść niezaufana"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe (uruchamiane na -impl i -fake).
+contract-tests = ["tools-common-contract/contract-tests"]
+
+[dependencies]
+tools-common-contract = { path = "../tools-common-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+platform-apps-contract = { path = "../platform-apps-contract" }
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+
+[lints]
+workspace = true

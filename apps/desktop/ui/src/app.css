@@ -1,0 +1,58 @@
+/* Okno główne: pełna wysokość, bez przewijania strony (przewijają się kolumny). */
+html,
+body,
+#app {
+  height: 100%;
+  overflow: hidden;
+}
+/*
+ * Skala interfejsu to CSS `zoom` na <html> (appearance.ts). Jednostki okna (`vh`, `vw`) są przy tym
+ * mnożone przez skalę, więc `min-height: 100vh` z ui-kit robiło stronę wyższą niż okno — pole
+ * pisania lądowało pod dolną krawędzią. Wysokość bierze się z łańcucha `height: 100%`, a rozmiary
+ * liczone od okna używają `--alfa-vh` / `--alfa-vw` (okno w jednostkach po skalowaniu).
+ */
+:root {
+  --alfa-vh: calc(100vh / var(--alfa-zoom, 1));
+  --alfa-vw: calc(100vw / var(--alfa-zoom, 1));
+}
+body {
+  min-height: 0;
+}
+
+/* Przeładowanie strony (F5/Ctrl+R) i menu kontekstowe WebView wyłączane w JS — §14.8. */
+body {
+  user-select: none;
+}
+textarea,
+input,
+[data-selectable],
+.alfa-prose {
+  user-select: text;
+}
+
+/* Gęstość kompaktowa: mniejsze odstępy i kontrolki (tokeny nadpisane lokalnie). */
+:root[data-density='compact'] {
+  --alfa-size-control: 28px;
+  --alfa-space-3: 8px;
+  --alfa-space-4: 12px;
+  --alfa-font-size-md: 13px;
+}
+
+/* Instancja testowa (budowa `e2e`, znacznik ustawia powłoka): plakietka, żeby nikt nie wziął tego
+   okna za swoją Alfę — testy zamykają je bez ostrzeżenia. Nie przechwytuje kliknięć. */
+html[data-test-instance] body::after {
+  content: 'Instancja testowa — zamknie się sama, nie używaj tego okna';
+  position: fixed;
+  bottom: var(--alfa-space-2);
+  left: 50%;
+  z-index: 9999;
+  padding: var(--alfa-space-1) var(--alfa-space-3);
+  transform: translateX(-50%);
+  border-radius: var(--alfa-radius-full);
+  background: var(--alfa-color-warning);
+  color: var(--alfa-color-bg);
+  font-size: var(--alfa-font-size-xs);
+  font-weight: var(--alfa-weight-semibold);
+  white-space: nowrap;
+  pointer-events: none;
+}

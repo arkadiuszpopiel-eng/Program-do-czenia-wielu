@@ -1,0 +1,224 @@
+{
+ "id": "F8-01",
+ "version": 1,
+ "description": "Katalog awarii chaosowych Diagnosty (ACCEPTANCE F8-01, F8-06). Każda awaria: wstrzyknięcie do świata chaosowego (atrapy portów, crates/diagnostician-fake), wykrycie z poprawną klasyfikacją (jedyny incydent), kompletna karta propozycji (diff, uzasadnienie, ryzyko, plan cofnięcia), naprawa zweryfikowana sondą zdrowia, cofnięcie przywracające stan 1:1 sprzed naprawy; obszar Jądra wyłącznie przez Brokera. Próg: 24/24 (≥ 20).",
+ "policy": "auto_medium_risk; ryzyko wysokie — zgoda użytkownika; Jądro — Broker",
+ "faults": [
+  {
+   "id": "f01-module-start",
+   "kind": "module_start_failure",
+   "target": "voice-tts",
+   "consent": "auto",
+   "fault": "Po zmianie konfiguracji (voice.tts.engine = „nieznany”, rewizja r2) moduł voice-tts nie startuje (3 próby).",
+   "repair": "Rollback konfiguracji do ostatniej dobrej rewizji r1.",
+   "undo": "Rollback r1 → r2."
+  },
+  {
+   "id": "f02-config-corrupted",
+   "kind": "config_corrupted",
+   "target": "config/shared.toml",
+   "consent": "auto",
+   "fault": "Plik wspólnej konfiguracji nie przechodzi walidacji (config.invalid).",
+   "repair": "Plik do kwarantanny, przywrócenie ostatniej dobrej kopii.",
+   "undo": "Usunięcie identycznej kopii, powrót pliku z kwarantanny."
+  },
+  {
+   "id": "f03-session-db-corrupted",
+   "kind": "session_db_corrupted",
+   "target": "sesje/s1.db",
+   "consent": "user",
+   "fault": "Baza sesji uszkodzona (SQLITE_CORRUPT).",
+   "repair": "Baza do kwarantanny, przywrócenie kopii (ryzyko wysokie — zgoda użytkownika).",
+   "undo": "Usunięcie kopii, powrót bazy z kwarantanny."
+  },
+  {
+   "id": "f04-session-db-locked",
+   "kind": "session_db_locked",
+   "target": "sesje/s2.db",
+   "consent": "auto",
+   "fault": "Baza sesji zajęta przez inny proces (3× SQLITE_BUSY).",
+   "repair": "Dłuższy busy_timeout (5000 → 15000 ms) i ponowne otwarcie modułu.",
+   "undo": "Przywrócenie 5000 ms."
+  },
+  {
+   "id": "f05-disk-full",
+   "kind": "disk_full",
+   "target": "C:",
+   "consent": "auto",
+   "fault": "Na woluminie C: zostało < 500 MB (pamięć podręczna modeli 4 GB).",
+   "repair": "Pamięć podręczna na D:, logi tylko ostrzeżenia, wstrzymane pobieranie; człowiek zwalnia miejsce.",
+   "undo": "Powrót pliku na C:, przywrócenie ustawień."
+  },
+  {
+   "id": "f06-sidecar-crash-loop",
+   "kind": "sidecar_crash_loop",
+   "target": "pocket-tts",
+   "consent": "auto",
+   "fault": "Sidecar pocket-tts restartowany 3× w oknie przez watchdoga.",
+   "repair": "Tryb zachowawczy sidecara (CPU, mniej wątków) i restart.",
+   "undo": "Wyłączenie trybu zachowawczego."
+  },
+  {
+   "id": "f07-gpu-lost",
+   "kind": "gpu_lost",
+   "target": "voice-stt",
+   "consent": "auto",
+   "fault": "Utrata urządzenia GPU w voice-stt (device lost).",
+   "repair": "voice.stt.device = cpu i restart.",
+   "undo": "Powrót do vulkan."
+  },
+  {
+   "id": "f08-api-key-revoked",
+   "kind": "api_key_revoked",
+   "target": "anthropic",
+   "consent": "auto",
+   "fault": "Dostawca odpowiada 401 (klucz unieważniony).",
+   "repair": "Wyłączenie trasy; człowiek dodaje nowy klucz (Diagnosta nie dotyka sekretów).",
+   "undo": "Ponowne włączenie trasy."
+  },
+  {
+   "id": "f09-rate-limit-loop",
+   "kind": "rate_limit_loop",
+   "target": "openai",
+   "consent": "auto",
+   "fault": "4× 429 od dostawcy w oknie.",
+   "repair": "Wstrzymanie trasy z wykładniczym odstępem.",
+   "undo": "Usunięcie wstrzymania."
+  },
+  {
+   "id": "f10-budget-exhausted",
+   "kind": "budget_exhausted",
+   "target": "miesiac",
+   "consent": "auto",
+   "fault": "Odmowa cost-meter: limit miesięczny wyczerpany.",
+   "repair": "Router woli model lokalny (budżetu nie zmienia — polityka Jądra).",
+   "undo": "Przywrócenie preferencji."
+  },
+  {
+   "id": "f11-port-in-use",
+   "kind": "port_in_use",
+   "target": "providers-local",
+   "consent": "auto",
+   "fault": "Port 8080 llama-server zajęty przez obcy proces.",
+   "repair": "Wolny port (8081) i restart.",
+   "undo": "Powrót do 8080."
+  },
+  {
+   "id": "f12-model-missing",
+   "kind": "model_missing",
+   "target": "bielik-4.5b",
+   "consent": "auto",
+   "fault": "Brak pliku modelu bielik-4.5b.",
+   "repair": "Model zastępczy qwen-3b i ponowne pobranie ze sprawdzeniem SHA-256.",
+   "undo": "Anulowanie pobrania, powrót wyboru modelu."
+  },
+  {
+   "id": "f13-model-corrupted",
+   "kind": "model_corrupted",
+   "target": "models/whisper-small.bin",
+   "consent": "auto",
+   "fault": "Hash modelu whisper-small niezgodny.",
+   "repair": "Model do kwarantanny, whisper-base, ponowne pobranie.",
+   "undo": "Anulowanie pobrania, powrót modelu i wyboru."
+  },
+  {
+   "id": "f14-webview-broken",
+   "kind": "webview_broken",
+   "target": "webview/EBWebView",
+   "consent": "auto",
+   "fault": "Proces WebView2 się wysypuje (uszkodzony profil danych).",
+   "repair": "Profil do kwarantanny (WebView2 utworzy nowy), restart ui-shell.",
+   "undo": "Powrót profilu."
+  },
+  {
+   "id": "f15-schema-mismatch",
+   "kind": "schema_mismatch",
+   "target": "memory.db",
+   "consent": "auto",
+   "fault": "Dane pamięci w schemacie 9, kod obsługuje 8 (po rollbacku wersji).",
+   "repair": "Tryb tylko do odczytu; człowiek aktualizuje Alfę.",
+   "undo": "Wyłączenie trybu tylko do odczytu."
+  },
+  {
+   "id": "f16-undo-journal-full",
+   "kind": "undo_journal_full",
+   "target": "undo-journal",
+   "consent": "auto",
+   "fault": "Dziennik cofania osiągnął pojemność (10 000 wpisów).",
+   "repair": "2000 najstarszych wpisów do archiwum (nic nie jest usuwane).",
+   "undo": "Przywrócenie wpisów z archiwum."
+  },
+  {
+   "id": "f17-file-locked",
+   "kind": "file_locked",
+   "target": "config/machine/desktop.toml",
+   "consent": "auto",
+   "fault": "Plik nakładki maszyny zablokowany (2× ERROR_SHARING_VIOLATION).",
+   "repair": "Kolejka zapisów odroczonych z ponawianiem.",
+   "undo": "Wyłączenie odraczania."
+  },
+  {
+   "id": "f18-dir-permission",
+   "kind": "dir_permission_denied",
+   "target": "C:/Users/ja/Alfa/Sesje",
+   "consent": "auto",
+   "fault": "Brak prawa zapisu do katalogu sesji (ERROR_ACCESS_DENIED).",
+   "repair": "Katalog zastępczy z prawem zapisu.",
+   "undo": "Powrót katalogu."
+  },
+  {
+   "id": "f19-clock-skew",
+   "kind": "clock_skew",
+   "target": "system",
+   "consent": "auto",
+   "fault": "Zegar systemowy przesunięty o 1 h (błędy TLS).",
+   "repair": "Korekta znaczników czasu; człowiek włącza synchronizację czasu.",
+   "undo": "Usunięcie korekty."
+  },
+  {
+   "id": "f20-network-down",
+   "kind": "network_down",
+   "target": "network",
+   "consent": "auto",
+   "fault": "Sieć niedostępna (2× w oknie).",
+   "repair": "Router w trybie offline (model lokalny).",
+   "undo": "Wyłączenie trybu offline."
+  },
+  {
+   "id": "f21-update-package-corrupted",
+   "kind": "update_package_corrupted",
+   "target": "%LOCALAPPDATA%/Alfa/versions/0.0.2.zip",
+   "consent": "broker",
+   "fault": "Paczka aktualizacji ze złym podpisem/hashem (obszar Jądra).",
+   "repair": "Prośba do Brokera: paczka do kwarantanny (Broker-UI, fizyczne potwierdzenie).",
+   "undo": "Broker przywraca paczkę."
+  },
+  {
+   "id": "f22-resource-budget",
+   "kind": "resource_budget_exceeded",
+   "target": "memory-consolidation",
+   "consent": "auto",
+   "fault": "Strażniczka pamięci przekracza budżet RAM (3 próbki 300 > 120 MB).",
+   "repair": "Cykl życia lazy i restart.",
+   "undo": "Powrót do always."
+  },
+  {
+   "id": "f23-log-disk-limit",
+   "kind": "log_disk_limit",
+   "target": "logs/diagnostics",
+   "consent": "auto",
+   "fault": "Strumień Diagnostyka osiągnął limit dysku (500 segmentów).",
+   "repair": "100 najstarszych segmentów do archiwum.",
+   "undo": "Przywrócenie segmentów."
+  },
+  {
+   "id": "f24-kernel-config-tampered",
+   "kind": "kernel_config_tampered",
+   "target": "config/kernel.toml",
+   "consent": "broker",
+   "fault": "Plik polityk Jądra zmieniony poza Brokerem.",
+   "repair": "Prośba do Brokera: plik do kwarantanny, przywrócenie podpisanej kopii.",
+   "undo": "Broker cofa przywrócenie."
+  }
+ ]
+}

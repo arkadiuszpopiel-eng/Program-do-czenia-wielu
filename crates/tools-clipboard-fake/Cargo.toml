@@ -1,0 +1,23 @@
+[package]
+name = "tools-clipboard-fake"
+description = "tools-clipboard: atrapa narzędzi schowka — prawdziwe manifesty, walidacja argumentów, schowek w pamięci z cofaniem zapisu (bez Brokera)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-clipboard-contract = { path = "../tools-clipboard-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tools-clipboard-contract = { path = "../tools-clipboard-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

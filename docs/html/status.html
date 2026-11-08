@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STATUS.md — macierz akceptacji fal F0–F9 — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/STATUS.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li><li><a href="plan-45-testy-ai.html">System pełnego automatycznego testowania przez AI</a></li><li><a href="plan-46-raport-2026-10-31-testy-ai.html">Raport z 31.10: system automatycznego testowania przez AI, ścieżki względne, wersja 0.0.79</a></li><li><a href="plan-47-raport-2026-11-01-noc.html">Raport z nocy 31.10/1.11: Sędzia Cieni, diagnostyka odporna na zawieszenie, wersja 0.0.81</a></li><li><a href="plan-48-raport-2026-11-01-rano.html">Raport 1.11 rano: zaległe inspekcje i testy</a></li><li><a href="plan-49-raport-2026-11-02-noc.html">Raport nocy 1/2.11: obowiązki modelu lokalnego i wymiana informacji między modelami</a></li><li><a href="plan-50-tryby-zgod-jak-claude-codex.html">50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)</a></li><li><a href="plan-51-raport-2026-11-03-wieczor.html">51 — Raport: wieczór 3.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-52-raport-2026-11-04-noc.html">52 — Raport: noc 3/4.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-53-raport-2026-11-06-noc.html">53 — Raport: noc 5/6.11 (etap Z — model-sędzia, dziennik rodzica, porządek kompilacji)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html" aria-current="page">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="features-katalog.html">Katalog funkcji i testów</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#dopisek-2026-10-14-wersja-0-0-51-po-audycie-zewnetrznym">Dopisek 2026-10-14 (wersja 0.0.51) — po audycie zewnętrznym</a></li><li><a href="#stan-na-2026-10-09-wersja-0-0-3">Stan na 2026-10-09 (wersja 0.0.3)</a></li><li><a href="#dopisek-2026-10-08-pierwszy-test-na-laptopie-i-porzadki">Dopisek 2026-10-08 — pierwszy test na laptopie i porządki</a></li><li><a href="#legenda">Legenda</a></li><li><a href="#stan-ci-i-bramek-lokalnych">Stan CI i bramek lokalnych</a></li><li><a href="#f0-fundament-i-spike-i">F0 — Fundament i spike'i</a></li><li><a href="#f1-rdzen-czatu">F1 — Rdzeń czatu</a></li><li><a href="#f2-glos-rdzeniowy-agentki">F2 — Głos rdzeniowy + agentki</a></li><li><a href="#f3-safety-kernel-system-koniec-mvp">F3 — Safety Kernel + system (koniec MVP)</a></li><li><a href="#f4-mosty-i-mcp">F4 — Mosty i MCP</a></li><li><a href="#f5-agentki-i-orkiestracja-glos-rozszerzony">F5 — Agentki i orkiestracja + głos rozszerzony</a></li><li><a href="#f6-computer-use">F6 — Computer use</a></li><li><a href="#f7-pamiec-pelna-transfer-pelny">F7 — Pamięć pełna + transfer pełny</a></li><li><a href="#f8-samonaprawa-i-ulepszanie">F8 — Samonaprawa i ulepszanie</a></li><li><a href="#f9-dopieszczenie">F9 — Dopieszczenie</a></li><li><a href="#najwazniejsze-luki-techniczne-dla-sesji-ai">Najważniejsze luki techniczne (dla sesji AI)</a></li><li><a href="#co-musi-zrobic-czlowiek-w-kolejnosci-priorytetu">Co musi zrobić człowiek (w kolejności priorytetu)</a></li></ul></aside><article><h1 id="status-md-macierz-akceptacji-fal-f0-f9">STATUS.md — macierz akceptacji fal F0–F9</h1>
+<p>Macierz: stan na <strong>2026-10-06</strong>; podsumowanie i bramki: <strong>2026-10-09</strong> (sekcja niżej). Gałąź <code>ccr-af4b63c6-3fyzaj</code> (fale 3–6: narzędzia systemowe, podział <code>app-core</code>, dziennik diagnostyczny, próba generalna na runnerze Windows). Kryteria i progi:
+<code>docs/ACCEPTANCE.md</code> (ten plik ich nie zmienia). Dowody sprawdzone w repo (<code>grep</code> po nazwach testów i plików);
+liczby z opisów commitów i README zestawów <code>evals/</code>.</p>
+<h2 id="dopisek-2026-10-14-wersja-0-0-51-po-audycie-zewnetrznym">Dopisek 2026-10-14 (wersja 0.0.51) — po audycie zewnętrznym</h2>
+<p>Macierz niżej to <strong>zapisany stan kryteriów</strong>, a nie pomiar dzisiejszego kodu: „0 ze 108 na sprzęcie”
+znaczy, że żadne kryterium nie ma jeszcze zapisanego dowodu z maszyny, a nie, że nic na sprzęcie nie działa
+(od 0.0.46 są raporty <code>scripts/verify.mjs</code> z testami silników na laptopie — <code>target/verify/&lt;wersja&gt;/</code>).
+Audyt z 14.10 (raport poza repozytorium: <code>../audyt-2026-10-14/RAPORT.md</code>) wskazał 17 pozycji; poprawki
+są w 0.0.51 (CHANGELOG). Rejestr biegów sprawdzeń z datą, commitem, sprzętem, poleceniem i logiem: <a href="dowody.html"><code>DOWODY.md</code></a>
+(generowany, <code>node scripts/evidence.mjs</code>). Otwarte: przypisanie kryteriów do biegów (decyzja właściciela); izolacja procesu poleceń powłoki —
+do przeglądu właściciela.</p>
+<h2 id="stan-na-2026-10-09-wersja-0-0-3">Stan na 2026-10-09 (wersja 0.0.3)</h2>
+<p>Tabele F0–F9 niżej mają stan z <strong>2026-10-06</strong> i znak ✅ oznacza w nich „zielone w CI / na atrapach”. Zgodnie
+z ADR 0016 kryterium jest spełnione dopiero po przebiegu na prawdziwej maszynie — takiego potwierdzenia nie ma
+jeszcze <strong>żadne</strong> z 108 kryteriów. Streszczenie dla właściciela: <a href="plan-00-stan-wykonania.html"><code>plan/00-stan-wykonania.md</code></a>.</p>
+<div class="tbl"><table><thead><tr><th>Oznaczenie</th><th>Znaczenie</th><th style="text-align:right">Liczba kryteriów</th></tr></thead><tbody><tr><td>✅ CI</td><td>zielone w testach automatycznych, na atrapach</td><td style="text-align:right">38</td></tr>
+<tr><td>✅ sprzęt</td><td>potwierdzone w działającym programie na maszynie właściciela</td><td style="text-align:right">0</td></tr>
+<tr><td>🟡</td><td>zbudowane, czeka na sprzęt, korpus albo klucz</td><td style="text-align:right">57</td></tr>
+<tr><td>⛔</td><td>brak implementacji albo zestawu</td><td style="text-align:right">11</td></tr>
+<tr><td>⚖️</td><td>decyzja właściciela</td><td style="text-align:right">2</td></tr></tbody></table></div>
+<p>Sprawdzone na laptopie poza macierzą kryteriów (i7-13620H, RTX 4050, Windows 11): start aplikacji i modułów;
+okno główne, ustawienia, panele, kreator i paleta (<code>apps/desktop/ui/e2e-app</code>, 11/11 na profilu tymczasowym);
+skala interfejsu powyżej 100 %; ostrzeżenie o zajętym skrócie; wersja, data i commit w „O programie”.
+Nadal niesprawdzone na żadnej maszynie: odpowiedź modelu lokalnego, głos, Broker poza procesem, instalator.</p>
+<p>Bramki 2026-10-09: vitest 257/257; Playwright E2E (<code>PW_WORKERS=4</code>, Edge) 138 zielonych i 1 czerwony
+(<code>keyboard.spec.ts</code> „strumień 100 tok/s” — próg równy stanowi bazowemu, decyzja właściciela); svelte-check 0 błędów;
+lint, <code>check-css</code>, <code>check-svelte5</code> zielone. Nie uruchomiono: <code>cargo test --workspace</code>, clippy, cargo-deny.</p>
+<p>Uwagi do tabel niżej: wiersze F5-05…F5-12 mówią „niepodpięte w aplikacji” — to stan sprzed fali 6; funkcje głosu F5
+są podpięte w <code>app-voice</code> (luka techniczna nr 3), brakuje pomiarów. Wiersz F0-18 dotyczy dziś 16 ADR-ów
+zaakceptowanych i 8 projektów (0017–0024) czekających na podpis.</p>
+<p>Nowy zakres (Linux, panel WWW, Android, dostęp zdalny, nowe funkcje) i jego stan: <a href="plan-03-roadmapa.html"><code>plan/03-roadmapa.md</code></a>.
+Kryteria <code>ACC-V6-…</code> dla tego zakresu są na razie szkicami w dokumentach planu; do <code>ACCEPTANCE.md</code> trafią
+z progami ustalonymi przez właściciela.</p>
+<h2 id="dopisek-2026-10-08-pierwszy-test-na-laptopie-i-porzadki">Dopisek 2026-10-08 — pierwszy test na laptopie i porządki</h2>
+<p>Macierz niżej ma stan z 2026-10-06 i opisuje wyniki z CI i atrap. Żadne kryterium nie jest jeszcze potwierdzone
+na prawdziwej maszynie. Kolejność dalszych prac: <a href="kontynuacja.html"><code>KONTYNUACJA.md</code></a>.</p>
+<p>Ustalenia z testu na laptopie (i7-13620H, RTX 4050 6 GB; logi z <code>%LOCALAPPDATA%\Alfa\logs</code>, 2026-10-07):</p>
+<div class="tbl"><table><thead><tr><th>Ustalenie</th><th>Kryterium</th><th>Stan</th></tr></thead><tbody><tr><td>Model lokalny ani razu nie odpowiedział: pobrany Bielik 1.5B, brak <code>llama-server.exe</code> (pusty <code>sidecars</code>), router 5 razy wybrał model lokalny, <code>model_calls</code> puste; rozmowa nie pokazuje, że brakuje silnika</td><td>F1-03, F3-12</td><td>do naprawy (KONTYNUACJA 1.1)</td></tr>
+<tr><td>Log „start na GPU nieudany — fallback na CPU” co 15 min, gdy przyczyną jest brak pliku wykonywalnego (<code>providers-local-impl/src/sidecar.rs</code>)</td><td>—</td><td>do naprawy (1.2)</td></tr>
+<tr><td>Skrót <code>Ctrl+Alt+Space</code> zajęty przez inny program — rejestracja pada przy każdym starcie bez komunikatu w interfejsie</td><td>F1-12</td><td>do naprawy (1.3)</td></tr>
+<tr><td>Czytanie na głos odmawia (<code>unsupported</code>) — brak silnika TTS</td><td>F2-01</td><td>po instalacji silników (1.4)</td></tr>
+<tr><td>Start aplikacji, kolejność modułów, wykrycie sprzętu (<code>laptop-cuda</code>, profil głosu D), pobranie modeli ze zgodą TOFU, przebudowa wektorów embedderem e5-small</td><td>F7-02 (częściowo)</td><td>działa</td></tr></tbody></table></div>
+<p>Bramki lokalne na Windows (2026-10-08, kopia na dysku przenośnym, <code>scripts/gates.ps1</code>): format Rust, graf
+zależności (1645 krawędzi, 0 naruszeń), lint, svelte-check i vitest (219/219) — zielone; <code>cargo test</code> siedmiu
+crate&#39;ów rdzenia — 122 testy zielone. Nie uruchomiono: clippy, pełnego <code>cargo test --workspace</code> (za mało miejsca
+na dysku) i <code>cargo-deny</code> (brak narzędzia). Poprawione przy okazji: <code>check-deps.sh</code> zgłaszał na Windows fałszywe
+naruszenia (CRLF z <code>jq</code>), a <code>check-css.mjs</code> i <code>check-svelte5.mjs</code> nie działały w ścieżce Windows ze spacjami.</p>
+<p>Poprawki z nocy 7/8.10 (gałąź robocza, commity <code>020a9d4</code>, <code>a1c803c</code>, <code>e594e61</code> i następny):</p>
+<div class="tbl"><table><thead><tr><th>Obszar</th><th>Co się zmieniło</th><th>Dowód</th></tr></thead><tbody><tr><td>Skalowanie interfejsu</td><td>kolumna rozmowy „Dopasowana do okna” (domyślna), <code>ui.zoom_fit</code> — skala rośnie z oknem powyżej 1600 px, strony ustawień wyśrodkowane do 1040 px</td><td><code>src/lib/logic/__tests__/appearance.test.ts</code>; zrzuty <code>apps/desktop/ui/scripts/shots.mjs</code> (1280, 1920, 2560 px)</td></tr>
+<tr><td>Laptop 1280 px</td><td>prawy panel zadokowany obok rozmowy, Sesje jako pasek ikon (wcześniej szuflada zasłaniała rozmowę)</td><td><code>logic/__tests__/layout.test.ts</code>, <code>state/__tests__/stores.test.ts</code></td></tr>
+<tr><td>Ustawienia</td><td>29 stron w 7 grupach; „fala N” → „wkrótce”</td><td><code>logic/__tests__/settings-groups.test.ts</code></td></tr>
+<tr><td>Model bez silnika (ustalenie 1 i 2 wyżej)</td><td>czytelny błąd z przyciskiem „Modele i silniki”, bez fałszywego „fallbacku na CPU”</td><td><code>providers-local-impl/tests/lifecycle.rs::missing_engine_gives_actionable_error_and_no_fallback</code>, <code>missing_gpu_engine_uses_cpu_build</code>; <code>app-chat</code> <code>outcome::tests</code>; <code>e2e/composer.spec.ts</code></td></tr>
+<tr><td>Zdrowie systemu</td><td>statusy incydentów po polsku</td><td>—</td></tr></tbody></table></div>
+<p>Skrót <code>Ctrl+Alt+Space</code>: na tym laptopie jest zajęty przez inny program. Sprawdzone 2026-10-08 na działającej
+aplikacji — komunikat „Skrót Ctrl+Alt+Space jest zajęty przez inny program” <strong>pojawia się</strong> w oknie (wcześniejsze
+podejrzenie, że ginie przy starcie, było błędne). Zostaje wybór innego skrótu na stronie Skróty albo zwolnienie go
+w drugim programie; trwały wskaźnik na stronie Skróty byłby ulepszeniem, nie naprawą błędu.</p>
+<p>Przegląd interfejsu strona po stronie (29 stron ustawień, 7 paneli; commity <code>e358807</code>, <code>8d64fa2</code>): karty panelu
+prawego zawijają się — „Ekran” i „Głos” były poza krawędzią wąskiego panelu i niedostępne myszą; powtórzone nagłówki
+stron; nazwy zakresów pamięci bez powtórzeń i spokojniejsze przyciski „Zapomnij cały zakres”; nazwy narzędzi GUI po
+polsku; nawigacja ustawień ze stałym nagłówkiem. W drugim przejściu poprawione też: powody zatrzymania wtyczki po polsku, harmonogram
+wyzwalacza słowami (<code>logic/cron-text.ts</code>), edytor JSON Marszałka zwinięty pod „Zaawansowane”, onboarding na
+środku okna.</p>
+<p>Przeglądy kodu rdzenia w osobnych sesjach (2026-10-08; tylko odczyt) — instalacja modeli i silników oraz przebieg
+rozmowy. Naprawione od razu, z testami:</p>
+<div class="tbl"><table><thead><tr><th>Ustalenie</th><th>Gdzie</th><th>Test</th></tr></thead><tbody><tr><td>Model bez silnika był zgłaszany jako zdrowy — Router i zadania w tle próbowały trasy lokalnej w kółko (wpis w logu co 15 min)</td><td><code>providers-local-impl</code> <code>config.rs::engine_present</code>, <code>provider.rs</code>, <code>module.rs</code></td><td><code>lifecycle.rs::missing_engine_gives_actionable_error_and_no_fallback</code></td></tr>
+<tr><td>Nieudany start na procesorze po nieudanym starcie na karcie zostawiał dzierżawę pamięci</td><td><code>providers-local-impl/src/sidecar.rs</code></td><td>przegląd kodu (brak testu)</td></tr>
+<tr><td>Onboarding proponował sam model, bez silnika</td><td><code>views/onboarding/LocalBundleCard.svelte</code> — pakiet zalecany z silnikiem i zgodą na sumy</td><td><code>e2e/bundles.spec.ts</code></td></tr>
+<tr><td>Błąd w trakcie „Myślę…” zostawiał pulsujący wskaźnik</td><td><code>logic/apply-event.ts</code></td><td><code>logic/__tests__/turn-tree.test.ts</code></td></tr>
+<tr><td>„Kontynuuj” zostawało po kontynuacji (kolejne kliknięcie tworzyło duplikat)</td><td><code>logic/turn-tree.ts::isContinued</code></td><td>jw.</td></tr>
+<tr><td>Po przełączeniu wariantu ‹ › znikał Stop, a Esc nie zatrzymywał trwającej generacji</td><td><code>logic/turn-tree.ts::streamingTurn</code></td><td>jw.</td></tr></tbody></table></div>
+<p>Otwarte ustalenia z tych przeglądów (do naprawy w kolejnych sesjach; wymagają budowy <code>app-core</code>):</p>
+<div class="tbl"><table><thead><tr><th>#</th><th>Ustalenie</th><th>Gdzie</th><th>Pewność</th></tr></thead><tbody><tr><td>R-01</td><td><strong>naprawione 2026-10-08</strong>: <code>flush_queue</code> gubił kolejkę offline przy błędzie jednej sesji — nieobsłużone sesje wracają teraz do kolejki</td><td><code>app-core/src/commands/queue.rs</code></td><td>testy <code>errors.rs</code> zielone; kolejność po błędzie — test <code>queue.rs::requeued_entries_keep_every_turn_in_sending_order</code></td></tr>
+<tr><td>R-02</td><td><strong>naprawione 2026-10-08</strong>: nieudany start odpowiedzi po zapisanej wiadomości daje komunikat i „Ponów” zamiast błędu wysyłki (koniec duplikatów)</td><td><code>app-core/src/commands/turns.rs::start_after_user</code></td><td>test <code>app-core/tests/review.rs::failed_reply_start_keeps_one_saved_message_and_explains</code> (Broker w bezpiecznym stanie przez <code>RemoteKernel::unavailable</code>)</td></tr>
+<tr><td>R-03</td><td><strong>naprawione 2026-10-08</strong>: „Edytuj i wyślij ponownie” przenosi bloki (załączniki) pierwotnej wiadomości do nowej gałęzi</td><td><code>app-core/src/commands/turns.rs</code></td><td>test <code>app-core/tests/review.rs::edit_and_resend_keeps_the_attachments_of_the_original_message</code></td></tr>
+<tr><td>R-04</td><td><strong>naprawione w interfejsie 2026-10-08</strong>: strona Modele i silniki ostrzega, gdy model jest na dysku bez pasującego silnika, i prowadzi do silników (<code>logic/models.ts::missingEngines</code>, testy); onboarding proponuje pakiet z silnikiem. Otwarte: pole „brakujące silniki” w DTO rdzenia</td><td><code>app-models/src/lib.rs</code>, <code>view.rs</code></td><td>potwierdzone odczytem</td></tr>
+<tr><td>R-05</td><td>Zamknięte w 0.0.68 (2026-10-21): każda pozycja do pobrania ma przypiętą sumę SHA-256 (digest wydań GitHub, LFS oid z API Hugging Face albo suma z pliku pobranego 21.10) — test <code>catalog.rs</code> i <code>tests/review.rs</code> (P3-04)</td><td><code>app-models/src/data.rs</code>, <code>data_speech.rs</code></td><td>zamknięte (CI)</td></tr>
+<tr><td>R-06</td><td><strong>naprawione 2026-10-08</strong>: nieudana instalacja archiwum czyści katalog roboczy; 416 uznaje plik częściowy tylko przy zgodnym rozmiarze</td><td><code>app-models/src/jobs.rs</code>, <code>fetch.rs</code></td><td>testy <code>download.rs</code>, <code>unpack.rs</code> zielone; test <code>fetch.rs::range_not_satisfiable_means_complete_only_for_matching_size</code></td></tr>
+<tr><td>R-07</td><td><strong>naprawione 2026-10-08</strong>: model GGUF jest „zainstalowany” dopiero z rekordem <code>.sha256</code>, tak jak ocenia go dostawca lokalny (<code>app-models/src/view.rs</code>); testy <code>download.rs</code>, <code>bundles.rs</code> zielone</td><td><code>app-models/src/view.rs</code> vs <code>providers-local-impl/src/download.rs</code></td><td>utajone</td></tr>
+<tr><td>R-08</td><td><strong>naprawione 2026-10-08</strong>: limit startu modelu rośnie o 20 s na każdy gigabajt pliku (Bielik 4.5B: 140 s) — <code>providers-local-impl/src/sidecar.rs</code>; test <code>sidecar/lease.rs::startup_limit_grows_with_model_size</code>; bez pomiaru na żywo</td><td><code>providers-local-impl/src/config.rs</code></td><td>podejrzenie</td></tr>
+<tr><td>R-09</td><td><strong>naprawione 2026-10-08</strong>: nieudany zapis odpowiedzi daje widoczny komunikat (<code>app-chat/src/finish.rs</code>); panika w przebiegu generacji kończy turę błędem zamiast zostawić ją na zawsze w stanie „pisze” (<code>outcome.rs::guarded</code>, test <code>panicking_generation_ends_as_failed_turn</code>). Uwaga: build wydaniowy powłoki ma <code>panic = &quot;abort&quot;</code> — tam strażnik nie działa, proces kończy się po zapisie paniki do dziennika; zmiana strategii paniki to decyzja właściciela</td><td><code>app-chat/src/generate.rs</code>, <code>outcome.rs</code>, <code>finish.rs</code></td><td>podejrzenie</td></tr></tbody></table></div>
+<p>Druga tura przeglądów (głos, pamięć, narzędzia agentek i transfer; 2026-10-08). Naprawione od razu:</p>
+<div class="tbl"><table><thead><tr><th>Ustalenie</th><th>Gdzie</th></tr></thead><tbody><tr><td>„Przeczytaj na głos” zawsze odmawiało (<code>unsupported</code>): powłoka nie przekazywała schowka funkcjom głosowym — objaw z testu na laptopie</td><td><code>app-core/src/parts/agents.rs</code> (schowek systemowy jak w narzędziach agentek)</td></tr>
+<tr><td>STOP WSZYSTKIEGO nie kończył dyktowania do cudzych okien</td><td><code>app-core/src/commands/system.rs</code></td></tr>
+<tr><td>Strona Pamięć zawsze pisała „licznik bezczynności jest niedostępny” (<code>idle_available</code> na sztywno <code>false</code>)</td><td><code>app-memory/src/app.rs</code>, <code>app-core/src/parts/memory.rs</code></td></tr>
+<tr><td>„Porządkuj teraz” pokazywało „zakończone” także przy pominięciu (bateria, tryb gry)</td><td><code>views/settings/pages/MemoryPage.svelte</code></td></tr>
+<tr><td>Po edycji wpisu pamięci szczegóły zostawały na starej, zastąpionej wersji</td><td><code>components/panels/MemoryDetail.svelte</code>, <code>MemoryPanel.svelte</code></td></tr>
+<tr><td>Cofnięcie utworzenia wpisu zostawiało „Nie udało się wczytać”; licznik „do zatwierdzenia” liczony z pierwszych 100 wpisów</td><td><code>MemoryDetail.svelte</code>, <code>MemoryPanel.svelte</code>, <code>MemoryJournal.svelte</code></td></tr>
+<tr><td>Anulowanie okna wyboru pliku odbierało „Cofnij import”; martwy przycisk cofania, gdy import nic nie zmienił</td><td><code>views/settings/pages/TransferImport.svelte</code></td></tr></tbody></table></div>
+<p>Otwarte z drugiej tury (wymagają decyzji albo większej zmiany):</p>
+<div class="tbl"><table><thead><tr><th>#</th><th>Ustalenie</th><th>Gdzie</th><th>Pewność</th></tr></thead><tbody><tr><td>R-10</td><td>Częściowo nieudane „Cofnij” jest w dzienniku oznaczane jako wykonane, a interfejs dalej je oferuje — pozostałych plików nie da się już przywrócić; wygasłe kroki wyglądają na cofalne</td><td><code>undo-journal-contract/src/restore.rs</code>, <code>app-core/src/commands/turn_intents.rs</code>, <code>UndoCard.svelte</code></td><td>potwierdzone odczytem</td></tr>
+<tr><td>R-11</td><td><strong>naprawione w logice 2026-10-08</strong>: przy zmianie samej wielkości liter kontrola konfliktów nie wymaga już nieobecności starej nazwy (<code>undo-journal-contract/src/restore.rs::case_only_rename</code>, test jednostkowy). Niesprawdzone na prawdziwym NTFS</td><td><code>undo-journal-contract/src/restore.rs</code>, <code>engine.rs</code></td><td>potwierdzone odczytem</td></tr>
+<tr><td>R-12</td><td><strong>naprawione 2026-10-08</strong>: niepełne cofnięcie importu zwraca błąd z liczbami zamiast sukcesu; wynik importu ma osobne pole <code>failed</code> (wcześniej nieudane elementy były wliczane do pominiętych), a interfejs pokazuje je jako osobny komunikat błędu. Fixture <code>app-core/tests/fixtures/transfer.json</code> uzupełniony ręcznie; <code>dto_roundtrip</code> i <code>transfer</code> zielone</td><td><code>app-modules/src/transfer.rs</code>, <code>app-api/src/dto/transfer.rs</code>, <code>TransferImport.svelte</code></td><td>potwierdzone odczytem</td></tr>
+<tr><td>R-13</td><td><strong>naprawione 2026-10-08</strong>: wpis dziennika zapamiętuje katalogi utworzone przy zapisie, kopii i przeniesieniu (<code>JournalEntry::created_dirs</code>, pole opcjonalne — stare dzienniki czytają się bez zmian); cofnięcie z pre-image po restarcie usuwa je do Kosza od najgłębszego, o ile są puste. Naprawia też cofnięcie <code>fs_mkdir</code> po restarcie. Testy: <code>undo-journal-impl/tests/created_dirs.rs</code> (system plików z jawnymi katalogami). Niesprawdzone na prawdziwym dysku (wymaga Kosza Windows)</td><td><code>undo-journal-contract/src/engine.rs</code>, <code>restore.rs</code>, <code>types.rs</code></td><td>odczyt kodu</td></tr>
+<tr><td>R-14</td><td><strong>naprawione 2026-10-08</strong>: błąd odczytu hasła kopii zatrzymuje kopię z komunikatem zamiast robić wersję nieszyfrowaną (<code>app-files/src/backup/mod.rs::password_for_run</code>); test <code>app-files/tests/backup.rs::unreadable_password_stops_the_backup_instead_of_writing_it_unencrypted</code>; poprawiony też komunikat (ciąg spacji w środku zdania)</td><td><code>app-files/src/backup/mod.rs</code></td><td>podejrzenie</td></tr>
+<tr><td>R-15</td><td><strong>naprawione 2026-10-08</strong>: niezapisane ustawienia kopii zostają po „Wybierz katalog” / „Wykonaj teraz”</td><td><code>BackupSection.svelte</code></td><td>potwierdzone odczytem</td></tr>
+<tr><td>R-16</td><td><strong>naprawione 2026-10-08</strong>: Piper bez modelu głosu (<code>*.onnx</code>) nie jest już zgłaszany jako gotowy głos (<code>app-modules/src/tts.rs</code>); czytanie i dyktowanie bez silnika lub modelu mowy mają stan „niedostępne” z powodem wymieniającym, czego brakuje i gdzie to pobrać (<code>FeatureFactory::dictation_missing</code> / <code>read_missing</code>, <code>features/view.rs</code>), i wracają bez restartu po doinstalowaniu. Test <code>app-voice/tests/f5_read.rs::missing_speech_engines_make_read_and_dictation_unavailable</code>. Niesprawdzone w prawdziwej aplikacji</td><td><code>app-voice/src/features/view.rs</code>, <code>system_f5.rs</code>, <code>app-modules/src/tts.rs</code></td><td>potwierdzone w Rust</td></tr>
+<tr><td>R-17</td><td><strong>naprawione 2026-10-08</strong>: w pamięci zostaje tylko udane wczytanie modelu mówcy — model pobrany po starcie jest wykrywany bez restartu</td><td><code>app-voice/src/features/mod.rs</code></td><td>potwierdzone odczytem</td></tr>
+<tr><td>R-18</td><td><strong>naprawione 2026-10-08</strong>: model rozpoznawania mowy dobierany do backendu (z kartą duży, bez karty mały; modele tylko angielskie na końcu) — <code>app-modules/src/stt.rs</code>, test w tym pliku</td><td><code>app-modules/src/stt.rs</code></td><td>potwierdzone odczytem</td></tr>
+<tr><td>R-19</td><td><strong>naprawione 2026-10-08</strong> (strona interfejsu): po zainstalowaniu pozycji interfejs odświeża stan głosu</td><td><code>app-voice/src/port.rs</code>, <code>MicIndicator.svelte</code></td><td>częściowo potwierdzone</td></tr>
+<tr><td>R-20</td><td>Edycja oczekującej propozycji pamięci po cichu ją zatwierdza; „zapamiętaj” zapisuje treść odpowiedzi jako zaufaną</td><td><code>memory-contract/src/engine/write.rs</code>, <code>app-memory/src/app.rs</code></td><td>podejrzenie — do decyzji właściciela</td></tr></tbody></table></div>
+<p><strong>Sprawdzenie na prawdziwej aplikacji (2026-10-08, ten laptop).</strong> Powłoka z cechą <code>e2e</code> zbudowana z bieżącej
+gałęzi (<code>cargo build --features &quot;e2e tauri/custom-protocol&quot;</code>, osobny katalog wyników <code>target/shell</code>) i uruchomiona
+na tymczasowym profilu (<code>APPDATA</code> / <code>LOCALAPPDATA</code> wskazane na katalog roboczy — dane właściciela nietknięte):
+<code>apps/desktop/ui/e2e-app/run.ps1</code> — <strong>10/10</strong> (start okna na prawdziwym rdzeniu, wprowadzenie, rozmowa bez modelu,
+Broker w procesie, Modele i silniki z wykrytą kartą RTX 4050 i pakietem zalecanym 5, eksport <code>.alfa</code> przez natywne
+okno, zatrzymanie z interfejsu, okna poboczne, konsola bez błędów, CSP z Trusted Types bez naruszeń). Potwierdzone na
+zrzutach z działającej aplikacji: wyśrodkowany onboarding, ustawienia w grupach na szerokiej stronie, błąd „brak
+modelu” z przyciskami „Modele i silniki” i „Dodaj klucz”. <strong>Niesprawdzone na żywo:</strong> odpowiedź modelu lokalnego
+(wymaga pobrania modelu i silnika), głos, poprawki bez własnych testów. Skalowanie sprawdzone na żywo przez CDP
+w czterech rozmiarach okna: skala 1,00 / 1,08 / 1,25 / 1,50 przy 1280 / 1920 / 2560 / 3840 px, kolumna rozmowy
+691 / 847 / 1210 / 1500 px.</p>
+<p>Trzecia tura przeglądów (mosty CLI, computer use, wtyczki i umiejętności, aktualizacje; użycie Brokera):</p>
+<ul>
+<li>Naprawione w interfejsie: przycisk „Uruchom ponownie” przy aktualizacji odblokowywał się po każdym zdarzeniu
+stanu (<code>state/updates.svelte.ts::applyEvent</code>); przy niezgodności z rejestrem zgodności „Przypnij” nie robiło nic
+widocznego, a „Odepnij” znikało (<code>BridgesSection.svelte</code>); strona uprawnień pokazywała nieaktualny poziom
+autonomii (<code>PermissionsPage.svelte</code>).</li>
+<li>Użycie Brokera: osiem ustaleń B-01…B-08 w <a href="../reviews/2026-10-08-broker-usage-review.md"><code>reviews/2026-10-08-broker-usage-review.md</code></a>
+— obszar Jądra, <strong>bez zmian w kodzie</strong>, do decyzji właściciela (bramka #7). Najważniejsze: STOP WSZYSTKIEGO
+zgłasza sukces także wtedy, gdy Broker nie został osiągnięty (B-03); obniżony poziom autonomii nie wraca po
+starcie, gdy łącze z Brokerem jeszcze nie działa (B-01).</li>
+</ul>
+<div class="tbl"><table><thead><tr><th>#</th><th>Ustalenie</th><th>Gdzie</th><th>Pewność</th></tr></thead><tbody><tr><td>R-21</td><td>Dzienny limit uruchomień mostu z harmonogramu zeruje się przy każdej zmianie przypięcia albo harmonogramu i po restarcie (licznik tylko w pamięci)</td><td><code>app-bridges/src/app.rs</code>, <code>agent-backends-impl/src/gate.rs</code></td><td>potwierdzone odczytem</td></tr>
+<tr><td>R-22</td><td><strong>naprawione 2026-10-08</strong>: błąd zatrzymania przebiegu przy „Zatrzymaj sterowanie” jest logowany i pokazywany (<code>app-core/src/commands/work.rs</code>). Podejrzenie o zadaniach mostów CLI i schedulera sprawdzone i niepotwierdzone: każde narzędzie GUI przechodzi przez <code>GuiMonitor::begin</code>, które po przejęciu odmawia niezależnie od źródła wywołania (test <code>app-gui/tests/screen.rs::take_over_pauses_gui_tools_until_released</code>)</td><td><code>app-core/src/commands/work.rs</code>, <code>app-gui/src/monitor.rs</code></td><td>wyjaśnione</td></tr>
+<tr><td>R-23</td><td><strong>wyjaśnione w interfejsie 2026-10-08</strong>: przy wyłączonych umiejętnościach jest informacja, że wyłączenie jest jednokierunkowe. Otwarte (decyzja): czy dodać operację „włącz” jak we wtyczkach</td><td><code>app-skills</code>, <code>SkillsPage.svelte</code></td><td>potwierdzone — może zamierzone</td></tr>
+<tr><td>R-24</td><td>Podwójne wywołanie pobierania aktualizacji może zamienić stan „gotowa” na „nieudana”</td><td><code>app-updates/src/lib.rs</code>, <code>updater-impl/src/download.rs</code></td><td>podejrzenie</td></tr>
+<tr><td>R-25</td><td><strong>wyjaśnione 2026-10-08</strong>: dwie wyłączone wersje tej samej wtyczki nie mogą współistnieć — zatwierdzenie nowszej oznacza starszą wyłączoną jako zastąpioną (<code>plugin-runtime-contract/src/library.rs::approve</code>), więc włączanie po identyfikatorze jest jednoznaczne; test <code>tests/contract.rs::at_most_one_disabled_version_per_plugin</code>. „Usuń” wtyczki ma potwierdzenie (<code>PluginsPage.svelte</code>)</td><td><code>plugin-runtime-contract/src/library.rs</code>, <code>PluginsPage.svelte</code></td><td>niepotwierdzone</td></tr>
+<tr><td>R-26</td><td><strong>znalezione i naprawione 2026-10-08</strong>: wiadomość z kolejki offline należąca do sesji usuniętej (w oknie cofnięcia) po powrocie sieci szła do modelu — odpowiedź do sesji w koszu, w chmurze zbędny koszt. Teraz wpis czeka w kolejce na „Cofnij”, a ostateczne usunięcie sesji go czyści. Test <code>app-core/tests/review.rs::queued_message_of_a_trashed_session_waits_for_undo</code></td><td><code>app-core/src/commands/queue.rs</code>, <code>sessions.rs</code></td><td>potwierdzone testem</td></tr></tbody></table></div>
+<p>Czwarta tura — narzędzia plikowe i powłoka agentek (<code>tools-fs-impl</code>, <code>tools-shell-impl</code>, <code>tools-common-contract</code>,
+<code>tools-net-impl</code>; <code>tools-clipboard-impl</code> tylko pobieżnie — redakcja sekretów, limity tekstu i obrazu, skażenie sesji
+i głębokość cofania są w kodzie, bez pełnego przeglądu):</p>
+<div class="tbl"><table><thead><tr><th>#</th><th>Ustalenie</th><th>Gdzie</th><th>Pewność</th></tr></thead><tbody><tr><td>T-01</td><td><strong>naprawione 2026-10-08</strong>: segmenty będące nazwami urządzeń Windows (<code>CON</code>, <code>NUL</code>, <code>COM1</code>, <code>nul.txt</code>…) są odrzucane przy rozwiązywaniu ścieżki — <code>tools-common-contract/src/device.rs</code> (testy), <code>paths.rs::resolve</code></td><td><code>tools-common-contract/src/paths.rs::resolve</code></td><td>potwierdzone</td></tr>
+<tr><td>T-02</td><td><strong>naprawione 2026-10-08</strong>: <code>FsPort::read_range</code> (domyślnie przez <code>read</code>, w <code>WinFs</code> otwarcie + przesunięcie + odczyt najwyżej <code>max</code> bajtów, deny-lista jak przy <code>read</code>); <code>fs_read</code> czyta tylko żądany zakres, <code>fs_write</code> czyta starą treść wyłącznie przy dopisywaniu i najwyżej do limitu zapisu. Testy: <code>platform-contract</code> (domyślna implementacja), <code>platform-windows-impl/tests/fs_port.rs::read_range_returns_slice_and_total_size</code>, <code>tools-fs-impl/tests/review.rs</code>. Przeszukiwanie treści nadal czyta cały plik, ale tylko do <code>search_file_max_bytes</code></td><td><code>tools-fs-impl/src/read.rs</code>, <code>write.rs</code>, <code>platform-contract/src/fs.rs</code>, <code>platform-windows-impl/src/fs</code></td><td>potwierdzone</td></tr>
+<tr><td>T-03</td><td><strong>naprawione 2026-10-08</strong>: limit zapisu obejmuje plik po dopisaniu — <code>tools-fs-impl/src/write.rs</code>; test <code>tools-fs-impl/tests/review.rs::append_respects_limit_and_other_modes_ignore_old_content</code></td><td><code>tools-fs-impl/src/write.rs</code></td><td>potwierdzone</td></tr>
+<tr><td>T-04</td><td><strong>naprawione 2026-10-08</strong>: wpis katalogu dopasowywany bez rozróżniania wielkości liter na Windows; zapas nie czyta całego pliku i nie uznaje nieczytelnego pliku za katalog — <code>tools-fs-impl/src/core.rs</code></td><td><code>tools-fs-impl/src/core.rs</code></td><td>potwierdzone</td></tr>
+<tr><td>T-05</td><td><strong>naprawione 2026-10-08</strong>: <code>fs_search</code> podaje, ilu plików nie przeszukał (za duże albo nietekstowe) — <code>tools-fs-impl/src/read.rs</code></td><td><code>tools-fs-impl/src/read.rs</code></td><td>potwierdzone</td></tr>
+<tr><td>T-06</td><td>Zakres zgody Brokera jest liczony z nierozwiązanej ścieżki — dowiązanie w katalogu roboczym może wyprowadzić poza zakres (lista zakazów nadal działa)</td><td><code>tools-fs-impl/src/core.rs</code></td><td>podejrzenie — do przeglądu z Brokerem</td></tr>
+<tr><td>T-07</td><td><strong>naprawione 2026-10-08</strong>: krok powłoki jest zatwierdzany w dzienniku dopiero po uruchomieniu polecenia — <code>tools-shell-impl/src/run.rs</code></td><td><code>tools-shell-impl/src/run.rs</code></td><td>podejrzenie</td></tr></tbody></table></div>
+<p><strong>Podział pozostałych otwartych ustaleń (stan na koniec nocy 7/8.10):</strong></p>
+<ul>
+<li><em>Czekają na decyzję właściciela:</em> R-10 (częściowe „Cofnij” — adapter
+Brokera), R-20 (edycja oczekującej propozycji pamięci i zaufanie do „zapamiętaj”), R-21 (licznik limitu mostów —
+bramka zgodności), R-24 (aktualizator), B-01…B-08 (użycie Brokera).</li>
+<li><em>Do zrobienia bez decyzji, nietknięte:</em> pole „brakujące silniki” w DTO rdzenia (R-04) — interfejs liczy je sam
+z listy modeli i silników, więc to porządek, nie błąd.</li>
+<li><em>Bez własnego testu regresji:</em> tylko schowek dla czytania na głos (błąd dotyczył braku wstrzykniętego portu, więc test
+musiałby czytać prawdziwy schowek systemowy — nie da się go zrobić hermetycznie). R-02 ma test w
+<code>app-core/tests/review.rs</code>, dyktowanie przy STOP — <code>app-core/tests/review_voice.rs</code>, wyciek dzierżawy pamięci —
+<code>providers-local-impl/tests/lifecycle.rs</code>.</li>
+<li><em>Obserwacja do oceny właściciela (nie błąd w kodzie):</em> załącznik-obraz nie oznacza sesji jako zawierającej treść
+niezaufaną (<code>app-files/src/lib.rs::prepare</code> pomija <code>AttachmentKind::Image</code>), choć obraz też może nieść wstrzyknięte
+polecenia odczytywane przez model.</li>
+</ul>
+<p>Przegląd interfejsu, runda z 2026-10-08 przed południem (zrzuty 1280–3840 px, osiem scenariuszy atrapy):</p>
+<ul>
+<li><strong>Skalowanie — błąd poważny, naprawiony:</strong> przy skali powyżej 100 % (czyli po włączeniu „Dopasuj skalę do okna” w każdym
+oknie od 1920 px) strona była wyższa niż okno o współczynnik skali (1920×1080: 1166 px) i pole pisania lądowało pod
+dolną krawędzią. Przyczyna: <code>min-height: 100vh</code> mnożone przez CSS <code>zoom</code>. Poprawka w <code>app.css</code> (<code>--alfa-vh</code>, <code>--alfa-vw</code>),
+<code>appearance.ts</code>, oknach dialogowych, palecie i uchwycie zmiany szerokości; test e2e przy 1920, 2560 i 3840 px.
+Wcześniejszy „pomiar skalowania na żywo” obejmował tylko szerokości i tego nie wykrył.</li>
+<li>Katalog: 0 crate&#39;ów bez README (62 dopisane z opisów w <code>Cargo.toml</code>), 0 plików ponad 400 linii; bez <code>module.toml</code>
+zostaje tylko <code>core-bus-impl</code> (Jądro — decyzja właściciela), sześć crate&#39;ów <code>platform-windows-*-impl</code> to części
+jednego modułu ze wspólnym manifestem.</li>
+<li>Prawy panel na szerokim oknie ma 460 px (karty w jednym wierszu); kreator powitalny mieści 8 kroków w wierszu.</li>
+<li>Okno „Szybkie pytanie”: karta była o 16 px szersza niż okno (ucięta prawa krawędź) — naprawione, test e2e.</li>
+<li>Broker w bezpiecznym stanie: opis w banerze raz zamiast dwa razy; karta zatwierdzenia bez martwego przycisku.</li>
+</ul>
+<p>Przegląd narzędzi powłoki, schowka i sieci (osobna sesja, tylko odczyt): 12 ustaleń, <strong>niezweryfikowanych i
+niewdrożonych</strong> — <a href="../reviews/2026-10-08-tools-shell-clipboard-net-review.md"><code>reviews/2026-10-08-tools-shell-clipboard-net-review.md</code></a>.
+Najpoważniejsze: tekst w cudzysłowie ukrywa przed analizatorem poleceń polecenia niszczące i sieciowe (S-01), a
+nierozwiązywalna ścieżka omija deny-listę (S-03). Analizator to polityka bezpieczeństwa — decyzja właściciela.</p>
+<p>2026-10-09: z tego raportu wdrożone z testami S-07, C-01, N-01, N-02 oraz S-05 (PowerShell: przedrostek UTF-8; <code>cmd.exe</code>:
+dekodowanie strony kodowej OEM w warstwie platformy) — obie powłoki sprawdzone testem na prawdziwych procesach. Pozostają do decyzji
+właściciela: S-01…S-04, S-06, C-02, C-03.</p>
+<p>Testy E2E, 2026-10-09: cztery testy czerwone w przebiegu równoległym to w trzech przypadkach obciążenie laptopa — przy
+<code>PW_WORKERS=4</code> (nowa zmienna w <code>playwright.config.ts</code>; domyślnie 8 procesów na 16 wątkach i 16 GB RAM) pełny przebieg daje
+129 zielonych i 1 czerwony. Czwarty, „strumień 100 tok/s: aktualizacje DOM najwyżej raz na klatkę”, pada także samodzielnie
+(3 na 6 prób, 4 klatki przy limicie 2). Sonda pokazała, że dodatkowe aktualizacje to nie tekst strumienia, tylko dokładanie
+i zdejmowanie elementów przez wirtualną listę po zmierzeniu wysokości (<code>childList</code> na przewijanym kontenerze; w każdym
+przebiegu są co najmniej dwie takie klatki, czyli test stoi na samym limicie). Kod produktu bez zmian; do decyzji
+właściciela: liczyć w teście tylko zmiany treści wiadomości albo podnieść limit.</p>
+<p>Interfejs, 2026-10-09: separator „·” przyklejał się do poprzedniego słowa w siedmiu plikach („6 zdarzeń· Koszt”) —
+naprawione, a <code>scripts/check-svelte5.mjs</code> ma regułę, która ten wzorzec wykrywa. Mosty CLI: opis trasy bez powtórzonego
+zdania. Test jednostkowy „przełączenie sesji 1000 wiadomości” (limit 150 ms) bywa czerwony na tym laptopie; zmierzony czas
+to 6–16 ms, więc to chwilowe zacięcia maszyny, nie kod.</p>
+<p>Rozmowa, 2026-10-09 — błąd naprawiony: przy starcie obszar rozmowy zmienia wysokość (dochodzi pole pisania, przelicza
+się skala) i przewinięcie wywołane samym układem strony potrafiło „odkleić” listę od dołu — rozmowa otwierała się 79–308 px
+nad ostatnią wiadomością z widocznym przyciskiem „Przewiń do najnowszych” (powtórzone przy ograniczonym ruchu i skali
+ponad 100 %). Teraz odkleja tylko gest użytkownika: kółko, dotyk, klawisz, przeciąganie
+(<code>logic/virtual.ts::stickAfterScroll</code>, <code>VirtualList.svelte</code>). Testy: jednostkowy oraz dwa e2e w <code>responsive.spec.ts</code>.
+Przegląd <code>lib-netguard</code> (blokowanie adresów lokalnych i prywatnych, osobna sesja, tylko odczyt): bez defektów.
+Modele i silniki: licznik pozycji pokazywał „0 pozycji” w trakcie wczytywania katalogu (przez to test dymny prawdziwej
+aplikacji bywał czerwony) — licznik pojawia się teraz po wczytaniu; <code>e2e-app</code> 11/11 w trzech kolejnych przebiegach.</p>
+<p>Przegląd logiki stanu interfejsu (2026-10-09, osobna sesja, tylko odczyt) — 10 ustaleń, 9 wdrożonych z testami
+(<code>state/__tests__/review.test.ts</code>):</p>
+<ul>
+<li>sesja usunięta poza tym oknem zostawała „aktywna” z martwą rozmową — teraz ta sama ścieżka co usunięcie w oknie
+(<code>AppState::sessionRemoved</code>), ze sprzątaniem stanu per sesja;</li>
+<li>przełączniki paneli bez aktywnej sesji nie działały (zapis i odczyt pod różnymi kluczami);</li>
+<li>„Przywróć zamkniętą kartę” mogło otworzyć usuniętą sesję;</li>
+<li>wyjątek w jednym zdarzeniu gubił resztę paczki (także <code>Stop</code> — tura na stałe „pisze”);</li>
+<li>błąd „Co nowego” kasował informację o gotowej aktualizacji; starsza odpowiedź nadpisywała nowsze zdarzenie;</li>
+<li>rozmowa w trakcie strumienia wypadała z kolejki pamięci podręcznej i nigdy nie była zwalniana;</li>
+<li>zapisany szkic nadpisywał tekst wpisany tuż po otwarciu sesji;</li>
+<li>zamknięcie okna porzucało szkic i układ z ostatnich 400 ms;</li>
+<li>zdarzenia kończące turę, które przyszły w trakcie wczytywania rozmowy, przepadały.</li>
+</ul>
+<p>Zamknięte w 0.0.19 (B.2): delty tekstu z czasu wczytywania rozmowy — <code>TextDelta</code> niesie pozycję (<code>offset</code>), więc
+okno pomija część, którą ma z migawki, i dopisuje resztę. Nadal otwarte: to samo okno przy starcie (lista sesji
+nadpisuje zdarzenia sprzed odpowiedzi). Niezweryfikowane podejrzenia: spóźniona delta po <code>Stop</code> przywraca status
+„pisze”; ponowny <code>start()</code> klienta Tauri dokłada nasłuchy.</p>
+<p>Porządki na dyskach, 2026-10-09 (zgoda właściciela): została jedna kopia robocza na E:. Usunięte <code>cargo clean</code>: stare wyniki
+kompilacji w <code>apps/desktop/src-tauri/target</code> (36 GB), te same w <code>D:\alfa</code> oraz w ukrytej, zmaterializowanej kopii repozytorium
+wewnątrz magazynu pnpm (<code>alfa-narzedzia/pnpm-store/v10/projects/…</code> — dowiązanie zamienione w katalog przy kopiowaniu z D:).
+Do Kosza: <code>D:\alfa</code>, <code>D:\alfa-narzedzia</code>, ta ukryta kopia, migawka ZIP z GitHuba i jej katalog — każde po sprawdzeniu, że ma
+ten sam commit co GitHub i zero niewypchniętych zmian. Nietknięte: <code>D:\alfa-narzedzia.rar</code> (12 GB, archiwum właściciela).
+Z globalnego <code>~/.npmrc</code> usunięto linię <code>cache=D:\alfa-narzedzia\npm-cache</code> (<code>npm config delete cache</code>): każde wywołanie npm poza
+środowiskiem przenośnym — także z haka formatującego — odtwarzało przez nią katalog na D:. npm używa teraz domyślnej
+lokalizacji w profilu użytkownika. Tak samo usunięto globalne <code>store-dir=D:\alfa-narzedzia\pnpm-store</code> z konfiguracji pnpm; w środowisku
+przenośnym magazyn pozostaje na E:. Kopie obu starych plików: <code>%TEMP%\npmrc-przed-porzadkami.txt</code>,
+<code>%TEMP%\pnpm-rc-przed-porzadkami.txt</code>.</p>
+<p>Stan na koniec dnia 2026-10-08 (49 commitów lokalnych + ten wpis): <code>gates.ps1</code> zielone, vitest 243/243, <code>e2e-app</code> 11/11
+po naprawie skalowania. Pełny przebieg E2E: 125 zielonych, 4 czerwone — test czasowy strumienia, test TOFU modeli (×2)
+i test panelu Głos; każdy z nich przechodzi uruchomiony osobno i pada tylko przy równoległym przebiegu na tym laptopie
+(TOFU pada tak samo na kodzie sprzed dzisiejszych zmian). Do zbadania: limity czasu tych testów albo mniej procesów
+równoległych.</p>
+<p>Stan końcowy 2026-10-08 ok. 11:40 (39 commitów lokalnych): prawdziwa aplikacja zbudowana z końca gałęzi i uruchomiona na
+tymczasowym profilu — <code>e2e-app</code> 10/10; <code>scripts/gates.ps1</code> zielone; vitest 243/243; E2E 124/125 (test czasowy palety).</p>
+<p>Testy E2E na tym laptopie (Edge, <code>PW_CHANNEL=msedge</code>): komplet 125 zielony w ostatnim przebiegu; test palety bywa
+czerwony pod obciążeniem. Test „paleta: otwarcie ≤ 50 ms” ma
+medianę ok. 9 ms, ale 1–2 z 7 prób trwają 230–440 ms (próg maksimum 150 ms) — tak samo przed zmianami tej nocy.
+Pomiar rozdzielony: samo otwarcie zawsze trwa ok. 7 ms; opóźnia się pojedyncza klatka obrazu (ok. 250–450 ms)
+mniej więcej 2 s po starcie, bez długiego zadania JavaScript i niezależnie od rozmycia tła palety — wygląda na
+harmonogram klatek przeglądarki bez okna, nie na kod Alfy. Do potwierdzenia w prawdziwej aplikacji (F1-09).
+Testy <code>slow-core</code> miały za krótki limit na start aplikacji przy wolnym rdzeniu — poprawione.</p>
+<p>Pomiar w prawdziwej aplikacji (WebView2, 2026-10-08, 66 otwarć palety przez CDP): samo otwarcie 2–13 ms w każdej
+próbie; 4 razy następna klatka obrazu spóźniła się o 215–435 ms. Wpisy <code>long-animation-frame</code> dla tych klatek mają
+<code>blockingDuration</code> 0, pustą listę skryptów i ok. 0 ms pracy nad stylem i układem — opóźnia się wyświetlenie klatki
+po stronie silnika i karty graficznej, nie kod Alfy (okno widoczne i z fokusem; rozmycie tła palety wykluczone
+wcześniej). Test E2E „paleta: otwarcie ≤ 50 ms” mierzy czas do klatki, więc na tym laptopie bywa czerwony
+(mediana zawsze ok. 9 ms, maksimum ponad próg 150 ms). Tak samo zachowuje się drugi test czasowy („strumień 100 tok/s: aktualizacje DOM najwyżej raz na klatkę”):
+nad ranem 2026-10-08 padał w 3 z 5 prób na bieżącym kodzie i w 6 z 6 na kodzie sprzed zmian tej nocy — to stan
+maszyny (opóźnione klatki), nie regresja. <strong>Próg zostaje bez zmian</strong> — to budżet F1-09; do decyzji
+właściciela: mierzyć maksimum do gotowego okna palety zamiast do klatki albo zostawić i zbadać sterownik/zasilanie.</p>
+<p>Zmiana procesu: recenzję robi osobna sesja Claude w świeżym kontekście, nie drugi model (ADR 0016). Wszędzie
+niżej „model-recenzent” ma to znaczenie.</p>
+<h2 id="legenda">Legenda</h2>
+<div class="tbl"><table><thead><tr><th>Znak</th><th>Znaczenie</th></tr></thead><tbody><tr><td>✅</td><td>Spełnione w CI lub na atrapach (deterministycznie) — podany test i wynik.</td></tr>
+<tr><td>🟡</td><td>Zaimplementowane, ale wymaga pomiaru na sprzęcie / korpusie / kluczu (kto i która bramka ludzka, PLAN §4.6).</td></tr>
+<tr><td>⛔</td><td>Brak implementacji albo brak zestawu/testu, którego wymaga kryterium (powód i bloker).</td></tr>
+<tr><td>⚖️</td><td>Wymaga decyzji lub akceptacji człowieka (nic nie trzeba mierzyć).</td></tr></tbody></table></div>
+<p>Bramki ludzkie (PLAN §4.6): #1 logowanie do CLI i klucze API · #2 UAC / Hello · #3 korpus własny · #4 makiety ·
+#5 odsłuchy · #6 testy akustyczne · #7 ADR-y, decyzje §19, PR-y Jądra/Brokera · #8 przygotowanie maszyn i VM ·
+#9 repo i runnery self-hosted · #10 klucz minisign, certyfikat, konto usługi Brokera.</p>
+<h2 id="stan-ci-i-bramek-lokalnych">Stan CI i bramek lokalnych</h2>
+<ul>
+<li>Workflow <code>.github/workflows/ci.yml</code>: Rust (ubuntu-24.04, windows-latest), Powłoka Tauri (Windows; testy z cechą
+<code>e2e</code> i bez), cargo-deny, UI (Svelte 5), Dokumentacja — wszystkie zielone na <code>a5c642d</code> i kolejnych commitach fali 6.</li>
+<li>Workflow <code>.github/workflows/rehearsal.yml</code> („Próba generalna (Windows)”, fala 6 — przed testem na laptopie
+właściciela): <code>hf-catalog</code> (adresy, rozmiary i SHA-256 plików z katalogów modeli w API Hugging Face — bramka),
+<code>setup-dev</code> (<code>scripts/setup-dev.ps1 -Ci</code> pod PowerShell 5.1 i 7 — zielony), <code>live-engines</code> (prawdziwe pobranie,
+rozpakowanie i uruchomienie <code>llama-server</code>, <code>whisper-server</code>, <code>piper</code> przez <code>ModelsApp</code> na CPU, raport SHA-256)
+i <code>app-e2e</code> (prawdziwa aplikacja: build z cechą <code>e2e</code>, Playwright przez CDP do WebView2). Wyniki — punkt 12 luk.</li>
+<li>Bramki lokalne (sesja w chmurze, Linux): fmt, clippy <code>-D warnings</code> (+ cross-clippy <code>x86_64-pc-windows-msvc</code>),
+<code>cargo test --workspace</code>, cargo deny, check-deps; UI: lint, svelte-check, build, budżet JS, Storybook, prettier,
+vitest, Playwright E2E na atrapie z axe.</li>
+</ul>
+<h2 id="f0-fundament-i-spike-i">F0 — Fundament i spike&#39;i</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F0-01</td><td>CI zielone (fmt, clippy, test, svelte-check, cargo-deny, diff generowanych)</td><td>✅</td><td><code>.github/workflows/ci.yml</code>; pełna zieleń m.in. na <code>a5c642d</code> (Linux i Windows); próba generalna na runnerze Windows — <code>rehearsal.yml</code>.</td></tr>
+<tr><td>F0-02</td><td>Trójka crate&#39;ów + test kontraktowy na fake i impl</td><td>✅</td><td><code>example-module-impl/tests/module.rs::contract_suite</code>, <code>example-module-fake/tests/fake.rs::contract_suite</code>; <code>scripts/check-deps.sh</code> — 0 naruszeń.</td></tr>
+<tr><td>F0-03</td><td>Spike (a): profil A p50 ≤ 2000 / p95 ≤ 3000 ms</td><td>🟡</td><td>Atrapy: p50 1380 / p95 1610 ms (<code>voice-pipeline-impl/tests/e2e_turn.rs::time_to_first_audio_profile_a_budget_100_scenarios</code>). Pomiar ≥ 50 tur loopbackiem na desktopie z emulacją i laptopie wg <code>evals/spikes/a-petla-glosowa/</code> (<code>results/</code> pusty). Bramki #6, #8.</td></tr>
+<tr><td>F0-04</td><td>Spike (a): AEC bez fałszywych przerwań przy własnym TTS</td><td>🟡</td><td>Atrapy: <code>e2e_barge.rs::own_tts_echo_through_room_does_not_interrupt</code>; AEC3 w <code>voice-dsp</code> (ERLE 49 dB). 30 min TTS przez głośniki + odsłuch, wynik do ADR 11. Bramki #6, #8.</td></tr>
+<tr><td>F0-05</td><td>Spike (b): prośby o uprawnienia CLI w naszym kanale (n ≥ 20)</td><td>🟡</td><td>Fałszywe CLI 20/20: <code>agent-backends-fake/tests/compliance.rs::twenty_of_twenty_permission_requests_reach_sink_and_mcp_host</code>. Prawdziwe <code>claude</code>/<code>codex</code> wg <code>evals/spikes/b-most-cli/</code>. Bramka #1.</td></tr>
+<tr><td>F0-06</td><td>Spike (b): 0 odczytów tokenów CLI</td><td>🟡</td><td>Statycznie: <code>agent-backends-impl/tests/rules.rs::sources_never_touch_cli_credentials</code>, <code>accounts-hub-impl/tests/cli.rs::no_cli_credential_paths_in_sources</code>, SR-06. Monitor ETW/Procmon na desktopie. Bramki #1, #8.</td></tr>
+<tr><td>F0-07</td><td>Spike (b): zimny start mostu zmierzony</td><td>🟡</td><td>10 startów prawdziwego CLI, wynik do ADR 5. Bramka #1.</td></tr>
+<tr><td>F0-08</td><td>Spike (e): WER PL ≤ 12 %</td><td>🟡</td><td>Runner <code>alfa-voice-eval</code> (<code>evals/F2/README.md</code>); korpus nienagrany. Bramka #3.</td></tr>
+<tr><td>F0-09</td><td>Spike (e): ślepa ocena TTS ≥ 4,0</td><td>🟡</td><td>Protokół <code>evals/spikes/e-voice-lab/</code>; ocenia właściciel. Bramka #5 (no-go nie blokuje F1).</td></tr>
+<tr><td>F0-10</td><td>Spike (e): tabela kandydatów głosu na obu maszynach</td><td>🟡</td><td>Tabela <code>evals/spikes/e-voice-lab/candidates.md</code> bez pomiarów TTFB i zasobów. Bramka #8.</td></tr>
+<tr><td>F0-11</td><td>Spike (f): RAM drzewa Tauri/WebView2 (1 i 3 okna)</td><td>🟡</td><td><code>evals/spikes/f-ram-tauri/measure-ram.ps1</code>, <code>results/</code> pusty. Od wyniku zależą F1-08, F5-12, F9-02. Bramka #8.</td></tr>
+<tr><td>F0-12</td><td>Spike (h): whisper.cpp Vulkan i CUDA 1 h bez crashy</td><td>🟡</td><td><code>evals/spikes/h-sprzet/bench-whisper.ps1</code> na RX 9070 XT i RTX 4050. Bramka #8.</td></tr>
+<tr><td>F0-13</td><td>Spike (h): RTF Pocket-PL, tok/s modeli 4B/8B</td><td>🟡</td><td><code>bench-llama.ps1</code>, <code>bench_pocket_tts.py</code>, szablon <code>results/TEMPLATE.md</code>. Wynik wyznacza próg F1-03 i F3-07. Bramka #8.</td></tr>
+<tr><td>F0-14</td><td>Spike (i): SQLCipher + sqlite-vec + FTS5</td><td>✅</td><td><code>crates/spike-data/tests/spike.rs</code> (4 testy), <code>evals/spikes/i-dane/RESULT.md</code>, ADR 0008.</td></tr>
+<tr><td>F0-15</td><td>Spike (j): Snap Layouts, Mica, pisownia PL, toast z AUMID</td><td>🟡</td><td>Protokół <code>evals/spikes/j-powloka/</code>. Dziś natywne dekoracje okna, bez Mica i AUMID z launchera. Właściciel + model-recenzent, bramka #8.</td></tr>
+<tr><td>F0-16</td><td>Spike (k): Broker-UI na High IL z usługi, SendInput odrzucony</td><td>🟡</td><td>Kod w <code>platform-windows-kernel-impl</code>; <code>tests/kernel_windows.rs::send_input_into_broker_window_is_always_flagged_injected</code> (<code>#[ignore]</code>, pulpit); atrapy: <code>app-safety/tests/chain.rs::approval_crosses_all_processes_and_injection_never_succeeds</code>. Self-hosted. Bramki #9, #10.</td></tr>
+<tr><td>F0-17</td><td>Makiety 1–3 zaakceptowane</td><td>⚖️</td><td><code>packages/ui-kit/src/stories/Screens.stories.ts</code> (Start, Conversation, VoiceMode; jasny/ciemny). Akceptacja — bramka #4.</td></tr>
+<tr><td>F0-18</td><td>ADR 1–15 zaakceptowane</td><td>⚖️</td><td><code>docs/ADR/README.md</code>: 14 „Zaakceptowany”, ADR 0006 „Tymczasowy” (spike g wymaga klucza Anthropic). Potwierdzenie — bramka #7.</td></tr>
+<tr><td>F0-19</td><td><code>THREAT_MODEL.md</code> i rdzeń <code>evals/</code> z hashami w CI</td><td>✅</td><td><code>docs/THREAT_MODEL.md</code>; <code>evals-impl/tests/repo_suites.rs::f8_suite_is_intact_and_listed</code>, <code>alfa-evals verify evals</code>. <code>evals/acceptance/HASHES</code> pusty — nic jeszcze nie zamrożono.</td></tr></tbody></table></div>
+<h2 id="f1-rdzen-czatu">F1 — Rdzeń czatu</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F1-01</td><td>≥ 3 adaptery API zielone na fixture&#39;ach syntetycznych</td><td>✅</td><td><code>providers-api-impl/tests/{anthropic,anthropic_errors,openai_chat,openai_responses,catalog}.rs</code> na serwerze SSE z <code>tests/support</code>; generyczny: <code>catalog.rs::openai_compatible_entry_streams_via_generic_adapter</code>, <code>anthropic_compatible_entry_uses_messages_api_without_betas</code>. Fixture&#39;y w crate, nie w <code>evals/F1/api-fixtures/</code>.</td></tr>
+<tr><td>F1-02</td><td>Walidacja adapterów na żywo (nb)</td><td>🟡</td><td>Wymaga kluczy; nightly nieskonfigurowany. Bramka #1.</td></tr>
+<tr><td>F1-03</td><td>llama.cpp na żywo: 20 promptów PL, tok/s ≥ F0-13</td><td>🟡</td><td>Sidecar <code>llama-server</code>, pobieranie Bielik 4.5B Q8_0 (<code>providers-local-impl</code>); testy na <code>fake-llama-server</code> (<code>tests/{lifecycle,contract,download}.rs</code>). Zestaw 20 promptów PL: szkic <code>evals/F1/prompts-pl/</code> (warunki <code>must</code> = „bez błędu”, jakość raportowana; do akceptacji człowieka). Brak runnera i pomiaru na self-hosted. Bramka #8.</td></tr>
+<tr><td>F1-04</td><td>Fallback ≤ 2 s, 0 utraconych wiadomości (50 prób)</td><td>✅</td><td><code>router-impl/tests/fallback.rs::fifty_trials_5xx_and_timeout_switch_within_2s_without_loss</code> (5xx: 0,28 ms); w aplikacji <code>app-core/tests/routing.rs::router_falls_back_after_5xx_and_ui_gets_one_answer</code>.</td></tr>
+<tr><td>F1-05</td><td>Izolacja ≥ 3 sesji równolegle</td><td>✅</td><td><code>app-core/tests/spy.rs::parallel_sessions_never_leak_into_each_other</code> (4 sesje), <code>spy_modes.rs::agent_voice_and_chat_sessions_never_leak</code>, <code>sessions-impl/tests/storage.rs::three_parallel_sessions_do_not_leak</code>.</td></tr>
+<tr><td>F1-06</td><td>Private WS ≤ +5 % po 1 h / 500 wiadomościach</td><td>🟡</td><td>Brak skryptu E2E; pomiar na self-hosted z emulacją baseline. Bramki #8, #9.</td></tr>
+<tr><td>F1-07</td><td>axe 0 critical/serious, obsługa klawiaturą</td><td>✅</td><td><code>apps/desktop/ui/e2e/a11y.spec.ts</code>, <code>keyboard.spec.ts</code> (+ axe w <code>agents-voice</code>, <code>memory-tasks</code>, <code>computer</code>): E2E 62/62 w obu motywach.</td></tr>
+<tr><td>F1-08</td><td>Budżety lekkości §3.4</td><td>🟡</td><td>Czeka na wartości z F0-11 (ADR) i pomiar drzewa procesów na self-hosted.</td></tr>
+<tr><td>F1-09</td><td>Budżety UI §14.7</td><td>🟡</td><td>W CI (bez limitów baseline): JS 90/150 KB i CSS (<code>scripts/bundle-size.mjs</code>), paleta ≤ 50 ms i DOM raz na klatkę (<code>keyboard.spec.ts</code>). Brak: composer ≤ 16 ms p95, 60 kl./s, panel ≤ 100 ms, 1000 wiadomości ≤ 150 ms — ślad CDP na self-hosted.</td></tr>
+<tr><td>F1-10</td><td>Round-trip <code>.alfa</code> desktop → laptop → desktop, 0 sekretów</td><td>🟡</td><td>CI: <code>transfer-contract</code> <code>contract_tests::round_trip_restores_identical_state</code>, <code>no_secrets_in_plain_export</code>; <code>app-core/tests/transfer.rs::export_import_roundtrip_through_commands</code>. Przebieg między maszynami — bramka #8.</td></tr>
+<tr><td>F1-11</td><td>Klucz dodany bez restartu, trasa aktywna ≤ 5 s</td><td>✅</td><td><code>app-core/tests/commands.rs::accounts_store_key_in_vault_and_never_return_it</code> (konto działa od razu w tym samym procesie). Czasu ≤ 5 s test nie mierzy jawnie.</td></tr>
+<tr><td>F1-12</td><td>Reguła AltGr i kill-switch zarejestrowany</td><td>✅</td><td><code>platform-contract/src/hotkey.rs::altgr_rule_rejects_all_polish_letters</code>, <code>kill_switch_reserved_and_display</code>; <code>app-core/tests/units.rs::altgr_rule_and_kill_switch_are_enforced</code>; UI <code>src/lib/logic/__tests__/shortcuts.test.ts</code>.</td></tr>
+<tr><td>F1-13</td><td>Wyłączona trasa: 0 wywołań w 100 próbach</td><td>✅</td><td><code>router-impl/tests/decisions.rs::disabled_route_gets_zero_calls_in_100_tries</code>.</td></tr></tbody></table></div>
+<h2 id="f2-glos-rdzeniowy-agentki">F2 — Głos rdzeniowy + agentki</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F2-01</td><td>Profil A p50 ≤ 2000 / p95 ≤ 3000 ms (≥ 200 tur)</td><td>🟡</td><td>Atrapy: p50 1380 / p95 1610 ms (<code>e2e_turn.rs</code>). Prawdziwe modele: <code>voice-pipeline-impl</code> <code>real_models_on_corpus</code> (<code>#[ignore]</code>). Bramki #3, #8.</td></tr>
+<tr><td>F2-02</td><td>Profile B/C (nb)</td><td>🟡</td><td>Wymaga kluczy usług mowy; chmurowe STT/TTS są dziś tylko typami w <code>voice-stt</code>/<code>voice-tts</code>. Bramka #1.</td></tr>
+<tr><td>F2-03</td><td>WER PL ≤ 12 %</td><td>🟡</td><td><code>alfa-voice-eval score</code>; CI sprawdza tylko format na 3 próbkach (<code>voice-pipeline-impl/tests/f2_eval.rs</code>). Korpus i zamrożenie <code>evals/acceptance/F2/test.sha256</code>. Bramka #3.</td></tr>
+<tr><td>F2-04</td><td>Recall „stop/anuluj” ≥ 99 %, reakcja &lt; 300 ms</td><td>🟡</td><td>Atrapy: <code>e2e_barge.rs::stop_and_wait_commands_react_under_300ms</code> (190 ms); gramatyka: <code>voice-cmd-impl/tests/frozen_set.rs::recall_and_negative_precision</code> (113/113, 0/88). ≥ 200 prób z korpusu. Bramka #3.</td></tr>
+<tr><td>F2-05</td><td>Precision backchannelu ≥ 95 %</td><td>🟡</td><td>Atrapy: <code>e2e_barge.rs::backchannel_every_3s_for_60s_never_interrupts</code>, <code>voice-dialog-impl/tests/metrics.rs::backchannel_every_3s_for_60s_gives_zero_false_interruptions</code>. Korpus. Bramka #3.</td></tr>
+<tr><td>F2-06</td><td>Fałszywe przerwania ≤ 1/h</td><td>🟡</td><td>1 h TTS przez głośniki laptopa z TV, dziennik → <code>alfa-voice-eval score --session-log</code>. Bramka #6.</td></tr>
+<tr><td>F2-07</td><td>Usłyszany prefiks ±1 słowo w ≥ 90 %</td><td>🟡</td><td>Atrapy: <code>voice-dialog-impl/tests/metrics.rs::heard_prefix_accuracy</code>, <code>e2e_barge.rs::barge_in_ducks_stops_and_keeps_heard_prefix</code>. ≥ 100 przerwań z korpusu. Bramka #3.</td></tr>
+<tr><td>F2-08</td><td>Intencje przerwań ≥ 90 % dla każdej klasy</td><td>🟡</td><td>6 klas w <code>voice-dialog</code> (<code>tests/classifier.rs</code>); ≥ 50 przykładów na klasę z korpusu. Bramka #3.</td></tr>
+<tr><td>F2-09</td><td>„Nie” przerywa tylko samodzielnie w <code>Speaking</code></td><td>🟡</td><td>Reguła: <code>voice-dialog-impl/tests/scenarios.rs::standalone_nie_from_voice_cmd_interrupts_only_while_speaking</code>. ≥ 50 nagranych fraz „nie no, dobrze”. Bramka #3.</td></tr>
+<tr><td>F2-10</td><td>Odrębność głosów v0 (ECAPA ≤ 0,6, ABX ≥ 90 %)</td><td>🟡</td><td><code>voice-tts-contract/src/voices.rs::v0_has_four_distinct_voices_from_two_bases</code>. Pomiar wymaga modeli TTS i ECAPA; ABX — właściciel. Bramka #5.</td></tr>
+<tr><td>F2-11</td><td>Zmiana obsady w locie 20/20</td><td>✅</td><td><code>voice-pipeline-impl/tests/e2e_persona_ptt.rs::persona_switches_live_twenty_times</code>, <code>ui_switch_changes_voice_of_next_reply</code>.</td></tr>
+<tr><td>F2-12</td><td>Wyłączność głośnika/mikrofonu (100 scenariuszy)</td><td>✅</td><td><code>scheduler-lite-impl/tests/module.rs::hundred_concurrent_scenarios_without_overlap</code>; 1000 losowych w <code>scheduler-lite-contract/src/contract_tests/</code>.</td></tr>
+<tr><td>F2-13</td><td>STT + TTS + LLM w budżecie VRAM; pełny ekran → zwolnienie</td><td>🟡</td><td>Logika: <code>model-residency-impl/tests/manager.rs::budgets_follow_device_profile</code>, <code>fullscreen_and_battery_signals_switch_modes</code>. Pomiar VRAM na desktopie i laptopie. Bramka #8.</td></tr>
+<tr><td>F2-14</td><td>Ducking &lt; 50 ms, twardy stop ≤ 400 ms w 95 %</td><td>🟡</td><td>Automat: <code>voice-dialog-impl/tests/metrics.rs::hard_stop_within_400ms_and_duck_immediately</code> (p95 350 ms). ≥ 100 prób na sprzęcie. Bramki #6, #8.</td></tr></tbody></table></div>
+<h2 id="f3-safety-kernel-system-koniec-mvp">F3 — Safety Kernel + system (koniec MVP)</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F3-01</td><td>Kill-switch: cisza + zabite Job Objects &lt; 200 ms p95</td><td>🟡</td><td>Logika: <code>safety-broker-impl/tests/budget.rs::kill_switch_p95_under_200ms</code> (≈ 0,14 ms), <code>watchdog-impl/tests/watchdog.rs::kill_switch_p95_50_trials</code>, <code>app-core/tests/wiring.rs::kill_switch_cancels_running_generations_quickly</code> (3,3 ms). 50 prób z audio i Job Objects pod obciążeniem UI na self-hosted.</td></tr>
+<tr><td>F3-02</td><td>Cofalność <code>fs.*</code> 100 % (≥ 200 losowych operacji)</td><td>✅</td><td><code>tools-fs-impl/tests/props.rs::random_sequences_are_fully_undoable</code> (50 × 4–10 operacji), <code>undo-journal-contract/tests/props.rs</code> (256 przypadków), <code>undo-journal-impl/tests/journal.rs</code> (200).</td></tr>
+<tr><td>F3-03</td><td>Snapshot zakresu shella: 100 % po ≥ 50 skryptach</td><td>✅</td><td><code>tools-shell-impl/tests/props.rs::scripts_in_scope_are_fully_undoable</code> (60), <code>run.rs::snapshot_then_script_then_undo_restores_scope</code>.</td></tr>
+<tr><td>F3-04</td><td>„Agentka zmienia Jądro / zatwierdza sama siebie”: 0 w ≥ 100</td><td>🟡</td><td>Logika: <code>safety-broker-impl/tests/negative.rs::zero_successful_attacks</code> (116 scenariuszy), <code>app-safety/tests/chain.rs</code> (100 wstrzykniętych kliknięć → 0), <code>tests/review.rs</code>. Prawdziwy SendInput do Broker-UI (<code>kernel_windows.rs</code>, <code>#[ignore]</code>) na self-hosted.</td></tr>
+<tr><td>F3-05</td><td>Red-team prompt injection ≥ 100: 0 eskalacji, 0 egressu</td><td>⛔</td><td>Zestaw <code>evals/F3/redteam/</code> nie istnieje — tworzy model-recenzent. Częściowe obrony z testami: taint (F3-06), skaner MCP <code>mcp-contract/src/injection.rs</code>, XSS <code>lib-markdown/tests/xss.rs</code>.</td></tr>
+<tr><td>F3-06</td><td>Sesja <code>tainted</code>: wysokie ryzyko i <code>net.egress</code> pytają</td><td>✅</td><td><code>risk-classifier-contract/tests/props.rs::tainted_egress_never_proceeds_even_on_l4</code>, <code>safety-broker-contract</code> <code>flows::tainted_egress_asks_on_l4</code>, SR-01 <code>safety-broker-impl/tests/review.rs::auto_approved_plan_does_not_cover_tainted_egress</code>.</td></tr>
+<tr><td>F3-07</td><td>Eval narzędzi fs/shell na lokalnym 3–4,5B ≥ próg</td><td>🟡</td><td>35 zadań <code>evals/F3/tools/tasks.json</code>, CI na atrapie: <code>cargo test -p app-agents --test eval_tools</code>; pomiar <code>measure_on_local_model</code> (<code>#[ignore]</code>, Windows + <code>llama-server</code>). Próg ustala właściciel (ADR 14).</td></tr>
+<tr><td>F3-08</td><td>Destrukcja głosem → potwierdzenie nie-głosem, także na L4</td><td>✅</td><td><code>risk-classifier-contract/tests/props.rs::voice_destruction_never_proceeds</code>, <code>safety-broker-contract</code> <code>flows::voice_destruction_asks_on_l4</code>. E2E z prawdziwym głosem — w F3-12.</td></tr>
+<tr><td>F3-09</td><td>Audyt: Broker jedynym writerem, łańcuch, ACL append-only</td><td>🟡</td><td><code>safety-broker-impl/tests/audit.rs::chain_of_10k_events_verifies_and_survives_reopen</code>, <code>tampering_is_detected</code>; <code>app-safety/tests/windows_ports.rs</code> (DACL potoku). Brak próby zapisu z procesu agentki do plików Audytu na Windows; SR-08 bez testu Windows.</td></tr>
+<tr><td>F3-10</td><td>Aktualizacja + rollback launchera (10 cykli)</td><td>🟡</td><td>Pełny cykl gotowy: pobieranie ze wznawianiem, minisign + SHA-256, instalacja obok, rollback i crash-loop — <code>updater-impl/tests/update_flow.rs::good_update_full_cycle</code>, <code>user_rollback_and_watchdog_rollback</code>, <code>update_safety.rs::downgrade_needs_explicit_user_rollback</code>, <code>launcher.rs::crash_of_new_version_falls_back_to_previous</code>; <code>app-updates/tests/updates.rs</code>. Zostały: klucz minisign (bramka #10), test instalatora NSIS i 10 cykli na desktopie i laptopie (self-hosted).</td></tr>
+<tr><td>F3-11</td><td>Watchdog: safe-mode po N awariach, restart (20 scenariuszy)</td><td>✅</td><td><code>watchdog-impl/tests/watchdog.rs::crash_loop_enters_safe_mode_and_rolls_back_once</code>, <code>restarts_outside_window_never_loop</code> (20 iteracji), <code>missed_heartbeats_and_failing_health</code>. Brak jednego zestawu 20 scenariuszy.</td></tr>
+<tr><td>F3-12</td><td>Scenariusz MVP bez kluczy 6/6</td><td>⛔</td><td>Brak <code>evals/F3/mvp-scenario.md</code>. Instalator jest: menedżer modeli i sidecarów <code>app-models</code> (Ustawienia → „Modele i silniki”, onboarding) — <code>llama-server</code>, <code>whisper-server</code>, <code>piper</code>, GGUF, whisper, Piper, Silero, openWakeWord, model mówcy; HTTPS z wznawianiem, SHA-256 / zgoda TOFU, bezpieczne ZIP (<code>app-models/tests/{download,unpack}.rs</code>). Blokery: okno zatwierdzeń przez Brokera poza procesem (<code>app-broker</code>) niezweryfikowane na sprzęcie; adresy/hashe sidecarów i modeli głosu do przypięcia przez człowieka (HF/GitHub zablokowane w sesji); pomiary F0/F2.</td></tr>
+<tr><td>F3-13</td><td>Port CDP zamknięty w buildzie produkcyjnym (test CI)</td><td>✅</td><td><code>apps/desktop/src-tauri/src/cdp.rs</code>: <code>production_build_adds_no_browser_args</code> (bez cechy <code>e2e</code> — <code>None</code>), <code>cdp_flag_exists_only_behind_e2e_feature</code> (jedyne wystąpienie flagi w powłoce i <code>tauri*.conf.json</code> za <code>#[cfg(feature = &quot;e2e&quot;)]</code>), <code>production_refuses_environment_that_opens_cdp</code> (odmowa startu przy <code>WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS</code> ze zdalnym debugowaniem). CI: job „Powłoka Tauri (Windows)” — <code>cargo test --lib</code> z cechą <code>e2e</code> i bez (fala 5; pierwszy przebieg po commicie).</td></tr></tbody></table></div>
+<h2 id="f4-mosty-i-mcp">F4 — Mosty i MCP</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F4-01</td><td>Postęp delegowanego zadania ≤ 1 s</td><td>🟡</td><td>Fałszywe CLI: <code>agent-backends-fake/tests/bridges.rs::progress_latency_within_budget</code>. 20 zadań z prawdziwym CLI. Bramka #1.</td></tr>
+<tr><td>F4-02</td><td>Anulowanie ≤ 2 s</td><td>🟡</td><td><code>bridges.rs::cancel_kills_process_tree</code>. Prawdziwe CLI. Bramka #1.</td></tr>
+<tr><td>F4-03</td><td>20/20 próśb o uprawnienia trafia do Broker-UI</td><td>🟡</td><td><code>compliance.rs::twenty_of_twenty_permission_requests_reach_sink_and_mcp_host</code> (fałszywe CLI). Wymaga okna Brokera podłączonego w aplikacji i prawdziwego CLI. Bramka #1.</td></tr>
+<tr><td>F4-04</td><td>0 odczytów <code>~/.claude</code>, <code>~/.codex</code> (ETW)</td><td>🟡</td><td>Testy źródeł + SR-06 <code>agent-backends-impl/tests/review.rs::copy_skips_credential_stores</code>. ETW podczas 20 zadań — model-recenzent. Bramki #1, #8.</td></tr>
+<tr><td>F4-05</td><td>Wyłącznik trasy: 0 wywołań w 100 próbach</td><td>✅</td><td><code>agent-backends-fake/tests/compliance.rs::disabled_route_means_zero_calls_0_of_100</code>.</td></tr>
+<tr><td>F4-06</td><td>Nieświeży rejestr degraduje trasę do „szarej”</td><td>✅</td><td><code>compliance-contract</code> <code>contract_tests::stale_route_degrades</code>, <code>status.rs::degradation_rules</code>; <code>compliance-impl/tests/service.rs::repo_registry_private_sessions_and_staleness</code>.</td></tr>
+<tr><td>F4-07</td><td>Serwer MCP tylko stdio/potok, bez TCP; hash opisów</td><td>✅</td><td><code>mcp-impl/tests/static_rules.rs::no_network_listeners_in_sources</code>; <code>mcp-contract/src/trust.rs::changed_description_blocks_even_on_trusted_server</code>, <code>injected_description_is_never_auto_approved</code>.</td></tr>
+<tr><td>F4-08</td><td>Kontrakty mostów na nagranych fixture&#39;ach</td><td>🟡</td><td>Na skryptach fałszywego CLI: <code>agent-backends-fake/tests/contract.rs::claude_bridge_passes_contract</code>, <code>codex_bridge_passes_contract</code>. Brak <code>evals/F4/bridge-fixtures/</code> nagranych z prawdziwego CLI (spike b). Bramka #1.</td></tr></tbody></table></div>
+<h2 id="f5-agentki-i-orkiestracja-glos-rozszerzony">F5 — Agentki i orkiestracja + głos rozszerzony</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F5-01</td><td>Agentki równolegle: 0 konfliktów zasobów w 100</td><td>✅</td><td><code>scheduler-fake/tests/parallel.rs::parallel_agents_without_resource_conflicts</code>, <code>agent-runtime-impl/tests/parallel.rs::hundred_random_scenarios_have_no_collisions</code>.</td></tr>
+<tr><td>F5-02</td><td>Steering w ≤ 1 kroku atomowym 20/20</td><td>✅</td><td><code>scheduler-fake/tests/steering.rs::steering_within_one_atomic_step_20_of_20</code>.</td></tr>
+<tr><td>F5-03</td><td>Scheduler: 0 zakleszczeń w 1000</td><td>✅</td><td><code>scheduler-fake/tests/props.rs::zero_deadlocks_in_1000_random_scenarios</code>.</td></tr>
+<tr><td>F5-04</td><td>Most nie startuje z wyzwalacza 0/100</td><td>✅</td><td><code>triggers-impl/tests/compliance.rs::bridge_never_starts_from_trigger_0_of_100</code>, <code>agent-backends-fake/tests/compliance.rs::bridges_never_start_from_trigger_or_improver_0_of_100</code>, SR2-08 <code>scheduler-fake/tests/review.rs</code>.</td></tr>
+<tr><td>F5-05</td><td>Słowa wywoławcze: FAR ≤ 1/dzień</td><td>🟡</td><td><code>alfa-wake-eval</code>; CI sprawdza mechanikę (<code>voice-wake-impl/tests/eval.rs::synthetic_samples_far_frr</code>). ≥ 24 h tła PL i wytrenowany model KWS. Moduł niepodpięty w aplikacji. Bramki #3, #8.</td></tr>
+<tr><td>F5-06</td><td>Słowa wywoławcze: FRR ≤ 5 %</td><td>🟡</td><td>Jak F5-05; ≥ 200 pozytywów właściciela. Bramka #3.</td></tr>
+<tr><td>F5-07</td><td>Weryfikacja właściciela: EER ≤ 3 %</td><td>🟡</td><td><code>alfa-speaker-eval</code> (<code>voice-speaker-impl/tests/eval.rs::synthetic_samples_eer</code>); model ECAPA, Common Voice PL + TTS. Niepodpięte w aplikacji. Bramka #3.</td></tr>
+<tr><td>F5-08</td><td>Weryfikacja właściciela: FAR ≤ 0,1 % przy progu ścisłym</td><td>🟡</td><td>Jak F5-07; ≥ 3000 prób obcych. Bramka #3.</td></tr>
+<tr><td>F5-09</td><td>Reguły Marszałka tylko zawężają</td><td>✅</td><td><code>marshal-fake/tests/narrowing.rs::zero_widening_rules_pass_50</code> (0/22 rozszerzających), <code>effective_policy_never_exceeds_ceiling</code>; SR2-05 <code>marshal-fake/tests/review.rs</code>.</td></tr>
+<tr><td>F5-10</td><td>Dyktowanie do 5 aplikacji ≥ 95 %</td><td>🟡</td><td>Normalizacja 30/30 (<code>voice-dictation-contract/src/tests.rs</code>, <code>evals/F5/voice/dictation-cases.json</code>); 0 wpisów do okien Alfy/Brokera i pól haseł (property). Niepodpięte w aplikacji; pomiar w 5 aplikacjach na self-hosted.</td></tr>
+<tr><td>F5-11</td><td>Czytanie zaznaczenia w 5 aplikacjach</td><td>🟡</td><td>Testy kontraktowe <code>voice-readaloud-*</code> na <code>platform-fake</code>. Niepodpięte w aplikacji (dostępne tylko „Przeczytaj na głos” wiadomości). Self-hosted.</td></tr>
+<tr><td>F5-12</td><td>Pigułka: RAM okna ≤ budżet z F0-11</td><td>🟡</td><td>Pigułka bez frameworka, ~4/8 KB gzip (<code>scripts/bundle-size.mjs</code>); RAM okna po F0-11.</td></tr></tbody></table></div>
+<h2 id="f6-computer-use">F6 — Computer use</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F6-01</td><td>Własny zestaw ≥ 50 zadań: ≥ 85 % w każdej z 5 kategorii</td><td>⛔</td><td>Szkic <code>evals/F6/tasks/</code> (60 zadań, 5 kategorii po 12, JSON Schema, strony ćwiczebne <code>web/</code>; do akceptacji — m.in. ≥ 20 zadań na klasę, poziom L4, zatwierdzająca na hoście). Brak runnera F6, VM i „mózgu” (klucz albo most). Moduły gotowe i podpięte w <code>app-agents</code>: <code>tools-browser</code>, <code>tools-office</code>, <code>tools-vision</code> (OCR, opis obrazu), <code>tools-system</code>, <code>tools-net</code>, <code>tools-media</code>. Bramki #1, #8.</td></tr>
+<tr><td>F6-02</td><td>Benchmark zewnętrzny ≥ wynik modelu − 5 pp</td><td>⛔</td><td>Nieprzygotowany (dostępność OSWorld / Windows Agent Arena do weryfikacji).</td></tr>
+<tr><td>F6-03</td><td>Macierz aplikacja × trasa</td><td>⛔</td><td>Szkic <code>evals/F6/app-matrix.md</code> (45 pozycji: trasa wybrana i zapasowa, oczekiwana jakość UIA, arkusz pomiaru); spike (c) niewykonany. Do pomiaru: próg <code>sparse</code> (≤ 5 węzłów łącznie z ramą okna) może nie wykrywać pustych drzew.</td></tr>
+<tr><td>F6-04</td><td>Weryfikacja po każdej akcji GUI</td><td>✅</td><td><code>tools-uia-impl/tests/uia.rs::actions_are_verified_and_passwords_never_set</code>, <code>tools-window-impl/tests/window.rs::move_and_state_are_verified</code>, <code>tools-input-impl/tests/input.rs</code>.</td></tr>
+<tr><td>F6-05</td><td>Deny-listy w zrzutach/OCR/wejściu: 0 naruszeń w 100</td><td>🟡</td><td>Atrapy: <code>tools-screen-impl/tests/screen.rs::monitor_capture_is_masked_tainted_and_pixel_free_in_events</code>, <code>tools-uia-impl/tests/uia.rs::reads_are_tainted_redacted_and_hide_passwords</code>; Windows: <code>platform-windows-gui-impl</code> <code>monitor_capture_masks_and_hook_detects_user</code> (<code>#[ignore]</code>). 100 scenariuszy w VM; otwarte P2-01, P2-02, P2-03.</td></tr>
+<tr><td>F6-06</td><td>Zakaz <code>gui.control</code> wobec Alfy/Brokera: 0 w 50</td><td>🟡</td><td>Property: <code>tools-input-impl/tests/input.rs::zero_input_events_reach_protected_windows</code>, <code>tools-uia-impl/tests/uia.rs::zero_uia_actions_on_protected_windows</code>, <code>tools-window-impl/tests/window.rs::zero_window_changes_on_protected_windows</code>, <code>platform-fake/tests/desktop.rs::no_effect_ever_reaches_protected_windows</code>. 50 prób na desktopie z oknami WebView2 (P2-01).</td></tr>
+<tr><td>F6-07</td><td>Helper <code>uiAccess</code></td><td>⛔</td><td>Helper nie istnieje (port zwraca błąd „wymaga helpera uiAccess”). Bramka #2.</td></tr>
+<tr><td>F6-08</td><td>Przejmij / Pauza / Stop ≤ 500 ms</td><td>🟡</td><td><code>gui_stop</code>/<code>gui_release</code>, przerwanie fizycznym wejściem: <code>tools-input-impl/tests/input.rs::physical_input_interrupts_and_user_activity_blocks</code>, <code>platform-fake/tests/desktop.rs::physical_input_interrupts_and_blocks_start</code>. Spike (d) i pomiar na desktopie.</td></tr></tbody></table></div>
+<h2 id="f7-pamiec-pelna-transfer-pelny">F7 — Pamięć pełna + transfer pełny</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F7-01</td><td>Izolacja pamięci: 0 przecieków</td><td>✅</td><td><code>memory-contract</code> <code>contract_tests_f7::spy::spy_three_sessions</code> (4 sesje z prywatną, 4 agentki, 1000 zapytań) na <code>memory-impl/tests/f7_contract.rs</code> i <code>memory-fake</code>.</td></tr>
+<tr><td>F7-02</td><td>recall@5 ≥ 0,85 (≥ 200 zapytań PL)</td><td>🟡</td><td>Embedder ONNX (<code>lib-embed</code>) podpięty w aplikacji (<code>app-models</code>): <code>[search.embedder] model</code>, pobranie e5-small z menedżera (zgoda TOFU), <code>preload</code> z dzierżawą RAM, wymiana embeddera w działającym <code>search</code> (<code>set_embedder</code>) i przebudowa wektorów baz sesji i zakresów pamięci w tle (<code>app-models/tests/embed.rs</code> na modelu zabawkowym: aktywacja → przebudowa → wyszukiwanie wektorowe). Próg niesprawdzony na prawdziwym modelu (HF niedostępny w chmurze; SHA-256 katalogu do przypięcia); runner <code>ALFA_F7_EMBEDDER</code>/<code>ALFA_F7_STRICT</code>, 0,964 na <code>HashEmbedder</code>; 249 zapytań niezamrożonych.</td></tr>
+<tr><td>F7-03</td><td>Kaskada <code>forget</code>: 100 % usunięć zweryfikowanych</td><td>✅</td><td><code>contract_tests_f7::forget::forget_fifty_verified</code>, <code>forget_session_cascade</code>, <code>memory-impl/tests/forget_props.rs</code>.</td></tr>
+<tr><td>F7-04</td><td>Niezaufane nie awansuje, brak auto-<code>remember</code></td><td>✅</td><td><code>contract_tests_f7::access::untrusted_never_promotes</code>, <code>memory-consolidation-contract/tests/guardian.rs</code>, SR2-07 <code>agent-runtime-impl/tests/review.rs::memory_write_in_tainted_run_is_untrusted</code>.</td></tr>
+<tr><td>F7-05</td><td>Konsolidacja nie na baterii / w grze (20 scenariuszy)</td><td>✅</td><td><code>memory-consolidation-impl/tests/adapters.rs::never_starts_on_battery_or_in_game_mode_f7_05</code>.</td></tr>
+<tr><td>F7-06</td><td>Round-trip <code>.alfa</code> pełny desktop ↔ laptop</td><td>🟡</td><td>Symulacja: <code>memory-impl/tests/documents.rs::alfa_round_trip_desktop_to_laptop_without_loss</code>. Brak <code>evals/F7/alfa-full/</code> i przebiegu na dwóch maszynach. Bramka #8.</td></tr>
+<tr><td>F7-07</td><td>Kopia zapasowa + restore 1:1 w CI</td><td>✅</td><td><code>transfer-contract</code> <code>contract_tests::more::backup_rotation</code> (stan 1:1; test robi 4 kopie z rotacją do 2, ACCEPTANCE mówi o 5). Harmonogram kopii niepodpięty w aplikacji.</td></tr>
+<tr><td>F7-08</td><td>Migracje schematu od F1 bez błędu</td><td>⛔</td><td>Szkic <code>evals/F7/migrations/</code> (24 scenariusze: paczki <code>.alfa</code> v0/v1, dokumenty pamięci, bazy SQLite; oczekiwania sprawdzone na kodzie 23/24), brak runnera w CI. Mechanizmy: <code>lib-sqlstore/tests/sqlstore.rs::migrations_apply_once_per_namespace</code>, upcaster <code>transfer-contract/src/migrate.rs</code>. Otwarte: powrót do starszej wersji po migracji (m-23, <code>UnknownMigration</code>).</td></tr></tbody></table></div>
+<h2 id="f8-samonaprawa-i-ulepszanie">F8 — Samonaprawa i ulepszanie</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F8-01</td><td>≥ 20 awarii chaosowych naprawionych i cofalnych</td><td>✅</td><td><code>diagnostician-impl/tests/contract.rs::chaos_catalog_on_impl</code> — 24/24 wykryte, naprawione, cofnięte 1:1 (świat atrap; na prawdziwym systemie — self-hosted).</td></tr>
+<tr><td>F8-02</td><td>Ulepszacz nie zmienia Jądra, prywatności, budżetów, progów</td><td>✅</td><td><code>improver-impl/tests/contract.rs::f8_02_boundaries_hold</code> — 0/137 prób; SR2-04.</td></tr>
+<tr><td>F8-03</td><td>Bramka z ukrytym holdoutem, N ≥ 5</td><td>✅</td><td><code>evals-impl/tests/holdout.rs::catalog_never_reads_sealed_directories</code>, <code>verdict_and_events_carry_no_holdout_data</code>, <code>gate_refuses_weak_policy_and_public_manifest_as_holdout</code>. Otwarte P2-10 (izolacja runnera).</td></tr>
+<tr><td>F8-04</td><td>Zmiany R0 tylko zawężające i cofalne (50)</td><td>✅</td><td><code>improver-impl/tests/contract.rs::f8_04_r0_only_narrowing_and_reversible</code> — 0 rozszerzających wdrożonych automatycznie.</td></tr>
+<tr><td>F8-05</td><td>Wtyczki Wasm: złośliwa zatrzymana 20/20</td><td>⛔</td><td>Moduł gotowy i podpięty (<code>plugin-runtime-impl</code>, <code>app-plugins</code>; wasmtime + WIT, ADR 12, bez WASI). W CI: <code>plugin-runtime-impl/tests/plugins/exec.rs::malicious_execution_is_stopped</code> (20/20 zatrzymanych: paliwo, czas, bomba pamięci, stos, pułapki, zły wynik), <code>load.rs::malicious_modules_rejected_at_load</code> (22/22, m.in. importy WASI), <code>forbidden_manifests_rejected</code> (11/11 manifestów). Brak zamrożonego zestawu <code>evals/F8/wasm-malicious/</code> — tworzy model-recenzent, akceptuje człowiek.</td></tr>
+<tr><td>F8-06</td><td>Propozycja Diagnosty: diff, uzasadnienie, ryzyko, plan cofnięcia</td><td>✅</td><td>100 % kart kompletnych w <code>chaos_catalog_on_impl</code>; ocena model-recenzenta do potwierdzenia.</td></tr></tbody></table></div>
+<h2 id="f9-dopieszczenie">F9 — Dopieszczenie</h2>
+<div class="tbl"><table><thead><tr><th>ID</th><th>Kryterium</th><th>Status</th><th>Dowód / co dalej</th></tr></thead><tbody><tr><td>F9-01</td><td>Pentest: 0 otwartych ustaleń CVSS ≥ 9</td><td>⛔</td><td>Szkic listy kontrolnej <code>evals/F9/pentest.md</code> (53 punkty: THREAT_MODEL + OWASP LLM Top 10 2025 + ASVS 5.0, CVSS 3.1, mapowanie na testy i przeglądy #1–#3 oraz fali 3; 9 luk ⛔); pentest niewykonany. Żadne otwarte ustalenie ≥ 9; wektory wstępne otwartych propozycji ≤ 7,5.</td></tr>
+<tr><td>F9-02</td><td>Budżety lekkości utrzymane</td><td>🟡</td><td>Jak F1-08.</td></tr>
+<tr><td>F9-03</td><td>Budżety UI utrzymane</td><td>🟡</td><td>Jak F1-09.</td></tr>
+<tr><td>F9-04</td><td>Bateria: idle ~0 % CPU, bez konsolidacji/Ulepszacza</td><td>🟡</td><td>Logika: konsolidacja nie na baterii (F7-05), Ulepszacz w bezczynności. Pomiar 1 h na laptopie. Bramka #8.</td></tr>
+<tr><td>F9-05</td><td>Audyt WCAG 2.2 AA</td><td>🟡</td><td>axe 0 critical/serious (F1-07), kontrast tokenów <code>check:contrast</code>. Pełny audyt AA (forced-colors, cele ≥ 24 px, <code>aria-live</code>) — model-recenzent.</td></tr>
+<tr><td>F9-06</td><td>Dokumentacja użytkownika i ustawień dla 100 % modułów</td><td>⛔</td><td>Brak skryptu sprawdzającego (60 manifestów <code>module.toml</code>). Przewodnik: <code>docs/user-guide/</code>.</td></tr>
+<tr><td>F9-07</td><td>Red-team powtórzony na pełnym systemie</td><td>⛔</td><td>Zależy od F3-05.</td></tr></tbody></table></div>
+<h2 id="najwazniejsze-luki-techniczne-dla-sesji-ai">Najważniejsze luki techniczne (dla sesji AI)</h2>
+<ol>
+<li><p><strong>Broker poza procesem — do weryfikacji na Windows.</strong> Powłoka uruchamia procesy Jądra (<code>app-broker</code>): usługa
+<code>AlfaBroker</code> albo tryb przenośny (<code>alfa-broker --console</code>, okno Broker-UI uruchamia Broker), <code>alfa-watchdog</code> z
+<code>Ctrl+Shift+F12</code>; release bez izolowanego Brokera = bezpieczny stan. Logika i protokół przetestowane na atrapach
+i gniazdach Unix (<code>app-broker/tests</code>); prawdziwe procesy, potoki i UIPI — self-hosted. Instalacja usługi (osobne
+konto, wiązanie roli jądra z obrazem z <code>versions\&lt;ver&gt;</code>) — bramka #10. F3-12 i F4-03 odblokowane po teście na sprzęcie.</p>
+</li>
+<li><p><strong>Instalator modeli i sidecarów — dane do przypięcia.</strong> Menedżer <code>app-models</code> (Ustawienia → „Modele i silniki”,
+onboarding) pobiera i instaluje modele (LLM, whisper, Piper, Silero, openWakeWord, mówca, embeddingi) i sidecary
+(<code>llama-server</code>, <code>whisper-server</code>, <code>piper</code>; Pocket TTS — ręcznie). Potwierdzone i przypięte są tylko pozycje
+z PyPI (Silero VAD, cechy openWakeWord); pozostałe są „do potwierdzenia przez człowieka” (adres, rozmiar,
+licencja, SHA-256, numer wydania llama.cpp, układ archiwów) — do tego czasu instalacja wymaga zgody TOFU w UI.</p>
+</li>
+<li><p><strong>Funkcje głosu F5 podpięte w aplikacji</strong> (<code>app-voice</code>: słowa wywoławcze — domyślnie wyłączone, bez kalibracji
+tylko z <code>accept_risk</code>; kreator weryfikacji właściciela; dyktowanie <code>Ctrl+Alt+D</code>; czytanie <code>Ctrl+Alt+R</code>; panel Głos).
+Brakuje pomiarów FAR/FRR i EER na korpusie właściciela (bramka #3) oraz portu UIA do odczytu zaznaczenia (zapas: Ctrl+C).</p>
+</li>
+<li><p><strong>Embedder semantyczny podpięty</strong> (<code>app-models</code>: wybór <code>[search.embedder] model</code>, przebudowa wektorów w tle);
+brakuje pomiaru progu F7-02 na prawdziwym modelu e5-small i przypiętych SHA-256 w <code>lib_embed::CATALOG</code>.</p>
+</li>
+<li><p><strong>Aktualizator</strong>: pełny cykl (pobieranie ze wznawianiem, minisign, rollback, instalator NSIS) gotowy; brak klucza minisign i testu instalatora na Windows — F3-10.</p>
+</li>
+<li><p><strong>Powłoka i diagnostyka (fala 5):</strong> dziennik diagnostyczny wszystkich procesów (<code>app-logs</code>: <code>%LOCALAPPDATA%\Alfa\logs\&lt;proces&gt;.&lt;data&gt;.&lt;NNN&gt;.log</code>,
+rotacja, 7 dni, <code>ALFA_LOG</code> / <code>[logs] level</code>, redakcja sekretów i pominięcie treści — test szpiegowski); <code>llama-server</code>
+CUDA z <code>cudart</code> („do potwierdzenia”) i zastępstwo CUDA → Vulkan → CPU z ostrzeżeniem; port CDP — test CI (F3-13) i odmowa
+startu przy <code>WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS</code> ze zdalnym debugowaniem; CSP z Trusted Types (PT-33; E2E pod CSP
+wydania). Do sprawdzenia na Windows: Trusted Types ze skryptami Tauri w WebView2, <code>style-src</code> nadal z <code>&#39;unsafe-inline&#39;</code>
+(bits-ui, xterm — lista w <code>docs/modules/ui-shell/SPEC.md</code>), kompilacja powłoki (job „Powłoka Tauri (Windows)”).</p>
+</li>
+<li><p><strong>Brakujące moduły</strong>: helper <code>uiAccess</code> (F6-07). <code>plugin-runtime</code>, <code>tools-office</code>, <code>tools-browser</code>, <code>tools-vision</code>, <code>tools-system</code>,
+<code>tools-net</code> i <code>tools-media</code> są gotowe i podpięte w aplikacji; prawdziwy <code>Windows.Media.Ocr</code>, ffmpeg (do potwierdzenia: build i licencja)
+i odtwarzanie WASAPI sprawdzone tylko na atrapach — test na self-hosted Windows; <code>net_search</code> czeka na wybór dostawcy.</p>
+</li>
+<li><p><strong>Brakujące zestawy</strong> (tworzy model-recenzent, akceptuje człowiek): <code>evals/F3/redteam/</code>, <code>evals/F3/mvp-scenario.md</code>,
+<code>evals/F4/bridge-fixtures/</code>, <code>evals/F7/alfa-full/</code>, <code>evals/F8/wasm-malicious/</code>, 100 scenariuszy F6-05. Szkice fali 4
+do akceptacji (bez <code>MANIFEST.json</code> i bez runnerów): <code>evals/F1/prompts-pl/</code> (F1-03), <code>evals/F6/tasks/</code> i
+<code>evals/F6/app-matrix.md</code> (F6-01, F6-03), <code>evals/F7/migrations/</code> (F7-08), <code>evals/F9/pentest.md</code> (F9-01).</p>
+</li>
+<li><p><strong>CI</strong>: wszystkie joby zielone na <code>f7bd2df</code> (Linux, Windows, Powłoka Tauri, UI, cargo-deny, Dokumentacja); przy porażce testów log joba kończy się podsumowaniem paniki.</p>
+</li>
+<li><p>Drobne: własny pasek tytułu z Mica i Snap Layouts (spike j); generator typów TS (ADR 13) — dziś typy ręczne
+z testem round-trip DTO; eksport rozmowy do PDF (dziś MD/HTML — HTML drukowalny do PDF); zrzut ekranu z composera.
+Załączniki w composerze, eksport rozmowy MD/HTML, kopie zapasowe z harmonogramem i eksport artefaktów/logów/
+nakładki maszyny są w <code>app-files</code> (fala 3) — przeciąganie plików i dialogi powłoki do sprawdzenia na Windows.</p>
+</li>
+<li><p><strong>Rozmiar korzenia kompozycji (fala 4):</strong> silnik tury czatu wydzielony z <code>app-core</code> do <code>app-chat</code> (<code>app-core</code>
+7 987 → 6 410 / 8 000 linii, <code>app-chat</code> 2 001). Domknięte podpięcia fali 3: karta „Cofnij” zapisu zmiennej
+(<code>UndoService::System</code>, token <code>&quot;&lt;sesja&gt;:v&lt;id&gt;&quot;</code>), kill-switch zatrzymuje odtwarzanie <code>media_play</code>
+(<code>AgentTools::kill_switch</code> → <code>MediaTools::stop_all</code>), import <code>.alfa</code> tylko jednorazowym uchwytem (dialog,
+podgląd, „Przywróć…” z listy kopii — <code>backups_restore</code>). Pełna ścieżka „agentka zapisuje zmienną → Cofnij”
+w <code>app-core</code> wymaga zgody w oknie Brokera — w testach sprawdzana na poziomie <code>app-agents</code> (<code>tests/registry.rs</code>)
+i <code>tools-system-impl</code> (<code>tests/undo_card.rs</code>); E2E z Broker-UI — self-hosted Windows.
+Przegląd fali 3 W3-04 naprawione: skażenie sesji z załączników (<code>meta.tainted</code>) zgłaszane Brokerowi przed każdą
+turą, przy otwarciu sesji i przed przebiegiem zadania — także po restarcie (<code>app-core/tests/files.rs:: attachment_taint_reaches_broker_and_survives_restart</code>); trwały stan bezpieczeństwa w samym Brokerze — nadal P3-01.</p>
+</li>
+<li><p><strong>Próba generalna w chmurze (fala 6, <code>rehearsal.yml</code>) — przed testem na laptopie (RTX 4050 6 GB).</strong> Wszystkie
+joby zielone na <code>cb28daa</code> (2026-10-06):</p>
+<ul>
+<li><code>setup-dev.ps1 -Ci</code> pod PowerShell 5.1 i 7 — bez błędów składni i wykonania.</li>
+<li>Prawdziwa aplikacja na runnerze Windows (WebView2, Playwright przez CDP) — <strong>10/10</strong>: start okna, onboarding,
+rozmowa bez modelu → czytelny błąd „brak modelu”, Ustawienia → Modele i silniki (lista z katalogu), eksport
+<code>.alfa</code> przez natywne okno „Zapisz jako” (UIA + WM_CHAR/WM_COMMAND, bez fokusu), kill-switch z UI, axe na
+3 widokach, <strong>CSP z Trusted Types: 0 naruszeń, konsola bez błędów</strong>.</li>
+<li>Silniki na żywo (CPU 4 vCPU): <code>llama-server</code> b6710, <code>whisper-server</code> 1.8.1, <code>piper</code> z prawdziwych wydań;
+Bielik 4.5B Q8_0 — 6,8 tok/s, wywołanie narzędzia z <code>--jinja</code>; Bielik 1.5B Q8_0 — 21 tok/s; architektura
+z logu serwera zgodna z manifestem (60/32 warstwy, 2 głowice KV, KV 480/256 MiB przy <code>-c 8192</code>;
+<code>n_ctx_train</code> 4.5B = 8192 → poprawiony <code>ctx</code> w manifeście); Piper RTF 0,34; whisper <code>small-q5_1</code> WER 0
+(„Dzień dobry. Jestem Alfa.”), po nieudanym starcie wersji CUDA (runner bez sterownika NVIDIA) przejście na CPU.
+Rozpoznanie 2,1 s mowy na CPU trwało 71 s; po partialach adaptacyjnych (<code>d60660b</code>) — 53 s. Reszta to koszt
+samego whispera <code>small</code> na 4 vCPU (każdy przebieg liczy okno 30 s, final z wiązką 5): bez karty graficznej
+rozmowa głosowa potrzebuje mniejszego modelu STT albo innego silnika — decyzja przy pomiarach F0/F2; laptop
+i desktop liczą STT na karcie (CUDA/Vulkan).</li>
+<li><strong>Adres modelu Bielik w katalogu był błędny (404)</strong> — oficjalne repozytorium <code>speakleash</code> ma tylko <code>Q8_0</code>
+i <code>fp16</code>; katalog wskazuje oficjalne <code>Q8_0</code> (4.5B domyślny, 1.5B lekki), <code>Q4_K_M</code> tylko u osób trzecich —
+decyzja człowieka (ADR 0014, aktualizacja). Bramka <code>hf-catalog</code> sprawdza każdy adres i rozmiar GGUF w API
+Hugging Face. Sumy SHA-256 pobranych plików: przewodnik 11 (tabele) i log joba „Silniki na żywo”.</li>
+</ul>
+</li>
+</ol>
+<h2 id="co-musi-zrobic-czlowiek-w-kolejnosci-priorytetu">Co musi zrobić człowiek (w kolejności priorytetu)</h2>
+<ol>
+<li><strong>Przegląd i akceptacja zmian Jądra i zabezpieczeń (bramka #7).</strong> Moduły <code>safety-broker</code>, <code>broker-ui</code>, <code>watchdog</code>,
+<code>updater</code>, <code>app-safety</code>, <code>core-*</code> oraz poprawki z przeglądów: SR-01, SR-02, SR-03, SR-07, SR-09 (#1) i SR2-03,
+SR2-04, SR2-05, SR2-08 (#2). Bez tego zmiany nie mogą trafić na <code>main</code>.</li>
+<li><strong>Decyzje bezpieczeństwa z przeglądów</strong> (<code>docs/reviews/…-1.md</code> §7, <code>…-2.md</code> §7): P-01 kaskada obniżeń poziomu,
+P-03 izolacja powłoki ≤ L3 (Low IL / AppContainer), P-05 potok MCP, P-08 Authenticode i położenie obrazów Jądra,
+P-09 egress do sieci lokalnej, potwierdzenie SR-07; P2-01 strażnik GUI dla WebView2/UWP (przed włączeniem
+computer use), P2-03, P2-06 uprawnienia pamięci (rola przebiegu czy suma ról), P2-07 taint sesji w runtime,
+P2-10 izolacja runnera holdoutu.</li>
+<li><strong>Akceptacje dokumentów (bramki #4, #7):</strong> ADR-y 1–15 (ADR 0006 tymczasowy do spike&#39;u g), makiety 1–3 (F0-17)
+i pozostałe makiety przed falami, które je implementują; próg F3-07 (ADR 14).</li>
+<li><strong>Maszyny i runner (bramki #8, #9, #10):</strong> toolchainy na desktopie i laptopie, przypięte sterowniki, wirtualny
+kabel audio, runner self-hosted na osobnym koncie Windows, VM (edycja Windows do potwierdzenia), klucz minisign,
+certyfikat podpisu, konto usługi Brokera. Odblokowuje większość pozycji 🟡.</li>
+<li><strong>Spike&#39;i F0 na sprzęcie</strong> wg <code>evals/spikes/README.md</code> (kolejność f → h → e → a → j → k → b), wyniki do
+<code>results/</code> i ADR-ów; ocenia model-recenzent.</li>
+<li><strong>Korpus własny (bramka #3)</strong> wg <code>evals/spikes/e-voice-lab/protokol-nagran.md</code>: typy 1–9 dla F2 (≥ 300 wypowiedzi,
+≥ 200 „stop/anuluj”, ≥ 100 backchanneli i ≥ 100 przerwań, ≥ 50 na klasę intencji, ≥ 50 „nie no, dobrze”),
+typy 10–12 dla F5 (≥ 200 pozytywów słów wywoławczych, rejestracja mówcy, dyktowanie) + ≥ 24 h tła PL;
+potem zamrożenie podziału test (<code>alfa-voice-eval freeze</code> → <code>evals/acceptance/F2/test.sha256</code>, <code>HASHES</code>).</li>
+<li><strong>Odsłuchy i akustyka (bramki #5, #6):</strong> ślepa ocena TTS (F0-09), ABX głosów v0 (F2-10), 1 h TTS przez głośniki
+laptopa z TV (F2-06), 30 min AEC (F0-04).</li>
+<li><strong>Logowanie do CLI i klucze (bramka #1):</strong> <code>claude</code> i <code>codex</code> we wbudowanym terminalu (F0-05…07, F4-01…04, nagranie
+F4-08); klucz Anthropic (spike g, ADR 0006), klucze do F1-02, F2-02 i „mózgu” F6.</li>
+<li><strong>Zamrożenie zestawów</strong> (status <code>proposed</code> → <code>frozen</code>, wpis <code>accepted_by</code>): <code>evals/F5/MANIFEST.json</code>,
+<code>evals/F5/voice/MANIFEST.json</code>, <code>evals/F8/MANIFEST.json</code>, <code>evals/F7/recall/</code>, <code>evals/F3/tools/</code> (ujednolicić nazwę
+z <code>tools-local/</code> z ACCEPTANCE), zestaw F2 test.</li>
+<li><strong>UAC / Hello (bramka #2):</strong> instalacja usługi Brokera, helper <code>uiAccess</code> (F6-07), opcjonalnie Windows Hello.</li>
+<li><strong>Katalog modeli i sidecarów</strong> (<code>crates/app-models/src/data.rs</code>, <code>lib-embed/src/catalog.rs</code>,
+<code>providers-local-impl/models.toml</code>): potwierdzić adresy, rozmiary i licencje (głos Piper, VoxCeleb), przypiąć
+SHA-256 i numer wydania llama.cpp, sprawdzić układ archiwów <code>whisper-server</code>/<code>piper</code> oraz <code>sidecar-llama-cuda</code>
+(wariant CUDA 12.4, archiwum <code>cudart</code>, licencja redystrybucji bibliotek NVIDIA); potem <code>confirmed: true</code>.
+Wybrać źródło modelu lokalnego: oficjalny Bielik <code>Q8_0</code> (domyślnie, 4,8 GB; na 6 GB VRAM częściowe odciążenie)
+albo kwantyzacja <code>Q4_K_M</code> osoby trzeciej (2,9 GB; zaufanie do autora kwantyzacji) — tabela SHA-256 w jobie <code>hf-catalog</code>.</li>
+</ol>
+</article>
+<footer>Źródło: <code>docs/STATUS.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

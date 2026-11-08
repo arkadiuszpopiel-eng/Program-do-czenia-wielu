@@ -1,0 +1,26 @@
+[package]
+name = "scheduler-fake"
+description = "Pełny scheduler (F5): deterministyczna atrapa na wirtualnym zegarze — ten sam rdzeń co -impl, skryptowane wykonawczynie, nagrane zdarzenia, restart z zapisanego stanu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+scheduler-contract = { path = "../scheduler-contract", features = ["contract-tests"] }
+core-bus-contract.workspace = true
+cost-meter-contract = { path = "../cost-meter-contract" }
+async-trait.workspace = true
+
+[dev-dependencies]
+agent-backends-contract = { path = "../agent-backends-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+serde.workspace = true
+serde_json.workspace = true
+sha2 = "0.10.9"
+tokio.workspace = true
+
+[lints]
+workspace = true

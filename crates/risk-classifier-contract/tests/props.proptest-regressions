@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 4dbdd449d2dc78025ca00449a24a4f10c8c057b21ba3ca79269fc7ea64a4f230 # shrinks to f = ActionFacts { tool: "tool", class: Read, reversible: Yes, scope: InScope, egress: None, egress_allowlisted: false, destructive: Recoverable, bulk: 1, install: false, origin: UserVoice { confidence: SttConfidence(0), speaker_verified: false }, tainted: false, untrusted_input_in_args: false, touches_private_data: false, kernel_rule: None }

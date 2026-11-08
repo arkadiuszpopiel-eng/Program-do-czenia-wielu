@@ -1,0 +1,258 @@
+{
+  "$id": "alfa://schemas/module-manifest.v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ModuleManifest",
+  "description": "Manifest modułu Alfy (`module.toml`, docs/PLAN.md §3.2), schemat v1.",
+  "type": "object",
+  "properties": {
+    "budget": {
+      "description": "Budżet zasobów.",
+      "$ref": "#/$defs/ResourceBudget"
+    },
+    "capabilities": {
+      "description": "Żądane zdolności (tokeny przydziela Broker).",
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Capability"
+      }
+    },
+    "config_schema": {
+      "description": "Ścieżka do JSON Schema konfiguracji modułu (względem katalogu modułu).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "health": {
+      "description": "Health-check (domyślnie `ping` co 15 s).",
+      "$ref": "#/$defs/HealthSpec",
+      "default": {
+        "check": "ping",
+        "interval_s": 15
+      }
+    },
+    "id": {
+      "description": "Identyfikator modułu (kebab-case).",
+      "$ref": "#/$defs/ModuleId"
+    },
+    "isolation": {
+      "description": "Izolacja (domyślnie `inproc`).",
+      "$ref": "#/$defs/Isolation",
+      "default": "inproc"
+    },
+    "kind": {
+      "description": "Rodzaj modułu.",
+      "$ref": "#/$defs/ModuleKind"
+    },
+    "lifecycle": {
+      "description": "Cykl życia (domyślnie `lazy`).",
+      "$ref": "#/$defs/Lifecycle",
+      "default": "lazy"
+    },
+    "provides": {
+      "description": "Kontrakty dostarczane.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ContractRef"
+      }
+    },
+    "requires": {
+      "description": "Kontrakty wymagane (wyłącznie `*-contract`).",
+      "type": "array",
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ContractRef"
+      }
+    },
+    "ui": {
+      "description": "Wkład do UI.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UiContribution"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "version": {
+      "description": "Wersja semver.",
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "version",
+    "kind",
+    "budget"
+  ],
+  "x-schema-version": 1,
+  "$defs": {
+    "Capability": {
+      "description": "Żądana zdolność: `<nazwa>` lub `<nazwa>(<zakres>)`.",
+      "type": "string"
+    },
+    "ContractRef": {
+      "description": "Referencja kontraktu: `<nazwa>-contract@<major>`.",
+      "type": "string"
+    },
+    "HealthSpec": {
+      "description": "Specyfikacja health-checku.",
+      "type": "object",
+      "properties": {
+        "check": {
+          "description": "Nazwa sprawdzenia (np. `ping`).",
+          "type": "string"
+        },
+        "interval_s": {
+          "description": "Odstęp między sprawdzeniami w sekundach (> 0).",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "check",
+        "interval_s"
+      ]
+    },
+    "Isolation": {
+      "description": "Izolacja modułu (PLAN §3.2 „Izolacja wg potrzeby”).",
+      "oneOf": [
+        {
+          "description": "Natywny crate w procesie jądra.",
+          "type": "string",
+          "const": "inproc"
+        },
+        {
+          "description": "Osobny proces (JSON-RPC po stdio / named pipe).",
+          "type": "string",
+          "const": "process"
+        },
+        {
+          "description": "Wtyczka Wasm (wasmtime, własny WIT).",
+          "type": "string",
+          "const": "wasm"
+        }
+      ]
+    },
+    "Lifecycle": {
+      "description": "Cykl życia modułu.",
+      "oneOf": [
+        {
+          "description": "Ładowany przy pierwszym użyciu, zwalniany po bezczynności.",
+          "type": "string",
+          "const": "lazy"
+        },
+        {
+          "description": "Ładowany na żądanie (jawnie), zwalniany po bezczynności.",
+          "type": "string",
+          "const": "on-demand"
+        },
+        {
+          "description": "Zawsze rezydentny (jądro).",
+          "type": "string",
+          "const": "always"
+        }
+      ]
+    },
+    "ModuleId": {
+      "description": "Identyfikator modułu w kebab-case (np. `voice-stt`).",
+      "type": "string"
+    },
+    "ModuleKind": {
+      "description": "Rodzaj modułu (PLAN §3.2).",
+      "oneOf": [
+        {
+          "description": "Usługa jądra lub tła.",
+          "type": "string",
+          "const": "service"
+        },
+        {
+          "description": "Narzędzie dla agentek.",
+          "type": "string",
+          "const": "tool"
+        },
+        {
+          "description": "Dostawca modeli.",
+          "type": "string",
+          "const": "provider"
+        },
+        {
+          "description": "Silnik głosowy (STT/TTS/VAD…).",
+          "type": "string",
+          "const": "voice-engine"
+        },
+        {
+          "description": "Paczka agentek/person.",
+          "type": "string",
+          "const": "agent-pack"
+        },
+        {
+          "description": "Panel UI ładowany leniwie.",
+          "type": "string",
+          "const": "ui-panel"
+        }
+      ]
+    },
+    "ResourceBudget": {
+      "description": "Budżet zasobów deklarowany przez moduł (monitorowany w runtime, PLAN §3.4).",
+      "type": "object",
+      "properties": {
+        "cpu_pct": {
+          "description": "Maksymalne obciążenie CPU w procentach (0–100) w stanie aktywnym.",
+          "type": "integer",
+          "format": "uint8",
+          "maximum": 255,
+          "minimum": 0
+        },
+        "ram_mb": {
+          "description": "Maksymalna pamięć RAM w MB (> 0).",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0
+        },
+        "vram_mb": {
+          "description": "Opcjonalny budżet VRAM w MB.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "ram_mb",
+        "cpu_pct"
+      ]
+    },
+    "UiContribution": {
+      "description": "Wkład modułu do UI.",
+      "type": "object",
+      "properties": {
+        "panel": {
+          "description": "Identyfikator panelu ładowanego leniwie, jeśli jest.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "settings_page": {
+          "description": "Ścieżka strony ustawień (route), jeśli jest.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

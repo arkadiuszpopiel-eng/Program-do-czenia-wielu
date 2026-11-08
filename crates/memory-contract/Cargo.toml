@@ -1,0 +1,29 @@
+[package]
+name = "memory-contract"
+description = "Pamięć: kontrakt v0 (sesja) i F7 — cztery warstwy, zakresy z uprawnieniami, wersje faktów, Inspektor, forget kaskadowo, dziennik z cofaniem, silnik wspólny dla -impl i -fake"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+lib-sqlstore = { path = "../lib-sqlstore" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

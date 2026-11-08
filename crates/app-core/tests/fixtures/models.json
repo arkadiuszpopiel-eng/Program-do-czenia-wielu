@@ -1,0 +1,51 @@
+[
+  {
+    "command": "models_local_list",
+    "args": {},
+    "result": [
+      {
+        "id": "bielik-4.5b-v3.0-instruct-q8_0",
+        "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
+        "size_bytes": 5060427776,
+        "installed": false,
+        "default": true,
+        "downloading": false
+      }
+    ]
+  },
+  {
+    "command": "models_local_download",
+    "args": {
+      "modelId": null
+    },
+    "result": null
+  },
+  {
+    "command": "models_local_cancel",
+    "args": {
+      "modelId": null
+    },
+    "result": null
+  },
+  {
+    "command": "models_local_download",
+    "args": {
+      "modelId": "bielik-4.5b-v3.0-instruct-q8_0"
+    },
+    "result": null
+  },
+  {
+    "command": "models_local_list",
+    "args": {},
+    "result": [
+      {
+        "id": "bielik-4.5b-v3.0-instruct-q8_0",
+        "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
+        "size_bytes": 5060427776,
+        "installed": true,
+        "default": true,
+        "downloading": false
+      }
+    ]
+  }
+]

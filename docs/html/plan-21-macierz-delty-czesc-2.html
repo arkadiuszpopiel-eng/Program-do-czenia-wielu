@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/21-macierz-delty-czesc-2.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html" aria-current="page">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li><li><a href="plan-45-testy-ai.html">System pełnego automatycznego testowania przez AI</a></li><li><a href="plan-46-raport-2026-10-31-testy-ai.html">Raport z 31.10: system automatycznego testowania przez AI, ścieżki względne, wersja 0.0.79</a></li><li><a href="plan-47-raport-2026-11-01-noc.html">Raport z nocy 31.10/1.11: Sędzia Cieni, diagnostyka odporna na zawieszenie, wersja 0.0.81</a></li><li><a href="plan-48-raport-2026-11-01-rano.html">Raport 1.11 rano: zaległe inspekcje i testy</a></li><li><a href="plan-49-raport-2026-11-02-noc.html">Raport nocy 1/2.11: obowiązki modelu lokalnego i wymiana informacji między modelami</a></li><li><a href="plan-50-tryby-zgod-jak-claude-codex.html">50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)</a></li><li><a href="plan-51-raport-2026-11-03-wieczor.html">51 — Raport: wieczór 3.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-52-raport-2026-11-04-noc.html">52 — Raport: noc 3/4.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-53-raport-2026-11-06-noc.html">53 — Raport: noc 5/6.11 (etap Z — model-sędzia, dziennik rodzica, porządek kompilacji)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="features-katalog.html">Katalog funkcji i testów</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#f-wiedza-siec-osoby">F. Wiedza, sieć, osoby</a></li><li><a href="#g-komputer">G. Komputer</a></li><li><a href="#h-dostawcy-i-dobor-modelu">H. Dostawcy i dobór modelu</a></li><li><a href="#i-modele-lokalne-i-karty-graficzne">I. Modele lokalne i karty graficzne</a></li><li><a href="#j-tworczosc">J. Twórczość</a></li><li><a href="#k-awatar">K. Awatar</a></li><li><a href="#l-multimedia">L. Multimedia</a></li><li><a href="#m-trening-diagnostyka-przeplywy-start">M. Trening, diagnostyka, przepływy, start</a></li><li><a href="#n-rzeczy-w-delcie-zaplanowane-niezrobione-kandydaci">N. Rzeczy w Delcie zaplanowane, niezrobione — kandydaci</a></li><li><a href="#postep-po-wersji-0-0-43-2026-10-12">Postęp po wersji 0.0.43 (2026-10-12)</a></li><li><a href="#podsumowanie-liczbowe">Podsumowanie liczbowe</a></li></ul></aside><article><h1 id="21-macierz-funkcji-delty-ai-czesc-2-wiedza-komputer-modele-tworczosc-awatar-multimedia-reszta">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</h1>
+<p>Stan na <strong>2026-10-11</strong>. Ciąg dalszy <a href="plan-20-macierz-delty-czesc-1.html"><code>20</code></a>; te same oznaczenia decyzji.</p>
+<h2 id="f-wiedza-siec-osoby">F. Wiedza, sieć, osoby</h2>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Funkcja w Delcie</th><th>W Alfie dziś</th><th>Decyzja</th><th>Grupa</th></tr></thead><tbody><tr><td>F1</td><td>„Naucz”: kadr z kamery + opis pisany albo dyktowany, tytuł, kategoria (rzecz, przedmiot, miejsce, fakt, notatka), tagi, zdjęcie, przypisanie do osoby</td><td>„Zapamiętaj” w pamięci</td><td>przenosimy</td><td>P5</td></tr>
+<tr><td>F2</td><td>„Wiedza”: szukanie, edycja, usuwanie, konsolidacja (co 5 nowych), eksport, import (scal / zastąp), ponowne indeksowanie</td><td>Inspektor pamięci, porządkowanie nocne</td><td>dostosowujemy: import i eksport wiedzy</td><td>P5</td></tr>
+<tr><td>F3</td><td>Panel RAG: dokumenty do 20 plików po 25 MB, fragmenty 1100 znaków z zakładką 150, 8 wyników, próg 0,40, wyszukiwanie semantyczne / mieszane / dokładne</td><td>wyszukiwanie hybrydowe FTS5 + wektory</td><td>dostosowujemy: suwaki progu i liczby fragmentów</td><td>P5</td></tr>
+<tr><td>F4</td><td>Wyszukiwarka: wyniki + encyklopedia, historia 30 zapytań, popularne, „Odpowiedź AI”</td><td>brak</td><td>przenosimy</td><td>P5</td></tr>
+<tr><td>F5</td><td>Wiadomości: odświeżanie przez wyszukiwanie, kategorie, streszczenie, auto-odświeżanie 5–60 min, odczyt głosem</td><td>brak</td><td>przenosimy</td><td>P5</td></tr>
+<tr><td>F6</td><td>Ulubione strony: 10 kategorii, własne źródła, wykrywanie RSS</td><td>brak</td><td>przenosimy</td><td>P5</td></tr>
+<tr><td>F7</td><td>Osoby: nazwa, znana / tymczasowa, główna, notatki, ostatnio widziana; fakty z kategorią, źródłem i pewnością</td><td>SPEC <code>person-memory</code></td><td>przenosimy</td><td>P6</td></tr>
+<tr><td>F8</td><td>Rejestracja twarzy (próg 0,35) i głosu (0,62, margines 0,06)</td><td>profil głosu właściciela</td><td>przenosimy</td><td>P6</td></tr>
+<tr><td>F9</td><td>Tożsamość: aktywna osoba 15 s, ponowne rozpoznanie najwyżej co 8 s, grupowanie nieznanych twarzy (wyłączone)</td><td>brak</td><td>przenosimy</td><td>P6</td></tr>
+<tr><td>F10</td><td>Historia rozmów osoby (streszczenia)</td><td>brak</td><td>przenosimy</td><td>P6</td></tr></tbody></table></div>
+<h2 id="g-komputer">G. Komputer</h2>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Funkcja w Delcie</th><th>W Alfie dziś</th><th>Decyzja</th><th>Grupa</th></tr></thead><tbody><tr><td>G1</td><td>Głośność systemu: odczyt, ustaw, głośniej, ciszej, wycisz (krok 10)</td><td>brak</td><td>przenosimy</td><td>P7</td></tr>
+<tr><td>G2</td><td>Uruchom program, plik albo adres (16 nazw skrótowych; lista zakazanych programów)</td><td>brak</td><td>przenosimy przez Brokera</td><td>P7</td></tr>
+<tr><td>G3</td><td>Lista okien, przełączenie okna</td><td>UIA w budowie</td><td>przenosimy</td><td>P7</td></tr>
+<tr><td>G4</td><td>Schowek: odczyt i zapis (osobne uprawnienie)</td><td>schowek z ochroną</td><td>jest</td><td>—</td></tr>
+<tr><td>G5</td><td>Klawisze multimediów</td><td>brak</td><td>przenosimy</td><td>P7</td></tr>
+<tr><td>G6</td><td>Mysz: ruch, klik, dwuklik, prawy, przewijanie; klawiatura: pisanie, skróty</td><td><code>SendInput</code> w dyktowaniu</td><td>przenosimy przez Brokera</td><td>P7</td></tr>
+<tr><td>G7</td><td>Klik po tekście z ekranu, z próbą bez klikania</td><td>brak</td><td>przenosimy</td><td>P7</td></tr>
+<tr><td>G8</td><td>8 uprawnień (ekran, mysz, klawiatura, pliki, schowek, auto-potwierdzanie plików, skan sieci, procesy)</td><td>poziomy L0–L4 i zdolności Brokera</td><td>dostosowujemy — bez „auto-potwierdzania” jako flagi modelu</td><td>P7</td></tr>
+<tr><td>G9</td><td>Panel komputera: nazwa, system, czas pracy, pamięć, dysk; zrzut ekranu</td><td>strona Urządzenia, panel Ekran</td><td>jest</td><td>—</td></tr>
+<tr><td>G10</td><td>Menedżer procesów: 5 najcięższych, szukanie, sortowanie, zakończenie z potwierdzeniem</td><td>brak</td><td>przenosimy</td><td>P7</td></tr>
+<tr><td>G11</td><td>Spis sprzętu: USB, ekrany, dźwięk, dyski, pamięć, płyta, sieć, Wi-Fi, połączenia; skan sieci za zgodą</td><td>strona Urządzenia (podstawy)</td><td>przenosimy</td><td>P7</td></tr>
+<tr><td>G12</td><td>Dziennik działań na komputerze</td><td>audyt Brokera</td><td>jest (pełniejszy)</td><td>—</td></tr>
+<tr><td>G13</td><td>Menedżer plików (tylko katalog wysyłek)</td><td>panel Pliki</td><td>nie — Alfa ma lepszy</td><td>—</td></tr></tbody></table></div>
+<h2 id="h-dostawcy-i-dobor-modelu">H. Dostawcy i dobór modelu</h2>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Funkcja w Delcie</th><th>W Alfie dziś</th><th>Decyzja</th><th>Grupa</th></tr></thead><tbody><tr><td>H1</td><td>Dostawcy rozmowy: lokalny, Ollama, OpenAI, Anthropic, Google, OpenRouter + 11 zgodnych z OpenAI (DeepSeek, Qwen, Moonshot, Zhipu, MiniMax, Mistral, xAI, Groq, Cerebras, Together, Fireworks)</td><td>katalog dostawców w TOML</td><td>jest; uzupełnić listę</td><td>P2</td></tr>
+<tr><td>H2</td><td>Listy modeli pobierane na żywo, pamięć 24 h</td><td>lista modeli konta</td><td>jest</td><td>—</td></tr>
+<tr><td>H3</td><td>Stan środków na koncie (tylko OpenRouter)</td><td>planowane C2.11a</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>H4</td><td>Inteligentny wybór: długość, kod, rozumowanie, wiele kroków, obraz; progi oszczędny / zrównoważony / jakość</td><td>klasy zadań</td><td>przenosimy sygnały trudności</td><td>P12</td></tr>
+<tr><td>H5</td><td>Pula modeli z rolami (rozmowa, kod, analiza, twórcze, wizja), premia za model już wczytany</td><td>kolejki na klasę</td><td>dostosowujemy</td><td>P2</td></tr>
+<tr><td>H6</td><td>Zużycie i koszt na dostawcę z tabeli cen</td><td>koszty z kursem NBP, limity</td><td>jest (lepsze)</td><td>—</td></tr></tbody></table></div>
+<h2 id="i-modele-lokalne-i-karty-graficzne">I. Modele lokalne i karty graficzne</h2>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Funkcja w Delcie</th><th>W Alfie dziś</th><th>Decyzja</th><th>Grupa</th></tr></thead><tbody><tr><td>I1</td><td>Sklep modeli: 4 zakładki, wiersz z parametrami, rozmiarem, oceną dopasowania, pobraniami</td><td>stały katalog pakietów</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I2</td><td>Filtr rozmiaru (≤3B, 4–9B, 10–15B, 16–35B, &gt;35B), kategorie (9), sortowania</td><td>brak</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I3</td><td>Ocena: mieści się (plik + 1,5 GB ≤ pamięć karty) / część na procesorze (≤ 1,4 ×) / za duży</td><td>ocena pakietów; od 0.0.39 ocena przy każdym modelu rozmowy</td><td>przenosimy — <strong>zrobione 0.0.39</strong> (mieści się / częściowo / procesor; bez progu „za duży”)</td><td>P2</td></tr>
+<tr><td>I4</td><td>HuggingFace: 60 na stronę, „Załaduj więcej”, lista plików repozytorium, kolejka pobierania</td><td>brak</td><td>przenosimy (pobrania z sumą kontrolną)</td><td>P2</td></tr>
+<tr><td>I5</td><td>Modele w częściach: komplet w kolejce, znak „Niepełny”, blokada wczytania</td><td>brak</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I6</td><td>Ostrzeżenia o nieobsługiwanej kwantyzacji</td><td>brak</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I7</td><td>Archiwum modeli z SHA-256, przywracanie, „Usuń na stałe”</td><td>brak</td><td>przenosimy (usuwanie na stałe tylko ręką użytkownika)</td><td>P2</td></tr>
+<tr><td>I8</td><td>Katalog modeli: zmiana folderu, miejsce na dysku, liczniki</td><td>ścieżki modeli</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I9</td><td>Parametry wczytania: warstwy na karcie, kontekst, wątki</td><td>automatyczne</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I10</td><td>Parametry silnika: flash attention, typy pamięci KV, mmap, mlock, tryb podziału, wsad, dekodowanie spekulatywne, pamięć podręczna</td><td>brak w oknie</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I11</td><td>Profile rodzin modeli (Gemma, Qwen, Llama, Mistral, Phi): próbkowanie, myślenie, ograniczenie kontekstu</td><td>brak</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I12</td><td>Poprawki szablonów: łączenie komunikatów systemowych i kolejnych tur, spłaszczanie narzędzi, system w pierwszej turze, ponowienie po błędzie 400</td><td>filtr zmyślonych wywołań</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I13</td><td>Strażnik tur: zakaz znaczników tur, żeby model nie dopisywał wypowiedzi użytkownika</td><td>brak</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I14</td><td>Dopasowanie do pamięci karty: dobór kontekstu do luzu, <code>--fit-target</code>, pomiar faktycznych warstw</td><td>automatyczne w <code>llama-server</code></td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I15</td><td>5 stopni awaryjnego startu (pełny → układ auto → bez wizji → bez przyspieszeń → minimalny)</td><td>zapas CPU</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I16</td><td>Model widzący: dobór projektora do rodziny i rozmiaru</td><td>czeka na C3.6</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I17</td><td>Wybór karty dyskretnej; interfejs na karcie zintegrowanej</td><td>role kart</td><td>jest; dochodzi przełącznik</td><td>P2</td></tr>
+<tr><td>I18</td><td>Warianty silnika CUDA / Vulkan / ROCm: przełącz, zainstaluj, „Przywróć Vulkan”</td><td>pakiety silników CUDA / Vulkan / CPU</td><td>przenosimy przełączanie; ROCm przez WSL — nie (skrypt)</td><td>P2</td></tr>
+<tr><td>I19</td><td>Aktualizacja silnika: pobierz → sprawdź → podmień; stara wersja do pierwszego udanego wczytania</td><td>aktualizator programu z wycofaniem</td><td>przenosimy dla silników</td><td>P2</td></tr>
+<tr><td>I20</td><td>Wczytanie przy starcie; zwolnienie po bezczynności (300 s, 30–7200)</td><td>zwalnianie pamięci okna</td><td>przenosimy</td><td>P2</td></tr>
+<tr><td>I21</td><td>Strojenie do sprzętu: wątki, wsad, kontekst</td><td>klasa sprzętu i zalecenie</td><td>jest; uzupełnić</td><td>P2</td></tr>
+<tr><td>I22</td><td>Lista polecanych (ok. 70) i polskie rodziny na żywo</td><td>pakiety 1–6</td><td>przenosimy; lista do przeglądu licencji</td><td>P2</td></tr></tbody></table></div>
+<h2 id="j-tworczosc">J. Twórczość</h2>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Funkcja w Delcie</th><th>W Alfie dziś</th><th>Decyzja</th><th>Grupa</th></tr></thead><tbody><tr><td>J1</td><td>Studio obrazu: tekst → obraz, obraz → obraz (siła 0,75)</td><td>brak</td><td>przenosimy</td><td>P8</td></tr>
+<tr><td>J2</td><td>Silnik lokalny: SD 1.5, SDXL, FLUX.1, FLUX.2 Klein, Chroma; model rozmowy zwalnia kartę</td><td>brak</td><td>przenosimy jako proces poboczny</td><td>P8</td></tr>
+<tr><td>J3</td><td>Parametry: wymiary, kroki 1–200, CFG, ziarno, seria 1–8, 9 próbników, 8 proporcji</td><td>brak</td><td>przenosimy</td><td>P8</td></tr>
+<tr><td>J4</td><td>LoRA, ControlNet, IP-Adapter (w Delcie częściowo)</td><td>brak</td><td>przenosimy LoRA; reszta po sprawdzeniu</td><td>P8</td></tr>
+<tr><td>J5</td><td>Kreator promptu: 20 stylów, światło, nastrój, kamera, kompozycja, jakość, 5 zestawów negatywnych</td><td>brak</td><td>przenosimy</td><td>P8</td></tr>
+<tr><td>J6</td><td>Tłumaczenie promptu na angielski i „ulepsz”</td><td>brak</td><td>przenosimy</td><td>P8</td></tr>
+<tr><td>J7</td><td>Profile, szacunek pamięci, seria do 50 promptów, anulowanie</td><td>brak</td><td>przenosimy</td><td>P8</td></tr>
+<tr><td>J8</td><td>7 dostawców w chmurze, kolejka zapasowa, szacunek kosztu, wykrywanie modeli</td><td>brak</td><td>przenosimy (koszt w limitach Alfy)</td><td>P8</td></tr>
+<tr><td>J9</td><td>Tryb hybrydowy: wzbogacenie promptu, szkic i dopracowanie, wiele etapów</td><td>brak</td><td>przenosimy</td><td>P8</td></tr>
+<tr><td>J10</td><td>Galeria: szukanie, filtr modelu, podgląd z metadanymi, archiwum</td><td>brak</td><td>przenosimy; dochodzą ulubione i „użyj promptu ponownie”</td><td>P8</td></tr>
+<tr><td>J11</td><td>Studio opowieści: komiks / książka / artykuł, 1–24 strony, „biblia” stylu i postaci, eksport</td><td>brak</td><td>przenosimy; dochodzi poprawianie pojedynczej strony</td><td>P8</td></tr>
+<tr><td>J12</td><td>Menedżer kamer: do 3, okno na kamerę, analiza ciągła, rozpoznanie osoby, nauka z kadru, tryb pokazowy</td><td>strona Kamery (USB)</td><td>przenosimy brakujące</td><td>P8, C3</td></tr>
+<tr><td>J13</td><td>Panel Audio: tekst → mowa → pobierz; nagranie → tekst → kopiuj</td><td>czytanie na głos, dyktowanie</td><td>przenosimy jako jeden panel</td><td>P8</td></tr></tbody></table></div>
+<h2 id="k-awatar">K. Awatar</h2>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Funkcja w Delcie</th><th>W Alfie dziś</th><th>Decyzja</th><th>Grupa</th></tr></thead><tbody><tr><td>K1</td><td>5 trybów: kula, 2D, 2.5D z fizyką, 3D, modele VRM / GLB / FBX</td><td>znak agentki z ustami wg głośności</td><td>przenosimy</td><td>P9</td></tr>
+<tr><td>K2</td><td>Rozmiary, włącznik, osobne okno</td><td>brak</td><td>przenosimy</td><td>P9</td></tr>
+<tr><td>K3</td><td>Menedżer modeli: import przeciągnięciem, ulubione, 8 dołączonych awatarów</td><td>brak</td><td>przenosimy; dołączone modele po sprawdzeniu licencji</td><td>P9</td></tr>
+<tr><td>K4</td><td>Ustawienia kuli, 2D, 2.5D, 3D (oddech, mruganie, wzrok, włosy, wiatr, klatki 15–60)</td><td>brak</td><td>przenosimy</td><td>P9</td></tr>
+<tr><td>K5</td><td>Ustawienia modelu 3D (kamera, światło, tło) — w Delcie niepodłączone</td><td>brak</td><td>przenosimy działające</td><td>P9</td></tr>
+<tr><td>K6</td><td>16 emocji z oznaczeń i słów; kolejność: ręczna &gt; intonacja &gt; treść</td><td>brak</td><td>przenosimy</td><td>P9</td></tr>
+<tr><td>K7</td><td>Ruch ust: głośność i 12 kształtów z zegarem dźwięku</td><td>poziom głośności</td><td>przenosimy</td><td>P9</td></tr>
+<tr><td>K8</td><td>Regulator jakości (15–120 klatek), pauza w tle, ograniczenie ruchu</td><td>reguła ograniczenia ruchu</td><td>przenosimy</td><td>P9</td></tr></tbody></table></div>
+<h2 id="l-multimedia">L. Multimedia</h2>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Funkcja w Delcie</th><th>W Alfie dziś</th><th>Decyzja</th><th>Grupa</th></tr></thead><tbody><tr><td>L1</td><td>Odtwarzacz: kolejka, poprzedni / następny, powtarzanie, przewijanie, głośność, wideo</td><td>brak</td><td>przenosimy</td><td>P10</td></tr>
+<tr><td>L2</td><td>Most sterowania: polecenia odtwarzania z rdzenia do okna, „co gra”</td><td>brak</td><td>przenosimy przez zdarzenia Alfy</td><td>P10</td></tr>
+<tr><td>L3</td><td>Polecenia głosem i tekstem („włącz muzykę”, „głośniej” — odtwarzacz czy system)</td><td>brak</td><td>przenosimy</td><td>P10</td></tr>
+<tr><td>L4</td><td>Wyszukiwanie i pobieranie z serwisów wideo</td><td>brak</td><td>wstrzymane — osobna decyzja właściciela</td><td>P10</td></tr>
+<tr><td>L5</td><td>Biblioteka, playlisty, historia</td><td>brak</td><td>nie (decyzja właściciela)</td><td>—</td></tr></tbody></table></div>
+<h2 id="m-trening-diagnostyka-przeplywy-start">M. Trening, diagnostyka, przepływy, start</h2>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Funkcja w Delcie</th><th>W Alfie dziś</th><th>Decyzja</th><th>Grupa</th></tr></thead><tbody><tr><td>M1</td><td>Laboratorium: projekty, obrazy z opisami, konfiguracja dla zewnętrznego narzędzia, odczyt wyników</td><td>brak</td><td>przenosimy; samo trenowanie — kandydat etapu H</td><td>P11</td></tr>
+<tr><td>M2</td><td>Pulpit testowy: „Testuj wszystko”, „Testuj 2×”, 32 testy w 8 grupach, historia 6 przebiegów, raport</td><td>Zdrowie systemu, diagnosta</td><td>przenosimy testy i raport</td><td>P11</td></tr>
+<tr><td>M3</td><td>Diagnostyka okna: testy połączenia, sprzętu i przeglądarki, ocena, podpowiedzi</td><td>Zdrowie systemu</td><td>dostosowujemy</td><td>P11</td></tr>
+<tr><td>M4</td><td>Migawki diagnostyczne: zapis, porównanie (do 100, 60 dni)</td><td>brak</td><td>przenosimy</td><td>P11</td></tr>
+<tr><td>M5</td><td>Przepływy: kanwa z paletą, siatką, minimapą; tryby Projekt / Testuj / Analiza</td><td>brak</td><td>przenosimy</td><td>P11</td></tr>
+<tr><td>M6</td><td>Węzły: wejście tekstu, model, szablon, parser JSON, warunek, pamięć sesji, pamięć długa, RAG, wyjście</td><td>brak</td><td>przenosimy; 5 węzłów „wkrótce” Delty — do macierzy „wkrótce” Alfy</td><td>P11</td></tr>
+<tr><td>M7</td><td>Wykonawca: tylko graf bez pętli, 100 węzłów, 500 kroków, 120 s na węzeł, 300 s na przebieg</td><td>limity zadań</td><td>przenosimy</td><td>P11</td></tr>
+<tr><td>M8</td><td>„Ustaw jako mózg rozmowy”</td><td>brak</td><td>przenosimy</td><td>P11</td></tr>
+<tr><td>M9</td><td>Instalator: środowisko, pakiety, silniki, katalog modeli</td><td>instalator programu, pakiety modeli</td><td>nie (Python)</td><td>—</td></tr>
+<tr><td>M10</td><td>Bramka gotowości przy starcie z testami i podpowiedziami</td><td>ekran ładowania</td><td>przenosimy</td><td>P3</td></tr></tbody></table></div>
+<h2 id="n-rzeczy-w-delcie-zaplanowane-niezrobione-kandydaci">N. Rzeczy w Delcie zaplanowane, niezrobione — kandydaci</h2>
+<div class="tbl"><table><thead><tr><th>Nr</th><th>Temat</th><th>Gdzie w planie Alfy</th></tr></thead><tbody><tr><td>N1</td><td>Głos premium z klonowaniem (Chatterbox), pełny dupleks, odszumianie, rozróżnianie mówiących</td><td>H.3; odszumianie Alfa ma</td></tr>
+<tr><td>N2</td><td>Model pomocniczy do dekodowania spekulatywnego, budżet rozumowania, własny szablon rozmowy</td><td>P2 — do oceny</td></tr>
+<tr><td>N3</td><td>Kilka kart w trybie automatycznym</td><td>P2</td></tr>
+<tr><td>N4</td><td>Awatar: śledzenie twarzy, nowy silnik graficzny, profile Eco / Ultra</td><td>H</td></tr>
+<tr><td>N5</td><td>Linux i własny system</td><td>etap G</td></tr>
+<tr><td>N6</td><td>Agent programista wykonujący naprawdę</td><td>P12</td></tr>
+<tr><td>N7</td><td>Wiadomości: karty w rozmowie, licznik nowych, usuwanie powtórek</td><td>P5</td></tr>
+<tr><td>N8</td><td>Obrazy: domalowywanie, powiększanie; ulubione w galerii</td><td>P8</td></tr>
+<tr><td>N9</td><td>Węzły przepływu: plik, zdarzenie z sieci, przekształcenie, API, poczta</td><td>P11, P14</td></tr></tbody></table></div>
+<h2 id="postep-po-wersji-0-0-43-2026-10-12">Postęp po wersji 0.0.43 (2026-10-12)</h2>
+<p>Pozycje macierzy ruszone w nocy 11/12 października: A23 i I3 — zrobione; A34, A35, B11 — częściowo. Rozmowa
+i mowa (grupa P1) nie ma wierszy w macierzy — jej stan jest w <a href="plan-19-specyfikacja-glosu-delty.html"><code>19</code></a>
+i w <a href="plan-17-przeniesienie-z-delty.html"><code>17</code></a>. Raport: <a href="plan-23-raport-nocny-2026-10-12.html"><code>23</code></a>.</p>
+<h2 id="podsumowanie-liczbowe">Podsumowanie liczbowe</h2>
+<p>Wierszy w obu częściach (bez listy kandydatów N): 208 — grupują ok. 400 pojedynczych funkcji. Decyzje: przenosimy — 146 ·
+dostosowujemy — 20 · jest — 38 · nie — 3 · wstrzymane — 1.</p>
+</article>
+<footer>Źródło: <code>docs/plan/21-macierz-delty-czesc-2.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

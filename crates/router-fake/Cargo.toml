@@ -1,0 +1,19 @@
+[package]
+name = "router-fake"
+description = "Atrapa Routera: skryptowane decyzje per klasa, zapis report(), obwody z kontraktu na ręcznym zegarze"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+router-contract = { path = "../router-contract" }
+providers-contract = { path = "../providers-contract" }
+
+[dev-dependencies]
+router-contract = { path = "../router-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

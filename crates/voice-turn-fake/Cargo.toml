@@ -1,0 +1,18 @@
+[package]
+name = "voice-turn-fake"
+description = "voice-turn: deterministyczne atrapy (model końca tury ze skryptu, detektor z adnotacji czasu końca tury)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+voice-turn-contract = { path = "../voice-turn-contract" }
+
+[dev-dependencies]
+voice-turn-contract = { path = "../voice-turn-contract", features = ["contract-tests"] }
+
+[lints]
+workspace = true

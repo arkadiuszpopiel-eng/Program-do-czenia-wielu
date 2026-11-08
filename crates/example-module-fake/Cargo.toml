@@ -1,0 +1,20 @@
+[package]
+name = "example-module-fake"
+description = "Wzorzec modułu (echo): deterministyczna atrapa do testów innych modułów"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+example-module-contract.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+example-module-contract = { workspace = true, features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

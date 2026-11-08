@@ -1,0 +1,28 @@
+[package]
+name = "memory-consolidation-contract"
+description = "Konsolidacja pamięci (Strażniczka pamięci): kontrakt — porty LLM/budżetu/stanu maszyny, polityka startu, reguły deterministyczne, przebieg z dziennikiem i cofaniem"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+memory-contract = { path = "../memory-contract" }
+core-bus-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+memory-fake = { path = "../memory-fake" }
+memory-consolidation-fake = { path = "../memory-consolidation-fake" }
+tokio.workspace = true
+proptest.workspace = true
+
+[lints]
+workspace = true

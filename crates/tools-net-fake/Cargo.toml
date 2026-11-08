@@ -1,0 +1,23 @@
+[package]
+name = "tools-net-fake"
+description = "tools-net: atrapy — narzędzia (prawdziwe manifesty i walidacja adresów z kontraktu, wyniki skryptowane, odczyty niezaufane) oraz wirtualna sieć dla HttpPort (trasy, przekierowania, treść nieskończona i wisząca, hosty z adresem niepublicznym, dziennik żądań) i wyszukiwarka skryptowana"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-net-contract = { path = "../tools-net-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+lib-netguard = { path = "../lib-netguard" }
+async-trait.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tools-net-contract = { path = "../tools-net-contract", features = ["contract-tests"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

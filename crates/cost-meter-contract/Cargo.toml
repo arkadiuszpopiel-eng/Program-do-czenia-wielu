@@ -1,0 +1,30 @@
+[package]
+name = "cost-meter-contract"
+description = "Kontrakt licznika kosztów: rekordy (mikro-USD/mikro-PLN, liczby całkowite), agregaty, kurs NBP z cache i kursem zapasowym, limity (wyłączalne), decyzja budżetowa"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+accounts-hub-contract = { path = "../accounts-hub-contract" }
+core-bus-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+chrono.workspace = true
+async-trait.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

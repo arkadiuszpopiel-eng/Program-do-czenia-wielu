@@ -1,0 +1,12 @@
+# Jednolite końce linii (LF) w repo i przy checkout — także na Windows (bez core.autocrlf).
+# Skrypty, JSON Schema i snapshoty porównywane bajt-po-bajcie nie mogą zależeć od CRLF.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.png binary
+*.jpg binary
+*.ico binary
+*.wav binary
+*.gguf binary
+*.onnx binary

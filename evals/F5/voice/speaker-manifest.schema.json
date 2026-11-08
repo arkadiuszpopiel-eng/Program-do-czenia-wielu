@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "Role": {
+      "description": "Rola pozycji.",
+      "oneOf": [
+        {
+          "const": "enroll",
+          "description": "Wypowiedź rejestracji właściciela (typ 11 protokołu nagrań).",
+          "type": "string"
+        },
+        {
+          "const": "trial",
+          "description": "Próba weryfikacji (właściciel albo obcy).",
+          "type": "string"
+        }
+      ]
+    },
+    "Source": {
+      "description": "Źródło nagrania.",
+      "oneOf": [
+        {
+          "const": "own",
+          "description": "Korpus własny (bramka #3).",
+          "type": "string"
+        },
+        {
+          "const": "common_voice",
+          "description": "Common Voice PL (obce głosy; licencja CC0).",
+          "type": "string"
+        },
+        {
+          "const": "tts",
+          "description": "Synteza TTS (obce głosy, także próby podszycia).",
+          "type": "string"
+        },
+        {
+          "const": "synthetic",
+          "description": "Próbka syntetyczna CI.",
+          "type": "string"
+        }
+      ]
+    },
+    "SynthVoice": {
+      "description": "Przepis próbki syntetycznej: ton podstawowy i ziarno.",
+      "properties": {
+        "f0": {
+          "description": "F0 (Hz).",
+          "format": "float",
+          "type": "number"
+        },
+        "secs": {
+          "description": "Długość (s).",
+          "format": "float",
+          "type": "number"
+        },
+        "seed": {
+          "description": "Ziarno.",
+          "format": "uint64",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "f0",
+        "seed",
+        "secs"
+      ],
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Pozycja manifestu.",
+  "properties": {
+    "audio": {
+      "default": null,
+      "description": "WAV 16 kHz mono (względnie wobec `--audio-root`, bez `..`).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "id": {
+      "description": "Unikalny identyfikator `[a-z0-9._:-]`.",
+      "type": "string"
+    },
+    "note": {
+      "default": null,
+      "description": "Uwagi (szept, odległość).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "role": {
+      "$ref": "#/$defs/Role",
+      "description": "Rola."
+    },
+    "source": {
+      "$ref": "#/$defs/Source",
+      "description": "Źródło."
+    },
+    "speaker": {
+      "description": "`owner` albo identyfikator obcego mówcy (np. `cv:<hash>`, `tts:pocket-beta`).",
+      "type": "string"
+    },
+    "split": {
+      "description": "`dev` / `test`.",
+      "type": "string"
+    },
+    "synth": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SynthVoice"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Przepis syntetyczny (zamiast `audio`)."
+    }
+  },
+  "required": [
+    "id",
+    "speaker",
+    "role",
+    "split",
+    "source"
+  ],
+  "title": "SpeakerItem",
+  "type": "object"
+}

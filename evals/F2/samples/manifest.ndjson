@@ -1,0 +1,5 @@
+# Próbki syntetyczne F2 (CI): format manifestu bez nagrań człowieka. Audio generuje
+# `alfa-voice-eval synth evals/F2/samples/manifest.ndjson <katalog>` (pliki .wav są w .gitignore).
+{"id":"syn-free-01","audio":"synthetic/syn-free-01.wav","kind":"free_speech","split":"dev","conditions":{"machine":"synthetic","environment":"quiet","mic":"virtual"},"transcript":"jutro o dziewiątej mam spotkanie z zespołem","synth":{"seed":1,"lead_ms":300,"speech_ms":1800,"tail_ms":700}}
+{"id":"syn-stop-02","audio":"synthetic/syn-stop-02.wav","kind":"command","split":"test","conditions":{"machine":"synthetic","environment":"quiet","mic":"virtual"},"transcript":"stop","command":"stop","onset_ms":300,"synth":{"seed":2,"lead_ms":300,"speech_ms":200,"tail_ms":700}}
+{"id":"syn-mhm-03","audio":"synthetic/syn-mhm-03.wav","kind":"backchannel","split":"test","conditions":{"machine":"synthetic","environment":"speakers","mic":"virtual"},"transcript":"mhm","tts":{"text":"Jutro rano masz spotkanie zespołu, potem przegląd budżetu, a po południu rozmowę z klientem.","audio_ms":6000,"played_at_start_ms":1500},"synth":{"seed":3,"lead_ms":300,"speech_ms":250,"tail_ms":700}}

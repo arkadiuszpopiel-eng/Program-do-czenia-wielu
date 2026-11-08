@@ -1,0 +1,21 @@
+node_modules
+dist
+storybook-static
+pnpm-lock.yaml
+target
+packages/ui-kit/src/tokens.css
+packages/ui-kit/src/tokens.ts
+docs
+crates
+.github
+providers-catalog
+# Obszary innych modułów (Rust, schematy, evals) i pliki sterujące — nie formatujemy ich Prettierem.
+evals
+packages/schemas
+scripts/README.md
+README.md
+AGENTS.md
+CLAUDE.md
+Cargo.lock
+# Generowany przez Rust (`crates/app-models/tests/bundles_ui.rs`, ALFA_UPDATE_FIXTURES=1).
+apps/desktop/ui/src/lib/api/fake/bundles.json

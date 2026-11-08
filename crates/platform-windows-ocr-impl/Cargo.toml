@@ -1,0 +1,28 @@
+[package]
+name = "platform-windows-ocr-impl"
+description = "platform-windows (F6): OcrPort dla tools-vision przez Windows.Media.Ocr (WinRT) — dekodowanie BitmapDecoder z kontrolą wymiarów przed pikselami, skalowanie do limitu silnika i współrzędne w pikselach wejścia; poza Windows „nieobsługiwane”"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+# Implementacja portu `tools-vision-contract::OcrPort`; jedno z miejsc z windows-rs (`deny.toml`: `wrappers`
+# dla `windows`). Bez `unsafe`: wywołania WinRT w windows-rs są bezpieczne, a MTA inicjuje windows-core.
+[dependencies]
+tools-vision-contract = { path = "../tools-vision-contract" }
+
+# Ta sama wersja windows-rs co w `platform-windows-impl` (AGENTS.md: jeden crate, jedna wersja).
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = [
+    "Foundation",
+    "Foundation_Collections",
+    "Globalization",
+    "Graphics_Imaging",
+    "Media_Ocr",
+    "Storage_Streams",
+] }
+
+[lints]
+workspace = true

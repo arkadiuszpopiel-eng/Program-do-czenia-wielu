@@ -1,0 +1,28 @@
+[package]
+name = "marshal-impl"
+description = "Marszałek (F5): implementacja modułu — nadzór na zdarzeniach scheduler.*/triggers.* z magistrali, eskalacje marshal.escalation, raport dzienny wg crona w strefie Europe/Warsaw, księga reguł w pliku, port tłumacza (LLM)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+marshal-contract = { path = "../marshal-contract" }
+triggers-contract = { path = "../triggers-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+futures-util.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+marshal-contract = { path = "../marshal-contract", features = ["contract-tests"] }
+core-bus-fake = { path = "../core-bus-fake" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

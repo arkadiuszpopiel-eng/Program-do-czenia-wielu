@@ -1,0 +1,357 @@
+{
+ "id": "F8-04",
+ "version": 1,
+ "description": "Zmiany R0 (ACCEPTANCE F8-04): 50 prób — zawężające, bezpieczne, rozszerzające, neutralne i odrzucane. Próg: 0 rozszerzających/neutralnych wdrożonych automatycznie; każde wdrożenie automatyczne cofalne (rollback przywraca wartość 1:1).",
+ "cases": [
+  {
+   "id": "r01",
+   "key": "memory.recall.top_k",
+   "old": 8,
+   "new": 4,
+   "expect": "narrowing"
+  },
+  {
+   "id": "r02",
+   "key": "memory.recall.top_k",
+   "old": 10,
+   "new": 6,
+   "expect": "narrowing"
+  },
+  {
+   "id": "r03",
+   "key": "memory.recall.top_k",
+   "old": 20,
+   "new": 1,
+   "expect": "narrowing"
+  },
+  {
+   "id": "r04",
+   "key": "memory.recall.top_k",
+   "old": 5,
+   "new": 3,
+   "expect": "narrowing"
+  },
+  {
+   "id": "r05",
+   "key": "memory.recall.top_k",
+   "old": 12,
+   "new": 11,
+   "expect": "narrowing"
+  },
+  {
+   "id": "r06",
+   "key": "memory.recall.top_k",
+   "old": 3,
+   "new": 2,
+   "expect": "narrowing"
+  },
+  {
+   "id": "r07",
+   "key": "memory.recall.top_k",
+   "old": 15,
+   "new": 9,
+   "expect": "narrowing"
+  },
+  {
+   "id": "r08",
+   "key": "voice.dialog.backchannel_enabled",
+   "old": true,
+   "new": false,
+   "expect": "narrowing"
+  },
+  {
+   "id": "r09",
+   "key": "ui.suggestions.enabled",
+   "old": true,
+   "new": false,
+   "expect": "narrowing"
+  },
+  {
+   "id": "r10",
+   "key": "router.weights.trasa0_czat",
+   "old": 0.5,
+   "new": 0.55,
+   "expect": "safe"
+  },
+  {
+   "id": "r11",
+   "key": "router.weights.trasa1_czat",
+   "old": 0.3,
+   "new": 0.4,
+   "expect": "safe"
+  },
+  {
+   "id": "r12",
+   "key": "router.weights.trasa2_czat",
+   "old": 0.9,
+   "new": 0.85,
+   "expect": "safe"
+  },
+  {
+   "id": "r13",
+   "key": "router.weights.trasa3_czat",
+   "old": 0.0,
+   "new": 0.1,
+   "expect": "safe"
+  },
+  {
+   "id": "r14",
+   "key": "router.weights.trasa4_czat",
+   "old": 1.0,
+   "new": 0.95,
+   "expect": "safe"
+  },
+  {
+   "id": "r15",
+   "key": "router.weights.trasa5_czat",
+   "old": 0.7,
+   "new": 0.65,
+   "expect": "safe"
+  },
+  {
+   "id": "r16",
+   "key": "router.weights.trasa6_czat",
+   "old": 0.45,
+   "new": 0.5,
+   "expect": "safe"
+  },
+  {
+   "id": "r17",
+   "key": "voice.dialog.interrupt_min_ms",
+   "old": 300,
+   "new": 450,
+   "expect": "safe"
+  },
+  {
+   "id": "r18",
+   "key": "voice.dialog.interrupt_min_ms",
+   "old": 600,
+   "new": 500,
+   "expect": "safe"
+  },
+  {
+   "id": "r19",
+   "key": "voice.turn.patience_ms",
+   "old": 800,
+   "new": 1000,
+   "expect": "safe"
+  },
+  {
+   "id": "r20",
+   "key": "voice.turn.patience_ms",
+   "old": 1500,
+   "new": 1300,
+   "expect": "safe"
+  },
+  {
+   "id": "r21",
+   "key": "voice.persona.lexicon.nbp",
+   "old": "en be pe",
+   "new": "en-be-pe",
+   "expect": "safe"
+  },
+  {
+   "id": "r22",
+   "key": "voice.persona.lexicon.lodz",
+   "old": "lodz",
+   "new": "łudź",
+   "expect": "safe"
+  },
+  {
+   "id": "r23",
+   "key": "voice.persona.lexicon.pkp",
+   "old": "pe ka pe",
+   "new": "pe-ka-pe",
+   "expect": "safe"
+  },
+  {
+   "id": "r24",
+   "key": "voice.persona.lexicon.rtx",
+   "old": "rtx",
+   "new": "er-te-iks",
+   "expect": "safe"
+  },
+  {
+   "id": "r25",
+   "key": "voice.persona.lexicon.bielik",
+   "old": "bielik",
+   "new": "bje-lik",
+   "expect": "safe"
+  },
+  {
+   "id": "r26",
+   "key": "memory.recall.top_k",
+   "old": 4,
+   "new": 8,
+   "expect": "widening"
+  },
+  {
+   "id": "r27",
+   "key": "memory.recall.top_k",
+   "old": 1,
+   "new": 20,
+   "expect": "widening"
+  },
+  {
+   "id": "r28",
+   "key": "memory.recall.top_k",
+   "old": 6,
+   "new": 7,
+   "expect": "widening"
+  },
+  {
+   "id": "r29",
+   "key": "memory.recall.top_k",
+   "old": 2,
+   "new": 3,
+   "expect": "widening"
+  },
+  {
+   "id": "r30",
+   "key": "memory.recall.top_k",
+   "old": 9,
+   "new": 15,
+   "expect": "widening"
+  },
+  {
+   "id": "r31",
+   "key": "voice.dialog.backchannel_enabled",
+   "old": false,
+   "new": true,
+   "expect": "widening"
+  },
+  {
+   "id": "r32",
+   "key": "ui.suggestions.enabled",
+   "old": false,
+   "new": true,
+   "expect": "widening"
+  },
+  {
+   "id": "r33",
+   "key": "router.weights.duzy_krok",
+   "old": 0.1,
+   "new": 0.9,
+   "expect": "neutral"
+  },
+  {
+   "id": "r34",
+   "key": "router.weights.zero",
+   "old": 0.5,
+   "new": 0.0,
+   "expect": "neutral"
+  },
+  {
+   "id": "r35",
+   "key": "voice.turn.patience_ms",
+   "old": 500,
+   "new": 2000,
+   "expect": "neutral"
+  },
+  {
+   "id": "r36",
+   "key": "voice.dialog.interrupt_min_ms",
+   "old": 200,
+   "new": 1000,
+   "expect": "neutral"
+  },
+  {
+   "id": "r37",
+   "key": "roles.asystentka.prompt",
+   "old": "Odpowiadaj krótko.",
+   "new": "Odpowiadaj krótko i rzeczowo.",
+   "expect": "neutral"
+  },
+  {
+   "id": "r38",
+   "key": "personas.alfa.style_prompt",
+   "old": "Ciepło.",
+   "new": "Ciepło i spokojnie.",
+   "expect": "neutral"
+  },
+  {
+   "id": "r39",
+   "key": "roles.badaczka.prompt",
+   "old": "Szukaj źródeł.",
+   "new": "Szukaj i cytuj źródła.",
+   "expect": "neutral"
+  },
+  {
+   "id": "r40",
+   "key": "router.weights.x",
+   "old": 0.5,
+   "new": 1.5,
+   "expect": "rejected"
+  },
+  {
+   "id": "r41",
+   "key": "memory.recall.top_k",
+   "old": 8,
+   "new": 0,
+   "expect": "rejected"
+  },
+  {
+   "id": "r42",
+   "key": "memory.recall.top_k",
+   "old": 8,
+   "new": "4",
+   "expect": "rejected"
+  },
+  {
+   "id": "r43",
+   "key": "voice.persona.lexicon.a",
+   "old": "a",
+   "new": "http://x.example",
+   "expect": "rejected"
+  },
+  {
+   "id": "r44",
+   "key": "voice.turn.patience_ms",
+   "old": 800,
+   "new": 100,
+   "expect": "rejected"
+  },
+  {
+   "id": "r45",
+   "key": "voice.dialog.interrupt_min_ms",
+   "old": 300,
+   "new": 5000,
+   "expect": "rejected"
+  },
+  {
+   "id": "r46",
+   "key": "kernel.voice.x",
+   "old": 1,
+   "new": 2,
+   "expect": "rejected"
+  },
+  {
+   "id": "r47",
+   "key": "voice.tts.engine",
+   "old": "piper",
+   "new": "pocket",
+   "expect": "rejected"
+  },
+  {
+   "id": "r48",
+   "key": "router.weights.budget",
+   "old": 0.5,
+   "new": 0.6,
+   "expect": "rejected"
+  },
+  {
+   "id": "r49",
+   "key": "memory.recall.top_k",
+   "old": 8,
+   "new": 8,
+   "expect": "rejected"
+  },
+  {
+   "id": "r50",
+   "key": "voice.persona.lexicon.dlugi",
+   "old": "a",
+   "new": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "expect": "rejected"
+  }
+ ]
+}

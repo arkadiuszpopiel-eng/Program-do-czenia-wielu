@@ -1,0 +1,14 @@
+packages:
+  - 'apps/*'
+  - 'apps/desktop/ui'
+  - 'packages/*'
+onlyBuiltDependencies:
+  - esbuild
+overrides:
+  # Audyt 2026-10-14 (A-08): GHSA-82fw-gwwq-j7x9 w @vitest/mocker < 4.1.11 (zależność Storybooka 9.1);
+  # verify 0.0.69: GHSA-qxg6-89mg-rqv8 i GHSA-xp26-3454-mjgp (< 4.1.12).
+  '@vitest/mocker@<4.1.12': 4.1.12
+  # verify 0.0.79 (2026-10-31): GHSA-g3hv-75wg-m249 (DoS przy wzorcach glob) w minimatch < 11.0.1 — eslint 9,
+  # @eslint/config-array, @eslint/eslintrc i typescript-estree używają tylko klasy `Minimatch` i funkcji
+  # `minimatch`, które 11.x eksportuje tak samo (sprawdzone: lint całego repozytorium zielony).
+  'minimatch@<11.0.1': 11.0.3

@@ -1,0 +1,871 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://alfa.local/evals/F6/tasks.schema.json",
+  "title": "Zestaw zadań computer use F6 (jeden plik = jedna kategoria)",
+  "description": "Format v1 — rozszerzenie formatu evals/F3/tools (id, kind, goal, setup, expect) o stan maszyny wirtualnej, sondy stanu końcowego, zdarzenia, zgody, trasę i ryzyko. Opis pól: README.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "kind", "description", "tasks"],
+  "properties": {
+    "version": {"const": 1},
+    "kind": {
+      "enum": ["pliki", "aplikacje", "przegladarka", "office", "ustawienia"]
+    },
+    "description": {"type": "string"},
+    "tasks": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/task"},
+      "minItems": 10
+    }
+  },
+  "definitions": {
+    "number": {
+      "type": "object",
+      "properties": {
+        "value": {"type": "number"},
+        "tolerance": {"type": "number", "minimum": 0}
+      },
+      "additionalProperties": false,
+      "required": ["value", "tolerance"]
+    },
+    "fileCheck": {
+      "type": "object",
+      "properties": {
+        "equals": {"type": "string"},
+        "contains": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "contains_ci": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "contains_any_ci": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "minItems": 1
+          }
+        },
+        "not_contains": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "numbers": {"type": "array", "items": {"$ref": "#/definitions/number"}},
+        "max_chars": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "pattern": "^(tool|broker|agent)\\.[a-z_.]+$"
+        },
+        "min": {"type": "integer", "minimum": 1},
+        "where": {"type": "object"}
+      },
+      "additionalProperties": false,
+      "required": ["kind"]
+    },
+    "cell": {
+      "type": "object",
+      "properties": {
+        "value": {"type": ["string", "number", "boolean"]},
+        "tolerance": {"type": "number", "minimum": 0},
+        "formula_any": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 1
+        },
+        "formula_contains": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "probe": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "window"},
+            "process": {"type": "string"},
+            "title_contains": {"type": "string"},
+            "state": {"enum": ["normal", "minimized", "maximized", "absent"]},
+            "state_any": {
+              "type": "array",
+              "items": {"enum": ["normal", "minimized", "maximized"]}
+            },
+            "rect_fraction": {
+              "type": "object",
+              "properties": {
+                "left": {
+                  "type": "array",
+                  "items": {"type": "number"},
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "right": {
+                  "type": "array",
+                  "items": {"type": "number"},
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "top": {
+                  "type": "array",
+                  "items": {"type": "number"},
+                  "minItems": 2,
+                  "maxItems": 2
+                },
+                "bottom": {
+                  "type": "array",
+                  "items": {"type": "number"},
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "required": ["type", "process"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "process"},
+            "image": {"type": "string"},
+            "running": {"type": "boolean"}
+          },
+          "additionalProperties": false,
+          "required": ["type", "image", "running"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "process_tree"},
+            "image": {"type": "string"},
+            "cmdline_not_contains": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": ["type", "image", "cmdline_not_contains"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "uia_text"},
+            "process": {"type": "string"},
+            "automation_id": {"type": "string"},
+            "digits_equal": {"type": "string", "pattern": "^[0-9]+$"},
+            "contains_ci": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": ["type", "process", "automation_id"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "registry"},
+            "key": {"type": "string", "pattern": "^HKCU\\\\"},
+            "name": {"type": "string"},
+            "equals": {"type": ["integer", "string"]}
+          },
+          "additionalProperties": false,
+          "required": ["type", "key", "name", "equals"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "env_user"},
+            "name": {"type": "string"},
+            "equals_any": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 1
+            },
+            "absent": {"type": "boolean"}
+          },
+          "additionalProperties": false,
+          "required": ["type", "name"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "service"},
+            "name": {"type": "string"},
+            "state": {"enum": ["running", "stopped"]},
+            "start_type": {"enum": ["automatic", "manual", "disabled"]}
+          },
+          "additionalProperties": false,
+          "required": ["type", "name", "state"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "recycle_bin"},
+            "contains": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 0
+            },
+            "not_contains": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 0
+            },
+            "origin": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": ["type"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "zip"},
+            "path": {"type": "string"},
+            "entries": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 1
+            },
+            "prefix_any": {"type": "array", "items": {"type": "string"}},
+            "verify_content": {"type": "boolean"}
+          },
+          "additionalProperties": false,
+          "required": ["type", "path", "entries"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "csv"},
+            "path": {"type": "string"},
+            "delimiter": {"type": "string", "minLength": 1, "maxLength": 1},
+            "encoding": {"enum": ["utf-8"]},
+            "header": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 1
+            },
+            "header_case_insensitive": {"type": "boolean"},
+            "rows": {
+              "type": "array",
+              "items": {"type": "array", "items": {"type": "string"}}
+            },
+            "order_matters": {"type": "boolean"}
+          },
+          "additionalProperties": false,
+          "required": ["type", "path", "delimiter", "header", "rows"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "image"},
+            "path": {"type": "string"},
+            "format": {"enum": ["png", "jpg", "gif", "bmp", "webp"]},
+            "width": {"type": "integer"},
+            "height": {"type": "integer"}
+          },
+          "additionalProperties": false,
+          "required": ["type", "path", "format", "width", "height"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "media"},
+            "path": {"type": "string"},
+            "format": {"type": "string"},
+            "duration_ms": {
+              "type": "array",
+              "items": {"type": "number"},
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "additionalProperties": false,
+          "required": ["type", "path", "format"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "word"},
+            "path": {"type": "string"},
+            "contains": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 0
+            },
+            "not_contains": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 0
+            },
+            "paragraph_count": {"type": "integer", "minimum": 1},
+            "paragraph": {
+              "type": "object",
+              "properties": {
+                "index": {"type": "integer", "minimum": 1},
+                "text_equals": {"type": "string"},
+                "bold": {"type": "boolean"}
+              },
+              "additionalProperties": false,
+              "required": ["index"]
+            },
+            "table": {
+              "type": "object",
+              "properties": {
+                "index": {"type": "integer"},
+                "cells": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {"type": "string", "minLength": 1},
+                    "minItems": 1
+                  }
+                }
+              },
+              "additionalProperties": false,
+              "required": ["index", "cells"]
+            }
+          },
+          "additionalProperties": false,
+          "required": ["type", "path"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "excel"},
+            "path": {"type": "string"},
+            "sheet": {"type": "string"},
+            "recalculate": {"type": "boolean"},
+            "sheets_include": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 1
+            },
+            "cells": {
+              "type": "object",
+              "patternProperties": {"^[A-Z]{1,3}[0-9]+$": {"$ref": "#/definitions/cell"}},
+              "additionalProperties": false
+            },
+            "column_values": {
+              "type": "object",
+              "properties": {
+                "column": {"type": "string", "pattern": "^[A-Z]{1,3}$"},
+                "set": {
+                  "type": "array",
+                  "items": {"type": "string", "minLength": 1},
+                  "minItems": 1
+                },
+                "allow_header": {
+                  "type": "array",
+                  "items": {"type": "string", "minLength": 1},
+                  "minItems": 0
+                }
+              },
+              "additionalProperties": false,
+              "required": ["column", "set"]
+            }
+          },
+          "additionalProperties": false,
+          "required": ["type", "path", "sheet"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "explorer_view"},
+            "folder": {"type": "string"},
+            "view_mode": {
+              "enum": ["details", "list", "small_icons", "medium_icons", "large_icons", "tiles", "content"]
+            }
+          },
+          "additionalProperties": false,
+          "required": ["type", "folder", "view_mode"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "download"},
+            "name": {"type": "string"},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "motw_zone": {"const": 3},
+            "in_quarantine": {"type": "boolean"}
+          },
+          "additionalProperties": false,
+          "required": ["type", "name", "sha256"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "browser_page"},
+            "url_contains": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 0
+            },
+            "url_not_contains": {
+              "type": "array",
+              "items": {"type": "string", "minLength": 1},
+              "minItems": 0
+            },
+            "query": {
+              "type": "object",
+              "additionalProperties": {"type": "string"}
+            },
+            "title_contains": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": ["type"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "motw"},
+            "path": {"type": "string"},
+            "zone": {"const": 3}
+          },
+          "additionalProperties": false,
+          "required": ["type", "path", "zone"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "approval"},
+            "tag": {"type": "string"},
+            "approved": {"const": false}
+          },
+          "additionalProperties": false,
+          "required": ["type", "tag", "approved"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {"const": "tree_not_contains"},
+            "root": {"type": "string"},
+            "text": {"type": "string", "minLength": 8}
+          },
+          "additionalProperties": false,
+          "required": ["type", "root", "text"]
+        }
+      ]
+    },
+    "app": {
+      "type": "object",
+      "properties": {
+        "launch": {"type": "string"},
+        "args": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "state": {"enum": ["normal", "minimized", "maximized"]},
+        "window_title_contains": {"type": "string"},
+        "typed_text": {"type": "string"},
+        "calculator_mode": {"enum": ["standard", "scientific", "programmer"]}
+      },
+      "additionalProperties": false,
+      "required": ["launch"]
+    },
+    "setup": {
+      "type": "object",
+      "properties": {
+        "level": {"enum": ["L3", "L4"]},
+        "files": {
+          "type": "object",
+          "additionalProperties": {"type": "string"}
+        },
+        "dirs": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "profile_files": {
+          "type": "object",
+          "additionalProperties": {"type": "string"}
+        },
+        "zips": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {"type": "string"}
+          }
+        },
+        "images": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "width": {"type": "integer", "minimum": 1},
+              "height": {"type": "integer", "minimum": 1},
+              "fill": {"type": "string", "pattern": "^#[0-9a-f]{6}$"},
+              "text": {"type": "string"},
+              "text_color": {"type": "string", "pattern": "^#[0-9a-f]{6}$"},
+              "font_size": {"type": "integer"}
+            },
+            "additionalProperties": false,
+            "required": ["width", "height", "fill"]
+          }
+        },
+        "audio": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "seconds": {"type": "number", "exclusiveMinimum": 0},
+              "rate": {"type": "integer"},
+              "channels": {"type": "integer", "minimum": 1, "maximum": 2},
+              "tone_hz": {"type": "number"}
+            },
+            "additionalProperties": false,
+            "required": ["seconds", "rate", "channels", "tone_hz"]
+          }
+        },
+        "office": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "paragraphs": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1},
+                "minItems": 0
+              },
+              "tables": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {"type": "string", "minLength": 1},
+                    "minItems": 1
+                  }
+                }
+              },
+              "sheets": {
+                "type": "object",
+                "additionalProperties": {"type": "array", "items": {"type": "array"}}
+              },
+              "text_columns": {
+                "type": "array",
+                "items": {"type": "string", "pattern": "^[A-Z]{1,3}$"}
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "motw": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "recycle": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "registry": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {"type": "string", "pattern": "^HKCU\\\\"},
+              "name": {"type": "string"},
+              "type": {"enum": ["dword", "string"]},
+              "value": {"type": ["integer", "string"]}
+            },
+            "additionalProperties": false,
+            "required": ["key", "name", "type", "value"]
+          }
+        },
+        "services": {
+          "type": "object",
+          "additionalProperties": {"enum": ["running", "stopped"]}
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "log": {"enum": ["application", "system"]},
+              "source": {"type": "string"},
+              "id": {"type": "integer"},
+              "level": {"enum": ["error", "warning", "information"]},
+              "message": {"type": "string"}
+            },
+            "additionalProperties": false,
+            "required": ["log", "source", "id", "level", "message"]
+          }
+        },
+        "env_user": {
+          "type": "object",
+          "additionalProperties": {"type": ["string", "null"]}
+        },
+        "apps": {"type": "array", "items": {"$ref": "#/definitions/app"}},
+        "explorer": {
+          "type": "object",
+          "properties": {
+            "folder": {"type": "string"},
+            "view_mode": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": ["folder", "view_mode"]
+        },
+        "approval_request": {
+          "type": "object",
+          "properties": {
+            "tag": {"type": "string"},
+            "capability": {"type": "string"},
+            "target": {"type": "string"},
+            "session": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": ["tag", "capability", "target", "session"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "expect": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/definitions/fileCheck"}
+        },
+        "absent": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "dirs": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "unchanged": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "answer_contains": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "answer_contains_ci": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "answer_any_ci": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "minItems": 1
+          }
+        },
+        "answer_not_contains": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "answer_not_contains_ci": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 0
+        },
+        "answer_numbers": {"type": "array", "items": {"$ref": "#/definitions/number"}},
+        "probes": {"type": "array", "items": {"$ref": "#/definitions/probe"}},
+        "events": {
+          "type": "object",
+          "properties": {
+            "required": {"type": "array", "items": {"$ref": "#/definitions/event"}},
+            "forbidden": {"type": "array", "items": {"$ref": "#/definitions/event"}},
+            "any_of": {
+              "type": "array",
+              "items": {"$ref": "#/definitions/event"},
+              "minItems": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "task": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(pl|ap|pr|of|us)-[0-9]{2}-[a-z0-9-]+$"
+        },
+        "kind": {
+          "enum": ["pliki", "aplikacje", "przegladarka", "office", "ustawienia"]
+        },
+        "difficulty": {"enum": ["latwe", "srednie", "trudne"]},
+        "guard": {"type": "boolean"},
+        "goal": {"type": "string", "minLength": 10},
+        "setup": {"$ref": "#/definitions/setup"},
+        "expect": {"$ref": "#/definitions/expect"},
+        "approvals": {
+          "type": "object",
+          "properties": {
+            "allow": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "capability": {
+                    "enum": ["net.egress", "system.admin", "fs.write", "gui.control"]
+                  },
+                  "target": {"type": "string"}
+                },
+                "additionalProperties": false,
+                "required": ["capability", "target"]
+              }
+            },
+            "max": {"type": "integer", "minimum": 0}
+          },
+          "additionalProperties": false,
+          "required": ["allow", "max"]
+        },
+        "route": {
+          "type": "object",
+          "properties": {
+            "primary": {"enum": ["api", "cli", "com", "uia", "vision", "input"]},
+            "fallback": {
+              "type": "array",
+              "items": {"enum": ["api", "cli", "com", "uia", "vision", "input"]}
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "browser_click",
+                  "browser_close",
+                  "browser_open",
+                  "browser_read",
+                  "browser_screenshot",
+                  "browser_type",
+                  "clipboard_read",
+                  "clipboard_write",
+                  "fs_copy",
+                  "fs_delete",
+                  "fs_delete_permanent",
+                  "fs_list",
+                  "fs_mkdir",
+                  "fs_move",
+                  "fs_read",
+                  "fs_rename",
+                  "fs_search",
+                  "fs_stat",
+                  "fs_write",
+                  "input_click",
+                  "input_keys",
+                  "input_scroll",
+                  "input_type_text",
+                  "media_convert",
+                  "media_info",
+                  "media_play",
+                  "net_download",
+                  "net_fetch",
+                  "net_search",
+                  "office_edit",
+                  "office_read",
+                  "screen_capture",
+                  "shell_run",
+                  "shell_terminal",
+                  "system_env",
+                  "system_env_set",
+                  "system_events",
+                  "system_process_info",
+                  "system_process_kill",
+                  "system_processes",
+                  "system_service_control",
+                  "system_services",
+                  "system_status",
+                  "uia_act",
+                  "uia_find",
+                  "uia_read_text",
+                  "uia_tree",
+                  "vision_describe",
+                  "vision_ocr",
+                  "window_focus",
+                  "window_list",
+                  "window_move",
+                  "window_state"
+                ]
+              },
+              "minItems": 1
+            },
+            "note": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": ["primary", "fallback", "tools"]
+        },
+        "risk": {
+          "type": "object",
+          "properties": {
+            "level": {"enum": ["niskie", "srednie", "wysokie"]},
+            "reversible": {"enum": ["yes", "scoped", "no"]},
+            "note": {"type": "string"}
+          },
+          "additionalProperties": false,
+          "required": ["level", "reversible", "note"]
+        },
+        "limits": {
+          "type": "object",
+          "properties": {
+            "max_steps": {"type": "integer", "minimum": 1},
+            "timeout_s": {"type": "integer", "minimum": 10}
+          },
+          "additionalProperties": false,
+          "required": ["max_steps", "timeout_s"]
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "audio-endpoint",
+              "broker-service",
+              "calculator",
+              "edge-app",
+              "edge-pdf",
+              "explorer",
+              "f6-web",
+              "ffmpeg",
+              "notepad",
+              "ocr-pl",
+              "office",
+              "paint",
+              "settings-app"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "difficulty",
+        "guard",
+        "goal",
+        "setup",
+        "expect",
+        "approvals",
+        "route",
+        "risk",
+        "limits",
+        "requires"
+      ]
+    }
+  }
+}

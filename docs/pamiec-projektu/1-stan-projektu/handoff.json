@@ -1,0 +1,57 @@
+{
+  "_meta": {
+    "version": "2.1",
+    "project": "Alfa AI Program",
+    "note": "Auto-ładowany przez SessionStart hook. Aktualizuj przed /clear lub zamknięciem sesji.",
+    "session_id": "b8c92890-d32a-48cf-afcf-c2baf7ce1924 (Alfa AI Laptop — jedyna rozmowa projektu od 1.11)",
+    "updated": "2026-11-06T06:40:00+01:00"
+  },
+  "current_state": "**Bieżący (2026-11-06 rano, PC):** właściciel 6.11 ok. 5:00: „scalić gałąź tak”, sędzia przy małym modelu „ok”, w rozmowie „do końca rozmowy” tryby zmieniane w każdej chwili jak w Claude Code/Codex, „resztę wykonaj tak by było ok”. Zrobione: Alt+M — następny tryb (jak Shift+Tab; bez L4; state/mode-switch.ts, e2e mode-cycle; ec011afd), przegląd drzewa w spawn_blocking (tools-fs-impl/inside.rs; 1bb0faa6), skrót PIN-u zostaje w pliku Sędziego (decyzja w memory/decisions.md). Gałąź do-przegladu-tryby-zgod SCALONA do ccr-af4b63c6-3fyzaj (889a4c6a), wersja 0.0.85 (CHANGELOG, 00-stan). verify wersja e9176994: 19/20 — lint czerwony (pl-settings.ts 401 linii) → poprawione aced0e57, pnpm lint zielony; Rust 3490/0/44, interfejs 553, przeglądarka 847, aplikacja 63 (282/285). NIE WGRANA do Alfa-uruchomiona — czeka na zgodę właściciela.",
+  "session_goal": "Właściciel 6.11 rano: decyzje z raportu 53 §4 — scalenie, Alt+M, spawn_blocking, reszta „tak by było ok”.",
+  "in_progress": [
+    "Wersja 0.0.85 zbudowana w bramce; wgranie do Alfa-uruchomiona (deploy-owner --no-start) po zgodzie właściciela."
+  ],
+  "blocking_issues": [
+    "Decyzja właściciela: profil Dziecko poza usługą Windows (ochrona umowna) — dopuścić z ostrzeżeniem czy wymagać usługi.",
+    "Decyzja przy przeglądzie: skrót PIN-u w pliku Sędziego zamiast Menedżera poświadczeń."
+  ],
+  "next_session": [
+    "Po decyzji właściciela: przegląd człowieka i scalenie gałęzi do-przegladu-broker-2026-10-28 (do 6407c88f; scalenie = nowa wersja z verify); ewentualnie wdrożenie docs/plan/43 (wyróżnianie czytanego zdania) i zmiana domyślnych paneli chowanych.",
+    "Ctrl+Alt+Space zajęty przez inny program na PC (Szybkie pytanie Alfy) — właściciel może zmienić skrót; test laptop_voice losowy pod obciążeniem; sprawdzić też, czy UI mówi o tym właścicielowi (ostrzeżenie przy starcie od 0.0.71).",
+    "Mosty CLI: komunikat „Narzędzie nie jest zainstalowane” myli, gdy jest aplikacja okienkowa (Claude, Codex ze Sklepu) bez CLI w PATH — pokazać „jest aplikacja, brak narzędzia wiersza poleceń” z poleceniem instalacji (22.10 zainstalowano npm -g claude-code 2.1.308 i codex 0.163.0).",
+    "Koszt podprzebiegów (delegacja, Krytyczka) poza dziennikiem kosztów — ich tury emitują już ModelUsage; doliczyć w app-chat agent.rs (gałąź !main) pod faktycznym dostawcą, reszta liczona tylko z części przebiegu głównego (raport 37 §2).",
+    "Zadania agentek w tle (app-tasks exec_agent, RuntimeExecutor) nie zapisują kosztu w cost-meter — limit ich nie widzi.",
+    "Koszt przebiegu agentki zapisuje się dopiero po jego końcu — limit dostawcy nie zatrzyma długiego przebiegu w trakcie (chroni „Limit kosztu zadania”); rozważyć zapis po każdej turze.",
+    "Właściciel: otworzyć Alfę skrótem „Alfa” (0.0.75); „Pełną automatykę” wybiera się w belce → menu „Tryb pracy” i potwierdza raz w oknie Brokera — zostaje po restarcie.",
+    "Sprawdzić limity kont (Ustawienia → Konta i klucze API): od 0.0.70 limit z kreatora (domyślnie 100 zł/mies.) blokuje płatne zapytania do dostawcy; konto bez limitu znosi limit dostawcy.",
+    "Po każdej zmianie w crate bliskim limitu (app-core 8000, app-api ~8000) uruchomić check-size z GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0='*' — bez tego skrypt pada na git.",
+    "Drobne (sprzed 22.10): wyłączone konto bez klucza — rdzeń pokazuje wiek starego klucza (account_dto liczy key_stored ze stanu), atrapa UI brak klucza.",
+    "Decyzja: agentki z narzędziami w zwykłych sesjach mogą iść do dostawców „może trenować” (DeepSeek, Kimi).",
+    "Znane ograniczenia (raporty 35 i 36): termin Routera liczy się do obwodu dostawcy, F1-04 > 2 s przy kontekście > ~10 tys. tokenów, koszt przebiegów agentek zapisywany pod „Router” (limit konta go nie widzi), „Limit kosztu zadania” domyślnie wyłączony.",
+    "Decyzje bez zmian: licencje C5.1, ONNX Runtime bez telemetrii, zip 9, Edge na PC, seria 7 „Pełny dostęp”, analizator powłoki, Broker, push."
+  ],
+  "env_snapshot": {
+    "key_paths": {
+      "repo": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa (jedyna kopia)",
+      "narzedzia": "E:/PROGRAMY W CZASIE PRAC/Alfa AI Program/alfa-narzedzia (zawsze . .\\scripts\\portable-env.ps1)",
+      "kopie": "F:/Kopie zapasowe programów Spopielony/Alfa/kopia-<data> (scripts/backup.sh; Seagate Backup Plus; ostatnia: kopia-2026-10-30_0430 — 0.0.78, stan bdb474fe)",
+      "plan": "alfa/docs/plan/03-roadmapa.md (C5.1 zrobione, P4)",
+      "raport": "alfa/docs/plan/34-raport-2026-10-21-0068.md (wcześniej 33 — 0.0.67)",
+      "adr": "alfa/docs/ADR/0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md",
+      "zbudowana": "alfa/target/shell/debug/alfa-desktop.exe — 0.0.68 (commit w opisie wersji), komplet sidecarów mowy; do wgrania: scripts/deploy-owner.sh, decyzja właściciela"
+    },
+    "ports": {
+      "alfa-ui (atrapa)": 5173,
+      "alfa-docs (podgląd HTML)": 5180
+    }
+  },
+  "test_results": "6.11 rano: verify wersja e9176994 — 19/20 (lint: pl-settings 401 linii, poprawione aced0e57, pnpm lint zielony); Rust 3490/0/44, vitest 553, Playwright 847, aplikacja 63/63 (282/285).",
+  "decisions_this_session": [
+    "6.11: etap Z scalony (właściciel); Alt+M jak Shift+Tab; sędzia przy małym modelu zatwierdzony; PIN w pliku Sędziego; profil Dziecko bez usługi z ostrzeżeniem."
+  ],
+  "next_steps": [
+    "Wgrać 0.0.85 po zgodzie właściciela (deploy-owner --no-start)",
+    "Z.8: model-sędzia w prawdziwej aplikacji z modelem lokalnym",
+    "Powtórzyć za dnia pomiar palety (e2e/keyboard.spec.ts) — w bramce 0.0.85 zielony"
+  ]
+}

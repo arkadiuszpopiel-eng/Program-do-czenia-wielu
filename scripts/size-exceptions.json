@@ -1,0 +1,49 @@
+{
+  "_opis": "Jawne wyjątki od limitu 400 linii (scripts/check-size.mjs): testy, atrapy i dane. `max` = obecna długość — plik nie może rosnąć; po podziale wpis usuwamy.",
+  "files": {
+    "apps/desktop/ui/e2e-app/smoke.spec.ts": {
+      "max": 716,
+      "reason": "test prawdziwej aplikacji — jeden przebieg kroków na wspólnym procesie; do podziału na pliki z osobnym startem"
+    },
+    "apps/desktop/ui/e2e/api-keys.spec.ts": {
+      "max": 414,
+      "reason": "test w przeglądarce — scenariusze kont i kluczy"
+    },
+    "apps/desktop/ui/src/lib/api/fake/fixtures.ts": {
+      "max": 415,
+      "reason": "atrapa — dane przykładowe"
+    },
+    "apps/desktop/ui/src/lib/api/fake/settings-part-a.ts": {
+      "max": 575,
+      "reason": "atrapa — schemat ustawień (dane)"
+    },
+    "apps/desktop/ui/src/lib/api/fake/settings-part-b.ts": {
+      "max": 409,
+      "reason": "atrapa — schemat ustawień (dane)"
+    },
+    "apps/desktop/ui/src/lib/i18n/pl-app.ts": {
+      "max": 416,
+      "reason": "słownik tłumaczeń (dane)"
+    },
+    "crates/accounts-hub-fake/src/hub.rs": {
+      "max": 406,
+      "reason": "atrapa huba kont"
+    },
+    "crates/app-core/tests/dto_roundtrip.rs": {
+      "max": 404,
+      "reason": "test — tabela wszystkich komend"
+    },
+    "crates/providers-local-impl/tests/lifecycle.rs": {
+      "max": 404,
+      "reason": "test cyklu życia silnika"
+    },
+    "crates/router-impl/tests/decisions.rs": {
+      "max": 437,
+      "reason": "test decyzji Routera"
+    },
+    "crates/voice-tts-impl/tests/tts.rs": {
+      "max": 412,
+      "reason": "test syntezy mowy"
+    }
+  }
+}

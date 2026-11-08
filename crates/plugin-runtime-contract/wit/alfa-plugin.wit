@@ -1,0 +1,24 @@
+/// Interfejs wtyczek Alfy (ADR 0012, docs/modules/plugin-runtime/SPEC.md).
+///
+/// Wtyczka to komponent Wasm (cel `wasm32-wasip2`, wit-bindgen) bez żadnych importów WASI:
+/// jedyny import to `host`, a każda operacja hosta przechodzi przez Brokera z tokenem
+/// zdolności wydanym dla agentki, która wywołała narzędzie (wtyczka ≤ rola wywołującej).
+/// Zmiana tego pliku = nowa wersja pakietu (kontrakt; `git diff --exit-code` w CI).
+package alfa:plugin@0.1.0;
+
+/// Funkcje hosta — jedyny dostęp wtyczki do świata.
+interface host {
+    /// Operacja hosta. `op`: `log`, `fs.read-text`, `fs.write-text`, `net.get`; `args`: obiekt
+    /// JSON operacji (pola nieznane = błąd). Wynik: JSON albo opis odmowy/błędu (po polsku).
+    /// Operacja spoza zdolności z manifestu wtyczki jest odrzucana przed Brokerem.
+    call: func(op: string, args: string) -> result<string, string>;
+}
+
+/// Świat wtyczki: import `host`, eksport `invoke`.
+world plugin {
+    import host;
+
+    /// Wywołanie narzędzia wtyczki: nazwa z manifestu (bez prefiksu `plugin_`) i argumenty
+    /// JSON zgodne z `input_schema`. Wynik: JSON zgodny z `output_schema` albo błąd (tekst).
+    export invoke: func(tool: string, input: string) -> result<string, string>;
+}

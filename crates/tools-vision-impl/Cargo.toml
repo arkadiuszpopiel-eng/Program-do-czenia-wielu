@@ -1,0 +1,42 @@
+[package]
+name = "tools-vision-impl"
+description = "tools-vision: OCR zrzutu/obszaru/pliku i opis obrazu modelem z wizją przez Brokera (gui.control, fs.read) — zrzut zamaskowany w porcie przed OCR i przed modelem, plik z deny-listą i wymiarami z nagłówka przed dekodowaniem, sesja prywatna tylko lokalnie, treść niezaufana"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+tools-vision-contract = { path = "../tools-vision-contract" }
+tools-screen-contract = { path = "../tools-screen-contract" }
+tools-window-contract = { path = "../tools-window-contract" }
+tools-common-contract = { path = "../tools-common-contract" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+compliance-contract = { path = "../compliance-contract" }
+providers-contract = { path = "../providers-contract" }
+lib-media = { path = "../lib-media" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+platform-contract.workspace = true
+async-trait.workspace = true
+futures-util.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+# Obraz dla modelu (ta sama wersja co tools-screen-impl, już w Cargo.lock).
+base64 = "0.22.1"
+
+[dev-dependencies]
+tools-vision-contract = { path = "../tools-vision-contract", features = ["contract-tests"] }
+tools-vision-fake = { path = "../tools-vision-fake" }
+lib-media = { path = "../lib-media", features = ["samples"] }
+platform-fake = { path = "../platform-fake" }
+safety-broker-fake = { path = "../safety-broker-fake" }
+providers-fake = { path = "../providers-fake" }
+core-bus-fake = { path = "../core-bus-fake" }
+watchdog-contract = { path = "../watchdog-contract" }
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

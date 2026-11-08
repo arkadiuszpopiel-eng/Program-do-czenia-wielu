@@ -1,0 +1,120 @@
+{"id":"f001","scope":"global","layer":"semantic","text":"Ulubiony kolor Karoliny to zielony."}
+{"id":"f002","scope":"global","layer":"semantic","text":"Ulubiony kolor Bartosza to granatowy."}
+{"id":"f003","scope":"global","layer":"semantic","text":"Karolina ma urodziny 14 marca."}
+{"id":"f004","scope":"global","layer":"semantic","text":"Piotr ma urodziny 2 września."}
+{"id":"f005","scope":"global","layer":"semantic","text":"Zuzanna ma urodziny 30 listopada."}
+{"id":"f006","scope":"global","layer":"semantic","text":"Bartosz ma alergię na orzechy."}
+{"id":"f007","scope":"global","layer":"semantic","text":"Magda ma alergię na pyłki brzozy."}
+{"id":"f008","scope":"global","layer":"semantic","text":"Numer telefonu do Agnieszki to 600 123 456."}
+{"id":"f009","scope":"global","layer":"semantic","text":"Numer telefonu do hydraulika to 797 300 200."}
+{"id":"f010","scope":"global","layer":"semantic","text":"Karolina mieszka przy ulicy Lipowej 7 w Poznaniu."}
+{"id":"f011","scope":"global","layer":"semantic","text":"Babcia Helena mieszka przy ulicy Polnej 3 w Kaliszu."}
+{"id":"f012","scope":"global","layer":"semantic","text":"Piotr pracuje jako architekt w Gdańsku."}
+{"id":"f013","scope":"global","layer":"semantic","text":"Zuzanna pracuje jako pielęgniarka na oddziale dziecięcym."}
+{"id":"f014","scope":"global","layer":"semantic","text":"Tomasz gra na gitarze basowej w zespole rockowym."}
+{"id":"f015","scope":"global","layer":"semantic","text":"Jan kibicuje drużynie Lech Poznań."}
+{"id":"f016","scope":"global","layer":"semantic","text":"Agnieszka nie je mięsa — jest wegetarianką."}
+{"id":"f017","scope":"global","layer":"semantic","text":"Imieniny Magdy przypadają 22 lipca."}
+{"id":"f018","scope":"global","layer":"semantic","text":"Szef Marcin lubi krótkie maile z podsumowaniem na początku."}
+{"id":"f019","scope":"global","layer":"semantic","text":"Pies Karoliny wabi się Fafik i ma pięć lat."}
+{"id":"f020","scope":"global","layer":"semantic","text":"Kot użytkownika nazywa się Mruczek i jest na diecie."}
+{"id":"f021","scope":"global","layer":"semantic","text":"Użytkownik do śniadania pije czarną kawę bez cukru."}
+{"id":"f022","scope":"global","layer":"semantic","text":"Wieczorem użytkownik pije herbatę miętową."}
+{"id":"f023","scope":"global","layer":"semantic","text":"W samolocie użytkownik wybiera miejsce przy oknie."}
+{"id":"f024","scope":"global","layer":"semantic","text":"W pociągu użytkownik wybiera wagon ciszy."}
+{"id":"f025","scope":"global","layer":"semantic","text":"W hotelu użytkownik prosi o pokój z dala od windy."}
+{"id":"f026","scope":"global","layer":"semantic","text":"Ulubiony gatunek muzyki użytkownika to jazz."}
+{"id":"f027","scope":"global","layer":"semantic","text":"Ulubiony gatunek filmów użytkownika to kryminały skandynawskie."}
+{"id":"f028","scope":"global","layer":"semantic","text":"Użytkownik czyta głównie reportaże."}
+{"id":"f029","scope":"global","layer":"semantic","text":"Witaminę D użytkownik bierze rano po śniadaniu."}
+{"id":"f030","scope":"global","layer":"semantic","text":"Lek na ciśnienie użytkownik bierze wieczorem o 21:00."}
+{"id":"f031","scope":"global","layer":"semantic","text":"Wizyta u dentysty jest 12 listopada o 9:00."}
+{"id":"f032","scope":"global","layer":"semantic","text":"Wizyta u okulisty jest zaplanowana na styczeń."}
+{"id":"f033","scope":"global","layer":"semantic","text":"Trening biegowy użytkownik ma we wtorki i czwartki."}
+{"id":"f034","scope":"global","layer":"semantic","text":"Basen użytkownik ma w soboty o 8:00."}
+{"id":"f035","scope":"global","layer":"semantic","text":"Rozmiar buta użytkownika to 43."}
+{"id":"f036","scope":"global","layer":"semantic","text":"Grupa krwi użytkownika to A Rh+."}
+{"id":"f037","scope":"global","layer":"semantic","text":"Rocznica ślubu użytkownika przypada 12 czerwca."}
+{"id":"f038","scope":"global","layer":"semantic","text":"Użytkownik nie lubi kolendry."}
+{"id":"f039","scope":"global","layer":"semantic","text":"Użytkownik mówi po polsku, angielsku i trochę po hiszpańsku."}
+{"id":"f040","scope":"global","layer":"semantic","text":"Ulubiona kawiarnia użytkownika to Mała Czarna na Starym Mieście."}
+{"id":"f041","scope":"global","layer":"semantic","text":"Numer rejestracyjny samochodu to PO 4821K."}
+{"id":"f042","scope":"global","layer":"semantic","text":"Samochód tankujemy olejem napędowym."}
+{"id":"f043","scope":"global","layer":"semantic","text":"Opony zimowe są przechowywane w serwisie OponaPlus."}
+{"id":"f044","scope":"global","layer":"semantic","text":"Ubezpieczenie samochodu odnawia się 3 lutego."}
+{"id":"f045","scope":"project:dom","layer":"semantic","text":"Paszport leży w górnej szufladzie biurka."}
+{"id":"f046","scope":"project:dom","layer":"semantic","text":"Zapasowy klucz do mieszkania jest u sąsiadki z mieszkania 12."}
+{"id":"f047","scope":"project:dom","layer":"semantic","text":"Instrukcja pralki jest w segregatorze w przedpokoju."}
+{"id":"f048","scope":"project:dom","layer":"semantic","text":"Hasło do Wi-Fi w domu to Zielona-Sowa-42."}
+{"id":"f049","scope":"project:dom","layer":"semantic","text":"Plastik odbierają w każdy wtorek."}
+{"id":"f050","scope":"project:dom","layer":"semantic","text":"Szkło odbierają co drugi czwartek."}
+{"id":"f051","scope":"project:dom","layer":"semantic","text":"Przegląd kotła gazowego jest ważny do końca października."}
+{"id":"f052","scope":"project:dom","layer":"semantic","text":"Rachunek za prąd płacę do 10. dnia miesiąca."}
+{"id":"f053","scope":"project:dom","layer":"semantic","text":"Internet opłacany jest przelewem stałym 20. dnia miesiąca."}
+{"id":"f054","scope":"project:dom","layer":"semantic","text":"Monsterę podlewam raz w tygodniu."}
+{"id":"f055","scope":"project:dom","layer":"semantic","text":"Storczyki podlewam zanurzeniowo co dziesięć dni."}
+{"id":"f056","scope":"project:dom","layer":"semantic","text":"Bezpieczniki są w szafce nad drzwiami wejściowymi."}
+{"id":"f057","scope":"project:praca","layer":"semantic","text":"Spotkanie zespołu marketingu odbywa się we wtorki o 10:00."}
+{"id":"f058","scope":"project:praca","layer":"semantic","text":"Spotkanie projektu Alfa jest w czwartki o 14:30."}
+{"id":"f059","scope":"project:praca","layer":"semantic","text":"Raport kwartalny trzeba wysłać do 5. dnia po końcu kwartału."}
+{"id":"f060","scope":"project:praca","layer":"semantic","text":"Raport sprzedaży wysyłam w każdy piątek do 15:00."}
+{"id":"f061","scope":"project:praca","layer":"semantic","text":"Za budżet odpowiada Agnieszka z działu finansów."}
+{"id":"f062","scope":"project:praca","layer":"semantic","text":"Za serwery odpowiada Tomasz z działu IT."}
+{"id":"f063","scope":"project:praca","layer":"semantic","text":"Za rekrutację odpowiada Zuzanna z HR."}
+{"id":"f064","scope":"project:praca","layer":"semantic","text":"Dostęp do repozytorium kodu nadaje zespół DevOps."}
+{"id":"f065","scope":"project:praca","layer":"semantic","text":"Klient Nowak i Syn preferuje kontakt mailowy."}
+{"id":"f066","scope":"project:praca","layer":"semantic","text":"Klient Polmar woli spotkania na żywo w swoim biurze."}
+{"id":"f067","scope":"project:praca","layer":"semantic","text":"Projekt Orzeł ma termin oddania 30 czerwca."}
+{"id":"f068","scope":"project:praca","layer":"semantic","text":"Projekt Wega kończymy do końca roku."}
+{"id":"f069","scope":"project:praca","layer":"semantic","text":"Faktury wysyłamy do księgowej pani Ireny do 3. dnia miesiąca."}
+{"id":"f070","scope":"project:praca","layer":"semantic","text":"Delegacje rozliczamy w systemie Kadrus w ciągu 7 dni."}
+{"id":"f071","scope":"project:praca","layer":"semantic","text":"Urlop zgłaszamy szefowi Marcinowi z dwutygodniowym wyprzedzeniem."}
+{"id":"f072","scope":"project:praca","layer":"semantic","text":"Hasło do Wi-Fi w biurze zmienia się co miesiąc i jest na tablicy w kuchni."}
+{"id":"f073","scope":"agent:beta","layer":"semantic","text":"Beta przygotowuje plan dnia każdego ranka o 7:30."}
+{"id":"f074","scope":"agent:beta","layer":"semantic","text":"Beta przypomina o lekach o 21:00."}
+{"id":"f075","scope":"agent:beta","layer":"semantic","text":"Beta prowadzi listę zakupów w notatce Zakupy."}
+{"id":"f076","scope":"agent:beta","layer":"procedural","text":"Procedura cotygodniowego przeglądu: zbierz zadania, oznacz pilne, zaproponuj plan na tydzień."}
+{"id":"f077","scope":"agent:beta","layer":"procedural","text":"Procedura odpisywania na maile klientów: podziękuj, odpowiedz w punktach, zaproponuj termin."}
+{"id":"f078","scope":"agent:beta","layer":"semantic","text":"Beta tłumaczy dokumenty na angielski w stylu formalnym."}
+{"id":"f079","scope":"agent:beta","layer":"semantic","text":"Beta archiwizuje paragony w folderze Wydatki 2026."}
+{"id":"f080","scope":"agent:beta","layer":"procedural","text":"Procedura kopii zapasowej: zamknij programy, uruchom eksport .alfa, sprawdź sumę kontrolną."}
+{"id":"f081","scope":"agent:beta","layer":"semantic","text":"Beta pilnuje terminów płatności i ostrzega trzy dni wcześniej."}
+{"id":"f082","scope":"agent:beta","layer":"semantic","text":"Beta zapisuje notatki ze spotkań w folderze Notatki ze spotkań."}
+{"id":"f083","scope":"session:urlop","layer":"episodic","text":"W rozmowie o urlopie wybraliśmy Chorwację na drugą połowę sierpnia."}
+{"id":"f084","scope":"session:urlop","layer":"semantic","text":"Lot do Splitu jest 16 sierpnia o 6:40 z Warszawy."}
+{"id":"f085","scope":"session:urlop","layer":"semantic","text":"Apartament w Trogirze zarezerwowany na 10 nocy."}
+{"id":"f086","scope":"session:urlop","layer":"semantic","text":"Na urlop trzeba zabrać adapter do gniazdek i krem z filtrem 50."}
+{"id":"f087","scope":"session:urlop","layer":"semantic","text":"Wynajem samochodu w Splicie kosztuje 320 euro za tydzień."}
+{"id":"f088","scope":"session:urlop","layer":"semantic","text":"Ubezpieczenie podróżne wykupione w PZU do 31 sierpnia."}
+{"id":"f089","scope":"session:urlop","layer":"episodic","text":"Użytkownik chce odwiedzić Park Narodowy Krka w trzecim dniu urlopu."}
+{"id":"f090","scope":"session:urlop","layer":"semantic","text":"Kot na czas urlopu zostaje u Karoliny."}
+{"id":"f091","scope":"session:remont","layer":"episodic","text":"Rozmawialiśmy o remoncie kuchni — start w październiku."}
+{"id":"f092","scope":"session:remont","layer":"semantic","text":"Fachowiec od remontu to pan Zbigniew, telefon 501 222 333."}
+{"id":"f093","scope":"session:remont","layer":"semantic","text":"Płytki do kuchni wybrane: szare 60x60 z Castoramy."}
+{"id":"f094","scope":"session:remont","layer":"semantic","text":"Budżet remontu kuchni to 35 000 zł."}
+{"id":"f095","scope":"session:remont","layer":"semantic","text":"Zmywarka ma być wbudowana, szerokość 45 cm."}
+{"id":"f096","scope":"session:remont","layer":"semantic","text":"Blat kuchenny z dębu, zamówiony z dostawą na 20 października."}
+{"id":"f097","scope":"session:hiszpanski","layer":"episodic","text":"Ustaliliśmy plan nauki hiszpańskiego: 20 minut dziennie."}
+{"id":"f098","scope":"session:hiszpanski","layer":"semantic","text":"Lekcje z lektorką Lucią są w poniedziałki o 18:00 online."}
+{"id":"f099","scope":"session:hiszpanski","layer":"semantic","text":"Poziom hiszpańskiego użytkownika to A2."}
+{"id":"f100","scope":"session:hiszpanski","layer":"semantic","text":"Fiszki do nauki są w aplikacji Anki, talia Hiszpański A2."}
+{"id":"z001","scope":"global","layer":"semantic","text":"Karolina lubi długie spacery po parku Sołackim."}
+{"id":"z002","scope":"global","layer":"semantic","text":"Bartosz pracuje zdalnie w piątki."}
+{"id":"z003","scope":"global","layer":"semantic","text":"Babcia Helena piecze najlepszą szarlotkę."}
+{"id":"z004","scope":"global","layer":"semantic","text":"Piotr ma brata Michała, który mieszka w Krakowie."}
+{"id":"z005","scope":"global","layer":"semantic","text":"Zielona herbata pomaga użytkownikowi się skupić."}
+{"id":"z006","scope":"global","layer":"semantic","text":"Magda poleciła serial o detektywie z Oslo."}
+{"id":"z007","scope":"global","layer":"semantic","text":"Użytkownik chce w przyszłym roku nauczyć się grać na pianinie."}
+{"id":"z008","scope":"global","layer":"semantic","text":"Telefon użytkownika to model z ekranem 6,1 cala."}
+{"id":"z009","scope":"global","layer":"semantic","text":"W kawiarni na rogu sprzedają dobre rogale."}
+{"id":"z010","scope":"global","layer":"semantic","text":"Samochód Piotra jest czerwony."}
+{"id":"z011","scope":"project:dom","layer":"semantic","text":"Na działce rośnie stara jabłoń."}
+{"id":"z012","scope":"project:dom","layer":"semantic","text":"Karton z dekoracjami świątecznymi stoi w piwnicy."}
+{"id":"z013","scope":"project:dom","layer":"semantic","text":"Pralka ma program szybki trwający 30 minut."}
+{"id":"z014","scope":"project:praca","layer":"semantic","text":"Projekt Mewa ma termin 15 sierpnia."}
+{"id":"z015","scope":"project:praca","layer":"semantic","text":"Spotkanie zarządu jest pierwszego dnia miesiąca."}
+{"id":"z016","scope":"project:praca","layer":"semantic","text":"Raport z podróży służbowej trzeba wysłać w ciągu 7 dni."}
+{"id":"z017","scope":"project:praca","layer":"semantic","text":"W biurze jest ekspres do kawy na drugim piętrze."}
+{"id":"z018","scope":"agent:beta","layer":"semantic","text":"Beta używa formatu daty dzień-miesiąc-rok."}
+{"id":"z019","scope":"session:urlop","layer":"semantic","text":"Rozważaliśmy też Grecję, ale jest za gorąco."}
+{"id":"z020","scope":"session:remont","layer":"semantic","text":"Stara lodówka zostanie oddana sąsiadowi."}

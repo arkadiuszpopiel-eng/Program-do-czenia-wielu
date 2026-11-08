@@ -1,0 +1,32 @@
+[package]
+name = "triggers-impl"
+description = "Wyzwalacze (F5): implementacja modułu — timer tokio, wejścia z magistrali (nowa wiadomość, koniec zadania) i obserwatora plików, zadania do schedulera, zdarzenia triggers.*, stan w pliku"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+triggers-contract = { path = "../triggers-contract" }
+scheduler-contract = { path = "../scheduler-contract" }
+core-bus-contract.workspace = true
+core-registry-contract.workspace = true
+async-trait.workspace = true
+futures-util.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+triggers-contract = { path = "../triggers-contract", features = ["contract-tests"] }
+scheduler-fake = { path = "../scheduler-fake" }
+agent-backends-contract = { path = "../agent-backends-contract" }
+agent-backends-fake = { path = "../agent-backends-fake" }
+safety-broker-contract = { path = "../safety-broker-contract" }
+core-bus-fake = { path = "../core-bus-fake" }
+serde.workspace = true
+tokio = { workspace = true, features = ["test-util"] }
+
+[lints]
+workspace = true

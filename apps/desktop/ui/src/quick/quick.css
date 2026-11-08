@@ -1,0 +1,9 @@
+/* Okno Szybkiego pytania: przezroczyste tło okna, karta na środku. */
+html,
+body {
+  height: auto;
+  background: transparent;
+}
+body {
+  padding: var(--alfa-space-2);
+}

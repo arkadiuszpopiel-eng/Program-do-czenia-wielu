@@ -1,0 +1,9 @@
+# Archive
+
+## Week of 2026-10-05
+
+Established portable dev env with catalog script (241 crates/107 modules), validated dependency graph (1645 edges, 0 violations), and Rust 1.94/Node/Perl toolchain; fixed Windows path handling and UI refactor (appearance.ts, settings-groups.ts). Shipped 13 alpha versions (v0.0.2–v0.0.14) with Glass/Next themes, API-key mgmt, speech filtering, settings nav rewrite, and avatar mouth-sync; fixed 60+ UI bugs, E2E 132→289. Documented 12 code-review findings (S-01/S-03 critical); broker error dedup and Windows file edge cases handled. Camera system planned (ADR 0025), blocked on Rust compile and voice engine selection. Alfa 0.0.25–0.0.27 shipped local voice plan (Piper fastest), Settings/shortcut fixes, and event sequencing (event_log.rs) with v0.0.19–0.0.22 (event recovery, API-key failover); Delta speech-port plan (ADR 0027) pending approval; 36GB+ and ~93GB cleaned; 20+ commits.
+
+## Week of 2026-10-12
+
+Alfa v0.0.41–0.0.58 shipped duties logic, system selftest, Ctrl+/ search, night report, P1 talk/speech (Supertonic, Qwen ASR, Smart Turn), voice gating, and onboarding rewrite. Audit A-01…A-17 was fixed (0.0.51–0.0.52), adding Settings "Dobór modelu" and "Stan połączeń", the `docs/DOWODY.md` evidence register, and a size gate in lint. Antigravity (`agy`) backend, a Low-integrity process module (wasmtime 36.0.18), and Google Gemini login via Antigravity (0.0.55–0.0.56) were added. Full verification was repeatedly interrupted by E: USB disconnects; 0.0.50 and 0.0.56 were not fully merged or checked. Open: joint Antigravity test (needs owner's Google account), vehicle-photo preview regression, move of `target` to C:, AppContainer isolation (A-07), and the 20 ms budget.

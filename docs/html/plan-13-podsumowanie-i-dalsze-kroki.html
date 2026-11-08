@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/13-podsumowanie-i-dalsze-kroki.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html" aria-current="page">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li><li><a href="plan-45-testy-ai.html">System pełnego automatycznego testowania przez AI</a></li><li><a href="plan-46-raport-2026-10-31-testy-ai.html">Raport z 31.10: system automatycznego testowania przez AI, ścieżki względne, wersja 0.0.79</a></li><li><a href="plan-47-raport-2026-11-01-noc.html">Raport z nocy 31.10/1.11: Sędzia Cieni, diagnostyka odporna na zawieszenie, wersja 0.0.81</a></li><li><a href="plan-48-raport-2026-11-01-rano.html">Raport 1.11 rano: zaległe inspekcje i testy</a></li><li><a href="plan-49-raport-2026-11-02-noc.html">Raport nocy 1/2.11: obowiązki modelu lokalnego i wymiana informacji między modelami</a></li><li><a href="plan-50-tryby-zgod-jak-claude-codex.html">50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)</a></li><li><a href="plan-51-raport-2026-11-03-wieczor.html">51 — Raport: wieczór 3.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-52-raport-2026-11-04-noc.html">52 — Raport: noc 3/4.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-53-raport-2026-11-06-noc.html">53 — Raport: noc 5/6.11 (etap Z — model-sędzia, dziennik rodzica, porządek kompilacji)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="features-katalog.html">Katalog funkcji i testów</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#1-twoje-zgloszenia-i-ich-stan">1. Twoje zgłoszenia i ich stan</a></li><li><a href="#2-co-powstalo-tej-nocy-wersje-0-0-16-i-0-0-17">2. Co powstało tej nocy (wersje 0.0.16 i 0.0.17)</a></li><li><a href="#3-co-zrobic-rano-ok-15-minut">3. Co zrobić rano (ok. 15 minut)</a></li><li><a href="#4-decyzje-ktore-odblokowuja-najwiecej">4. Decyzje, które odblokowują najwięcej</a></li><li><a href="#5-plan-nastepnych-sesji-kolejnosc-proponowana">5. Plan następnych sesji (kolejność proponowana)</a></li><li><a href="#6-przeglad-kodu-kamer-i-wyniki-testow">6. Przegląd kodu kamer i wyniki testów</a></li></ul></aside><article><h1 id="13-podsumowanie-pracy-2026-10-09-10-i-dalsze-kroki">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</h1>
+<p>Stan na <strong>2026-10-10 rano</strong>, wersja programu <strong>0.0.18</strong>. Dokument dla właściciela: co zostało zrobione od wersji
+0.0.7, co jest sprawdzone, a co nie, i co proponuję dalej. Szczegóły zmian: <a href="changelog.html"><code>../../CHANGELOG.md</code></a>;
+stan zadań: <a href="plan-03-roadmapa.html"><code>03-roadmapa.md</code></a>.</p>
+<h2 id="1-twoje-zgloszenia-i-ich-stan">1. Twoje zgłoszenia i ich stan</h2>
+<div class="tbl"><table><thead><tr><th>Zgłoszenie</th><th>Wersja</th><th>Stan</th><th>Czego nie sprawdziłam</th></tr></thead><tbody><tr><td>Klucz API dodany, a rozmowa nie działa (<code>tts-1</code>)</td><td>0.0.8</td><td>naprawione: rozmowa wybiera model rozmowy</td><td>rozmowa na Twoim prawdziwym kluczu</td></tr>
+<tr><td>Zakładka API z kolejkami do 10 modeli per zadanie</td><td>0.0.8, 0.0.10</td><td>zrobione; kolejka to kafelki „podnieś i upuść”</td><td>—</td></tr>
+<tr><td>Mikrofon łapie szum wentylatorów</td><td>0.0.8</td><td>redukcja szumów w 3 poziomach</td><td>ocena na słuch w Twoim otoczeniu</td></tr>
+<tr><td>Program słucha, ale nie odpowiada</td><td>0.0.8</td><td>naprawione (zegar potoku głosowego)</td><td>cała rozmowa głosowa na żywo</td></tr>
+<tr><td>Surowy JSON narzędzia w odpowiedzi</td><td>0.0.8</td><td>odfiltrowany</td><td>—</td></tr>
+<tr><td>Elementy systemowe w interfejsie (menu, dymki, belka)</td><td>0.0.10–0.0.13</td><td>menu, podpowiedzi i belka okna rysuje Alfa</td><td>—</td></tr>
+<tr><td>Pasek LED w górnej belce</td><td>0.0.11, 0.0.14</td><td>jedzie od lewej do prawej, we własnym torze</td><td>—</td></tr>
+<tr><td>Nawigacja Ustawień</td><td>0.0.11</td><td>od nowa: ikony, zwijane grupy, szukanie, klawiatura</td><td>—</td></tr>
+<tr><td>Obsada, mikrofon, stan w belce</td><td>0.0.12</td><td>od nowa, z objaśnieniem stanu</td><td>—</td></tr>
+<tr><td>Znak programu i belka okna</td><td>0.0.13</td><td>znak Alfy, nowa ikona programu</td><td>ikona na pasku zadań (pamięć podręczna Windows)</td></tr>
+<tr><td>Ekran ładowania</td><td>0.0.14</td><td>jest</td><td>wygląd w prawdziwym oknie przy starcie</td></tr>
+<tr><td>Ikony agentek, mini awatary w rytm mowy</td><td>0.0.14</td><td>twarz dla mówiącej i pracującej agentki</td><td>ruch ust przy prawdziwej mowie</td></tr>
+<tr><td>Sztywny, niemiły głos</td><td>0.0.14</td><td>strojenie mowy (styl, tempo, pauzy, różnice głosów)</td><td><strong>brzmienie — do Twojej oceny</strong>; lepsze głosy to osobna decyzja (punkt 4)</td></tr>
+<tr><td>Kilka kart graficznych</td><td>0.0.11</td><td>role kart, przypinanie modelu</td><td>praca na karcie zintegrowanej (brak silnika Vulkan)</td></tr>
+<tr><td>Kamery, rozpoznawanie osób, opis obrazu</td><td>0.0.15, 0.0.16</td><td>plan C3; zrobiony pierwszy krok: kamery USB, podgląd, zdjęcie jako załącznik</td><td><strong>prawdziwa kamera</strong> — kamera laptopa jest odłączona sprzętowo</td></tr>
+<tr><td>Porządki w interfejsie</td><td>0.0.9–0.0.16</td><td>nazwy stron, grupy, panel „Agentki”, strona urządzeń w „System”</td><td>—</td></tr></tbody></table></div>
+<h2 id="2-co-powstalo-tej-nocy-wersje-0-0-16-i-0-0-17">2. Co powstało tej nocy (wersje 0.0.16 i 0.0.17)</h2>
+<ul>
+<li><strong>Kamery:</strong> strona „Kamery” w Ustawieniach, podgląd z kilku kamer naraz, przełączniki, znak działającej kamery
+w belce, przycisk „zdjęcie z kamery” w polu pisania, prośba „opisz mi to, co widzisz” sama dołącza zdjęcie, zamykanie kamer przez „STOP WSZYSTKIEGO”.</li>
+<li><strong>Klucze:</strong> „Importuj ze zmiennych środowiskowych” na stronie kont.</li>
+<li><strong>Interfejs:</strong> zwarty panel „Agentki”, „Urządzenia” w grupie „System”.</li>
+<li><strong>Głos:</strong> „Głośność mowy” w zakładce „Głos”.</li>
+<li><strong>Pakiet decyzji:</strong> <a href="../reviews/2026-10-10-pakiet-decyzji-wlasciciela.md"><code>../reviews/2026-10-10-pakiet-decyzji-wlasciciela.md</code></a>
+— 44 decyzje z opisem po ludzku i rekomendacją.</li>
+<li><strong>Przegląd kodu kamer w świeżym kontekście</strong> (ADR 0016): wynik w sekcji 6.</li>
+</ul>
+<h2 id="3-co-zrobic-rano-ok-15-minut">3. Co zrobić rano (ok. 15 minut)</h2>
+<ol>
+<li><strong>Kamera:</strong> odsłoń kamerę laptopa (zasłonka albo klawisz z ikoną kamery). W Alfie: Ustawienia → Kamery → włącz
+„Kamery włączone” → „Szukaj kamer” → „Podgląd”. Jeśli obraz jest odwrócony, ma złe kolory albo go nie ma —
+napisz, co widzisz; ten fragment kodu nie widział jeszcze prawdziwej kamery.</li>
+<li><strong>Głos:</strong> Ustawienia → Głos → „Głosy agentek” → „Odsłuchaj”. Zmień styl na „Żywy” albo „Spokojny” i różnice
+głosów na „Jeden głos” — powiedz, które ustawienie brzmi najlepiej.</li>
+<li><strong>„Opisz mi to, co widzisz”:</strong> przy włączonych kamerach napisz to zdanie — Alfa sama dołączy zdjęcie z kamery
+i pokaże je przy polu; drugi Enter wysyła (albo kliknij aparat w polu pisania). Działa z modelem, który przyjmuje obrazy (np. przez Twoje konto API);
+w rozmowie głosowej jeszcze nie.</li>
+<li><strong>Pakiet decyzji:</strong> przy pięciu najważniejszych pozycjach (B-03, S-01, S-03, B-01, R-05) wystarczy „tak”.</li>
+</ol>
+<h2 id="4-decyzje-ktore-odblokowuja-najwiecej">4. Decyzje, które odblokowują najwięcej</h2>
+<div class="tbl"><table><thead><tr><th>Decyzja</th><th>Propozycja</th><th>Co odblokuje</th></tr></thead><tbody><tr><td>Lepszy głos agentek</td><td><strong>A:</strong> inny głos lokalny (pobranie, licencja do sprawdzenia — ADR 0024) albo <strong>B:</strong> głos z chmury przez Twoje konto API, włączany przełącznikiem, nigdy w sesji prywatnej. Proponuję B jako opcję obok głosu lokalnego. <strong>Rozstrzygnięte 2026-10-11: A — głos lokalny</strong> (<a href="plan-15-glos-lokalny.html">dokument 15</a>, grupa C5)</td><td>naprawdę różne i naturalne głosy; B wymaga adaptera mowy z dostępem do klucza — dlatego nie robiłam tego bez Ciebie; projekt decyzji: <a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026</a></td></tr>
+<tr><td>ADR 0025 — kamery i biometria</td><td>podpisać w zaproponowanym kształcie</td><td>rozpoznawanie osób i pamięć osób (C3.8–C3.13)</td></tr>
+<tr><td>Dostęp agentek do kamer (<code>camera.look</code>)</td><td>zgoda na nową zdolność Brokera <code>camera.view</code></td><td>„opisz, co widzisz” bez ręcznego dołączania zdjęcia, także głosem</td></tr>
+<tr><td>Obraz z kamery do modelu w chmurze</td><td>za zgodą dla konkretnej kamery</td><td>droga chmurowa opisu obrazu</td></tr>
+<tr><td>„Opisz, co widzisz” głosem</td><td>w rozmowie głosowej nie ma podglądu zdjęcia przed wysłaniem, a pomyłka rozpoznawania mowy mogłaby zrobić zdjęcie. Propozycja: tylko pełna fraza, Alfa najpierw mówi „robię zdjęcie z kamery …”, a do modelu w chmurze wysyła je tylko, gdy na to zezwolisz</td><td>prośba głosowa o opis obrazu (miejsce w kodzie: <code>CoreVoiceChat::voice_turn</code>; jeszcze nienapisane)</td></tr>
+<tr><td>Pobranie silnika „llama.cpp Vulkan”</td><td>zgoda</td><td>lekkie zadania na karcie zintegrowanej</td></tr>
+<tr><td>Pięć najważniejszych decyzji bezpieczeństwa</td><td>„tak” dla rekomendacji</td><td>wdrożenie i przegląd Jądra, wejście na <code>main</code></td></tr>
+<tr><td><code>gh auth login</code> i wypchnięcie commitów</td><td>Twoje działanie</td><td>kopia pracy poza tym dyskiem — dziś wszystko jest tylko lokalnie</td></tr></tbody></table></div>
+<h2 id="5-plan-nastepnych-sesji-kolejnosc-proponowana">5. Plan następnych sesji (kolejność proponowana)</h2>
+<div class="tbl"><table><thead><tr><th>Kolejność</th><th>Zadanie</th><th>Wymaga decyzji?</th></tr></thead><tbody><tr><td>1</td><td>Poprawki po Twoim teście kamery i ocenie głosu</td><td>nie</td></tr>
+<tr><td>2</td><td>C3.5 — kamery sieciowe (RTSP, wyszukiwanie w sieci lokalnej), znak kamery w pigułce głosowej</td><td>zakres wyszukiwania w sieci — krótka zgoda</td></tr>
+<tr><td>3</td><td>Głos z chmury albo nowy głos lokalny</td><td><strong>tak</strong> (punkt 4)</td></tr>
+<tr><td>4</td><td>C3.6–C3.7 — opis obrazu modelem lokalnym, narzędzie <code>camera.look</code></td><td>zgoda na pobranie modelu i zdolność Brokera</td></tr>
+<tr><td>5</td><td>B.1–B.3 — generator typów, numery zdarzeń, błędy strukturalne (szwy pod panel WWW i telefon)</td><td>nie</td></tr>
+<tr><td>6</td><td>C2.14, C2.15 — okresowe sprawdzanie kluczy, konto zapasowe</td><td>nie</td></tr>
+<tr><td>7</td><td>C2.1 — zestaw ewaluacyjny po polsku</td><td>nie</td></tr>
+<tr><td>8</td><td>C3.8–C3.13 — osoby i ich pamięć</td><td><strong>tak</strong> (ADR 0025)</td></tr>
+<tr><td>9</td><td>A.7–A.8 — wdrożenie decyzji bezpieczeństwa, przegląd Jądra, wejście na <code>main</code></td><td><strong>tak</strong> (pakiet decyzji)</td></tr></tbody></table></div>
+<h2 id="6-przeglad-kodu-kamer-i-wyniki-testow">6. Przegląd kodu kamer i wyniki testów</h2>
+<p>Przegląd w świeżym kontekście: <a href="../reviews/2026-10-10-przeglad-kamer.md"><code>../reviews/2026-10-10-przeglad-kamer.md</code></a>
+— 9 ustaleń, 7 naprawionych (ostatnie w 0.0.18) (między innymi: znak kamery świeci już podczas otwierania i jeszcze
+podczas zamykania; „STOP WSZYSTKIEGO” nie czeka na zawieszoną kamerę), 2 otwarte — oba wymagają prawdziwej
+kamery.</p>
+<p>Drugi przegląd objął zmiany 0.0.11–0.0.17 poza kamerami:
+<a href="../reviews/2026-10-10-przeglad-0.0.11-0.0.17.md"><code>../reviews/2026-10-10-przeglad-0.0.11-0.0.17.md</code></a> — 5 ustaleń, w tym dwa
+o prywatności zdjęcia z kamery (naprawione: ostrzejsze rozpoznawanie prośby i wysyłka dopiero po drugim Enterze)
+i jedno o ekranie ładowania, który mógł zostać na zawsze (naprawione).</p>
+<div class="tbl"><table><thead><tr><th>Zestaw</th><th>Wynik (wersja 0.0.17)</th></tr></thead><tbody><tr><td>Testy jednostkowe interfejsu</td><td>295 z 295</td></tr>
+<tr><td>Testy okna w przeglądarce (atrapa rdzenia)</td><td>239 z 241; czerwone: znany próg „strumień 100 tok/s” i jeden test panelu głosu, który pada losowo pod obciążeniem (powtórzony osobno: zielony)</td></tr>
+<tr><td>Testy Rust — kamery, rdzeń, mowa, silnik lokalny</td><td>zielone; <code>clippy -D warnings</code> czysty dla zmienionych pakietów</td></tr>
+<tr><td>Prawdziwa aplikacja na profilu tymczasowym</td><td>15 z 15 (jedno podejście miało 14 z 15 — niestabilny pomocnik systemowego okna „Zapisz jako”; powtórka zielona)</td></tr>
+<tr><td>Prawdziwa kamera</td><td><strong>nie sprawdzono</strong> — kamera laptopa odłączona sprzętowo</td></tr>
+<tr><td>Pełny zestaw testów Rust całego repozytorium (<code>cargo test --workspace</code>)</td><td><strong>2565 zaliczonych, 0 czerwonych</strong>, 33 pominięte (oznaczone w kodzie jako wymagające sprzętu albo decyzji człowieka)</td></tr>
+<tr><td>Kontrola ostrzeżeń całego repozytorium (<code>cargo clippy --workspace --all-targets -D warnings</code>)</td><td>czysto</td></tr></tbody></table></div>
+</article>
+<footer>Źródło: <code>docs/plan/13-podsumowanie-i-dalsze-kroki.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

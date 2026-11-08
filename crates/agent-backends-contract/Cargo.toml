@@ -1,0 +1,33 @@
+[package]
+name = "agent-backends-contract"
+description = "Kontrakt AgentBackend (PLAN §5.1, §8.5): zadania mostów CLI, zdarzenia (niezweryfikowane przez Alfę), zatwierdzenia, reguły zgodności uruchamiania"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane na -fake i na mostach -impl z fałszywym CLI.
+contract-tests = ["dep:tokio", "dep:futures-util"]
+
+[dependencies]
+compliance-contract = { path = "../compliance-contract" }
+core-bus-contract.workspace = true
+providers-contract = { path = "../providers-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait.workspace = true
+futures-core.workspace = true
+tokio = { workspace = true, optional = true }
+futures-util = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio.workspace = true
+
+[lints]
+workspace = true

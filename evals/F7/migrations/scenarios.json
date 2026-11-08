@@ -1,0 +1,678 @@
+{
+  "version": 1,
+  "description": "Scenariusze migracji schematów (ACCEPTANCE F7-08): paczki .alfa (manifest, sesje, tury), dokumenty pamięci i bazy SQLite (sesje, pamięć, indeks). Status: szkic — wymaga akceptacji człowieka.",
+  "scenarios": [
+    {
+      "id": "m-01-paczka-v0",
+      "entity": "alfa.package",
+      "from": "0",
+      "to": "1.0.0",
+      "title": "Paczka v0 (szkic sprzed SPEC v1): manifest, nagłówek i tury v0 → v1",
+      "input": {"package": "fixtures/alfa-v0", "workdir_root": "{SESJE}"},
+      "expected": {
+        "outcome": "ok",
+        "schema_version": "1.0.0",
+        "kind": "export",
+        "keys": ["config.common", "sessions"],
+        "upcast": [
+          {
+            "entity": "manifest",
+            "from": "0",
+            "to": "1.0.0",
+            "count": 1
+          },
+          {"entity": "session", "from": "0", "to": "1", "count": 1},
+          {"entity": "turn", "from": "0", "to": "1", "count": 8}
+        ],
+        "files_intact": true,
+        "sessions": {
+          "s-stara": {
+            "title": "Stara rozmowa o wakacjach",
+            "workdir": "{SESJE}/s-stara",
+            "privacy": "normal",
+            "active_leaf": 8,
+            "draft": null,
+            "turns": [
+              {
+                "id": 1,
+                "parent": null,
+                "branch": 1,
+                "role": "user",
+                "author": {"kind": "user"}
+              },
+              {
+                "id": 2,
+                "parent": 1,
+                "branch": 1,
+                "role": "assistant",
+                "author": {"kind": "agent", "agent": "beta"}
+              },
+              {
+                "id": 3,
+                "parent": 1,
+                "branch": 2,
+                "role": "assistant",
+                "author": {"kind": "agent", "agent": "alfa"}
+              },
+              {
+                "id": 4,
+                "parent": 3,
+                "branch": 2,
+                "role": "user",
+                "author": {"kind": "user"}
+              },
+              {
+                "id": 5,
+                "parent": 4,
+                "branch": 2,
+                "role": "assistant",
+                "author": {"kind": "agent", "agent": "gama"}
+              },
+              {
+                "id": 6,
+                "parent": 2,
+                "branch": 1,
+                "role": "user",
+                "author": {"kind": "user"}
+              },
+              {
+                "id": 7,
+                "parent": 6,
+                "branch": 1,
+                "role": "tool",
+                "author": {"kind": "tool", "name": "narzędzie"}
+              },
+              {
+                "id": 8,
+                "parent": 7,
+                "branch": 1,
+                "role": "system",
+                "author": {"kind": "system"}
+              }
+            ],
+            "roundtrip_equal": true
+          }
+        }
+      },
+      "covered_by": [
+        "transfer-contract/src/migrate_tests.rs::v0_session_gets_branches_and_authors",
+        "transfer-contract/src/migrate_tests.rs::v0_manifest_is_upcast_and_valid"
+      ],
+      "notes": "Tura 3 bez pola `v` = v0; autor domyślny `alfa`; rola `tool` → autor „narzędzie”; gałęzie liczone regułami TreeCursor; ponowny eksport zapisuje rekordy v1."
+    },
+    {
+      "id": "m-02-paczka-v1-f1",
+      "entity": "alfa.package",
+      "from": "1.0.0",
+      "to": "1.0.0",
+      "title": "Eksport F1 (schemat 1.0.0) importuje się bez migracji i bez strat",
+      "input": {"package": "fixtures/alfa-v1", "workdir_root": "{SESJE}"},
+      "expected": {
+        "outcome": "ok",
+        "schema_version": "1.0.0",
+        "kind": "export",
+        "keys": ["config.common", "sessions"],
+        "upcast": [],
+        "files_intact": true,
+        "sessions": {
+          "s-f1": {
+            "title": "Plan wyjazdu do Torunia",
+            "workdir": "{SESJE}/s-f1",
+            "privacy": "normal",
+            "active_leaf": 5,
+            "draft": "A gdzie zjeść obiad?",
+            "turns": [
+              {
+                "id": 1,
+                "parent": null,
+                "branch": 1,
+                "role": "user",
+                "author": {"kind": "user"}
+              },
+              {
+                "id": 2,
+                "parent": 1,
+                "branch": 1,
+                "role": "assistant",
+                "author": {"kind": "agent", "agent": "alfa"},
+                "heard": {"chars": 41, "approximate": true},
+                "usage": true
+              },
+              {
+                "id": 3,
+                "parent": 1,
+                "branch": 2,
+                "role": "assistant",
+                "author": {"kind": "agent", "agent": "beta"},
+                "hidden": true
+              },
+              {
+                "id": 4,
+                "parent": 2,
+                "branch": 1,
+                "role": "user",
+                "author": {"kind": "user"}
+              },
+              {
+                "id": 5,
+                "parent": 4,
+                "branch": 1,
+                "role": "assistant",
+                "author": {"kind": "agent", "agent": "alfa"}
+              }
+            ],
+            "roundtrip_equal": true,
+            "turns_bytes_identical": true
+          }
+        }
+      },
+      "covered_by": ["transfer-impl/tests/contract.rs", "app-core/tests/transfer.rs"],
+      "notes": "Wymóg ACCEPTANCE F7-08 „wszystkie wersje od F1”: każda kolejna wersja schematu dokłada tu paczkę `alfa-v<N>`."
+    },
+    {
+      "id": "m-03-tury-mieszane",
+      "entity": "alfa.turns",
+      "from": "0+1",
+      "to": "1",
+      "title": "Plik tur mieszający rekordy v0 i v1",
+      "input": {
+        "turns_inline": "{\"v\":0,\"id\":1,\"parent\":null,\"role\":\"user\",\"text\":\"Cześć\",\"ts\":\"2026-05-01T10:00:00Z\"}\n{\"v\":1,\"id\":2,\"parent\":1,\"branch\":1,\"role\":\"assistant\",\"author\":{\"kind\":\"agent\",\"agent\":\"alfa\"},\"content\":{\"text\":\"Witaj!\",\"blocks\":[]},\"usage\":null,\"created_at\":\"2026-05-01T10:00:02Z\",\"heard_prefix\":null,\"hidden\":false}\n{\"v\":0,\"id\":3,\"parent\":1,\"role\":\"assistant\",\"text\":\"Dzień dobry!\",\"ts\":\"2026-05-01T10:00:09Z\",\"agent\":\"delta\"}\n"
+      },
+      "expected": {
+        "outcome": "ok",
+        "upcast": [{"entity": "turn", "from": "0", "to": "1", "count": 2}],
+        "turns": [
+          {"id": 1, "branch": 1, "author": {"kind": "user"}},
+          {
+            "id": 2,
+            "branch": 1,
+            "author": {"kind": "agent", "agent": "alfa"}
+          },
+          {
+            "id": 3,
+            "branch": 2,
+            "author": {"kind": "agent", "agent": "delta"}
+          }
+        ]
+      },
+      "covered_by": ["transfer-contract/src/migrate_tests.rs::v0_session_gets_branches_and_authors"]
+    },
+    {
+      "id": "m-04-manifest-nowszy-minor",
+      "entity": "alfa.manifest",
+      "from": "1.1.0",
+      "to": "—",
+      "title": "Paczka z nowszej wersji (minor) — odmowa bez zapisu",
+      "input": {
+        "manifest_from": "fixtures/alfa-v1/manifest.alfa.json",
+        "set": {"schema_version": "1.1.0"}
+      },
+      "expected": {
+        "outcome": "error",
+        "error": {
+          "error": "newer_schema",
+          "found": "1.1.0",
+          "supported": "1.0.0"
+        }
+      },
+      "covered_by": ["transfer-contract/src/manifest.rs::validation_rejects_bad_manifests"]
+    },
+    {
+      "id": "m-05-manifest-nowszy-major",
+      "entity": "alfa.manifest",
+      "from": "2.0.0",
+      "to": "—",
+      "title": "Paczka z nowszej wersji (major) — odmowa bez zapisu",
+      "input": {
+        "manifest_from": "fixtures/alfa-v1/manifest.alfa.json",
+        "set": {"schema_version": "2.0.0"}
+      },
+      "expected": {
+        "outcome": "error",
+        "error": {
+          "error": "newer_schema",
+          "found": "2.0.0",
+          "supported": "1.0.0"
+        }
+      },
+      "covered_by": []
+    },
+    {
+      "id": "m-06-manifest-starszy-major",
+      "entity": "alfa.manifest",
+      "from": "0.9.0",
+      "to": "—",
+      "title": "Manifest ze `schema_version` 0.x (starsze major bez upcastera) — czytelna odmowa „za stara”, nie „nowsza”",
+      "input": {
+        "manifest_from": "fixtures/alfa-v1/manifest.alfa.json",
+        "set": {"schema_version": "0.9.0"}
+      },
+      "expected": {
+        "outcome": "error",
+        "error": {
+          "error": "older_schema",
+          "found": "0.9.0",
+          "oldest": "1.0.0"
+        }
+      },
+      "covered_by": [
+        "transfer-contract/tests/f7_manifest.rs::f7_manifest_scenarios",
+        "transfer-contract/tests/f7_manifest.rs::older_major_is_rejected_as_older_not_newer"
+      ],
+      "notes": "Fala 5: wersji 0.x nie wydano (v0 to `format: 0`), więc nie ma dla niej upcastera — odmowa `older_schema` bez sugestii aktualizacji. Przy pierwszej zmianie major: upcaster vN → vN+1 w `transfer_contract::migrate`, a `OLDEST_SCHEMA_VERSION` zostaje na najstarszej wersji z łańcuchem."
+    },
+    {
+      "id": "m-07-rekordy-nowsze",
+      "entity": "alfa.turns",
+      "from": "2",
+      "to": "—",
+      "title": "Tura i nagłówek sesji w wersji v2 (nowszej) — odmowa",
+      "input": {
+        "turns_inline": "{\"v\":2,\"id\":1}\n",
+        "header_inline": {"v": 2, "id": "s"}
+      },
+      "expected": {
+        "outcome": "error",
+        "turns_error": {"error": "newer_schema", "supported": "v1"},
+        "header_error": {"error": "newer_schema", "supported": "v1"}
+      },
+      "covered_by": ["transfer-contract/src/migrate_tests.rs::newer_or_broken_records_are_rejected"]
+    },
+    {
+      "id": "m-08-uszkodzona-linia",
+      "entity": "alfa.turns",
+      "from": "0",
+      "to": "—",
+      "title": "Urwana linia NDJSON — błąd ze wskazaniem linii, nic nie zapisano",
+      "input": {
+        "turns_inline": "{\"v\":0,\"id\":1,\"parent\":null,\"role\":\"user\",\"text\":\"a\",\"ts\":\"2026-05-01T10:00:00Z\"}\n{\"v\":0,\"id\":2,\n"
+      },
+      "expected": {
+        "outcome": "error",
+        "error": {"error": "invalid", "path": "sessions/s/turns.ndjson:2"}
+      },
+      "covered_by": ["transfer-contract/src/migrate_tests.rs::newer_or_broken_records_are_rejected"]
+    },
+    {
+      "id": "m-09-drzewo-niepoprawne",
+      "entity": "alfa.turns",
+      "from": "0",
+      "to": "—",
+      "title": "Tury v0 łamiące drzewo: id poza kolejnością, rodzic nieistniejący, pusta treść",
+      "input": {
+        "cases": {
+          "poza-kolejnoscia": "{\"v\":0,\"id\":2,\"parent\":null,\"role\":\"user\",\"text\":\"a\",\"ts\":\"2026-05-01T10:00:00Z\"}\n",
+          "sierota": "{\"v\":0,\"id\":1,\"parent\":null,\"role\":\"user\",\"text\":\"a\",\"ts\":\"2026-05-01T10:00:00Z\"}\n{\"v\":0,\"id\":2,\"parent\":7,\"role\":\"assistant\",\"text\":\"b\",\"ts\":\"2026-05-01T10:00:01Z\"}\n",
+          "pusta": "{\"v\":0,\"id\":1,\"parent\":null,\"role\":\"user\",\"text\":\"\",\"ts\":\"2026-05-01T10:00:00Z\"}\n"
+        }
+      },
+      "expected": {
+        "outcome": "error",
+        "cases": {
+          "poza-kolejnoscia": {"error": "invalid", "reason_contains": "poza kolejnością"},
+          "sierota": {"error": "invalid", "reason_contains": "nie istnieje"},
+          "pusta": {"error": "invalid", "reason_contains": "pusta tura"}
+        }
+      },
+      "covered_by": ["sessions-contract/src/import.rs (TreeCursor)"]
+    },
+    {
+      "id": "m-10-manifest-v0-sciezka",
+      "entity": "alfa.manifest",
+      "from": "0",
+      "to": "—",
+      "title": "Manifest v0 z wpisem `../poza-paczka.txt` — upcast, potem odmowa reguły ścieżek",
+      "input": {
+        "manifest_from": "fixtures/alfa-v0/manifest.alfa.json",
+        "append_file": {
+          "name": "../poza-paczka.txt",
+          "sha256": "2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881",
+          "size": 1
+        }
+      },
+      "expected": {
+        "outcome": "error",
+        "error": {
+          "error": "unsafe_path",
+          "path": "../poza-paczka.txt",
+          "reason": "dot_segment"
+        },
+        "upcast": [
+          {
+            "entity": "manifest",
+            "from": "0",
+            "to": "1.0.0",
+            "count": 1
+          }
+        ]
+      },
+      "covered_by": ["transfer-impl/tests/robust.rs::path_traversal_is_rejected_without_writes"]
+    },
+    {
+      "id": "m-11-naglowek-inny-katalog",
+      "entity": "alfa.session",
+      "from": "0",
+      "to": "—",
+      "title": "Nagłówek v0 w katalogu o innym identyfikatorze — odmowa",
+      "input": {
+        "session_from": "fixtures/alfa-v0/sessions/s-stara",
+        "as_id": "inna"
+      },
+      "expected": {
+        "outcome": "error",
+        "error": {
+          "error": "invalid",
+          "path": "sessions/inna",
+          "reason": "identyfikator niezgodny z katalogiem"
+        }
+      },
+      "covered_by": []
+    },
+    {
+      "id": "m-12-paczka-sekretow",
+      "entity": "alfa.package",
+      "from": "1.0.0 (kind secrets)",
+      "to": "—",
+      "title": "Paczka sekretów ze starszej wersji — czytelna odmowa (sekrety tylko w Credential Manager)",
+      "input": {
+        "manifest_from": "fixtures/alfa-v1/manifest.alfa.json",
+        "set": {"kind": "secrets"}
+      },
+      "expected": {
+        "outcome": "error",
+        "manifest_valid": true,
+        "error": {"error": "secrets_not_allowed"},
+        "writes": 0
+      },
+      "covered_by": ["transfer-impl/tests/secrets.rs::legacy_secrets_package_is_refused_readably"],
+      "notes": "Manifest przechodzi walidację; odmowa w planie importu (`engine/plan.rs`) — przed jakimkolwiek zapisem."
+    },
+    {
+      "id": "m-13-sekcja-secrets-json",
+      "entity": "alfa.package",
+      "from": "1.0.0",
+      "to": "1.0.0",
+      "title": "`secrets.json` w zwykłej paczce starszej wersji — pominięty, reszta importowana",
+      "input": {
+        "package": "fixtures/alfa-v1",
+        "add_entry": {
+          "path": "secrets.json",
+          "content": "{\"accounts\":[{\"id\":\"acc-9\",\"key\":\"sk-KANAREK-F7-SEC\"}]}"
+        }
+      },
+      "expected": {
+        "outcome": "ok",
+        "skipped": ["secrets.json"],
+        "stored_secrets": 0,
+        "sessions": ["s-f1"]
+      },
+      "covered_by": ["transfer-impl/tests/secrets.rs::secrets_section_in_regular_package_is_skipped"],
+      "notes": "Paczkę z dodatkowym wpisem buduje runner (manifest przeliczony); kanarek nie może trafić do sejfu ani logów."
+    },
+    {
+      "id": "m-14-pamiec-v0",
+      "entity": "memory.document",
+      "from": "v0",
+      "to": "F7",
+      "title": "Wpisy pamięci bez pól F7 — wartości domyślne (wersja 1, puste pochodzenie, nieprzypięte)",
+      "input": {
+        "document": "global.ndjson",
+        "lines": "fixtures/memory/v0-global.ndjson"
+      },
+      "expected": {
+        "outcome": "ok",
+        "entries": [
+          {
+            "id": "m-001",
+            "trusted": true,
+            "version": 1,
+            "pinned": false,
+            "subject": null,
+            "origin_empty": true
+          },
+          {
+            "id": "m-002",
+            "trusted": true,
+            "version": 1,
+            "pinned": false,
+            "subject": null,
+            "origin_empty": true
+          },
+          {
+            "id": "m-003",
+            "trusted": true,
+            "version": 1,
+            "pinned": false,
+            "subject": null,
+            "origin_empty": true
+          }
+        ]
+      },
+      "covered_by": ["memory-impl/tests/documents.rs"]
+    },
+    {
+      "id": "m-15-pamiec-f7",
+      "entity": "memory.document",
+      "from": "F7",
+      "to": "F7",
+      "title": "Wpis F7 (temat, wersja, poprzednik, przypięcie, pochodzenie) — bez zmian",
+      "input": {
+        "document": "global.ndjson",
+        "lines": "fixtures/memory/f7-global.ndjson"
+      },
+      "expected": {
+        "outcome": "ok",
+        "entries": [
+          {
+            "id": "m-004",
+            "trusted": true,
+            "version": 2,
+            "pinned": true,
+            "subject": "spotkanie zespołu",
+            "supersedes": "m-000",
+            "origin_empty": false
+          }
+        ]
+      },
+      "covered_by": ["memory-impl/tests/documents.rs"]
+    },
+    {
+      "id": "m-16-pamiec-niezaufana-globalna",
+      "entity": "memory.document",
+      "from": "v0",
+      "to": "—",
+      "title": "Wpis z treści niezaufanej w zakresie globalnym — cały dokument odrzucony (S19)",
+      "input": {
+        "document": "global.ndjson",
+        "lines": "fixtures/memory/untrusted-global.ndjson"
+      },
+      "expected": {
+        "outcome": "error",
+        "document_rejected": true,
+        "written": 0,
+        "rejected": [
+          {
+            "id": "m-010",
+            "reason": "treść niezaufana w zakresie szerszym niż sesja"
+          }
+        ]
+      },
+      "covered_by": ["memory-contract/src/contract_tests_f7/access.rs::untrusted_never_promotes"],
+      "notes": "Pierwszy wpis jest poprawny, ale `MemoryDocuments` odrzuca dokument w całości — nic nie zapisano."
+    },
+    {
+      "id": "m-17-pamiec-falszywe-zaufanie",
+      "entity": "memory.document",
+      "from": "v0",
+      "to": "F7",
+      "title": "`trusted: true` przy pochodzeniu z treści niezaufanej — flaga liczona od nowa",
+      "input": {
+        "document": "session/s-f1.ndjson",
+        "lines": "fixtures/memory/trusted-claim-session.ndjson"
+      },
+      "expected": {
+        "outcome": "ok",
+        "entries": [{"id": "m-011", "trusted": false, "version": 1}]
+      },
+      "covered_by": []
+    },
+    {
+      "id": "m-18-pamiec-inny-zakres",
+      "entity": "memory.document",
+      "from": "v0",
+      "to": "—",
+      "title": "Wpis globalny w dokumencie zakresu sesji — odmowa",
+      "input": {
+        "document": "session/s-f1.ndjson",
+        "lines": "fixtures/memory/scope-mismatch.ndjson"
+      },
+      "expected": {
+        "outcome": "error",
+        "document_rejected": true,
+        "rejected": [
+          {
+            "id": "m-012",
+            "reason": "zakres wpisu różny od zakresu dokumentu"
+          }
+        ]
+      },
+      "covered_by": []
+    },
+    {
+      "id": "m-19-pamiec-zrodlo-szersze",
+      "entity": "memory.document",
+      "from": "F7",
+      "to": "—",
+      "title": "Wpis sesji wyprowadzony z wpisu globalnego — odmowa (pochodzenie nie może być szersze)",
+      "input": {
+        "document": "session/s-f1.ndjson",
+        "lines": "fixtures/memory/derived-broader.ndjson"
+      },
+      "expected": {
+        "outcome": "error",
+        "document_rejected": true,
+        "rejected": [
+          {
+            "id": "m-013",
+            "reason": "źródło w zakresie szerszym niż wpis"
+          }
+        ]
+      },
+      "covered_by": []
+    },
+    {
+      "id": "m-20-baza-sesji-0001",
+      "entity": "sqlite.sessions",
+      "from": "0001",
+      "to": "0001",
+      "title": "Baza sesji z F1 otwierana bieżącym kodem — bez migracji, tury czytelne, append-only działa",
+      "input": {
+        "sql": "fixtures/sqlite/sessions-0001.sql",
+        "namespace": "sessions"
+      },
+      "expected": {
+        "outcome": "ok",
+        "applied": [],
+        "turns_decoded": true,
+        "update_blocked": true,
+        "delete_blocked": true
+      },
+      "covered_by": [
+        "lib-sqlstore/tests/sqlstore.rs::migrations_apply_once_per_namespace",
+        "sessions-impl/tests/storage.rs"
+      ]
+    },
+    {
+      "id": "m-21-pamiec-0001-v0",
+      "entity": "sqlite.memory",
+      "from": "0001",
+      "to": "0002",
+      "title": "Pamięć v0 w bazie sesji → migracja 0002 (dziennik, eksporty); wpisy v0 czytelne",
+      "input": {
+        "sql": "fixtures/sqlite/memory-0001-v0.sql",
+        "namespace": "memory"
+      },
+      "expected": {
+        "outcome": "ok",
+        "applied": ["0002"],
+        "journal_table": true,
+        "entries": [
+          {
+            "id": "m-101",
+            "version": 1,
+            "pinned": false,
+            "origin_empty": true
+          },
+          {
+            "id": "m-102",
+            "version": 1,
+            "pinned": false,
+            "origin_empty": true
+          }
+        ]
+      },
+      "covered_by": ["lib-sqlstore/tests/sqlstore.rs::migrations_apply_once_per_namespace"]
+    },
+    {
+      "id": "m-22-indeks-0001",
+      "entity": "sqlite.search",
+      "from": "0001",
+      "to": "0002",
+      "title": "Indeks wyszukiwania 0001 → 0002 (`search_vec_missing`); FTS działa dalej",
+      "input": {
+        "sql": "fixtures/sqlite/search-0001.sql",
+        "namespace": "search"
+      },
+      "expected": {
+        "outcome": "ok",
+        "applied": ["0002"],
+        "vec_missing_table": true,
+        "fts_hit": 1
+      },
+      "covered_by": ["search-impl/tests/reindex.rs"],
+      "notes": "Tabele `vec0` tworzy `prepare` po migracji (wymiar embeddera) — poza tym scenariuszem."
+    },
+    {
+      "id": "m-23-baza-z-nowszej-wersji",
+      "entity": "sqlite.sessions",
+      "from": "0001+0002",
+      "to": "—",
+      "title": "Powrót do starszej wersji aplikacji po migracji nowszej (aktualizator, wersje obok siebie) — baza tylko do odczytu, bez zmian",
+      "input": {
+        "sql": "fixtures/sqlite/sessions-unknown-0002.sql",
+        "namespace": "sessions"
+      },
+      "expected": {
+        "outcome": "ok",
+        "applied": [],
+        "newer": ["0002"],
+        "read_only": true,
+        "write_blocked": true,
+        "schema_unchanged": true
+      },
+      "covered_by": [
+        "sessions-impl/tests/f7_migrations.rs::f7_sessions_sql_scenarios",
+        "sessions-impl/tests/rollback.rs",
+        "lib-sqlstore/tests/rollback.rs"
+      ],
+      "notes": "Fala 5 (ADR 0007): migracje nieznane kodowi, ale nowsze od każdej znanej = baza z nowszej wersji. `lib_sqlstore::migrate` nic nie zapisuje i przełącza połączenie w `query_only` (dane czytelne, zapis odrzucony czytelnym błędem); migracje oznaczone przez nowszą wersję jako addytywne (`schema_compat`) — praca normalna. Luka/rozwidlenie historii nadal `UnknownMigration` (m-24 i testy `lib-sqlstore`)."
+    },
+    {
+      "id": "m-24-dziennik-migracji-uszkodzony",
+      "entity": "sqlite.memory",
+      "from": "0002 bez 0001",
+      "to": "—",
+      "title": "Dziennik migracji z luką (0002 bez 0001) — odmowa, bez zmian w bazie",
+      "input": {
+        "sql": "fixtures/sqlite/memory-out-of-order.sql",
+        "namespace": "memory"
+      },
+      "expected": {
+        "outcome": "error",
+        "error": "MigrationOutOfOrder",
+        "schema_unchanged": true
+      },
+      "covered_by": ["lib-sqlstore/tests/sqlstore.rs"]
+    }
+  ]
+}

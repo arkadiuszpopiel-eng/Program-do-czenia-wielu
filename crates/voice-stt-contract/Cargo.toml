@@ -1,0 +1,29 @@
+[package]
+name = "voice-stt-contract"
+description = "Rozpoznawanie mowy Voice Suite: kontrakt — partial/final, pewność i znaczniki słów, PL/EN, hotwords, bramka VAD, prywatność, fallback backendu, zdarzenia voice.stt.*"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+voice-audio-contract = { path = "../voice-audio-contract" }
+voice-vad-contract = { path = "../voice-vad-contract" }
+device-profile-contract = { path = "../device-profile-contract" }
+providers-contract = { path = "../providers-contract" }
+core-bus-contract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Galeria kształtów</title>
+<style>
+body { font-family: system-ui, sans-serif; }
+.siatka { display: grid; grid-template-columns: repeat(4, 80px); gap: 16px; }
+.k { width: 80px; height: 80px; }
+.c { background: #d32f2f; }
+.n { background: #1565c0; }
+.z { background: #2e7d32; }
+</style>
+</head>
+<body>
+<h1>Galeria kształtów</h1>
+<p>Kwadraty poniżej nie mają podpisów.</p>
+<div class="siatka" aria-hidden="true">
+<div class="k c"></div><div class="k n"></div><div class="k c"></div><div class="k z"></div>
+<div class="k n"></div><div class="k c"></div><div class="k z"></div><div class="k c"></div>
+<div class="k z"></div><div class="k n"></div><div class="k c"></div><div class="k n"></div>
+<div class="k c"></div><div class="k z"></div><div class="k n"></div><div class="k c"></div>
+</div>
+</body>
+</html>

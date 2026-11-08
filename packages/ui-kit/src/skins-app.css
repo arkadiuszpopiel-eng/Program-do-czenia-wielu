@@ -1,0 +1,52 @@
+/*
+ * Tła obszaru roboczego okna głównego w stylach z skins.css: siatka „Next”, poświata „Szkła”,
+ * kropki „Juniora”. Osobny plik, bo okna poboczne (Szybkie pytanie, pigułka — budżet ≤ 8 KB gzip)
+ * nie mają obszaru roboczego. Ładuj po skins.css.
+ */
+
+@media (forced-colors: none) {
+  /* Next: siatka 32 px z tła obszaru roboczego prototypu. */
+  :root[data-skin='next'] {
+    --alfa-skin-grid: light-dark(rgba(15, 22, 32, 0.045), rgba(255, 255, 255, 0.045));
+  }
+  :root[data-skin='next'] [data-surface='app'] {
+    background-color: var(--alfa-color-bg);
+    background-image:
+      linear-gradient(to right, var(--alfa-skin-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--alfa-skin-grid) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Szkło: barwna poświata pod całym oknem; duże obszary układu są przezroczyste. */
+  :root[data-skin='glass'] {
+    --alfa-skin-aurora-1: light-dark(rgba(129, 140, 248, 0.42), rgba(99, 102, 241, 0.4));
+    --alfa-skin-aurora-2: light-dark(rgba(56, 189, 248, 0.36), rgba(34, 197, 232, 0.3));
+    --alfa-skin-aurora-3: light-dark(rgba(244, 114, 182, 0.28), rgba(236, 72, 153, 0.24));
+  }
+  :root[data-skin='glass'] body:has([data-surface='app']) {
+    background:
+      radial-gradient(70vw 60vh at 8% -12%, var(--alfa-skin-aurora-1), transparent 62%),
+      radial-gradient(60vw 55vh at 100% 4%, var(--alfa-skin-aurora-2), transparent 58%),
+      radial-gradient(60vw 70vh at 62% 112%, var(--alfa-skin-aurora-3), transparent 62%),
+      var(--alfa-color-bg);
+    background-attachment: fixed;
+  }
+  :root[data-skin='glass'] [data-surface='app'] {
+    background: transparent;
+  }
+
+  /* Junior: kropki jak kartka z zeszytu w kropki. */
+  :root[data-skin='junior'] {
+    --alfa-skin-dots: light-dark(rgba(162, 121, 58, 0.16), rgba(255, 248, 236, 0.07));
+  }
+  :root[data-skin='junior'] [data-surface='app'] {
+    background-color: var(--alfa-color-bg);
+    background-image: radial-gradient(var(--alfa-skin-dots) 1.5px, transparent 1.6px);
+    background-size: 28px 28px;
+  }
+
+  /* Obszar zagnieżdżony w innym nie rysuje wzoru drugi raz (przesunięte linie i kropki). */
+  :root:is([data-skin='next'], [data-skin='junior']) [data-surface='app'] [data-surface='app'] {
+    background: transparent;
+  }
+}

@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P) — Alfa</title>
+<!-- Plik generowany: node scripts/docs-html.mjs ze źródła docs/plan/17-przeniesienie-z-delty.md. Nie edytuj ręcznie. -->
+<style>/* Styl stron docs/html (wklejany do każdej strony przez scripts/docs-html.mjs). Fonty systemowe,
+   bez zasobów zewnętrznych; jasny i ciemny według systemu albo przełącznika. */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f4f6fa, #0d1118);
+  --panel: light-dark(#ffffff, #151b24);
+  --line: light-dark(#d5dce6, #2a3340);
+  --text: light-dark(#111822, #e9eef5);
+  --muted: light-dark(#4a5567, #a3adbb);
+  --link: light-dark(#0a6c84, #6fd3e6);
+  --code: light-dark(#eef1f6, #1c2430);
+  --ok: light-dark(#0e7a44, #58d39a);
+  --run: light-dark(#0a6c84, #6fd3e6);
+  --todo: light-dark(#5b4fc4, #a99cf5);
+  --wait: light-dark(#8a5a00, #f0c060);
+  --plan: light-dark(#5a6678, #8f9bad);
+  --lab: light-dark(#a03a7a, #e58cc4);
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    15px/1.6 'Segoe UI Variable',
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-weight: 650;
+  color: var(--text);
+  text-decoration: none;
+}
+header button {
+  font: inherit;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  max-width: 1500px;
+  margin: 0 auto;
+}
+nav {
+  position: sticky;
+  top: 49px;
+  align-self: start;
+  max-height: calc(100vh - 49px);
+  overflow: auto;
+  padding: 16px 12px 40px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+}
+nav summary {
+  display: none;
+}
+nav h2 {
+  margin: 18px 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+nav ul,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav a {
+  display: block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+nav a:hover {
+  background: var(--code);
+}
+nav a[aria-current='page'] {
+  background: var(--code);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--link);
+}
+main {
+  padding: 8px 32px 60px;
+  min-width: 0;
+}
+article {
+  max-width: 1080px;
+}
+h1 {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 24px 0 12px;
+}
+h2 {
+  font-size: 20px;
+  margin: 36px 0 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 60px;
+}
+h3 {
+  font-size: 16px;
+  margin: 24px 0 8px;
+  scroll-margin-top: 60px;
+}
+.toc {
+  float: right;
+  width: 230px;
+  margin: 28px 0 16px 28px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 13px;
+}
+.toc a {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+}
+code {
+  font:
+    0.92em 'Cascadia Mono',
+    Consolas,
+    ui-monospace,
+    monospace;
+  background: var(--code);
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+pre {
+  overflow: auto;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--code);
+  line-height: 1.4;
+}
+pre code {
+  padding: 0;
+  background: none;
+}
+.tbl {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  clear: both;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th,
+td {
+  padding: 7px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+thead th {
+  background: var(--code);
+  font-weight: 650;
+  white-space: nowrap;
+}
+tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.st {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.st0 {
+  color: var(--ok);
+}
+.st1 {
+  color: var(--run);
+}
+.st2 {
+  color: var(--todo);
+}
+.st3 {
+  color: var(--wait);
+}
+.st4 {
+  color: var(--plan);
+}
+.st5 {
+  color: var(--lab);
+}
+.bar {
+  display: flex;
+  height: 12px;
+  min-width: 160px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--code);
+}
+.bar span {
+  background: currentColor;
+}
+.chip {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 1px 9px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 13px;
+}
+.meta,
+.legend,
+footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+footer {
+  margin-top: 48px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  clear: both;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 2px 16px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+  }
+  nav {
+    position: static;
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 16px;
+  }
+  nav summary {
+    display: block;
+    padding: 6px 0;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  main {
+    padding: 4px 16px 40px;
+  }
+  .toc {
+    float: none;
+    width: auto;
+    margin: 12px 0;
+  }
+}
+@media print {
+  header,
+  nav,
+  .toc {
+    display: none;
+  }
+  .layout {
+    display: block;
+  }
+}
+</style>
+</head>
+<body>
+<header><a class="brand" href="index.html">Alfa — plan i stan</a><button id="theme" type="button">Jasny / ciemny</button></header>
+<div class="layout">
+<nav aria-label="Dokumenty"><details id="navd"><summary>Spis dokumentów</summary><ul><li><a href="index.html">Start</a></li></ul><h2>Plan v6</h2><ul><li><a href="plan-00-stan-wykonania.html">00 — Stan wykonania</a></li><li><a href="plan-01-wizja-i-zasady.html">01 — Wizja i zasady planu v6</a></li><li><a href="plan-02-architektura-docelowa.html">02 — Architektura docelowa</a></li><li><a href="plan-03-roadmapa.html">03 — Roadmapa (dokument żywy)</a></li><li><a href="plan-04-nowe-funkcje.html">04 — Katalog nowych funkcji</a></li><li><a href="plan-05-windows.html">05 — Windows 11 (pierwsza wersja)</a></li><li><a href="plan-06-linux.html">06 — Linux</a></li><li><a href="plan-07-panel-www.html">07 — Panel WWW (sterowanie przez Internet)</a></li><li><a href="plan-08-android.html">08 — Android 15 i nowsze</a></li><li><a href="plan-09-dostep-zdalny-i-bezpieczenstwo.html">09 — Dostęp zdalny i bezpieczeństwo</a></li><li><a href="plan-10-zgodnosc-prawna.html">10 — Zgodność prawna (UE / Polska)</a></li><li><a href="plan-11-technologie-2026-10.html">11 — Technologie, stan na 2026-10-09</a></li><li><a href="plan-12-kamery-i-rozpoznawanie-osob.html">12 — Kamery, rozpoznawanie osób i opis obrazu</a></li><li><a href="plan-13-podsumowanie-i-dalsze-kroki.html">13 — Podsumowanie pracy (2026-10-09 → 10) i dalsze kroki</a></li><li><a href="plan-14-funkcje-wkrotce.html">14 — Funkcje oznaczone „wkrótce” i funkcje zależne od modułów</a></li><li><a href="plan-15-glos-lokalny.html">15 — Głos lokalny wysokiej jakości (dodatek do planu v6)</a></li><li><a href="plan-16-plan-zbiorczy.html">16 — Plan zbiorczy Alfy (stan i całość planu na 2026-10-11)</a></li><li><a href="plan-17-przeniesienie-z-delty.html" aria-current="page">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</a></li><li><a href="plan-18-wielu-uzytkownikow.html">18 — Wielu użytkowników: konta, logowanie, role (etap U)</a></li><li><a href="plan-19-specyfikacja-glosu-delty.html">19 — Specyfikacja systemu rozmowy i mowy Delty AI 0.8.35 (wzorzec dla P1)</a></li><li><a href="plan-20-macierz-delty-czesc-1.html">20 — Macierz funkcji Delty AI, część 1: powłoka, ustawienia, rozmowa, agentki, narzędzia</a></li><li><a href="plan-21-macierz-delty-czesc-2.html">21 — Macierz funkcji Delty AI, część 2: wiedza, komputer, modele, twórczość, awatar, multimedia, reszta</a></li><li><a href="plan-22-nowosci-2026-10.html">22 — Nowości z rynku do dodania (przegląd z 2026-10-11)</a></li><li><a href="plan-23-raport-nocny-2026-10-12.html">Raport z nocy 2026-10-11 / 12 (wersje 0.0.34 – 0.0.44)</a></li><li><a href="plan-24-samodzielne-testowanie.html">Samodzielne testowanie — co pomijałem i jak to zamknąć</a></li><li><a href="plan-25-do-przegladu-po-audycie.html">25 — Do przeglądu właściciela po audycie z 14.10.2026</a></li><li><a href="plan-26-raport-nocny-2026-10-15.html">Raport z nocy 2026-10-14 / 15 (wersje 0.0.52 – 0.0.54)</a></li><li><a href="plan-27-raport-nocny-2026-10-16.html">Raport z nocy 2026-10-15 / 16 (wersje 0.0.60 – 0.0.62)</a></li><li><a href="plan-28-raport-nocny-2026-10-18.html">Raport z dnia i nocy 2026-10-17 / 18 (wersja 0.0.63 — każda karta graficzna)</a></li><li><a href="plan-29-raport-2026-10-18.html">Raport z 2026-10-18 (wersja 0.0.64, praca na laptopie)</a></li><li><a href="plan-30-przekazanie-na-pc-2026-10-19.html">Przekazanie pracy na drugi komputer — 2026-10-19 rano</a></li><li><a href="plan-31-raport-2026-10-20.html">Raport z 2026-10-20 (wersja 0.0.65, praca na laptopie)</a></li><li><a href="plan-32-raport-2026-10-20-0066.html">Raport z 2026-10-20 po południu (wersja 0.0.66, laptop)</a></li><li><a href="plan-33-raport-2026-10-21-0067.html">Raport z 2026-10-21 (wersja 0.0.67, komputer stacjonarny)</a></li><li><a href="plan-34-raport-2026-10-21-0068.html">Raport z 2026-10-21 wieczorem (wersja 0.0.68, komputer stacjonarny)</a></li><li><a href="plan-35-raport-2026-10-22-0069.html">Raport z nocy 21/22.10 (wersja 0.0.69, komputer stacjonarny)</a></li><li><a href="plan-36-raport-2026-10-22-0070.html">Raport z nocy 22.10, po 1:30 (wersja 0.0.70, komputer stacjonarny)</a></li><li><a href="plan-37-raport-2026-10-22-0071.html">Raport z 22.10 rano (wersja 0.0.71, komputer stacjonarny)</a></li><li><a href="plan-38-raport-2026-10-22-0072.html">Raport z 22.10 po południu (wersja 0.0.72 = „0.0.71B”, komputer stacjonarny)</a></li><li><a href="plan-39-przeglad-2026-10-27.html">Przegląd zmian z 23–24.10 (27.10, laptop)</a></li><li><a href="plan-40-raport-2026-10-27-silnik.html">Raport 27.10: połączenie z silnikiem NextGO.Gray, wersja 0.0.74 i menu „Tryb pracy”</a></li><li><a href="plan-41-tryb-dla-dzieci.html">41 — Alfa dla dzieci: nauka, zabawa i podgląd rodzica (etap K)</a></li><li><a href="plan-42-raport-2026-10-28-noc.html">Raport z nocy 27/28.10: porządki interfejsu, wersja 0.0.75</a></li><li><a href="plan-43-czytane-zdanie.html">43 — Wyróżnianie czytanego zdania (projekt, bez kodu)</a></li><li><a href="plan-44-raport-2026-10-30-noc.html">Raport z nocy 29/30.10: narzędzia na prawdziwym Bieliku, historia wersji kanwy, wersja 0.0.78</a></li><li><a href="plan-45-testy-ai.html">System pełnego automatycznego testowania przez AI</a></li><li><a href="plan-46-raport-2026-10-31-testy-ai.html">Raport z 31.10: system automatycznego testowania przez AI, ścieżki względne, wersja 0.0.79</a></li><li><a href="plan-47-raport-2026-11-01-noc.html">Raport z nocy 31.10/1.11: Sędzia Cieni, diagnostyka odporna na zawieszenie, wersja 0.0.81</a></li><li><a href="plan-48-raport-2026-11-01-rano.html">Raport 1.11 rano: zaległe inspekcje i testy</a></li><li><a href="plan-49-raport-2026-11-02-noc.html">Raport nocy 1/2.11: obowiązki modelu lokalnego i wymiana informacji między modelami</a></li><li><a href="plan-50-tryby-zgod-jak-claude-codex.html">50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)</a></li><li><a href="plan-51-raport-2026-11-03-wieczor.html">51 — Raport: wieczór 3.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-52-raport-2026-11-04-noc.html">52 — Raport: noc 3/4.11 (etap Z — tryby zgód jak w Claude Code i Codex)</a></li><li><a href="plan-53-raport-2026-11-06-noc.html">53 — Raport: noc 5/6.11 (etap Z — model-sędzia, dziennik rodzica, porządek kompilacji)</a></li></ul><h2>Stan i historia</h2><ul><li><a href="status.html">STATUS.md — macierz akceptacji fal F0–F9</a></li><li><a href="dowody.html">Rejestr dowodów</a></li><li><a href="kontynuacja.html">Alfa — ocena zdolności do kontynuacji i plan dalszych prac</a></li><li><a href="features-katalog.html">Katalog funkcji i testów</a></li><li><a href="changelog.html">Dziennik zmian Alfy</a></li></ul><h2>Decyzje (ADR)</h2><ul><li><a href="adr.html">Rejestr decyzji architektonicznych (ADR)</a></li><li><a href="adr-0001-stos-rust-tauri-svelte.html">ADR 0001 — Stos: Rust + Tauri 2 + Svelte 5</a></li><li><a href="adr-0002-mikrojadro-i-format-modulu.html">ADR 0002 — Mikrojądro i format modułu (trójka crate'ów, manifest)</a></li><li><a href="adr-0003-izolacja-brokera-i-broker-ui.html">ADR 0003 — Izolacja Brokera i Broker-UI na wyższym poziomie integralności</a></li><li><a href="adr-0004-ml-runtime-bez-pythona.html">ADR 0004 — ML runtime bez Pythona (whisper.cpp Vulkan/CUDA, ONNX Runtime CPU, sherpa-onnx)</a></li><li><a href="adr-0005-agentbackend-vs-modelprovider.html">ADR 0005 — Dwa kontrakty: ModelProvider (tokeny) i AgentBackend (zadania)</a></li><li><a href="adr-0006-historia-append-only-i-galezie.html">ADR 0006 — Historia rozmowy append-only + gałęzie</a></li><li><a href="adr-0007-instalacja-launcher-side-by-side-webview2.html">ADR 0007 — Instalacja: stały launcher, wersje side-by-side, stały folder WebView2</a></li><li><a href="adr-0008-dane-sqlite-szyfrowane-sqlite-vec-fts5.html">ADR 0008 — Dane: SQLite (WAL) szyfrowane + sqlite-vec + FTS5 w jednej bazie per sesja</a></li><li><a href="adr-0009-markdown-w-rust-iframe-dla-artefaktow.html">ADR 0009 — Markdown z LLM renderowany w Rust; sandboxowany iframe tylko dla artefaktów HTML/SVG</a></li><li><a href="adr-0010-regula-skrotow-globalnych-altgr.html">ADR 0010 — Reguła skrótów globalnych (polski AltGr) i kill-switch Ctrl+Shift+F12</a></li><li><a href="adr-0011-silniki-glosu-v0-i-audio-wasapi-aec.html">ADR 0011 — Silniki głosu v0 i audio: crate wasapi, AEC z własną referencją TTS</a></li><li><a href="adr-0012-wtyczki-wasmtime-wit.html">ADR 0012 — Wtyczki AI: wasmtime + własny WIT (cel wasip2), bez importów WASI</a></li><li><a href="adr-0013-kontrakty-i-codegen-ts.html">ADR 0013 — Kontrakty i generowanie typów: Rust → TS (tauri-specta/ts-rs), JSON Schema zdarzeń, WIT</a></li><li><a href="adr-0014-lokalny-llm-llama-cpp-zamiast-ollamy.html">ADR 0014 — Lokalny LLM: wbudowany llama.cpp (Vulkan/CUDA/CPU) zamiast Ollamy</a></li><li><a href="adr-0015-model-uprawnien-tokeny-zdolnosci-l0-l4.html">ADR 0015 — Model uprawnień: tokeny zdolności i poziomy autonomii L0–L4</a></li><li><a href="adr-0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.html">ADR 0016 — Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu</a></li><li><a href="adr-0017-strategia-wieloplatformowa.html">ADR 0017 — Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux</a></li><li><a href="adr-0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.html">ADR 0018 — Fabryka platform (platform-select) i kontrakty Brokera niezależne od systemu</a></li><li><a href="adr-0019-protokol-niezalezny-od-transportu.html">ADR 0019 — Protokół klient–host niezależny od transportu</a></li><li><a href="adr-0020-host-bez-okna.html">ADR 0020 — Host bez okna: binarka alfa-host, okno Tauri jako klient lokalny</a></li><li><a href="adr-0021-dostep-zdalny-przekaznik-e2e-i-parowanie.html">ADR 0021 — Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń</a></li><li><a href="adr-0022-zgody-zdalne-dowod-urzadzenia-sparowanego.html">ADR 0022 — Zgody zdalne: dowód urządzenia sparowanego (PairedDevice)</a></li><li><a href="adr-0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.html">ADR 0023 — Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów</a></li><li><a href="adr-0024-licencja-silnika-mowy.html">ADR 0024 — Licencja silnika mowy (następca Pipera na GPL-3.0)</a></li><li><a href="adr-0025-kamery-i-biometria-twarzy.html">ADR 0025 — Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją</a></li><li><a href="adr-0026-glos-z-chmury-jako-opcja.html">ADR 0026 — Głos agentek z chmury jako opcja obok głosu lokalnego</a></li><li><a href="adr-0027-wielu-uzytkownikow-konta-i-role.html">ADR 0027 — Wielu użytkowników: konta, logowanie i role</a></li><li><a href="adr-0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.html">ADR 0028 — DirectML dla głosu Supertonic i rozpoznawanie mowy na kartach AMD/Intel</a></li><li><a href="adr-0029-konta-dzieci.html">ADR 0029 — Konta dzieci: wiek, podgląd rodzica, chmura, odznaki</a></li></ul><h2>Nowe moduły (SPEC)</h2><ul><li><a href="modules-platform-select.html">platform-select — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-gateway.html">remote-gateway — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-device-pairing.html">device-pairing — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-remote-relay.html">remote-relay — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-host-headless.html">host-headless — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-web-panel.html">web-panel — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-offline-client.html">offline-client — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-android.html">platform-android — SPEC (szkic v0, planowany — plan v6)</a></li><li><a href="modules-platform-linux.html">platform-linux — SPEC (szkic v0, planowany — plan v6)</a></li></ul></details></nav>
+<main><aside class="toc" aria-label="Na tej stronie"><ul><li><a href="#zasady-przenoszenia">Zasady przenoszenia</a></li><li><a href="#co-alfa-juz-ma-nie-przenosimy">Co Alfa już ma (nie przenosimy)</a></li><li><a href="#p1-rozmowa-i-mowa">P1 — rozmowa i mowa</a></li><li><a href="#p2-modele-lokalne-i-panel-system">P2 — modele lokalne i panel System</a></li><li><a href="#p3-nawigacja-i-powloka">P3 — nawigacja i powłoka</a></li><li><a href="#p4-rozmowa-brakujace-funkcje">P4 — rozmowa: brakujące funkcje</a></li><li><a href="#p5-siec-wiedza-polecenia">P5 — sieć, wiedza, polecenia</a></li><li><a href="#p6-osoby-i-tozsamosc">P6 — osoby i tożsamość</a></li><li><a href="#p7-komputer">P7 — komputer</a></li><li><a href="#p8-tworczosc">P8 — twórczość</a></li><li><a href="#p9-awatar">P9 — awatar</a></li><li><a href="#p10-odtwarzanie-multimediow">P10 — odtwarzanie multimediów</a></li><li><a href="#p11-pozostale">P11 — pozostałe</a></li><li><a href="#p12-agentki-programistki">P12 — agentki programistki</a></li><li><a href="#p13-dyski-sieciowe-i-chmurowe-kopie-zapasowe">P13 — dyski sieciowe i chmurowe, kopie zapasowe</a></li><li><a href="#p14-obowiazki-codzienne-agentek">P14 — obowiązki codzienne agentek</a></li><li><a href="#nie-przenosimy">Nie przenosimy</a></li><li><a href="#weryfikacja">Weryfikacja</a></li></ul></aside><article><h1 id="17-przeniesienie-funkcji-z-delty-ai-0-8-35-etap-p">17 — Przeniesienie funkcji z Delty AI 0.8.35 (etap P)</h1>
+<p>Stan na <strong>2026-10-11</strong>, wersja 0.0.28. Decyzja właściciela: Alfa jest programem docelowym; z Delty przenosimy
+system rozmowy i mowy oraz wszystkie brakujące elementy — skrupulatnie, połączone z planem Alfy.</p>
+<p>Źródło: <code>Delta_AI_0.8.35_KOMPLET_2026-09-18/03_REPOZYTORIUM_GIT_CZYSTE/Delta-AI-System</code>. Analiza objęła dwa
+przejścia po kodzie (zaplecze Python: 46 grup i 356 tras API, 59 narzędzi agenta; okno: 11 obszarów roboczych,
+50 widoków). Niczego nie uruchamiano. Specyfikacja głosu ze stałymi: <a href="plan-19-specyfikacja-glosu-delty.html"><code>19</code></a>.
+Macierz pozycja po pozycji: <a href="plan-20-macierz-delty-czesc-1.html"><code>20</code></a> i <a href="plan-21-macierz-delty-czesc-2.html"><code>21</code></a>.</p>
+<p>Nowości z rynku dopisane do grup (R1–R13): <a href="plan-22-nowosci-2026-10.html"><code>22-nowosci-2026-10.md</code></a>.</p>
+<h2 id="zasady-przenoszenia">Zasady przenoszenia</h2>
+<ol>
+<li>Szkielet Alfy zostaje: moduły z kontraktami, Broker, klucze w Menedżerze poświadczeń, bez Pythona.
+Z Delty bierzemy <strong>zachowanie, progi zdobyte na sprzęcie i ekrany</strong> — napisane od nowa w Rust, w wyglądzie Alfy.</li>
+<li>Każde działanie w systemie idzie przez Brokera. Wad Delty nie przenosimy: potwierdzenia podawanego przez sam
+model, narzędzi plików z dostępem do całego dysku, tokenu administratora bez hasła, treści z sieci bez oznaczenia.</li>
+<li>Kontrolka, która w Delcie nic nie robi, w Alfie albo działa, albo jej nie ma.</li>
+<li>Testy Delty (1741 zaplecza, ok. 1400 okna) są kryteriami odbioru przenoszonych zachowań.</li>
+<li>Każda grupa: wersje z dziennikiem zmian, przegląd w 3 stylach × 2 motywach, test prawdziwej aplikacji, próba
+na laptopie właściciela.</li>
+</ol>
+<h2 id="co-alfa-juz-ma-nie-przenosimy">Co Alfa już ma (nie przenosimy)</h2>
+<p>Rozmowa z gałęziami, edycją i ponowieniem (Delta tego nie ma) · agentki, Kreator, umiejętności, wtyczki Wasm ·
+zadania w tle · pamięć czterowarstwowa i wyszukiwanie hybrydowe · konta dostawców, kolejki modeli, konto zapasowe ·
+mosty CLI · kamery USB · terminal · eksport <code>.alfa</code> · aktualizacje z historią zmian · Zdrowie systemu · tłumienie
+echa z sygnałem odniesienia i przerywanie głosem · dyktowanie i czytanie na głos · PL/EN, trzy style.</p>
+<h2 id="p1-rozmowa-i-mowa">P1 — rozmowa i mowa</h2>
+<p>Wniosek z analizy: Alfa ma lepszy szkielet rozmowy (dźwięk natywny, tłumienie echa, dwustopniowe przerywanie,
+zapis tego, co użytkownik usłyszał), ale niesprawdzony na żywo i z jednym mechanicznym głosem. Delta ma lepsze
+silniki, strojenie ze sprzętu, zabezpieczenia i pełny ekran sterowania. Przenosimy to drugie.</p>
+<div class="tbl"><table><thead><tr><th>Element</th><th>W Delcie</th><th>W Alfie</th></tr></thead><tbody><tr><td>Synteza Supertonic 3</td><td>6 kroków, tempo 1,05, 10 barw (F1–F5, M1–M5), dwa zdania z wyprzedzeniem, zapas: Piper, potem Edge</td><td>proces poboczny w Rust na ONNX Runtime za <code>TtsBackend</code></td></tr>
+<tr><td>17 gotowych głosów</td><td>Supertonic ×11 (w tym „spokojna” 0,95), Piper ×5 (gosia i mc_speech z parametrami szumu), Edge „Zofia” ×1</td><td><code>voice-tts-contract/src/voices.rs</code>; wybór głosu dla każdej agentki</td></tr>
+<tr><td>Rozpoznawanie Qwen3-ASR 1.7B</td><td><code>llama-server</code>, start przy pierwszej wypowiedzi, zwolnienie po 10 min, karta przy ≥ 3,2 GB wolnej pamięci, podpowiedź nazw własnych, klip do 30 s</td><td>drugi silnik w <code>voice-stt-impl</code>; Whisper zostaje zapasem</td></tr>
+<tr><td>Zabezpieczenia rozpoznawania</td><td>odrzut jakości (poniżej 0,25 s, szczyt poniżej 0,02, mniej niż 120 ms mowy) · bramka Silero (250 ms mowy) · flagi: zły język, powtórzenia, pusty tekst · ponowne rozpoznanie Whisperem · lista zmyślonych fraz · normalizacja polska</td><td>nowy strażnik rozpoznawania</td></tr>
+<tr><td>Bezpiecznik silnika</td><td>3 awarie z rzędu → 30 s przerwy → jedna próba</td><td>stan i przycisk „Zamknij bezpiecznik” w oknie</td></tr>
+<tr><td>Koniec wypowiedzi</td><td>Smart Turn v3.2: próba po 250 ms ciszy, ponawianie co 350 ms, najdłużej 2 s; wypowiedź do 25 s; zapas — suwak ciszy 0,4–3 s</td><td>w miejsce atrapy w <code>voice-turn-impl</code></td></tr>
+<tr><td>Słowo wywoławcze</td><td>w tekście wypowiedzi: pierwsze 3 słowa, tolerancja jednej litery</td><td>działa od razu; model Alfy zostaje opcją</td></tr>
+<tr><td>Telemetria i diagnostyka</td><td>200 ostatnich próbek, p50 / p95 na silnik; 5 testów mikrofonu i silnika</td><td>panel w oknie</td></tr>
+<tr><td>Ekran „Rozmowa na żywo”</td><td>7 bloków, ok. 30 kontrolek, test głosu i mikrofonu, „Posłuchaj”</td><td>strona „Głos” i panel boczny</td></tr>
+<tr><td>Kula stanu</td><td>w belce, jako nakładka, w osobnym oknie</td><td>rozszerzenie pigułki głosowej</td></tr></tbody></table></div>
+<p>Stan po wersji 0.0.43 (2026-10-12):</p>
+<div class="tbl"><table><thead><tr><th>Element</th><th>Stan</th><th>Wersja</th></tr></thead><tbody><tr><td>Synteza Supertonic 3</td><td>zrobione; rozgrzewka przy włączeniu mikrofonu</td><td>0.0.30, 0.0.35</td></tr>
+<tr><td>17 gotowych głosów</td><td>częściowo: 10 barw Supertonic do wyboru dla każdej agentki; głosy Pipera z parametrami i Edge zostają</td><td>0.0.31</td></tr>
+<tr><td>Rozpoznawanie Qwen3-ASR</td><td>zrobione, z wyborem karta / Whisper na karcie / procesor według wolnej pamięci karty</td><td>0.0.33, 0.0.38</td></tr>
+<tr><td>Zabezpieczenia rozpoznawania</td><td>zrobione (strażnik, flagi, lista zmyśleń, zapas)</td><td>0.0.33</td></tr>
+<tr><td>Bezpiecznik silnika</td><td>zrobione, ze stanem i przyciskiem „Zamknij bezpiecznik”</td><td>0.0.33, 0.0.35</td></tr>
+<tr><td>Koniec wypowiedzi</td><td>zrobione (Smart Turn w osobnym procesie, 250 / 350 / 2000 ms, ustawienia progu i ciszy)</td><td>0.0.34, 0.0.35</td></tr>
+<tr><td>Słowo wywoławcze w tekście</td><td>Alfa ma własne rozpoznawanie zwrotu po imieniu (dokładniejsze); dopisana pisownia „Alpha”, „Gamma”, „Betta”</td><td>0.0.35</td></tr>
+<tr><td>Telemetria i diagnostyka</td><td>zrobione: liczniki strażnika i Smart Turn, „Sprawdź silniki”; pięć testów mikrofonu zostaje</td><td>0.0.35–0.0.41</td></tr>
+<tr><td>Ekran „Rozmowa na żywo”</td><td>częściowo: karta „Silniki rozmowy” w Ustawieniach i w panelu, pięć ustawień rozmowy, język rozpoznawania, kula stanu z tekstem rozpoznawanym na bieżąco w panelu „Głos”</td><td>0.0.35–0.0.45</td></tr>
+<tr><td>Kula stanu</td><td>częściowo: w panelu „Głos” (stan słowem, kto mówi, tekst na bieżąco); jako nakładka i w osobnym oknie — do zrobienia</td><td>0.0.45</td></tr></tbody></table></div>
+<p>Wyjście z P1 (8 scenariuszy na żywo) czeka na właściciela; rozmowa „na sucho” na prawdziwych silnikach przeszła
+(pomiary w <a href="plan-19-specyfikacja-glosu-delty.html"><code>19</code></a>).</p>
+<p>Czego z Delty nie bierzemy: martwych kontrolek („Auto-wyślij”, „Głos” i „Prędkość” przy silnikach offline),
+braku przerwania modelu przy zatrzymaniu rozmowy, braku rozwijania liczb (Alfa to ma).</p>
+<p>Pomiar z 2026-10-11 (<a href="plan-15-glos-lokalny.html"><code>15</code></a> §5a) to potwierdza: Supertonic potrzebuje 1–2 s na zdanie, a jest
+używalny dzięki 6 krokom i wyprzedzeniu o dwa zdania.</p>
+<p><strong>Wyjście z P1:</strong> 8 scenariuszy z listy Delty na laptopie właściciela — odpowiedź ok. 1 s po ostatnim słowie,
+liczby, pauza 1,5 s w środku zdania, wahanie, krótkie „tak / nie”, zdanie po angielsku, przerwanie głosem,
+wypowiedź 30 s.</p>
+<h2 id="p2-modele-lokalne-i-panel-system">P2 — modele lokalne i panel System</h2>
+<ul>
+<li><strong>Sklep modeli</strong>: zakładki Polecane / HuggingFace / Polskie / Pobrane; filtry rodzaju, rodziny i rozmiaru;
+ocena „mieści się na karcie” (plik + 1,5 GB ≤ pamięć karty); kolejka pobierania; modele GGUF w częściach;
+archiwum z sumą SHA-256 i przywracaniem.</li>
+<li><strong>Listy</strong>: polecane (ok. 70 pozycji) i rodziny polskie pobierane na żywo (Bielik, PLLuM, Qra, Trurl, Krakowiak, polka).</li>
+<li><strong>Rozkład modelu na karty</strong>: role kart (główna / współdzieli / bufor / nieużywana), podział warstwami,
+wierszami albo tensorowo, gotowe układy, karta z innego komputera przez sieć.</li>
+<li><strong>Dopasowanie do pamięci karty</strong>: zapas 0–512 MiB, pięć stopni awaryjnego startu, dobór kontekstu do luzu.</li>
+<li><strong>Profile rodzin modeli i poprawki szablonów</strong>: łączenie komunikatów systemowych, spłaszczanie wywołań narzędzi,
+strażnik tur (model nie dopisuje wypowiedzi użytkownika), ponowienie po błędzie szablonu.</li>
+<li><strong>Parametry silnika</strong>: kontekst, pamięć KV, mmap, flash attention, dekodowanie spekulatywne, wczytanie przy
+starcie, zwalnianie po bezczynności.</li>
+<li><strong>Warianty silnika</strong> CUDA / Vulkan / ROCm z aktualizacją i samoczynnym wycofaniem.</li>
+<li><strong>Panel System</strong>: podsumowanie (model, gdzie działa, warstwy, szybkość, ocena wydajności) i zakładki Model /
+Sprzęt / Łącze; przełącznik „Korzystanie z modeli” (tylko offline / offline + online / tylko online).</li>
+<li><strong>Monitor sprzętu</strong>: wszystkie karty (pamięć, obciążenie, temperatura, moc), pamięć karty per proces.</li>
+<li><strong>Nowe (R10, R11)</strong>: „Alfa Link” — modele z mocniejszego własnego komputera używane jak lokalne (kanał z etapu D);
+parametr przyspieszenia dla modeli z przewidywaniem kilku słów naraz.</li>
+</ul>
+<p>Stan po wersji 0.0.45: zrobione — monitor kart NVIDIA na żywo (0.0.36), ocena „mieści się na karcie” (0.0.39),
+nowe silniki głosu w pakietach (0.0.35, 0.0.38), wyszukiwarka, kolejność i podsumowanie miejsca na dysku
+w katalogu modeli (0.0.45); reszta listy do zrobienia.</p>
+<h2 id="p3-nawigacja-i-powloka">P3 — nawigacja i powłoka</h2>
+<ul>
+<li><strong>Menu kołowe</strong>: F1 „Rdzeń poleceń” (8 pól), F2 „Macierz narzędzi” (8 grup z podmenu), środkowy przycisk
+myszy; 6 suwaków dostrajania, import i eksport ustawień.</li>
+<li><strong>Doki w górnej belce</strong>: grupy widoków (pokazują tylko widoki, które już istnieją); „Funkcje” — 12
+przełączników zdolności ze zdaniem stanu i kolorem ryzyka oraz przycisk „Odetnij od komputera”; „Skróty” — własne ulubione widoki; „Okna”.</li>
+<li><strong>Okna odczepiane</strong>: każdy widok, do 12 okien, gotowe układy (Laptop, 2 monitory, 21:9), profile pracy,
+przenoszenie między monitorami, zawsze na wierzchu.</li>
+<li><strong>Pulpit kafelkowy</strong>: do 12 kafli, trzy skale (także dotykowa), tryb edycji, 8 zapisanych układów, osobne okno.</li>
+<li><strong>Wstecz / Dalej</strong>: 50 pozycji, Alt+←/→ i boczne przyciski myszy.</li>
+<li><strong>Tabela skrótów</strong> (F10) z wyszukiwaniem; <strong>ekran startowy</strong> z bramką gotowości.</li>
+</ul>
+<p>Dostosowanie: obecna nawigacja Alfy i jej skróty zostają; menu kołowe, doki i pulpit dochodzą jako dodatkowe
+sposoby poruszania się. Reguła o skrótach z AltGr obowiązuje.</p>
+<p>Stan po wersji 0.0.43: zrobione — Wstecz / Dalej (0.0.37) i wyszukiwanie w tabeli skrótów (0.0.42); reszta listy
+do zrobienia.</p>
+<h2 id="p4-rozmowa-brakujace-funkcje">P4 — rozmowa: brakujące funkcje</h2>
+<p>Karty rozmów z profilem (zakres pamięci: Sesja / Osoba / Projekt) · panel boczny: Tablica (40 przypiętych
+odpowiedzi), pytania „z boku”, Źródła · Tryb skupienia · Arena (dwa modele, głosowanie, tryb ślepy, historia) ·
+załączniki z torami Wizja / Tekst / RAG / Odtwarzacz i czytnikami tekstu, tabel i PDF · archiwum rozmów
+z filtrami i statystykami; eksport Markdown / JSON / PDF · szablony promptów ze zmiennymi · „Styl odpowiedzi”
+i parametry próbkowania · budżet kontekstu ze streszczeniem pominiętych tur · wybór modelu z oceną dopasowania.</p>
+<h2 id="p5-siec-wiedza-polecenia">P5 — sieć, wiedza, polecenia</h2>
+<p>Wyszukiwanie w sieci, pobieranie stron z ochroną adresów, głębokie badanie (5–15 stron), automatyczne
+wyszukiwanie dla modeli bez narzędzi — treść z sieci zawsze oznaczona jako niezaufana · Wiadomości i Ulubione
+strony (RSS) · „Naucz” (kadr z kamery i opis), Wiedza (edycja, konsolidacja, import i eksport) · panel RAG
+z progiem trafności · 16 poleceń wykonywanych bez modelu (muzyka, głośność, okna, ekrany programu, nauka:
+liczenie, quiz, literowanie, losowanie, data) i własne polecenia z testerem · tłumaczenie PL/EN · wbudowana
+instrukcja (9 działów).</p>
+<h2 id="p6-osoby-i-tozsamosc">P6 — osoby i tożsamość</h2>
+<p>Baza osób (fakty z kategorią, źródłem i pewnością; osoba główna; historia rozmów) · rozpoznawanie twarzy i głosu ·
+aktywna osoba wybiera pamięć · automatyczne rozpoznawanie nowych osób (domyślnie wyłączone) · narzędzia agentki
+„kim jestem” i „zapamiętaj osobę”. ADR 0025 przyjęty przez właściciela 2026-10-11. Wzorce zaszyfrowane, klucz
+w Menedżerze poświadczeń, kasowanie na żądanie. Łączy się z kontami z etapu U.</p>
+<h2 id="p7-komputer">P7 — komputer</h2>
+<p>Głośność, uruchamianie programów, lista i przełączanie okien, schowek, klawisze multimediów, mysz i klawiatura,
+klik po tekście z ekranu, zrzuty — wszystko przez Brokera, z dziennikiem · menedżer procesów · spis urządzeń
+i sieci · ekran uprawnień · praca agentki programistki, która w Delcie była tylko podglądem, w Alfie realnie
+przez mosty CLI i Brokera · <strong>nowe (R7)</strong>: „zobacz to okno” — pytanie o zawartość wskazanego okna, z maskowaniem.</p>
+<h2 id="p8-tworczosc">P8 — twórczość</h2>
+<p>Studio obrazu (stable-diffusion.cpp: SD 1.5, SDXL, FLUX.1 i 2, Chroma; tekst → obraz, obraz → obraz, 9 próbników,
+LoRA, serie, profile, kreator promptu) · 7 dostawców obrazów w chmurze z kolejką zapasową i szacunkiem kosztu ·
+tryb hybrydowy · Galeria z metadanymi i archiwum · Studio opowieści (komiks, książka, artykuł; stała „biblia”
+postaci; eksport) · panel Audio · menedżer kamer (do 3 naraz, okno na kamerę, analiza ciągła).</p>
+<h2 id="p9-awatar">P9 — awatar</h2>
+<p>Pięć trybów (kula, 2D, 2.5D, 3D, modele VRM / GLB) · menedżer modeli · 16 emocji · ruch ust według głośności
+i 12 kształtów zsynchronizowanych z zegarem dźwięku · regulator jakości · osobne okno.</p>
+<h2 id="p10-odtwarzanie-multimediow">P10 — odtwarzanie multimediów</h2>
+<p>Odtwarzacz (kolejka, powtarzanie, wideo), most sterowania, narzędzia agentki i polecenia głosowe („włącz”,
+„głośniej”, „co gra”). Bez biblioteki i playlist (decyzja właściciela). Źródła: pliki lokalne i załączniki;
+pobieranie z serwisów — osobna decyzja przed włączeniem.</p>
+<h2 id="p11-pozostale">P11 — pozostałe</h2>
+<p>Edytor przepływów (9 typów węzłów, limity, tryb „mózg rozmowy”) · role agentów z modelem na rolę, reguły
+routera, przepływ planista → wykonawcy → synteza · edytor persony z bloków · warsztat własnych modułów
+(w Alfie: wtyczki Wasm i Ulepszacz) · laboratorium treningu (zestaw danych, konfiguracja, ocena) · pulpit testowy
+(32 testy zaplecza, porównanie przebiegów, raport) · personalizacja (gęstość, czcionka, kolor akcentu).</p>
+<h2 id="p12-agentki-programistki">P12 — agentki programistki</h2>
+<p>Zlecenie właściciela z 2026-10-11: Alfa i pozostałe agentki mają umieć pracować nad oprogramowaniem tak, jak
+robi to asystent programisty — pisać kod, uruchamiać go, budować i testować programy — rozmawiając ze sobą
+w trakcie pracy i dobierając model do trudności zadania. W Delcie był to tylko podgląd bez wykonywania.</p>
+<div class="tbl"><table><thead><tr><th>Element</th><th>Opis</th><th>Co Alfa już ma</th></tr></thead><tbody><tr><td>Warsztat projektu</td><td>katalog projektu jako obszar roboczy: czytanie, szukanie, edycja plików, polecenia, testy, budowanie, git</td><td>terminal, panel Pliki, wersje artefaktów, cofanie kroków</td></tr>
+<tr><td><strong>Przycisk „Pełne uprawnienia”</strong></td><td>nadrzędny przełącznik w belce i w polu pisania, jak tryb pełnego dostępu w Claude Code i Codex: po włączeniu agentki nie pytają o żaden krok — piszą, uruchamiają, instalują i budują bez zatwierdzeń. Włącza go wyłącznie człowiek (potwierdzenie w oknie Brokera), dla sesji albo projektu; stan jest stale widoczny (czerwony znak w belce i w pigułce), jedno kliknięcie albo STOP go wyłącza</td><td>poziom L4 „Maks” już istnieje („nie pyta o nic poza twardymi blokadami Jądra”) — przycisk jest jego szybkim włącznikiem</td></tr>
+<tr><td>Tryb zwykły w projekcie</td><td>bez przycisku: w obrębie katalogu projektu agentka działa sama, a poza nim, przy kasowaniu, sieci i instalacjach — zgoda w oknie Brokera</td><td>poziomy autonomii L0–L3, zakresy katalogów w Brokerze</td></tr>
+<tr><td>Rozmowa między agentkami</td><td>planistka dzieli zadanie, wykonawczynie pracują równolegle i zgłaszają wyniki, krytyczka sprawdza; właściciel widzi ich wymianę i może wejść w słowo</td><td>role, delegowanie, zadania równoległe, oś czasu</td></tr>
+<tr><td>Dobór modelu do zadania</td><td>czytanie plików, szukanie i streszczanie — model lekki (lokalny albo tani); planowanie, trudne poprawki, przegląd — model mocny, dopiero gdy trzeba; podniesienie klasy po nieudanej próbie — <strong>zrobione w 0.0.51</strong> (ocena trudności, szczeble, podnoszenie po odrzuceniu, Krytyczka na lekkim; dalej: osobny model lokalny na szczebel)</td><td>klasy zadań i kolejki modeli (Rozmowa, Kod, Planowanie, Streszczanie), limity kosztów</td></tr>
+<tr><td>Budżet i raport</td><td>limit kroków, czasu i kosztu na zadanie; po pracy raport: co zmieniono, wynik testów, co nie zostało sprawdzone</td><td>limity zadań, samoweryfikacja „Gotowe”</td></tr>
+<tr><td>Bezpieczniki</td><td>treść z plików i z sieci traktowana jako dane, nie polecenia; sekrety nie trafiają do modelu; STOP przerywa wszystko</td><td>Broker, kill-switch, filtr sekretów</td></tr>
+<tr><td>Równoległe przebiegi (R3)</td><td>każda agentka w osobnej kopii roboczej repozytorium; panel przebiegów z podglądem zmian</td><td>zadania równoległe, oś czasu</td></tr>
+<tr><td>Model do etapu pracy (R4, R5)</td><td>tani model szuka i czyta, mocny pisze, średni sprawdza; praca dzielona tylko wtedy, gdy części są niezależne</td><td>klasy zadań i kolejki</td></tr>
+<tr><td>Jedna rozmowa (R1) i głos (R6)</td><td>zwykłe pytanie samo przechodzi w zadanie; głosem można zapytać o postęp, wstrzymać i zatwierdzić</td><td>rozmowa głosowa</td></tr></tbody></table></div>
+<p>Co zostaje także przy włączonym przycisku: każde działanie wykonuje Broker i trafia do dziennika (bez pytania,
+ale z zapisem i możliwością cofnięcia kroków); agentki nie mogą same włączyć przycisku ani zmieniać Brokera,
+audytu i własnych uprawnień; sekrety nie trafiają do modelu; STOP (<code>Ctrl+Shift+F12</code>) działa zawsze. Role Dziecko
+i Gość z etapu U nie mają tego przycisku.</p>
+<h2 id="p13-dyski-sieciowe-i-chmurowe-kopie-zapasowe">P13 — dyski sieciowe i chmurowe, kopie zapasowe</h2>
+<p>Zlecenie właściciela z 2026-10-11 (nowa funkcja, w Delcie jej nie było): zaawansowane korzystanie z dysków
+sieciowych i chmurowych, z pełnymi uprawnieniami do tworzenia kopii zapasowych.</p>
+<div class="tbl"><table><thead><tr><th>Element</th><th>Opis</th><th>Co Alfa już ma</th></tr></thead><tbody><tr><td>Podłączanie magazynów</td><td>dyski sieciowe w domu i firmie (SMB / NAS), WebDAV, SFTP, magazyny zgodne z S3, OneDrive, Google Drive, Dropbox; logowanie przez okno dostawcy, bez podawania hasła Alfie</td><td>klucze i hasła w Menedżerze poświadczeń; kreator kont</td></tr>
+<tr><td>Przeglądanie i praca na plikach</td><td>magazyny widoczne w panelu Pliki jak zwykłe katalogi; agentki mogą na nich czytać, zapisywać i porządkować — przez Brokera, w granicach nadanych uprawnień</td><td>panel Pliki, wersje artefaktów, cofanie kroków</td></tr>
+<tr><td>Kopie zapasowe</td><td>pełne uprawnienia do tworzenia kopii: danych Alfy (rozmowy, pamięć, ustawienia, agentki) i wskazanych katalogów użytkownika; harmonogram, kopie przyrostowe, wersje z rotacją, szyfrowanie po stronie komputera przed wysłaniem, sprawdzanie sum, przywracanie całości albo pojedynczych plików</td><td>eksport <code>.alfa</code> z szyfrowaniem i kopie z rotacją (moduł <code>transfer</code>), harmonogram zadań</td></tr>
+<tr><td>Kilka celów naraz</td><td>zasada 3-2-1: kopia lokalna, na dysku sieciowym i w chmurze; raport po każdej kopii i alarm, gdy kopia się nie udała albo jest stara</td><td>Zdrowie systemu, powiadomienia</td></tr>
+<tr><td>Zasady z rynku (R12)</td><td>migawki bez powtórzeń, rotacja dzienna / tygodniowa / miesięczna, okresowe sprawdzanie próbki danych, ćwiczone przywracanie; łączniki z logowaniem u dostawcy (R9)</td><td>—</td></tr>
+<tr><td>Bezpieczniki</td><td>kopia nigdy nie kasuje źródła; usuwanie starych wersji tylko według ustawionej rotacji; klucze API i sekrety nie trafiają do kopii jawnie; w sesji prywatnej nic nie idzie do chmury</td><td>twarda reguła: sekrety tylko w Menedżerze poświadczeń</td></tr></tbody></table></div>
+<p>Uwaga do budowy: połączenia z siecią lokalną i z chmurą przechodzą przez strażnika sieci (<code>lib-netguard</code>) —
+jego zmiany wymagają przeglądu właściciela. Konta z etapu U mają własne magazyny i własne kopie.</p>
+<h2 id="p14-obowiazki-codzienne-agentek">P14 — obowiązki codzienne agentek</h2>
+<p>Zlecenie właściciela z 2026-10-11 (nowa funkcja): możliwość przypisania agentki do zadań codziennych, takich jak
+sprawdzanie poczty.</p>
+<div class="tbl"><table><thead><tr><th>Element</th><th>Opis</th><th>Co Alfa już ma</th></tr></thead><tbody><tr><td>Przypisanie obowiązku</td><td>ekran „Obowiązki”: wybierasz agentkę, zadanie i porę (codziennie o 8:00, co godzinę, po zdarzeniu); gotowe wzory i własne opisy słowami</td><td>zadania w tle, wyzwalacze (czas, nowy plik, ręcznie), reguły Marszałka</td></tr>
+<tr><td>Poczta</td><td>konta IMAP, Gmail i Outlook: przegląd nowych wiadomości, streszczenie, oznaczenie ważnych, szkice odpowiedzi; <strong>wysłanie zawsze po Twoim zatwierdzeniu</strong>, chyba że sam zezwolisz dla wybranych nadawców</td><td>Broker i zgody; hasła w Menedżerze poświadczeń</td></tr>
+<tr><td>Kalendarz i przypomnienia</td><td>plan dnia rano, przypomnienia głosem i powiadomieniem, wykrywanie kolizji terminów</td><td>powiadomienia, głos</td></tr>
+<tr><td>Inne wzory</td><td>przegląd wiadomości z ulubionych stron (P5), porządki w Pobranych, kopia zapasowa (P13), raport kosztów, sprawdzenie stanu systemu, pilnowanie strony albo ceny</td><td>Ulepszacz, Zdrowie systemu</td></tr>
+<tr><td>Budżet i model</td><td>każdy obowiązek ma limit kosztu i czasu; domyślnie model lekki albo lokalny, mocny tylko gdy zadanie tego wymaga (jak w P12)</td><td>limity zadań, „zadania w tle tylko lokalnie”</td></tr>
+<tr><td>Raport</td><td>po każdym przebiegu krótki wpis w osi czasu i w raporcie dnia: co zrobiono, co czeka na decyzję; możliwość odczytania głosem</td><td>raport dnia, oś czasu</td></tr>
+<tr><td>Rutyny (R2) i poranny przegląd (R8)</td><td>obowiązek to zapisane polecenie + zakres + łączniki, uruchamiane z harmonogramu, zdarzeniem albo ręcznie; rano raport: poczta, kalendarz, zadania, koszty</td><td>wyzwalacze, raport dnia</td></tr>
+<tr><td>Bezpieczniki (R13)</td><td>treść wiadomości to dane, nie polecenia; wysyłka po zatwierdzeniu; nowy adresat zawsze z pytaniem; obowiązek nie ma dostępu do płatności ani kluczy i nie podnosi sobie uprawnień; przycisk wstrzymania wszystkich obowiązków</td><td>Broker, tagi prywatności</td></tr></tbody></table></div>
+<p>Stan po wersji 0.0.45: cztery wzory obowiązków (0.0.40, ukryte w 0.0.44) <strong>wróciły</strong>. Zadanie w tle uruchomione
+wyzwalaczem albo harmonogramem dostaje razem z poleceniem arkusz faktów z programu — otwarte zadania, zadania
+zakończone dziś, wyzwalacze z terminami, koszty z dziś i z miesiąca z limitem, katalog roboczy — z zakazem wyjścia
+poza te dane (<code>crates/app-tasks/src/facts.rs</code>, zbiera <code>CoreHost::facts</code> w <code>crates/app-core/src/host.rs</code>). Zadania
+z sesji prywatnych nie trafiają do przebiegów spoza nich; zadanie oparte na treści niezaufanej arkusza nie dostaje.
+Próba na lokalnym modelu (Bielik 4.5B, profil tymczasowy): „Poranny przegląd dnia” w 85 s i „Podsumowanie dnia”
+w 3 min 8 s — raporty zgodne z danymi; „Kontrola kosztów” po doprecyzowaniu polecenia — 30 s, trzy punkty
+zgodne z danymi. Próba ujawniła i pozwoliła naprawić błąd tworzenia drugiego wyzwalacza o tej samej nazwie po
+restarcie programu.</p>
+<p>Od 0.0.64 zadanie w tle z arkuszem faktów (każde nieskażone zadanie z wyzwalacza albo harmonogramu, nie tylko
+gotowe obowiązki) biegnie <strong>bez delegacji</strong>: role zostają, ale bez grupy narzędzi <code>delegate</code>, a polecenie mówi
+wprost, że delegowanie jest niedostępne (<code>crates/app-tasks/src/brief.rs</code>). Powód: próba 0.0.64 — mały model
+lokalny w kopercie JSON wywoływał delegację w każdej turze aż do <code>LoopDetected</code>; forma raportu i tak zabrania
+przekazywania zadania. Gdy przebieg nie ma żadnych narzędzi, koperta JSON jest wyłączona. Obowiązek wymagający
+delegacji (np. „co poniedziałek niech Beta zbada X”) wymaga osobnej decyzji.</p>
+<p>Zostaje w P14: koszty z poszczególnych dni (do porównań tygodni), krótszy krok sprawdzania odpowiedzi przez drugą
+agentkę na lokalnym modelu (dziś to większość czasu obowiązku), ekran „Obowiązki”, poczta, kalendarz, budżet
+obowiązku i raport z wykonania. Zmiana poleceń wzorów wymaga powtórzenia próby na modelu
+(<code>apps/desktop/ui/src/lib/logic/duties.ts</code>).</p>
+<p>Konta z etapu U mają własne obowiązki i własne skrzynki; telefon i panel WWW pokazują raporty i prośby o decyzję.</p>
+<h2 id="nie-przenosimy">Nie przenosimy</h2>
+<ul>
+<li>Rój Ruflo — Alfa ma własne agentki i MCP.</li>
+<li>Wykrywanie środowiska Pythona i skryptowe instalatory silników.</li>
+<li>Klucze w plikach.</li>
+<li>Menedżer plików ograniczony do katalogu wysyłek — Alfa ma panel Pliki.</li>
+<li>Rzeczy w Delcie tylko zapowiedziane (klonowanie głosu Chatterbox, pełny dupleks, śledzenie twarzy dla awatara)
+trafiają do etapu H jako kandydaci; port na Linuksa Alfa planuje w etapie G.</li>
+</ul>
+<h2 id="weryfikacja">Weryfikacja</h2>
+<ul>
+<li>Dla każdej pozycji macierzy: test przepisany z Delty albo nowy; brak testu oznacza pozycję niezaliczoną.</li>
+<li>Bramki Alfy przy każdej wersji; pomiary na laptopie zapisywane w dokumencie grupy.</li>
+<li>Po każdej grupie porównanie z macierzą: lista pozycji zrobionych, odłożonych i odrzuconych z powodem.</li>
+</ul>
+</article>
+<footer>Źródło: <code>docs/plan/17-przeniesienie-z-delty.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
+</div>
+<script>(()=>{const k='alfa-docs-theme',r=document.documentElement;let t=null;try{t=localStorage.getItem(k)}catch{}
+if(t)r.dataset.theme=t;if(matchMedia('(min-width: 901px)').matches)document.getElementById('navd').open=true;document.getElementById('theme').addEventListener('click',()=>{const d=(r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))==='dark'?'light':'dark';
+r.dataset.theme=d;try{localStorage.setItem(k,d)}catch{}})})()</script>
+</body>
+</html>

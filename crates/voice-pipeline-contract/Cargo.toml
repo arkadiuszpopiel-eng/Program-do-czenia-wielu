@@ -1,0 +1,33 @@
+[package]
+name = "voice-pipeline-contract"
+description = "Kontrakt potoku głosu: składanie modułów voice-* (mikrofon → DSP → VAD → STT → komendy/koniec tury → dialog → odpowiedź → persona → TTS → wyjście), port ReplySource, wejścia UI, stan pigułki, zdarzenia voice.pipeline.*"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[features]
+default = []
+# Współdzielone testy kontraktowe uruchamiane przeciw `-impl` i `-fake`.
+contract-tests = []
+
+[dependencies]
+core-bus-contract.workspace = true
+personas-contract = { path = "../personas-contract" }
+providers-contract = { path = "../providers-contract" }
+voice-dialog-contract = { path = "../voice-dialog-contract" }
+voice-persona-contract = { path = "../voice-persona-contract" }
+voice-wake-contract = { path = "../voice-wake-contract" }
+voice-speaker-contract = { path = "../voice-speaker-contract" }
+risk-classifier-contract = { path = "../risk-classifier-contract" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars.workspace = true
+async-trait.workspace = true
+futures-core.workspace = true
+
+[lints]
+workspace = true
