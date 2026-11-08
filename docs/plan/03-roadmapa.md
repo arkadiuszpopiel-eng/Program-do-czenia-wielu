@@ -9,7 +9,7 @@ testy i natywna weryfikacja: [raport](../repairs-2026-10-24/REPORT.md).
 krótkie komendy `tool_call`, odtwarzanie odkrytych schematów i wspólny selektor
 estymacji Routera/runtime: [raport i pomiary](../tool-routing-2026-10-24/REPORT.md).
 
-Ostatnia aktualizacja: **2026-10-22** (wersja programu 0.0.72; ostatni raport: [`38-raport-2026-10-22-0072.md`](38-raport-2026-10-22-0072.md)). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-11-08** (wersja programu 0.0.85; ostatnia praca: [Z.8 — testy integracyjne sędziego](../reviews/2026-11-08-z8-app-judge.md), Linux/atrapy; próba Windows pozostaje otwarta). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -248,7 +248,7 @@ Plan: [`50-tryby-zgod-jak-claude-codex.md`](50-tryby-zgod-jak-claude-codex.md) (
 | Z.5 | Plan jako tryb | zrobione | 2026-11-03 | L0 = Plan: narzędzia odczytu, trzy odpowiedzi pod planem |
 | Z.6 | Profil Dziecko z kłódkami i PIN-em rodzica | zrobione | 2026-11-04 | kłódka w Sędzim (sufit L1), PIN Argon2id z blokadą; scalone 6.11; skrót PIN-u w prywatnym pliku Sędziego — zatwierdzone 6.11 (konto dziecka może zmieniać własny Menedżer poświadczeń, katalogu usługi nie) |
 | Z.7 | Dziennik rodzica pod PIN-em | zrobione | 2026-11-05 | scalone 6.11 za zgodą właściciela; tematy rozmów i działania z osi czasu (od 5.11 także zgody, odmowy, werdykty sędziego, zmiany trybu, Max dostęp i próby PIN-u); pełna treść rozmów włączana PIN-em (przełącznik w Sędzim, znak „Rodzic czyta” w belce); otwarcie „do końca rozmowy” (5.11 noc) |
-| Z.8 | Testy trybów, ataków i prawdziwej aplikacji | w toku | 2026-11-06 | tabela tryb × kategoria działania (`modes_matrix.rs`), ataki na kłódkę w Sędzim (głos, agentka, Max dostęp lokalny, zgadywanie PIN-u — `child_lock_attacks.rs`), kłódka w menu/palecie w każdym stylu i motywie; wstrzyknięcia do modelu-sędziego ACC-Z4-judge-04 (5.11, prawdziwy Bielik); prawdziwa aplikacja (6.11): kłódka w menu, wpisy w dzienniku rozmowy, „do końca rozmowy” z zamknięciem po zmianie rozmowy, Max dostęp odrzucony przy kłódce, obniżenie trybu z paska pisania; zostaje model-sędzia w prawdziwej aplikacji z modelem lokalnym |
+| Z.8 | Testy trybów, ataków i prawdziwej aplikacji | w toku | 2026-11-08 | tabela tryb × kategoria działania (`modes_matrix.rs`), ataki na kłódkę w Sędzim (głos, agentka, Max dostęp lokalny, zgadywanie PIN-u — `child_lock_attacks.rs`), kłódka w menu/palecie w każdym stylu i motywie; wstrzyknięcia do modelu-sędziego ACC-Z4-judge-04 (5.11, prawdziwy Bielik); prawdziwa aplikacja (6.11): kłódka w menu, wpisy w dzienniku rozmowy, „do końca rozmowy” z zamknięciem po zmianie rozmowy, Max dostęp odrzucony przy kłódce, obniżenie trybu z paska pisania; zostaje model-sędzia w prawdziwej aplikacji z modelem lokalnym; 8.11: osiem testów integracyjnych składania sędziego (16 wariantów) + regresja pochodzenia najnowszej odpowiedzi — 49 testów zielonych, 1 pomiar lokalny pominięty; poprawione dziedziczenie pochodzenia ze starszej tury; [raport](../reviews/2026-11-08-z8-app-judge.md). Z.8 na Windows nadal otwarte |
 
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 

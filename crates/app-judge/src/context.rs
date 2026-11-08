@@ -93,12 +93,13 @@ pub fn context_from_turns(turns: &[Turn]) -> JudgeContext {
         .filter(owner)
         .flat_map(|t| limits_in(&t.content.text))
         .collect();
-    // Przebieg w chmurze tylko przy jawnej informacji; brak — sędzia lokalny (zapis nie wychodzi z komputera).
+    // Liczy się najnowsza odpowiedź. Brak jej pochodzenia nie dziedziczy informacji ze starszej tury;
+    // zostaje sędzia lokalny (zapis nie wychodzi z komputera).
     let local_only = turns
         .iter()
         .rev()
-        .filter(|t| t.role == Role::Assistant)
-        .find_map(is_local)
+        .find(|t| t.role == Role::Assistant)
+        .and_then(is_local)
         .unwrap_or(true);
     let mut transcript = Vec::new();
     let start = turns.len().saturating_sub(MAX_TURNS);

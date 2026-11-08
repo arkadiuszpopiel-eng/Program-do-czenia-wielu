@@ -24,6 +24,14 @@ tokio.workspace = true
 [dev-dependencies]
 sessions-fake = { path = "../sessions-fake" }
 approval-judge-fake = { path = "../approval-judge-fake" }
+# Z.8: rzeczywisty Broker i Router, atrapy wyłącznie na portach maszyny i dostawcy modelu.
+safety-broker-contract = { path = "../safety-broker-contract", features = ["contract-tests"] }
+safety-broker-impl = { path = "../safety-broker-impl" }
+compliance-contract = { path = "../compliance-contract" }
+watchdog-contract = { path = "../watchdog-contract" }
+platform-fake = { path = "../platform-fake" }
+providers-fake = { path = "../providers-fake" }
+tokio = { workspace = true, features = ["test-util"] }
 # Eval ACC-Z4-judge-04 na modelu lokalnym (test `#[ignore]`) — app-judge jest korzeniem składania.
 providers-local-impl = { path = "../providers-local-impl" }
 serde.workspace = true

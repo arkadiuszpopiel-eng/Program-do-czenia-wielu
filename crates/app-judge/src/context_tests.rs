@@ -95,6 +95,24 @@ fn cloud_only_when_known() {
 }
 
 #[test]
+fn unknown_latest_assistant_does_not_inherit_cloud_permission() {
+    let (s, id) = session(vec![
+        NewTurn::user("Pobierz kurs EUR"),
+        with_usage(
+            NewTurn::assistant("delta", "Poprzednia odpowiedź"),
+            "anthropic",
+            "claude-opus-5-5",
+        ),
+        NewTurn::assistant("delta", "Teraz pobieram kurs"),
+    ]);
+    let ctx = SessionContext::new(s).context(id.as_str(), None).unwrap();
+    assert!(
+        ctx.local_only,
+        "brak pochodzenia ostatniej odpowiedzi nie pozwala użyć starszej zgody na chmurę"
+    );
+}
+
+#[test]
 fn new_owner_message_is_new_task() {
     let a = context_from_turns(&[]);
     assert!(a.task.is_none());
