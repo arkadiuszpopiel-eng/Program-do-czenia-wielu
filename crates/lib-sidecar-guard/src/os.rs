@@ -1,6 +1,7 @@
 //! Zapytania do systemu: odcisk procesów (nazwa, pełna ścieżka, czas utworzenia) i ich kończenie.
 //! Bez `windows-rs` (zasada: Windows API tylko w `platform-windows-*`) — narzędzia systemowe.
 
+#[cfg(any(windows, test))]
 use std::collections::BTreeMap;
 
 /// Proces zastany pod numerem: nazwa pliku i ścieżka (małymi literami), czas utworzenia (FILETIME).
@@ -15,6 +16,7 @@ pub struct Seen {
 }
 
 /// Wiersz odpowiedzi: `numer<TAB>nazwa<TAB>ścieżka<TAB>czas`.
+#[cfg(any(windows, test))]
 pub(crate) fn parse_snapshot(text: &str) -> BTreeMap<u32, Seen> {
     text.lines()
         .filter_map(|row| {
