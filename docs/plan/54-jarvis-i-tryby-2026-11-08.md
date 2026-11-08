@@ -10,7 +10,10 @@ kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
 
 Aktualizacja po pełnej próbie: UI **856/856**; Rust **3461 zaliczonych / 20 nieudanych / 24 pominięte**
 na `9b8b7416`. [Raport katalogu i wyniki](../reviews/2026-11-08-catalog-platform.md) opisują poprawkę
-13 przypadków `app-models` (78 testów zaliczonych po zmianie) i pozostałe zadania.
+13 przypadków `app-models` (78 testów zaliczonych po zmianie). Kolejne
+[poprawki fixture'ów #27–30](../reviews/2026-11-08-linux-fixtures.md): 95 zaliczonych / 0 nieudanych /
+3 pominięte w zakresach ukierunkowanych; pełny Rust po tych zmianach do ponowienia.
+Pozostają `tool_diag` #33, rozbieżności UI #32 i błędy Windows.
 
 | Kolejność | Zadanie | Stan |
 | --- | --- | --- |

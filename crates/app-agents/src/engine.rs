@@ -91,7 +91,9 @@ mod tests {
 
     #[test]
     fn setting_value_becomes_an_absolute_path() {
-        let vars = |n: &str| (n == "USERPROFILE").then(|| "C:\\Users\\A".to_owned());
+        let home = std::env::temp_dir().join("alfa-nextgo-user");
+        let vars = |n: &str| (n == "USERPROFILE").then(|| home.to_string_lossy().into_owned());
+        let sep = std::path::MAIN_SEPARATOR;
         assert_eq!(root_from_setting("", vars), None);
         assert_eq!(root_from_setting("  ", vars), None);
         assert_eq!(
@@ -99,10 +101,32 @@ mod tests {
             None,
             "tylko ścieżka pełna"
         );
+        let setting = format!("\"%USERPROFILE%{sep}Gry{sep}NextGO\"");
+        assert_eq!(
+            root_from_setting(&setting, vars),
+            Some(home.join("Gry").join("NextGO"))
+        );
+        let raw = home.join("Silnik Do Gier AI NextGO.Gray");
+        assert_eq!(root_from_setting(&raw.to_string_lossy(), vars), Some(raw));
+        assert!(root_from_setting(&format!("%NIEZNANA%{sep}x"), vars).is_none());
+        assert!(root_from_setting("%USERPROFILE%", |_| Some("wzgledna".into())).is_none());
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_drive_paths_and_profile_expansion_remain_supported() {
+        let vars = |n: &str| (n == "USERPROFILE").then(|| "C:\\Users\\A".to_owned());
         let p = root_from_setting("\"%USERPROFILE%\\Gry\\NextGO\"", vars).unwrap();
         assert_eq!(p.to_string_lossy(), "C:\\Users\\A\\Gry\\NextGO");
         let raw = root_from_setting("E:\\Silnik Do Gier AI NextGO.Gray", vars).unwrap();
         assert!(raw.ends_with("Silnik Do Gier AI NextGO.Gray"));
         assert!(root_from_setting("%NIEZNANA%\\x", vars).is_none());
+        assert!(root_from_setting("C:Silnik", vars).is_none());
+    }
+
+    #[cfg(not(windows))]
+    #[test]
+    fn windows_drive_path_is_not_an_absolute_host_path() {
+        assert!(root_from_setting(r"C:\Gry\NextGO", |_| None).is_none());
     }
 }

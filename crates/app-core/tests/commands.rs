@@ -333,13 +333,16 @@ async fn model_manager_lists_catalog_and_switches_embedder() {
         .unwrap();
     let view = core.models_list().await.unwrap();
     let ids: Vec<&str> = view.items.iter().map(|i| i.id.as_str()).collect();
-    for id in [
-        "multilingual-e5-small",
-        "silero-vad",
-        "sidecar-llama-vulkan",
-    ] {
+    for id in ["multilingual-e5-small", "silero-vad"] {
         assert!(ids.contains(&id), "{id} w {ids:?}");
     }
+    // Katalog aplikacji wybiera hosta; obecna binarka sidecara jest tylko dla Windows x64.
+    use app_models::catalog::Target;
+    assert_eq!(
+        ids.contains(&"sidecar-llama-vulkan"),
+        Target::host() == Some(Target::WINDOWS_X64),
+        "sidecar katalogu hosta w {ids:?}"
+    );
     let vad = view.items.iter().find(|i| i.id == "silero-vad").unwrap();
     assert!(vad.pinned && vad.confirmed);
     assert!(

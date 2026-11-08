@@ -165,9 +165,11 @@ mod tests {
 
     impl CliProbe for Probe {
         fn locate(&self, program: &str) -> Option<PathBuf> {
-            ["node", "git", "py", "winget"]
-                .contains(&program)
-                .then(|| PathBuf::from(format!(r"C:\bin\{program}.exe")))
+            ["node", "git", "py", "winget"].contains(&program).then(|| {
+                std::env::temp_dir()
+                    .join("alfa-software-test-bin")
+                    .join(format!("{program}.exe"))
+            })
         }
         fn version_output(&self, _path: &Path) -> Option<String> {
             None
@@ -189,14 +191,17 @@ mod tests {
     #[test]
     fn scan_finds_tools_versions_and_browsers() {
         let dir = std::env::temp_dir().join(format!("alfa-soft-{}", std::process::id()));
-        let edge = dir.join(r"Microsoft\Edge\Application");
-        std::fs::create_dir_all(&edge).unwrap();
-        std::fs::write(edge.join("msedge.exe"), b"").unwrap();
+        // Pełna ścieżka względna katalogu Windows: na innych hostach `\` jest częścią nazwy.
+        let edge = dir.join(r"Microsoft\Edge\Application\msedge.exe");
+        std::fs::create_dir_all(edge.parent().unwrap()).unwrap();
+        std::fs::write(&edge, b"").unwrap();
         let probe = CliSoftwareProbe::with_roots(Arc::new(Probe), vec![dir.clone()]);
         let items = probe.scan();
         let get = |id: &str| items.iter().find(|i| i.id == id);
         assert_eq!(get("node").unwrap().version.as_deref(), Some("20.11.1"));
         assert_eq!(get("git").unwrap().version.as_deref(), Some("2.45.1"));
+        assert_eq!(get("py").unwrap().version.as_deref(), Some("3.12.4"));
+        assert_eq!(get("winget").unwrap().version.as_deref(), Some("1.9.25200"));
         assert_eq!(get("edge").unwrap().kind, SoftwareKind::Browser);
         assert!(get("chrome").is_none() && get("docker").is_none());
         let miss = missing(&items);

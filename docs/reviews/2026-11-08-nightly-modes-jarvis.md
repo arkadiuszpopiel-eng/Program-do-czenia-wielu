@@ -103,7 +103,11 @@ na `25c4e788`: [zestaw wyników](artifacts/ci-149-results.json). Całość nie j
 - Zielone: powłoka Tauri (build, Clippy, testy produkcyjne i e2e), cargo-deny, UI lint/typy/jednostkowe/
   bundle/Storybook, silniki CPU na żywo, katalog URL/hash i instalatory PowerShell 5.1/7.
 
-Dalej: zachować wyniki próby #31, rozwiązać pozostałe fixture'y Linux #27–30 i `tool_diag`,
+[Poprawki danych testowych #27–30](2026-11-08-linux-fixtures.md): **95 zaliczonych / 0 nieudanych / 3 pominięte**
+w ukierunkowanych zakresach, Clippy zielone. Pierwszy przebieg55/1 zachowano i wyjaśniono.
+Pełny Rust po zmianach nie był jeszcze ponowiony.
+
+Dalej: rozwiązać `tool_diag` (#33), ponowić pełny Rust,
 wyjaśnić rozbieżności CI UI oraz problemy Windows. Nie uruchamiać LLM CPU równocześnie
 z testami czasowymi UI. Wymagany niezależny przegląd pozostaje otwarty; wersja 0.0.85, etap J w toku.
 Harmonogram ma cogodzinne wznowienia w Cloud; ostatnia iteracja o 07:00 UTC ma zebrać raport
