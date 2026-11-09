@@ -59,6 +59,13 @@ Wybór i konfiguracja dostawcy są częścią implementacji. Nie podpinamy przyp
 instancji ani logowania właściciela jako domyślnej usługi. Test żywy wymaga skonfigurowanego
 uprawnionego dostawcy; wpis w katalogu narzędzi nie jest dowodem działania wyszukiwarki.
 
+## Dodatkowa wykryta usterka CI
+
+CI169 ma905/905 zaliczonych scenariuszyChromium, ale krok przekroczył30 minut i zadanie jest
+nieudane. [#55 — trzy części302+302+301](../reviews/2026-11-09-ci-ui-shards.md) zachowują cały
+zbiór i istniejące progi. Naprawa wymaga rzeczywistego nowegoCI; nie deklarować jej zaliczenia
+na podstawie samej listy testów. Pozostałe zadaniaCI169 i wszystkieWindows91 są zielone.
+
 ## Stan i następny przyrost
 
 Pierwsza karta: [#54](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/54).
