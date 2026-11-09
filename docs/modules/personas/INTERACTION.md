@@ -25,7 +25,12 @@ i krótkie meldunki. Dotyczy Alfy, Bety, Gamy, Delty i nowych person korzystają
 
 Instrukcje profilu trafiają do zwykłej rozmowy (w tym transkrypcji głosu), bezpośredniego przebiegu agentki,
 podzadania uruchamianego przez Dyrygentkę i zadania w tle. Ustawienie jest zapisywane przez istniejący
-magazyn konfiguracji i walidowane schematem. Panel Agentki pozwala wybrać profil osobno dla każdej persony.
+magazyn konfiguracji i walidowane schematem. Panel Agentki pozwala wybrać profil osobno dla czterech person wbudowanych.
+
+Kreator przy bibliotece własnych agentek udostępnia ten sam wspólny profil Standardowy/Jarvis.
+Opis wskazuje wspólny zakres: własne persony dziedziczą go, podobnie wbudowane z wyborem
+„Jak ustawienie wspólne”. Osobny Standardowy/Jarvis wbudowanej persony ma nadal pierwszeństwo.
+Zapis zmienia profil od następnej odpowiedzi; nie uruchamia mikrofonu ani zadania.
 
 ## Sprawdzenie
 

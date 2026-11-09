@@ -20,6 +20,7 @@
   import { load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BuilderForm from './BuilderForm.svelte';
+  import BuilderInteraction from './BuilderInteraction.svelte';
   import BuilderPreview from './BuilderPreview.svelte';
   import './work.css';
 
@@ -167,6 +168,7 @@
 
 <section class="wk-card" aria-labelledby="bd-library">
   <h3 id="bd-library">{t('builder.library')}</h3>
+  <BuilderInteraction />
   {#if loaded && library.length === 0}
     <p class="wk-meta">{t('builder.libraryEmpty')}</p>
   {:else if library.length}

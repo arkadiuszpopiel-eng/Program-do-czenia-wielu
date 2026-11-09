@@ -199,3 +199,9 @@ Dwa conductor_handoff i dwa kodowania Windows pozostają nieudane. Linux Clippy 
 bez błędu/obcięcia/pomyłki autora, także po restarcie i ponownym przypisaniu roli. Standard5/5 jednego
 zdania, Jarvis0/5 jednego zdania,5/5 poprawnych form imienia. Uprawnienia dotychczasowe, mikrofon
 headless nieaktywny. Faktyczne instrukcje żądania routera zapisane w syntetycznym raporcie.
+
+## Wspólny Jarvis w Kreatorze, #44
+
+[Kontrolka i sprawdzenie](2026-11-09-builder-jarvis.md):9/9 E2E w26,4s,4 style/2 motywy iEN,
+Beta dziedziczy, osobny Standard Alfy pozostaje. Typy0/0, lint/format/build/bundle zielone;
+nowy pełny899 przygotowywany. Zakres wspólny opisany jawnie, mikrofon włączany osobno.
