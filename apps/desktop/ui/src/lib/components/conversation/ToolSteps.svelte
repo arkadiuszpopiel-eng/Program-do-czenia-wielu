@@ -31,6 +31,7 @@
     memory: Brain,
   };
   const running = $derived(steps.find((s) => s.status === 'running'));
+  const pending = $derived(steps.filter((s) => s.status === 'needs_confirmation').length);
   const total = $derived(steps.reduce((sum, s) => sum + (s.duration_ms ?? 0), 0));
   async function undo(step: ToolStep) {
     if (step.undo_token) await app.undoStep(step.undo_token, step.label);
@@ -56,6 +57,9 @@
       <span>{t('conv.toolRunning', { label: running.label })}</span>
     {:else}
       <span>{t('conv.tools', { n: steps.length })}</span>
+      {#if pending > 0}
+        <span class="pending">{t('conv.toolsNeedConfirmation', { n: pending })}</span>
+      {/if}
       {#if total > 0}<span class="time">· {app.i18n.duration(total)}</span>{/if}
     {/if}
   </button>
@@ -63,13 +67,16 @@
     <ul class="list" id={regionId}>
       {#each steps as step (step.id)}
         {@const Icon = ICONS[step.icon]}
-        <li class="step" class:error={step.status === 'error'}>
+        <li class="step" class:error={step.status === 'error'} data-tool-status={step.status}>
           <Icon size={14} strokeWidth={1.5} aria-hidden="true" />
           <span class="label">{step.label}</span>
+          {#if step.status === 'needs_confirmation'}
+            <span class="pending">{t('conv.toolNeedsConfirmation')}</span>
+          {/if}
           {#if step.duration_ms !== null}
             <span class="time">{app.i18n.duration(step.duration_ms)}</span>
           {/if}
-          {#if step.undo_token && !app.runs.isUndone(step.undo_token, step.undone)}
+          {#if step.status !== 'needs_confirmation' && step.undo_token && !app.runs.isUndone(step.undo_token, step.undone)}
             <button type="button" class="undo" onclick={() => undo(step)}>
               <Undo2 size={12} strokeWidth={1.5} aria-hidden="true" />
               {t('common.undo')}
@@ -89,6 +96,8 @@
   }
   .summary {
     display: inline-flex;
+    flex-wrap: wrap;
+    max-width: 100%;
     align-items: center;
     gap: var(--alfa-space-1);
     align-self: flex-start;
@@ -128,6 +137,7 @@
   }
   .step {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--alfa-space-2);
     min-height: 24px;
@@ -136,6 +146,15 @@
   }
   .step.error {
     color: var(--alfa-color-error);
+  }
+  .pending {
+    color: var(--alfa-color-text);
+    font-size: var(--alfa-font-size-xs);
+    font-weight: 600;
+  }
+  .label {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
   .time {
     color: var(--alfa-color-text-subtle);

@@ -51,3 +51,12 @@ fn paths_under_root_follow_layout() {
     );
     assert_eq!(p.workdirs(), std::path::Path::new("/x/user/Sesje"));
 }
+
+#[test]
+fn tool_status_retains_legacy_wire_values_and_confirmation() {
+    for value in ["running", "done", "error", "needs_confirmation"] {
+        let status: app_api::dto::ToolStatus =
+            serde_json::from_value(serde_json::json!(value)).unwrap();
+        assert_eq!(serde_json::to_value(status).unwrap(), value);
+    }
+}

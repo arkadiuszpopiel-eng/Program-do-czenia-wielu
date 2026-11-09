@@ -46,7 +46,8 @@ pub fn replay_status(status: StepStatus) -> ReplayStatus {
 /// Stan kroku narzędzia w wątku (zwinięta linia statusu).
 pub fn tool_status(status: StepStatus) -> UiToolStatus {
     match status {
-        StepStatus::Ok | StepStatus::NeedsConfirmation => UiToolStatus::Done,
+        StepStatus::Ok => UiToolStatus::Done,
+        StepStatus::NeedsConfirmation => UiToolStatus::NeedsConfirmation,
         StepStatus::Denied | StepStatus::Failed | StepStatus::Cancelled => UiToolStatus::Error,
     }
 }
@@ -217,6 +218,14 @@ pub fn short(s: &str, max: usize) -> String {
 mod tests {
     use super::*;
     use agent_runtime_contract::BudgetKind;
+
+    #[test]
+    fn needs_confirmation_is_not_reported_as_done() {
+        assert_eq!(
+            tool_status(StepStatus::NeedsConfirmation),
+            UiToolStatus::NeedsConfirmation
+        );
+    }
 
     #[test]
     fn mappings() {

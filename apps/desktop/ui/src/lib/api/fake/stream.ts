@@ -223,7 +223,7 @@ export class FakeStreamer {
           : null;
         const done = {
           ...running,
-          status: 'done' as const,
+          status: intent ? ('needs_confirmation' as const) : ('done' as const),
           duration_ms: tool.ms,
           undo_token: tool.undo ? `${sid}:u${toolIndex + 1}` : null,
           intent,

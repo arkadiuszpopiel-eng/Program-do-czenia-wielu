@@ -57,6 +57,12 @@ po cofnięciu nie trafia na nieznany wariant (punkty kontrolne go nie zawierają
 Brak własnych zdolności (tokeny per akcja). `inproc`, `on-demand`. RAM ≤ 10 MB per przebieg; narzut pętli ≤ 20 ms na krok.
 
 ## Integracja (`app-*`, opis — podpina sesja kompozycji)
+
+Projekcja kroku narzędzia w rozmowie zachowuje `NeedsConfirmation` jako osobne
+`ToolStatus::NeedsConfirmation` (`needs_confirmation` w IPC), zgodne z Replay. Propozycja
+otwarcia terminala lub czynność czekająca na potwierdzenie nie są `Done`. Wątek pokazuje jawny
+opis PL/EN i nie oferuje dla takiego kroku „Cofnij”. Ten stan nie zmienia decyzji Brokera ani
+nie dowodzi późniejszego wykonania przez właściciela; samo otwarcie terminala nie wykonuje komendy.
 `Crew.persona_instructions` przypina profil współpracy każdej persony do nowych delegacji (8.11).
 Potomkini dostaje własny profil zamiast stylu odpowiedzi rodzica. Brak mapy w starszym checkpoincie
 oznacza pustą mapę; format wewnętrznego werdyktu Krytyczki pozostaje bez profilu współpracy.
