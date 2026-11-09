@@ -6,6 +6,7 @@ import type { Page } from '@playwright/test';
 import { plRest } from '../src/lib/i18n/pl-rest';
 import { expect, inEverySkin, shot, test } from './alfa';
 import { call } from './ipc-call';
+import { withDockingViewport } from './docking-viewport';
 
 const REST_KEYS = Object.keys(plRest);
 
@@ -69,63 +70,64 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
     await expect(models).toHaveCount(0);
   });
 
-  const toggle = async () => {
-    await main.keyboard.press('Control+k');
-    await expect(main.locator('dialog[open] input')).toBeFocused();
-    await main.keyboard.type('chowaj panele');
-    await expect(main.locator('dialog [role=option][data-selected]')).toContainText(
-      'Chowaj panele boczne automatycznie',
-    );
-    await main.keyboard.press('Enter');
-  };
-  // Od 29.10 panele chowają się domyślnie: ta część startuje z zadokowanymi, a na końcu wraca
-  // ustawienie sprzed testu.
-  const autohide = (await call<Record<string, unknown>>(main, 'settings_values'))[
-    'ui.panels_autohide'
-  ];
-  if (autohide !== false) await toggle();
+  await withDockingViewport(main, async () => {
+    const toggle = async () => {
+      await main.keyboard.press('Control+k');
+      await expect(main.locator('dialog[open] input')).toBeFocused();
+      await main.keyboard.type('chowaj panele');
+      await expect(main.locator('dialog [role=option][data-selected]')).toContainText(
+        'Chowaj panele boczne automatycznie',
+      );
+      await main.keyboard.press('Enter');
+    };
+    // Od 29.10 panele chowają się domyślnie: ta część startuje z zadokowanymi, a na końcu wraca
+    // ustawienie sprzed testu.
+    const autohide = (await call<Record<string, unknown>>(main, 'settings_values'))[
+      'ui.panels_autohide'
+    ];
+    if (autohide !== false) await toggle();
 
-  // Sesje chowane w całości przyciskiem w nagłówku: znacznik, wysunięcie, „Przypnij panel”.
-  const sessions = main.getByRole('navigation', { name: 'Sesje' });
-  // Poprzednie scenariusze mogą zostawić Sesje zamknięte; otwórz je tą samą drogą co właściciel.
-  if (!(await sessions.isVisible())) {
-    await main.getByRole('button', { name: 'Pokaż panel Sesje', exact: true }).click();
-  }
-  await expect(sessions).toBeVisible();
-  await main.getByRole('button', { name: 'Schowaj panel Sesje (Ctrl+B)' }).click();
-  await expect(sessions).toHaveCount(0);
-  const leftEdge = main.locator('.edge-tab.left');
-  await expect(leftEdge).toBeVisible();
-  await leftEdge.hover();
-  const pinned = main.getByRole('complementary', { name: 'Sesje' });
-  await expect(pinned).toBeVisible();
-  await shot(alfa, '43a-sesje-wysuniete');
-  await pinned.getByRole('button', { name: 'Przypnij panel' }).click();
-  await expect(sessions).toBeVisible();
-  await expect(leftEdge).toHaveCount(0);
+    // Sesje chowane w całości przyciskiem w nagłówku: znacznik, wysunięcie, „Przypnij panel”.
+    const sessions = main.getByRole('navigation', { name: 'Sesje' });
+    // Poprzednie scenariusze mogą zostawić Sesje zamknięte; otwórz je tą samą drogą co właściciel.
+    if (!(await sessions.isVisible())) {
+      await main.getByRole('button', { name: 'Pokaż panel Sesje', exact: true }).click();
+    }
+    await expect(sessions).toBeVisible();
+    await main.getByRole('button', { name: 'Schowaj panel Sesje (Ctrl+B)' }).click();
+    await expect(sessions).toHaveCount(0);
+    const leftEdge = main.locator('.edge-tab.left');
+    await expect(leftEdge).toBeVisible();
+    await leftEdge.hover();
+    const pinned = main.getByRole('complementary', { name: 'Sesje' });
+    await expect(pinned).toBeVisible();
+    await shot(alfa, '43a-sesje-wysuniete');
+    await pinned.getByRole('button', { name: 'Przypnij panel' }).click();
+    await expect(sessions).toBeVisible();
+    await expect(leftEdge).toHaveCount(0);
 
-  // Panele chowane: przełącznik z palety, znacznik przy krawędzi, wysunięcie po najechaniu.
-  const edge = main.getByRole('button', { name: /^Panel Sesje — najedź/ });
-  await toggle();
-  try {
-    await expect(edge).toBeVisible();
-    await shot(alfa, '42b-panele-schowane');
-    const peek = main.getByRole('complementary', { name: 'Sesje' });
-    const [w, h] = await main.evaluate(() => [window.innerWidth, window.innerHeight]);
-    // Wysunięty panel nad rozmową w każdym stylu i motywie (kryjące tło warstwy, cień, znacznik).
-    await inEverySkin(main, async (skin, theme) => {
-      await edge.hover();
-      await expect(peek).toBeVisible();
-      await shot(alfa, `42c-panel-wysuniety-${skin}-${theme}`);
-      await main.mouse.move(w! / 2, h! / 2);
-      await expect(peek).toHaveCount(0);
-    });
-  } finally {
+    // Panele chowane: przełącznik z palety, znacznik przy krawędzi, wysunięcie po najechaniu.
+    const edge = main.getByRole('button', { name: /^Panel Sesje — najedź/ });
     await toggle();
-  }
-  await expect(edge).toHaveCount(0);
-  if (autohide !== false) await toggle();
-
+    try {
+      await expect(edge).toBeVisible();
+      await shot(alfa, '42b-panele-schowane');
+      const peek = main.getByRole('complementary', { name: 'Sesje' });
+      const [w, h] = await main.evaluate(() => [window.innerWidth, window.innerHeight]);
+      // Wysunięty panel nad rozmową w każdym stylu i motywie (kryjące tło warstwy, cień, znacznik).
+      await inEverySkin(main, async (skin, theme) => {
+        await edge.hover();
+        await expect(peek).toBeVisible();
+        await shot(alfa, `42c-panel-wysuniety-${skin}-${theme}`);
+        await main.mouse.move(w! / 2, h! / 2);
+        await expect(peek).toHaveCount(0);
+      });
+    } finally {
+      await toggle();
+    }
+    await expect(edge).toHaveCount(0);
+    if (autohide !== false) await toggle();
+  });
   // Panele leniwe z tekstami drugiej części słownika (Pamięć, Głos).
   for (const key of ['Alt+4', 'Alt+6']) {
     await main.keyboard.press(key);

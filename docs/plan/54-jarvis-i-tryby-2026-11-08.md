@@ -22,8 +22,13 @@ Luna z kreatora i delegacja korzystają z Jarvisa; poprawka odtwarza definicje p
 Obsada konkretnej rozmowy nadal wymaga ponownego przypisania (#37). Lokalne porażki UI i Windows pozostają otwarte.
 
 [Harness UI #38](../reviews/2026-11-09-ui-test-harness.md):16 funkcjonalnych wariantów Planu i10 powtórzeń
-Glass zaliczone z zegarem atrapy; progi dotychczasowe. Nowy pełny zestaw887 oraz poprawki uruchomienia
+Glass zaliczone z zegarem atrapy; progi dotychczasowe. Nowy pełny zestaw890 (po #40) oraz poprawki uruchomienia
 instancji i otwarcia Sesji w WebView2 wymagają szerokiej próby. Starego877/2 nie uznano za zielony wynik.
+
+[Viewport WebView2 #40](../reviews/2026-11-09-webview-viewport.md): rehearsal78 ma61/1/5,
+plakietka instancji zaliczona; panel otwierał się jako szuflada w1028px. Tylko scenariusz dokowania
+korzysta teraz z jawnego viewportu1600×900 CDP z przywróceniem.3/3 lokalne testy helpera i check0/0;
+rzeczywisty nowy WebView2 pozostaje do wykonania, bez deklaracji odbioru natywnego szerokiego okna.
 
 [Zegar kolejki #39](../reviews/2026-11-09-review-timer-windows.md): CI156 Windows utknął w nowym
 teście #34; po publikacji został anulowany i nie ma pełnego wyniku. Aktywne zadanie blokujące

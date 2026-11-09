@@ -164,3 +164,10 @@ przejściu299+1ms i wznowieniu zegara ten sam test przeszedł w0,32s, a zakresy 
 bez błędu. Kod produkcyjny,300ms i progi pozostają dotychczasowe. Częściowe Windows:139 zakończonych
 wyników celów,544/3/7, osobno3 indywidualne zaliczenia celu review; nie pełny wynik. Brak Brokera
 w teście załączników otrzymał diagnostykę i zwolnienie starych uchwytów przed restartem; Windows do potwierdzenia.
+
+[WebView2 #40](2026-11-09-webview-viewport.md): rehearsal78 na74ce7f99 ma61/1/5; plakietka
+instancji naprawiona. Pozostały test dokowania działał w1028px, gdzie układ słusznie pokazuje
+szufladę, bez przycisku dokowania. Tylko ten fragment dostaje teraz viewport1600×900 CDP,
+z przywróceniem metryk i odłączeniem w finally. Helper3/3 na Chromium, check0/0, lint zaliczony.
+Poprawka wymaga nowego Windows CI; emulowany viewport jest odrębny od natywnego okna i odbioru sprzętu.
+Nowy pełny lokalny zestaw ma890 testów i pozostaje do wykonania.
