@@ -234,3 +234,20 @@ Jarvis ma25/25 imion i0/25 jednego zdania także przed dekoderem;45/50 tekstów 
 w2,5min. Kłódka Dziecko3,0s, wszystkie kroki diagnostyki OK, dokowanie38,4s. #47 potwierdzone
 na Windows bez zmiany120s/polityki. Pominięte: specjalny profil poziomu, logowanie CLI (brak narzędzia),
 natywny eksport i dwa skróty głosowe w widocznym pulpicie. Brak odbioru sprzętu/mikrofonu właściciela.
+
+## Pełny Linux --all-features iChromium,05:37UTC
+
+[Nowy pełny raport12d44af4](2026-11-09-validation-12d44af4.md):Linux3495/0/25,77 integracji
+i1121 wyników celów, wszystkie komendy0. CI161 UI901/901 w28,6min i573/573 jednostkowych,
+typy0/0, lint/build/bundle/Storybook. Chronione importy Brokera nadal blokują Clippy Linux.
+[#49 Kreator→Głos](2026-11-09-builder-voice.md) ma9/9 lokalnych E2E i573/573 jednostkowych;
+pełny Chromium tej późniejszej kontrolki pozostaje do nowego CI po publikacji. Mikrofon nadal wyłączony.
+
+## Windows Rust CI161 zielony,05:47UTC
+
+[Pełne12d44af4](2026-11-09-validation-12d44af4.md):3521 zaliczonych,0 nieudanych,46 pominiętych;
+1121 oryginalnych wyników celów. Clippy Windows także zaliczony. Cztery poprawiane cele14/14
+(conductor4,files3,exec_low5,shell_utf82), wszystkie pięć dawnych porażek przeszło. #45 i #46
+mają rzeczywiste potwierdzenie Windows bez zmian progów/polityk. CI całościowo czerwone przez
+chronione LinuxClippy; brak przeglądu i sprzętu nie pozwala scalać. Następny przyrost #49
+ma9/9 i573/573 lokalnie, pełny nowy CI po publikacji.

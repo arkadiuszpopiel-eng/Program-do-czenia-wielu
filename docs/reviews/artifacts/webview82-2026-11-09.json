@@ -1,0 +1,22 @@
+{
+  "run": 42564408255,
+  "job": 128987662454,
+  "source": "12d44af48df812d59f9978a9b5b902011e3a6ab1",
+  "passed": 62,
+  "failed": 0,
+  "skipped": 5,
+  "duration": "2.5min",
+  "child_lock": "passed3.0s; allbreadcrumbs ok; no120s/policychange",
+  "scope": "actualWindowsWebView2 CDP runner; dockingviewportemulatedonly; noownerhardware/micacceptance",
+  "artifact": 13651257729,
+  "artifact_bytes": 47240793,
+  "artifact_sha256": "a40c4bd696222a7c6c50de147c9171ce8d5a3172198780136b7800e5eaeac81e",
+  "verified": true,
+  "stats": {
+    "expected": 62,
+    "unexpected": 0,
+    "skipped": 5,
+    "flaky": 0,
+    "duration_ms": 151351.757
+  }
+}

@@ -6,23 +6,24 @@ dla każdej agentki. Właściciel potwierdził termin: **9.11.2026 o 08:00**; za
 czasu polskiego: **Europe/Warsaw = 07:00 UTC**. Szczegóły Jarvisa pozostają według roboczego
 kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
 
-## Aktualny stan,9.11 o05:12UTC
+## Aktualny stan,9.11 o05:48UTC
 
 | Obszar | Ostatni dowód | Co pozostaje |
 | --- | --- | --- |
 | Pięć trybów | jawny zakres rozmowa/globalnie, Plan bez rozmowy, regresje zgód i kłódki | niezależny przegląd i odbiór sprzętu |
 | Jarvis wbudowanych i własnych person | wspólny profil; cztery osobne przełączniki; Luna po restarcie katalogu10/10 tur Bielika | trwała obsada rozmowy #37; osobne przełączniki własnych person |
-| Kreator #44 |9 nowych E2E, pełny899/899 i573/573 jednostkowych, typy0/0 | nowy pełny Chromium CI161 obejmuje901, trwa |
-| Rust Linux | [pełne3492/0/24](../reviews/2026-11-09-full-validation.md) na169a6004, domyślne cechy | ponowienie --all-features na zamrożonym12d44af4 trwa |
-| Rust Windows | CI160:3516/5/46; #45 ma7/7 Linux, #46 MSVC crosscheck+Clippy0 | CI161 na12d44af4 wykonuje pełne testy |
+| Kreator #44 iGłos #49 | CI161:901/901 i573/573, typy0/0; #49 ma9/9 nowych ścieżek i573/573 | pełny nowy Chromium przycisku #49 w następnym CI |
+| Rust Linux | [pełne3495/0/25 --all-features](../reviews/2026-11-09-validation-12d44af4.md) na12d44af4,77 integracji | chroniony LinuxClippy i przegląd |
+| Rust Windows | [CI161:3521/0/46](../reviews/2026-11-09-validation-12d44af4.md), Clippy0,14/14 w poprawianych celach | przegląd; Windows #49 w następnym CI |
 | Windows/WebView2 | [rehearsal82:62/0/5](../reviews/2026-11-09-webview-green.md), kłódka3,0s i dokowanie38,4s | pięć jawnych pominięć, sprzęt i rzeczywisty mikrofon |
 | Zwięzłość Bielika | [#48:50 ciał i50 surowych odpowiedzi](../reviews/2026-11-09-jarvis-wire.md); Jarvis25/25 imion | jedno zdanie0/25 także przed dekoderem; Standard Bety/Gamy błędne imiona |
 | CI i przegląd | Tauri, cargo-deny, dokumentacja zielone | LinuxClippy: chronione importy Brokera, łatka dla człowieka; świeży przegląd |
 
 Kolejność do07:00UTC:
 
-1. Zebrać pełne wyniki Rust --all-features Linux, Windows CI161 i Chromium901 bez nakładania
-   ciężkich lokalnych prób. Nie przepisywać wcześniejszych porażek jako zaliczeń.
+1. Opublikować sprawdzony #49 i wykonać jego pełny Chromium w nowym CI. Windows CI1613521/0/46,
+   Linux --all-features3495/0/25 i dotychczasowy Chromium901/901 zakończone.
+   Nie przepisywać wcześniejszych porażek jako zaliczeń.
 2. Jeśli nowe Windows wykaże porażki, odtworzyć i poprawiać małe zakresy bez zmiany limitów;
    chronione poprawki pozostają łatkami do przeglądu człowieka.
 3. Opublikować raporty sprawdzonego przyrostu, aktualny plan/roadmapę i wygenerowane HTML;
@@ -76,26 +77,15 @@ prób i ograniczenie dysku opisano w tym raporcie.
 - O 07:00 UTC zakończyć nowe zmiany i przedstawić wynik. Etap J pozostaje otwarty do przeglądu i próby sprzętowej;
   obecna seria robocza nie stanowi wydania, wersja pozostaje 0.0.85.
 
-## Prewarunek rzeczywistego menu, #47
+## Dowody szczegółowe
 
-[Regresja modalu Głosu](../reviews/2026-11-09-composer-modal.md):Windows81 wskazał blokadę kliku,
-Chromium1028px odtworzył przechwycenie przez scrim. Helper zamyka modal zwykłym przyciskiem;
-2/2 po zmianie, typy0/0,120s i polityka dotychczasowe. Rzeczywisty Windows do wykonania.
+[Pełne12d44af4](../reviews/2026-11-09-validation-12d44af4.md) ·
+[Kreator #44](../reviews/2026-11-09-builder-jarvis.md) ·
+[Fixture rdzenia #45](../reviews/2026-11-09-windows-core-fixtures.md) ·
+[Kodowanie #46](../reviews/2026-11-09-windows-encoding.md) ·
+[Modal #47](../reviews/2026-11-09-composer-modal.md) ·
+[Windows82](../reviews/2026-11-09-webview-green.md) ·
+[Przewód #48](../reviews/2026-11-09-jarvis-wire.md) ·
+[Kreator → Głos #49](../reviews/2026-11-09-builder-voice.md).
 
-## Ponowienie Windows i poprawki fixture,04:53UTC
-
-CI160 na974ae45e: Windows **3516 zaliczonych,5 nieudanych,46 pominiętych**; te same dwa
-przypadki conductor_handoff, załącznik files oraz dwa kodowania. UI CI160 zaliczone;
-WebView81 **60/1/6**, PIN ustawiany i włączany poprawnie, blokada przy kliku menu za modalem Głosu.
-
-[Fixture rdzenia #45](../reviews/2026-11-09-windows-core-fixtures.md):7/7 na Linux i Clippy bez
-ostrzeżeń. Komendy delegowania mają deterministyczny FakeExec; załącznik zachowuje rzeczywisty
-Broker, lecz kolejne fazy działają w odrębnych, całkowicie zamykanych runtime.
-[Fixture kodowania #46](../reviews/2026-11-09-windows-encoding.md): jawny UTF8 pliku PowerShell,
-przypadek CMD wybierany niezależnym, ścisłym enkoderem OEM. MSVC crosscheck i Clippy zaliczone;
-**nie jest to wykonanie na Windows**. Żadne asercje polityki,300ms,120s ani progi evals nie zmienione.
-Nowy rzeczywisty Windows/WebView2 pozostaje kolejnym krokiem przed terminem07:00UTC.
-
-[Diagnoza przewodu #48](../reviews/2026-11-09-jarvis-wire.md):50 ciał HTTP z atrapy i50 bezpośrednich
-odtworzeń rzeczywistego Bielika; Jarvis nadal0/25 jednego zdania przed dekoderem, imiona25/25.
-45/50 tekstów identycznych,5 różnic Standard Luny zachowano; nie deklarujemy pełnej zgodności.
+Nieskuteczne warianty promptu pozostają cofnięte; zamrożone evals, limity i polityki dotychczasowe.

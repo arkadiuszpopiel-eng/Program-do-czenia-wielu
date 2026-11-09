@@ -46,3 +46,10 @@ aliasie toolchain; końcowe polecenie korzysta jawnie z1.94.1 z dostępnymi skł
 Nie dodano crate'ów ani nie zmieniono Cargo.lock.
 
 Logi `/workspace/scratch/windows-encoding-{check,check-safe,clippy,clippy-stable,clippy-final}.log`.
+
+## Potwierdzenie Windows CI161
+
+[Pełny Windows12d44af4](2026-11-09-validation-12d44af4.md) zakończony:3521/0/46,
+Clippy zielony. Wszystkie cztery poprawiane cele mają14/14, w tym pięć wcześniejszych porażek.
+To rzeczywiste wykonanie Windows, osobno od wcześniejszej kontroli MSVC z Linux.
+Sprzęt i mikrofon właściciela pozostają niesprawdzone.

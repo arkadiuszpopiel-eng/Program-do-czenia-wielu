@@ -41,3 +41,10 @@ Ukierunkowany Clippy bez ostrzeżeń,1m49s; format i rozmiary sprawdzone osobno.
 Logi `/workspace/scratch/windows-core-fixtures-{tests,clippy}.log`.
 Źródła produkcyjne, chronione moduły i progi evals pozostają dotychczasowe.
 To nie zaliczenie Windows ani odbiór sprzętu; rzeczywisty Windows po publikacji jest wymagany.
+
+## Potwierdzenie Windows CI161
+
+[Pełny Windows12d44af4](2026-11-09-validation-12d44af4.md) zakończony:3521/0/46,
+Clippy zielony. Wszystkie cztery poprawiane cele mają14/14, w tym pięć wcześniejszych porażek.
+To rzeczywiste wykonanie Windows, osobno od wcześniejszej kontroli MSVC z Linux.
+Sprzęt i mikrofon właściciela pozostają niesprawdzone.
