@@ -211,3 +211,12 @@ pełny899/899 naaf5a2bc5 zaliczony w38,5min,0 pominiętych i0 niestabilnych. Zak
 [Modal Głosu](2026-11-09-composer-modal.md) pozostał po z-night: snapshot80 oraz log81 (PIN OK,
 klik menu118s) i ChromiumRED scrimintercepts. Po zamknięciu panelu zwykłym przyciskiem2/2green,
 Svelte0/0 i lint. Polityka oraz120s dotychczasowe; Windows ponownie wymagany.
+
+## Sprawdzone fixture Windows,04:53UTC
+
+CI160 (974ae45e) zakończone: Windows3516/5/46; nadal te same pięć porażek. UI zaliczone.
+WebView81 ma60/1/6; PIN OK, menu za modalem blokowane. [#45](2026-11-09-windows-core-fixtures.md)
+ma7/7 Linux i Clippy0; [#46](2026-11-09-windows-encoding.md) ma crosscheck MSVC i crossClippy0.
+To kandydaci do rzeczywistego ponowienia Windows, bez deklaracji naprawienia tych pięciu porażek.
+Produkcja UI #44 ma pełne899/899 i573/573 jednostkowe; nowe dwa testy helpera #47 zaliczone osobno.
+Chroniony Broker i jego ostrzeżenia nie są zmieniane, świeży niezależny przegląd i sprzęt pozostają otwarte.

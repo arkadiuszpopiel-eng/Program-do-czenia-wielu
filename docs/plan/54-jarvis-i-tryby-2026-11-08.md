@@ -118,3 +118,17 @@ prób i ograniczenie dysku opisano w tym raporcie.
 [Regresja modalu Głosu](../reviews/2026-11-09-composer-modal.md):Windows81 wskazał blokadę kliku,
 Chromium1028px odtworzył przechwycenie przez scrim. Helper zamyka modal zwykłym przyciskiem;
 2/2 po zmianie, typy0/0,120s i polityka dotychczasowe. Rzeczywisty Windows do wykonania.
+
+## Ponowienie Windows i poprawki fixture,04:53UTC
+
+CI160 na974ae45e: Windows **3516 zaliczonych,5 nieudanych,46 pominiętych**; te same dwa
+przypadki conductor_handoff, załącznik files oraz dwa kodowania. UI CI160 zaliczone;
+WebView81 **60/1/6**, PIN ustawiany i włączany poprawnie, blokada przy kliku menu za modalem Głosu.
+
+[Fixture rdzenia #45](../reviews/2026-11-09-windows-core-fixtures.md):7/7 na Linux i Clippy bez
+ostrzeżeń. Komendy delegowania mają deterministyczny FakeExec; załącznik zachowuje rzeczywisty
+Broker, lecz kolejne fazy działają w odrębnych, całkowicie zamykanych runtime.
+[Fixture kodowania #46](../reviews/2026-11-09-windows-encoding.md): jawny UTF8 pliku PowerShell,
+przypadek CMD wybierany niezależnym, ścisłym enkoderem OEM. MSVC crosscheck i Clippy zaliczone;
+**nie jest to wykonanie na Windows**. Żadne asercje polityki,300ms,120s ani progi evals nie zmienione.
+Nowy rzeczywisty Windows/WebView2 pozostaje kolejnym krokiem przed terminem07:00UTC.
