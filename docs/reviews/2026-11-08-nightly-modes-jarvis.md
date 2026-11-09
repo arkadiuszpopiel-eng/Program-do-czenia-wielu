@@ -120,7 +120,7 @@ na `25c4e788`: [zestaw wyników](artifacts/ci-149-results.json). Całość nie j
 
 [Poprawki danych testowych #27–30](2026-11-08-linux-fixtures.md): **95 zaliczonych / 0 nieudanych / 3 pominięte**
 w ukierunkowanych zakresach, Clippy zielone. Pierwszy przebieg55/1 zachowano i wyjaśniono.
-Pełny Rust po zmianach nie był jeszcze ponowiony.
+Późniejszy pełny Rust988d13f3 opisano w sekcji powyżej.
 
 [Kompozycja OCR/FFmpeg #33](2026-11-08-ocr-composition.md): 81 narzędzi +5 prób straży,
 0 problemów na atrapach; wzorzec niezmieniony. Jarvis/głos6/6, diagnostyka i manifesty4/4,
@@ -131,3 +131,21 @@ wyjaśnić rozbieżności CI UI oraz problemy Windows. Nie uruchamiać LLM CPU r
 z testami czasowymi UI. Wymagany niezależny przegląd pozostaje otwarty; wersja 0.0.85, etap J w toku.
 Harmonogram ma cogodzinne wznowienia w Cloud; ostatnia iteracja o 07:00 UTC ma zebrać raport
 bez rozpoczynania nowych zmian.
+
+## Aktualizacja9.11: pełny UI i własna persona
+
+[Raport #35–36](2026-11-09-custom-personas.md) zachowuje wyniki, początkową porażkę restartu
+i jawne ograniczenie zakresu: odtworzenie definicji person/rol nie oznacza trwałej obsady rozmów (#37).
+Luna z Kreatora dziedziczy Jarvisa i własne imię, także w delegacji. Po odtworzeniu katalogu i ponownym
+przypisaniu roli działa po restarcie. Ukierunkowane testy: **15 zaliczonych / 0 nieudanych**;
+pełny Rust po nowej zmianie produkcyjnej pozostaje do wykonania.
+
+Pełny lokalny UI: **877 zaliczonych / 2 nieudane / 0 pominiętych**,37,8 minuty,
+na `bd389207` (UI równoważne `7752ac70`). Obie porażki Planu Glass dotyczą oczekiwania5 sekund
+na kartę końca odpowiedzi; nie podniesiono limitu. Osobno CI156: **879/879 E2E i573/573 jednostkowych**,
+typy/lint/build/bundle/Storybook zielone. Windows Rust nadal trwał przy zbieraniu wyników.
+
+WebView2 rehearsal77: **60 zaliczonych / 2 nieudane / 5 pominiętych**. Artefakt potwierdził brak
+flagi instancji przy domyślnym porcie9222 i próbę schowania już zamkniętych Sesji w teście.
+Poprawki harnessu są do wykonania. Nie ma dowodu awarii aplikacji w komunikacie zamknięcia strony
+po timeoutcie i sprzątaniu testu. Wszystkie te wyniki są odrębne od odbioru sprzętu właściciela.

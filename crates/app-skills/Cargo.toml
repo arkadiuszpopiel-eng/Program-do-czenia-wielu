@@ -33,6 +33,8 @@ tokio.workspace = true
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["test-util"] }
+agent-builder-contract = { path = "../agent-builder-contract", features = ["contract-tests"] }
+personas-fake = { path = "../personas-fake" }
 
 [lints]
 workspace = true

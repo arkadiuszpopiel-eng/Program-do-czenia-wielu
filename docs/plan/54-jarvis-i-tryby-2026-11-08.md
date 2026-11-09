@@ -8,20 +8,24 @@ kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
 
 ## Zakres i kolejność
 
-Aktualizacja po pełnej próbie: UI **856/856**; Rust **3461 zaliczonych / 20 nieudanych / 24 pominięte**
-na `9b8b7416`. [Raport katalogu i wyniki](../reviews/2026-11-08-catalog-platform.md) opisują poprawkę
+Aktualizacja9.11: pełny lokalny UI **877 zaliczonych / 2 nieudane / 0 pominiętych** na `bd389207`
+(UI równoważne `7752ac70`); osobno CI156 **879/879 E2E i573/573 jednostkowych**. Porażki lokalnego
+Planu Glass pozostają otwarte. Pełny Rust na `988d13f3`: **3485 zaliczonych / 1 nieudany / 24 pominięte**;
+test zegara #34 naprawił pojedynczy przypadek, bez przemianowania pełnej próby na zieloną.
+[Raport katalogu i wyniki](../reviews/2026-11-08-catalog-platform.md) opisują poprawkę
 13 przypadków `app-models` (78 testów zaliczonych po zmianie). Kolejne
 [poprawki fixture'ów #27–30](../reviews/2026-11-08-linux-fixtures.md): 95 zaliczonych / 0 nieudanych /
-3 pominięte w zakresach ukierunkowanych; pełny Rust po tych zmianach do ponowienia.
+3 pominięte w zakresach ukierunkowanych; późniejszy pełny Rust opisano wyżej.
 [Kompozycja OCR/FFmpeg #33](../reviews/2026-11-08-ocr-composition.md) przeszła81 narzędzi i5 prób
-straży na atrapach bez problemów. Pełny Rust po zmianach, rozbieżności UI #32 i błędy Windows
-pozostają do sprawdzenia.
+straży na atrapach bez problemów. [Własne persony #35–36](../reviews/2026-11-09-custom-personas.md):
+Luna z kreatora i delegacja korzystają z Jarvisa; poprawka odtwarza definicje po restarcie.
+Obsada konkretnej rozmowy nadal wymaga ponownego przypisania (#37). Lokalne porażki UI i Windows pozostają otwarte.
 
 | Kolejność | Zadanie | Stan |
 | --- | --- | --- |
 | 1 | Regresja Z.8: produkcyjna integracja modelu-sędziego, kontekst ostatniej odpowiedzi | kod i testy w PR #20, przegląd otwarty |
 | 2 | Każdy z pięciu trybów: jawny wybór zakresu rozmowa / globalnie, poprawny stan i zgody | implementacja; pełny lokalny E2E856/856, odrębne błędy CI otwarte |
-| 3 | Jarvis: ustawienie wspólne i osobne dla Alfy, Bety, Gamy i Delty | implementacja; testy rdzenia i UI |
+| 3 | Jarvis: ustawienie wspólne i osobne dla Alfy, Bety, Gamy i Delty | testy rdzenia/UI; własna Luna dziedziczy ustawienie wspólne, także po odtworzeniu katalogu |
 | 4 | Profil w delegacjach, zadaniach w tle i rozmowie głosowej | 6 testów rdzenia i syntetycznego głosu zaliczonych |
 | 5 | Próba na prawdziwym modelu lokalnym, zapis surowych odpowiedzi i ograniczeń | po #31:40/40 transport, Jarvis20/20 imion, 0/20 jednego zdania; jakość częściowa |
 | 6 | Regresje CI, szerokie testy, dokumentacja, katalog funkcji i draft PR | w toku |
@@ -35,7 +39,7 @@ Aktualne ponowienie: [Rust988d13f3](../reviews/2026-11-08-rust-rerun.md) —3485
 1 nieudany,24 pominięte; pełne wszystkie76integracji. Nowa porażka #34: test kolejki a300ms
 okna Cofnij; [poprawka testu zegara](../reviews/2026-11-08-queue-clock.md) ma4/4 i20 powtórzeń pary
 bez błędu, bez zmiany300ms. [UI #32](../reviews/2026-11-08-ui-geometry.md) —23 nowych E2E i573 jednostkowe
-zaliczone, pełny E2E nowego źródła do wykonania. Menu mieści się w małym oknie i po powiększeniu.
+zaliczone; pełne nowe wyniki podano wyżej. Menu mieści się w małym oknie i po powiększeniu.
 
 ## Zachowanie Jarvisa
 

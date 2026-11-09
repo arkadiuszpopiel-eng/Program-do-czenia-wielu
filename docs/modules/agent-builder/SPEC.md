@@ -40,6 +40,12 @@ Deterministycznie: imię po „agentkę/o imieniu…”, zadania po „która/ż
 `inproc`, `on-demand`; RAM ≤ 2 MB; budowa ≤ 5 ms.
 
 ## Integracja (`app-*`, opis)
+Przy starcie `app-skills` odtwarza z zapisanej biblioteki definicje person i ról we wspólnym
+katalogu. Przed publikacją sprawdza cały zestaw dotychczasową walidacją katalogu; konflikt nie
+nadpisuje istniejącego wpisu. Identyczny wpis jest idempotentny. Odtworzenie nie przydziela ról
+rozmowom, nie wykonuje zadań ani nie aktywuje wyzwalaczy. Trwała obsada rozmów pozostaje osobnym
+zakresem ([#37](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/37)).
+
 `AgentBuilderModule::new(personas, katalog manifestów narzędzi, DirManifestStore::open(%LOCALAPPDATA%\Alfa\agents), CeilingSource = |s| broker.autonomy(s, None))`; komendy UI `builder_propose/build/preview/dry_run/save`; po zapisie: obsada (`Personas::set_cast` na polecenie właściciela), poziom autonomii agentki w Brokerze przez `request_autonomy_change` tylko obniżająco, umiejętności przez `skills`, głos v0 do łańcucha `voice-tts` (`VoicePreset`).
 
 ## Testy akceptacyjne
