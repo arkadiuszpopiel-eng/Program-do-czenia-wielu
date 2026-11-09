@@ -129,8 +129,8 @@ app-agents32 zaliczone/3 pominięte. Ręczna zgoda w oknie Brokera pominięta, b
 Dalej: wykonać pełny E2E nowego UI, zaplanować końcowy pełny Rust po dalszych przyrostach,
 wyjaśnić rozbieżności CI UI oraz problemy Windows. Nie uruchamiać LLM CPU równocześnie
 z testami czasowymi UI. Wymagany niezależny przegląd pozostaje otwarty; wersja 0.0.85, etap J w toku.
-Harmonogram ma cogodzinne wznowienia w Cloud; ostatnia iteracja o 07:00 UTC ma zebrać raport
-bez rozpoczynania nowych zmian.
+Pierwotny harmonogram kończył się07:00UTC. Korekta właściciela9.11 o06:53UTC zastąpiła
+ten termin usunięciem obecnych usterek; potem raport, zapis i STOP do odwołania. Bez nowych funkcji.
 
 ## Aktualizacja9.11: pełny UI i własna persona
 
@@ -261,3 +261,12 @@ głos zWER0, ale nie uruchomiła LLM bezllamaCPU. #51 prywatna, niecommitowana �
 ma pełnyClippy0/6m56s i4/4 testy; opublikowanyLinuxCI nadal czerwony do przeglądu człowieka.
 [#50](2026-11-09-jarvis-webview.md):2/2 Chromium1028/1600 i typy0/0; natywny przepływ Jarvisa
 czterech person iGłosu z zachowaniem mikrofonu/uprawnień wymaga następnegoCI. Produkcja bez zmian.
+
+## Korekta zakresu i usterka etykiet,07:34UTC
+
+Wiążąca korekta właściciela: naprawić obecną listę usterek, bez nowych funkcji; po raporcie
+zakończyć prace do odwołania. Lista i warunki: [plan54](../plan/54-jarvis-i-tryby-2026-11-08.md).
+[Raport #53](2026-11-09-builder-labels.md): regresja etykiet RED→4/4 i573/573; poprawka wymaga
+nowego pełnegoCI. Baza35df604b maCI163 Chromium903/903 i WindowsRust3521/0/46.
+WebView84:63/0/5, nowy Jarvis3,1s; silniki84:1/0,367,46s, syntetyczny głosWER0.
+LinuxClippy #51 nadal wymaga przeglądu chronionej łatki; zwięzłość Bielika i obsada #37 otwarte.

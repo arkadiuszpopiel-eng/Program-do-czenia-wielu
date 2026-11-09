@@ -108,6 +108,11 @@
     await reload();
   }
 
+  function colorLabel(key: string): string {
+    const index = policy?.palette.indexOf(key) ?? -1;
+    return index < 0 ? t('builder.color') : t('builder.colorN', { n: index + 1 });
+  }
+
   async function voice() {
     await step(() => app.client.builder.voicePreview(draft));
   }
@@ -176,7 +181,7 @@
       {#each library as a (a.persona)}
         <li>
           <strong>{a.name}</strong>
-          <span class="wk-meta">{a.role} · {a.autonomy} · {a.color}</span>
+          <span class="wk-meta">{a.role} · {a.autonomy} · {colorLabel(a.color)}</span>
         </li>
       {/each}
     </ul>

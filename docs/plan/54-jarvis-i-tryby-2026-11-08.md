@@ -1,42 +1,43 @@
 # 54 — Jarvis i dalszy rozwój trybów, 8–9.11.2026
 
 Karta [#22](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/22).
-Zlecenie właściciela: rozwijać i testować program w Cloud do rana, do 8:00; Jarvis dostępny
-dla każdej agentki. Właściciel potwierdził termin: **9.11.2026 o 08:00**; zachowano interpretację
-czasu polskiego: **Europe/Warsaw = 07:00 UTC**. Szczegóły Jarvisa pozostają według roboczego
-kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
+Pierwotne okno kończyło się9.11.2026 o08:00 Europe/Warsaw (07:00UTC).
+**Właściciel zmienił zlecenie9.11 o06:53UTC: praca trwa do usunięcia obecnie wykrytych usterek.**
+Nie dodajemy nowych funkcji ani kolejnych ulepszeń. Po rozliczeniu napraw: pełny raport, zapis
+wyników i zakończenie prac do odwołania. Powtarzany opis pierwotnego okna nie unieważnia tej
+konkretnej korekty. Zakaz commitowania chronionych modułów bez przeglądu pozostaje w mocy.
 
-## Aktualny stan,9.11 o06:26UTC
+## Zamknięta lista obecnych usterek
+
+| Karta | Usterka | Stan |
+| --- | --- | --- |
+| #53 | surowe klucze tłumaczeń system/vision i koloru w Kreatorze | RED odtworzony, naprawa PL/EN oraz etykiety palety, testy w toku |
+| #41/#48 | Bielik: Jarvis ignoruje jedno zdanie; Standard myli imiona Bety/Gamy | diagnoza zapisana, naprawa do wykonania bez zmiany progów |
+| #37 | obsada rozmowy znika po restarcie | naprawa trwałości i regresja do wykonania |
+| #51 | publiczny LinuxClippy blokują importy chronionego testu | łatka ma pełnyClippy0 i4/4; otwarty przegląd właściciela |
+| #52 | pobieranie silników okresowo kończy HTTP504 | dwie porażki zachowane; najnowszy84 zaliczył1/1 na tych samych pinach; diagnoza w istniejącym budżecie |
+
+Backlog nowych funkcji, w tym indywidualne przełączniki własnych person, jest zamrożony.
+Nowe usterki będące skutkiem napraw podlegają regresji; nie rozszerzamy listy o nowe ulepszenia.
+
+## Baza testowa przed naprawami,9.11 o07:14UTC
 
 | Obszar | Ostatni dowód | Co pozostaje |
 | --- | --- | --- |
 | Pięć trybów | jawny zakres rozmowa/globalnie, Plan bez rozmowy, regresje zgód i kłódki | niezależny przegląd i odbiór sprzętu |
-| Jarvis wbudowanych i własnych person | wspólny profil; cztery osobne przełączniki; Luna po restarcie katalogu10/10 tur Bielika | trwała obsada rozmowy #37; osobne przełączniki własnych person |
-| Kreator #44 iGłos #49 | CI162 na d18d9433:901/901 i573/573, typy0/0 | #50 dwa wspólne przepływy zaliczone; pełne903 i native68 do wykonania |
+| Jarvis wbudowanych i własnych person | wspólny profil; cztery osobne przełączniki; Luna po restarcie katalogu10/10 tur Bielika | trwała obsada rozmowy #37; osobne przełączniki własnych person w zamrożonym backlogu |
+| Kreator #44 iGłos #49 | CI163 na35df604b:903/903 i573/573, typy0/0 | tylko naprawy z listy powyżej |
 | Rust Linux | [pełne3495/0/25 --all-features](../reviews/2026-11-09-validation-12d44af4.md) na12d44af4,77 integracji | chroniony LinuxClippy i przegląd |
-| Rust Windows | [CI162:3521/0/46](../reviews/2026-11-09-ci162-and-review.md), Clippy0 | przegląd i sprzęt |
-| Windows/WebView2 | rehearsal82 i83:62/0/5 | #50 native-wrapper w nowym CI; sprzęt i mikrofon |
+| Rust Windows | CI163:3521/0/46, Clippy0 | przegląd i sprzęt |
+| Windows/WebView2 | rehearsal84:63/0/5, bezpośredni Jarvis zaliczony | sprzęt i mikrofon |
 | Zwięzłość Bielika | [#48:50 ciał i50 surowych odpowiedzi](../reviews/2026-11-09-jarvis-wire.md); Jarvis25/25 imion | jedno zdanie0/25 także przed dekoderem; Standard Bety/Gamy błędne imiona |
 | CI i przegląd | Tauri, cargo-deny, dokumentacja zielone; #51 prywatna łatka ma pełnyClippy0 i4/4 | publicznyLinuxClippy nadal czerwony; #52 dwa HTTP504 silników83; świeży przegląd |
 
-Kolejność do07:00UTC:
-
-1. Zebrać nowy native-wrapper Jarvisa #50 i pełny nowy Chromium903. Kod produkcyjny pozostaje
-   identyczny z zielonymi Windows3521/0/46 i Chromium901/901 wCI162. Linux --all-features3495/0/25 zakończony.
-   Nie przepisywać wcześniejszych porażek jako zaliczeń.
-2. Jeśli nowe Windows wykaże porażki, odtworzyć i poprawiać małe zakresy bez zmiany limitów;
-   chronione poprawki pozostają łatkami do przeglądu człowieka.
-3. Opublikować raporty sprawdzonego przyrostu, aktualny plan/roadmapę i wygenerowane HTML;
-   wstrzymać aktualizację ref podczas bieżącego CI, aby go nie anulować.
-4. Zebrać końcowy raport z commitami, dokładnymi wynikami i otwartymi punktami. Po07:00UTC
-   nie zaczynać zmian. Termin9.11 o08:00 Europe/Warsaw pozostaje bez korekty.
-
-Dalszy backlog: obsada rozmowy #37; indywidualny profil własnych person; różnorodne zadania
-jakościowe i porównanie odpowiedniejszego modelu bez dostrajania do jednego pytania; rzeczywisty
-mikrofon, odsłuch i widoczny pulpit Windows. [Raport nocny](../reviews/2026-11-08-nightly-modes-jarvis.md)
-zachowuje poprzednie wyniki, porażki i odrzucone warianty. [Karta #22](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/22)
-obejmuje całość; [draft PR24](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/pull/24)
-pozostaje bez scalenia.
+Kolejność pracy: naprawy z powyższej listy w osobnych worktree, celowane regresje, odpowiednie
+pełne testy/CI, publikacja sprawdzonych przyrostów i aktualizacja raportu. Nie przypisywać starych
+wyników nowym zmianom. Pomiary modelu i czasowe UI uruchamiać kolejno bez konkurującego obciążenia.
+Po naprawach pełny raport z dokładnymi wynikami i ograniczeniami, potem STOP do odwołania.
+Niezależny przegląd, zieloneCI i odbiór sprzętu pozostają warunkami scalenia/akceptacji.
 
 ## Zachowanie Jarvisa
 
@@ -74,8 +75,8 @@ prób i ograniczenie dysku opisano w tym raporcie.
 - Zmiany chronionych modułów przygotować jako łatkę do przeglądu człowieka; nie commitować ich automatycznie.
 - Publikować sprawdzone przyrosty jako draft PR. Niezależny przegląd i zielone CI pozostają warunkiem scalenia.
 - Nie uruchamiać mostów CLI z harmonogramu. Nie pobierać kolejnych wielkich modeli bez potrzeby.
-- O 07:00 UTC zakończyć nowe zmiany i przedstawić wynik. Etap J pozostaje otwarty do przeglądu i próby sprzętowej;
-  obecna seria robocza nie stanowi wydania, wersja pozostaje 0.0.85.
+- Pierwotny termin07:00UTC został zastąpiony korektą właściciela. Po rozliczeniu obecnych usterek
+  zapisać pełny raport i zakończyć prace do odwołania. EtapJ i wersja0.0.85 pozostają bez wydania.
 
 ## Dowody szczegółowe
 
@@ -92,3 +93,5 @@ Nieskuteczne warianty promptu pozostają cofnięte; zamrożone evals, limity i p
 
 [Bezpośredni WebView Jarvisa #50](../reviews/2026-11-09-jarvis-webview.md) ·
 [CI162, prywatna łatka #51 iHTTP504 #52](../reviews/2026-11-09-ci162-and-review.md).
+
+[Etykiety Kreatora #53 i bazaCI163/Windows84](../reviews/2026-11-09-builder-labels.md).

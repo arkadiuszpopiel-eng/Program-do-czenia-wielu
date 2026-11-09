@@ -10,6 +10,12 @@ krótkie komendy `tool_call`, odtwarzanie odkrytych schematów i wspólny selekt
 estymacji Routera/runtime: [raport i pomiary](../tool-routing-2026-10-24/REPORT.md).
 
 Ostatnia aktualizacja: **2026-11-08** (wersja programu 0.0.85; ostatnia praca: [Z.8 — testy integracyjne sędziego](../reviews/2026-11-08-z8-app-judge.md), Linux/atrapy; próba Windows pozostaje otwarta). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
+**9.11.2026 — wiążąca korekta właściciela:** usunąć obecną listę usterek z [planu54](54-jarvis-i-tryby-2026-11-08.md),
+bez nowych funkcji; po pełnym raporcie i zapisie STOP do odwołania. Pierwotny termin07:00UTC zastąpiony.
+[Etykiety Kreatora #53](../reviews/2026-11-09-builder-labels.md):4/4 i573/573 lokalnie;
+baza35df:CI163903/903, Windows3521/0/46, WebView84 63/0/5. Nowy pełnyCI poprawki oczekiwany.
+ChronionyLinuxClippy, zwięzłość/tożsamość Bielika i trwała obsada nadal otwarte. Bez odbioru sprzętu.
+
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.

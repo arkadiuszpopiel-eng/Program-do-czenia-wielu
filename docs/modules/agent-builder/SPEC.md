@@ -58,3 +58,6 @@ zakresem ([#37](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/i
 ## Otwarte pytania
 - Usunięcie roli przy nieudanym `add_persona` (brak operacji usuwania w `Personas`).
 - Piaskownica z modelem (przebieg `agent-runtime` na narzędziach skryptowanych) jako druga faza testu — port w `app-*`.
+
+Biblioteka i grupy narzędzi w UI mają etykiety PL/EN; kolor używa tej samej numeracji palety co
+formularz. Identyfikatory grup i tokeny kolorów pozostają danymi, nie nazwami widocznymi użytkownikowi.
