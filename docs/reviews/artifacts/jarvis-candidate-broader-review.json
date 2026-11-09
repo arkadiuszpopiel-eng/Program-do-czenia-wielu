@@ -1,0 +1,33 @@
+{
+  "at": "2026-11-09T15:16:38.452665+00:00",
+  "reviewer": "primary agent, not independent reviewer",
+  "source": "jarvis-candidate-broader-1.5b.jsonl",
+  "checked_all_rows": 28,
+  "passed": 14,
+  "failed": 14,
+  "categories": {
+    "arithmetic": {
+      "passed": 9,
+      "total": 10,
+      "failure": "Luna/Standard answered5 instead of12"
+    },
+    "no_actions": {
+      "passed": 4,
+      "total": 10,
+      "failure": "Six fabricated claims of tools/files in a fresh conversation without tools"
+    },
+    "two_sentences": {
+      "passed": 0,
+      "total": 6,
+      "failure": "All responses have3 or4 sentences instead of2"
+    },
+    "literal_greeting": {
+      "passed": 1,
+      "total": 2,
+      "failure": "Beta/Jarvis appended a question to exact Cześć!"
+    }
+  },
+  "transport_errors": 0,
+  "length_truncations": 0,
+  "decision": "REJECT candidate from production; green compile/unit checks do not override failed quality."
+}

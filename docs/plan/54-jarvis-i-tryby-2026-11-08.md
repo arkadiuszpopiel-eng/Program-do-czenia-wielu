@@ -12,10 +12,10 @@ konkretnej korekty. Zakaz commitowania chronionych modułów bez przeglądu pozo
 | Karta | Usterka | Stan |
 | --- | --- | --- |
 | #53 | surowe klucze tłumaczeń system/vision i koloru w Kreatorze | naprawiona:905/905 Chromium,63/0/5 Windows/WebView2; obraz potwierdzony |
-| #41/#48 | Bielik: Jarvis ignoruje jedno zdanie; Standard myli imiona Bety/Gamy | diagnoza zapisana, naprawa do wykonania bez zmiany progów |
-| #37 | obsada rozmowy znika po restarcie | naprawa:76 testów modułów i17 integracji; pełny nowyCI wymagany |
-| #51 | publiczny LinuxClippy blokują importy chronionego testu | zatwierdzona dokładna łatka:pełnyworkspaceClippy0/6m01s i4/4; nowyCI wymagany |
-| #52 | pobieranie silników okresowo kończy HTTP504 | naprawa odstępów:RED3/1→4/4, całyapp-models82/0/1,Clippy0; nowyWindowsCI wymagany |
+| #41/#48 | Bielik: Jarvis ignoruje jedno zdanie; Standard myli imiona Bety/Gamy | nierozwiązana; kandydat odrzucony po14/28 innych pytań i6 fikcyjnych potwierdzeniach wykonania |
+| #37 | obsada rozmowy znika po restarcie | naprawiona;76 testów modułów i17 integracji, pełneCI166 zielone |
+| #51 | publiczny LinuxClippy blokują importy chronionego testu | naprawiona po zgodzie właściciela; pełnyClippy0 i4/4, pełneCI166 zielone |
+| #52 | pobieranie silników okresowo kończy HTTP504 | naprawiona obsługa ponowień;82/0/1 iClippy0;CI166 oraz Windows87 zielone |
 
 Backlog nowych funkcji, w tym indywidualne przełączniki własnych person, jest zamrożony.
 Nowe usterki będące skutkiem napraw podlegają regresji; nie rozszerzamy listy o nowe ulepszenia.
@@ -101,3 +101,10 @@ Nieskuteczne warianty promptu pozostają cofnięte; zamrożone evals, limity i p
 [Zatwierdzona naprawa #51](../reviews/2026-11-09-broker-imports-approved.md).
 
 [Przerwy po chwilowych HTTP504 #52](../reviews/2026-11-09-http-outage.md).
+
+## Aktualizacja napraw9.11
+
+[Raport napraw i rzeczywistych prób Bielika](../reviews/2026-11-09-jarvis-model-repair.md).
+Baza cc6f0ac9: CI166 Linux3504/0/25, Windows3530/0/46, Chromium905/905 iVitest573/573;
+Windows87 WebView2 63/0/5, syntetyczne silniki1/0/2 filtrowane. Wynik modelu jest oddzielną
+bramką jakości; sama poprawna propagacja instrukcji nie zamyka #41/#48. Nowe funkcje pozostają zamrożone.

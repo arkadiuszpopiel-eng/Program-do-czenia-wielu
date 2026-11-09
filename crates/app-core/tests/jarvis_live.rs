@@ -21,10 +21,11 @@ struct LocalBrain {
     provider: Arc<dyn ModelProvider>,
     model: String,
     seen: Mutex<Vec<(String, ChatRequest)>>,
+    sent: Arc<Mutex<Vec<ChatRequest>>>,
 }
 
 /// Jawny budżet tej próby integracji; nie zmienia ustawień produkcyjnego adaptera.
-struct BoundedProvider(LocalProvider);
+struct BoundedProvider(LocalProvider, Arc<Mutex<Vec<ChatRequest>>>);
 
 #[async_trait]
 impl ModelProvider for BoundedProvider {
@@ -37,6 +38,7 @@ impl ModelProvider for BoundedProvider {
     fn stream(&self, mut request: ChatRequest, cancel: CancellationToken) -> ProviderStream {
         request.params.max_tokens = Some(96);
         request.params.temperature = Some(0.0);
+        self.1.lock().unwrap().push(request.clone());
         self.0.stream(request, cancel)
     }
     fn health(&self) -> ProviderHealth {
@@ -90,8 +92,13 @@ async fn all_personas_on_local_model() {
     config.default_model.clone_from(&model);
     config.threads = Some(4);
     let sidecar = Sidecar::new(config, Arc::new(TokioLauncher::default()), None, None).unwrap();
+    let sent = Arc::new(Mutex::new(Vec::new()));
     let brain = Arc::new(LocalBrain {
-        provider: Arc::new(BoundedProvider(LocalProvider::new(models, sidecar.clone()))),
+        provider: Arc::new(BoundedProvider(
+            LocalProvider::new(models, sidecar.clone()),
+            sent.clone(),
+        )),
+        sent,
         model: model.clone(),
         seen: Mutex::new(Vec::new()),
     });
@@ -150,10 +157,13 @@ async fn all_personas_on_local_model() {
                 let saved = core.turns_list(session).await.unwrap();
                 let answer = saved.turns.iter().find(|t| t.id == turn).unwrap();
                 let elapsed_ms = started.elapsed().as_millis();
+                let sent = brain.sent.lock().unwrap().last().cloned().unwrap();
                 results.push(serde_json::json!({"agent":agent,"mode":mode,"repeat":repeat,"elapsed_ms":elapsed_ms,
                     "text":answer.text,"error":answer.error,"response_author":answer.author,
                     "truncated":answer.truncated,"usage":answer.usage,
-                    "mentions_own_name": answer.text.to_lowercase().contains(agent)}));
+                    "mentions_own_name": answer.text.to_lowercase().contains(agent),
+                    "provider_request_system":sent.system,
+                    "provider_request_tool_count":sent.tools.len()}));
                 if let Ok(path) = std::env::var("ALFA_LIVE_REPORT") {
                     let report = serde_json::json!({"model":model,"platform":"Linux Cloud CPU; headless core, no microphone", "max_tokens":96, "temperature":0.0, "results":results});
                     std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
@@ -193,15 +203,20 @@ fn custom_live_fixture() -> (Arc<LocalBrain>, Arc<Sidecar>, String, String) {
     config.default_model.clone_from(&model);
     config.threads = Some(4);
     let sidecar = Sidecar::new(config, Arc::new(TokioLauncher::default()), None, None).unwrap();
+    let sent = Arc::new(Mutex::new(Vec::new()));
     let brain = Arc::new(LocalBrain {
-        provider: Arc::new(BoundedProvider(LocalProvider::new(models, sidecar.clone()))),
+        provider: Arc::new(BoundedProvider(
+            LocalProvider::new(models, sidecar.clone()),
+            sent.clone(),
+        )),
+        sent,
         model: model.clone(),
         seen: Mutex::new(Vec::new()),
     });
     (brain, sidecar, model, report_path)
 }
 
-// Syntetyczna persona bez narzędzi: model tools=false, bez deklaracji wykonania czynności.
+// Syntetyczna persona bez narzędzi; zdolności modelu pochodzą z katalogu.
 fn luna_draft() -> app_core::dto::AgentDraft {
     serde_json::from_value(serde_json::json!({
         "name": "Luna", "glyph": "L", "color": "color.agent.custom-2",
@@ -243,7 +258,7 @@ async fn wait_for_luna(
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 #[ignore = "własna persona i lokalny Bielik; ALFA_LIVE_*, bez mikrofonu i narzędzi"]
-async fn custom_persona_on_local_model_after_catalog_restart() {
+async fn custom_persona_on_local_model_after_catalog_and_cast_restart() {
     let (brain, sidecar, model, report_path) = custom_live_fixture();
     let dir = tempfile::tempdir().unwrap();
     let mut opts = common::options(None, Arc::new(HeadlessShell::default()));
@@ -260,8 +275,27 @@ async fn custom_persona_on_local_model_after_catalog_restart() {
     assert_eq!(dry.hash, preview.hash);
     let saved = core.builder_save(draft, dry.hash).await.unwrap();
     assert_eq!(saved.persona, "luna");
+    let mut sessions = Vec::new();
+    for _ in 0..10 {
+        let session = core
+            .sessions_create(SessionTemplate::Empty)
+            .await
+            .unwrap()
+            .id;
+        core.sessions_choose_workdir(session.clone(), WorkdirChoice::None)
+            .await
+            .unwrap();
+        core.agents_set_roles(
+            session.clone(),
+            saved.persona.clone(),
+            vec![saved.role.clone()],
+        )
+        .await
+        .unwrap();
+        sessions.push(session);
+    }
     let mut results = Vec::new();
-    for mode in ["standard", "jarvis"] {
+    for (mode_index, mode) in ["standard", "jarvis"].into_iter().enumerate() {
         core.settings_set(
             "agents.interaction_mode".into(),
             SettingValue::Text(mode.into()),
@@ -269,7 +303,7 @@ async fn custom_persona_on_local_model_after_catalog_restart() {
         .await
         .unwrap();
         if mode == "jarvis" {
-            // Wspólny profil i katalog wracają po restarcie; obsada jest ponownie przydzielana.
+            // Profil, katalog i obsada wracają po restarcie bez ponownego przypisywania ról.
             drop(core);
             let mut opts = common::options(None, Arc::new(HeadlessShell::default()));
             opts.brain = Some(brain.clone());
@@ -279,22 +313,19 @@ async fn custom_persona_on_local_model_after_catalog_restart() {
                 .unwrap();
         }
         let mut events = core.subscribe_events();
-        for repeat in 1..=5 {
-            let session = core
-                .sessions_create(SessionTemplate::Empty)
-                .await
-                .unwrap()
-                .id;
-            core.sessions_choose_workdir(session.clone(), WorkdirChoice::None)
-                .await
-                .unwrap();
-            core.agents_set_roles(
-                session.clone(),
-                saved.persona.clone(),
-                vec![saved.role.clone()],
-            )
-            .await
-            .unwrap();
+        for (index, session) in sessions[mode_index * 5..mode_index * 5 + 5]
+            .iter()
+            .enumerate()
+        {
+            let repeat = index + 1;
+            let session = session.clone();
+            let agents = core.agents_list(session.clone()).await.unwrap();
+            assert!(
+                agents
+                    .iter()
+                    .any(|a| a.id == saved.persona && a.role_ids.contains(&saved.role)),
+                "obsada przypisana przed restartem musi pozostać bez ponownego przypisania"
+            );
             let mut message = common::send(
                 "Jednym krótkim zdaniem przedstaw się swoim imieniem i powiedz, że jesteś gotowa pomóc.",
                 None,
@@ -314,13 +345,17 @@ async fn custom_persona_on_local_model_after_catalog_restart() {
             // Instrukcje pochodzą wyłącznie z publicznego, syntetycznego draftu tej próby.
             let (who, request) = brain.seen.lock().unwrap().last().cloned().unwrap();
             let system = request.system.unwrap_or_default();
+            let sent = brain.sent.lock().unwrap().last().cloned().unwrap();
             results.push(serde_json::json!({
                 "agent":"luna", "mode":mode, "repeat":repeat,
-                "core_restarted":mode == "jarvis", "roles_reassigned":true,
+                "core_restarted":mode == "jarvis", "roles_reassigned":false,
+                "session_and_cast_created_before_restart":true,
                 "elapsed_ms":started.elapsed().as_millis(), "text":answer.text,
                 "error":answer.error, "response_author":answer.author,
                 "truncated":answer.truncated, "usage":answer.usage,
-                "router_request_system":system, "router_request_tool_count":request.tools.len()
+                "router_request_system":system, "router_request_tool_count":request.tools.len(),
+                "provider_request_system":sent.system,
+                "provider_request_tool_count":sent.tools.len()
             }));
             let report = serde_json::json!({
                 "model":model, "platform":"Linux Cloud CPU; headless core, no microphone",

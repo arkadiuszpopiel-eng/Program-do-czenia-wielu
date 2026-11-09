@@ -39,9 +39,13 @@ nie jest dowodem wykonania zadania. Testy na atrapach i w przeglądarce są oddz
 na rzeczywistym modelu oraz mikrofonie.
 
 Własna Luna z publicznego Kreatora ma oddzielną ręczną próbę lokalnego Bielika:5 rozmów Standard
-i5 Jarvis po restarcie katalogu oraz ponownym przypisaniu roli. Rola rozmowy nie ma narzędzi;
-raport zachowuje instrukcje żądania routera, autora i obcięcie. Wynik jakości opisano osobno
-w [raporcie #43](../../reviews/2026-11-09-live-custom.md).
+i5 Jarvis po restarcie katalogu i obsad (Standard jest kontrolą przed restartem).
+Wszystkie10 rozmów oraz role są przygotowane przed restartem;
+test nie przypisuje ich ponownie. Rola rozmowy nie ma narzędzi; raport zachowuje instrukcje
+routera i faktycznego dostawcy, autora oraz obcięcie. Nowa próba nazywa się
+`custom_persona_on_local_model_after_catalog_and_cast_restart` w `jarvis_live.rs`.
+[Wyniki i ograniczenia modelu](../../reviews/2026-11-09-jarvis-model-repair.md);
+[wcześniejszy raport #43](../../reviews/2026-11-09-live-custom.md) pozostaje historyczny.
 
 Przegląd w świeżej sesji przed scaleniem; SPEC nie zamyka żadnego kryterium sprzętowego.
 

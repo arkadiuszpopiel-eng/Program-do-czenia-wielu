@@ -9,23 +9,23 @@ testy i natywna weryfikacja: [raport](../repairs-2026-10-24/REPORT.md).
 krótkie komendy `tool_call`, odtwarzanie odkrytych schematów i wspólny selektor
 estymacji Routera/runtime: [raport i pomiary](../tool-routing-2026-10-24/REPORT.md).
 
-Ostatnia aktualizacja: **2026-11-08** (wersja programu 0.0.85; ostatnia praca: [Z.8 — testy integracyjne sędziego](../reviews/2026-11-08-z8-app-judge.md), Linux/atrapy; próba Windows pozostaje otwarta). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
-**9.11.2026 — wiążąca korekta właściciela:** usunąć obecną listę usterek z [planu54](54-jarvis-i-tryby-2026-11-08.md),
-bez nowych funkcji; po pełnym raporcie i zapisie STOP do odwołania. Pierwotny termin07:00UTC zastąpiony.
-[Etykiety Kreatora #53](../reviews/2026-11-09-builder-labels.md):4/4 i573/573 lokalnie;
-baza35df:CI163903/903, Windows3521/0/46, WebView84 63/0/5. Nowy pełnyCI poprawki oczekiwany.
-ChronionyLinuxClippy, zwięzłość/tożsamość Bielika i trwała obsada nadal otwarte. Bez odbioru sprzętu.
+Ostatnia aktualizacja: **2026-11-09** (wersja programu0.0.85, etapJ bez wydania).
+Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: [`README.md`](README.md).
 
-[Naprawa obsady #37](../reviews/2026-11-09-cast-restart.md):76/76 modułów i17/17 integracji,
-Clippy0; pełny nowyRustCI oczekiwany. #53 potwierdzona905/905 i63/0/5 WebView.
-Właściciel zatwierdził konkretną łatkę #51; problemHTTP504 i zwięzłość Bielika nadal otwarte.
+**Korekta właściciela06:53UTC:** wyłącznie obecne usterki z [planu54](54-jarvis-i-tryby-2026-11-08.md),
+bez nowych funkcji; po rozliczeniu napraw, pełnym raporcie i zapisie STOP do odwołania.
+Pierwotny termin07:00UTC został zastąpiony. Automatyzacja pozostaje wyłączona.
 
-[Zatwierdzone importy #51](../reviews/2026-11-09-broker-imports-approved.md): pełnyworkspaceClippy0/6m01s
-razem z #37,4/4 testy; nowy pełnyCI po publikacji. Bez scalenia i bez zmian polityk/evals.
+**Naprawione #53/#37/#51/#52:** etykiety Kreatora, trwała obsada, zatwierdzone importy Brokera,
+odstępy po chwilowymHTTP504. Baza cc6f0ac9 ma pełneCI166: Linux3504/0/25,
+Windows3530/0/46, Clippy0, Chromium905/905, Vitest573/573; Windows87 WebView2 63/0/5,
+syntetyczne silniki1/0/2 filtrowane. Historia awariiHTTP504 pozostaje w raporcie.
 
-[#52](../reviews/2026-11-09-http-outage.md): kontrolowana awaria504 RED→4/4,
-app-models82/0/1 iClippy0 bez większego budżetu. Baza9d2b35fa:LinuxCI1653500/0/25,
-Chromium905/905;WindowsRust jeszcze trwa. Windows86silniki1/0 przed poprawką,WebView63/0/5.
+**#41/#48 otwarte:** nieopublikowany kandydat1.5B miał imię i gotowość50/50, ale jedno zdanie19/50
+i14/28 innych pytań, w tym6 fikcyjnych potwierdzeń wykonania; został odrzucony.
+Nie zamykamy jakości odpowiedzi wynikiem samych testów kodu. Szczegóły i niezaliczone próby:
+[raport napraw](../reviews/2026-11-09-jarvis-model-repair.md). Niezależny przegląd i odbiór sprzętu
+pozostają otwarte; bez scalenia, nowej wersji lub nowych funkcji.
 
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 

@@ -1,5 +1,10 @@
 # Własna Luna na rzeczywistym Bieliku, #43
 
+Aktualizacja9.11: poniżej jest historyczna próba z ręcznym przypisaniem roli.
+Nowa próba `custom_persona_on_local_model_after_catalog_and_cast_restart` odtwarza obsadę
+bez takiego przypisania; dawny filtr nazwy poniżej jest archiwalny.
+[Nowy raport, dowody i nadal otwarte problemy jakości](2026-11-09-jarvis-model-repair.md).
+
 9.11.2026, Cloud Linux CPU, headless Core, syntetyczne audio. **10/10 tur ukończonych w36,99s**,
 0 błędów,0 obcięć, autor `luna` w10/10. Jarvis dziedziczony z ustawienia wspólnego działa także
 po restarcie katalogu i ponownym przypisaniu roli. Nie oznacza to trwałej obsady rozmowy (#37).

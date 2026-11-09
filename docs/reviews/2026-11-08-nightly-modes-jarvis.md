@@ -9,6 +9,20 @@ To raport autorski; wymagany przegląd przed scaleniem jest otwarty.
 Aktualizacja 21:03 UTC: stare procesy zakończyły się bez końcowego wyniku pełnego UI i Rust.
 Wznowienie oraz następna regresja: [Plan bez rozmowy](2026-11-08-plan-without-session.md).
 
+## Bieżący stan9.11 — tylko obecne usterki
+
+Wiążąca korekta właściciela06:53UTC zastąpiła dawny termin. Nowe funkcje są zamrożone.
+[Raport napraw i prób modelu](2026-11-09-jarvis-model-repair.md) zawiera dowody oraz niezaliczone warianty.
+Na cc6f0ac9 naprawy #53/#37/#51/#52 mają pełne zieloneCI166 iWindows87:
+RustLinux3504/0/25, RustWindows3530/0/46, Chromium905/905, Vitest573/573;
+WebView2 63/0/5, syntetyczne silniki1/0/2 filtrowane. Chronioną łatkę #51 zatwierdził właściciel „ok”.
+
+#41/#48 pozostają otwarte: kandydat dał1.5B imię i gotowość50/50, jedno zdanie19/50
+i14/28 innych pytań, w tym6 fikcyjnych potwierdzeń wykonania. Kandydat odrzucony i zapisany jako łatka;
+instrukcje produkcyjne pozostają na cc6f0ac9. Publikowana jest tylko poprawa ręcznej diagnostyki.
+Pełne wyniki rzeczywistego modelu są oddzielone od atrap, Linux/Chromium iWindows/WebView2.
+Dawne tabele poniżej są historią przebiegów, a nie wynikami ostatniej zmiany źródeł.
+
 ## Zmiany do przeglądu
 
 - Ustawienie wspólne i cztery nadpisania profilu Standardowy / Jarvis; zapis i walidacja
