@@ -1,0 +1,39 @@
+{
+  "source": "169a6004b414d9fa610f10fdacde565de3bd2410",
+  "run": 42549736415,
+  "job": 128942395555,
+  "platform": "WindowsGitHub/WebView2;dockingsectionemulated1600x900,nativeelsewhere",
+  "passed": 60,
+  "failed": 1,
+  "skipped": 6,
+  "elapsed_min": 4.6,
+  "docking_scenario": {
+    "status": "passed",
+    "duration_s": 39.9
+  },
+  "failure": {
+    "test": "zy-klodka-dziecko.spec.ts",
+    "status": "timedOut",
+    "duration_ms": 120003,
+    "start_time": "2026-11-09T02:30:21.167Z",
+    "cleanup_stack_line": 87,
+    "root_cause": "unknown",
+    "screen52a": false,
+    "trace_zip": false
+  },
+  "artifact": {
+    "id": 13645970772,
+    "bytes": 46637759,
+    "sha256": "da0b55a2f04f44c3f63a076e5b0c409428abf517cc5db04d3218b7357e16a0d8"
+  },
+  "previous78_child_lock_s": 3.1,
+  "ci159_chromium": {
+    "run": 42549736330,
+    "job": 128942473626,
+    "e2e_passed": 890,
+    "e2e_failed": 0,
+    "elapsed_min": 28.2,
+    "unit_passed": 573,
+    "unit_files": 103
+  }
+}

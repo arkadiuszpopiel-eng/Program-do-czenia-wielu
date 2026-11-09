@@ -54,3 +54,9 @@ Logi: `/workspace/scratch/webview-viewport-tests.log` (pierwsze2),
 `webview-viewport-tests-final.log` (2/1), `webview-viewport-tests-complete.log` (3/3),
 `webview-viewport-check.log`. Archiwum Windows: `webview2-ci78-74ce.zip`.
 Niezależny przegląd, pełne próby i Windows nadal otwarte; wersja0.0.85, etap J w toku.
+
+## Sprawdzenie w rzeczywistym Windows80
+
+Na169a6004 scenariusz z-night przeszedł39,9s. Cały WebView2:60/1/6, nowy timeout kłódki Dziecko;
+[diagnoza #42 i artefakt](2026-11-09-webview-child-lock.md). Osobno Chromium CI159:890/890 E2E,
+573/573 jednostkowych, typy0/0 i lint zielone. Emulacja dotyczyła tylko fragmentu dokowania.

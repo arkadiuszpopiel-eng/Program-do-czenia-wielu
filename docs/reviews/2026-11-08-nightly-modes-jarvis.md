@@ -179,3 +179,11 @@ Nowy pełny lokalny zestaw ma890 testów i pozostaje do wykonania.
 Jarvis20/20 imion, lecz0/20 jednego zdania w każdym przebiegu. Wszystkie40 tekstów identyczne.
 Obie nieskuteczne zmiany app-chat cofnięto; zachowano łatki jako dowód, nie jako naprawę.
 51/51 testów i Clippy przeszły osobno. Pełny Rust169a6004 działa na77 integracjach; wynik otwarty.
+
+## Pełny Chromium CI159 i Windows80
+
+Na169a6004 CI159 zaliczyło890/890 E2E (28,2min),573/573 jednostkowych/103 pliki, typy0/0,
+lint/build/bundle/Storybook. Poprzedni lokalny877/2 zachowano oddzielnie. Windows80:60/1/6;
+dokowanie #40 już zaliczone, nowy timeout kłódki Dziecko wymaga [diagnostyki #42](2026-11-09-webview-child-lock.md).
+Nie zmieniono120s ani polityki. Linux Clippy nadal blokują chronione importy; pełny Linux Rust
+jest uruchomiony osobno na77 integracjach. Windows Rust CI159 trwa; nie ma pełnego wyniku.

@@ -8,6 +8,11 @@ kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
 
 ## Zakres i kolejność
 
+Najnowszy pełny Chromium **CI159 na169a6004:890/890 E2E i573/573 jednostkowych**,28,2 minuty E2E.
+Windows80 zaliczył scenariusz dokowania; całość60/1/6, nowy timeout kłódki Dziecko
+[otrzymuje diagnostykę #42](../reviews/2026-11-09-webview-child-lock.md). Pełny Linux Rust i Windows Rust
+pozostają otwarte; wcześniejsze wyniki niżej zachowano jako historię.
+
 Aktualizacja9.11: pełny lokalny UI **877 zaliczonych / 2 nieudane / 0 pominiętych** na `bd389207`
 (UI równoważne `7752ac70`); osobno CI156 **879/879 E2E i573/573 jednostkowych**. Porażki lokalnego
 Planu Glass pozostają otwarte. Pełny Rust na `988d13f3`: **3485 zaliczonych / 1 nieudany / 24 pominięte**;
