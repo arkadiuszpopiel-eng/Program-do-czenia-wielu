@@ -1,5 +1,11 @@
 # Jarvis i tryby — raport roboczy z Cloud, 8–9.11.2026
 
+**Blokada aktualnegoCI167:** [RUSTSEC-2026-0459 / SQLite–SQLCipher](2026-11-09-ci167-sqlite.md).
+Kandydat ma naprawiony SQLCipher4.20/SQLite3.54.1,33/0/1 testów bazy,73/0/3 modułów i15/0 Core.
+Właściciel zatwierdził wyłącznie wąską łatkę licencji51e27c10; po zastosowaniu lokalny audyt4/4.
+Nadal wymagane nowe pełneCI oraz niezależny przegląd.
+Nie wyłączono szyfrowania ani nie ignorowano CVE. Bielik #41/#48 także pozostaje otwarty.
+
 Plan: [54](../plan/54-jarvis-i-tryby-2026-11-08.md), karta [#22](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/22).
 Gałąź: `feat/nightly-modes-jarvis`, podstawa PR [#20](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/pull/20)
 i poprawka Linux w PR [#23](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/pull/23).

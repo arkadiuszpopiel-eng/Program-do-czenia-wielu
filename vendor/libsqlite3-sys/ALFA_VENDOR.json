@@ -1,0 +1,97 @@
+{
+  "archive_url": "https://static.crates.io/crates/libsqlite3-sys/libsqlite3-sys-0.39.1.crate",
+  "archive_sha256": "14a5f01b87b92705d07b433c06f96cbc764637d81a0bffb5734ce17cf0f9a2b3",
+  "adapter": "0.39.1",
+  "sqlcipher_src": "=420.0.0",
+  "omitted_upstream_files": [
+    "sqlite3/sqlite3.c",
+    "sqlite3/sqlite3.h",
+    "sqlite3/sqlite3ext.h",
+    "Cargo.lock"
+  ],
+  "generated_bindings": [
+    {
+      "original": "bindgen-bindings/bindgen_3.45.3.rs",
+      "generated": "bindgen-bindings/generated/bindgen_3.45.3.rs",
+      "sha256": "2633a8b90cded7bc2c8464fc423891a6dda7f68a72fcf433b3a5408aaa8f37ce",
+      "upstream_sha256": "2633a8b90cded7bc2c8464fc423891a6dda7f68a72fcf433b3a5408aaa8f37ce"
+    },
+    {
+      "original": "bindgen-bindings/bindgen_3.45.3_ext.rs",
+      "generated": "bindgen-bindings/generated/bindgen_3.45.3_ext.rs",
+      "sha256": "6ec49b03d074315101f589115db0436d3e4d56028034f8b847d1bf467877a2ee",
+      "upstream_sha256": "35d3d3f2388bfeb6d950242f0efa217541d2eb0d686195f41eb9ce9cef86f99d"
+    },
+    {
+      "original": "sqlcipher/bindgen_bundled_version.rs",
+      "generated": "sqlcipher/generated/bindgen_bundled_version.rs",
+      "sha256": "4ce4a6519255f9d1c22c9f894b7f0452f1ae11d54dc9bf3205265ec9142f1da3",
+      "upstream_sha256": "4ce4a6519255f9d1c22c9f894b7f0452f1ae11d54dc9bf3205265ec9142f1da3"
+    },
+    {
+      "original": "sqlite3/bindgen_bundled_version.rs",
+      "generated": "sqlite3/generated/bindgen_bundled_version.rs",
+      "sha256": "a25057a06d8cb5053a61c8f0ff746cc3d81b3bd778fbd3199ba12c8a6ee2945d",
+      "upstream_sha256": "a25057a06d8cb5053a61c8f0ff746cc3d81b3bd778fbd3199ba12c8a6ee2945d"
+    },
+    {
+      "original": "sqlite3/bindgen_bundled_version_ext.rs",
+      "generated": "sqlite3/generated/bindgen_bundled_version_ext.rs",
+      "sha256": "89601d843eac8194ae137ca660c65d5b7dc22657132210b4bae988ff0cca4a8d",
+      "upstream_sha256": "b4757194d9f463c9c9168d38f943eedfd2a06d7c402374a75062e6fda8d4ff2c"
+    }
+  ],
+  "whitespace_normalizations": [
+    {
+      "path": "sqlite3/wasm32-wasi-vfs.c",
+      "upstream_sha256": "b95842044da2b8777876b7d3fef8c9711e8c201fb4a4255dbac98729a456bb5d",
+      "normalized_sha256": "b59fd82c175f0ab7fb0542254e4c08bf021bf2d69b4c135c97c82fe58c4036a0"
+    },
+    {
+      "path": "wrapper_ext.h",
+      "upstream_sha256": "fa7a53fea99318ee29d75e6d5fab4d7ed26e9599803268e6a24396265f2a6f3a",
+      "normalized_sha256": "ea52943dcd9b5f72d9db56daacab062a0cd8e03bad58734d25969f3e49a531c2"
+    },
+    {
+      "path": "bindgen-bindings/generated/bindgen_3.45.3_ext.rs",
+      "upstream_sha256": "35d3d3f2388bfeb6d950242f0efa217541d2eb0d686195f41eb9ce9cef86f99d",
+      "normalized_sha256": "6ec49b03d074315101f589115db0436d3e4d56028034f8b847d1bf467877a2ee"
+    },
+    {
+      "path": "sqlite3/generated/bindgen_bundled_version_ext.rs",
+      "upstream_sha256": "b4757194d9f463c9c9168d38f943eedfd2a06d7c402374a75062e6fda8d4ff2c",
+      "normalized_sha256": "89601d843eac8194ae137ca660c65d5b7dc22657132210b4bae988ff0cca4a8d"
+    }
+  ],
+  "files": {
+    ".cargo_vcs_info.json": "f410bda919d68f688b35fb4fe324b8a506dfcfebcc4b5b6a31a1885d806485b7",
+    ".gitignore": "d89b7a44f37a816f5b0ca8297e0d17067ca5f41e45d1455b0a56d072679a00a6",
+    "Cargo.toml": "cdd411352012b07f272c37f0097e76023d1958a7ed26e1e60211dfa2f3fca99d",
+    "Cargo.toml.orig": "c09dc5c010b8c3c779031228adf9198acbb5f9e2aef298dfa4df13b4d6844300",
+    "LICENSE": "c10c1f27337546471e5f7e4e97fdd398b35b9d4e126115dcd22de8d8e65abf6f",
+    "README.alfa.md": "0d0df21ed4844abedfbc64a7486c5a6fa84e95d0b432e3629e511eea1d88cbcf",
+    "README.md": "37bc68dfc68170cb60f5dad7cfa64a6bc74893947e9d466575ca2c4c00ad6061",
+    "Upgrade.md": "d151a67d4bbb1a5a300d084d210d6cd238d833a6d4bd5d958ae7469a9deccb36",
+    "bindgen-bindings/bindgen_3.45.3.rs": "b7fce022766b6276f59be9c1c84d2ea55a155125038884535277255590c4e4f8",
+    "bindgen-bindings/bindgen_3.45.3_ext.rs": "b05949672c2c69a2893f533eb78061bade0487ac1f0984206669c14d1ae97181",
+    "bindgen-bindings/generated/bindgen_3.45.3.rs": "2633a8b90cded7bc2c8464fc423891a6dda7f68a72fcf433b3a5408aaa8f37ce",
+    "bindgen-bindings/generated/bindgen_3.45.3_ext.rs": "6ec49b03d074315101f589115db0436d3e4d56028034f8b847d1bf467877a2ee",
+    "build.rs": "433ac177f12a5b25cc509c1fb866e1567840fba7376cc5a36ba1f5248b07e562",
+    "build/bindings_buildtime.rs": "680bf98cd510b0859145f25742c06592f42ec60259fb40b12f6a547faf343a76",
+    "build/bindings_prebuilt.rs": "52f287d8d80e57722c83b1d63ba881c4b415a7a191583c5e7b54deb7b2483a1c",
+    "build/build_bundled.rs": "7e59da0ec3d9c8575290d35e69bdeef39364af18da3a5cbddb089ec461dd13cd",
+    "build/build_linked.rs": "b20c985aa2a35a74025f104bdc83785a3e82ccd9ed34bbcb64a63e7663cf3ae6",
+    "build/loadable_extension.rs": "694dadbdfc91f069ac8951b8d19cf6a03d2cfa65a82f4d5a4c1629d6416c837e",
+    "sqlcipher/bindgen_bundled_version.rs": "8c33c1456c03002375f9f7e87909e9935a6e608ce31cc7f3b33277237beb27aa",
+    "sqlcipher/generated/bindgen_bundled_version.rs": "4ce4a6519255f9d1c22c9f894b7f0452f1ae11d54dc9bf3205265ec9142f1da3",
+    "sqlite3/bindgen_bundled_version.rs": "cf8e0756b600e7520dedc950c20d89f8d4f0c4c1585d86a74b4f42febe8bfa67",
+    "sqlite3/bindgen_bundled_version_ext.rs": "c9cfe812ac12432adeb65520b9ffea4a54398b6a23938c55c6b6fb306d2aa045",
+    "sqlite3/generated/bindgen_bundled_version.rs": "a25057a06d8cb5053a61c8f0ff746cc3d81b3bd778fbd3199ba12c8a6ee2945d",
+    "sqlite3/generated/bindgen_bundled_version_ext.rs": "89601d843eac8194ae137ca660c65d5b7dc22657132210b4bae988ff0cca4a8d",
+    "sqlite3/wasm32-wasi-vfs.c": "b59fd82c175f0ab7fb0542254e4c08bf021bf2d69b4c135c97c82fe58c4036a0",
+    "src/error.rs": "eea43c9e7e05a58002a406ce1bf518299284798a64158a2114516c2fcc7df524",
+    "src/lib.rs": "f61d8e306e11357479e20999f7b7adc5f3dbaea40cd17361853574001cf79360",
+    "wrapper.h": "b78f576f7eeabf316e183d476b0f16344b6897680b4df47628d3ce38c0aa979a",
+    "wrapper_ext.h": "ea52943dcd9b5f72d9db56daacab062a0cd8e03bad58734d25969f3e49a531c2"
+  }
+}

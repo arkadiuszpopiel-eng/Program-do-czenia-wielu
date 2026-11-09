@@ -10,7 +10,7 @@
   },
   "scripts": {
     "check": "pnpm -r --if-present check",
-    "lint": "eslint . && node scripts/check-svelte5.mjs && node scripts/check-css.mjs && node scripts/check-size.mjs",
+    "lint": "eslint . && node scripts/check-svelte5.mjs && node scripts/check-css.mjs && node scripts/check-size.mjs && node scripts/vendor-sqlite.mjs --check",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

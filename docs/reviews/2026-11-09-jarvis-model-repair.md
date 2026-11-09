@@ -6,6 +6,10 @@ Po rozliczeniu wyników i zapisie koniec prac do odwołania. Automatyzacja nocna
 To raport autorski, nie wymagany niezależny przegląd.
 
 **Cztery usterki mają sprawdzone naprawy. #41/#48 nadal nie są usunięte.**
+NoweCI167 wykryło ponadto podatność używanego SQLCipher/SQLite:
+[RUSTSEC-2026-0459 — dowody i blokada audytu](2026-11-09-ci167-sqlite.md).
+Nie uznajemy całego zadania za zakończone. Audyt historycznegoCI167 był czerwony;
+po odrębnej naprawie i zgodzie na dokładną łatkę licencji lokalny aktualny audyt4/4.
 Zmiany instrukcji modelu nie przeszły jakości i nie trafiają do kodu produkcyjnego.
 [Kompletna odrzucona łatka](patches/jarvis-model-identity-candidate.patch),
 [walidacja i odciski źródeł](artifacts/jarvis-candidate-validation.json).
@@ -143,7 +147,7 @@ Pełna dodatkowa próba 1.5B: **14/28 zaliczonych**, bez błędu transportu i be
 
 Zgodność z instrukcją nie jest egzekwowana niezawodnie przez same zmiany promptu.
 Nie obchodzimy tego obniżeniem progów, wzrostem timeoutów, gotową odpowiedzią testową,
-przepisywaniem tekstu modelu ani fikcyjnym meldunkiem o wykonaniu. Produkcyjne źródła wróciły
+przepisywaniem tekstu modelu ani fikcyjnym meldunkiem o wykonaniu. Produkcyjne instrukcje modelu wróciły
 do sprawdzonej bazy; cały kandydat jest zapisany jako łatka i surowe wyniki.
 
 ## Osobny, bezpieczny przyrost diagnostyki
@@ -184,3 +188,9 @@ przyrostu diagnostyki i dokumentacji; aktualny wynik jest dostępny w sprawdzeni
 4. Zapis raportu nie oznacza usunięcia wszystkich usterek. Automatyzacja jest wyłączona;
    bez ponownego uruchamiania harmonogramu i bez prac nad nowymi funkcjami.
 
+
+HistoryczneCI167 miało czerwony audyt; odrębna naprawa SQLCipher po zgodzie właściciela
+przechodzi lokalny audyt4/4. Nowy pełnyCI jest rozliczany osobno wPR #24.
+Odrębny kandydat używa naprawionego SQLCipher4.20/SQLite3.54.1; potwierdzone testy i pozostająca
+decyzja licencji są w raporcie SQLCipher. Właściciel zatwierdził wyłącznie wąską łatkę licencji51e27c10; rzeczywisty audyt po zgodzie4/4.
+Nie stosowano niezatwierdzonych zmian polityki.

@@ -27,3 +27,13 @@ na funkcji rejestrującej sqlite-vec (`src/open.rs`, transmute wskaźnika `sqlit
 
 Testy: `tests/sqlstore.rs` (szyfrowanie, zły klucz, WAL/FK, sqlite-vec + FTS5 z `fold_pl`, migracje, usuwanie
 plików), `tests/rollback.rs` (baza z nowszej wersji: tylko odczyt / addytywne / luka), `tests/fold_props.rs` (property-based: długość, idempotencja, ASCII dla PL, zakresy słów).
+
+## Naprawiony SQLCipher (ADR 0030)
+
+Zależność rusqlite0.41.1 korzysta z przypiętego adaptera libsqlite3-sys0.39.1
+i sqlcipher-src420 (SQLCipher4.20 / SQLite3.54.1). Kopię adaptera odtwarza
+`scripts/vendor-sqlite.mjs`; `--check` kontroluje odciski bez sieci. Szyfrowanie i format
+klucza są dotychczasowe. Regresja `sqlite_security` sprawdza rzeczywisty silnik i szyfrowany
+plik. Automatyczna regresja otwiera świeżą kopię publicznej bazy z aktywnymWAL starego silnika.
+Ręczny test przechwycenia takiej pary wymaga `ALFA_SQLCIPHER_FIXTURE_DIR` i starego silnika;
+nie korzysta z danych użytkownika.

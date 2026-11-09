@@ -61,3 +61,7 @@ lto = true
 opt-level = "s"
 panic = "abort"
 strip = true
+
+# Ten sam adapter SQLCipher co workspace, ADR 0030.
+[patch.crates-io]
+libsqlite3-sys = { path = "../../../vendor/libsqlite3-sys" }

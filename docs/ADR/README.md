@@ -35,3 +35,4 @@ Każda decyzja techniczna z `docs/PLAN.md` §1.2 ma swój ADR. Decyzje są odwra
 | [0029](0029-konta-dzieci.md) | Konta dzieci: przedziały wieku, podgląd rodzica, zgoda na chmurę, odznaki osobiste | **Przyjęty** |
 
 Statusy: **Zaakceptowany** — obowiązuje; dopisek „(spike …)" oznacza, że wartości liczbowe lub wykonalność potwierdza wskazany spike w F0 bez zmiany kierunku. **Tymczasowy** — kierunek przyjęty, ale ADR wraca do przeglądu po wskazanym spike'u. **Proponowany** — projekt przygotowany przez sesję AI; nie obowiązuje do podpisu właściciela.
+| [0030](0030-sqlcipher-rustsec-2026-0459.md) | Naprawiony SQLCipher bez wyjątku advisory RUSTSEC-2026-0459 | **Proponowany; wąska łatka licencji zatwierdzona** |
