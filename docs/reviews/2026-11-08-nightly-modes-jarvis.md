@@ -204,4 +204,4 @@ headless nieaktywny. Faktyczne instrukcje żądania routera zapisane w syntetycz
 
 [Kontrolka i sprawdzenie](2026-11-09-builder-jarvis.md):9/9 E2E w26,4s,4 style/2 motywy iEN,
 Beta dziedziczy, osobny Standard Alfy pozostaje. Typy0/0, lint/format/build/bundle zielone;
-nowy pełny899 przygotowywany. Zakres wspólny opisany jawnie, mikrofon włączany osobno.
+pełny899/899 naaf5a2bc5 zaliczony w38,5min,0 pominiętych i0 niestabilnych. Zakres wspólny opisany jawnie, mikrofon włączany osobno.

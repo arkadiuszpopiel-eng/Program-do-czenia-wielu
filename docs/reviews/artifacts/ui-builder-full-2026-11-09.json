@@ -1,0 +1,28 @@
+{
+  "source": "af5a2bc5e71ad9319879fbf8931f324c99d1aeea",
+  "phase": "finished",
+  "exit_code": 0,
+  "stats": {
+    "startTime": "2026-11-09T03:36:23.716Z",
+    "duration": 2307639.758,
+    "expected": 899,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "raw_sha256": "ce394436418a3f0f8fab6b98a8eb75fdc248de9532a55ab23d3cf1469a8b0c27",
+  "raw_bytes": 985719,
+  "workers": 2,
+  "started_at": "2026-11-09T03:36:20.568130+00:00",
+  "finished_at": "2026-11-09T04:14:51.681918+00:00",
+  "platform": "LinuxCloud/Chromium/fakebackend;noWindows/mic",
+  "command": [
+    "pnpm",
+    "--dir",
+    "apps/desktop/ui",
+    "exec",
+    "playwright",
+    "test",
+    "--reporter=list,json"
+  ]
+}

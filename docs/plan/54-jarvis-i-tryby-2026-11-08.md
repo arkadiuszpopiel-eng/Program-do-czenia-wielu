@@ -73,7 +73,7 @@ Pełny Rust na169a6004 ruszył z77 celami integracyjnymi; nie ma jeszcze wyniku.
 
 [Kontrolka w Kreatorze #44](../reviews/2026-11-09-builder-jarvis.md): wspólny profil przy bibliotece
 własnych agentek, jawny zakres i pierwszeństwo osobnych wyborów.9/9 nowych E2E i typy0/0 zaliczone;
-nowy pełny899 do wykonania.
+pełny899/899 naaf5a2bc5 zaliczony,0 pominiętych i0 niestabilnych.
 
 ## Zachowanie Jarvisa
 

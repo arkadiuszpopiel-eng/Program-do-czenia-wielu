@@ -25,6 +25,8 @@ wewnątrz Core, osobno od tych testów interfejsu.
 - Rozmiary po dodaniu nowych plików do indeksu:3489 plików,264 crate'y,0 naruszeń.
 
 Logi `/workspace/scratch/builder-jarvis-{red,tests,check,build,unit}.log`.
-Pełny nowy zestaw **899** E2E pozostaje do wykonania na zamrożonym kandydacie.
+Pełny nowy zestaw **899/899** E2E zaliczony na zamrożonym `af5a2bc5`,0 pominiętych,0 niestabilnych,
+kod0,38,5minuty. [Podsumowanie, komenda i SHA256](artifacts/ui-builder-full-2026-11-09.json).
+Surowy raport985719 bajtów zachowano w `/workspace/scratch/ui-builder-full/report.json`.
 Wcześniejszy pełny CI159890/890 dotyczy169a6004 (UI produkcyjne równoważne974ae45e), bez tej kontrolki; nie zastępuje nowej próby.
 To Linux/Chromium z atrapą backendu, bez odbioru Windows/WebView2 i mikrofonu.
