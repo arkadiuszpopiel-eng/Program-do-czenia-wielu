@@ -33,6 +33,10 @@ raport zachowuje każdą różnicę. Tutaj Luna następuje po40 turach wbudowany
 na osobnym serwerze. Przyczyna różnicy pozostaje otwarta; nie przypisujemy jej dekoderowi ani cache
 bez dodatkowej kontrolowanej próby. Standard Bety/Gamy nadal ma10/10 błędnych form Betta/Gamma.
 
+Niskie `input_tokens` z raportu rdzenia nie dowodzi braku promptu: kontrakt `Usage` oznacza
+wejście poza cache. Na przykład powtórzenie Standard Luny ma w surowym HTTP `prompt_tokens=544`
+i `cached_tokens=543`; po odjęciu pozostaje1. Pełny system nadal występuje w żądaniu.
+
 Następne kroki: różnorodne zadania z niezależnym kryterium długości, osobno zimny/ciepły start
 oraz porównanie odpowiedniejszego modelu na docelowym sprzęcie. Zestawy evals pozostają zamrożone.
 Mikrofon, Windows i sprzęt właściciela nie są przedmiotem tej próby.
