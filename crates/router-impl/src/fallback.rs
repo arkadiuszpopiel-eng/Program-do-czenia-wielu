@@ -172,6 +172,12 @@ impl Run {
             };
             let waited = tokio::select! {
                 biased;
+                () = self.cancel.cancelled() => {
+                    // Router kończy własną próbę niezależnie od reakcji adaptera na token.
+                    self.core.report(cand, Outcome::Cancelled);
+                    let _ = self.tx.send(ProviderEvent::stop(StopReason::Cancelled)).await;
+                    return Attempt::Done;
+                }
                 () = self.tx.closed() => {
                     // Konsument upuścił strumień — przerywamy (wywołujący anuluje cel).
                     self.core.report(cand, Outcome::Cancelled);

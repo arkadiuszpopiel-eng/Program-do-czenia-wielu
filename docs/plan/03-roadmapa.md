@@ -1,5 +1,11 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Nowe zlecenie właściciela9.11 `/goal`: wznowione naprawy i ulepszenia do jakości Enterprise.**
+[Plan55 — lokalnie/chmura, narzędzia i wyszukiwanie](55-enterprise-lokalnie-chmura-i-wyszukiwanie.md)
+zastępuje wcześniejszy STOP i zamrożenie funkcji. Pierwszy przyrost: anulowanie zawieszonego
+adapteraRoutera[#54](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/54).
+Dalsze wpisy z wcześniejszego okna są historią; kryteria przeglądu i sprzętu pozostają otwarte.
+
 **Naprawa SQLCipher potwierdzona pełnymCI168:** [RUSTSEC-2026-0459 / SQLite–SQLCipher](../reviews/2026-11-09-ci167-sqlite.md).
 Kod050f86c7 używa SQLCipher4.20/SQLite3.54.1/OpenSSL; wąska łatka licencji51e27c10 zatwierdzona
 wyłącznie przez właściciela. CI168 wszystkie6 zadań zielone:Linux3506/0/26,Windows3532/0/47,
