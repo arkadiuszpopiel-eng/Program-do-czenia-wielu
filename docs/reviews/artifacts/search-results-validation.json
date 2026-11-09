@@ -1,0 +1,171 @@
+{
+  "updated_utc": "2026-11-09T23:05:45.415869+00:00",
+  "issue": 56,
+  "base_commit": "23300f82fa6a9c940ab3121a4dfa9d908f28d4c9",
+  "worktree": "/workspace/wt-search-results",
+  "platform": "LinuxCloudCPU,syntheticSearchPort,Brokerharness;no liveSearchAPI,GPU,Windowsorrealmic",
+  "red": {
+    "passed": 0,
+    "failed": 4,
+    "exit": 101
+  },
+  "first_green": {
+    "passed": 4,
+    "failed": 0,
+    "exit": 0
+  },
+  "final_tests": {
+    "totals": [
+      35,
+      0,
+      0
+    ],
+    "target_results": 10,
+    "exit": 0,
+    "command": "cargo +1.94.1 test --locked -p tools-net-contract -p tools-net-impl -p tools-net-fake --all-features -j2"
+  },
+  "initial_clippy": {
+    "exit": 101,
+    "cause": "2test-only field_reassign_with_default;fixedinitializers,no lintallow"
+  },
+  "final_clippy": {
+    "exit": 0,
+    "elapsed_seconds": 1.74,
+    "command": "cargo +1.94.1 clippy --locked -p tools-net-contract -p tools-net-impl -p tools-net-fake --all-targets --all-features -j2 -- -D warnings"
+  },
+  "checks": {
+    "fmt": {
+      "exit": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "lint": {
+      "exit": 0,
+      "sha256": "99794c8b5bc1615b6569a522e44879f4b326be9d562c1237d3462fa637afd4b6"
+    },
+    "docs_generate": {
+      "exit": 0,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs_check": {
+      "exit": 0,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs_verify": {
+      "exit": 0,
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    },
+    "generated_pages": 102
+  },
+  "source_sha256": {
+    "crates/tools-net-impl/src/fetch.rs": "c581c8c32201e7b33e5727e3435429a5c456437903cfc4c36d4d6b012bd8c52d",
+    "crates/tools-net-impl/src/search_results.rs": "a362ba48591528fdc139af49c6e22cdad3e9470d0f19ffcccb72f51d6f3eb99a",
+    "crates/tools-net-impl/src/lib.rs": "b07d6265bd77a6ad68bac526bbb33255dfa1f226ad5d0566b5dd30276cfa8584",
+    "crates/tools-net-impl/tests/search_results.rs": "1aa12f40c746bb65c266cb7aa22d98fb2312ca0e5d6ddc4dd11e9a28e121f398"
+  },
+  "log_sha256": {
+    "red.log": "b3e16bc13fc9f3f6d836ac74538d2a396a0af0748e26a59a36c48562dabc8fb9",
+    "green.log": "ae633713d78b728a6b274c7ea818dc936fa775163027405c418e757d9db4ab12",
+    "full.log": "fa8915cb1c05023192e94e9902fc4cbdc3dd4d0d2e663d0b290b212680b641a2",
+    "full-final.log": "684c8bccfc58b1a0876e29f6b8b2585f696a831b591e8bd195259711c13469d3",
+    "clippy.log": "a1934e703dc1d71aeeed60183731960b3ab708bd8e759b5480e087da4cd3fc41",
+    "clippy-final.log": "a84533a538c79a762c7976fb726b83db7ca27c74dfb7a2b46175fa5bfbcc4d01"
+  },
+  "work_window": {
+    "timezone": "Europe/Warsaw",
+    "develop_until": "2026-11-10T05:30:00+01:00",
+    "tests_report_stop": "2026-11-10T06:00:00+01:00"
+  },
+  "baseline_ci170": {
+    "commit": "23300f82fa6a9c940ab3121a4dfa9d908f28d4c9",
+    "CI170": "10/10success",
+    "Windows92": "4/4success",
+    "jobs": [
+      {
+        "job_id": 129420641536,
+        "rust_targets": 1128,
+        "rust_totals": [
+          3540,
+          0,
+          47
+        ],
+        "lines": []
+      },
+      {
+        "job_id": 129420641684,
+        "rust_targets": 1128,
+        "rust_totals": [
+          3514,
+          0,
+          26
+        ],
+        "lines": []
+      },
+      {
+        "job_id": 129421889635,
+        "rust_targets": 0,
+        "rust_totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T20:43:32.4619436Z   301 passed (8.1m)"
+        ]
+      },
+      {
+        "job_id": 129421889671,
+        "rust_targets": 0,
+        "rust_totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T20:45:08.2530442Z   302 passed (9.7m)"
+        ]
+      },
+      {
+        "job_id": 129421889714,
+        "rust_targets": 0,
+        "rust_totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T20:43:51.3890331Z   302 passed (8.5m)"
+        ]
+      },
+      {
+        "job_id": 129420640923,
+        "rust_targets": 0,
+        "rust_totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T20:33:16.0621589Z packages/ui-kit check: svelte-check found 0 errors and 0 warnings",
+          "2026-11-09T20:33:32.6797115Z apps/desktop/ui check: svelte-check found 0 errors and 0 warnings",
+          "2026-11-09T20:34:39.4077545Z  Test Files  103 passed (103)",
+          "2026-11-09T20:34:39.4080425Z       Tests  573 passed (573)"
+        ]
+      },
+      {
+        "job_id": 129420640379,
+        "rust_targets": 0,
+        "rust_totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T20:41:17.4161081Z   5 skipped\r",
+          "2026-11-09T20:41:17.4167098Z   63 passed (3.0m)\r"
+        ]
+      }
+    ],
+    "scope": "COMPLETED baselinebeforesearchresultsfix;notcurrentnewCI"
+  },
+  "qualification": "Not productionsearchadapter;existingURLvalidation+budgets applied toresults only;rawSearchPortallocationnotboundedbythisprojection;newfullCI+independentreviewpending"
+}

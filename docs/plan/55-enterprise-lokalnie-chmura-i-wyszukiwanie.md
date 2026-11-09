@@ -1,5 +1,16 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Nowe okno właściciela:10.11.2026,Europe/Warsaw.** Rozwój i poprawki do05:30
+(04:30UTC), potem wyłącznie końcowe testy i raport, zakończenie06:00 (05:00UTC).
+Późniejsza korekta właściciela ma pierwszeństwo. Długie testy uruchamiać odpowiednio wcześnie;
+nie zaczynać nowych prób po terminie i jawnie zgłosić niewykonane lub nieukończone kontrole.
+
+**Baza23300f82 ma zieloneCI170 iWindows92.** Linux3514/0/26,Windows3540/0/47;
+E2E302+302+301=905,bez porażek,w8,1–9,7min na część. WebView2 63/0/5. Nie jest to
+odbiór GPU12GB,prawdziwegoAPI lub mikrofonu. Kolejna naprawa[#56](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/56)
+dotyczy sekretów w URL i limitów wyników wyszukiwania; [raport](../reviews/2026-11-10-search-results.md).
+
+
 ## Zakres zlecony 9.11.2026
 
 Właściciel poleceniem `/goal` wznowił naprawy i ulepszenia w kierunku jakości Enterprise:

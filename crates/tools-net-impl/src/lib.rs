@@ -15,6 +15,7 @@ mod core;
 mod download;
 mod fetch;
 mod http;
+mod search_results;
 
 use std::path::PathBuf;
 use std::sync::Arc;

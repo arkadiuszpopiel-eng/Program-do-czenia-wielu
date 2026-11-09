@@ -27,6 +27,13 @@ Zdarzenia: `tool.net.fetch` (host, status, bajty), `tool.net.download` (ścieżk
 - **Bez proxy systemowego**, bez ciasteczek, bez nagłówków od modelu; adres wyglądający na zawierający sekret (wzorce `tools-common::text`) → odmowa (eksfiltracja przez URL).
 - **Limity:** treść `net_fetch` ≤ 2 MiB (przekroczenie = przerwanie odczytu, wynik obcięty), czas całkowity ≤ 30 s; pobieranie ≤ 200 MiB i ≤ 300 s; nagłówek `Content-Length` ponad limit = odmowa bez odczytu treści; anulowanie (kill-switch) przerywa odczyt i usuwa plik częściowy.
 - **Treść niezaufana:** `untrusted = Web`, taint sesji zgłaszany Brokerowi, sekrety redagowane, tekst tylko dla typów tekstowych.
+- **Wyniki wyszukiwania:** granica narzędzia egzekwuje `max_results`, niezależnie od dostawcy.
+  Każdy zwracany URL przechodzi istniejącą walidację celu HTTPS/publicznego i sekretów; adres
+  ze znakami sterującymi, niedozwolony lub zawierający wykryty sekret jest pomijany, nie
+  przepisywany do wymyślonego źródła. Budżet `output_max_chars` ogranicza też sumę znaków pól
+  `url/title/snippet` w wyniku strukturalnym; długiego URL nie skracamy. Pominięcie lub
+  skrócenie jest jawne w tekście wyniku. To nie jest pobranie źródeł ani sprawdzenie DNS:
+  rzeczywisty odczyt nadal wymaga osobnego `net_fetch` z Brokerem i kontrolą DNS.
 - **Pobieranie:** wyłącznie do kwarantanny `<katalog roboczy sesji>\Kwarantanna` (albo `%USERPROFILE%\Alfa\Kwarantanna\<sesja>`), drugi token `fs.write(plik)`; nazwa od serwera oczyszczona (bez separatorów, ADS, nazw urządzeń, kropek/spacji na końcu), plik `.part` tworzony jako nowy i przemianowywany bez nadpisania, katalog i jego przodkowie w kwarantannie nie mogą być dowiązaniem/junction, SHA-256 liczone w locie, MOTW (`Zone.Identifier`, `ZoneId=3`, `HostUrl`) na Windows; rozszerzenia wykonywalne oznaczone w wyniku.
 
 ## Zdolności / uprawnienia

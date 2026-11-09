@@ -10,8 +10,7 @@ use tools_common_contract::{
     text,
 };
 use tools_net_contract::{
-    EVENT_FETCH, FetchArgs, FetchOut, HttpMethod, SearchArgs, SearchHit, SearchOut,
-    url_carries_secret,
+    EVENT_FETCH, FetchArgs, FetchOut, HttpMethod, SearchArgs, url_carries_secret,
 };
 
 use crate::core::{Core, Step, fail, net_failure, refuse};
@@ -180,15 +179,12 @@ impl Core {
         self.release(std::slice::from_ref(&grant)).await;
         let hits = found?;
         report_untrusted(&self.gate, ctx, TaintSource::Web).await;
-        let out = SearchOut {
-            results: hits
-                .into_iter()
-                .map(|h| SearchHit {
-                    title: text::redact_secrets(&h.title),
-                    url: h.url,
-                    snippet: text::redact_secrets(&h.snippet),
-                })
-                .collect(),
+        let (out, limited) =
+            crate::search_results::project(hits, max, self.config.output_max_chars);
+        let notice = if limited {
+            "Część wyników dostawcy pominięto lub skrócono (kontrola adresów i limity).\n"
+        } else {
+            ""
         };
         let lines: Vec<String> = out
             .results
@@ -196,7 +192,11 @@ impl Core {
             .map(|h| format!("- {} — {}\n  {}", h.title, h.url, h.snippet))
             .collect();
         let (rendered, _) = text::truncate_chars(
-            &format!("Wyniki ({}):\n{}", out.results.len(), lines.join("\n")),
+            &format!(
+                "Wyniki ({}):\n{notice}{}",
+                out.results.len(),
+                lines.join("\n")
+            ),
             self.config.output_max_chars,
         );
         let mut o = ToolOutcome::ok(rendered, serde_json::to_value(&out).unwrap_or_default())
