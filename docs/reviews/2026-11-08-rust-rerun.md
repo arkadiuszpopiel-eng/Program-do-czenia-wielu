@@ -18,8 +18,7 @@ partiami mieścił artefakty na dysku32GB. Sterownik i logi: `/workspace/scratch
 
 Jedyna porażka: `review::queued_message_of_a_trashed_session_waits_for_undo`, partia14,
 `review.rs:114`: licznik kolejki0 zamiast1. Karta [#34](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/34).
-Testowy harness ma300ms na Cofnij; kod po wygaśnięciu celowo usuwa sesję i kolejkę. Trwa
-weryfikacja wpływu rzeczywistego czasu operacji na test. Nie wydłużano tego okna, timeoutów ani
+Testowy harness ma300ms na Cofnij; kod po wygaśnięciu celowo usuwa sesję i kolejkę. [Weryfikacja zegara testu](2026-11-08-queue-clock.md) ma osobny wynik4/4 i20 powtórzeń pary. Nie wydłużano tego okna, timeoutów ani
 nie usuwano asercji. Pierwotna próba miała
 **3461/20/24** na9b8b7416 i pozostaje osobnym artefaktem.
 

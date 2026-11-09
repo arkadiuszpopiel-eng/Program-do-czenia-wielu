@@ -77,7 +77,7 @@ async fn edit_and_resend_keeps_the_attachments_of_the_original_message() {
 
 /// Kolejka offline a kosz: sesja usunięta przed powrotem sieci nie dostaje odpowiedzi modelu,
 /// a jej wiadomość nie ginie — wychodzi po „Cofnij”. (Kolejność po błędzie: test w `queue.rs`.)
-#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+#[tokio::test]
 async fn queued_message_of_a_trashed_session_waits_for_undo() {
     let h = harness().await;
     let core = &h.core;
@@ -103,6 +103,8 @@ async fn queued_message_of_a_trashed_session_waits_for_undo() {
     // Sesja usunięta, zanim wróciła sieć: jej wiadomość nie idzie do modelu, tylko czeka w kolejce
     // na „Cofnij” — pozostałe sesje dostają odpowiedzi.
     let before = h.provider.requests().len();
+    // Ten scenariusz dotyczy wciąż dostępnego Cofnij, nie czasu pracy SQL/schedulera maszyny.
+    tokio::time::pause();
     let ticket = core.sessions_remove(sessions[1].clone()).await.unwrap();
     core.set_online(true).await;
     core.system_retry_queue().await.unwrap();
@@ -119,6 +121,7 @@ async fn queued_message_of_a_trashed_session_waits_for_undo() {
     let turns = core.turns_list(sessions[1].clone()).await.unwrap().turns;
     assert_eq!(turns.len(), 2, "przywrócona sesja dostaje odpowiedź");
     assert_eq!(core.system_status().await.unwrap().queued_messages, 0);
+    tokio::time::resume();
     for sid in &sessions {
         core.turns_stop(sid.clone()).await.unwrap();
     }
@@ -126,6 +129,39 @@ async fn queued_message_of_a_trashed_session_waits_for_undo() {
         h.provider.requests().len() - before,
         3,
         "po jednym wywołaniu modelu na sesję — żadnego dla sesji w koszu"
+    );
+}
+
+/// Ten sam budżet300ms: przed upływem wpis czeka, po upływie znika wraz z sesją.
+#[tokio::test]
+async fn queued_message_is_removed_when_the_undo_window_expires() {
+    let h = harness().await;
+    let core = &h.core;
+    let session = core
+        .sessions_create(SessionTemplate::Empty)
+        .await
+        .unwrap()
+        .id;
+    core.set_online(false).await;
+    core.turns_send(session.clone(), send("Wyślij później", None))
+        .await
+        .unwrap();
+    tokio::time::pause();
+    let expires = tokio::time::Instant::now() + std::time::Duration::from_millis(300);
+    let ticket = core.sessions_remove(session.clone()).await.unwrap();
+    // Zadanie kosza rejestruje timer przed świadomym przesunięciem zegara.
+    tokio::task::yield_now().await;
+    tokio::time::advance(std::time::Duration::from_millis(299)).await;
+    assert_eq!(core.system_status().await.unwrap().queued_messages, 1);
+    // `advance` nie czeka na obsługę timerów; sonda tego samego terminu synchronizuje zegar.
+    tokio::time::sleep_until(expires).await;
+    tokio::task::yield_now().await;
+    assert_eq!(core.system_status().await.unwrap().queued_messages, 0);
+    assert!(core.sessions_undo_remove(ticket.token).await.is_err());
+    assert!(core.turns_list(session).await.is_err());
+    assert!(
+        h.provider.requests().is_empty(),
+        "bez wywołania modelu dla kosza"
     );
 }
 

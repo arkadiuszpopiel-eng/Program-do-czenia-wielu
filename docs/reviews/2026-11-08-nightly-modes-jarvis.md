@@ -53,7 +53,8 @@ Obrazy `jarvis-{classic,glass,next,junior}.png` pokazują panel w Cloud.
 **3485 zaliczonych / 1 nieudany / 24 pominięte**. Workspace bez app-core3282/0/22;
 app-core lib, wszystkie76 celów i doctesty203/1/2. Jedyna porażka dotyczy kolejki sesji w koszu
 z testowym oknem Cofnij300ms ([#34](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/34));
-przyczyna wymaga odtworzenia na kontrolowanym zegarze. Całość nie jest zielona. Chronione ostrzeżenie
+[Test zegara](2026-11-08-queue-clock.md) po zmianie ma4/4,20 powtórzeń pary bez błędu
+i4/4 sąsiednich testów. Nie wydłużono300ms ani nie uznano poprzedniego pełnego przebiegu za zielony. Chronione ostrzeżenie
 Brokera nadal blokuje pełny Clippy i CI; istniejąca łatka pozostaje do przeglądu człowieka.
 
 [Geometria menu i ustawień #32](2026-11-08-ui-geometry.md): **23/23 nowych E2E**, jednostkowe
@@ -125,7 +126,7 @@ Pełny Rust po zmianach nie był jeszcze ponowiony.
 0 problemów na atrapach; wzorzec niezmieniony. Jarvis/głos6/6, diagnostyka i manifesty4/4,
 app-agents32 zaliczone/3 pominięte. Ręczna zgoda w oknie Brokera pominięta, bez deklaracji odbioru.
 
-Dalej: odtworzyć i ustabilizować #34 bez wydłużania okna, wykonać pełny E2E nowego UI,
+Dalej: wykonać pełny E2E nowego UI, zaplanować końcowy pełny Rust po dalszych przyrostach,
 wyjaśnić rozbieżności CI UI oraz problemy Windows. Nie uruchamiać LLM CPU równocześnie
 z testami czasowymi UI. Wymagany niezależny przegląd pozostaje otwarty; wersja 0.0.85, etap J w toku.
 Harmonogram ma cogodzinne wznowienia w Cloud; ostatnia iteracja o 07:00 UTC ma zebrać raport

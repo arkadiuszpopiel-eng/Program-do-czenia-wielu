@@ -33,7 +33,8 @@ CI149 ma osobne porażki Windows/UI/Linux; szczegóły w [raporcie nocnym](../re
 
 Aktualne ponowienie: [Rust988d13f3](../reviews/2026-11-08-rust-rerun.md) —3485 zaliczonych,
 1 nieudany,24 pominięte; pełne wszystkie76integracji. Nowa porażka #34: test kolejki a300ms
-okna Cofnij. [UI #32](../reviews/2026-11-08-ui-geometry.md) —23 nowych E2E i573 jednostkowe
+okna Cofnij; [poprawka testu zegara](../reviews/2026-11-08-queue-clock.md) ma4/4 i20 powtórzeń pary
+bez błędu, bez zmiany300ms. [UI #32](../reviews/2026-11-08-ui-geometry.md) —23 nowych E2E i573 jednostkowe
 zaliczone, pełny E2E nowego źródła do wykonania. Menu mieści się w małym oknie i po powiększeniu.
 
 ## Zachowanie Jarvisa
