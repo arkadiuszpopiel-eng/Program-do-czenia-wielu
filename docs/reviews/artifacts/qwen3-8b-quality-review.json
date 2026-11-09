@@ -1,0 +1,38 @@
+{
+  "updated_utc": "2026-11-09T19:34:53.670588+00:00",
+  "model": "official Qwen3-8B Q4_K_M",
+  "scope": "30one-repeatqualityscreens,notappGPUacceptance",
+  "groups": {
+    "no_actions": {
+      "screening_pass": 10,
+      "total": 10
+    },
+    "intro": {
+      "screening_pass": 10,
+      "total": 10
+    },
+    "arithmetic": {
+      "screening_pass": 10,
+      "total": 10
+    }
+  },
+  "truncated": 0,
+  "reasoning_chars": 0,
+  "tool_call_cases": 0,
+  "observed_line_time_gate_cases": 3,
+  "elapsed_ms": {
+    "min": 3337,
+    "median": 24233.5,
+    "max": 98386
+  },
+  "estimated_vram_mib": {
+    "weights_plus_fixed_overhead": 5345,
+    "kv_at8192": 1024,
+    "llm_total": 6369,
+    "plus_stt_reserve1500": 7869,
+    "owner_target_assumption": 12288,
+    "kind": "manifest estimate, not measuredGPU/VRAM"
+  },
+  "actual_core": "FAILED0/1/1filtered;2/40attempts38notrun,AlfaJarvis96876ms correctNo,BetaJarvisIdle60969ms",
+  "qualification": "NOT accepted for application or hardware; generation quality only"
+}

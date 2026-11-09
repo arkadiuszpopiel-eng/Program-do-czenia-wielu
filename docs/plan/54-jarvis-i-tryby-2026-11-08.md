@@ -1,10 +1,16 @@
 # 54 — Jarvis i dalszy rozwój trybów, 8–9.11.2026
 
-**Blokada aktualnegoCI167:** [RUSTSEC-2026-0459 / SQLite–SQLCipher](../reviews/2026-11-09-ci167-sqlite.md).
-Kandydat ma naprawiony SQLCipher4.20/SQLite3.54.1,33/0/1 testów bazy,73/0/3 modułów i15/0 Core.
-Właściciel zatwierdził wyłącznie wąską łatkę licencji51e27c10; po zastosowaniu lokalny audyt4/4.
-Nadal wymagane nowe pełneCI oraz niezależny przegląd.
-Nie wyłączono szyfrowania ani nie ignorowano CVE. Bielik #41/#48 także pozostaje otwarty.
+**Naprawa SQLCipher potwierdzona pełnymCI168:** [RUSTSEC-2026-0459 / SQLite–SQLCipher](../reviews/2026-11-09-ci167-sqlite.md).
+Kod050f86c7 używa SQLCipher4.20/SQLite3.54.1/OpenSSL; wąska łatka licencji51e27c10 zatwierdzona
+wyłącznie przez właściciela. CI168 wszystkie6 zadań zielone:Linux3506/0/26,Windows3532/0/47,
+Clippy0,Chromium905/905,Vitest573/573. Windows90 wszystkie4 zielone:WebView2 63/0/5,
+syntetyczne silnikiCPU1/0/2 filtrowane. Jakość Bielika#41/#48 i niezależny przegląd pozostają otwarte.
+Eksperymenty kontekstu wycofano; nie opublikowano kolejnej zmiany instrukcji modelu.
+
+Właściciel zlecił próbę modelu8–9B i wskazał **RTX2060 12GB**. Qwen3-8BQ4 w sondzie ma30/30
+poprawnych treści (imiona/format,brak fikcyjnych działań,arytmetyka); pełnyCoreCPU niezaliczony
+po2/40próbach z powoduIdle Bety. GPU12GB,prawdziwe narzędzia i mikrofon nie są odebrane.
+Produkcyjnego katalogu/defaultu nie zmieniono; #41/#48 pozostają otwarte.
 
 Karta [#22](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/22).
 Pierwotne okno kończyło się9.11.2026 o08:00 Europe/Warsaw (07:00UTC).

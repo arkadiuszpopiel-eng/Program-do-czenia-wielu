@@ -1,9 +1,13 @@
 //! Ręczna próba rozmowy wszystkich person na rzeczywistym modelu lokalnym, bez Tauri i mikrofonu.
 //! Zmienne: ALFA_LIVE_SERVER, ALFA_LIVE_MODELS_DIR, ALFA_LIVE_MODEL, ALFA_LIVE_REPORT.
+//! ALFA_LIVE_MODEL_ENTRY: publiczny manifest dodatkowego modelu z wymaganym SHA256.
+//! Diagnostyka: ALFA_LIVE_QUERY; ALFA_LIVE_JARVIS_FIRST=1 zmienia kolejność tylko wbudowanych person.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 mod common;
+#[path = "jarvis_live/model.rs"]
+mod probe_model;
 
 use app_core::dto::{AlfaEvent, SessionTemplate, SettingValue, WorkdirChoice};
 use app_core::ports::{BrainChoice, BrainError, BrainPort, BrainRequest, HeadlessShell};
@@ -13,9 +17,24 @@ use providers_contract::{
     CancellationToken, ChatRequest, Cost, CostEstimate, ModelInfo, ModelProvider,
     ProviderCapabilities, ProviderError, ProviderHealth, ProviderId, ProviderStream, Usage,
 };
-use providers_local_impl::{LocalConfig, LocalProvider, Sidecar, TokioLauncher};
+use providers_local_impl::{LocalProvider, Sidecar, TokioLauncher};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
+
+fn live_query() -> String {
+    std::env::var("ALFA_LIVE_QUERY").unwrap_or_else(|_| {
+        "Jednym krótkim zdaniem przedstaw się swoim imieniem i powiedz, że jesteś gotowa pomóc."
+            .into()
+    })
+}
+
+fn profile_order() -> [&'static str; 2] {
+    if std::env::var("ALFA_LIVE_JARVIS_FIRST").is_ok_and(|value| value == "1") {
+        ["jarvis", "standard"]
+    } else {
+        ["standard", "jarvis"]
+    }
+}
 
 struct LocalBrain {
     provider: Arc<dyn ModelProvider>,
@@ -83,14 +102,7 @@ impl BrainPort for LocalBrain {
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 #[ignore = "rzeczywisty model lokalny; ALFA_LIVE_* — raport, bez mikrofonu i Windows"]
 async fn all_personas_on_local_model() {
-    let server = std::env::var("ALFA_LIVE_SERVER").expect("ALFA_LIVE_SERVER");
-    let models_dir = std::env::var("ALFA_LIVE_MODELS_DIR").expect("ALFA_LIVE_MODELS_DIR");
-    let model = std::env::var("ALFA_LIVE_MODEL").expect("ALFA_LIVE_MODEL");
-    let models = providers_local_impl::builtin_models().unwrap();
-    assert!(models.iter().any(|m| m.id == model));
-    let mut config = LocalConfig::new(models_dir, server);
-    config.default_model.clone_from(&model);
-    config.threads = Some(4);
+    let (models, config, model) = probe_model::configuration();
     let sidecar = Sidecar::new(config, Arc::new(TokioLauncher::default()), None, None).unwrap();
     let sent = Arc::new(Mutex::new(Vec::new()));
     let brain = Arc::new(LocalBrain {
@@ -110,7 +122,7 @@ async fn all_personas_on_local_model() {
         .unwrap();
     let mut events = core.subscribe_events();
     let mut results = Vec::new();
-    for mode in ["standard", "jarvis"] {
+    for mode in profile_order() {
         core.settings_set(
             "agents.interaction_mode".into(),
             SettingValue::Text(mode.into()),
@@ -128,10 +140,7 @@ async fn all_personas_on_local_model() {
                 core.sessions_choose_workdir(session.clone(), WorkdirChoice::None)
                     .await
                     .unwrap();
-                let mut message = common::send(
-                    "Jednym krótkim zdaniem przedstaw się swoim imieniem i powiedz, że jesteś gotowa pomóc.",
-                    None,
-                );
+                let mut message = common::send(&live_query(), None);
                 message.addressed_to = Some(agent.into());
                 let started = Instant::now();
                 let turn = core
@@ -162,10 +171,10 @@ async fn all_personas_on_local_model() {
                     "text":answer.text,"error":answer.error,"response_author":answer.author,
                     "truncated":answer.truncated,"usage":answer.usage,
                     "mentions_own_name": answer.text.to_lowercase().contains(agent),
-                    "provider_request_system":sent.system,
+                    "provider_request_system":sent.system, "provider_request_user":sent.messages.last().map(|m| m.visible_text()),
                     "provider_request_tool_count":sent.tools.len()}));
                 if let Ok(path) = std::env::var("ALFA_LIVE_REPORT") {
-                    let report = serde_json::json!({"model":model,"platform":"Linux Cloud CPU; headless core, no microphone", "max_tokens":96, "temperature":0.0, "results":results});
+                    let report = serde_json::json!({"model":model,"platform":"Linux Cloud CPU; headless core, no microphone", "max_tokens":96, "temperature":0.0, "query":live_query(), "results":results});
                     std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
                 }
                 assert!(answer.error.is_none(), "{agent}/{mode}: {:?}", answer.error);
@@ -193,15 +202,8 @@ async fn all_personas_on_local_model() {
 }
 
 fn custom_live_fixture() -> (Arc<LocalBrain>, Arc<Sidecar>, String, String) {
-    let server = std::env::var("ALFA_LIVE_SERVER").expect("ALFA_LIVE_SERVER");
-    let models_dir = std::env::var("ALFA_LIVE_MODELS_DIR").expect("ALFA_LIVE_MODELS_DIR");
-    let model = std::env::var("ALFA_LIVE_MODEL").expect("ALFA_LIVE_MODEL");
+    let (models, config, model) = probe_model::configuration();
     let report_path = std::env::var("ALFA_LIVE_REPORT").expect("ALFA_LIVE_REPORT");
-    let models = providers_local_impl::builtin_models().unwrap();
-    assert!(models.iter().any(|m| m.id == model));
-    let mut config = LocalConfig::new(models_dir, server);
-    config.default_model.clone_from(&model);
-    config.threads = Some(4);
     let sidecar = Sidecar::new(config, Arc::new(TokioLauncher::default()), None, None).unwrap();
     let sent = Arc::new(Mutex::new(Vec::new()));
     let brain = Arc::new(LocalBrain {
@@ -326,10 +328,7 @@ async fn custom_persona_on_local_model_after_catalog_and_cast_restart() {
                     .any(|a| a.id == saved.persona && a.role_ids.contains(&saved.role)),
                 "obsada przypisana przed restartem musi pozostać bez ponownego przypisania"
             );
-            let mut message = common::send(
-                "Jednym krótkim zdaniem przedstaw się swoim imieniem i powiedz, że jesteś gotowa pomóc.",
-                None,
-            );
+            let mut message = common::send(&live_query(), None);
             message.addressed_to = Some(saved.persona.clone());
             let started = Instant::now();
             let turn = core
@@ -354,12 +353,12 @@ async fn custom_persona_on_local_model_after_catalog_and_cast_restart() {
                 "error":answer.error, "response_author":answer.author,
                 "truncated":answer.truncated, "usage":answer.usage,
                 "router_request_system":system, "router_request_tool_count":request.tools.len(),
-                "provider_request_system":sent.system,
+                "provider_request_system":sent.system, "provider_request_user":sent.messages.last().map(|m| m.visible_text()),
                 "provider_request_tool_count":sent.tools.len()
             }));
             let report = serde_json::json!({
                 "model":model, "platform":"Linux Cloud CPU; headless core, no microphone",
-                "max_tokens":96, "temperature":0.0, "results":results
+                "max_tokens":96, "temperature":0.0, "query":live_query(), "results":results
             });
             std::fs::write(&report_path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
             assert!(answer.error.is_none(), "{:?}", answer.error);

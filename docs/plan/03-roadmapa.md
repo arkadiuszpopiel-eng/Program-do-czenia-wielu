@@ -1,10 +1,16 @@
 # 03 — Roadmapa (dokument żywy)
 
-**Blokada aktualnegoCI167:** [RUSTSEC-2026-0459 / SQLite–SQLCipher](../reviews/2026-11-09-ci167-sqlite.md).
-Kandydat ma naprawiony SQLCipher4.20/SQLite3.54.1,33/0/1 testów bazy,73/0/3 modułów i15/0 Core.
-Właściciel zatwierdził wyłącznie wąską łatkę licencji51e27c10; po zastosowaniu lokalny audyt4/4.
-Nadal wymagane nowe pełneCI oraz niezależny przegląd.
-Nie wyłączono szyfrowania ani nie ignorowano CVE. Bielik #41/#48 także pozostaje otwarty.
+**Naprawa SQLCipher potwierdzona pełnymCI168:** [RUSTSEC-2026-0459 / SQLite–SQLCipher](../reviews/2026-11-09-ci167-sqlite.md).
+Kod050f86c7 używa SQLCipher4.20/SQLite3.54.1/OpenSSL; wąska łatka licencji51e27c10 zatwierdzona
+wyłącznie przez właściciela. CI168 wszystkie6 zadań zielone:Linux3506/0/26,Windows3532/0/47,
+Clippy0,Chromium905/905,Vitest573/573. Windows90 wszystkie4 zielone:WebView2 63/0/5,
+syntetyczne silnikiCPU1/0/2 filtrowane. Jakość Bielika#41/#48 i niezależny przegląd pozostają otwarte.
+Eksperymenty kontekstu wycofano; nie opublikowano kolejnej zmiany instrukcji modelu.
+
+Właściciel zlecił próbę modelu8–9B i wskazał **RTX2060 12GB**. Qwen3-8BQ4 w sondzie ma30/30
+poprawnych treści (imiona/format,brak fikcyjnych działań,arytmetyka); pełnyCoreCPU niezaliczony
+po2/40próbach z powoduIdle Bety. GPU12GB,prawdziwe narzędzia i mikrofon nie są odebrane.
+Produkcyjnego katalogu/defaultu nie zmieniono; #41/#48 pozostają otwarte.
 
 **24.10.2026 — poprawki lokalne 0.0.72:** limit 500 kroków i wspólny budżet
 orkiestracji, profile narzędzi każdej agentki, przebudowa Pipeline z doborem modeli
@@ -280,7 +286,7 @@ Zlecenie właściciela 8.11; [plan nocny 54](54-jarvis-i-tryby-2026-11-08.md), [
 
 | ID | Zadanie | Stan | Data | Uwagi |
 | --- | --- | --- | --- | --- |
-| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-09 | kod rozmowy, przebiegów, delegacji i zadań w tle; #31 Jarvis20/20 imion w próbie Bielika, jedno zdanie0/20; #41 świeża baza i2 warianty po40 tur również0/20, zmiany cofnięte; #35–36 własna Luna, delegacja i odtworzenie katalogu na atrapach; #43 Luna10/10 tur Bielika, Jarvis po restarcie, jedno zdanie0/5; #48:50 ciał HTTP+50 odtworzeń modelu, Jarvis0/25 jednego zdania przed dekoderem,45/50 tekstów zgodnych; trwała obsada rozmowy #37 otwarta; przegląd oraz próba sprzętowa otwarte |
+| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-09 | kod rozmowy, przebiegów, delegacji i zadań w tle; #31 Jarvis20/20 imion w próbie Bielika, jedno zdanie0/20; #41 świeża baza i2 warianty po40 tur również0/20, zmiany cofnięte; #35–36 własna Luna, delegacja i odtworzenie katalogu na atrapach; #43 Luna10/10 tur Bielika, Jarvis po restarcie, jedno zdanie0/5; #48:50 ciał HTTP+50 odtworzeń modelu, Jarvis0/25 jednego zdania przed dekoderem,45/50 tekstów zgodnych; #37 naprawione i potwierdzone pełnymCI168; przegląd oraz próba sprzętowa otwarte |
 | J.2 | Panel Agentki: wybór Jarvisa i przejście do sterowania głosem | w toku | 2026-11-08 | 4 style × 2 motywy; #44 wspólny profil w bibliotece Kreatora,9/9 nowych E2E (także EN), typy0/0; pełny899/899 naaf5a2bc5 i CI161901/901 na12d44af4 zaliczone; #49 pełnyCI162901/901+573 zaliczony; #50 nowy nativeprzepływ i2/2 Chromium, dalszyCI otwarty; testy na atrapach i axe |
 | J.3 | Zakres każdego z pięciu trybów i odporność na spóźnione odpowiedzi | w toku | 2026-11-08 | jawny wybór rozmowa / globalnie; Plan i kłódka zachowują zakres rozmowy; regresje wyścigu żądań; karta #25: Plan bez rozmowy nie zmienia poziomu globalnego, Alt+M pomija niedostępny Plan |
 | J.4 | Próby wszystkich person na rzeczywistym modelu i w torze głosowym | w toku | 2026-11-08 | Linux Cloud CPU i syntetyczne audio; Windows i mikrofon pozostają osobną próbą |

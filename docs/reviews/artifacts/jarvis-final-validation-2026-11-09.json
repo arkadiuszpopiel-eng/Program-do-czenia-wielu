@@ -1,0 +1,255 @@
+{
+  "updated_utc": "2026-11-09T19:36:14.476906+00:00",
+  "production_commit": "050f86c725bb474ae0a06d6dccecd044c86dd862",
+  "production_changes": "NONE afterapprovedSQLCipher repair",
+  "ci168": {
+    "linux": {
+      "job_id": 129317758151,
+      "targets": 1126,
+      "totals": [
+        3506,
+        0,
+        26
+      ],
+      "lines": [
+        "2026-11-09T17:30:12.7365272Z test fixed_engine_opens_legacy_encrypted_wal ... ok",
+        "2026-11-09T17:30:12.7380527Z test linked_sqlcipher_uses_fixed_sqlite ... ok"
+      ]
+    },
+    "webview": {
+      "job_id": 129317757710,
+      "targets": 0,
+      "totals": [
+        0,
+        0,
+        0
+      ],
+      "lines": [
+        "2026-11-09T17:32:19.8878564Z   5 skipped\r",
+        "2026-11-09T17:32:19.8878959Z   63 passed (2.8m)\r"
+      ]
+    },
+    "tauri": {
+      "job_id": 129317757683,
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0
+    },
+    "engines": {
+      "job_id": 129317758244,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "filtered": 2,
+      "seconds": 846.27,
+      "tts_ttfb_ms": 457,
+      "tts_audio_ms": 2185,
+      "wer": 0,
+      "stt_ms": 25516,
+      "stt_rtf": 11.68,
+      "cuda_fallback": "Cuda start failed on runner; Cpu used"
+    },
+    "windows": {
+      "job_id": 129317758187,
+      "targets": 1126,
+      "totals": [
+        3532,
+        0,
+        47
+      ],
+      "security": [
+        "2026-11-09T17:46:49.3545973Z test fixed_engine_opens_legacy_encrypted_wal ... ok\r",
+        "2026-11-09T17:46:49.3704756Z test linked_sqlcipher_uses_fixed_sqlite ... ok\r"
+      ]
+    },
+    "ui": {
+      "job_id": 129317758276,
+      "lines": [
+        "2026-11-09T17:14:47.0064768Z packages/ui-kit check: svelte-check found 0 errors and 0 warnings",
+        "2026-11-09T17:15:03.9580973Z apps/desktop/ui check: svelte-check found 0 errors and 0 warnings",
+        "2026-11-09T17:16:11.3292391Z  Test Files  103 passed (103)",
+        "2026-11-09T17:16:11.3294852Z       Tests  573 passed (573)",
+        "2026-11-09T17:45:51.5987374Z   905 passed (29.3m)"
+      ]
+    },
+    "full_status": {
+      "commit": "050f86c725bb474ae0a06d6dccecd044c86dd862",
+      "ci168": "6/6success",
+      "rehearsal90": "4/4success"
+    }
+  },
+  "baseline100": {
+    "updated_utc": "2026-11-09T18:33:22.909482+00:00",
+    "phase": "completed_unqualified",
+    "source": {
+      "at": "2026-11-09T18:24:57.535191+00:00",
+      "production_base_commit": "050f86c725bb474ae0a06d6dccecd044c86dd862",
+      "production_changes": "NONE; all rejected context changes restored",
+      "test_file": "crates/app-core/tests/jarvis_live.rs",
+      "test_file_sha256": "d2373c786ae7b3ea06d5078fda3668c9097572e24e94c57ed62050b2cc5d9267",
+      "test_patch_sha256": "d4728d064d1c6f1ec7425be535d0058d1db48d981ca495eb9cefee25fd15a49e",
+      "binary_sha256": "b1c8587d00da07c3adff71f88e791f9c449aeab73ac3adcb5d19605c08051563",
+      "checks": "52/0/0;fmt/size0;Clippy0/19.42s;build0/9.76s",
+      "budgets": "actual production60/30;outer120 perturn;96tokens/temperature0",
+      "expected_protocol": "2questionsx(4builtinsx2profilesx5repeats +customLunax2profilesx5repeats)=100responses; noactionsfromtools, no realaudio"
+    },
+    "results": [
+      {
+        "question": "intro",
+        "scope": "builtin",
+        "started_utc": "2026-11-09T18:25:09.045248+00:00",
+        "finished_utc": "2026-11-09T18:29:03.526492+00:00",
+        "test_exit": 0,
+        "expected_rows": 40,
+        "rows": 40,
+        "errors": 0,
+        "truncated": 0,
+        "report_sha256": "a2e1ea196a559e7b2d07abea627e4920bb0aaa1abe953e0383dab00bbab41fb7",
+        "process_group_cleaned": true,
+        "builtin_profile_order": "jarvis thenstandard,5repeats each",
+        "luna_profile_order": "standard5pre-restart,Jarvis5post-restart,0reassignments"
+      },
+      {
+        "question": "intro",
+        "scope": "luna",
+        "started_utc": "2026-11-09T18:29:03.528074+00:00",
+        "finished_utc": "2026-11-09T18:29:44.679757+00:00",
+        "test_exit": 0,
+        "expected_rows": 10,
+        "rows": 10,
+        "errors": 0,
+        "truncated": 0,
+        "report_sha256": "1d49592043fd30e9eb4ee7f2314edc966711116e7c46468e14faa24e62252ae9",
+        "process_group_cleaned": true,
+        "builtin_profile_order": "jarvis thenstandard,5repeats each",
+        "luna_profile_order": "standard5pre-restart,Jarvis5post-restart,0reassignments"
+      },
+      {
+        "question": "no_actions",
+        "scope": "builtin",
+        "started_utc": "2026-11-09T18:29:44.680458+00:00",
+        "finished_utc": "2026-11-09T18:32:34.890629+00:00",
+        "test_exit": 0,
+        "expected_rows": 40,
+        "rows": 40,
+        "errors": 0,
+        "truncated": 0,
+        "report_sha256": "359323f92420dedd5e5dce749dfc80a2b8e9eeac4d21d7ee5fcedc95b5d02c9b",
+        "process_group_cleaned": true,
+        "builtin_profile_order": "jarvis thenstandard,5repeats each",
+        "luna_profile_order": "standard5pre-restart,Jarvis5post-restart,0reassignments"
+      },
+      {
+        "question": "no_actions",
+        "scope": "luna",
+        "started_utc": "2026-11-09T18:32:34.891863+00:00",
+        "finished_utc": "2026-11-09T18:33:22.907472+00:00",
+        "test_exit": 0,
+        "expected_rows": 10,
+        "rows": 10,
+        "errors": 0,
+        "truncated": 0,
+        "report_sha256": "2285951c8971b375e11852cd0ef98e76114b641feeb94a592b4d1f7bd277bf90",
+        "process_group_cleaned": true,
+        "builtin_profile_order": "jarvis thenstandard,5repeats each",
+        "luna_profile_order": "standard5pre-restart,Jarvis5post-restart,0reassignments"
+      }
+    ],
+    "semantic_qualification": "NOT accepted from transport; raw text requires separate review",
+    "platform": "Linux Cloud CPU, headless actual Core+GGUF; no GPU/realmic; other ports synthetic",
+    "transport_all_passed": true
+  },
+  "arithmetic_failed": {
+    "updated_utc": "2026-11-09T18:47:37.060748+00:00",
+    "phase": "completed_unqualified",
+    "source": {
+      "at": "2026-11-09T18:24:57.535191+00:00",
+      "production_base_commit": "050f86c725bb474ae0a06d6dccecd044c86dd862",
+      "production_changes": "NONE; all rejected context changes restored",
+      "test_file": "crates/app-core/tests/jarvis_live.rs",
+      "test_file_sha256": "d2373c786ae7b3ea06d5078fda3668c9097572e24e94c57ed62050b2cc5d9267",
+      "test_patch_sha256": "d4728d064d1c6f1ec7425be535d0058d1db48d981ca495eb9cefee25fd15a49e",
+      "binary_sha256": "b1c8587d00da07c3adff71f88e791f9c449aeab73ac3adcb5d19605c08051563",
+      "checks": "52/0/0;fmt/size0;Clippy0/19.42s;build0/9.76s",
+      "budgets": "actual production60/30;outer120 perturn;96tokens/temperature0",
+      "expected_protocol": "1arithmeticquestionx(4builtinsx2profilesx5repeats +customLunax2profilesx5repeats)=50responses; originalproduction050f"
+    },
+    "results": [
+      {
+        "question": "arithmetic",
+        "scope": "builtin",
+        "started_utc": "2026-11-09T18:40:35.082054+00:00",
+        "finished_utc": "2026-11-09T18:47:05.423475+00:00",
+        "test_exit": 101,
+        "expected_rows": 40,
+        "rows": 21,
+        "errors": 0,
+        "truncated": 4,
+        "report_sha256": "51219052a75d2fbdc01307c5ca79c45a66e9327a973291155decc18b7d0df7d9",
+        "process_group_cleaned": true,
+        "builtin_profile_order": "jarvis thenstandard,5repeats each",
+        "luna_profile_order": "standard5pre-restart,Jarvis5post-restart,0reassignments"
+      },
+      {
+        "question": "arithmetic",
+        "scope": "luna",
+        "started_utc": "2026-11-09T18:47:05.425307+00:00",
+        "finished_utc": "2026-11-09T18:47:37.060183+00:00",
+        "test_exit": 101,
+        "expected_rows": 10,
+        "rows": 1,
+        "errors": 0,
+        "truncated": 1,
+        "report_sha256": "d3235a7f7d5e8a83d8d159c9e1ffe27a16f9e21493fb0045b5bf31367f125af9",
+        "process_group_cleaned": true,
+        "builtin_profile_order": "jarvis thenstandard,5repeats each",
+        "luna_profile_order": "standard5pre-restart,Jarvis5post-restart,0reassignments"
+      }
+    ],
+    "semantic_qualification": "NOT accepted from transport; raw text requires separate review",
+    "platform": "Linux Cloud CPU, headless actual Core+GGUF; no GPU/realmic; other ports synthetic",
+    "transport_all_passed": false
+  },
+  "context_candidates": "Bothwithheld; v1lostownertitle,v2coldJarvisIdle; patchSHA7f886e16bd655a42c792b8497756fdf8caadbca1d50a799cea9ea24cf589ac31",
+  "qwen_quality": {
+    "updated_utc": "2026-11-09T19:34:53.670588+00:00",
+    "model": "official Qwen3-8B Q4_K_M",
+    "scope": "30one-repeatqualityscreens,notappGPUacceptance",
+    "groups": {
+      "no_actions": {
+        "screening_pass": 10,
+        "total": 10
+      },
+      "intro": {
+        "screening_pass": 10,
+        "total": 10
+      },
+      "arithmetic": {
+        "screening_pass": 10,
+        "total": 10
+      }
+    },
+    "truncated": 0,
+    "reasoning_chars": 0,
+    "tool_call_cases": 0,
+    "observed_line_time_gate_cases": 3,
+    "elapsed_ms": {
+      "min": 3337,
+      "median": 24233.5,
+      "max": 98386
+    },
+    "estimated_vram_mib": {
+      "weights_plus_fixed_overhead": 5345,
+      "kv_at8192": 1024,
+      "llm_total": 6369,
+      "plus_stt_reserve1500": 7869,
+      "owner_target_assumption": 12288,
+      "kind": "manifest estimate, not measuredGPU/VRAM"
+    },
+    "actual_core": "FAILED0/1/1filtered;2/40attempts38notrun,AlfaJarvis96876ms correctNo,BetaJarvisIdle60969ms",
+    "qualification": "NOT accepted for application or hardware; generation quality only"
+  },
+  "qwen_CPU_core": "failed0/1/1filtered,2/40attempts38unrun",
+  "hardware": "OwnerRTX206012GB targetNOTtested; no realmic; testsCIWindowsWebViewdebug separatefromLinuxCPUrealmodels",
+  "automation": "disabled;no merge/release/subagents/CLIbridges/evalorpolicychanges"
+}

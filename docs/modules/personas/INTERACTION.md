@@ -47,6 +47,18 @@ routera i faktycznego dostawcy, autora oraz obcięcie. Nowa próba nazywa się
 [Wyniki i ograniczenia modelu](../../reviews/2026-11-09-jarvis-model-repair.md);
 [wcześniejszy raport #43](../../reviews/2026-11-09-live-custom.md) pozostaje historyczny.
 
+Ręczna diagnostyka przyjmuje `ALFA_LIVE_QUERY` (wyłącznie publiczne pytanie syntetyczne).
+`ALFA_LIVE_JARVIS_FIRST=1` zaczyna macierz wbudowanych person od zimnego Jarvisa;
+nie zmienia kolejności kontrolnego restartu Luny. Liczba powtórzeń pozostaje5 dla każdej persony
+w każdym profilu, limity i zdolności modeli są dotychczasowe. Raport zawiera pytanie faktycznego
+dostawcy. Sukces transportu należy oceniać oddzielnie od poprawności imienia, formatu i twierdzeń
+o wykonaniu. Nie zaliczać odpowiedzi modelu wyłącznie z wyniku1/0 testu transportowego.
+
+Dodatkowy model w ręcznej próbie można podać publicznym `ALFA_LIVE_MODEL_ENTRY` (JSON typuModelEntry,
+obowiązkowy SHA256). Manifest testu nie może zastępować identyfikatorów modeli wbudowanych.
+Nie zmienia to katalogu produkcyjnego. Qwen3-8B sprawdzono w trybie bez rozumowania;
+konfiguracja i ograniczenia znajdują się w powyższym raporcie.
+
 Przegląd w świeżej sesji przed scaleniem; SPEC nie zamyka żadnego kryterium sprzętowego.
 
 W bibliotece Kreatora przy wspólnym Jarvisie przycisk **Sterowanie głosem** zamyka Ustawienia
