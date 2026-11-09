@@ -6,80 +6,43 @@ dla każdej agentki. Właściciel potwierdził termin: **9.11.2026 o 08:00**; za
 czasu polskiego: **Europe/Warsaw = 07:00 UTC**. Szczegóły Jarvisa pozostają według roboczego
 kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
 
-## Zakres i kolejność
+## Aktualny stan,9.11 o05:12UTC
 
-[Najnowsze pełne wyniki na169a6004](../reviews/2026-11-09-full-validation.md):
-Cloud Linux Rust3492/0/24, wszystkie77 integracji app-core; Windows CI1593516/5/45.
-Oba testy kolejki #39 zaliczone na Windows; pozostałe5 porażek opisano oddzielnie.
-[Własna Luna #43](../reviews/2026-11-09-live-custom.md):10/10 tur rzeczywistego Bielika,
-Jarvis dziedziczony także po restarcie i ponownym przypisaniu roli; jedno zdanie Jarvisa0/5.
-
-
-Najnowszy pełny Chromium **CI159 na169a6004:890/890 E2E i573/573 jednostkowych**,28,2 minuty E2E.
-Windows80 zaliczył scenariusz dokowania; całość60/1/6, nowy timeout kłódki Dziecko
-[otrzymuje diagnostykę #42](../reviews/2026-11-09-webview-child-lock.md). Pełne wyniki Rust podano wyżej; wcześniejsze wyniki niżej zachowano jako historię.
-
-Aktualizacja9.11: pełny lokalny UI **877 zaliczonych / 2 nieudane / 0 pominiętych** na `bd389207`
-(UI równoważne `7752ac70`); osobno CI156 **879/879 E2E i573/573 jednostkowych**. Porażki lokalnego
-Planu Glass pozostają otwarte. Pełny Rust na `988d13f3`: **3485 zaliczonych / 1 nieudany / 24 pominięte**;
-test zegara #34 naprawił pojedynczy przypadek, bez przemianowania pełnej próby na zieloną.
-[Raport katalogu i wyniki](../reviews/2026-11-08-catalog-platform.md) opisują poprawkę
-13 przypadków `app-models` (78 testów zaliczonych po zmianie). Kolejne
-[poprawki fixture'ów #27–30](../reviews/2026-11-08-linux-fixtures.md): 95 zaliczonych / 0 nieudanych /
-3 pominięte w zakresach ukierunkowanych; późniejszy pełny Rust opisano wyżej.
-[Kompozycja OCR/FFmpeg #33](../reviews/2026-11-08-ocr-composition.md) przeszła81 narzędzi i5 prób
-straży na atrapach bez problemów. [Własne persony #35–36](../reviews/2026-11-09-custom-personas.md):
-Luna z kreatora i delegacja korzystają z Jarvisa; poprawka odtwarza definicje po restarcie.
-Obsada konkretnej rozmowy nadal wymaga ponownego przypisania (#37). Lokalne porażki UI i Windows pozostają otwarte.
-
-[Harness UI #38](../reviews/2026-11-09-ui-test-harness.md):16 funkcjonalnych wariantów Planu i10 powtórzeń
-Glass zaliczone z zegarem atrapy; progi dotychczasowe. Nowy pełny zestaw890 (po #40) oraz poprawki uruchomienia
-instancji i otwarcia Sesji w WebView2 wymagają szerokiej próby. Starego877/2 nie uznano za zielony wynik.
-
-[Viewport WebView2 #40](../reviews/2026-11-09-webview-viewport.md): rehearsal78 ma61/1/5,
-plakietka instancji zaliczona; panel otwierał się jako szuflada w1028px. Tylko scenariusz dokowania
-korzysta teraz z jawnego viewportu1600×900 CDP z przywróceniem.3/3 lokalne testy helpera i check0/0;
-rzeczywisty nowy WebView2 pozostaje do wykonania, bez deklaracji odbioru natywnego szerokiego okna.
-
-[Zegar kolejki #39](../reviews/2026-11-09-review-timer-windows.md): CI156 Windows utknął w nowym
-teście #34; po publikacji został anulowany i nie ma pełnego wyniku. Aktywne zadanie blokujące
-odtworzyło zawieszenie na Linux. Ręczne299+1ms i wznowienie zegara dały11/11 testów ukierunkowanych
-oraz20 wykonań pary bez błędu;300ms nie zmieniono. Nowy Windows pozostaje wymagany.
-
-| Kolejność | Zadanie | Stan |
+| Obszar | Ostatni dowód | Co pozostaje |
 | --- | --- | --- |
-| 1 | Regresja Z.8: produkcyjna integracja modelu-sędziego, kontekst ostatniej odpowiedzi | kod i testy w PR #20, przegląd otwarty |
-| 2 | Każdy z pięciu trybów: jawny wybór zakresu rozmowa / globalnie, poprawny stan i zgody | implementacja; pełny lokalny E2E856/856, odrębne błędy CI otwarte |
-| 3 | Jarvis: ustawienie wspólne i osobne dla Alfy, Bety, Gamy i Delty | testy rdzenia/UI; własna Luna dziedziczy ustawienie wspólne, także po odtworzeniu katalogu |
-| 4 | Profil w delegacjach, zadaniach w tle i rozmowie głosowej | 6 testów rdzenia i syntetycznego głosu zaliczonych |
-| 5 | Próba na prawdziwym modelu lokalnym, zapis surowych odpowiedzi i ograniczeń | po #31:40/40 transport, Jarvis20/20 imion, 0/20 jednego zdania; jakość częściowa |
-| 6 | Regresje CI, szerokie testy, dokumentacja, katalog funkcji i draft PR | w toku |
-| 7 | Dalsze małe funkcje trybów i Jarvisa, każda z kryterium i testem | po sprawdzeniu bieżącej zmiany |
-| 8 | Raport końcowy: commity, wyniki, niezakończone punkty i kolejność dalszej pracy | na zakończenie okna pracy |
+| Pięć trybów | jawny zakres rozmowa/globalnie, Plan bez rozmowy, regresje zgód i kłódki | niezależny przegląd i odbiór sprzętu |
+| Jarvis wbudowanych i własnych person | wspólny profil; cztery osobne przełączniki; Luna po restarcie katalogu10/10 tur Bielika | trwała obsada rozmowy #37; osobne przełączniki własnych person |
+| Kreator #44 |9 nowych E2E, pełny899/899 i573/573 jednostkowych, typy0/0 | nowy pełny Chromium CI161 obejmuje901, trwa |
+| Rust Linux | [pełne3492/0/24](../reviews/2026-11-09-full-validation.md) na169a6004, domyślne cechy | ponowienie --all-features na zamrożonym12d44af4 trwa |
+| Rust Windows | CI160:3516/5/46; #45 ma7/7 Linux, #46 MSVC crosscheck+Clippy0 | CI161 na12d44af4 wykonuje pełne testy |
+| Windows/WebView2 | [rehearsal82:62/0/5](../reviews/2026-11-09-webview-green.md), kłódka3,0s i dokowanie38,4s | pięć jawnych pominięć, sprzęt i rzeczywisty mikrofon |
+| Zwięzłość Bielika | [#48:50 ciał i50 surowych odpowiedzi](../reviews/2026-11-09-jarvis-wire.md); Jarvis25/25 imion | jedno zdanie0/25 także przed dekoderem; Standard Bety/Gamy błędne imiona |
+| CI i przegląd | Tauri, cargo-deny, dokumentacja zielone | LinuxClippy: chronione importy Brokera, łatka dla człowieka; świeży przegląd |
 
-Próba bez obciążenia i poprawka form imienia: [raport #31](../reviews/2026-11-08-jarvis-identity.md).
-CI149 ma osobne porażki Windows/UI/Linux; szczegóły w [raporcie nocnym](../reviews/2026-11-08-nightly-modes-jarvis.md).
+Kolejność do07:00UTC:
 
-Aktualne ponowienie: [Rust988d13f3](../reviews/2026-11-08-rust-rerun.md) —3485 zaliczonych,
-1 nieudany,24 pominięte; pełne wszystkie76integracji. Nowa porażka #34: test kolejki a300ms
-okna Cofnij; [poprawka testu zegara](../reviews/2026-11-08-queue-clock.md) ma4/4 i20 powtórzeń pary
-bez błędu, bez zmiany300ms. [UI #32](../reviews/2026-11-08-ui-geometry.md) —23 nowych E2E i573 jednostkowe
-zaliczone; pełne nowe wyniki podano wyżej. Menu mieści się w małym oknie i po powiększeniu.
+1. Zebrać pełne wyniki Rust --all-features Linux, Windows CI161 i Chromium901 bez nakładania
+   ciężkich lokalnych prób. Nie przepisywać wcześniejszych porażek jako zaliczeń.
+2. Jeśli nowe Windows wykaże porażki, odtworzyć i poprawiać małe zakresy bez zmiany limitów;
+   chronione poprawki pozostają łatkami do przeglądu człowieka.
+3. Opublikować raporty sprawdzonego przyrostu, aktualny plan/roadmapę i wygenerowane HTML;
+   wstrzymać aktualizację ref podczas bieżącego CI, aby go nie anulować.
+4. Zebrać końcowy raport z commitami, dokładnymi wynikami i otwartymi punktami. Po07:00UTC
+   nie zaczynać zmian. Termin9.11 o08:00 Europe/Warsaw pozostaje bez korekty.
 
-[Ponowienie jakości #41](../reviews/2026-11-09-jarvis-sentence.md): świeża baza i dwa warianty
-ogólnej instrukcji, każdy40/40 technicznie poprawnych tur, lecz Jarvis nadal0/20 jednego zdania.
-Wszystkie teksty identyczne; nieskuteczne zmiany cofnięto, surowe wyniki i łatki zachowano.
-Pełny Rust na169a6004 ruszył z77 celami integracyjnymi; nie ma jeszcze wyniku.
-
-[Kontrolka w Kreatorze #44](../reviews/2026-11-09-builder-jarvis.md): wspólny profil przy bibliotece
-własnych agentek, jawny zakres i pierwszeństwo osobnych wyborów.9/9 nowych E2E i typy0/0 zaliczone;
-pełny899/899 naaf5a2bc5 zaliczony,0 pominiętych i0 niestabilnych.
+Dalszy backlog: obsada rozmowy #37; indywidualny profil własnych person; różnorodne zadania
+jakościowe i porównanie odpowiedniejszego modelu bez dostrajania do jednego pytania; rzeczywisty
+mikrofon, odsłuch i widoczny pulpit Windows. [Raport nocny](../reviews/2026-11-08-nightly-modes-jarvis.md)
+zachowuje poprzednie wyniki, porażki i odrzucone warianty. [Karta #22](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/22)
+obejmuje całość; [draft PR24](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/pull/24)
+pozostaje bez scalenia.
 
 ## Zachowanie Jarvisa
 
 Opis: [kontrakt profilu](../modules/personas/INTERACTION.md). Panel **Agentki** (`Alt+1`)
 pozwala wybrać Standardowy / Jarvis / Jak ustawienie wspólne. Ustawienie wspólne znajduje się
-w **Ustawienia → Agentki**. Profil obowiązuje od nowej odpowiedzi lub nowego przebiegu.
+w **Ustawienia → Agentki** oraz przy bibliotece **Kreatora**. Własne persony dziedziczą ten profil;
+osobne przełączniki dotyczą obecnie czterech wbudowanych. Profil obowiązuje od nowej odpowiedzi lub nowego przebiegu.
 
 Jarvis dodaje krótkie meldunki, instrukcję wykonania zlecenia i sprawdzenia wyniku oraz odpowiedzi
 nadające się do odsłuchu. Pozostają imię, role, głos i pamięć persony. Właściciel osobno włącza

@@ -227,3 +227,10 @@ Chroniony Broker i jego ostrzeżenia nie są zmieniane, świeży niezależny prz
 odtworzeń na Bieliku CPU zakończonych stop. Pełny system Luny zachowany10/10, szablon2/2.
 Jarvis ma25/25 imion i0/25 jednego zdania także przed dekoderem;45/50 tekstów identycznych,
 5 różnic Standard Luny jawnie zapisanych. Kod produkcyjny, progi i polityki dotychczasowe.
+
+## WebView2 ponownie zielony,05:09UTC
+
+[Rehearsal82](2026-11-09-webview-green.md) na12d44af4:62 zaliczone,0 nieudanych,5 pominiętych
+w2,5min. Kłódka Dziecko3,0s, wszystkie kroki diagnostyki OK, dokowanie38,4s. #47 potwierdzone
+na Windows bez zmiany120s/polityki. Pominięte: specjalny profil poziomu, logowanie CLI (brak narzędzia),
+natywny eksport i dwa skróty głosowe w widocznym pulpicie. Brak odbioru sprzętu/mikrofonu właściciela.
