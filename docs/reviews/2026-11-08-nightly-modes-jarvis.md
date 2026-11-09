@@ -187,3 +187,15 @@ lint/build/bundle/Storybook. Poprzedni lokalny877/2 zachowano oddzielnie. Window
 dokowanie #40 już zaliczone, nowy timeout kłódki Dziecko wymaga [diagnostyki #42](2026-11-09-webview-child-lock.md).
 Nie zmieniono120s ani polityki. Linux Clippy nadal blokują chronione importy; pełny Linux Rust
 jest uruchomiony osobno na77 integracjach. Windows Rust CI159 trwa; nie ma pełnego wyniku.
+
+## Pełny Rust i własna Luna,03:15–03:23UTC
+
+[Pełne wyniki](2026-11-09-full-validation.md): Linux169a6004 **3492/0/24**, wszystkie77 integracji,
+workspace/lib/doc, komendy0. Windows CI159 **3516/5/45**;1121 oryginalnych wyników, wykluczono7
+powtórzeń grep. Oba testy kolejki #39 przeszły; files nadal bez kernel_broker, mimo wiersza ready.
+Dwa conductor_handoff i dwa kodowania Windows pozostają nieudane. Linux Clippy chroniony nadal czerwony.
+
+[Nowa własna Luna #43](2026-11-09-live-custom.md):10/10 rzeczywistych tur Bielika w36,99s,
+bez błędu/obcięcia/pomyłki autora, także po restarcie i ponownym przypisaniu roli. Standard5/5 jednego
+zdania, Jarvis0/5 jednego zdania,5/5 poprawnych form imienia. Uprawnienia dotychczasowe, mikrofon
+headless nieaktywny. Faktyczne instrukcje żądania routera zapisane w syntetycznym raporcie.

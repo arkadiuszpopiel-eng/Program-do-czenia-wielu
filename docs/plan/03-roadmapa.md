@@ -257,11 +257,11 @@ Zlecenie właściciela 8.11; [plan nocny 54](54-jarvis-i-tryby-2026-11-08.md), [
 
 | ID | Zadanie | Stan | Data | Uwagi |
 | --- | --- | --- | --- | --- |
-| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-09 | kod rozmowy, przebiegów, delegacji i zadań w tle; #31 Jarvis20/20 imion w próbie Bielika, jedno zdanie0/20; #41 świeża baza i2 warianty po40 tur również0/20, zmiany cofnięte; #35–36 własna Luna, delegacja i odtworzenie katalogu po restarcie sprawdzone na atrapach; trwała obsada rozmowy #37 otwarta; przegląd oraz próba sprzętowa otwarte |
+| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-09 | kod rozmowy, przebiegów, delegacji i zadań w tle; #31 Jarvis20/20 imion w próbie Bielika, jedno zdanie0/20; #41 świeża baza i2 warianty po40 tur również0/20, zmiany cofnięte; #35–36 własna Luna, delegacja i odtworzenie katalogu na atrapach; #43 Luna10/10 tur Bielika, Jarvis po restarcie, jedno zdanie0/5; trwała obsada rozmowy #37 otwarta; przegląd oraz próba sprzętowa otwarte |
 | J.2 | Panel Agentki: wybór Jarvisa i przejście do sterowania głosem | w toku | 2026-11-08 | 4 style × 2 motywy; testy na atrapach i axe |
 | J.3 | Zakres każdego z pięciu trybów i odporność na spóźnione odpowiedzi | w toku | 2026-11-08 | jawny wybór rozmowa / globalnie; Plan i kłódka zachowują zakres rozmowy; regresje wyścigu żądań; karta #25: Plan bez rozmowy nie zmienia poziomu globalnego, Alt+M pomija niedostępny Plan |
 | J.4 | Próby wszystkich person na rzeczywistym modelu i w torze głosowym | w toku | 2026-11-08 | Linux Cloud CPU i syntetyczne audio; Windows i mikrofon pozostają osobną próbą |
-| J.5 | Regresje CI i raport nocny | w toku | 2026-11-09 | pełny Rust988d13f3:3485/1/24; CI156 Windows nieukończony przez test #34; #39:11/11+20 powtórzeń po299+1ms; lokalny UI877/2/0, osobno CI156 UI879/879 i573 jednostkowe; WebView2 rehearsal78:61/1/5; #35–36:15 testów; #38:16 wariantów+10 powtórzeń; #40:3 testy viewportu, CI159 Chromium890/890+573 jednostkowe; Windows80 dokowanie zaliczone, całość60/1/6, nowa diagnostyka kłódki #42; chroniona łatka Brokera otwarta |
+| J.5 | Regresje CI i raport nocny | w toku | 2026-11-09 | pełny Linux169a6004:3492/0/24; CI159 Windows3516/5/45, oba testy kolejki #39 zaliczone; CI156 zawieszony zachowano jako historię; lokalny UI877/2/0, osobno CI156 UI879/879 i573 jednostkowe; WebView2 rehearsal78:61/1/5; #35–36:15 testów; #38:16 wariantów+10 powtórzeń; #40:3 testy viewportu, CI159 Chromium890/890+573 jednostkowe; Windows80 dokowanie zaliczone, całość60/1/6, nowa diagnostyka kłódki #42; chroniona łatka Brokera otwarta |
 
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 

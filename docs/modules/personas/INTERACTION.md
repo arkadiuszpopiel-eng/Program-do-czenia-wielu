@@ -33,4 +33,9 @@ Testy mają potwierdzać propagację ustawienia i brak zmiany uprawnień. Odpowi
 nie jest dowodem wykonania zadania. Testy na atrapach i w przeglądarce są oddzielone od odsłuchu i próby
 na rzeczywistym modelu oraz mikrofonie.
 
+Własna Luna z publicznego Kreatora ma oddzielną ręczną próbę lokalnego Bielika:5 rozmów Standard
+i5 Jarvis po restarcie katalogu oraz ponownym przypisaniu roli. Rola rozmowy nie ma narzędzi;
+raport zachowuje instrukcje żądania routera, autora i obcięcie. Wynik jakości opisano osobno
+w [raporcie #43](../../reviews/2026-11-09-live-custom.md).
+
 Przegląd w świeżej sesji przed scaleniem; SPEC nie zamyka żadnego kryterium sprzętowego.

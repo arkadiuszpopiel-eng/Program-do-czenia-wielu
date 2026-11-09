@@ -8,10 +8,16 @@ kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
 
 ## Zakres i kolejność
 
+[Najnowsze pełne wyniki na169a6004](../reviews/2026-11-09-full-validation.md):
+Cloud Linux Rust3492/0/24, wszystkie77 integracji app-core; Windows CI1593516/5/45.
+Oba testy kolejki #39 zaliczone na Windows; pozostałe5 porażek opisano oddzielnie.
+[Własna Luna #43](../reviews/2026-11-09-live-custom.md):10/10 tur rzeczywistego Bielika,
+Jarvis dziedziczony także po restarcie i ponownym przypisaniu roli; jedno zdanie Jarvisa0/5.
+
+
 Najnowszy pełny Chromium **CI159 na169a6004:890/890 E2E i573/573 jednostkowych**,28,2 minuty E2E.
 Windows80 zaliczył scenariusz dokowania; całość60/1/6, nowy timeout kłódki Dziecko
-[otrzymuje diagnostykę #42](../reviews/2026-11-09-webview-child-lock.md). Pełny Linux Rust i Windows Rust
-pozostają otwarte; wcześniejsze wyniki niżej zachowano jako historię.
+[otrzymuje diagnostykę #42](../reviews/2026-11-09-webview-child-lock.md). Pełne wyniki Rust podano wyżej; wcześniejsze wyniki niżej zachowano jako historię.
 
 Aktualizacja9.11: pełny lokalny UI **877 zaliczonych / 2 nieudane / 0 pominiętych** na `bd389207`
 (UI równoważne `7752ac70`); osobno CI156 **879/879 E2E i573/573 jednostkowych**. Porażki lokalnego
