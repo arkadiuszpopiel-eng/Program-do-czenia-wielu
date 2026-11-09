@@ -1,6 +1,6 @@
 <!-- Własne persony dziedziczą wspólny profil; zmiana ma jawny zakres także dla wbudowanych. -->
 <script lang="ts">
-  import { Select } from '@alfa/ui-kit';
+  import { Button, Select } from '@alfa/ui-kit';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
@@ -21,6 +21,11 @@
       busy = false;
     }
   }
+
+  function voice() {
+    app.closeSettings();
+    app.openPanel('voice');
+  }
 </script>
 
 <div class="profile">
@@ -40,6 +45,13 @@
       ? 'Custom agents inherit this profile. Built-in agents using the common setting inherit it too; their individual choices take priority. Changes apply from the next response. Turn on the microphone separately in Voice.'
       : 'Własne agentki dziedziczą ten profil. Wbudowane z wyborem „Jak ustawienie wspólne” także; ich osobne wybory mają pierwszeństwo. Zmiana obowiązuje od następnej odpowiedzi. Mikrofon włącz osobno w panelu Głos.'}
   </p>
+  {#if value === 'jarvis'}
+    <div class="wk-actions">
+      <Button size="sm" variant="ghost" disabled={busy} onclick={voice}
+        >{en ? 'Voice controls' : 'Sterowanie głosem'}</Button
+      >
+    </div>
+  {/if}
 </div>
 
 <style>

@@ -44,3 +44,7 @@ raport zachowuje instrukcje żądania routera, autora i obcięcie. Wynik jakośc
 w [raporcie #43](../../reviews/2026-11-09-live-custom.md).
 
 Przegląd w świeżej sesji przed scaleniem; SPEC nie zamyka żadnego kryterium sprzętowego.
+
+W bibliotece Kreatora przy wspólnym Jarvisie przycisk **Sterowanie głosem** zamyka Ustawienia
+i otwiera panel **Głos**. To nawigacja: zachowuje profil i stan mikrofonu; nie uruchamia rozmowy
+ani nasłuchu. Osobne wybory wbudowanych person nadal mają pierwszeństwo.

@@ -25,10 +25,16 @@ for (const style of ['classic', 'glass', 'next', 'junior']) {
       const library = page.getByRole('region', { name: 'Agentki z Kreatora' });
       const common = library.getByRole('combobox', { name: 'Wspólny profil współpracy' });
       await expect(common).toHaveAttribute('data-value', 'standard');
+      await expect(library.getByRole('button', { name: 'Sterowanie głosem' })).toHaveCount(0);
       await expect(library).toContainText('Własne agentki dziedziczą ten profil');
       await pickOption(common, 'jarvis');
       await expectAccessible(page, `Kreator Jarvis ${style} ${theme}`);
-      await page.getByRole('button', { name: 'Wróć do rozmowy' }).click();
+      const voice = library.getByRole('button', { name: 'Sterowanie głosem' });
+      await expect(voice).toBeVisible();
+      await voice.click();
+      await expect(page.getByRole('tab', { name: 'Głos', selected: true })).toBeVisible();
+      await expect(page.getByText('Mikrofon wyłączony.', { exact: true })).toBeVisible();
+      await page.keyboard.press('Alt+1');
       await expect(alfa).toHaveAttribute('data-interaction', 'standard');
       await expect(beta).toHaveAttribute('data-interaction', 'jarvis');
       await openBuilder(page);
@@ -54,5 +60,10 @@ test('Kreator: wspólny profil ma etykietę i opis po angielsku', async ({ page 
   await expect(common).toHaveAttribute('data-value', 'standard');
   await expect(page.getByText(/Custom agents inherit this profile/)).toBeVisible();
   await pickOption(common, 'jarvis');
+  await expect(common).toHaveAttribute('data-value', 'jarvis');
+  await page.getByRole('button', { name: 'Voice controls', exact: true }).click();
+  await expect(page.getByRole('tab', { name: 'Voice', selected: true })).toBeVisible();
+  await expect(page.getByText('Microphone is off.', { exact: true })).toBeVisible();
+  await page.keyboard.press('Control+,');
   await expect(common).toHaveAttribute('data-value', 'jarvis');
 });
