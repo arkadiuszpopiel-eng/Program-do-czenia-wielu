@@ -112,3 +112,9 @@ prób i ograniczenie dysku opisano w tym raporcie.
 - Nie uruchamiać mostów CLI z harmonogramu. Nie pobierać kolejnych wielkich modeli bez potrzeby.
 - O 07:00 UTC zakończyć nowe zmiany i przedstawić wynik. Etap J pozostaje otwarty do przeglądu i próby sprzętowej;
   obecna seria robocza nie stanowi wydania, wersja pozostaje 0.0.85.
+
+## Prewarunek rzeczywistego menu, #47
+
+[Regresja modalu Głosu](../reviews/2026-11-09-composer-modal.md):Windows81 wskazał blokadę kliku,
+Chromium1028px odtworzył przechwycenie przez scrim. Helper zamyka modal zwykłym przyciskiem;
+2/2 po zmianie, typy0/0,120s i polityka dotychczasowe. Rzeczywisty Windows do wykonania.

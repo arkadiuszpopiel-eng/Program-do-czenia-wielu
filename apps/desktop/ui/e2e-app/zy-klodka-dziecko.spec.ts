@@ -5,6 +5,7 @@
 // instancji testowej jest tymczasowy (na przebieg); przy ustawionym już PIN-ie test się pomija.
 import { expect, shot, test } from './alfa';
 import { call, refused } from './ipc-call';
+import { prepareComposer } from './composer-ready';
 
 interface ChildLock {
   pin_set: boolean;
@@ -34,10 +35,7 @@ async function step<T>(name: string, run: () => Promise<T>): Promise<T> {
 
 test('profil Dziecko: kłódka w menu trybów, wyłączenie PIN-em', async ({ alfa }) => {
   const { main } = alfa;
-  const back = main.getByRole('button', { name: 'Wróć do rozmowy' });
-  if (await back.isVisible()) await back.click();
-  const composer = main.locator('form.composer');
-  await expect(composer).toBeVisible({ timeout: 30_000 });
+  const composer = await prepareComposer(main);
   const before = await step('odczyt stanu początkowego', () =>
     call<ChildLock>(main, 'permissions_child_lock', { change: null }),
   );

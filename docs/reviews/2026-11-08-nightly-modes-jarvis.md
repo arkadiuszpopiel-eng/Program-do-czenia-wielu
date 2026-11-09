@@ -205,3 +205,9 @@ headless nieaktywny. Faktyczne instrukcje żądania routera zapisane w syntetycz
 [Kontrolka i sprawdzenie](2026-11-09-builder-jarvis.md):9/9 E2E w26,4s,4 style/2 motywy iEN,
 Beta dziedziczy, osobny Standard Alfy pozostaje. Typy0/0, lint/format/build/bundle zielone;
 pełny899/899 naaf5a2bc5 zaliczony w38,5min,0 pominiętych i0 niestabilnych. Zakres wspólny opisany jawnie, mikrofon włączany osobno.
+
+## Diagnoza blokady menu, #47
+
+[Modal Głosu](2026-11-09-composer-modal.md) pozostał po z-night: snapshot80 oraz log81 (PIN OK,
+klik menu118s) i ChromiumRED scrimintercepts. Po zamknięciu panelu zwykłym przyciskiem2/2green,
+Svelte0/0 i lint. Polityka oraz120s dotychczasowe; Windows ponownie wymagany.
