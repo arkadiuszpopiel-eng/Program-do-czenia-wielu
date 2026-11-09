@@ -132,3 +132,7 @@ Broker, lecz kolejne fazy działają w odrębnych, całkowicie zamykanych runtim
 przypadek CMD wybierany niezależnym, ścisłym enkoderem OEM. MSVC crosscheck i Clippy zaliczone;
 **nie jest to wykonanie na Windows**. Żadne asercje polityki,300ms,120s ani progi evals nie zmienione.
 Nowy rzeczywisty Windows/WebView2 pozostaje kolejnym krokiem przed terminem07:00UTC.
+
+[Diagnoza przewodu #48](../reviews/2026-11-09-jarvis-wire.md):50 ciał HTTP z atrapy i50 bezpośrednich
+odtworzeń rzeczywistego Bielika; Jarvis nadal0/25 jednego zdania przed dekoderem, imiona25/25.
+45/50 tekstów identycznych,5 różnic Standard Luny zachowano; nie deklarujemy pełnej zgodności.

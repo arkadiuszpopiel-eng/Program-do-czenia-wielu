@@ -220,3 +220,10 @@ ma7/7 Linux i Clippy0; [#46](2026-11-09-windows-encoding.md) ma crosscheck MSVC 
 To kandydaci do rzeczywistego ponowienia Windows, bez deklaracji naprawienia tych pięciu porażek.
 Produkcja UI #44 ma pełne899/899 i573/573 jednostkowe; nowe dwa testy helpera #47 zaliczone osobno.
 Chroniony Broker i jego ostrzeżenia nie są zmieniane, świeży niezależny przegląd i sprzęt pozostają otwarte.
+
+## Diagnoza żądania Jarvisa, #48
+
+[Przewód i model](2026-11-09-jarvis-wire.md):50 syntetycznych ciał HTTP z atrapy oraz50 bezpośrednich
+odtworzeń na Bieliku CPU zakończonych stop. Pełny system Luny zachowany10/10, szablon2/2.
+Jarvis ma25/25 imion i0/25 jednego zdania także przed dekoderem;45/50 tekstów identycznych,
+5 różnic Standard Luny jawnie zapisanych. Kod produkcyjny, progi i polityki dotychczasowe.
