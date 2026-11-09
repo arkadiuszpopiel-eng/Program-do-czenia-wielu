@@ -1,0 +1,28 @@
+{
+  "owner_approval": "Explicit reply ok to question linking this exact patch; no wider protected changes or merge authorization",
+  "source_local_parent": "c97686b80f605ec87e1fdfed914268c47ad2bbb8",
+  "equivalent_remote_parent": "9438def1702671d2796d66d98a31874a718a76e2",
+  "source_tree_parent": "8d309138d86bc9a32cf7a7a63ad8ce66a70fab84",
+  "protected_file": "crates/safety-broker-impl/tests/grants_review.rs",
+  "patched_blob": "8d7424ac1583265c994b0ea3cad7583ecea8a0b9",
+  "clippy": {
+    "command": "cargo +1.94.1 clippy --locked --workspace --all-targets -j2 -- -D warnings",
+    "exit": 0,
+    "warnings": 0,
+    "duration": "6m01s"
+  },
+  "tests": {
+    "command": "cargo +1.94.1 test --locked -p safety-broker-impl --test grants_review -j2",
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0,
+    "duration_s": 0.01
+  },
+  "platform": "Linux Cloud; actual Broker unit integration, no owner hardware acceptance",
+  "wrong_worktree_attempt": "Stopped exit130 before verification; not counted",
+  "log_sha256": {
+    "broker-approved-full-clippy.log": "6d154f8b82e6eb096b0fc1f7c76dbf555918b966c95f0dfae409326879288e42",
+    "broker-approved-grants.log": "5a3bb13f5d3f0c27d5e692ffaedac8635460deb8f1c4b0a153d8e71c0a013f95",
+    "broker-approved-wrong-worktree-cancelled.log": "b4ee57f837b67c44ab66fe6aeb5c6fbe1c070ed721013e1b3c3a6294cb723474"
+  }
+}

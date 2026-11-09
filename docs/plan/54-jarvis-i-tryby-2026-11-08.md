@@ -14,7 +14,7 @@ konkretnej korekty. Zakaz commitowania chronionych modułów bez przeglądu pozo
 | #53 | surowe klucze tłumaczeń system/vision i koloru w Kreatorze | naprawiona:905/905 Chromium,63/0/5 Windows/WebView2; obraz potwierdzony |
 | #41/#48 | Bielik: Jarvis ignoruje jedno zdanie; Standard myli imiona Bety/Gamy | diagnoza zapisana, naprawa do wykonania bez zmiany progów |
 | #37 | obsada rozmowy znika po restarcie | naprawa:76 testów modułów i17 integracji; pełny nowyCI wymagany |
-| #51 | publiczny LinuxClippy blokują importy chronionego testu | właściciel zatwierdził konkretną łatkę odpowiedzią „ok”; integracja i pełnyClippy do wykonania |
+| #51 | publiczny LinuxClippy blokują importy chronionego testu | zatwierdzona dokładna łatka:pełnyworkspaceClippy0/6m01s i4/4; nowyCI wymagany |
 | #52 | pobieranie silników okresowo kończy HTTP504 | 85 ponownieHTTP504 sześciu archiwów;84 zaliczony; diagnoza bez zwiększania prób |
 
 Backlog nowych funkcji, w tym indywidualne przełączniki własnych person, jest zamrożony.
@@ -97,3 +97,5 @@ Nieskuteczne warianty promptu pozostają cofnięte; zamrożone evals, limity i p
 [Etykiety Kreatora #53 i bazaCI163/Windows84](../reviews/2026-11-09-builder-labels.md).
 
 [Trwała obsada #37](../reviews/2026-11-09-cast-restart.md).
+
+[Zatwierdzona naprawa #51](../reviews/2026-11-09-broker-imports-approved.md).

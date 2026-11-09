@@ -280,3 +280,11 @@ Etykiety #53:905/905 Chromium i63/0/5 WebView85, poprawiony obraz obejrzany.
 Silniki85 znowuHTTP504 sześciu archiwów; problem otwarty. Trzy nowe warianty promptu/30 tur
 nie naprawiły wszystkich person, nie wprowadzono ich. Właściciel zatwierdził wyłącznie konkretną
 łatkę importów #51 odpowiedzią „ok”; integracja i pełnyClippy następne. Brak zgody na merge.
+
+## Zatwierdzona łatka Brokera sprawdzona z #37
+
+[#51](2026-11-09-broker-imports-approved.md): po jednoznacznej odpowiedzi właściciela „ok”
+sprawdzono dokładne importy razem z #37:pełnyworkspace/alltargetsClippy0/6m01s i4/4.
+Pierwszy omyłkowy przebieg bez łatki zatrzymany130; nie jest dowodem. Nowy pełnyCI po publikacji
+wymagany; wcześniejsze czerwoneCI pozostają w historii. Bez szerszej zmiany chronionego źródła,
+polityk, evals i bez merge. Naa3041b6f WindowsCI164 zakończony3521/0/46,1121 wyników celów.

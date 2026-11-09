@@ -17,7 +17,9 @@ use safety_broker_contract::contract_tests::{
 use safety_broker_contract::{ApprovalDecision, Broker, Capability, UNTIL_REVOKED};
 use safety_broker_impl::BrokerEngine;
 use safety_broker_impl::audit::MemoryAudit;
-use watchdog_contract::{Clock, KillReason, KillSwitch, ManualClock};
+use watchdog_contract::{Clock, ManualClock};
+#[cfg(windows)]
+use watchdog_contract::{KillReason, KillSwitch};
 
 const HOUR: u64 = 3_600_000;
 

@@ -20,6 +20,9 @@ ChronionyLinuxClippy, zwięzłość/tożsamość Bielika i trwała obsada nadal 
 Clippy0; pełny nowyRustCI oczekiwany. #53 potwierdzona905/905 i63/0/5 WebView.
 Właściciel zatwierdził konkretną łatkę #51; problemHTTP504 i zwięzłość Bielika nadal otwarte.
 
+[Zatwierdzone importy #51](../reviews/2026-11-09-broker-imports-approved.md): pełnyworkspaceClippy0/6m01s
+razem z #37,4/4 testy; nowy pełnyCI po publikacji. Bez scalenia i bez zmian polityk/evals.
+
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
