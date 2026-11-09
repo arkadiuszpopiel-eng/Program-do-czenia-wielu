@@ -23,3 +23,10 @@ przygotowany skrypt pozostaje niewykorzystany. Windows/WebView2 nowej kontrolki 
 
 Logi Cloud: `/workspace/scratch/builder-voice-{red,green,unit,check,build}.log`.
 Chronione moduły, kontrakty, ustawienia mikrofonu i progi evals dotychczasowe.
+
+## Pełny CI162
+
+Na d18d9433 z tym przyciskiem:901/901 E2E w30,0min,573/573 jednostkowych, typy0/0,
+lint/build/bundle/Storybook zielone; Windows3521/0/46 i Tauri zielone. WebView83 ma62/0/5
+w ogólnym zestawie; bezpośredni scenariusz czterech profili i nawigacji Głosu dodaje #50,
+którego native-wrapper wymaga nowego CI. Szczegóły w [raporcie CI162](2026-11-09-ci162-and-review.md).

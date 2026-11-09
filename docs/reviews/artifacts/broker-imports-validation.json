@@ -1,0 +1,33 @@
+{
+  "source": "d18d94336058f41ded5df3ab2eecdc8b12a2a4fe",
+  "worktree": "/workspace/wt-broker-import-review",
+  "source_uncommitted": true,
+  "published_source_unchanged": true,
+  "patch": "docs/reviews/patches/linux-broker-test-imports.patch",
+  "commands": [
+    "cargo fmt --all -- --check",
+    "cargo clippy --locked --workspace --all-targets -j2 -- -D warnings",
+    "cargo test --locked -p safety-broker-impl --test grants_review -j2"
+  ],
+  "clippy": {
+    "exit_code": 0,
+    "warnings": 0,
+    "elapsed": "6m56s"
+  },
+  "tests": {
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0
+  },
+  "logs": {
+    "broker-imports-full-clippy.log": {
+      "bytes": 26389,
+      "sha256": "c21a508c4a8017d2c463ad4e519665245abe2756e6c812f22bb4b6ec4a0aa8ac"
+    },
+    "broker-imports-grants-review.log": {
+      "bytes": 2062,
+      "sha256": "08d77702f9b6af06ba6c51af214aa843d31af72ffd9341f2f890694b46ac2c10"
+    }
+  },
+  "patched_blob": "8d7424ac1583265c994b0ea3cad7583ecea8a0b9"
+}

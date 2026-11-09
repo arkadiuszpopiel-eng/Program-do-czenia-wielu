@@ -6,23 +6,23 @@ dla każdej agentki. Właściciel potwierdził termin: **9.11.2026 o 08:00**; za
 czasu polskiego: **Europe/Warsaw = 07:00 UTC**. Szczegóły Jarvisa pozostają według roboczego
 kontraktu; dalsze wskazówki właściciela mają pierwszeństwo.
 
-## Aktualny stan,9.11 o05:48UTC
+## Aktualny stan,9.11 o06:26UTC
 
 | Obszar | Ostatni dowód | Co pozostaje |
 | --- | --- | --- |
 | Pięć trybów | jawny zakres rozmowa/globalnie, Plan bez rozmowy, regresje zgód i kłódki | niezależny przegląd i odbiór sprzętu |
 | Jarvis wbudowanych i własnych person | wspólny profil; cztery osobne przełączniki; Luna po restarcie katalogu10/10 tur Bielika | trwała obsada rozmowy #37; osobne przełączniki własnych person |
-| Kreator #44 iGłos #49 | CI161:901/901 i573/573, typy0/0; #49 ma9/9 nowych ścieżek i573/573 | pełny nowy Chromium przycisku #49 w następnym CI |
+| Kreator #44 iGłos #49 | CI162 na d18d9433:901/901 i573/573, typy0/0 | #50 dwa wspólne przepływy zaliczone; pełne903 i native68 do wykonania |
 | Rust Linux | [pełne3495/0/25 --all-features](../reviews/2026-11-09-validation-12d44af4.md) na12d44af4,77 integracji | chroniony LinuxClippy i przegląd |
-| Rust Windows | [CI161:3521/0/46](../reviews/2026-11-09-validation-12d44af4.md), Clippy0,14/14 w poprawianych celach | przegląd; Windows #49 w następnym CI |
-| Windows/WebView2 | [rehearsal82:62/0/5](../reviews/2026-11-09-webview-green.md), kłódka3,0s i dokowanie38,4s | pięć jawnych pominięć, sprzęt i rzeczywisty mikrofon |
+| Rust Windows | [CI162:3521/0/46](../reviews/2026-11-09-ci162-and-review.md), Clippy0 | przegląd i sprzęt |
+| Windows/WebView2 | rehearsal82 i83:62/0/5 | #50 native-wrapper w nowym CI; sprzęt i mikrofon |
 | Zwięzłość Bielika | [#48:50 ciał i50 surowych odpowiedzi](../reviews/2026-11-09-jarvis-wire.md); Jarvis25/25 imion | jedno zdanie0/25 także przed dekoderem; Standard Bety/Gamy błędne imiona |
-| CI i przegląd | Tauri, cargo-deny, dokumentacja zielone | LinuxClippy: chronione importy Brokera, łatka dla człowieka; świeży przegląd |
+| CI i przegląd | Tauri, cargo-deny, dokumentacja zielone; #51 prywatna łatka ma pełnyClippy0 i4/4 | publicznyLinuxClippy nadal czerwony; #52 dwa HTTP504 silników83; świeży przegląd |
 
 Kolejność do07:00UTC:
 
-1. Opublikować sprawdzony #49 i wykonać jego pełny Chromium w nowym CI. Windows CI1613521/0/46,
-   Linux --all-features3495/0/25 i dotychczasowy Chromium901/901 zakończone.
+1. Zebrać nowy native-wrapper Jarvisa #50 i pełny nowy Chromium903. Kod produkcyjny pozostaje
+   identyczny z zielonymi Windows3521/0/46 i Chromium901/901 wCI162. Linux --all-features3495/0/25 zakończony.
    Nie przepisywać wcześniejszych porażek jako zaliczeń.
 2. Jeśli nowe Windows wykaże porażki, odtworzyć i poprawiać małe zakresy bez zmiany limitów;
    chronione poprawki pozostają łatkami do przeglądu człowieka.
@@ -89,3 +89,6 @@ prób i ograniczenie dysku opisano w tym raporcie.
 [Kreator → Głos #49](../reviews/2026-11-09-builder-voice.md).
 
 Nieskuteczne warianty promptu pozostają cofnięte; zamrożone evals, limity i polityki dotychczasowe.
+
+[Bezpośredni WebView Jarvisa #50](../reviews/2026-11-09-jarvis-webview.md) ·
+[CI162, prywatna łatka #51 iHTTP504 #52](../reviews/2026-11-09-ci162-and-review.md).

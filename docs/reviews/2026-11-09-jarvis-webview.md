@@ -22,7 +22,8 @@ a pierwotna porażka jest zgłaszana po sprzątaniu. Konfiguracji lintów nie zm
 To test wspólnego przepływu na atrapie backendu, **nie wykonanie native-wrappera na Windows**.
 Native-wrapper i jego asercje IPC wymagają następnego Windows CI;120s,15s, polityki i progi evals
 pozostają dotychczasowe. Nowy zestaw zawiera903 headless E2E i68 native E2E, ale nie są to jeszcze
-zaliczone wyniki pełnych zestawów. Publikacja czeka na ukończenie CI162 i czas do07:00UTC.
+zaliczone wyniki pełnych zestawów. CI162 zakończyło901/901 na produkcji d18d9433. Ten test jest publikowany do następnego CI;
+produkcyjne źródła pozostają identyczne. Termin07:00UTC nadal obowiązuje.
 
 Logi Cloud: `/workspace/scratch/jarvis-native-{check-final,flow}.log`;
 pierwszy lint opisano w `/workspace/scratch/jarvis-native-first-lint.txt`.

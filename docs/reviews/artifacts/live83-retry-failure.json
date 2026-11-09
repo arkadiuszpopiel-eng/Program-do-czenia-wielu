@@ -1,0 +1,21 @@
+{
+  "source": "d18d9433",
+  "run": 42569520994,
+  "job": 129008532628,
+  "attempt": 2,
+  "result": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "filtered": 2,
+    "elapsed_seconds": 248.19
+  },
+  "problems": [
+    "sidecar-llama-cpu HTTP504",
+    "sidecar-llama-vulkan HTTP504",
+    "sidecar-llama-cuda HTTP504",
+    "missingCPU preventsLLM generation"
+  ],
+  "parameters_changed": false,
+  "issue": 52
+}

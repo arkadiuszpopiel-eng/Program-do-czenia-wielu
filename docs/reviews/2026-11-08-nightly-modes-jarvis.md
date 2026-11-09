@@ -251,3 +251,13 @@ pełny Chromium tej późniejszej kontrolki pozostaje do nowego CI po publikacji
 mają rzeczywiste potwierdzenie Windows bez zmian progów/polityk. CI całościowo czerwone przez
 chronione LinuxClippy; brak przeglądu i sprzętu nie pozwala scalać. Następny przyrost #49
 ma9/9 i573/573 lokalnie, pełny nowy CI po publikacji.
+
+## CI162 i ostatnia regresja Jarvisa,06:26UTC
+
+[Raport](2026-11-09-ci162-and-review.md):d18d9433 Windows3521/0/46 iChromium901/901/30min,
+573 jednostkowe, Tauri iClippy Windows zielone. WebView83 ponownie62/0/5. Osobny job silników
+ma dwie porażkiHTTP504 (różne pakiety), bez zmian limitów; druga próba rozpoznała syntetyczny
+głos zWER0, ale nie uruchomiła LLM bezllamaCPU. #51 prywatna, niecommitowana łatka importów
+ma pełnyClippy0/6m56s i4/4 testy; opublikowanyLinuxCI nadal czerwony do przeglądu człowieka.
+[#50](2026-11-09-jarvis-webview.md):2/2 Chromium1028/1600 i typy0/0; natywny przepływ Jarvisa
+czterech person iGłosu z zachowaniem mikrofonu/uprawnień wymaga następnegoCI. Produkcja bez zmian.
