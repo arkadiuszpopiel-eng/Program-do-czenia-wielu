@@ -149,3 +149,10 @@ WebView2 rehearsal77: **60 zaliczonych / 2 nieudane / 5 pominiętych**. Artefakt
 flagi instancji przy domyślnym porcie9222 i próbę schowania już zamkniętych Sesji w teście.
 Poprawki harnessu są do wykonania. Nie ma dowodu awarii aplikacji w komunikacie zamknięcia strony
 po timeoutcie i sprzątaniu testu. Wszystkie te wyniki są odrębne od odbioru sprzętu właściciela.
+
+[Harness #38](2026-11-09-ui-test-harness.md): kontrolowany wariant wolnego strumienia odtworzył
+brak karty Planu w5 sekundach. Zegar testowy doprowadza odpowiedź do końca; nowe8 wariantów wolnych
+sprawdza brak karty przed końcem i obecność po nim. Po zmianie16/16 oraz10/10 powtórzeń Glass,
+lint i check0/0. Nie zmieniono5 sekund ani progów wydajności. Pełny887 pozostaje do wykonania.
+Przygotowano flagę instancji testowej także dla portu9222 i jawne otwarcie Sesji w scenariuszu
+WebView2; te poprawki wymagają ponownego rzeczywistego Windows CI.

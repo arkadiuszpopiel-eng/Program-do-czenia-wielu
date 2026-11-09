@@ -261,7 +261,7 @@ Zlecenie właściciela 8.11; [plan nocny 54](54-jarvis-i-tryby-2026-11-08.md), [
 | J.2 | Panel Agentki: wybór Jarvisa i przejście do sterowania głosem | w toku | 2026-11-08 | 4 style × 2 motywy; testy na atrapach i axe |
 | J.3 | Zakres każdego z pięciu trybów i odporność na spóźnione odpowiedzi | w toku | 2026-11-08 | jawny wybór rozmowa / globalnie; Plan i kłódka zachowują zakres rozmowy; regresje wyścigu żądań; karta #25: Plan bez rozmowy nie zmienia poziomu globalnego, Alt+M pomija niedostępny Plan |
 | J.4 | Próby wszystkich person na rzeczywistym modelu i w torze głosowym | w toku | 2026-11-08 | Linux Cloud CPU i syntetyczne audio; Windows i mikrofon pozostają osobną próbą |
-| J.5 | Regresje CI i raport nocny | w toku | 2026-11-09 | pełny Rust988d13f3:3485/1/24; test zegara #34:4/4 i20 powtórzeń pary zaliczone, pełny wynik zachowany; pełny lokalny UI877/2/0, osobno CI156 UI879/879 i573 jednostkowe; WebView2 rehearsal77:60/2/5, diagnoza harnessu; #35–36:15 testów ukierunkowanych; CI i chroniona łatka Brokera otwarte |
+| J.5 | Regresje CI i raport nocny | w toku | 2026-11-09 | pełny Rust988d13f3:3485/1/24; #34:4/4 i20 powtórzeń pary, pełny wynik zachowany; lokalny UI877/2/0, osobno CI156 UI879/879 i573 jednostkowe; WebView2 rehearsal77:60/2/5; #35–36:15 testów ukierunkowanych; #38:16 wariantów Planu+10 powtórzeń zielone, pełny887 i poprawki harnessu WebView2 do sprawdzenia; CI i chroniona łatka Brokera otwarte |
 
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 

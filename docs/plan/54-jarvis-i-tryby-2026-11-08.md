@@ -21,6 +21,10 @@ straży na atrapach bez problemów. [Własne persony #35–36](../reviews/2026-1
 Luna z kreatora i delegacja korzystają z Jarvisa; poprawka odtwarza definicje po restarcie.
 Obsada konkretnej rozmowy nadal wymaga ponownego przypisania (#37). Lokalne porażki UI i Windows pozostają otwarte.
 
+[Harness UI #38](../reviews/2026-11-09-ui-test-harness.md):16 funkcjonalnych wariantów Planu i10 powtórzeń
+Glass zaliczone z zegarem atrapy; progi dotychczasowe. Nowy pełny zestaw887 oraz poprawki uruchomienia
+instancji i otwarcia Sesji w WebView2 wymagają szerokiej próby. Starego877/2 nie uznano za zielony wynik.
+
 | Kolejność | Zadanie | Stan |
 | --- | --- | --- |
 | 1 | Regresja Z.8: produkcyjna integracja modelu-sędziego, kontekst ostatniej odpowiedzi | kod i testy w PR #20, przegląd otwarty |

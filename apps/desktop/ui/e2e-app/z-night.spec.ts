@@ -87,6 +87,11 @@ test('belka, panele chowane i teksty okien leniwych w WebView2', async ({ alfa }
 
   // Sesje chowane w całości przyciskiem w nagłówku: znacznik, wysunięcie, „Przypnij panel”.
   const sessions = main.getByRole('navigation', { name: 'Sesje' });
+  // Poprzednie scenariusze mogą zostawić Sesje zamknięte; otwórz je tą samą drogą co właściciel.
+  if (!(await sessions.isVisible())) {
+    await main.getByRole('button', { name: 'Pokaż panel Sesje', exact: true }).click();
+  }
+  await expect(sessions).toBeVisible();
   await main.getByRole('button', { name: 'Schowaj panel Sesje (Ctrl+B)' }).click();
   await expect(sessions).toHaveCount(0);
   const leftEdge = main.locator('.edge-tab.left');
