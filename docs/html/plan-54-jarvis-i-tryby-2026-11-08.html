@@ -326,11 +326,11 @@ Nie dodajemy nowych funkcji ani kolejnych ulepszeń. Po rozliczeniu napraw: peł
 wyników i zakończenie prac do odwołania. Powtarzany opis pierwotnego okna nie unieważnia tej
 konkretnej korekty. Zakaz commitowania chronionych modułów bez przeglądu pozostaje w mocy.</p>
 <h2 id="zamknieta-lista-obecnych-usterek">Zamknięta lista obecnych usterek</h2>
-<div class="tbl"><table><thead><tr><th>Karta</th><th>Usterka</th><th>Stan</th></tr></thead><tbody><tr><td>#53</td><td>surowe klucze tłumaczeń system/vision i koloru w Kreatorze</td><td>RED odtworzony, naprawa PL/EN oraz etykiety palety, testy w toku</td></tr>
+<div class="tbl"><table><thead><tr><th>Karta</th><th>Usterka</th><th>Stan</th></tr></thead><tbody><tr><td>#53</td><td>surowe klucze tłumaczeń system/vision i koloru w Kreatorze</td><td>naprawiona:905/905 Chromium,63/0/5 Windows/WebView2; obraz potwierdzony</td></tr>
 <tr><td>#41/#48</td><td>Bielik: Jarvis ignoruje jedno zdanie; Standard myli imiona Bety/Gamy</td><td>diagnoza zapisana, naprawa do wykonania bez zmiany progów</td></tr>
-<tr><td>#37</td><td>obsada rozmowy znika po restarcie</td><td>naprawa trwałości i regresja do wykonania</td></tr>
-<tr><td>#51</td><td>publiczny LinuxClippy blokują importy chronionego testu</td><td>łatka ma pełnyClippy0 i4/4; otwarty przegląd właściciela</td></tr>
-<tr><td>#52</td><td>pobieranie silników okresowo kończy HTTP504</td><td>dwie porażki zachowane; najnowszy84 zaliczył1/1 na tych samych pinach; diagnoza w istniejącym budżecie</td></tr></tbody></table></div>
+<tr><td>#37</td><td>obsada rozmowy znika po restarcie</td><td>naprawa:76 testów modułów i17 integracji; pełny nowyCI wymagany</td></tr>
+<tr><td>#51</td><td>publiczny LinuxClippy blokują importy chronionego testu</td><td>właściciel zatwierdził konkretną łatkę odpowiedzią „ok”; integracja i pełnyClippy do wykonania</td></tr>
+<tr><td>#52</td><td>pobieranie silników okresowo kończy HTTP504</td><td>85 ponownieHTTP504 sześciu archiwów;84 zaliczony; diagnoza bez zwiększania prób</td></tr></tbody></table></div>
 <p>Backlog nowych funkcji, w tym indywidualne przełączniki własnych person, jest zamrożony.
 Nowe usterki będące skutkiem napraw podlegają regresji; nie rozszerzamy listy o nowe ulepszenia.</p>
 <h2 id="baza-testowa-przed-naprawami-9-11-o07-14utc">Baza testowa przed naprawami,9.11 o07:14UTC</h2>
@@ -391,6 +391,7 @@ zapisać pełny raport i zakończyć prace do odwołania. EtapJ i wersja0.0.85 p
 <p><a href="../reviews/2026-11-09-jarvis-webview.md">Bezpośredni WebView Jarvisa #50</a> ·
 <a href="../reviews/2026-11-09-ci162-and-review.md">CI162, prywatna łatka #51 iHTTP504 #52</a>.</p>
 <p><a href="../reviews/2026-11-09-builder-labels.md">Etykiety Kreatora #53 i bazaCI163/Windows84</a>.</p>
+<p><a href="../reviews/2026-11-09-cast-restart.md">Trwała obsada #37</a>.</p>
 </article>
 <footer>Źródło: <code>docs/plan/54-jarvis-i-tryby-2026-11-08.md</code> · strona generowana, zmiany wprowadzaj w pliku MD.</footer></main>
 </div>

@@ -205,6 +205,20 @@ fn manifest_err(e: ManifestError) -> SessionError {
 }
 
 impl SessionDbProvider for SqliteSessions {
+    fn release_idle(&self, id: &SessionId) {
+        let db = {
+            let mut open = lock(&self.open);
+            if open.get(id).is_some_and(|db| Arc::strong_count(db) == 1) {
+                open.remove(id)
+            } else {
+                None
+            }
+        };
+        if let Some(db) = db.and_then(|db| Arc::try_unwrap(db).ok()) {
+            let _ = db.close();
+        }
+    }
+
     fn session_db(&self, id: &SessionId) -> Result<Arc<Db>, SessionError> {
         // Blokada `open` przez całe otwieranie: jedna instancja `Db` na plik. Kolejność blokad:
         // `open` → `index` (nigdy odwrotnie).

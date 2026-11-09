@@ -17,6 +17,7 @@ mod ids;
 mod model;
 mod prompt;
 mod state;
+mod storage;
 mod text;
 
 #[cfg(feature = "contract-tests")]
@@ -40,6 +41,7 @@ pub use prompt::{
     COMMON_RULES, DEFAULT_PROMPT_TEMPLATE, PromptError, render_system_prompt, validate_template,
 };
 pub use state::PersonasState;
+pub use storage::CastStore;
 pub use text::{Token, fold, tokenize};
 
 /// Zmiana obsady (Audyt: kto, skąd — UI / głos / Marszałek).
@@ -135,6 +137,9 @@ pub fn persona_added_event(persona: &Persona) -> Event {
 /// Błędy usługi person.
 #[derive(Debug, thiserror::Error, Clone, PartialEq, Eq)]
 pub enum PersonasError {
+    /// Nie udało się trwale zapisać lub odtworzyć obsady.
+    #[error("zapis obsady: {0}")]
+    Storage(String),
     /// Niepoprawna obsada.
     #[error(transparent)]
     Cast(#[from] CastError),

@@ -35,3 +35,12 @@ bez nowych funkcji. Zamrożona lista: etykiety #53, zwięzłość/tożsamość B
 trwała obsada #37, chronione importy #51, diagnozaHTTP504 #52. Po rozliczeniu tej listy:
 pełny raport, zapis i zakończenie prac do odwołania. Nie wracać automatycznie do ulepszeń.
 Niezależny przegląd, zieloneCI i odbiór sprzętu nadal pozostają otwarte; PR pozostaje draftem.
+
+## Potwierdzenie po publikacji a3041b6f
+
+CI164: **905/905 Chromium,24,8min**,573/573 jednostkowe, typy0/0, lint/build/budżet/Storybook.
+Rehearsal85: **63/0/5 Windows/WebView2**,0 niestabilnych,142,48s; Jarvis2,4s.
+Artefakt13657561092,47 528 300B,SHA256
+`25383f8d992828ead6b5ebe765cbc8cf606faf6c557a925aef91d119920da57b` zweryfikowany.
+Obraz52b obejrzany: obie nazwy grup iKolor2 poprawne. DotyczyPL; EN potwierdzony headless.
+Silniki85 nie przeszły:HTTP504 sześciu archiwów,0/1/2filtered,207,90s. Usterka #52 otwarta.

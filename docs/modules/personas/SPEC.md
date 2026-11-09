@@ -46,6 +46,16 @@ Decyzje v1: `SessionId` z `core-bus-contract`; „Krytyczka ≠ autorka, gdy mo�
 - Prompty w języku żeńskim; usługi systemowe (Scheduler, Marszałek, Diagnosta, Ulepszacz, Watchdog, Router) bez persony i głosu.
 - Persona nie może zmienić własnej roli ani obsady bez polecenia użytkownika (Marszałek działa na Twoje polecenie).
 
+## Trwałość obsady (#37)
+Adapter `CastStore` zapisuje każdą zatwierdzoną zmianę do szyfrowanej bazy danej rozmowy
+(`app-store`, migracja0004, append-only). Zapis poprzedza zmianę stanu i zdarzenie; jego błąd
+nie potwierdza zmiany. Po załadowaniu katalogu person/rol obsady istniejących sesji są walidowane
+i odtwarzane bez nowego polecenia i bez uruchamiania mikrofonu. Błędny zapis odrzuca odtworzenie.
+Ostateczne usunięcie sesji usuwa bazę/klucz i kopię RAM; cofalny kosz zachowuje obsadę.
+Po odczycie adapter zwalnia nieużywane połączenia; cudza czynna referencja zachowuje tę samą instancjęDb.
+Import wielu sesji zapisuje i publikuje każdą osobno; nie jest transakcją obejmującą wiele baz.
+Samodzielny moduł/fake może działać bez adaptera (dotychczasowe testy deterministyczne).
+
 ## Zdolności / uprawnienia
 Brak własnych; profile uprawnień ról to polityka Jądra (tylko Broker/Ty).
 

@@ -270,3 +270,13 @@ zakończyć prace do odwołania. Lista i warunki: [plan54](../plan/54-jarvis-i-t
 nowego pełnegoCI. Baza35df604b maCI163 Chromium903/903 i WindowsRust3521/0/46.
 WebView84:63/0/5, nowy Jarvis3,1s; silniki84:1/0,367,46s, syntetyczny głosWER0.
 LinuxClippy #51 nadal wymaga przeglądu chronionej łatki; zwięzłość Bielika i obsada #37 otwarte.
+
+## Naprawa trwałej obsady i zgoda #51
+
+[#37](2026-11-09-cast-restart.md): odtworzona utrata roli Luny0/1 →76/76 testów modułów
+oraz17/17 integracji,Clippy zmienionych crate'ów0. Zapis w szyfrowanej bazie sesji, zwalnianie
+nieużywanych połączeń i usunięcie RAM po usunięciu rozmowy. Nowy pełnyRustCI wymagany.
+Etykiety #53:905/905 Chromium i63/0/5 WebView85, poprawiony obraz obejrzany.
+Silniki85 znowuHTTP504 sześciu archiwów; problem otwarty. Trzy nowe warianty promptu/30 tur
+nie naprawiły wszystkich person, nie wprowadzono ich. Właściciel zatwierdził wyłącznie konkretną
+łatkę importów #51 odpowiedzią „ok”; integracja i pełnyClippy następne. Brak zgody na merge.

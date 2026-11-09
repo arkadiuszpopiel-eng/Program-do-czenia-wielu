@@ -1,0 +1,61 @@
+{
+  "base": "a3041b6f36f8ae7c9428913bf99ff14907556ffb",
+  "platform": "Cloud Linux; SQLCipher real, provider/OS/headless ports fake; no real model or microphone in this fix validation",
+  "unit": {
+    "passed": 76,
+    "failed": 0,
+    "ignored": 0,
+    "scope": "sessions/personas contract,impl,fake and app-store; 31 target result lines"
+  },
+  "refined_storage_tests": {
+    "passed": 3,
+    "failed": 0,
+    "note": "repeat of existing3 with stronger voice/failure/multiple-load assertions; not additional cases"
+  },
+  "app_core": {
+    "passed": 17,
+    "failed": 0,
+    "targets": {
+      "agents": 8,
+      "jarvis": 5,
+      "jarvis_custom": 2,
+      "scenario": 2
+    }
+  },
+  "clippy": {
+    "packages": [
+      "sessions-contract",
+      "sessions-fake",
+      "sessions-impl",
+      "personas-contract",
+      "personas-fake",
+      "personas-impl",
+      "app-store",
+      "app-api",
+      "app-core"
+    ],
+    "all_targets": true,
+    "warnings": 0,
+    "duration": "2m03s",
+    "command": "cargo +1.94.1 clippy --locked -p sessions-contract -p sessions-fake -p sessions-impl -p personas-contract -p personas-fake -p personas-impl -p app-store -p app-api -p app-core --all-targets -j2 -- -D warnings"
+  },
+  "checks": {
+    "fmt": "cargo +1.94 fmt --all -- --check:0; explicit1.94.1 has no rustfmt component",
+    "deps": "1809 edges/0 violations",
+    "size": "3501 files/264 crates/11 existing exceptions/0 violations; app-core exactly8000 lines",
+    "tauri_lock": "Only generated app-store dependency entry synchronized; no version upgrades. Full Windows cargo metadata --locked pending CI; local --no-deps --locked passed"
+  },
+  "initial_failures": [
+    "RED missing Luna role after restart:0passed1failed2.08s",
+    "First added SQL test failed compilation E0282; explicit rusqlite Result annotation fixed",
+    "Full Tauri metadata offline: missing tauri-plugin-dialog; cargo update generated app-store entry, unrelated dependency-edge drift discarded",
+    "check-deps initially called with node in error, corrected bash exits0"
+  ],
+  "log_sha256": {
+    "cast-restart-red.log": "e59ca0b6529a073924071c280650310ea4620ccb3ecbc4e5c9a5a35b9c414a82",
+    "cast-restart-unit-final.log": "285acace0e73f6d0e8185f59b18d5496181df3f8939e725ea8c559714fc5e7f8",
+    "cast-restart-storage-final.log": "8e0481ed544f09984d51b852bbca7de956b06dfaa1bad6bf70a0ade91a0715d1",
+    "cast-restart-core-final.log": "5c255f8271b9f72de62612502b0ed7ff9ffb9efbf23adc1823cd0d75935a7005",
+    "cast-restart-clippy-final.log": "b9450337ac1ec5254d982ca33ed756001f4b304c0ad34f639cfd7c268a9b554f"
+  }
+}

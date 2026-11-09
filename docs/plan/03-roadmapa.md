@@ -16,6 +16,10 @@ bez nowych funkcji; po pełnym raporcie i zapisie STOP do odwołania. Pierwotny 
 baza35df:CI163903/903, Windows3521/0/46, WebView84 63/0/5. Nowy pełnyCI poprawki oczekiwany.
 ChronionyLinuxClippy, zwięzłość/tożsamość Bielika i trwała obsada nadal otwarte. Bez odbioru sprzętu.
 
+[Naprawa obsady #37](../reviews/2026-11-09-cast-restart.md):76/76 modułów i17/17 integracji,
+Clippy0; pełny nowyRustCI oczekiwany. #53 potwierdzona905/905 i63/0/5 WebView.
+Właściciel zatwierdził konkretną łatkę #51; problemHTTP504 i zwięzłość Bielika nadal otwarte.
+
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.

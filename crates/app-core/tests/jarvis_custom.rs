@@ -70,7 +70,7 @@ fn check_profile(request: &ChatRequest, jarvis: bool) {
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-async fn builder_persona_inherits_jarvis_after_restart_and_role_reassignment() {
+async fn builder_persona_keeps_roles_and_jarvis_after_restart() {
     let dir = tempfile::tempdir().unwrap();
     let provider = Arc::new(common::ScriptedProvider::new(Duration::from_millis(1)));
     let shell = Arc::new(app_core::ports::HeadlessShell::default());
@@ -113,11 +113,8 @@ async fn builder_persona_inherits_jarvis_after_restart_and_role_reassignment() {
     a.h.rx = a.h.core.subscribe_events();
     let agents = a.h.core.agents_list(a.sid.clone()).await.unwrap();
     assert!(agents.iter().any(|agent| agent.id == "luna"));
-    // Trwała obsada rozmów to osobny zakres (#37); katalog i wspólny profil są odtwarzane.
-    a.h.core
-        .agents_set_roles(a.sid.clone(), "luna".into(), vec!["czytelniczka".into()])
-        .await
-        .unwrap();
+    let luna = agents.iter().find(|agent| agent.id == "luna").unwrap();
+    assert!(luna.role_ids.iter().any(|role| role == "czytelniczka"));
     let resumed = ask(&mut a.h, &a.sid).await;
     check_profile(&resumed, true);
     assert_eq!(

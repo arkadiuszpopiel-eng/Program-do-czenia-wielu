@@ -10,6 +10,7 @@
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
 mod agents;
+mod casts;
 mod recovery;
 
 use std::collections::{BTreeMap, HashSet};
@@ -49,6 +50,7 @@ const MIGRATIONS: &[(&str, &str)] = &[
     ),
     ("0002", crate::agents::MIGRATION_0002),
     ("0003", crate::recovery::MIGRATION),
+    ("0004", crate::casts::MIGRATION),
 ];
 
 /// Fakty o turze zapisywane raz, razem z turą.

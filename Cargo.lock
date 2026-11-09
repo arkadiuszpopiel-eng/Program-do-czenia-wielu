@@ -1088,6 +1088,7 @@ version = "0.0.85"
 dependencies = [
  "app-api",
  "lib-sqlstore",
+ "personas-contract",
  "serde",
  "serde_json",
  "sessions-contract",
