@@ -3,6 +3,7 @@
 //! SHA-256 liczony w locie (z przeliczeniem istniejącej części), twardy limit rozmiaru, do
 //! [`MAX_RESUMES`] automatycznych wznowień po zerwaniu, anulowanie. Przekierowania tylko na
 //! `https://` (≤ 5). Bez telemetrii: stały `User-Agent` bez wersji, bez ciasteczek.
+//! HTTP5xx/429: anulowalne odstępy250/500/1000ms w tym samym budżecie trzech wznowień.
 
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -74,6 +75,7 @@ pub struct Fetcher {
 enum Step {
     Done(String, u64),
     Interrupted(String),
+    RetryableStatus(StatusCode),
 }
 
 fn total_from(resp: &reqwest::Response, offset: u64) -> Option<u64> {
@@ -133,18 +135,29 @@ impl Fetcher {
         }
         let mut resumes = 0;
         loop {
-            match self.attempt(url, &part, limit, cancel, progress).await? {
+            let (why, delay) = match self.attempt(url, &part, limit, cancel, progress).await? {
                 Step::Done(sha, size) => {
                     tokio::fs::rename(&part, path)
                         .await
                         .map_err(|e| io(path, e))?;
                     return Ok((sha, size));
                 }
-                Step::Interrupted(why) if resumes < MAX_RESUMES => {
-                    resumes += 1;
-                    tracing::warn!(%why, resumes, "pobieranie przerwane — wznawiam");
+                Step::Interrupted(why) => (why, None),
+                Step::RetryableStatus(status) => (
+                    format!("HTTP {}", status.as_u16()),
+                    Some(Duration::from_millis(250).saturating_mul(2_u32.saturating_pow(resumes))),
+                ),
+            };
+            if resumes >= MAX_RESUMES {
+                return Err(FetchError::Network(why));
+            }
+            resumes += 1;
+            tracing::warn!(%why, resumes, "pobieranie przerwane — wznawiam");
+            if let Some(delay) = delay {
+                tokio::select! {
+                    () = cancel.cancelled() => return Err(FetchError::Cancelled),
+                    () = tokio::time::sleep(delay) => {}
                 }
-                Step::Interrupted(why) => return Err(FetchError::Network(why)),
             }
         }
     }
@@ -192,7 +205,7 @@ impl Fetcher {
             }
             s if s.is_success() => false,
             s if s.is_server_error() || s == StatusCode::TOO_MANY_REQUESTS => {
-                return Ok(Step::Interrupted(format!("HTTP {}", s.as_u16())));
+                return Ok(Step::RetryableStatus(s));
             }
             s => return Err(FetchError::Rejected(format!("HTTP {}", s.as_u16()))),
         };

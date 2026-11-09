@@ -23,6 +23,10 @@ Właściciel zatwierdził konkretną łatkę #51; problemHTTP504 i zwięzłość
 [Zatwierdzone importy #51](../reviews/2026-11-09-broker-imports-approved.md): pełnyworkspaceClippy0/6m01s
 razem z #37,4/4 testy; nowy pełnyCI po publikacji. Bez scalenia i bez zmian polityk/evals.
 
+[#52](../reviews/2026-11-09-http-outage.md): kontrolowana awaria504 RED→4/4,
+app-models82/0/1 iClippy0 bez większego budżetu. Baza9d2b35fa:LinuxCI1653500/0/25,
+Chromium905/905;WindowsRust jeszcze trwa. Windows86silniki1/0 przed poprawką,WebView63/0/5.
+
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.

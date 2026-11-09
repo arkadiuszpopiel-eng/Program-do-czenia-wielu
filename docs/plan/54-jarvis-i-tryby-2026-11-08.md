@@ -15,7 +15,7 @@ konkretnej korekty. Zakaz commitowania chronionych modułów bez przeglądu pozo
 | #41/#48 | Bielik: Jarvis ignoruje jedno zdanie; Standard myli imiona Bety/Gamy | diagnoza zapisana, naprawa do wykonania bez zmiany progów |
 | #37 | obsada rozmowy znika po restarcie | naprawa:76 testów modułów i17 integracji; pełny nowyCI wymagany |
 | #51 | publiczny LinuxClippy blokują importy chronionego testu | zatwierdzona dokładna łatka:pełnyworkspaceClippy0/6m01s i4/4; nowyCI wymagany |
-| #52 | pobieranie silników okresowo kończy HTTP504 | 85 ponownieHTTP504 sześciu archiwów;84 zaliczony; diagnoza bez zwiększania prób |
+| #52 | pobieranie silników okresowo kończy HTTP504 | naprawa odstępów:RED3/1→4/4, całyapp-models82/0/1,Clippy0; nowyWindowsCI wymagany |
 
 Backlog nowych funkcji, w tym indywidualne przełączniki własnych person, jest zamrożony.
 Nowe usterki będące skutkiem napraw podlegają regresji; nie rozszerzamy listy o nowe ulepszenia.
@@ -99,3 +99,5 @@ Nieskuteczne warianty promptu pozostają cofnięte; zamrożone evals, limity i p
 [Trwała obsada #37](../reviews/2026-11-09-cast-restart.md).
 
 [Zatwierdzona naprawa #51](../reviews/2026-11-09-broker-imports-approved.md).
+
+[Przerwy po chwilowych HTTP504 #52](../reviews/2026-11-09-http-outage.md).

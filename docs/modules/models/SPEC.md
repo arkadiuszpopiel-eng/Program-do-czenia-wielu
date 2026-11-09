@@ -52,6 +52,9 @@ Stan wykrywany tanio (bez hashowania): zadanie w toku → błąd → rekord `sta
 - Pobieranie do katalogu roboczego `%LOCALAPPDATA%\Alfa\downloads\<id>\` (`.part`, `Range: bytes=n-`, ≤ 3
   automatyczne wznowienia, twardy limit 2× rozmiar z katalogu, min. +64 MiB); na miejsce docelowe trafia dopiero
   plik zweryfikowany. Przypięty SHA-256 niezgodny → plik usunięty, stan `failed`.
+- HTTP5xx/429: przed ponowieniem przerwy250/500/1000ms, anulowalne dotychczasowym tokenem.
+  Nadal najwyżej cztery żądania i te same timeouty15/30s. Zerwany strumień/Range wznawiany jak wcześniej.
+  Trwała awaria kończy się jawnym błędem; odpowiedź błędu nie nadpisuje pliku częściowego.
 - Plik bez przypiętego hasha → `needs_trust`: UI pokazuje policzony SHA-256 i licencję; instalacja wyłącznie po
   `models_trust_hash` z hashami równymi policzonym, a przed instalacją pliki są hashowane ponownie (podmiana po
   pobraniu → usunięcie). Rekord instalacji zapamiętuje `trusted: true`.

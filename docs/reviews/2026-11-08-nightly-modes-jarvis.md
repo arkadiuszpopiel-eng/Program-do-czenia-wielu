@@ -288,3 +288,12 @@ sprawdzono dokładne importy razem z #37:pełnyworkspace/alltargetsClippy0/6m01s
 Pierwszy omyłkowy przebieg bez łatki zatrzymany130; nie jest dowodem. Nowy pełnyCI po publikacji
 wymagany; wcześniejsze czerwoneCI pozostają w historii. Bez szerszej zmiany chronionego źródła,
 polityk, evals i bez merge. Naa3041b6f WindowsCI164 zakończony3521/0/46,1121 wyników celów.
+
+## Regresja HTTP504 i pełnyLinuxCI165
+
+[#52](2026-11-09-http-outage.md): RED3/1→4/4; całyapp-models82/0/1 iClippy0.
+Anulowalne przerwy250/500/1000ms bez zwiększania czterech żądań, timeoutów i pinów.
+KontrolnyWindows86 na wcześniejszym9d2b35fa zaliczyłsilniki1/0/2filtered w280,50s,
+WER0/STT37198ms; nie przypisujemy tego nowej poprawce. Windows85 zachowuje porażkę504.
+Na9d2b35fa LinuxCI1653500/0/25,1124 cele;Chromium905/905/23,6min,573jednostkowe,
+WebView86 63/0/5,Jarvis2,7s. PełnyRustWindows jeszcze trwa. ZwięzłośćBielika nadal otwarta.
