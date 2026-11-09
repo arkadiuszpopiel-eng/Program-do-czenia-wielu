@@ -55,6 +55,11 @@ okna Cofnij; [poprawka testu zegara](../reviews/2026-11-08-queue-clock.md) ma4/4
 bez błędu, bez zmiany300ms. [UI #32](../reviews/2026-11-08-ui-geometry.md) —23 nowych E2E i573 jednostkowe
 zaliczone; pełne nowe wyniki podano wyżej. Menu mieści się w małym oknie i po powiększeniu.
 
+[Ponowienie jakości #41](../reviews/2026-11-09-jarvis-sentence.md): świeża baza i dwa warianty
+ogólnej instrukcji, każdy40/40 technicznie poprawnych tur, lecz Jarvis nadal0/20 jednego zdania.
+Wszystkie teksty identyczne; nieskuteczne zmiany cofnięto, surowe wyniki i łatki zachowano.
+Pełny Rust na169a6004 ruszył z77 celami integracyjnymi; nie ma jeszcze wyniku.
+
 ## Zachowanie Jarvisa
 
 Opis: [kontrakt profilu](../modules/personas/INTERACTION.md). Panel **Agentki** (`Alt+1`)

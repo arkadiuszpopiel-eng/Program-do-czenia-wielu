@@ -1,0 +1,928 @@
+{
+  "max_tokens": 96,
+  "model": "bielik-1.5b-v3.0-instruct-q8_0",
+  "platform": "Linux Cloud CPU; headless core, no microphone",
+  "results": [
+    {
+      "agent": "alfa",
+      "elapsed_ms": 22954,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 1,
+      "response_author": "alfa",
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 724,
+        "latency_ms": 22719,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 20346,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 1,
+      "response_author": "beta",
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 581,
+        "latency_ms": 20323,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 44,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 24555,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 1,
+      "response_author": "gama",
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 688,
+        "latency_ms": 24533,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 58,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 18722,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 1,
+      "response_author": "delta",
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 595,
+        "latency_ms": 18707,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 2260,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 2,
+      "response_author": "alfa",
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 2197,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 6658,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 2,
+      "response_author": "beta",
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 6627,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 44,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 8165,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 2,
+      "response_author": "gama",
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 8140,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 58,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 1695,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 2,
+      "response_author": "delta",
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1679,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 1686,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 3,
+      "response_author": "alfa",
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1667,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 6012,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 3,
+      "response_author": "beta",
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 5994,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 44,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 10205,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 3,
+      "response_author": "gama",
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 10182,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 58,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 2012,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 3,
+      "response_author": "delta",
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1992,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 1509,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 4,
+      "response_author": "alfa",
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1494,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 5410,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 4,
+      "response_author": "beta",
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 5394,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 44,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 7722,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 4,
+      "response_author": "gama",
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 7704,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 58,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 1640,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 4,
+      "response_author": "delta",
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1622,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 1537,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 5,
+      "response_author": "alfa",
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1514,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 5661,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 5,
+      "response_author": "beta",
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 5642,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 44,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 7009,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 5,
+      "response_author": "gama",
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 6992,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 58,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 1456,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 5,
+      "response_author": "delta",
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1439,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 12,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 8397,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 1,
+      "response_author": "alfa",
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 278,
+        "latency_ms": 8366,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 8287,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 1,
+      "response_author": "beta",
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 278,
+        "latency_ms": 8267,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 8365,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 1,
+      "response_author": "gama",
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 278,
+        "latency_ms": 8343,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 8657,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 1,
+      "response_author": "delta",
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 278,
+        "latency_ms": 8641,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 1253,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 2,
+      "response_author": "alfa",
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1234,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 1271,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 2,
+      "response_author": "beta",
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1250,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 1187,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 2,
+      "response_author": "gama",
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1172,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 1186,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 2,
+      "response_author": "delta",
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1150,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 1149,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 3,
+      "response_author": "alfa",
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1128,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 1165,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 3,
+      "response_author": "beta",
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1145,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 1218,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 3,
+      "response_author": "gama",
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1201,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 1127,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 3,
+      "response_author": "delta",
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1109,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 1202,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 4,
+      "response_author": "alfa",
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1181,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 1151,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 4,
+      "response_author": "beta",
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1124,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 1278,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 4,
+      "response_author": "gama",
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1257,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 1186,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 4,
+      "response_author": "delta",
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1172,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "alfa",
+      "elapsed_ms": 1212,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 5,
+      "response_author": "alfa",
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1195,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 1119,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 5,
+      "response_author": "beta",
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1102,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "gama",
+      "elapsed_ms": 1160,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 5,
+      "response_author": "gama",
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1140,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    },
+    {
+      "agent": "delta",
+      "elapsed_ms": 1191,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "jarvis",
+      "repeat": 5,
+      "response_author": "delta",
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "truncated": false,
+      "usage": {
+        "cost": {
+          "currency": "PLN",
+          "minor": 0
+        },
+        "cost_micro_pln": 0,
+        "input_tokens": 1,
+        "latency_ms": 1165,
+        "model": "bielik-1.5b-v3.0-instruct-q8_0",
+        "output_tokens": 9,
+        "provider": "llama.cpp (Cloud CPU)"
+      }
+    }
+  ],
+  "temperature": 0.0
+}

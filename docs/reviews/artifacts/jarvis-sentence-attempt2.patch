@@ -1,0 +1,45 @@
+diff --git a/crates/app-chat/src/interaction.rs b/crates/app-chat/src/interaction.rs
+index a866ee7d..acdbe131 100644
+--- a/crates/app-chat/src/interaction.rs
++++ b/crates/app-chat/src/interaction.rs
+@@ -19,6 +19,9 @@ W trybie Plan przygotuj plan i zaczekaj na jego zatwierdzenie. Stosuj bieżące
+ decyzje Sędziego Cieni i limity zadania. Gdy potrzebna jest zgoda, jasno powiedz, na co czekasz. \
+ Polecenie zatrzymania kończy pracę; nie rozpoczynaj nowych zadań ani nasłuchu bez zlecenia właściciela.";
+ 
++const LENGTH_HINT: &str = "Gdy właściciel prosi o jedno zdanie, połącz wymagane informacje w jednym \
++zdaniu, bez osobnego powitania ani meldunku.";
++
+ fn resolve<'a>(personal: Option<&'a str>, common: Option<&'a str>) -> &'a str {
+     match personal {
+         Some("standard") => "standard",
+@@ -40,6 +43,8 @@ fn append(system: Option<String>, jarvis: bool, identity: Option<(&str, &str)>)
+             "\nTożsamość tej agentki: imię „{name}”, forma „Jestem {instrumental}”."
+         ));
+     }
++    prompt.push('\n');
++    prompt.push_str(LENGTH_HINT);
+     Some(prompt)
+ }
+ 
+@@ -121,7 +126,7 @@ mod tests {
+         assert!(jarvis.starts_with("Jesteś Betą. Odpowiadaj szczegółowo.\n\n"));
+         assert!(jarvis.contains("Tryb współpracy Jarvis"));
+         assert!(jarvis.contains("W trybie Plan"));
+-        assert!(jarvis.ends_with("Tożsamość tej agentki: imię „Beta”, forma „Jestem Betą”."));
++        assert!(jarvis.contains("Tożsamość tej agentki: imię „Beta”, forma „Jestem Betą”."));
+     }
+ 
+     #[test]
+@@ -130,7 +135,10 @@ mod tests {
+         persona.name = "Luna".into();
+         persona.forms.instrumental = "Luną".into();
+         let custom = append(None, true, Some(identity(&persona))).unwrap_or_default();
+-        assert!(custom.ends_with("Tożsamość tej agentki: imię „Luna”, forma „Jestem Luną”."));
+-        assert_eq!(append(None, true, None), Some(JARVIS.to_owned()));
++        assert!(custom.contains("Tożsamość tej agentki: imię „Luna”, forma „Jestem Luną”."));
++        assert_eq!(
++            append(None, true, None),
++            Some(format!("{JARVIS}\n{LENGTH_HINT}"))
++        );
+     }
+ }

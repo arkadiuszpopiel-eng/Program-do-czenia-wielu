@@ -171,3 +171,11 @@ szufladę, bez przycisku dokowania. Tylko ten fragment dostaje teraz viewport160
 z przywróceniem metryk i odłączeniem w finally. Helper3/3 na Chromium, check0/0, lint zaliczony.
 Poprawka wymaga nowego Windows CI; emulowany viewport jest odrębny od natywnego okna i odbioru sprzętu.
 Nowy pełny lokalny zestaw ma890 testów i pozostaje do wykonania.
+
+## Ponowienie Bielika9.11, #41
+
+[Raport i surowe wyniki](2026-11-09-jarvis-sentence.md): świeża baza236,32s, wariant instrukcji
+211,03s, wariant końcowy238,42s. Każdy40/40 bez błędu transportu, obcięcia i pomyłki autora;
+Jarvis20/20 imion, lecz0/20 jednego zdania w każdym przebiegu. Wszystkie40 tekstów identyczne.
+Obie nieskuteczne zmiany app-chat cofnięto; zachowano łatki jako dowód, nie jako naprawę.
+51/51 testów i Clippy przeszły osobno. Pełny Rust169a6004 działa na77 integracjach; wynik otwarty.
