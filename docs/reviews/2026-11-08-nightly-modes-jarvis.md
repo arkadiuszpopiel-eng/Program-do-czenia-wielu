@@ -156,3 +156,11 @@ sprawdza brak karty przed końcem i obecność po nim. Po zmianie16/16 oraz10/10
 lint i check0/0. Nie zmieniono5 sekund ani progów wydajności. Pełny887 pozostaje do wykonania.
 Przygotowano flagę instancji testowej także dla portu9222 i jawne otwarcie Sesji w scenariuszu
 WebView2; te poprawki wymagają ponownego rzeczywistego Windows CI.
+
+[Regresja testu zegara #39](2026-11-09-review-timer-windows.md): po anulowaniu CI156 log pokazał
+zawieszenie nowego przypadku wygasania od00:30 do01:29. To własna regresja testu #34, mimo zielonych
+prób Linux. Aktywne zadanie blokujące odtworzyło ją na Linux (watchdog30s, kod124); po ręcznym
+przejściu299+1ms i wznowieniu zegara ten sam test przeszedł w0,32s, a zakresy mają11/11 i20 powtórzeń
+bez błędu. Kod produkcyjny,300ms i progi pozostają dotychczasowe. Częściowe Windows:139 zakończonych
+wyników celów,544/3/7, osobno3 indywidualne zaliczenia celu review; nie pełny wynik. Brak Brokera
+w teście załączników otrzymał diagnostykę i zwolnienie starych uchwytów przed restartem; Windows do potwierdzenia.

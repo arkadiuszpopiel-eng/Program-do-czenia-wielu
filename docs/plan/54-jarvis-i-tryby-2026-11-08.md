@@ -25,6 +25,11 @@ Obsada konkretnej rozmowy nadal wymaga ponownego przypisania (#37). Lokalne pora
 Glass zaliczone z zegarem atrapy; progi dotychczasowe. Nowy pełny zestaw887 oraz poprawki uruchomienia
 instancji i otwarcia Sesji w WebView2 wymagają szerokiej próby. Starego877/2 nie uznano za zielony wynik.
 
+[Zegar kolejki #39](../reviews/2026-11-09-review-timer-windows.md): CI156 Windows utknął w nowym
+teście #34; po publikacji został anulowany i nie ma pełnego wyniku. Aktywne zadanie blokujące
+odtworzyło zawieszenie na Linux. Ręczne299+1ms i wznowienie zegara dały11/11 testów ukierunkowanych
+oraz20 wykonań pary bez błędu;300ms nie zmieniono. Nowy Windows pozostaje wymagany.
+
 | Kolejność | Zadanie | Stan |
 | --- | --- | --- |
 | 1 | Regresja Z.8: produkcyjna integracja modelu-sędziego, kontekst ostatniej odpowiedzi | kod i testy w PR #20, przegląd otwarty |

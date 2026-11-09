@@ -163,7 +163,14 @@ async fn core_on(dir: &std::path::Path, secrets: &Arc<MemorySecretStore>) -> Boo
     let mut opts = options(Some(provider), shell.clone());
     opts.secrets = Some(secrets.clone());
     let core = AppCore::build(AppPaths::under(dir), opts).await.unwrap();
-    let broker = core.kernel_broker().expect("Sędzia Cieni w procesie");
+    let broker = match core.kernel_broker() {
+        Some(broker) => broker,
+        None => {
+            let modules = core.modules_list().await.unwrap();
+            let state = modules.modules.iter().find(|m| m.id == "safety-broker");
+            panic!("Sędzia Cieni w procesie: {state:?}");
+        }
+    };
     (core, shell, broker)
 }
 
@@ -213,7 +220,7 @@ async fn attachment_taint_reaches_broker_and_survives_restart() {
             .await
             .contains(&RuleId::TaintedEgress)
     );
-    drop((core, rx));
+    drop((core, rx, broker, shell));
 
     // Restart: nowy Broker nie pamięta skażenia — otwarcie sesji je odtwarza.
     let (core, _, broker) = core_on(dir.path(), &secrets).await;
@@ -225,7 +232,7 @@ async fn attachment_taint_reaches_broker_and_survives_restart() {
             .await
             .contains(&RuleId::TaintedEgress)
     );
-    drop(core);
+    drop((core, broker));
 
     // Restart i od razu tura (bez otwierania sesji w UI) — skażenie zgłoszone przed generacją.
     let (core, _, broker) = core_on(dir.path(), &secrets).await;

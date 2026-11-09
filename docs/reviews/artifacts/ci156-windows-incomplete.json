@@ -1,0 +1,29 @@
+{
+  "source": "7752ac7019c302f6dc2f1698964a9864930ef35e",
+  "run": 42537977215,
+  "job": 128906478826,
+  "conclusion": "cancelled after publication of 74ce7f99 at 2026-11-09T01:29Z; incomplete Windows suite",
+  "completed_targets": {
+    "passed": 544,
+    "failed": 3,
+    "ignored": 7,
+    "completed_target_results": 139
+  },
+  "unfinished_review": {
+    "individual_passed": [
+      "queued_message_of_a_trashed_session_waits_for_undo",
+      "failed_reply_start_keeps_one_saved_message_and_explains",
+      "edit_and_resend_keeps_the_attachments_of_the_original_message"
+    ],
+    "unfinished": "queued_message_is_removed_when_the_undo_window_expires",
+    "started": "2026-11-09T00:30:26Z",
+    "over_60s_message": "2026-11-09T00:31:26Z",
+    "cancelled": "2026-11-09T01:29:03Z"
+  },
+  "failures": [
+    "conductor_handoff::later_refusal_does_not_erase_recorded_command_output",
+    "conductor_handoff::receipts_survive_limit_and_core_restart_without_repeating_delegate",
+    "files::attachment_taint_reaches_broker_and_survives_restart"
+  ],
+  "not_a_full_result": true
+}

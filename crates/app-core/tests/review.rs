@@ -136,6 +136,14 @@ async fn queued_message_of_a_trashed_session_waits_for_undo() {
 #[tokio::test]
 async fn queued_message_is_removed_when_the_undo_window_expires() {
     let h = harness().await;
+    // Porty systemu mogą trzymać aktywne zadanie blokujące; Tokio nie przesuwa wtedy czasu samo.
+    let (release, waiting) = std::sync::mpsc::channel::<()>();
+    let (started, ready) = tokio::sync::oneshot::channel();
+    let blocker = tokio::task::spawn_blocking(move || {
+        let _ = started.send(());
+        let _ = waiting.recv();
+    });
+    ready.await.unwrap();
     let core = &h.core;
     let session = core
         .sessions_create(SessionTemplate::Empty)
@@ -153,7 +161,10 @@ async fn queued_message_is_removed_when_the_undo_window_expires() {
     tokio::task::yield_now().await;
     tokio::time::advance(std::time::Duration::from_millis(299)).await;
     assert_eq!(core.system_status().await.unwrap().queued_messages, 1);
-    // `advance` nie czeka na obsługę timerów; sonda tego samego terminu synchronizuje zegar.
+    // Aktywne porty blokujące wyłączają automatyczny skok Tokio do następnego timera.
+    // Dochodzimy ręcznie do tego samego terminu300ms, potem pozwalamy obsłużyć timer.
+    tokio::time::advance(std::time::Duration::from_millis(1)).await;
+    tokio::time::resume();
     tokio::time::sleep_until(expires).await;
     tokio::task::yield_now().await;
     assert_eq!(core.system_status().await.unwrap().queued_messages, 0);
@@ -163,6 +174,8 @@ async fn queued_message_is_removed_when_the_undo_window_expires() {
         h.provider.requests().is_empty(),
         "bez wywołania modelu dla kosza"
     );
+    drop(release);
+    blocker.await.unwrap();
 }
 
 /// R-02: odpowiedź nie wystartowała po zapisaniu wiadomości (tu: Broker w bezpiecznym stanie nie

@@ -26,3 +26,11 @@ Nie uznano wcześniejszego pełnego przebiegu za zielony po samym teście ukieru
 Logi: `/workspace/scratch/queue-clock-tests.log`, `queue-clock-tests-final.log`,
 `queue-clock-stress.log`, `queue-adjacent-tests.log`, `queue-clock-clippy.log`.
 Niezależny przegląd i Windows CI otwarte; nie jest to odbiór sprzętu. Wersja0.0.85, etap J w toku.
+
+## Późniejsza regresja Windows
+
+CI156 ujawnił zawieszenie nowego przypadku wygasania. Linux bez aktywnego zadania blokującego
+nie odtworzył wcześniej tej sytuacji. [Reproduktor i poprawka #39](2026-11-09-review-timer-windows.md)
+opisują czerwony przebieg zakończony watchdogiem30s, ręczne przejście299+1ms, wznowienie zegara
+i20 wykonań pary bez błędu. Windows CI156 był nieukończony i anulowany; wcześniejsze liczby
+zaliczonych testów Linux pozostają wynikami tamtych przebiegów, nie dowodem poprawności Windows.
