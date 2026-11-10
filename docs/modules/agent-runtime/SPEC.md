@@ -48,6 +48,10 @@ po cofnięciu nie trafia na nieznany wariant (punkty kontrolne go nie zawierają
 - **Adapter schedulera:** `RuntimeExecutor: TaskExecutor` — ładunek `AgentTaskPayload`, przebieg `task-<zadanie>-a<próba>` (wznowienie z checkpointu), agentka przydzielona przez scheduler z obsady, budżety ∩ zadanie, taint zadania, pochodzenie ≠ użytkownik → `CommandOrigin::Agent`; `Completed` → `Succeeded{run, verified}`, odrzucenie Krytyczki/pętla/odmowa → `Failed{retryable:false}`, błąd dostawcy → ponawialny, `Stop`/anulowanie → `Stopped`; porzucenie wykonania anuluje przebieg.
 
 ## Niezmienniki
+- Końcowa odpowiedź po odmowie zasad narzędzia zawiera stałą informację runtime o liczbie
+  niewykonanych operacji. Pochodzi ona z utrwalonego `denied_calls`, nie z narracji modelu;
+  przeżywa wznowienie i nie ujawnia argumentów. Twarda odmowa nadal kończy przebieg `Refused`
+  przed kolejną turą modelu. Dopisek nie zmienia werdyktu weryfikacji ani uprawnień.
 - Informacja o wykrytych programach nie nakazuje ponownego pytania o instalację. Potrzebne
   do zadania narzędzia agentka instaluje dostępnymi narzędziami w ramach aktywnych zgód,
   sprawdza wynik i zgłasza rzeczywistą odmowę lub wymagane potwierdzenie. Nie nadaje sobie praw.
