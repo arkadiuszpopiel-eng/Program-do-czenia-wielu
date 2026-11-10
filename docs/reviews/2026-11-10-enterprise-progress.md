@@ -1,5 +1,8 @@
 # Raport postępu prac Enterprise — 10.11.2026
 
+Aktualny [raport zamknięcia i wynikiCI176/Windows98](2026-11-10-enterprise-final.md).
+Poniżej zachowany wcześniejszy raport postępu.
+
 Stan po przygotowaniu #63, przed jego pełnym CI; to nie jest raport końcowy o 06:00.
 Właściciel wyznaczył rozwój przed **05:30 Europe/Warsaw (04:30 UTC)**, potem tylko końcowe
 testy i raport, zakończenie **06:00 (05:00 UTC)**. Późniejsza korekta ma pierwszeństwo.

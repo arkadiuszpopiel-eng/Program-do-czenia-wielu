@@ -1,5 +1,13 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Zamknięcie okna10.11.2026:** opublikowany kod`4c683568` ma zieloneCI17610/10
+orazWindows984/4:Linux3550/0/26,Windows3576/0/47,Chromium915/915,WebView263/0/5.
+Kandydat#64 ma lokalnie68/0/0, ale pozostaje poza gałęzią PR bez własnego pełnegoCI.
+CI176 trwało39min35s; po jego końcu35min39s doSTOP, więc nie rozpoczęto kolejnego przebiegu.
+#41/#48, produkcyjny dostawcaWWW, rzeczywisteAPI/GPU12GB/mikrofon i przegląd pozostają otwarte.
+[Pełny raport i dalsze kroki](../reviews/2026-11-10-enterprise-final.md).
+Dalszy rozwój wyłącznie po nowym zleceniu. Poniższe wpisy zachowują historię wcześniejszych baz.
+
 **Kandydat #63 — oczekiwanie na magazyn pobrania:** Stop i istniejący deadline kończą
 oczekiwanie na begin/write. Rozpoczęte I/O może jeszcze wracać w tle; sprzątanie następuje po
 powrocie pracownika. Rozpoczęty commit zachowuje rzeczywisty wynik. RED2/4 → GREEN62/0/0;

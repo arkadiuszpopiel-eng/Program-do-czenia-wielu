@@ -1,0 +1,76 @@
+[
+  {
+    "name": "final-published-tools-net",
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "tools-net-contract",
+      "-p",
+      "tools-net-impl",
+      "-p",
+      "tools-net-fake",
+      "--all-features",
+      "-j2"
+    ],
+    "cwd": "/workspace/wt-nightly",
+    "exit": 0,
+    "started_utc": "2026-11-10T04:29:52.622107+00:00",
+    "finished_utc": "2026-11-10T04:29:54.414593+00:00",
+    "log_sha256": "76d080dd6f88df3e59e4b7b398779158245064e78d6ec46a789af33df1b1fa7b"
+  },
+  {
+    "name": "docs-check",
+    "command": [
+      "node",
+      "scripts/docs-html.mjs",
+      "--check"
+    ],
+    "cwd": "/workspace/wt-enterprise-final",
+    "exit": 0,
+    "started_utc": "2026-11-10T04:29:54.414989+00:00",
+    "finished_utc": "2026-11-10T04:29:54.898677+00:00",
+    "log_sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+  },
+  {
+    "name": "docs-verify",
+    "command": [
+      "node",
+      "scripts/docs-html.mjs",
+      "--verify"
+    ],
+    "cwd": "/workspace/wt-enterprise-final",
+    "exit": 0,
+    "started_utc": "2026-11-10T04:29:54.899489+00:00",
+    "finished_utc": "2026-11-10T04:29:55.695919+00:00",
+    "log_sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+  },
+  {
+    "name": "lint",
+    "command": [
+      "pnpm",
+      "lint"
+    ],
+    "cwd": "/workspace/wt-enterprise-final",
+    "exit": 0,
+    "started_utc": "2026-11-10T04:29:55.696701+00:00",
+    "finished_utc": "2026-11-10T04:30:24.528790+00:00",
+    "log_sha256": "1255772245d9156c937a19b0925bee099f20b33a2233777142bd8b88d3fcdd05"
+  },
+  {
+    "name": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "cwd": "/workspace/wt-enterprise-final",
+    "exit": 0,
+    "started_utc": "2026-11-10T04:30:24.531396+00:00",
+    "finished_utc": "2026-11-10T04:30:24.555333+00:00",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

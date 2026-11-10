@@ -1,0 +1,223 @@
+{
+  "head_sha": "4c683568582586343c6c1cc26daed309fec2ee62",
+  "checked_utc": "2026-11-10T04:26:23Z",
+  "runs": [
+    {
+      "id": 42751408682,
+      "name": "Próba generalna (Windows)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 98,
+      "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42751408682/jobs",
+      "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42751408682/logs",
+      "workflow_id": 376724312
+    },
+    {
+      "id": 42751408643,
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 176,
+      "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42751408643/jobs",
+      "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42751408643/logs",
+      "workflow_id": 371319063
+    }
+  ],
+  "ci_jobs": [
+    {
+      "id": 129615651286,
+      "name": "Powłoka Tauri (Windows)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129615651399,
+      "name": "UI — kontrole i build",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129615651518,
+      "name": "Rust (windows-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129615651541,
+      "name": "cargo-deny",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129615651600,
+      "name": "Dokumentacja",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129615651611,
+      "name": "Rust (ubuntu-24.04)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129616254292,
+      "name": "UI E2E + axe (2/3)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129616254321,
+      "name": "UI E2E + axe (1/3)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129616254329,
+      "name": "UI E2E + axe (3/3)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129619736158,
+      "name": "UI (Svelte 5)",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "windows_jobs": [
+    {
+      "id": 129615651939,
+      "name": "setup-dev.ps1 (PowerShell 5.1 i 7)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129615652116,
+      "name": "Hugging Face — adresy z katalogów modeli",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129615652305,
+      "name": "Prawdziwa aplikacja — E2E przez CDP (WebView2)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 129615652372,
+      "name": "Silniki na żywo (CPU)",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "collection_note": "Initial single-argument summary write exceeded OS argument size (error7); raw logs saved successfully. Summary saved in bounded chunks.",
+  "ci_started_utc": "2026-11-10T03:44:46Z",
+  "ci_completed_utc": "2026-11-10T04:24:21Z",
+  "ci_elapsed_seconds": 2375,
+  "logs": [
+    {
+      "job_id": 129615651611,
+      "bytes": 886182,
+      "rust_targets": 1132,
+      "rust": [
+        3550,
+        0,
+        26
+      ],
+      "sha256": "ff1c02cb73f64b35f7452b46a8ee3f67afbbae64bbaa8c5bc0bccc448bbe3fcb",
+      "raw_log_path": "/workspace/scratch/enterprise-final-2026-11-10/ci-logs/job-129615651611.log"
+    },
+    {
+      "job_id": 129615651518,
+      "bytes": 897147,
+      "rust_targets": 1132,
+      "rust": [
+        3576,
+        0,
+        47
+      ],
+      "sha256": "98e0be0a6920d694dc5281c47b21228043a9c1a65bfe9b007468731ce22b8a71",
+      "raw_log_path": "/workspace/scratch/enterprise-final-2026-11-10/ci-logs/job-129615651518.log"
+    },
+    {
+      "job_id": 129615651399,
+      "bytes": 139231,
+      "rust_targets": 0,
+      "rust": [
+        0,
+        0,
+        0
+      ],
+      "sha256": "ecf634b018193eb1aea686c0b3ee81a922b3e9d77622f3deaa8f89cd3ca320c9",
+      "raw_log_path": "/workspace/scratch/enterprise-final-2026-11-10/ci-logs/job-129615651399.log",
+      "summary_lines": [
+        "2026-11-10T03:45:22.7532277Z packages/ui-kit check: svelte-check found 0 errors and 0 warnings",
+        "2026-11-10T03:45:36.1841149Z apps/desktop/ui check: svelte-check found 0 errors and 0 warnings",
+        "2026-11-10T03:46:28.5155160Z  Test Files  103 passed (103)",
+        "2026-11-10T03:46:28.5157042Z       Tests  573 passed (573)"
+      ]
+    },
+    {
+      "job_id": 129616254292,
+      "bytes": 90564,
+      "rust_targets": 0,
+      "rust": [
+        0,
+        0,
+        0
+      ],
+      "sha256": "e68dbf0dc2c2985bed4cdea0626421cbb0e33fb05aa38e8cff2975bb6b4b2200",
+      "raw_log_path": "/workspace/scratch/enterprise-final-2026-11-10/ci-logs/job-129616254292.log",
+      "summary_lines": [
+        "2026-11-10T03:55:34.7245037Z   305 passed (8.5m)"
+      ]
+    },
+    {
+      "job_id": 129616254321,
+      "bytes": 91185,
+      "rust_targets": 0,
+      "rust": [
+        0,
+        0,
+        0
+      ],
+      "sha256": "290b502883bf8599c098d6a3f9be8a22727c1233d6ebb660a1c10f81b061bd0c",
+      "raw_log_path": "/workspace/scratch/enterprise-final-2026-11-10/ci-logs/job-129616254321.log",
+      "summary_lines": [
+        "2026-11-10T03:55:38.5156757Z   305 passed (8.4m)"
+      ]
+    },
+    {
+      "job_id": 129616254329,
+      "bytes": 91364,
+      "rust_targets": 0,
+      "rust": [
+        0,
+        0,
+        0
+      ],
+      "sha256": "969eefb8f6762f5d8d829601417e47dda4dea589a8dd9bf38659ea347ba7eb96",
+      "raw_log_path": "/workspace/scratch/enterprise-final-2026-11-10/ci-logs/job-129616254329.log",
+      "summary_lines": [
+        "2026-11-10T03:56:50.3429428Z   305 passed (9.7m)"
+      ]
+    },
+    {
+      "job_id": 129615652305,
+      "bytes": 115581,
+      "rust_targets": 0,
+      "rust": [
+        0,
+        0,
+        0
+      ],
+      "sha256": "a3d8d4f79db919f7a42ed4e5f97a06a8b6531d2a398b11a4a6cdb4f24aebd6ca",
+      "raw_log_path": "/workspace/scratch/enterprise-final-2026-11-10/ci-logs/job-129615652305.log",
+      "summary_lines": [
+        "2026-11-10T03:52:41.4294989Z   5 skipped",
+        "2026-11-10T03:52:41.4295514Z   63 passed (2.7m)"
+      ]
+    }
+  ]
+}
