@@ -86,6 +86,10 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
 ## Fake
 `providers-local-fake`: udaje sidecar (skryptowane odpowiedzi, tok/s z wirtualnym zegarem), pobieranie z lokalnych fixture'ów, symulacja OOM/crash.
 
+Integracyjne fixture'y instalacji serwera publikują niezmienną binarkę Cargo jako nowy regularny
+plik przez dowiązanie twarde w tym samym systemie plików. Nie otwierają wykonywanego inode do
+zapisu; zachowują sprawdzenie instalacji po starcie bez restartu, bez retries i zwiększenia czasu.
+
 ## Otwarte pytania
 - Próg jakości tool-use po polsku na Bielik 4.5B — pomiar F3.
 - SHA-256 i dokładny rozmiar GGUF Bielika — wpisać do `models.toml` po pierwszym pobraniu (pełna weryfikacja łańcucha dostaw).

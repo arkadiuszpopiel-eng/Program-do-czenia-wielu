@@ -64,7 +64,13 @@ pub struct Env {
 
 impl Env {
     pub fn new() -> Self {
-        let dir = tempfile::tempdir().unwrap();
+        // Ten sam system plików co niezmienna binarka Cargo: fixture instaluje ją bez
+        // otwierania nowego pliku do zapisu (ETXTBSY przy równoległym zapisie/exec na Linux).
+        let server = fake_server();
+        let dir = tempfile::Builder::new()
+            .prefix("alfa-local-test-")
+            .tempdir_in(server.parent().unwrap())
+            .unwrap();
         let args_file = dir.path().join("args.txt");
         let log_file = dir.path().join("requests.ndjson");
         Self {
@@ -76,6 +82,12 @@ impl Env {
 
     pub fn models(&self) -> PathBuf {
         self.dir.path().join("models")
+    }
+
+    /// Nowa ścieżka regularnego pliku po instalacji; bez uchwytu zapisu do wykonywanej binarki.
+    pub fn install_server_at(&self, path: &Path) {
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::hard_link(fake_server(), path).unwrap();
     }
 
     /// Kolejne uruchomienia: listy argumentów.
