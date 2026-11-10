@@ -25,3 +25,17 @@ uprawnień i bez zmian progów ewaluacji. Nocne harmonogramy pozostają wyłącz
 Dodatkowy RED0/1: przy samejLunie sprawdzenie wybierało ponownie lokalny8B. Teraz lekka
 chmura może sprawdzić wynik (review), gdy istniejące bramki na to pozwalają. Ręczny mocny
 szczebel sprawdzania i kolejki nadal mają pierwszeństwo. Ponowne pełne64/0/0 i Clippy0.
+
+Jawny lekki szczebel właściciela jest respektowany także dla firmowego aliasu API bez
+nazwy Luna/Haiku. RED0/1 wybierał ponownie lokalny model; po poprawce pełne65/0/0
+i Clippy0. Ranking nadal respektuje mocny szczebel i nie tworzy nieznanych dostawców.
+
+PełneCI178 wykryło regresję dwóch niezmienionych testówCore: profil główny widoczny
+w katalogu, lecz niepobrany, promował lekki model ponad średni w ręcznej kolejce konta
+z włączonym przestawianiem. NowyRouterRED0/1 odtworzył dokładnie tę kolejność.
+Preferencja pomocy obejmuje teraz kolejki automatyczne; ręczne przestawiane kolejki nadal
+korzystają z dotychczasowej hierarchii. PełnyRouter66/0/0 i Clippy0. TestówCore nie zmieniono.
+
+Dwa oryginalne testyCore model_routing po poprawce:2/0/0. SHA256 pliku testów jest
+identyczny jak w niezaliczonymCI178. Końcowe lint/format/rozmiary/102 stronyHTML kod0.
+[Dowody kolejnych regresji](artifacts/main-local-routing-followup.json).

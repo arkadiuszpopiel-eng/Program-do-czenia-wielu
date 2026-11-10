@@ -1,17 +1,21 @@
 //! Lokalny8–12B do pracy głównej, skonfigurowana lekka chmura do pomocy.
 use crate::routing::{Registered, RouterCore};
 use providers_contract::{HealthState, ModelKind};
-use router_contract::{Candidate, DifficultyNote, RouteKind, Rung, params_billions, rung_by_name};
+use router_contract::{Candidate, DifficultyNote, RouteKind, Rung, TaskClass, params_billions};
 
-fn helper(model: &str) -> bool {
-    rung_by_name(model) == Rung::Light
-        || model
-            .to_ascii_lowercase()
-            .split(['-', '_', '/', ':'])
-            .any(|p| p == "luna")
+fn helper(core: &RouterCore, candidate: &Candidate) -> bool {
+    let rung = core.rung_of(candidate);
+    rung == Rung::Light
+        || (rung != Rung::Strong
+            && candidate
+                .model
+                .to_ascii_lowercase()
+                .split(['-', '_', '/', ':'])
+                .any(|p| p == "luna"))
 }
 
 pub(crate) fn api_candidates(
+    core: &RouterCore,
     reg: &[(providers_contract::ProviderId, Registered)],
 ) -> Vec<Candidate> {
     let mut out = Vec::new();
@@ -25,12 +29,13 @@ pub(crate) fn api_candidates(
         }
         for (m, c) in caps.models {
             let candidate = Candidate::new(id.clone(), &m);
-            if helper(&m) && c.supports(ModelKind::Chat) && !out.contains(&candidate) {
+            if helper(core, &candidate) && c.supports(ModelKind::Chat) && !out.contains(&candidate)
+            {
                 out.push(candidate);
             }
         }
     }
-    out.sort_by_key(|c| u8::from(!helper(&c.model)));
+    out.sort_by_cached_key(|c| u8::from(!helper(core, c)));
     out
 }
 
@@ -43,11 +48,13 @@ fn main_local(core: &RouterCore, c: &Candidate) -> bool {
 
 pub(crate) fn prefer(
     core: &RouterCore,
+    class: TaskClass,
     mut list: Vec<Candidate>,
     note: &DifficultyNote,
     review: bool,
 ) -> Vec<Candidate> {
-    if note.start == Rung::Strong
+    if core.manual_queue(class)
+        || note.start == Rung::Strong
         || note.escalated_from.is_some()
         || !core.difficulty_policy().local_first
         || !(list.iter().any(|c| main_local(core, c))
@@ -64,7 +71,7 @@ pub(crate) fn prefer(
         return list;
     }
     // Ranking nie omija check(): prywatność, możliwości, stan i budżet pozostają bramkami.
-    list.sort_by_key(|c| {
+    list.sort_by_cached_key(|c| {
         if main_local(core, c) {
             return u8::from(review);
         }
@@ -72,7 +79,7 @@ pub(crate) fn prefer(
             .registered(&c.provider)
             .is_some_and(|r| r.kind == RouteKind::Api)
         {
-            if helper(&c.model) && core.rung_of(c) != Rung::Strong {
+            if helper(core, c) {
                 u8::from(!review)
             } else if core.rung_of(c) == Rung::Strong {
                 3

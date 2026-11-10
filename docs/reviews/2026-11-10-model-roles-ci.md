@@ -39,3 +39,25 @@ Ignorowana próba rzeczywistych silników nie została tutaj ponowiona lokalnie.
 
 Nowy commit wymaga własnego pełnegoCI. Ta korekta nie nadaje uprawnień, nie zmienia
 polityk lub zamrożonych progów i nie uznaje nieudanegoCI177/Windows99 za zaliczone.
+
+## Kolejny opublikowany head a3d50bf1 — stan08:11UTC
+
+Windows100 (42777855684) zakończony:4/4 zadania zielone;WebView263/0/5,
+setup,HuggingFace i rzeczywiste silnikiCPU. Qwen8B:96 tokenów,4,18tok/s,
+start27559ms,pierwszy token29568ms,całość52517ms. Propozycja narzędzia26327ms;
+bez dowodu wykonania fizycznej akcji. Bielik11B ponownieNOT_RUN_CPU_BUDGET,0 tokenów,
+bez uruchomienia serwera. To zaliczona ochrona pamięci, nie zaliczona generacja11B.
+
+CI178 (42777855709) nadal testujeRust Linux/Windows. Pozostałe8/10 zadań zielone:
+Chromium915/915 (305+305+305),Vitest573/573,Tauri,deny,dokumentacja. Clippy na obu
+platformach przeszedł. PełneCI nie jest jeszcze zaliczone; aktualny wynik będzie wPR24
+i checkpoint. Tego przebiegu nie przerywa kolejna publikacja.
+
+## Regresja pełnegoCI178 i naprawa Routera
+
+Linux zakończony porażką:3563/2/26,1135 wyników celów. Oba błędy to niezmieniony
+app-core/model_routing: wybór lekkiego zamiast średniego modelu w ręcznej kolejce konta.
+Nie modyfikowanoCore ani jego asercji. Nowa regresjaRouteraRED0/1 odtworzyła błąd.
+Po ograniczeniu preferencji lokalny/pomoc do kolejek automatycznych:Router66/0/0,
+Clippy0 oraz oryginalnyCore/model_routing2/0/0. WindowsRust jeszcze działał w stanie08:19UTC;
+nie przerwano go. Kolejny head wymaga własnegoCI.

@@ -127,6 +127,7 @@ impl RouterCore {
     /// Kolejność prób według szczebli od szczebla startowego notatki.
     pub(crate) fn arrange(
         &self,
+        class: TaskClass,
         list: Vec<Candidate>,
         note: &DifficultyNote,
         review: bool,
@@ -148,6 +149,6 @@ impl RouterCore {
             local_first,
             note.escalated_from.as_ref(),
         );
-        crate::main_local::prefer(self, ordered, note, review)
+        crate::main_local::prefer(self, class, ordered, note, review)
     }
 }

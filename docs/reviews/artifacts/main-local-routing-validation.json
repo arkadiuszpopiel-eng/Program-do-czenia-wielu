@@ -137,7 +137,7 @@
     }
   ],
   "results": [
-    64,
+    66,
     0,
     0
   ],
@@ -208,7 +208,10 @@
     }
   ],
   "latest_source_sha256": {
-    "crates/router-impl/src/main_local.rs": "d127b6363ae4d50169363b0466508c68b6440a913f258f343959203fa6214c0e",
-    "crates/router-impl/tests/main_local_assistance.rs": "1d972bd151e19734c4dc59191ccf2e0672b0db1373d32045d1249d957ea89308"
-  }
+    "crates/router-impl/src/main_local.rs": "9418499998ad7e301cef92008a9ee7a8c8b7414b7014565c296448e82b4ed601",
+    "crates/router-impl/src/routing.rs": "e038eb1e2dfe4e3089da45fa7927b945282a5568dc9c756f536ef6b6aa850106",
+    "crates/router-impl/src/difficulty.rs": "b1c97505b50d621e204fb5c2d6c476d492e74aecd43158147246f2d84be1aaa8",
+    "crates/router-impl/tests/main_local_assistance.rs": "844dc1b5f8683dcdfb5bee95dec4a8ff2f5fcccadce39d31728ffca95b3c7903"
+  },
+  "followup_artifact": "main-local-routing-followup.json"
 }

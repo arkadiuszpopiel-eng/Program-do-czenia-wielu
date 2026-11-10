@@ -233,3 +233,53 @@ fn budget_blocks_assistance_instead_of_spending_silently() {
         .is_err()
     );
 }
+
+#[test]
+fn explicit_light_rung_supports_a_cloud_deployment_with_an_opaque_name() {
+    let c = RouterCore::default();
+    let local = named("local", MAIN, &[], true);
+    c.register(local.clone(), RouteKind::Local);
+    let alias = "company-deployment-a";
+    c.register(named("openai", SOL, &[alias], false), RouteKind::Api);
+    let mut policy = c.difficulty_policy();
+    policy.rungs.insert(format!("openai:{alias}"), Rung::Light);
+    c.set_difficulty_policy(policy);
+    let mut r = req("Sprawdź odpowiedź");
+    r.meta.route.review = true;
+    assert_eq!(choose(&c, TaskClass::Conversation, &r).chosen.model, alias);
+    r.meta.route.review = false;
+    local.off.store(true, Ordering::SeqCst);
+    assert_eq!(choose(&c, TaskClass::Code, &r).chosen.model, alias);
+}
+
+#[test]
+fn reordered_account_queue_keeps_difficulty_when_main_model_is_missing() {
+    use std::collections::BTreeMap;
+    let c = RouterCore::default();
+    let local = named("local", MAIN, &[], true);
+    local.off.store(true, Ordering::SeqCst);
+    c.register(local, RouteKind::Local);
+    c.register(
+        named("openai", SOL, &["gpt-4o", "gpt-4o-mini"], false),
+        RouteKind::Api,
+    );
+    c.set_provider_queues(BTreeMap::from([(
+        ProviderId::new("openai"),
+        BTreeMap::from([(
+            TaskClass::Code,
+            vec![SOL.into(), "gpt-4o".into(), "gpt-4o-mini".into()],
+        )]),
+    )]));
+    let mut p = c.difficulty_policy();
+    p.reorder_queues = true;
+    c.set_difficulty_policy(p.clone());
+    let r = req("dodaj komentarz");
+    let order = |d: RouteDecision| d.targets().map(|c| c.model.clone()).collect::<Vec<_>>();
+    assert_eq!(
+        order(choose(&c, TaskClass::Code, &r)),
+        ["gpt-4o", SOL, "gpt-4o-mini"]
+    );
+    p.rungs.insert("openai:gpt-4o".into(), Rung::Light);
+    c.set_difficulty_policy(p);
+    assert_eq!(choose(&c, TaskClass::Code, &r).chosen.model, SOL);
+}

@@ -6,6 +6,8 @@ Automatyczna główna praca na profilu lokalnym8–12B zaczyna się lokalnie; le
 Luna/Haiku/odpowiednik z dostępnego konta jest pomocą przy problemie. Brak modelu lub konta
 nie daje fikcyjnego sukcesu. Trudne zadania/eskalacja, ręczne kolejki/przypięcia i istniejące
 bramki prywatności, możliwości i budżetu pozostają nadrzędne.1.5B local-light tylkoSummarize.
+Jawny lekki szczebel działa także dla firmowego aliasu API. Kolejka konta z włączonym
+przestawianiem zachowuje dobór według trudności; pomoc chmury nie zmienia jej szczebli.
 
 
 ## Cel

@@ -1,7 +1,10 @@
 # Role modeli: główny8–12B, lekka pomoc lokalna i chmurowa — 10.11.2026
 
 Aktualne [rozliczenieCI177/Windows99, wynikQwenCPU i korekta](2026-11-10-model-roles-ci.md).
-CI177/Windows99 są niezaliczone; nowe poprawki wymagają osobnegoCI.
+CI177/Windows99 są niezaliczone. Windows100 dlaa3d50bf1:4/4 sukces. CI178 wykryło
+regresję doboru w ręcznej kolejce; poprawka Routera ma66/0/0 i Clippy0.
+Oba oryginalne, niezmienione testyCore/model_routing przeszły2/0/0.
+Aktualne wyniki dla każdego heada zapisujemy wPR24.
 
 Nowe polecenie właściciela po zakończeniu nocnego okna. Prace wznowiono wyłącznie w tym
 zakresie; oba nocne harmonogramy pozostają wyłączone. Poprzedni raport i błędy zachowane.
@@ -25,6 +28,8 @@ zakresie; oba nocne harmonogramy pozostają wyłączone. Poprzedni raport i bł�
 Lekka chmura może też sprawdzić wynik lokalnego8B. Regresja z samąLuną wykryła
 powtórny wybór tego samego lokalnego modelu; poprawka ma ponowne64/0/0 i Clippy0.
 Sprawdzanie nadal respektuje ręczne kolejki i mocny szczebel ustawiony przez właściciela.
+Firmowe aliasy API respektują jawny lekki szczebel właściciela: dodatkowyRED0/1
+naprawiono, pełneRouter65/0/0 i Clippy0.
 
 ## Pamięć docelowej RTX2060 12GB
 
@@ -48,8 +53,8 @@ niepotwierdzone przez człowieka; nie zmieniono polityki licencji zależności.
 | Moduł | RED | Końcowy wynik lokalny |
 | --- | --- | --- |
 | providers-local #65 | 1/3; osobny fallback0/1 | 80/0/0,12 wyników celów; Clippy0; pamięć5/5 |
-| app-models #66 | 0/3 | 85/0/1,17 wyników celów; Clippy0 |
-| Router #67 | 3/3 po korekcie fixture; brak głównego0/1 | 64/0/0,16 wyników celów; Clippy0 |
+| app-models #66 | 0/3 | 86/0/1,17 wyników celów; Clippy0 |
+| Router #67 | 3/3 po korekcie fixture; brak głównego0/1 | 66/0/0,16 wyników celów; Clippy0 |
 
 Zapis wyników: zaliczone/błędy/ignorowane. Pierwszy build app-models zakończył linker101
 po wyczerpaniu miejsca. Po zachowaniu binariów dawnych prób w zweryfikowanym gzip i usunięciu
@@ -64,7 +69,8 @@ odbiór płatnegoAPI lub semantyki odpowiedzi person. Nowy head wymaga własnego
 nie przypisujemy mu zielonych CI176/Windows98 poprzednika4c683568.
 
 Końcowe lint,format,102 strony HTML i odnośniki: kod0; schematy bez zmian.
-Pierwszy lint wykrył401 linii zamiast400: usunięto pustą linię dokumentacji, bez zmiany limitu.
+Pierwszy lint wykrył401 linii zamiast400; pierwsza korekta spowodowała błądClippy
+dokumentacji. Ostatecznie przywrócono akapit, łącząc dwie linie opisu; limit400 zachowany.
 [Końcowe kontrole](artifacts/model-roles-final-checks.json). Logika połączonych modułów
 odpowiada sprawdzonym osobnym przyrostom.
 

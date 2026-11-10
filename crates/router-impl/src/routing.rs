@@ -223,7 +223,7 @@ impl RouterCore {
             .iter()
             .filter(|(id, r)| r.kind == RouteKind::Local && Some(id) == light_id.as_ref())
             .find_map(|(_, r)| default(r));
-        let api = crate::main_local::api_candidates(&reg);
+        let api = crate::main_local::api_candidates(self, &reg);
         let mut policy = RoutePolicy::defaults(local.as_ref(), &api);
         let queues = self.queues.read().unwrap_or_else(|p| p.into_inner());
         crate::helpers::apply_queues(&mut policy.classes, &queues);
@@ -294,7 +294,7 @@ impl RouterCore {
             .as_ref()
             .filter(|n| n.reorders() && manual.is_none())
         {
-            rest = self.arrange(rest, note, constraints.hint.review);
+            rest = self.arrange(class, rest, note, constraints.hint.review);
         }
         let list = pinned.into_iter().chain(rest);
         let now = self.clock.now_ms();
