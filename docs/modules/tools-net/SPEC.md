@@ -34,9 +34,11 @@ Zdarzenia: `tool.net.fetch` (host, status, bajty), `tool.net.download` (ścieżk
   Powtórzony poprawny cel z istniejącej normalizacji `checked_target` (bez fragmentu) nie
   zużywa miejsca ani znaków. Zachowujemy kolejność i pierwszy oryginalny URL/tytuł/opis;
   różne ścieżki, query i porty pozostają osobne. Nie pobieramy dodatkowych wyników w celu uzupełnienia.
-  Każdy zwracany URL przechodzi istniejącą walidację celu HTTPS/publicznego i sekretów; adres
-  ze znakami sterującymi, niedozwolony lub zawierający wykryty sekret jest pomijany, nie
-  przepisywany do wymyślonego źródła. Budżet `output_max_chars` ogranicza też sumę znaków pól
+  Każdy zwracany URL przechodzi istniejącą walidację celu HTTPS/publicznego i sekretów.
+  Adres ze znakami sterującymi, niedozwolony lub zawierający wykryty sekret jest pomijany,
+  nie przepisywany do wymyślonego źródła. Klucze i wartości parametrów query są sprawdzane
+  dotychczasowym detektorem po jednym standardowym dekodowaniu, bez nowych wzorców.
+  Budżet `output_max_chars` ogranicza też sumę znaków pól
   `url/title/snippet` w wyniku strukturalnym; długiego URL nie skracamy. Pominięcie lub
   skrócenie jest jawne w tekście wyniku. To nie jest pobranie źródeł ani sprawdzenie DNS:
   rzeczywisty odczyt nadal wymaga osobnego `net_fetch` z Brokerem i kontrolą DNS.

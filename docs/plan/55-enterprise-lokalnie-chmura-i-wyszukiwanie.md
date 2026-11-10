@@ -1,5 +1,10 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Kandydat #61 — kodowane parametry źródeł:** istniejący detektor sprawdza również
+klucze i wartości po dekodowaniu query; poprawne URL pozostają oryginalne. Lokalnie **47/0/0**
+łącznie z #59/#60, Clippy/lint/format bez błędów; [raport i granice](../reviews/2026-11-10-search-encoded-params.md).
+Baza 74f09914 ma pełne zielone CI173 i Windows95; nowy przyrost wymaga własnego CI/przeglądu.
+
 **Kandydat #60 — Stop przy odpowiedzi wyszukiwarki:** już zgłoszone anulowanie nie
 staje się sukcesem lub błędem I/O. Komunikat nie zaprzecza możliwej wysyłce zapytania.
 Lokalnie 44/0/0, Clippy/lint/format bez błędów; [raport i granice](../reviews/2026-11-10-search-cancel.md).

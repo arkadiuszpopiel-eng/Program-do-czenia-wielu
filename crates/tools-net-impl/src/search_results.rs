@@ -3,7 +3,7 @@
 use std::collections::BTreeSet;
 
 use tools_common_contract::text;
-use tools_net_contract::{SearchHit, SearchOut};
+use tools_net_contract::{SearchHit, SearchOut, url_carries_secret};
 
 use crate::fetch::checked_target;
 
@@ -41,6 +41,15 @@ pub(crate) fn project(hits: Vec<SearchHit>, max: u32, budget: usize) -> (SearchO
             limited = true;
             continue;
         };
+        // Te same wzorce także po standardowym dekodowaniu parametrów HTTP.
+        if target
+            .url()
+            .query_pairs()
+            .any(|(key, value)| url_carries_secret(&format!("{key}={value}")))
+        {
+            limited = true;
+            continue;
+        }
         // Klucz z już sprawdzonego celu, lecz źródło dla modelu zachowuje oryginalny URL.
         if !seen.insert(target.as_str().to_owned()) {
             limited = true;

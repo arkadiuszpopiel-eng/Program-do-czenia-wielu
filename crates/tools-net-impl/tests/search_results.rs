@@ -292,3 +292,51 @@ async fn secret_fragment_is_rejected_before_recording_seen_target() {
     assert_eq!(urls(&out), vec![safe]);
     assert!(!serde_json::to_string(&out).unwrap().contains("tajny123"));
 }
+
+#[tokio::test]
+async fn percent_encoded_parameter_names_do_not_expose_detected_secrets() {
+    for key in [
+        "%74%6f%6b%65%6e",
+        "%70%61%73%73%77%6f%72%64",
+        "%61%70%69%5f%6b%65%79",
+    ] {
+        let unsafe_url = format!("https://docs.example/a?{key}=tajny123");
+        let safe = "https://docs.example/safe";
+        let out = projected(vec![hit(&unsafe_url), hit(safe)], 10, 4096).await;
+        assert_eq!(urls(&out), vec![safe], "{key}");
+        assert!(!serde_json::to_string(&out).unwrap().contains("tajny123"));
+        assert!(out.text.contains("pominięto"));
+    }
+}
+
+#[tokio::test]
+async fn encoded_known_secret_prefix_in_query_value_is_omitted() {
+    let safe = "https://docs.example/safe";
+    let out = projected(
+        vec![
+            hit("https://docs.example/a?ref=%73%6b%2DABCDEFGHIJKLMNOPQRSTUV"),
+            hit(safe),
+        ],
+        10,
+        4096,
+    )
+    .await;
+    assert_eq!(urls(&out), vec![safe]);
+    assert!(
+        !serde_json::to_string(&out)
+            .unwrap()
+            .contains("ABCDEFGHIJKLMNOPQRSTUV")
+    );
+}
+
+#[tokio::test]
+async fn harmless_encoded_query_is_preserved_without_rewriting_source_url() {
+    let sources = [
+        "https://docs.example/a?q=za%C5%BC%C3%B3%C5%82%C4%87",
+        "https://docs.example/a?query=tokenizacja+tekstu&lang=pl",
+        "https://docs.example/a?query=abc%3D123",
+    ];
+    let out = projected(sources.into_iter().map(hit).collect(), 10, 4096).await;
+    assert_eq!(urls(&out), sources);
+    assert!(!out.text.contains("pominięto"));
+}

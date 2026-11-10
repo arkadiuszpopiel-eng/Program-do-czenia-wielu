@@ -1,0 +1,155 @@
+{
+  "checked_utc": "2026-11-10T01:54:13.087888+00:00",
+  "commit": "74f0991477300ee7a33281dcc89610e4dcef1c01",
+  "CI173": {
+    "run": 42733744361,
+    "status": "completed success10/10",
+    "completed_results": [
+      {
+        "name": "Linux",
+        "id": 129557839314,
+        "targets": 1129,
+        "passed": 3523,
+        "failed": 0,
+        "ignored": 26,
+        "playwright": []
+      },
+      {
+        "name": "UI1",
+        "id": 129558662639,
+        "targets": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "playwright": [
+          "2026-11-10T01:22:28.4517063Z   305 passed (10.0m)"
+        ]
+      },
+      {
+        "name": "UI2",
+        "id": 129558662439,
+        "targets": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "playwright": [
+          "2026-11-10T01:21:09.3664992Z   305 passed (8.7m)"
+        ]
+      },
+      {
+        "name": "UI3",
+        "id": 129558662634,
+        "targets": 0,
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0,
+        "playwright": [
+          "2026-11-10T01:24:47.9836746Z   305 passed (10.8m)"
+        ]
+      }
+    ],
+    "jobs": [
+      {
+        "id": 129557838956,
+        "name": "Dokumentacja",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129557839296,
+        "name": "Rust (windows-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129557839314,
+        "name": "Rust (ubuntu-24.04)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129557839320,
+        "name": "UI — kontrole i build",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129557839324,
+        "name": "Powłoka Tauri (Windows)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129557839523,
+        "name": "cargo-deny",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129558662439,
+        "name": "UI E2E + axe (2/3)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129558662634,
+        "name": "UI E2E + axe (3/3)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129558662639,
+        "name": "UI E2E + axe (1/3)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129563968287,
+        "name": "UI (Svelte 5)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "windows": {
+      "job": 129557839296,
+      "targets": 1129,
+      "passed": 3549,
+      "failed": 0,
+      "ignored": 47
+    }
+  },
+  "Windows95": {
+    "run": 42733744380,
+    "status": "completed success4/4",
+    "webview": [
+      "2026-11-10T01:18:04.6340080Z   5 skipped",
+      "2026-11-10T01:18:04.6343898Z   63 passed (2.7m)"
+    ],
+    "jobs": [
+      {
+        "id": 129557839060,
+        "name": "setup-dev.ps1 (PowerShell 5.1 i 7)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129557839238,
+        "name": "Hugging Face — adresy z katalogów modeli",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129557839420,
+        "name": "Prawdziwa aplikacja — E2E przez CDP (WebView2)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129557839470,
+        "name": "Silniki na żywo (CPU)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  }
+}
