@@ -1,0 +1,136 @@
+{
+  "updated_utc": "2026-11-10T01:30:09.317355+00:00",
+  "issue": 60,
+  "published_base": "74f0991477300ee7a33281dcc89610e4dcef1c01",
+  "parent_local": "d6d18bbea050fa17f8da25fe6ea2a55647f00d26",
+  "RED": {
+    "passed": 1,
+    "failed": 3,
+    "ignored": 0,
+    "exit": 101
+  },
+  "GREEN": {
+    "passed": 44,
+    "failed": 0,
+    "ignored": 0,
+    "target_results": 11,
+    "new_tests": 4,
+    "new_variants": 5,
+    "exit": 0
+  },
+  "confirmed_checks": [
+    {
+      "check": "fmt-confirmed",
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "started_utc": "2026-11-10T01:27:55.216038+00:00",
+      "finished_utc": "2026-11-10T01:28:02.937070+00:00",
+      "exit": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "check": "clippy-confirmed",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "tools-net-contract",
+        "-p",
+        "tools-net-impl",
+        "-p",
+        "tools-net-fake",
+        "--all-features",
+        "--all-targets",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "started_utc": "2026-11-10T01:28:02.938202+00:00",
+      "finished_utc": "2026-11-10T01:28:03.688221+00:00",
+      "exit": 0,
+      "log_sha256": "4ddc61e93a34a57902a8c3ead110e79bdd49d19cf5cc71ac1dae39b8398ef7b7"
+    },
+    {
+      "check": "lint-confirmed",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "started_utc": "2026-11-10T01:28:03.688611+00:00",
+      "finished_utc": "2026-11-10T01:28:29.013137+00:00",
+      "exit": 0,
+      "log_sha256": "a33e9fe4c3c485e45fadd2e8ed56c54e439c6658a53b247df827562fef57555c"
+    }
+  ],
+  "first_clippy_log_seconds": 19.47,
+  "environment_transition": "OriginalPTYexithandleslost;retainedlogs;confirmedcheckexitcodeswithshortcachedrerun",
+  "scope": "FakeSearchPort/Brokerharness;no actualexternalAPI,hardware,LLM,policy,budgetorevalchanges",
+  "source_sha256": {
+    "crates/tools-net-impl/src/fetch.rs": "a38c802f46c2e52350557cbdffca5b51ce0e4893858bbcbd4142e2259805d631",
+    "crates/tools-net-impl/tests/search_cancel.rs": "ea3bc997df8294d1cdede18e51a6197c139a04f0a418fbd454c199c5afb17276",
+    "docs/modules/tools-net/SPEC.md": "f2be0dccc038f62271bb3ccc19fb30bb60741812ca8be98fa2c734cc59f6757b"
+  },
+  "logs": {
+    "red.log": {
+      "bytes": 4791,
+      "sha256": "657f24d724665297cadfb3bef6ba037db12bfc96b54164640bac4f99a7ec1c63"
+    },
+    "green-full.log": {
+      "bytes": 4978,
+      "sha256": "668961c5529e3f26bf24b7d879f63239aabb00b66dcca6b3a4b1e497787cd8b2"
+    },
+    "clippy.log": {
+      "bytes": 1989,
+      "sha256": "5cfb39e0992373c06b41d12a05c3354297bb30f9f67792c9047048bea2621d84"
+    },
+    "lint.log": {
+      "bytes": 407,
+      "sha256": "6f656476390e0f17849123925490656e42d95d310a96bc15438a9686e0de2506"
+    },
+    "fmt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clippy-confirmed.log": {
+      "bytes": 60,
+      "sha256": "4ddc61e93a34a57902a8c3ead110e79bdd49d19cf5cc71ac1dae39b8398ef7b7"
+    },
+    "lint-confirmed.log": {
+      "bytes": 407,
+      "sha256": "a33e9fe4c3c485e45fadd2e8ed56c54e439c6658a53b247df827562fef57555c"
+    },
+    "fmt-confirmed.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs-generate.log": {
+      "bytes": 48,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs-check.log": {
+      "bytes": 48,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs-verify.log": {
+      "bytes": 59,
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    }
+  },
+  "publication_gate": "WaitfullCI173/Windows95on74f09914;do notcancel;publish59+60afterallchecks;freshreviewbeforemerge",
+  "docs": {
+    "pages": 102,
+    "generate_exit": 0,
+    "check_exit": 0,
+    "verify_exit": 0,
+    "problems": 0
+  }
+}

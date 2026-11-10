@@ -26,6 +26,9 @@ Zdarzenia: `tool.net.fetch` (host, status, bajty), `tool.net.download` (ścieżk
 - **DNS rebinding:** resolver klienta odrzuca host, gdy **którykolwiek** rozwiązany adres jest niepubliczny; połączenie idzie wyłącznie na adresy sprawdzone w tym samym rozwiązaniu (bez drugiego zapytania DNS); każde przekierowanie i każde wywołanie rozwiązuje i sprawdza od nowa.
 - **Bez proxy systemowego**, bez ciasteczek, bez nagłówków od modelu; adres wyglądający na zawierający sekret (wzorce `tools-common::text`) → odmowa (eksfiltracja przez URL).
 - **Limity:** treść `net_fetch` ≤ 2 MiB (przekroczenie = przerwanie odczytu, wynik obcięty), czas całkowity ≤ 30 s; pobieranie ≤ 200 MiB i ≤ 300 s; nagłówek `Content-Length` ponad limit = odmowa bez odczytu treści; anulowanie (kill-switch) przerywa odczyt i usuwa plik częściowy.
+  Wyszukiwanie sprawdza token ponownie po odpowiedzi dostawcy/zwolnieniu zgody i przed
+  oddaniem wyniku. Stop zgłoszony przed zwrotem dostawcy nie staje się sukcesem ani błędem I/O.
+  Anulowanie odbioru nie dowodzi, że dostawca nie otrzymał zapytania lub przerwał jego wykonanie.
 - **Treść niezaufana:** `untrusted = Web`, taint sesji zgłaszany Brokerowi, sekrety redagowane, tekst tylko dla typów tekstowych.
 - **Wyniki wyszukiwania:** granica narzędzia egzekwuje `max_results`, niezależnie od dostawcy.
   Powtórzony poprawny cel z istniejącej normalizacji `checked_target` (bez fragmentu) nie

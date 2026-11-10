@@ -47,6 +47,13 @@ pub(crate) fn checked_target(url: &str, action: &str) -> Step<lib_netguard::Targ
     Ok(target)
 }
 
+fn search_cancelled() -> Box<ToolOutcome> {
+    let mut out = ToolOutcome::cancelled("odbiór wyników wyszukiwania");
+    out.text =
+        "Anulowano odbiór wyników wyszukiwania. Zapytanie mogło już dotrzeć do dostawcy.".into();
+    Box::new(out)
+}
+
 impl Core {
     /// `net_fetch`.
     pub(crate) async fn fetch(
@@ -169,7 +176,7 @@ impl Core {
         let grant = self.egress(ctx, m, target.host(), action).await?;
         let max = a.max_results.unwrap_or(10).clamp(1, 20);
         let found = tokio::select! {
-            () = ctx.cancel.cancelled() => Err(Box::new(ToolOutcome::cancelled(action))),
+            () = ctx.cancel.cancelled() => Err(search_cancelled()),
             r = tokio::time::timeout_at(deadline, port.search(&a.query, max)) => match r {
                 Ok(Ok(hits)) => Ok(hits),
                 Ok(Err(e)) => Err(net_failure(&e, action)),
@@ -177,6 +184,9 @@ impl Core {
             },
         };
         self.release(std::slice::from_ref(&grant)).await;
+        if ctx.cancel.is_cancelled() {
+            return Err(search_cancelled());
+        }
         let hits = found?;
         report_untrusted(&self.gate, ctx, TaintSource::Web).await;
         let (out, limited) =
@@ -201,6 +211,9 @@ impl Core {
         );
         let mut o = ToolOutcome::ok(rendered, serde_json::to_value(&out).unwrap_or_default())
             .untrusted(TaintSource::Web);
+        if ctx.cancel.is_cancelled() {
+            return Err(search_cancelled());
+        }
         o.approval = grant.auth.approval;
         Ok(o)
     }

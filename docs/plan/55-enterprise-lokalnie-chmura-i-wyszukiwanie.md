@@ -1,5 +1,10 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Kandydat #60 — Stop przy odpowiedzi wyszukiwarki:** już zgłoszone anulowanie nie
+staje się sukcesem lub błędem I/O. Komunikat nie zaprzecza możliwej wysyłce zapytania.
+Lokalnie 44/0/0, Clippy/lint/format bez błędów; [raport i granice](../reviews/2026-11-10-search-cancel.md).
+Publikacja wraz z #59 po zakończeniu pełnego CI poprzedniego heada.
+
 **Kandydat #59 — deduplikacja źródeł:** powtórzony poprawny cel nie zajmuje kolejnego
 miejsca ani budżetu znaków, pierwszy oryginalny URL i kolejność są zachowane.
 Lokalnie 40/0/0 i Clippy bez ostrzeżeń; [raport i ograniczenia](../reviews/2026-11-10-search-dedup.md).
