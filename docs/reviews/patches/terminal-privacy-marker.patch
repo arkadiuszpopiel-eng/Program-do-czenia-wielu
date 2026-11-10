@@ -1,0 +1,26 @@
+diff --git a/crates/app-core/tests/computer.rs b/crates/app-core/tests/computer.rs
+index 99e52f42..41db3161 100644
+--- a/crates/app-core/tests/computer.rs
++++ b/crates/app-core/tests/computer.rs
+@@ -203,7 +203,10 @@ async fn terminal_input_only_by_command_and_never_in_events() {
+     assert!(session.alive);
+     // base64(SECRET + "\r") — bez zależności od crate'a base64 w testach.
+     let b64 = "TGlzdGEgemFrdXBvdyBtbGVrbyA0NDE3DQ==".to_owned();
+-    a.h.core.terminal_input(session.id, b64).await.unwrap();
++    a.h.core
++        .terminal_input(session.id, b64.clone())
++        .await
++        .unwrap();
+     a.h.core.terminal_resize(session.id, 120, 40).await.unwrap();
+     assert_eq!(a.h.core.terminal_list().await.unwrap().len(), 1);
+     let typed = format!("{SECRET}\r").into_bytes();
+@@ -222,7 +225,8 @@ async fn terminal_input_only_by_command_and_never_in_events() {
+         seen.extend(batch.iter().cloned());
+     }
+     let seen = serde_json::to_string(&seen).unwrap();
+-    assert!(!seen.contains("4417"), "treść terminala nie w zdarzeniach");
++    assert!(!seen.contains(SECRET), "treść terminala nie w zdarzeniach");
++    assert!(!seen.contains(&b64), "wejście base64 nie w zdarzeniach");
+     assert!(!seen.contains("PS> "));
+ }
+ 
