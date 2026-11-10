@@ -45,6 +45,7 @@ Karta delegowanego zadania (plan, kroki, wyjście, koszt), karta „czeka na zat
 
 ## Testy akceptacyjne
 - F4-01/02 (`progress_latency_within_budget`, `cancel_kills_process_tree`, kontrakt `cancel_within_budget`) — ściśle przy `ALFA_PERF_BUDGETS=1`.
+- Linux: zakończenie procesu potomnego potwierdza brak PID lub stan zombie z jednego odczytu `/proc`; błąd odczytu i uszkodzony rekord nie są dowodem zakończenia. Nie zwiększa to budżetu anulowania.
 - F4-03: 20/20 próśb → `ApprovalSink` (kontrakt `permissions_reach_sink` dla obu mostów + `twenty_of_twenty…` przez narzędzie MCP `approve`).
 - F4-04: statyczny skan źródeł (brak ścieżek poświadczeń); monitor ETW — self-hosted (do zrobienia z `platform-windows`).
 - F4-05: `disabled_route_means_zero_calls_0_of_100`; F5-04: `bridges_never_start_from_trigger_or_improver_0_of_100`.
