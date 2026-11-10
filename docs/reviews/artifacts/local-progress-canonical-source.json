@@ -1,0 +1,13 @@
+{
+  "canonical": "8116740d22f7fa45c7b38e1540a3629fed0f5d75",
+  "tested_local": "df0b02c8046cfe2a30c2b9c754be1fe9cdd6ea2f",
+  "tree": "63cec382b44cc979852214eb1e7eb8599177f492",
+  "identical_tree": true,
+  "actual_model_probe_local": "03680732336d4094ae088a8d63c14029f04062b4",
+  "intermediate406linecommit_not_in_published_ancestry": true,
+  "bundle": {
+    "file": "local-progress-probe-sources.bundle",
+    "bytes": 23752,
+    "sha256": "f8221d32cd0c724f020f934ea57b4bb167c76eb237f67acc300e13e71040a23e"
+  }
+}

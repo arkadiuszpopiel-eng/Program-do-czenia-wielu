@@ -1,0 +1,54 @@
+{
+  "kind": "history",
+  "source": {
+    "binary": "/workspace/scratch/defect-closure/jarvis-history-baseline",
+    "sha256": "846bea4c9219c72ec668e3a6065a5e1d2ac6d6bc83b3f75e87f1739632641e2f",
+    "source_commit": "77a85caa88993d06e7a81f2bfbcb2e431aabbe33",
+    "note": "Only new test fixtures, no production modifications; synthetic contradictory history",
+    "source_test_patch_sha256": "f8a87f2365d9483da7c300a694f8c6b395ca49c440727799f0fa88c8d48738b9"
+  },
+  "model_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "platform": "Linux Cloud CPU after19:33 recovery; forced LocalBrain; no GPU, microphone, Windows or external API",
+  "max_tokens": 96,
+  "temperature": 0,
+  "threads": 4,
+  "first_token_s": 60,
+  "idle_s": 30,
+  "turn_timeout_s": 120,
+  "command": [
+    "/workspace/scratch/defect-closure/jarvis-history-baseline",
+    "--ignored",
+    "--exact",
+    "recorded_history::recorded_history_facts_on_local_model",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start": "2026-11-10T20:09:50.709784+00:00",
+  "state": "completed",
+  "owned_servers": {
+    "749574": {
+      "pid": 749574,
+      "state": "R",
+      "group": 749567,
+      "birth": "18499374",
+      "comm": "llama-server"
+    }
+  },
+  "peak_rss_kib": 9760528,
+  "cleanup": [
+    {
+      "pid": 749574,
+      "signal": "SIGTERM",
+      "last_signal": "SIGKILL"
+    }
+  ],
+  "pid": 749567,
+  "group": 749567,
+  "exit": 101,
+  "elapsed_s": 268.866,
+  "end": "2026-11-10T20:14:19.576599+00:00",
+  "logs_sha256": {
+    "test.log": "756a661c1487f0605f54b6bf7e85fe3811aecc832acc0e359801e33f92ed48e2",
+    "responses.json": "be69ba7f4fb18caa7769a5afa21c89d6ee5a2cc8033afbe55190745fb4a7503a"
+  }
+}

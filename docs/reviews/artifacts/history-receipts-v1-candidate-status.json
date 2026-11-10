@@ -1,0 +1,47 @@
+{
+  "kind": "history",
+  "source": {
+    "binary": "/workspace/scratch/defect-closure/jarvis-history-candidate",
+    "sha256": "c7f741c1bd362d71be25ddff03901e66f78f1c2918b62b83e2cbe9403d914237",
+    "source_commit": "46f515bfc10fa7beaed7499b976f888d81bb9ccb plus current #58 patch",
+    "note": "Bounded branch ledger note; same30case protocol; passive first-visible-text observation added, not a request/model/timeout change"
+  },
+  "model_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "platform": "Linux Cloud CPU after19:33 recovery; forced LocalBrain; no GPU, microphone, Windows or external API",
+  "max_tokens": 96,
+  "temperature": 0,
+  "threads": 4,
+  "first_token_s": 60,
+  "idle_s": 30,
+  "turn_timeout_s": 120,
+  "command": [
+    "/workspace/scratch/defect-closure/jarvis-history-candidate",
+    "--ignored",
+    "--exact",
+    "recorded_history::recorded_history_facts_on_local_model",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start": "2026-11-10T20:43:43.619630+00:00",
+  "state": "completed",
+  "owned_servers": {
+    "759939": {
+      "pid": 759939,
+      "state": "Z",
+      "group": 759932,
+      "birth": "18702683",
+      "comm": "llama-server"
+    }
+  },
+  "peak_rss_kib": 10303140,
+  "cleanup": [],
+  "pid": 759932,
+  "group": 759932,
+  "exit": 0,
+  "elapsed_s": 1023.808,
+  "end": "2026-11-10T21:00:47.428393+00:00",
+  "logs_sha256": {
+    "test.log": "a0b41bcbd65aebc840160c0cae278f0a8b6a4345329b6b7deda529c75f97df2d",
+    "responses.json": "6f1b4ee0a08c93d1acf79907d4bf14f435deb092392e8f7fb1e2209d864ac70d"
+  }
+}

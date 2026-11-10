@@ -1,0 +1,47 @@
+{
+  "kind": "local-ping",
+  "source": {
+    "binary": "/workspace/scratch/defect-closure/77-progress-replay",
+    "sha256": "59ed764dfdbb7ade0928ba1e16dbf45b869b5f7b930fca1302a9897aee277e50",
+    "source_commit": "03680732336d4094ae088a8d63c14029f04062b4",
+    "input_sha256": "deed3427a50a9bb6dd73f5b19d4b6cb4d2d8189ae369ab605e83273ffcdadf87"
+  },
+  "model_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "platform": "Linux Cloud CPU LocalProvider replay outside Core; no GPU, microphone, Windows or external API",
+  "max_tokens": 96,
+  "temperature": 0,
+  "threads": 4,
+  "first_token_s": 60,
+  "idle_s": 30,
+  "turn_timeout_s": 120,
+  "command": [
+    "/workspace/scratch/defect-closure/77-progress-replay",
+    "--ignored",
+    "--exact",
+    "cold_and_warm_request_keep_transport_and_visible_budgets_separate",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start": "2026-11-10T21:52:54.287885+00:00",
+  "state": "completed",
+  "owned_servers": {
+    "765230": {
+      "pid": 765230,
+      "state": "Z",
+      "group": 765224,
+      "birth": "19117675",
+      "comm": "llama-server"
+    }
+  },
+  "peak_rss_kib": 9514256,
+  "cleanup": [],
+  "pid": 765224,
+  "group": 765224,
+  "exit": 101,
+  "elapsed_s": 95.664,
+  "end": "2026-11-10T21:54:29.952271+00:00",
+  "logs_sha256": {
+    "test.log": "cf44fc43b8bf10c57d4730cfd99c2245276bbc5d9c970598e8b43a28f17ca6a6",
+    "responses.json": "11c959a111ad9b6d42fdeae0adce22d4bfca31e745fa56a973b71b96381028b9"
+  }
+}

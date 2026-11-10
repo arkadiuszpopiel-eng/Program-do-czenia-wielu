@@ -1,8 +1,8 @@
 {
   "recorded_utc": "2026-11-10T20:06:29.376201+00:00",
-  "phase": "CI184_complete_and_cloud_recovered",
-  "published_base": "632e5d435016d4b7e5d5939a42a12d079c156ebf",
-  "prepared_code_head": "bf9ffe0532275f6c9cf9c169213e2f226e35fb8d",
+  "phase": "local_progress_fix_validating_and_rejected_history_candidate_archived",
+  "published_base": "46f515bfc10fa7beaed7499b976f888d81bb9ccb",
+  "prepared_code_head": "8116740d22f7fa45c7b38e1540a3629fed0f5d75",
   "code_commits": [
     {
       "local": "caf5f23b97e1dd9330859671397225a9c175663f",
@@ -40,6 +40,7 @@
     39,
     40,
     42,
+    43,
     44,
     45,
     46,
@@ -70,7 +71,7 @@
     75,
     76
   ],
-  "closed_count": 47,
+  "closed_count": 48,
   "previous_ci": {
     "head": "632e5d435016d4b7e5d5939a42a12d079c156ebf",
     "run": 42863147933,
@@ -290,7 +291,7 @@
     "rejected_prompt_not_in_application": true
   },
   "documentation": {
-    "plans_and_generated_html": "Plan55/roadmap updated; generator/check/verify103pages0problems; pnpm lint0; no production files changed.",
+    "plans_and_generated_html": "Generator/check/verify103pages0problems, lint0 aftertraitextraction; fresh docs refresh beforepublication",
     "current_report": "docs/reviews/2026-11-10-defect-closure.md",
     "final_ci_results_location": "PR24 description (updated without interrupting CI)",
     "initial_recovery_setup_errors": "Cargo absent from PATH (exit127), restored /home/agent/.cargo/bin. New docs worktree lacked marked; original error logs retained, dependency symlink then all checks passed.",
@@ -322,18 +323,18 @@
     "no_schedules_reenabled": true
   },
   "resume": [
-    "Inspect clock, local checkpoint, live processes and worktrees before any writes",
-    "Read final PR24 head/CI; local feat branch may still be632e5d43",
-    "Compare local computer.rs to blob41db316108e932c1fd6c080970722dd3374f2b4f before moving worktrees",
-    "Keep rejected persona-prefix experiment separate; baseline executable f9 contains accepted production prompt",
-    "Run outstanding Qwen facts/custom-persona tests sequentially, then update plan55/roadmap with generator"
+    "Read current time/checkpoint/worktrees/editorlease before writes",
+    "Read PR24 current head and completed CI; preserve prior46f CI185/Windows108",
+    "Do not apply rejected58V1 or cadence-onlypatches as acceptedcode",
+    "Inspect source progress fixture and retained failures; #58semantic gate remains0/30",
+    "GPU12GB,realphone,APIsearchprovider/account,microphone and fresh independent review still required"
   ],
   "commands": {
     "terminal_current": "cargo +1.94.1 test --locked -p app-core --test computer -j2 (exit UNKNOWN after Cloud loss)",
     "module_checks": "cargo +1.94.1 test --locked -p <module> --all-features -j2; cargo +1.94.1 clippy --locked -p <module> --all-targets --all-features -j2 -- -D warnings",
     "raw_commands_location": "/workspace/scratch/defect-closure; prior detailed command receipt docs/reviews/artifacts/defect-closure-validation.json"
   },
-  "validated_head": "77a85caa88993d06e7a81f2bfbcb2e431aabbe33",
+  "validated_head": "46f515bfc10fa7beaed7499b976f888d81bb9ccb",
   "CI184": {
     "run": 42884779747,
     "jobs": [
@@ -507,5 +508,83 @@
         "bytes": 103311
       }
     ]
+  },
+  "updated_at": "2026-11-10T22:14:14.515436+00:00",
+  "latest_full_ci": {
+    "source": "46f515bfc10fa7beaed7499b976f888d81bb9ccb",
+    "CI185": {
+      "run": 42892472297,
+      "jobs": "10/10 success",
+      "linux": [
+        3595,
+        0,
+        26
+      ],
+      "windows": [
+        3617,
+        0,
+        47
+      ],
+      "target_results_each": 1141,
+      "vitest": 573,
+      "chromium": [
+        315,
+        315,
+        315
+      ]
+    },
+    "Windows108": {
+      "run": 42892472263,
+      "jobs": "4/4 success",
+      "webview2": [
+        63,
+        0,
+        5
+      ]
+    },
+    "data": "ci185-complete.json"
+  },
+  "closed_cards_verified_total": 48,
+  "newly_closed_card": 43,
+  "open_cards": [
+    22,
+    31,
+    41,
+    48,
+    58,
+    68,
+    69,
+    77
+  ],
+  "local_next_source": {
+    "head": "03680732336d4094ae088a8d63c14029f04062b4",
+    "checks": [
+      159,
+      0,
+      1
+    ],
+    "clippy_exit": 0,
+    "real_model": "FAILED0/1 due coldvisible83898ms>60s;2/2responses,no transporterrors,warm414ms;source03680732",
+    "CI": "not yet run for this source; see PR24",
+    "final_source_commit": "8116740d22f7fa45c7b38e1540a3629fed0f5d75",
+    "checks_after_extraction": [
+      159,
+      0,
+      1
+    ],
+    "tested_local_snapshot": "df0b02c8046cfe2a30c2b9c754be1fe9cdd6ea2f",
+    "identical_tested_tree": "63cec382b44cc979852214eb1e7eb8599177f492"
+  },
+  "rejected_candidates": {
+    "58": "local5538f59a;30transport,0/30semantic; archivedpatch, not appcode",
+    "77_cadence_only": "localaa02af79;0responses within120s; archivedpatch, not appcode"
+  },
+  "correction": "Code101 attribution to FirstToken/unrunwarm was premature; rawdata read and report/commentary corrected beforepublication",
+  "stronger_model_next": {
+    "model": "bielik-11b-v2.3-instruct-q4-k-m",
+    "sha256": "ece698889c07d4a98a8fb7c9968ad7ad20961cf824c0b008895fe0506c87b834",
+    "state": "official pinned download in progress, not tested; future outcomes in checkpoint/PR",
+    "why": "17GiB Cloud can attempt bounded text semantic diagnostic unlike8GB WindowsCPUrunner; noGPUacceptance",
+    "not_tool_capable": true
   }
 }

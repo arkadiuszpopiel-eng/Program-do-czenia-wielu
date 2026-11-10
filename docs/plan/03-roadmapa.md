@@ -1,13 +1,17 @@
 # 03 — Roadmapa (dokument żywy)
 
-**Odbiór kodu10.11:**77a85caa ma [CI184](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42884779747)
+**Odbiór kodu10.11:**46f515bf ma [CI185](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42892472297)
 **10/10**, Linux3595/0/26, Windows3617/0/47, Chromium945, Vitest573;
-[Windows107](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42884779841) **4/4**, WebView2 63/0/5.
-Zamknięto47 zweryfikowanych kart. GłównyQwen8B:50/50 tożsamości i50/50 świeżych pytań
-bez fikcyjnych działań, w tym Luna po restarcie. #58 obejmuje odrębny brak faktów wcześniejszej
-historii i pozostaje w pracy; #77 historycznyIdleCPU nadal otwarty. Telefon/API/GPU/mikrofon
-oraz niezależny przegląd nieodebrane. [Raport i dane](../reviews/2026-11-10-defect-closure.md).
-Starsze wpisy poniżej są historią, nie aktualnym stanem odbioru.
+[Windows108](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42892472263) **4/4**, WebView2 63/0/5.
+Zamknięto48 zweryfikowanych kart, w tym rzeczywistą próbę Luny po restarcie #43.
+Główny Qwen8B:50/50 tożsamości i50/50 świeżych pytań o brak działań; szerszy #58
+nadal niezaliczony: kandydat V1 ma30/30 transportu,0/30 wierności rejestrowi i został
+odrzucony. [Dane i łatka](../reviews/2026-11-10-history-receipts.md).
+Nowy8116740d mierzy lokalne first-token/idle według postępu treści: pingi/metadane nie
+przedłużają deadline. Limity60/30s i chmura bez zmian; sama kadencja10s odrzucona.
+[Raport #77](../reviews/2026-11-10-local-progress.md); wymaga własnego CI i odbioru.
+Otwarte #22/#31/#41/#48/#58/#68/#69/#77, GPU12GB/API/mikrofon/telefon i niezależny przegląd.
+[Pełny raport i zachowane porażki](../reviews/2026-11-10-defect-closure.md).
 
 **Domykanie usterek10.11:** #64 deadline68/0/0, #73 jawna odmowa135/0/0, #75 pomiar
 zakończenia procesu59/0/1 i20/20 anulowań ×3 mosty-atrapy przy2s; Clippy0. Baza574b3391

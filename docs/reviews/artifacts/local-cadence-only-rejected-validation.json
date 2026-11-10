@@ -1,0 +1,114 @@
+{
+  "source_commit": "aa02af79a3aab0be9cb39eb2b189d06b598a91f5",
+  "checks": [
+    {
+      "label": "77-red-initial",
+      "exit": 0,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "log_sha256": "f4eff2b833e6a025b462c7761607bb33d558b055b11851754ce141ee509548d8",
+      "note": "first command used abbreviated exact filter,0 tests; not RED or pass evidence"
+    },
+    {
+      "label": "77-red",
+      "exit": 101,
+      "counts": [
+        0,
+        1,
+        0
+      ],
+      "log_sha256": "3c8032c1f6559c5a4efbf72be76ed833dcc69f39c41bf387b06a04146b7435d3",
+      "note": ""
+    },
+    {
+      "label": "77-green",
+      "exit": 0,
+      "counts": [
+        81,
+        0,
+        0
+      ],
+      "log_sha256": "8593ce44e19dca62b379cd6fb43ffec12d95b27766a844a4f11eddf65ea4cf25",
+      "note": ""
+    },
+    {
+      "label": "77-final-test",
+      "exit": 0,
+      "counts": [
+        81,
+        0,
+        1
+      ],
+      "log_sha256": "b5c35daa6ff27b64de815a48ebaa432457b4d912292e90315cf60c5eb4718012",
+      "note": ""
+    },
+    {
+      "label": "77-clippy",
+      "exit": 0,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "log_sha256": "62ff81002ce7d9e1d2081297d2318b59e6ff841a1681d21db97abc24cfc39245",
+      "note": ""
+    }
+  ],
+  "real_replay": {
+    "kind": "local-ping",
+    "source": {
+      "binary": "/workspace/scratch/defect-closure/77-local-ping-replay",
+      "sha256": "acc1a00fabfad8c5cc96666e9d60552dda5d4185eee4b165e37a6c1ed25db1bf",
+      "source_commit": "aa02af79a3aab0be9cb39eb2b189d06b598a91f5",
+      "input_sha256": "deed3427a50a9bb6dd73f5b19d4b6cb4d2d8189ae369ab605e83273ffcdadf87"
+    },
+    "model_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+    "platform": "Linux Cloud CPU LocalProvider replay outside Core; no GPU, microphone, Windows or external API",
+    "max_tokens": 96,
+    "temperature": 0,
+    "threads": 4,
+    "first_token_s": 60,
+    "idle_s": 30,
+    "turn_timeout_s": 120,
+    "command": [
+      "/workspace/scratch/defect-closure/77-local-ping-replay",
+      "--ignored",
+      "--exact",
+      "cold_and_warm_request_keep_transport_and_visible_budgets_separate",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "start": "2026-11-10T21:34:58.668819+00:00",
+    "state": "completed",
+    "owned_servers": {
+      "762582": {
+        "pid": 762582,
+        "state": "Z",
+        "group": 762576,
+        "birth": "19010113",
+        "comm": "llama-server"
+      }
+    },
+    "peak_rss_kib": 9513548,
+    "cleanup": [],
+    "pid": 762576,
+    "group": 762576,
+    "exit": 101,
+    "elapsed_s": 131.333,
+    "end": "2026-11-10T21:37:10.004869+00:00",
+    "logs_sha256": {
+      "test.log": "eb38275cdd525e0c958ad57533a63b43f5ff9d027ac87594ce91697e016a2bed",
+      "responses.json": "10607d412fe875d3c5e8c896ab7d4b5aff135fe12a8260a7f34f75e690eaebc9"
+    }
+  },
+  "limits_unchanged": {
+    "first_event_s": 60,
+    "idle_s": 30,
+    "turn_s": 120
+  },
+  "server_ping_s": 10,
+  "semantic_acceptance": false
+}
