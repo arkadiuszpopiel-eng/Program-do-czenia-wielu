@@ -1,0 +1,169 @@
+{
+  "code_commit": "54dfabf7266b31855e91670653dac08201cc3835",
+  "base": "bb13c48d75c8a909c102678917f314508d63ee13",
+  "published": false,
+  "tests": {
+    "passed": 91,
+    "failed": 0,
+    "ignored": 1,
+    "targets": 17
+  },
+  "checks": [
+    {
+      "label": "fmt",
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-11-10T23:31:27.198080+00:00",
+      "end": "2026-11-10T23:31:36.467962+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/79-offload-final-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "test",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "providers-local-impl",
+        "--all-features",
+        "-j2"
+      ],
+      "start": "2026-11-10T23:31:36.468824+00:00",
+      "end": "2026-11-10T23:31:45.816900+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/79-offload-final-test.log",
+      "sha256": "b4b8c88f771a6913d96a0869ec0847d45afb706c766fd95b20be1c234e652aa1"
+    },
+    {
+      "label": "clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "providers-local-impl",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start": "2026-11-10T23:31:45.818908+00:00",
+      "end": "2026-11-10T23:31:58.361029+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/79-offload-final-clippy.log",
+      "sha256": "0d87c5949fe54c778179a7ddaddb8ac1bc928829ca5f5459b69c9f56209e30db"
+    },
+    {
+      "label": "lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "start": "2026-11-10T23:31:58.362716+00:00",
+      "end": "2026-11-10T23:31:59.160454+00:00",
+      "exit": 1,
+      "log": "/workspace/scratch/defect-closure/79-offload-final-lint.log",
+      "sha256": "98d79c039d2d7e98c7c3b8c2c126cb7b16c92ddca7aac26383f45172a12a597f"
+    }
+  ],
+  "lint_with_installed_dependencies": {
+    "command": [
+      "pnpm",
+      "lint"
+    ],
+    "start": "2026-11-10T23:32:23.909820+00:00",
+    "end": "2026-11-10T23:33:07.457371+00:00",
+    "exit": 0,
+    "log": "/workspace/scratch/defect-closure/79-offload-lint-deps-restored.log",
+    "sha256": "0c80624d5ff570dba63730e374fe074798a274d4248479a4ad587bb726cb24f9",
+    "environment_fix": "share already pinned installed node_modules; no lockfile/package change"
+  },
+  "red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "providers-local-impl",
+      "--test",
+      "full_offload",
+      "-j2"
+    ],
+    "start": "2026-11-10T23:29:48.442154+00:00",
+    "end": "2026-11-10T23:30:04.083499+00:00",
+    "exit": 101,
+    "log_sha256": "6a35e9fa4b43f131ec33372e83247e38fe31d01594d2a9258ff33bd5e1662e5d"
+  },
+  "first_full_run": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "providers-local-impl",
+      "--all-features",
+      "-j2"
+    ],
+    "start": "2026-11-10T23:30:44.387076+00:00",
+    "end": "2026-11-10T23:31:05.967849+00:00",
+    "exit": 101,
+    "log_sha256": "b5ba418a6ac6ebaff5400c3ec88fc440341147ee8c18dffeeb6fffd457d9ef63"
+  },
+  "source_contract": {
+    "source": "https://github.com/ggml-org/llama.cpp/blob/b11559/src/llama-model.cpp",
+    "scope": "source contract, no GPU measurement",
+    "excerpts": [
+      {
+        "from": 1649,
+        "lines": [
+          "    const int i_gpu_start = std::max(n_layer_all + 1 - n_gpu_layers, 0);",
+          "    const int act_gpu_layers = devices.empty() ? 0 : std::min(n_gpu_layers, n_layer_all + 1);",
+          "    auto get_layer_buft_list = [&](int il) -> llama_model::impl::layer_dev {",
+          "        const bool is_swa = il < n_layer_all && hparams.is_swa(il);",
+          "        if (il < i_gpu_start || (il - i_gpu_start) >= act_gpu_layers) {",
+          "            LLAMA_LOG_DEBUG(\"load_tensors: layer %3d assigned to device %s, is_swa = %d\\n\", il, ggml_backend_dev_name(cpu_dev), is_swa);",
+          "            return {cpu_dev, &pimpl->cpu_buft_list};",
+          "        }",
+          "        const int layer_gpu = std::upper_bound(splits.begin(), splits.begin() + n_devices(), float(il - i_gpu_start)/act_gpu_layers) - splits.begin();",
+          "        auto * dev = devices.at(layer_gpu).dev;",
+          "        LLAMA_LOG_DEBUG(\"load_tensors: layer %3d assigned to device %s, is_swa = %d\\n\", il, ggml_backend_dev_name(dev), is_swa);",
+          "        return {dev, &pimpl->gpu_buft_list.at(dev)};",
+          "    };"
+        ]
+      },
+      {
+        "from": 2399,
+        "lines": [
+          "uint32_t llama_model::n_gpu_layers() const {",
+          "    // note: plus 1 for the \"output\" layer",
+          "    return params.n_gpu_layers >= 0 ? params.n_gpu_layers : hparams.n_layer_all + 1;",
+          "}"
+        ]
+      }
+    ]
+  },
+  "files": {
+    "crates/providers-local-impl/src/config.rs": "163eddca5d3d0c9f9372c712e2eb08ec3a3b9da0aaaf577aeafa23d68f2dad0f",
+    "crates/providers-local-impl/tests/full_offload.rs": "055aefc10771224874d0df435266b7e239fdfb2c4764840c61efe204fe93e3d7",
+    "crates/providers-local-impl/tests/lifecycle.rs": "6b7dc201f22b3fbe752d0a106c87603e4e20fb175be9240e3f4955568bd2ac6a",
+    "crates/providers-local-impl/README.md": "3445a6741c66684d95bf9980550b1544a60a75f2347885c62b151ba2daa5d8fe",
+    "docs/modules/providers-local/SPEC.md": "333d9f4a8971282308baddf73126b05a8bd5fa87539abacdc036304b4fbc424d",
+    "docs/vendor/llama-cpp.md": "083b4614dcb2ee68d012fcf83e7258dfd2f0629bb2249b03047421a2930212b0"
+  },
+  "hardware_acceptance": "NOT_RUN_NO_GPU",
+  "context_or_vram_threshold_changes": false
+}

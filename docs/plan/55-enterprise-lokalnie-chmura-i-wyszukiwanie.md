@@ -1,16 +1,20 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
-**Odbiór kodu10.11:**b85c5371 ma [CI186](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970574)
-**10/10**, Linux3600/0/27, Windows3622/0/48, Chromium945, Vitest573;
-[Windows109](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970490) **4/4**, WebView2 63/0/5.
-Zamknięto49 zweryfikowanych kart, w tym wąską próbę imion/zwięzłości głównego8B #31 i Lunę #43.
-#58 nadal niezaliczony: kandydat V1 ma30/30 transportu,0/30 wierności rejestrowi i został
-odrzucony. [Dane i łatka](../reviews/2026-11-10-history-receipts.md).
-Nowy69e33656 chroni generację długich argumentów przed buforującą kopertą; lokalne
-163/0/1,Clippy/fmt/lint0. [Raport #77](../reviews/2026-11-10-tool-envelope-progress.md); wymaga własnego CI.
-Bielik11B:zgodnySHA256, lecz surowa próbaCPU0odpowiedzi/1timeout/2niewykonane; jakośćNOT_EVALUATED.
-[Dane](../reviews/2026-11-10-bielik11b-cpu.md). Nowszy9B jest dopiero kandydatem do osobnej próby.
-Otwarte #22/#41/#48/#58/#68/#69/#77/#78 oraz GPU12GB/API/mikrofon/telefon i niezależny przegląd.
+**Stan testów z 10.11:** bb13c48d (kod69e33656) ma [CI187](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565989)
+**10/10**, Linux3604/0/27, Windows3626/0/48, po1145celów; Chromium945, Vitest573;
+[Windows110](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565976) **4/4**, WebView2 63/0/5.
+[Pełne dane](../reviews/artifacts/ci187-complete.json). Nie przerwano poprzedniego CI kolejną publikacją.
+Zamknięto49 zweryfikowanych kart. Nowy kod54dfabf7 poprawia pełne odciążenieGPU: dodatkowy
+poziom wyjściowy llama.cpp, bez zwiększenia budżetów. Lokalne91/0/1,Clippy/fmt/lint0;
+[raport #79](../reviews/2026-11-10-full-gpu-offload.md). Następny head wymaga własnegoCI.
+#58 pozostaje niezaliczony: V1 Qwen8B ma30/30 transportu i0/30 wierności rejestrowi, odrzucony.
+Nowy Qwen3.5-9B mimo zgodnego SHA ma2/3 zgodności z licznikami w każdej z dwóch diagnoz; Done1 nadal pominięte,
+dodatkowe niepoparte przyczyny i widoczny tekst65601>60000ms w drugim wariancie.
+[Pełne wyniki9B](../reviews/2026-11-10-qwen35-9b-cpu.md); nie zmieniono modelu domyślnego lub promptu.
+Bielik11B:0 odpowiedzi/1 timeout/2 niewykonane na CPU; jakość NOT_EVALUATED.
+[Dane11B](../reviews/2026-11-10-bielik11b-cpu.md). [Naprawiony zegar narzędzi #77](../reviews/2026-11-10-tool-envelope-progress.md)
+ma pełneCI187; odbiór zimnego i ciepłego startu na GPU12GB nadal niewykonany.
+Otwarte #22/#41/#48/#58/#68/#69/#77/#78 oraz nowy #79 do zakończenia CI; wymaganeGPU/API/mikrofon/telefon i niezależny przegląd.
 [Pełny raport i zachowane porażki](../reviews/2026-11-10-defect-closure.md).
 
 **Domykanie usterek10.11:** #64 deadline68/0/0, #73 jawna odmowa135/0/0, #75 pomiar

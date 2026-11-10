@@ -1,8 +1,8 @@
 {
   "recorded_utc": "2026-11-10T20:06:29.376201+00:00",
-  "phase": "local_progress_fix_validating_and_rejected_history_candidate_archived",
-  "published_base": "46f515bfc10fa7beaed7499b976f888d81bb9ccb",
-  "prepared_code_head": "69e336560ad0d6eade8a98fc3b30269fecb1dbf9",
+  "phase": "next_full_gpu_fix_prepared_after_completeCI187",
+  "published_base": "bb13c48d75c8a909c102678917f314508d63ee13",
+  "prepared_code_head": "54dfabf7266b31855e91670653dac08201cc3835",
   "code_commits": [
     {
       "local": "caf5f23b97e1dd9330859671397225a9c175663f",
@@ -335,7 +335,7 @@
     "module_checks": "cargo +1.94.1 test --locked -p <module> --all-features -j2; cargo +1.94.1 clippy --locked -p <module> --all-targets --all-features -j2 -- -D warnings",
     "raw_commands_location": "/workspace/scratch/defect-closure; prior detailed command receipt docs/reviews/artifacts/defect-closure-validation.json"
   },
-  "validated_head": "b85c53715558cf870b786b427e8f32a1ed5f5bd4",
+  "validated_head": "bb13c48d75c8a909c102678917f314508d63ee13",
   "CI184": {
     "run": 42884779747,
     "jobs": [
@@ -510,50 +510,51 @@
       }
     ]
   },
-  "updated_at": "2026-11-10T23:11:43.972490+00:00",
+  "updated_at": "2026-11-10T23:52:31.463826+00:00",
   "latest_full_ci": {
-    "head": "b85c53715558cf870b786b427e8f32a1ed5f5bd4",
-    "recorded_utc": "2026-11-10T23:06:30.272201+00:00",
+    "head": "bb13c48d75c8a909c102678917f314508d63ee13",
+    "code_commit": "69e336560ad0d6eade8a98fc3b30269fecb1dbf9",
+    "recorded_utc": "2026-11-10T23:51:36.040478+00:00",
     "complete": true,
     "runs": [
       {
-        "id": 42912970490,
+        "id": 42921565976,
         "name": "Próba generalna (Windows)",
         "status": "completed",
         "conclusion": "success",
-        "run_number": 109,
-        "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970490/jobs",
-        "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970490/logs",
+        "run_number": 110,
+        "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565976/jobs",
+        "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565976/logs",
         "workflow_id": 376724312
       },
       {
-        "id": 42912970574,
+        "id": 42921565989,
         "name": "CI",
         "status": "completed",
         "conclusion": "success",
-        "run_number": 186,
-        "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970574/jobs",
-        "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970574/logs",
+        "run_number": 187,
+        "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565989/jobs",
+        "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565989/logs",
         "workflow_id": 371319063
       }
     ],
-    "CI186": {
-      "run": 42912970574,
+    "CI187": {
+      "run": 42921565989,
       "jobs": [
         10,
         0
       ],
       "linux": [
-        3600,
+        3604,
         0,
         27
       ],
       "windows": [
-        3622,
+        3626,
         0,
         48
       ],
-      "targets_each": 1143,
+      "targets_each": 1145,
       "vitest": 573,
       "vitest_files": 103,
       "chromium": [
@@ -565,10 +566,10 @@
         5,
         4
       ],
-      "fmt_clippy_deny_schema_docs": "success"
+      "fmt_clippy_deny_schema_graph_docs": "success"
     },
-    "Windows109": {
-      "run": 42912970490,
+    "Windows110": {
+      "run": 42921565976,
       "jobs": [
         4,
         0
@@ -579,116 +580,39 @@
         5
       ],
       "qwen8b_cpu": {
-        "first_token_ms": 15272,
-        "total_ms": 28100,
+        "first_token_ms": 20753,
+        "total_ms": 34854,
         "tokens": 96,
-        "tok_per_s": 7.48
+        "tok_per_s": 6.81
       },
       "bielik45_cpu": {
-        "first_token_ms": 12071,
-        "total_ms": 25754,
-        "tokens": 82,
-        "tok_per_s": 5.99
+        "first_token_ms": 16288,
+        "total_ms": 36838,
+        "tokens": 96,
+        "tok_per_s": 4.67
       },
       "bielik11b": "NOT_RUN_CPU_BUDGET0tokens",
-      "piper_ttfb_ms": 849,
+      "piper_ttfb_ms": 1039,
+      "piper_audio_ms": 2162,
+      "piper_rtf": 0.481,
       "stt_fixture_wer": 0,
-      "stt_ms": 40423,
-      "hardware_gpu_or_real_microphone_test": false
+      "stt_ms": 55235,
+      "stt_rtf": 25.55,
+      "hardware_acceptance": "no GPU/microphone/phone; recordedfixtureCPUonly; tool_calledproposal isnotexecutedaction"
     },
     "logs": {
-      "ci186-job-130169200566.log": {
-        "bytes": 92556,
-        "sha256": "a0821220ef61e40f255e47610e32bba4aa0ad3a10c2c5bac5f306bc2f9a5737e",
-        "targets": 0,
-        "counts": [
-          0,
-          0,
-          0
-        ]
-      },
-      "ci186-job-130168084102.log": {
-        "bytes": 895670,
-        "sha256": "6b5d909959aeefa8c432c3de72372a941f0578a13f8e271364bcdb77fbb64428",
-        "targets": 1143,
-        "counts": [
-          3600,
-          0,
-          27
-        ]
-      },
-      "ci186-job-130168084429.log": {
-        "bytes": 893512,
-        "sha256": "88451287db694a4f5848d0323940dbd96fff5e6ac0ff6702583a69bbaffa2102",
-        "targets": 1143,
-        "counts": [
-          3622,
-          0,
-          48
-        ]
-      },
-      "ci186-job-130169200723.log": {
-        "bytes": 91888,
-        "sha256": "29688eadcdef44d25deb8b8d7f95e345b035f8b34a4db2d40f66fcf84fbe6cdf",
-        "targets": 0,
-        "counts": [
-          0,
-          0,
-          0
-        ]
-      },
-      "ci186-job-130168083407.log": {
-        "bytes": 102138,
-        "sha256": "6e6eef6d417256ff33eda90de4164b166329732e1192c7d2c375fe37f9f6ad13",
-        "targets": 1,
-        "counts": [
-          1,
-          0,
-          0
-        ]
-      },
-      "ci186-job-130169200753.log": {
-        "bytes": 92962,
-        "sha256": "461d7a7a504c2c53a7d3521b4bd27d395293b662fc21a772d4fdeeac7f125a9a",
-        "targets": 0,
-        "counts": [
-          0,
-          0,
-          0
-        ]
-      },
-      "ci186-job-130168084358.log": {
-        "bytes": 142440,
-        "sha256": "93b425cbddf98fff5651ee6a7cf0ba90f619d37622ab26323cdb1600d822601f",
-        "targets": 0,
-        "counts": [
-          0,
-          0,
-          0
-        ]
-      },
-      "ci186-job-130168084458.log": {
-        "bytes": 127759,
-        "sha256": "eee716e08d86703f1a03fb8bb25e3e053f236ec42bc509a7641ad23c87ee12b3",
-        "targets": 2,
-        "counts": [
-          9,
-          0,
-          0
-        ]
-      },
-      "ci186-job-130168083007.log": {
-        "bytes": 118267,
-        "sha256": "67d0f26cc3084d2d97eea4a8ad29c2d19cbf51e04240976bf70a32d95638b33c",
-        "targets": 0,
-        "counts": [
-          0,
-          0,
-          0
-        ]
-      }
+      "ci187-job-130197433361.log": "c02f6f2ba30d296e53062c126ed8ee5fea25365e16d2d44ddca0373fd847ad2e",
+      "ci187-job-130197433736.log": "8258d8713566340a138fb0167230d57d00b8af9dfbc99bee7566a956fe72f9e9",
+      "ci187-job-130197433770.log": "67d5aed2f663ba398ddb2dd194a74bb27c1cd7122f90d11ce3f685e390d012e6",
+      "ci187-job-130197433804.log": "6a3786fbf66e9d644d5e37831c198f4be3763ea098c9f225bb1221af2656816b",
+      "ci187-job-130197433823.log": "90402a734c031526528b1f7db0f84673075873e7ab0496005a82feb1d95353fd",
+      "ci187-job-130197434078.log": "c3d62cda813a272d0e4dd332696a45aed3b036b8c7c305ca842b293ed815593b",
+      "ci187-job-130198280713.log": "7d54b82e58feba20d151a108c667db114d6ee4c78a8c23a885a1d3fb375d2b6a",
+      "ci187-job-130198280763.log": "5bbdcf89abb14ae98fbde567ab6a8bd498f8459ca02fcfc5acc1a8893cd25b01",
+      "ci187-job-130198280769.log": "2435a339b48ea47fcb200701ec69ecae33c037d29b128a3c96c28a3dd8b9bf42"
     },
-    "log_format": "GitHub decoded UTF8; CRLFnormalizedLF, notarchivebytes"
+    "log_format": "decodedUTF8 CRLF→LF, not ZIP bytes; metadataall14jobscomplete savedseparately",
+    "CI_cancelled": false
   },
   "closed_cards_verified_total": 49,
   "newly_closed_card": 43,
@@ -700,18 +624,16 @@
     68,
     69,
     77,
-    78
+    78,
+    79
   ],
   "local_next_source": {
-    "head": "69e336560ad0d6eade8a98fc3b30269fecb1dbf9",
-    "checks": [
-      163,
-      0,
-      1
-    ],
-    "clippy_fmt_lint_exit": 0,
-    "data": "local-tool-envelope-progress-validation.json",
-    "CI": "pending publication; not CI186 ofparentb85"
+    "code": "54dfabf7266b31855e91670653dac08201cc3835",
+    "issue": 79,
+    "tests": "91/0/1",
+    "clippy_fmt_lint": "0",
+    "published_at_snapshot": false,
+    "next_ci": "not_started_at_snapshot"
   },
   "rejected_candidates": {
     "58": "local5538f59a;30transport,0/30semantic; archivedpatch, not appcode",
@@ -739,5 +661,13 @@
     },
     "independent_review": "not yet completed; no merge"
   },
-  "current_local_preparation": "validated second progresscode + zero-context source-identicalpatchformat +11Breport; CI186 complete, ready normalFFpublication"
+  "current_local_preparation": "validated second progresscode + zero-context source-identicalpatchformat +11Breport; CI186 complete, ready normalFFpublication",
+  "qwen35_research": {
+    "first": "3transport,2/3ledger,2unsupportedcauses",
+    "temporal": "3transport,2/3ledger,1unsupportedcause,visible65601>60000",
+    "accepted": false,
+    "full30Core": "NOT_RUN",
+    "report": "2026-11-10-qwen35-9b-cpu.md"
+  },
+  "fully_resolved": false
 }

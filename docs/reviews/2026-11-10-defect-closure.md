@@ -1,6 +1,8 @@
 # Domykanie usterek — raport i dowody, 10.11.2026
 
-Ostatni pełny odbiór: b85c5371 ma CI186 **10/10** i Windows109 **4/4**. Nowy69e33656 rozwija8116740d: zegar generacji widzi niepuste delty przed buforującą kopertą, a TTFT/after_output nadal wymagają zdekodowanego wyjścia. Pingi/metadane nie zmieniają deadline. Limity60/30s i zachowanie chmury bez zmian. [Raport #77](2026-11-10-tool-envelope-progress.md). Wynik następnego heada jest dopisywany w [PR24](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/pull/24). Nie jest to deklaracja ukończonej jakości Enterprise ani odbioru sprzętowego.
+Ostatni pełny odbiór: **bb13c48d**, kod69e33656, CI187 **10/10** i Windows110 **4/4**. Zegar generacji widzi niepuste delty przed buforującą kopertą, a TTFT/after_output nadal wymagają zdekodowanego wyjścia. Pingi/metadane nie zmieniają deadline. Limity60/30s i zachowanie chmury bez zmian. [Raport #77](2026-11-10-tool-envelope-progress.md).
+
+Następny54dfabf7 usuwa rozbieżność pełnego odciążenia z przypiętym llama.cpp; lokalnie91/0/1,Clippy/fmt/lint0. [Raport #79](2026-11-10-full-gpu-offload.md). Wymaga własnegoCI; nie jest to pomiar GPU. Nowy9B nie usunął #58 i nie został przyjęty: [pełne dane](2026-11-10-qwen35-9b-cpu.md). Wynik następnego heada jest dopisywany w [PR24](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/pull/24). Nie jest to deklaracja ukończonej jakości Enterprise lub odbioru sprzętowego.
 
 ## Naprawione zakresy kodu
 
@@ -18,9 +20,12 @@ Pierwszy fixture #73 używał błędnego pola text zamiast content (0/3); błąd
 
 ## Pełne CI i zachowane porażki
 
+[CI187](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565989) na bb13c48d: **10/10**, Linux **3604/0/27**, Windows **3626/0/48**, po1145 wyników celów. Vitest573, Chromium315+315+315=945, Tauri5+4,Clippy/fmt/deny/schematy/graf/docs sukces.
+[Windows110](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565976): **4/4**, WebView2 **63/0/5**. CPUQwen8B:20753ms pierwszy token,34854ms/96tokenów/6,81tok/s;4.5B:16288ms/36838ms/96tokenów/4,67tok/s;11B NOT_RUN_CPU_BUDGET. PiperTTFB1039ms, STT z nagrania WER0/55235ms. To nie mikrofon/GPU. [Wyniki i hashe](artifacts/ci187-complete.json). Pełny przebieg zakończył się przed publikacją następnej poprawki.
+
 [CI186](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970574) na b85c5371: **10/10**, Linux **3600/0/27**, Windows **3622/0/48**, po1143 wyników celów; Vitest **573**, Chromium **945**, Tauri **5+4**, Clippy/fmt/deny/schematy/graf/docs sukces.
 [Windows109](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970490): **4/4**, WebView2 **63/0/5**. Qwen8B CPU:15272ms pierwszy token,28100ms/96tokenów/7,48tok/s. Bielik4.5B:12071ms/25754ms/82tokeny/5,99tok/s;11B NOT_RUN_CPU_BUDGET. PiperTTFB849ms, nagranieSTT WER0/40423ms. [Wyniki i hashe](artifacts/ci186-complete.json).
-Następny69e33656 ma lokalnie163/0/1,Clippy/fmt/lint0 i wymaga własnego CI.
+Kod69e33656 ma lokalnie163/0/1,Clippy/fmt/lint0 i powyższy pełnyCI187.
 
 [CI185](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42892472297) na46f515bf: **10/10**, Linux **3595/0/26**, Windows **3617/0/47**, po1141 wyników celów, Vitest **573**, Chromium **315+315+315=945**. Tauri **5+4**, Clippy/format/deny/schematy/graf/docs zielone.
 [Windows108](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42892472263): **4/4**, WebView2 **63/0/5**; Qwen8B CPU **11738ms** pierwszy token, **25387ms/96tokenów/7,03tok/s**. Bielik4.5B CPU12089ms/24041ms/71tokenów/5,94tok/s;11B **NOT_RUN_CPU_BUDGET**,0tokenów. PiperTTFB838ms; nagranie STT WER0,40672ms. To fixture audio, nie prawdziwy mikrofon. [Wyniki i SHA256 zdekodowanych logów](artifacts/ci185-complete.json); logi są kopią UTF8 z normalizacją CRLF→LF, nie bajtami archiwum ZIP.
@@ -87,3 +92,8 @@ Sprawdzone lokalne commity odzyskano z bundle7bf2069f…; zweryfikowano checksum
 [Komendy i dane](artifacts/defect-closure-final-state.json) · [Zdekodowana kopia22 odpowiedzi niezaliczonej próby](artifacts/core-qwen-initial-22.json) · [Bundle źródeł do odtworzenia](artifacts/defect-closure-candidates.bundle). Bundle zawiera również odrzuconą gałąź eksperymentu, której nie włączono do aplikacji.
 [Kontrola40](artifacts/core-qwen-control-40.json) · [Fakty40](artifacts/core-qwen-facts-40.json) · [Luna10 tożsamość](artifacts/core-qwen-luna-identity-10.json) · [Luna10 fakty](artifacts/core-qwen-luna-facts-10.json). Osobne pliki -review i -status zawierają ocenę i czasy/hashe.
 Surowe logi lokalne pozostają w `/workspace/scratch/defect-closure/` ze wskazanymi SHA256. Checkpoint odnowiono po odzyskaniu Cloud; lokalny feat doprowadzono fast-forward do77a85caa. Odrzucony #58 zachowano lokalnie w osobnym worktree i w opublikowanej łatce; nie włączono do aplikacji. Kandydat samej kadencji #77 został odrzucony; nie ma flagi ping10 w produkcji. Przyjęty lokalnie8116740d wybiera limity według postępu treści, z domyślną dotychczasową semantyką adapterów chmurowych; bez zmiany polityk/promptu. Wymaga własnego CI.
+
+## Nowy przyrost i zakończona diagnoza9B
+
+#79: lokalny54dfabf7 poprawia pełne odciążenieGPU; [91/0/1 i dane](2026-11-10-full-gpu-offload.md). Karta oczekuje własnegoCI nowego heada.
+Qwen3.5-9B: pełnySHA zgodny, formatmiddleSystem odrzuconyHTTP500,2niewykonane. Po prawidłowym scaleniu3transporty,2/3liczników,2niepoparteprzyczyny. Jedna zadeklarowana hipoteza niezależności historii od aktualnego projektu nadal2/3,1niepopartaprzyczyna i pierwszytekst65601>60000ms. **Odrzucono oba warianty**, bez zmiany promptu/modeludomyślnego, pełne30CoreNOT_RUN. [Dokładne teksty, czasy i ograniczenia](2026-11-10-qwen35-9b-cpu.md).
