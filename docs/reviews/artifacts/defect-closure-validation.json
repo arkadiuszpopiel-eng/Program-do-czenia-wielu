@@ -1,0 +1,219 @@
+{
+  "source_base": "574b3391c605729aff55006c4c9f8a97e50330d9",
+  "source_integration_head": "f4d27ecdc2a7d2577bc822be65aaba29a6a9a4fb",
+  "checks": {
+    "64": [
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "--locked",
+          "-p",
+          "tools-net-contract",
+          "-p",
+          "tools-net-impl",
+          "-p",
+          "tools-net-fake",
+          "--all-features",
+          "-j2"
+        ],
+        "exit": 0,
+        "start": "2026-11-10T16:40:43.910812+00:00",
+        "end": "2026-11-10T16:40:52.107586+00:00",
+        "sha256": "3b1cbbe472ae15d0011649e0f9b72fc8b8cc4ba0b3e29be64fe0636aa1c0eceb"
+      },
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "clippy",
+          "--locked",
+          "-p",
+          "tools-net-contract",
+          "-p",
+          "tools-net-impl",
+          "-p",
+          "tools-net-fake",
+          "--all-targets",
+          "--all-features",
+          "-j2",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit": 0,
+        "start": "2026-11-10T16:40:52.114064+00:00",
+        "end": "2026-11-10T16:41:07.235075+00:00",
+        "sha256": "73d7079fa16deabc08815b2f42a91dd9ca0c471ff8c51120fc0cd28f537f0bde"
+      }
+    ],
+    "73": [
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "--locked",
+          "-p",
+          "agent-runtime-contract",
+          "-p",
+          "agent-runtime-impl",
+          "-p",
+          "agent-runtime-fake",
+          "--all-features",
+          "-j2"
+        ],
+        "exit": 0,
+        "start": "2026-11-10T16:49:09.454699+00:00",
+        "end": "2026-11-10T16:49:38.113835+00:00",
+        "sha256": "c026e7153b8dfa72eece7674e7d5d98c30f543f564add2f9e2617f18788ba902"
+      },
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "clippy",
+          "--locked",
+          "-p",
+          "agent-runtime-contract",
+          "-p",
+          "agent-runtime-impl",
+          "-p",
+          "agent-runtime-fake",
+          "--all-targets",
+          "--all-features",
+          "-j2",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit": 0,
+        "start": "2026-11-10T16:49:38.114458+00:00",
+        "end": "2026-11-10T16:50:19.350472+00:00",
+        "sha256": "c65fc0628ad3279ca9686b41055851d0bdea0cf308faa51fc94af77669b6ec0c"
+      }
+    ],
+    "75": {
+      "counts": {
+        "passed": 59,
+        "failed": 0,
+        "ignored": 1
+      },
+      "targets": 13,
+      "files": {
+        "75-clippy.log": "7d709ac97059c5426eb450ffce0d49b92ae6a52f1619485d0d062213992a624c",
+        "75-stress.log": "073490f05065e4d61a4ceedb3cae38a9ae6b0eb3baa832c1ca6d635575cb54bc",
+        "75-red.log": "34d17f7feda59a765325997da49d456be1b664d43d3f4e42b1da56d75dc6635b",
+        "75-green.log": "da573b5ea44bafc3dd44bc108aa70574b553e0ae69c502525fa4d1948a84d1c8"
+      }
+    }
+  },
+  "previous_ci": {
+    "head": "574b3391c605729aff55006c4c9f8a97e50330d9",
+    "ci": {
+      "run": 42854928717,
+      "number": 182,
+      "jobs_passed": 9,
+      "jobs_failed": 1,
+      "linux": {
+        "passed": 3580,
+        "failed": 1,
+        "ignored": 26,
+        "targets": 1138
+      },
+      "windows": {
+        "passed": 3607,
+        "failed": 0,
+        "ignored": 47,
+        "targets": 1138
+      },
+      "vitest": 573,
+      "chromium": [
+        315,
+        315,
+        315
+      ]
+    },
+    "windows_rehearsal": {
+      "run": 42854928523,
+      "number": 105,
+      "jobs_passed": 4,
+      "webview": {
+        "passed": 63,
+        "failed": 0,
+        "skipped": 5
+      },
+      "qwen_cpu": {
+        "output_tokens": 96,
+        "first_token_ms": 15346,
+        "total_ms": 28368,
+        "tok_per_s": 7.37,
+        "tool_proposal_ms": 18518
+      },
+      "bielik_11b": "NOT_RUN_CPU_BUDGET RAM8192MB VRAM0MB"
+    },
+    "log_sha256": {
+      "job-129966372949.log": "bc47706556ea03588fdb2ed9dbf5a5319c1019c5c41afc928a45ebee5ca1aa11",
+      "ci182-windows.log": "2b5d4e853572c190a5e98244dee3ce454908cac585eb9571645adf2257a7364b",
+      "job-129965251652.log": "5722416eeb301efb81d03091cc7062580f0cac9651573541fcecb0ec48285eec",
+      "ci182-linux.log": "81c3a3f039f44bb017ce37da47a2d305df907972b2fdbe7e7a35fcef17c6cb65",
+      "job-129966373079.log": "08233bb9f30040f73e2e58731475d8c56485083a1714f326df4dbfa427a5355b",
+      "job-129965253035.log": "af93cf753c86582885f099301cb80a6cd3e8cffb32e6ff687965346c62de8c2c",
+      "job-129965251747.log": "cb6e36d871adecaa998603c10b2ad569961d7b589c4e4c5d489572e0dbd2d902",
+      "job-129966373035.log": "808cd5765969bb3f716145284d937a9bc06011f2020fa031d203cbe9ca7e7a2e"
+    },
+    "limitations": [
+      "Windows105 live engine tool proposal is not proof of physical action",
+      "No RTX2060, real phone, microphone, external search API or Windows UAC acceptance"
+    ]
+  },
+  "counts": {
+    "64": [
+      68,
+      0,
+      0
+    ],
+    "73": [
+      135,
+      0,
+      0
+    ],
+    "75": [
+      59,
+      0,
+      1
+    ],
+    "75_real_cancel_attempts": 20,
+    "75_bridges_per_attempt": 3
+  },
+  "protected_patch_pending": {
+    "issue": 70,
+    "sha256": "636b5802fba693d6ffe951abab4ad538b094dc539bfcd15a80b08a92636e1e82"
+  },
+  "new_full_ci": "not yet started at artifact creation",
+  "limitations": [
+    "Linux fake providers and fake CLI, no real CLI launch",
+    "No actual Windows administrator or driver install",
+    "Core CPU primary-model acceptance pending; old failure preserved",
+    "No phone gateway, search API choice or hardware acceptance"
+  ],
+  "integration_checks": {
+    "fmt": 0,
+    "diff": 0,
+    "lint": 0,
+    "docs_verify": 0,
+    "html_pages": 103,
+    "log_sha256": {
+      "lint.log": "693b9fe5990e813f54c34d86effdc86c14cf9761745995b613d6609466286add",
+      "docs-generate.log": "813aff687e70e641b4edb8a5400607b9071bc4c52f80f2cd71c2be0ef67adda0",
+      "docs-verify-final.log": "e1efc1496f2e6b075eb82b4f296e93a104942365a9e88ee6014397d9241caa80"
+    },
+    "procedure_failures": [
+      "Initial docs generation before linking pinned node_modules: ERR_MODULE_NOT_FOUND marked",
+      "Attempted non-existent scripts/check-plan-html.mjs: MODULE_NOT_FOUND",
+      "First --verify before regeneration: stale 2 HTML files; regeneration then --verify passed",
+      "Raw log transfer oversized shell argument chunk failed; retried with smaller chunks and completed; no CI rerun"
+    ]
+  }
+}

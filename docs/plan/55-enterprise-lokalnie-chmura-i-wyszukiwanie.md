@@ -1,5 +1,11 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Domykanie usterek10.11:** #64 deadline68/0/0, #73 jawna odmowa135/0/0, #75 pomiar
+zakończenia procesu59/0/1 i20/20 anulowań ×3 mosty-atrapy przy2s; Clippy0. Baza574b3391
+ma CI182 **9/10** (Linux3580/1/26, #75), Windows105 **4/4**, WebView2 63/0/5.
+[Raport i ograniczenia](../reviews/2026-11-10-defect-closure.md). Nowe poprawki wymagają własnegoCI;
+Core Qwen8B, sprzęt i przegląd pozostają otwarte. Bez merge i zmiany polityk/progów.
+
 **Nowe zlecenie właściciela po zamknięciu nocnego okna:** główne modele lokalne8–12B
 naRTX2060 12GB z zapasem kontekstu. Qwen3-8B Q4_K_M domyślny, Bielik11B Q4_K_M jako
 alternatywa tekstowa;1.5B tylko pomocniczy. Dostępna Luna/Haiku pomaga po problemie lokalnym;

@@ -1,5 +1,11 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Domykanie usterek10.11:** #64 deadline68/0/0, #73 jawna odmowa135/0/0, #75 pomiar
+zakończenia procesu59/0/1 i20/20 anulowań ×3 mosty-atrapy przy2s; Clippy0. Baza574b3391
+ma CI182 **9/10** (Linux3580/1/26, #75), Windows105 **4/4**, WebView2 63/0/5.
+[Raport i ograniczenia](../reviews/2026-11-10-defect-closure.md). Nowe poprawki wymagają własnegoCI;
+Core Qwen8B, sprzęt i przegląd pozostają otwarte. Bez merge i zmiany polityk/progów.
+
 **Pełna zgoda10.11 — #74:** właściciel potwierdził maksymalne dostępne możliwości po świadomym
 włączeniu pełnej zgody. Prompt nie wymaga już proponowania każdej brakującej instalacji:
 agentka ma działać w ramach aktywnych zgód, bez powtórnego pytania, i sprawdzić wynik.
