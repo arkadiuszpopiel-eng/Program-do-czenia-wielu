@@ -116,7 +116,7 @@ pub(crate) fn tool_result(
     block_id: &str,
     max_chars: usize,
 ) -> ToolResult {
-    let (body, _) = text::truncate_chars(&outcome.text, max_chars);
+    let body = crate::observation::bounded_output(&outcome.text, max_chars);
     let body = match outcome.untrusted {
         Some(_) => text::wrap_untrusted(&body, tool, block_id),
         None => body,

@@ -48,6 +48,9 @@ po cofnięciu nie trafia na nieznany wariant (punkty kontrolne go nie zawierają
 - **Adapter schedulera:** `RuntimeExecutor: TaskExecutor` — ładunek `AgentTaskPayload`, przebieg `task-<zadanie>-a<próba>` (wznowienie z checkpointu), agentka przydzielona przez scheduler z obsady, budżety ∩ zadanie, taint zadania, pochodzenie ≠ użytkownik → `CommandOrigin::Agent`; `Completed` → `Succeeded{run, verified}`, odrzucenie Krytyczki/pętla/odmowa → `Failed{retryable:false}`, błąd dostawcy → ponawialny, `Stop`/anulowanie → `Stopped`; porzucenie wykonania anuluje przebieg.
 
 ## Niezmienniki
+- Długi tekst obserwacji zachowuje początek (podsumowanie) i koniec (diagnostyka kompilatora),
+  z jawnym znacznikiem pominiętego środka w dotychczasowym limicie znaków. Krótki tekst pozostaje
+  bez zmian. Delimitacja niezaufanej treści i obrazy pozostają zachowane; skrót nie potwierdza wykonania.
 - Każdy krok to zdarzenie; stan odtwarzalny z dziennika; `StepStarted` = `usage.steps`; checkpoint po każdej turze.
 - Narzędzie tylko przez Brokera (token jednorazowy); odmowa = `Denied`, nigdy obejście. Potomek ≤ rodzic (koperta, budżet, autonomia, sesja).
 - Taint monotoniczny w przebiegu i dziedziczony; argumenty z niezaufanej treści oznaczane (`untrusted_args`).
