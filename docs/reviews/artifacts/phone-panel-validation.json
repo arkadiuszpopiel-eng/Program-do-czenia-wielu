@@ -1,0 +1,157 @@
+{
+  "issue": 69,
+  "parent_ui_commit": "29fc132e",
+  "remote_red": [
+    0,
+    1
+  ],
+  "first_regression": [
+    55,
+    2,
+    0
+  ],
+  "title_target_red": [
+    0,
+    1
+  ],
+  "final_regression": [
+    58,
+    0,
+    0
+  ],
+  "unit_results": [
+    573,
+    0,
+    0
+  ],
+  "checks": [
+    {
+      "name": "remote-unit",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@alfa/desktop-ui",
+        "test"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:29:14.220497+00:00",
+      "finished_utc": "2026-11-10T09:29:46.490944+00:00",
+      "sha256": "46fbd7fdc1c49d840fcd5c265d578e53f3a9484211a8cea478a7eb51af027383"
+    },
+    {
+      "name": "remote-check-final",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@alfa/desktop-ui",
+        "check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:29:46.492168+00:00",
+      "finished_utc": "2026-11-10T09:30:11.218780+00:00",
+      "sha256": "99b6bc14b252fb5207b8192880d1b152224107e7ef0526ad0687febb77df4c1a"
+    },
+    {
+      "name": "remote-bundle",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@alfa/desktop-ui",
+        "bundle-size"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:30:11.229438+00:00",
+      "finished_utc": "2026-11-10T09:30:12.261945+00:00",
+      "sha256": "485ab6bbf9e332e3484ccd1fe2a6505ad826992ce2988bccdf1234a8957eec45"
+    },
+    {
+      "name": "remote-lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:30:12.265008+00:00",
+      "finished_utc": "2026-11-10T09:30:43.219565+00:00",
+      "sha256": "080a0e10ee4e59aa5bcf20d12772cb820710c7c9259a23773da45b2534fa996f"
+    },
+    {
+      "name": "remote-docs",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:30:43.220399+00:00",
+      "finished_utc": "2026-11-10T09:30:43.624929+00:00",
+      "sha256": "813aff687e70e641b4edb8a5400607b9071bc4c52f80f2cd71c2be0ef67adda0"
+    },
+    {
+      "name": "remote-docs-verify",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--verify"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:30:43.625626+00:00",
+      "finished_utc": "2026-11-10T09:30:43.994891+00:00",
+      "sha256": "e1efc1496f2e6b075eb82b4f296e93a104942365a9e88ee6014397d9241caa80"
+    },
+    {
+      "name": "remote-diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:30:43.995309+00:00",
+      "finished_utc": "2026-11-10T09:30:44.406621+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "logs": {
+    "remote-red": {
+      "sha256": "b4f32ce2c307b8aa339d0e4a5f8403d182d751d92a0190761efbedfd632d0af7",
+      "exit": "1"
+    },
+    "remote-regression": {
+      "sha256": "669ac215444f6f2ef4ea2e0c5ce1cf55e6e483e9a1738208bbf94e010f01c5ee",
+      "exit": "1"
+    },
+    "title-target-red": {
+      "sha256": "fa9e3ba17d051fd91c02ac628b9d07bc620a5fc11d59f2d4a3001e5903518105",
+      "exit": "1"
+    },
+    "remote-final-regression": {
+      "sha256": "c978bc0631e9e331e0e0157f2fbf1487c0018554a6bf0d03246e3f7603ef9964",
+      "exit": "0"
+    },
+    "remote-fixed-build": {
+      "sha256": "1c820f0051be6086979e14cd5f6e4f5dae8fc154128b42d208420259d224f855",
+      "exit": "0"
+    }
+  },
+  "screenshots": [
+    {
+      "path": "docs/reviews/artifacts/jarvis-phone-cockpit.png",
+      "sha256": "c8c73b91677fc74e6ac2e58eb2162bdc9fbb0e5e80a4d9523120023d0f6c24bd",
+      "inspected": true,
+      "scope": "fakeAPI/headlessLinuxChromium/390x844touch, not real phone or connection"
+    },
+    {
+      "path": "docs/reviews/artifacts/phone-panel-preview.png",
+      "sha256": "873049f0a10153c29387187b529445ea055a47e8fcfdb5b60c70aac61073e424",
+      "inspected": true,
+      "scope": "fakeAPI/headlessLinuxChromium/390x844touch, not real phone or connection"
+    }
+  ],
+  "proof": "8 disabled actions and disabled pairing;0WebSocket;Escape restores focus;PL/EN;320/390/1280 light/dark",
+  "new_e2e_total": 945,
+  "limits": [
+    "UI preview only; no remote-gateway,relay,pairing,WebAuthn or remote approvals",
+    "New head fullCI and independent review required",
+    "No real phone,GPU,microphone orAPI acceptance"
+  ]
+}

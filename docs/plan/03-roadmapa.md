@@ -3,7 +3,7 @@
 **Nowe zlecenieUI i telefon10.11:** opcjonalny kokpitJarvis, większe cele dotykowe i kafelki.
 Baza13c8c88d ma pełneCI179/Windows101 zielone (Linux3567/0/26,Windows3593/0/47).
 NowyUI#68 ma57/57próbChromium; nie jest odbiorem telefonu. Brama/parowanie telefonu
-nie istnieją; #69 zaczyna się od jawnego podglądu panelu, bez aktywnych poleceń.
+nie istnieją; #69 ma jawny podgląd panelu bez aktywnych poleceń,58/58próbChromium.
 [Plan56](56-kokpit-jarvis-i-panel-telefonu.md) · [RaportUI](../reviews/2026-11-10-jarvis-mobile.md).
 
 **Nowe zlecenie właściciela po zamknięciu nocnego okna:** główne modele lokalne8–12B

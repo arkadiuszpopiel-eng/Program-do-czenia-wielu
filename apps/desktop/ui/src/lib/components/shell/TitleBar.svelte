@@ -347,7 +347,8 @@
       flex: 1;
     }
   }
-  @media (pointer: coarse) and (max-width: 360px) {
+  /* Przy320px tytuł ustępuje kontrolkom; F2 i panel Sesje zachowują zmianę nazwy. */
+  @media (max-width: 360px) {
     .crumbs {
       display: none;
     }

@@ -12,7 +12,7 @@ Poprzednie nocne terminy są zamknięte; automatyzacje pozostają wyłączone.
    audyt zrzutów desktop/390px/320px, opcjonalny kokpit, cele dotykowe, istniejąca nawigacja.
    RED0/2→GREEN2/2, końcowa regresja57/57; motywy/style/axe/niski ekran.
 3. [#69](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/69):
-   po kontroliUI rozpocząć responsywny podgląd panelu telefonu, jawnie bez połączenia i bez
+   po kontroliUI przygotowano responsywny podgląd panelu telefonu, jawnie bez połączenia i bez
    aktywnych zdalnych poleceń. Nie udawać parowania lub wykonania czynności.
 4. Przed wdrożeniem transportu: podpisy i przegląd zdalnego dostępu, kontrakty, parowanie,
    przekaźnikE2E, odwoływanie urządzeń, wznawianie sesji i autoryzacja każdej komendy.
@@ -41,3 +41,5 @@ zablokowane polecenia i potwierdzenia z ważnego urządzenia. Transport nie jest
 
 #41/#48, jakość wszystkich person na8–12B,RTX2060 12GB,prawdziweAPI/hybryda,mikrofon
 oraz wybór dostawcyWWW pozostają otwarte. Zielone testyUI nie zamykają tych problemów.
+
+[Podgląd panelu i backlog transportu](../reviews/2026-11-10-phone-panel.md).

@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { expectAccessible, openApp, waitForChat } from './helpers';
 
+test('belka w320px nie ma zbyt małego celu tytułu rozmowy', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await openApp(page);
+  await waitForChat(page);
+  await expectAccessible(page, 'belka320px');
+});
+
 test('kokpit Jarvis jest opcjonalny, pamięta wybór i nie zmienia trybu zgód', async ({ page }) => {
   await openApp(page, { path: '/?style=next&theme=dark' });
   await waitForChat(page);

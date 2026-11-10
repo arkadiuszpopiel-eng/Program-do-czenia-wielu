@@ -7,12 +7,21 @@
   import Mic from '@lucide/svelte/icons/mic';
   import Cpu from '@lucide/svelte/icons/cpu';
   import ShieldCheck from '@lucide/svelte/icons/shield-check';
+  import Smartphone from '@lucide/svelte/icons/smartphone';
+  import Lazy from '../shell/Lazy.svelte';
   import { useApp } from '../../state/context';
   import { cockpitCopy } from './copy';
   import './cockpit.css';
   const app = useApp();
   const copy = $derived(cockpitCopy(app.i18n.locale));
   const cast = $derived(app.activeId ? (app.agents[app.activeId] ?? []) : []);
+  let remote = $state(false);
+  let launch = $state<HTMLButtonElement | null>(null);
+  const loadRemote = () => import('./RemotePreview.svelte');
+  const closeRemote = () => {
+    remote = false;
+    requestAnimationFrame(() => launch?.focus());
+  };
   const tiles = $derived([
     {
       id: 'sessions',
@@ -52,22 +61,39 @@
       </button>
     {/each}
   </nav>
-  {#if cast.length}
-    <div class="cockpit-cast" role="group" aria-label={copy.crew}>
-      {#each cast as person (person.id)}
-        <button
-          type="button"
-          onclick={() => {
-            app.selectedAgent = person.id;
-            app.openPanel('agents');
-          }}
-        >
-          <span class="cockpit-state" data-status={person.status} aria-hidden="true"></span>
-          {agents[person.id].name}<span class="cockpit-agent-status"
-            >{app.i18n.t(`agentStatus.${person.status}`)}</span
+  <div class="cockpit-footer">
+    {#if cast.length}
+      <div class="cockpit-cast" role="group" aria-label={copy.crew}>
+        {#each cast as person (person.id)}
+          <button
+            type="button"
+            onclick={() => {
+              app.selectedAgent = person.id;
+              app.openPanel('agents');
+            }}
           >
-        </button>
-      {/each}
-    </div>
-  {/if}
+            <span class="cockpit-state" data-status={person.status} aria-hidden="true"></span>
+            {agents[person.id].name}<span class="cockpit-agent-status"
+              >{app.i18n.t(`agentStatus.${person.status}`)}</span
+            >
+          </button>
+        {/each}
+      </div>
+    {/if}
+    <button
+      type="button"
+      class="cockpit-phone"
+      bind:this={launch}
+      aria-label={copy.phone}
+      title={copy.phone}
+      onclick={() => (remote = true)}
+    >
+      <Smartphone size={20} strokeWidth={1.5} aria-hidden="true" />
+    </button>
+  </div>
+  {#if remote}<Lazy
+      load={loadRemote}
+      props={{ onclose: closeRemote }}
+      label={app.i18n.t('common.loading')}
+    />{/if}
 </section>

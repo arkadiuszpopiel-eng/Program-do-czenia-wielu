@@ -40,3 +40,8 @@ Surowe komendy, wyniki, logi iSHA256 pozostają w scratch/jarvis-mobile.
 Nowy head wymaga własnego pełnegoCI i niezależnego przeglądu przed merge. Odbiór nowegoUI
 Windows/WebView2 oraz prawdziwego telefonu nie jest tu zaliczony. #41/#48,GPU,API,mikrofon
 i wyszukiwarka pozostają otwarte. [Plan kolejnych etapów](../plan/56-kokpit-jarvis-i-panel-telefonu.md).
+
+Po rozpoczęciu#69 dodatkowy test320px wykrył zbyt mały cel tytułu w belce (także bez dialogu).
+Pomocniczy tytuł ustępuje kontrolkom w tym rozmiarze; pełne58/58kolejnej regresji zielone,
+bez zmiany proguaxe. [Bieżący kokpit telefonu](artifacts/jarvis-phone-cockpit.png)
+i [podgląd panelu](2026-11-10-phone-panel.md).

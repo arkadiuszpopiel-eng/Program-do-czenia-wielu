@@ -25,8 +25,10 @@ export async function createClient(): Promise<AlfaClient> {
   const settings: Record<string, string | boolean> = {};
   const style = params.get('style');
   const theme = params.get('theme');
+  const locale = params.get('locale');
   if (style) settings['ui.style'] = style;
   if (theme) settings['ui.theme'] = theme;
+  if (locale === 'en' || locale === 'pl') settings['ui.locale'] = locale;
   const avatars = params.get('avatars');
   if (avatars) settings['ui.avatars'] = avatars;
   // Panele: `?panels=autohide|docked`. Domyślnie chowane (właściciel 29.10), ale testy automatyczne

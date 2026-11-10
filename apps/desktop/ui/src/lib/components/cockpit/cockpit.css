@@ -124,6 +124,32 @@
   gap: 4px 12px;
   margin-top: 10px;
 }
+.cockpit-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.cockpit-footer .cockpit-cast {
+  flex: 1;
+  margin-top: 0;
+}
+.cockpit-phone {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  flex: none;
+  border: 1px solid var(--alfa-color-border);
+  border-radius: 12px;
+  background: var(--alfa-color-bg);
+  color: var(--alfa-color-accent);
+  cursor: pointer;
+}
+.cockpit-phone:focus-visible {
+  outline: 2px solid var(--alfa-color-focus);
+  outline-offset: 2px;
+}
 .cockpit-cast button {
   display: inline-flex;
   align-items: center;
