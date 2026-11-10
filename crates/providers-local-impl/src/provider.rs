@@ -138,7 +138,15 @@ impl ModelProvider for LocalProvider {
         let default_model = installed
             .iter()
             .find(|m| &m.id == default)
-            .or_else(|| installed.first())
+            .or_else(|| {
+                if default == crate::MAIN_MODEL {
+                    installed
+                        .iter()
+                        .find(|m| (8.0..=12.0).contains(&m.params_b))
+                } else {
+                    installed.first()
+                }
+            })
             .map(|m| m.id.clone());
         ProviderCapabilities {
             provider: self.id.clone(),

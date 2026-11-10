@@ -258,7 +258,7 @@ async fn module_download_publishes_progress_events() {
 #[test]
 fn manifest_validation_rejects_iq_quants_and_bad_entries() {
     let models = builtin_models().unwrap();
-    assert_eq!(models.len(), 2);
+    assert_eq!(models.len(), 4);
     let bielik = &models[0];
     assert!(bielik.id.starts_with("bielik-4.5b"));
     assert_eq!(bielik.quant, "Q8_0");
@@ -269,7 +269,13 @@ fn manifest_validation_rejects_iq_quants_and_bad_entries() {
         // Tylko oficjalne repozytorium autorów (speakleash), plik z nazwy wpisu, adres przypięty
         // do rewizji i hash z repozytorium — pełna weryfikacja łańcucha dostaw (C5.1, 2026-10-21).
         let repo = "https://huggingface.co/speakleash/Bielik-";
-        assert!(m.url.starts_with(repo), "{}", m.url);
+        assert!(
+            m.url.starts_with(repo)
+                || m.url
+                    .starts_with("https://huggingface.co/Qwen/Qwen3-8B-GGUF/"),
+            "{}",
+            m.url
+        );
         let revision = m
             .url
             .rsplit_once("/resolve/")
@@ -281,7 +287,7 @@ fn manifest_validation_rejects_iq_quants_and_bad_entries() {
             m.url
         );
         assert_eq!(m.sha256.len(), 64, "hash pliku z repozytorium: {}", m.id);
-        assert!(m.id.ends_with("-q8_0") && m.file.ends_with(".Q8_0.gguf"));
+        assert!(["Q8_0", "Q4_K_M"].contains(&m.quant.as_str()));
     }
     for q in ["IQ4_XS", "iq3_m", "model.IQ2_XXS.gguf"] {
         assert!(is_iq_quant(q), "{q}");

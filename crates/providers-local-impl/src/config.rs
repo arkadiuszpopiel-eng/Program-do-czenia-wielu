@@ -10,6 +10,9 @@ use providers_contract::ProviderPrivacy;
 
 use crate::manifest::{GPU_OVERHEAD_MB, ModelEntry};
 
+/// Główny model lokalny; Bielik1.5B pozostaje jawnym pomocnikiem.
+pub const MAIN_MODEL: &str = "qwen3-8b-q4-k-m";
+
 /// Najmniejszy kontekst przy automatycznym zmniejszaniu (rozmowa z promptem systemowym i kilkoma
 /// turami mieści się z zapasem; mniej — ryzyko „za długiej rozmowy" po kilku wymianach).
 pub const MIN_CTX: u32 = 4_096;
@@ -133,7 +136,7 @@ impl LocalConfig {
                 .map(|k| (k, server.clone()))
                 .collect(),
             server_candidates: BTreeMap::new(),
-            default_model: "bielik-4.5b-v3.0-instruct-q8_0".into(),
+            default_model: MAIN_MODEL.into(),
             gpu_name: None,
             pin_device: false,
             shared_memory: false,
@@ -289,6 +292,13 @@ impl LaunchPlan {
         }
         if entry.tools {
             args.push("--jinja".into());
+        }
+        if entry.id == MAIN_MODEL {
+            // Qwen3: budżet odpowiedzi służy odpowiedzi, bez ukrytego łańcucha rozumowania.
+            args.extend([
+                "--chat-template-kwargs".into(),
+                r#"{"enable_thinking":false}"#.into(),
+            ]);
         }
         args
     }

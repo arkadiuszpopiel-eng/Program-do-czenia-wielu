@@ -1,5 +1,18 @@
 # providers-local — SPEC (v1, F1)
 
+## Role modeli — zlecenie10.11.2026
+
+Domyślny Qwen3-8B Q4_K_M (8k kontekstu, szablon bez thinking); Bielik11B Q4_K_M jako
+alternatywa tekstowa bez deklaracji narzędzi. Oficjalne pliki/revizje/SHA256 są przypięte.
+Bielik11B ma mniejszy margines i wymaga odbioru GPU; głównym wyborem pozostaje8B.
+Bielik1.5B służy wyłącznie lekkiej pomocy. Brak głównego8–12B nie promuje zainstalowanego
+1.5B/4.5B do domyślnej trasy. Jawna konfiguracja pomocnika zachowuje własny model.
+Pamięć: Qwen5345+1152MiB przy8k, Bielik6963+1600MiB; dodatkowo1500MiB mowy i768MiB
+ekranu oraz600MiB syntezy głosu pozostawia na12GiB odpowiednio2923 i857MiB.
+Qwen16k mieści też rezerwę512MiB;
+Bielik16k musi zejść do8k przy tych rezerwach. To szacunek, nie odbiór sprzętu.
+Bielik1.5B i poprzednie wyniki jakości pozostają zachowane; zmiana modelu ich nie zalicza.
+
 ## Cel
 Lokalny `ModelProvider`: wbudowany llama.cpp (Vulkan/CUDA/CPU) jako osobny proces; bez kluczy API jedyny „mózg" (MVP), z kluczami — komendy, fallback, offline. Ollama i LM Studio jako zewnętrzne endpointy przez adapter generyczny (w `providers-api`), nie tutaj. Pobieranie modelu 1,5–4,5B (oficjalny GGUF autorów; Bielik v3 — Q8_0, fala 6) w onboardingu (PLAN §1.2, §5.2, §16.2 F1).
 
@@ -20,7 +33,7 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
   → CPU), `-ngl` z dzierżawy `model-residency` (GPU → wszystkie warstwy, CPU → 0) albo proporcjonalnie do budżetu VRAM,
   `-c`, `--threads` (rdzenie fizyczne), `--alias`, `-np 1`, `--jinja` (narzędzia).
 - **Modele:** `models.toml` (GGUF, URL HF, rozmiar, SHA-256, kwant, warstwy, kontekst, szacunki VRAM/RAM, licencja);
-  walidacja: `.gguf`, bez kwantów IQ, https. Domyślny: Bielik 4.5B v3.0 Instruct Q8_0 (fala 6; wcześniej Q4_K_M — brak w oficjalnym repozytorium).
+  walidacja: `.gguf`, bez kwantów IQ, https. Historyczny domyślny: Bielik 4.5B v3.0 Instruct Q8_0 (fala 6; wcześniej Q4_K_M — brak w oficjalnym repozytorium).
 - **Pobieranie:** wznawianie HTTP Range z pliku `.part` (≤ 3 automatyczne wznowienia), SHA-256; zły hash → błąd
   i usunięcie `.part`. Hash nieznany w manifeście (`sha256 = ""`) → zapis przy pierwszym pobraniu (`<plik>.sha256`,
   zaufanie przy pierwszym użyciu) + ostrzeżenie w logach; model bez zapisanego hasha = niezainstalowany.
