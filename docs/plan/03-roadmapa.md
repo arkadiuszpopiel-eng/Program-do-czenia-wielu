@@ -1,5 +1,14 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Odbiór kodu10.11:**77a85caa ma [CI184](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42884779747)
+**10/10**, Linux3595/0/26, Windows3617/0/47, Chromium945, Vitest573;
+[Windows107](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42884779841) **4/4**, WebView2 63/0/5.
+Zamknięto47 zweryfikowanych kart. GłównyQwen8B:50/50 tożsamości i50/50 świeżych pytań
+bez fikcyjnych działań, w tym Luna po restarcie. #58 obejmuje odrębny brak faktów wcześniejszej
+historii i pozostaje w pracy; #77 historycznyIdleCPU nadal otwarty. Telefon/API/GPU/mikrofon
+oraz niezależny przegląd nieodebrane. [Raport i dane](../reviews/2026-11-10-defect-closure.md).
+Starsze wpisy poniżej są historią, nie aktualnym stanem odbioru.
+
 **Domykanie usterek10.11:** #64 deadline68/0/0, #73 jawna odmowa135/0/0, #75 pomiar
 zakończenia procesu59/0/1 i20/20 anulowań ×3 mosty-atrapy przy2s; Clippy0. Baza574b3391
 ma CI182 **9/10** (Linux3580/1/26, #75), Windows105 **4/4**, WebView2 63/0/5.
@@ -18,7 +27,8 @@ Clippy0; skryptowany model z rzeczywistym Rust przeszedł kompilację, poprawkę
 Cykl sprawdzony dla4wbudowanych person i własnej. Qwen8B CPU sam poprawił dwa małe programy
 (błąd typu i logiki), ze sprawdzonymi wynikami procesów; to sonda poza Core/Brokerem.
 `dev_test` nie ogłasza zaliczenia przy kodzie0 bez wykonanych testów. Wspólne207/0/0
-dla12crate'ów, Clippy0. Chroniona łatka testu Core pozostaje do konkretnego przeglądu właściciela.
+dla12crate'ów, Clippy0. Łatka zwykłego testu app-core #70 jest opublikowana w bf9ffe05;
+wcześniejsza kwalifikacja jako chronionego core-* była zbyt szeroka. Przegląd przed merge pozostaje otwarty.
 [Plan kodowania](55-enterprise-lokalnie-chmura-i-wyszukiwanie.md#kodowanie-10-11) · [Raport](../reviews/2026-11-10-coding-workflow.md).
 Baza b4e2dbcd: CI180 **9/10**, Windows Rust3592/1/47 (predykat4417), Linux3567/0/26;
 Chromium945/945, Windows102 **4/4**, WebView2 63/0/5. Nie nazywamy pełnegoCI180 zielonym.

@@ -1,5 +1,14 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Odbiór kodu10.11:**77a85caa ma [CI184](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42884779747)
+**10/10**, Linux3595/0/26, Windows3617/0/47, Chromium945, Vitest573;
+[Windows107](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42884779841) **4/4**, WebView2 63/0/5.
+Zamknięto47 zweryfikowanych kart. GłównyQwen8B:50/50 tożsamości i50/50 świeżych pytań
+bez fikcyjnych działań, w tym Luna po restarcie. #58 obejmuje odrębny brak faktów wcześniejszej
+historii i pozostaje w pracy; #77 historycznyIdleCPU nadal otwarty. Telefon/API/GPU/mikrofon
+oraz niezależny przegląd nieodebrane. [Raport i dane](../reviews/2026-11-10-defect-closure.md).
+Starsze wpisy poniżej są historią, nie aktualnym stanem odbioru.
+
 **Domykanie usterek10.11:** #64 deadline68/0/0, #73 jawna odmowa135/0/0, #75 pomiar
 zakończenia procesu59/0/1 i20/20 anulowań ×3 mosty-atrapy przy2s; Clippy0. Baza574b3391
 ma CI182 **9/10** (Linux3580/1/26, #75), Windows105 **4/4**, WebView2 63/0/5.
@@ -127,8 +136,9 @@ Stare harmonogramy pozostają wyłączone. Ten plan nie oznacza zakończonego od
 
 ### Zakres bieżącego przyrostu
 
-1. #70: deterministyczna próba prywatności terminala; osobna, konkretna łatka chronionego testu
-   Core do przeglądu właściciela. [Raport](../reviews/2026-11-10-terminal-privacy.md).
+1. #70: deterministyczna próba prywatności terminala. Łatka zwykłego testu warstwy app-core
+   została opublikowana w bf9ffe05; wcześniejsza kwalifikacja jako chronionego core-* była
+   zbyt szeroka. Bez zmiany polityk lub tagów. [Raport](../reviews/2026-11-10-terminal-privacy.md).
 2. #71: zachowanie końcowych błędów kompilatora w ograniczonym wyniku narzędzia. Początek,
    jawne pominięcie środka i końcówka mieszczą się w istniejącym limicie; bez zwiększania progów.
 3. Test integracyjny runtime: skryptowane decyzje modelu i rzeczywisty Rust w prywatnym katalogu:
@@ -159,8 +169,8 @@ nie deklarujemy wykonanej próby Luna/Haiku ani instalacji nowego dostawcy.
 
 ### Kolejność dalszego odbioru
 
-1. Konkretna decyzja właściciela o łatce Core #70 i niezależny przegląd przyrostów; pełne CI
-   nowego heada. Wynik poprzednika zachowany, bez anulowania kompletnego przebiegu pushem.
+1. Pełne CI aktualnego heada i niezależny przegląd przyrostów, w tym testu aplikacyjnego #70.
+   Wynik poprzednika zachowany, bez anulowania kompletnego przebiegu pushem.
 2. Rzeczywisty runtime z docelowym modelem i narzędziami na Windows: przygotowanie zależności,
    poprawka błędu kompilacji oraz regresji logicznej, STOP, wznowienie i odtworzenie raportu.
 3. Na RTX2060 12GB: pamięć i czasy przy 8k kontekstu oraz obciążeniu głosu/ekranu. Po tym

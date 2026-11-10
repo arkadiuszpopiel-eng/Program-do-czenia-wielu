@@ -1,6 +1,6 @@
 {
-  "recorded_utc": "2026-11-10T19:24:00Z",
-  "phase": "prepared_for_final_ci",
+  "recorded_utc": "2026-11-10T20:06:29.376201+00:00",
+  "phase": "CI184_complete_and_cloud_recovered",
   "published_base": "632e5d435016d4b7e5d5939a42a12d079c156ebf",
   "prepared_code_head": "bf9ffe0532275f6c9cf9c169213e2f226e35fb8d",
   "code_commits": [
@@ -58,13 +58,19 @@
     61,
     62,
     63,
+    64,
     65,
     66,
     67,
+    70,
     71,
-    72
+    72,
+    73,
+    74,
+    75,
+    76
   ],
-  "closed_count": 41,
+  "closed_count": 47,
   "previous_ci": {
     "head": "632e5d435016d4b7e5d5939a42a12d079c156ebf",
     "run": 42863147933,
@@ -188,7 +194,8 @@
         "clippy_exit": 0
       },
       "current_local_result": "UNKNOWN: command started, exec transport lost before result was read; final GitHub CI required",
-      "authority": "ordinary app-* composition test, not protected core-*; AGENTS94 + Architecture328; no policy/privacy-tag change"
+      "authority": "ordinary app-* composition test, not protected core-*; AGENTS94 + Architecture328; no policy/privacy-tag change",
+      "CI184": "computer target and terminal_input_only_by_command_and_never_in_events passed Linux and Windows"
     }
   },
   "core_qwen": {
@@ -225,7 +232,8 @@
       "wall_s": 490.582,
       "responses_sha256": "9e5292f07da9c7a0258a9d9e52684f415397bc9df5f2c82e02640fa8802e8dc2",
       "log_sha256": "eca75e00f20ab2258ef80c49bb519eaac4f4b9b775950b8d1d61076d92190bf6",
-      "scope": "transport/persona routing/Jarvis request marker, not exhaustive semantic acceptance"
+      "scope": "transport/persona routing/Jarvis request marker, not exhaustive semantic acceptance",
+      "semantic_review": "40/40 correct identity/readiness/single sentence; author review after recovery, not general quality"
     },
     "rejected_candidate": {
       "source": "ed710717afe56a49be98d48ad2f664e5e8059598",
@@ -253,9 +261,8 @@
     "limitations": [
       "The initial failure is retained; restart changed environment, so subsequent success does not prove its correction",
       "No changes to production HTTP timeout semantics, limits, model weights or default persona prompt",
-      "All40 model outputs after restart were not exhaustively graded for semantic quality",
-      "Qwen facts probe and custom Luna after restart not run before Cloud became unavailable",
-      "No RTX2060, microphone, real phone or external API acceptance"
+      "No RTX2060, microphone, real phone or external API acceptance",
+      "After19:33 recovery, all50 identity and50 fresh no-actions responses reviewed; prior-history58 is separate and unresolved."
     ]
   },
   "cloud": {
@@ -266,7 +273,10 @@
     "metadata_status": "provider reports running/connected while selected execution environment unavailable; no root cause inferred",
     "local_checkpoint_update_after_loss": false,
     "local_computer_cargo_completion_unknown": true,
-    "model_processes": "controlled probes ended; v2 controller targeted only its recorded own servers; no new model launched after loss"
+    "model_processes": "controlled probes ended; v2 controller targeted only its recorded own servers; no new model launched after loss",
+    "ready_again_utc": "2026-11-10T19:33:35Z",
+    "checkpoint_updated_after_recovery": true,
+    "local_computer_build": "No test result; old Cargo/rustc were zombies; not counted as pass. CI184 computer passed both systems."
   },
   "rescue": {
     "bundle_sha256": "7bf2069f67004e7d010b8de159151ad07ec08564faaf9725458813831c662db8",
@@ -280,9 +290,28 @@
     "rejected_prompt_not_in_application": true
   },
   "documentation": {
-    "plans_and_generated_html": "unchanged after Cloud loss; prior103-page generation verified, finalCI must verify them",
+    "plans_and_generated_html": "Plan55/roadmap updated; generator/check/verify103pages0problems; pnpm lint0; no production files changed.",
     "current_report": "docs/reviews/2026-11-10-defect-closure.md",
-    "final_ci_results_location": "PR24 description (updated without interrupting CI)"
+    "final_ci_results_location": "PR24 description (updated without interrupting CI)",
+    "initial_recovery_setup_errors": "Cargo absent from PATH (exit127), restored /home/agent/.cargo/bin. New docs worktree lacked marked; original error logs retained, dependency symlink then all checks passed.",
+    "checks": [
+      {
+        "log": "/workspace/scratch/defect-closure/recovery-docs-generate.log",
+        "sha256": "813aff687e70e641b4edb8a5400607b9071bc4c52f80f2cd71c2be0ef67adda0"
+      },
+      {
+        "log": "/workspace/scratch/defect-closure/recovery-docs-check.log",
+        "sha256": "813aff687e70e641b4edb8a5400607b9071bc4c52f80f2cd71c2be0ef67adda0"
+      },
+      {
+        "log": "/workspace/scratch/defect-closure/recovery-docs-verify.log",
+        "sha256": "e1efc1496f2e6b075eb82b4f296e93a104942365a9e88ee6014397d9241caa80"
+      },
+      {
+        "log": "/workspace/scratch/defect-closure/recovery-docs-lint.log",
+        "sha256": "0a9c098bc6f005749db08b0e758d50e03be4b35741b088a9faddb81264eeeb40"
+      }
+    ]
   },
   "constraints": {
     "no_merge": true,
@@ -303,5 +332,180 @@
     "terminal_current": "cargo +1.94.1 test --locked -p app-core --test computer -j2 (exit UNKNOWN after Cloud loss)",
     "module_checks": "cargo +1.94.1 test --locked -p <module> --all-features -j2; cargo +1.94.1 clippy --locked -p <module> --all-targets --all-features -j2 -- -D warnings",
     "raw_commands_location": "/workspace/scratch/defect-closure; prior detailed command receipt docs/reviews/artifacts/defect-closure-validation.json"
+  },
+  "validated_head": "77a85caa88993d06e7a81f2bfbcb2e431aabbe33",
+  "CI184": {
+    "run": 42884779747,
+    "jobs": [
+      10,
+      0
+    ],
+    "linux": [
+      3595,
+      0,
+      26
+    ],
+    "windows": [
+      3617,
+      0,
+      47
+    ],
+    "targets_each": 1141,
+    "vitest": 573,
+    "chromium": [
+      315,
+      315,
+      315
+    ],
+    "format_clippy_deny_tauri_docs": "success"
+  },
+  "Windows107": {
+    "run": 42884779841,
+    "jobs": [
+      4,
+      0
+    ],
+    "webview": [
+      63,
+      0,
+      5
+    ],
+    "qwen_cpu": {
+      "first_token_ms": 20856,
+      "total_ms": 35391,
+      "tokens": 96,
+      "tok_per_s": 6.6
+    },
+    "bielik45_cpu": {
+      "first_token_ms": 16312,
+      "total_ms": 36307,
+      "tokens": 93,
+      "tok_per_s": 4.65
+    },
+    "bielik11": "NOT_RUN_CPU_BUDGET,0 tokens; RAM8192MB/VRAM0MB",
+    "tool_called": "model proposal only, not physical operation"
+  },
+  "real_qwen_recovery": {
+    "identity": [
+      50,
+      0
+    ],
+    "no_actions": [
+      50,
+      0
+    ],
+    "same_protocol": "4builtins40 + Luna10, standard/Jarvis,96tokens,temp0, unchanged60/30/120s; Luna catalog/cast restored without role reassignment",
+    "records": [
+      {
+        "path": "docs/reviews/artifacts/core-qwen-control-40.json",
+        "sha256": "9e5292f07da9c7a0258a9d9e52684f415397bc9df5f2c82e02640fa8802e8dc2"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-control-40-review.json",
+        "sha256": "fec6e00db73a3073d0d2ff6239848a79014c2ed04232c0efd24b82ad536629bc"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-control-40-status.json",
+        "sha256": "8f421de0f5c4d7d64d56258e4e79911da731e41d56587170c06565dfcd024862"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-facts-40.json",
+        "sha256": "a5ad7669d88fe5cddfa2efda1dfbecbae880ac5551a10fe39965c8236c6a6431"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-facts-40-review.json",
+        "sha256": "8078c5cff64298f78728ee5f2ec142ddd196c69ac657f1b5b13945ed4f882204"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-facts-40-status.json",
+        "sha256": "1cd65f490302b42d32e55ffaeda3b32be59833f30ca70c92ec910c38e2525aa2"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-luna-identity-10.json",
+        "sha256": "7e17b370b6d795c66495306c39dbd1fad95161e0288c49c9b35c067295dba808"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-luna-identity-10-review.json",
+        "sha256": "c0449a3a9456522520507c6cdb1c5c2a40638dd796aeecc688c54cbe65aa7e29"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-luna-identity-10-status.json",
+        "sha256": "b973d9175448a56dd39c5fc1a70f777d6bcedccc9e7de80d1c4920d1e9d891a6"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-luna-facts-10.json",
+        "sha256": "5a82b2f5c3c834f1e3465a3c65d8c1005d0ee7b7aeb023788f3126eec5042dac"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-luna-facts-10-review.json",
+        "sha256": "d90726624973209d416ca737fc60cea8c06ac90a49bec2f96832188623a95d2b"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-luna-facts-10-status.json",
+        "sha256": "2910e4a9141fe9fd7fe4f2a06642e183555e5b5a761bbc598b16363a7f7491c2"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-rejected-prefix-40.json",
+        "sha256": "8943036a1915cd495fa2b4b02f9a9a3591b0201e54bb41d6a78c11fa86f06b4f",
+        "decision": "REJECTED experiment, not application code"
+      },
+      {
+        "path": "docs/reviews/artifacts/core-qwen-rejected-prefix-40-status.json",
+        "sha256": "d2062647f1d3dfbc50ad5c70d7870a53e5cfe7d60e81e5db27f3e76f70ce4262",
+        "decision": "REJECTED experiment, not application code"
+      }
+    ],
+    "limits": "fresh synthetic sessions, forcedLocalBrain/fake host ports; no physical GPU/API/phone/mic acceptance",
+    "broader58": "Prior-history receipt propagation remains open; test-only reproducer prepared in separate worktree"
+  },
+  "decoded_ci_log_hashes": {
+    "format": "GitHub decoded UTF8, CRLF normalizedLF; these are text hashes, not archive hashes",
+    "logs": [
+      {
+        "path": "/workspace/scratch/defect-closure/ci184-windows-decoded.log",
+        "sha256": "a0b2532bdc2aa36588c4b0e1eeb0ec14965e31d5e475cd296bdea835f47bd38c",
+        "bytes": 892926
+      },
+      {
+        "path": "/workspace/scratch/defect-closure/ci184-linux-decoded.log",
+        "sha256": "534f74370fa075360adb09cc6765f66663bc89d65c1abcb8279dcbac904710fd",
+        "bytes": 894048
+      },
+      {
+        "path": "/workspace/scratch/defect-closure/ci184-job-130070094000.log",
+        "sha256": "6fb8d2e6d21d1eff14a29ca0e8668b7c2bea2a5c808f3f87ae216526e3c25b91",
+        "bytes": 142522
+      },
+      {
+        "path": "/workspace/scratch/defect-closure/ci184-job-130070095070.log",
+        "sha256": "77156e96a49e1d3b4fef18f5a4ca9b5c94f5aa40e1b79b0e1455f1aa846873d7",
+        "bytes": 117242
+      },
+      {
+        "path": "/workspace/scratch/defect-closure/ci184-job-130071436118.log",
+        "sha256": "2ce1c82d4ea06617659b308bad8f85c725110a2238880f8f5f6485068853e5ec",
+        "bytes": 91886
+      },
+      {
+        "path": "/workspace/scratch/defect-closure/ci184-job-130071436239.log",
+        "sha256": "b3b1f648259436d61a93f47599baa5dcd8fad2090790e4096983926ab929de24",
+        "bytes": 93039
+      },
+      {
+        "path": "/workspace/scratch/defect-closure/ci184-job-130070094372.log",
+        "sha256": "ccf6ecd06e5786fb9f5ec6b4fd926ccee107a561de8805d5ad4ab94572abcaac",
+        "bytes": 129891
+      },
+      {
+        "path": "/workspace/scratch/defect-closure/ci184-job-130071436199.log",
+        "sha256": "ecac80d50edb6e9b7c9fd4856e291e70c33c47689082962e9c483df0bd8686f9",
+        "bytes": 92556
+      },
+      {
+        "path": "/workspace/scratch/defect-closure/windows107-live-decoded.log",
+        "sha256": "6ac5256c16085145c5cea3a9c917ae024f4886a4d71e0e036de58a0b75ad4af7",
+        "bytes": 103311
+      }
+    ]
   }
 }
