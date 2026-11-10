@@ -1,5 +1,7 @@
 # Terminal — deterministyczna próba prywatności (#70)
 
+**Aktualizacja10.11:** kwalifikacja tego zwykłego testu app-core jako chronionego core-* była zbyt szeroka. Dokładna łatka jest przygotowana wbf9ffe05 w ramach zlecenia napraw; bieżącą bazę weryfikuje nowyCI. Bez zmian polityk/tagów prywatności; przegląd przed merge nadal wymagany. [Aktualny raport](2026-11-10-defect-closure.md).
+
 Baza: `b4e2dbcdfd64e5379b1499f870014aa39d8a011a`, PR24, Cloud Linux.
 
 ## Problem i zakres
@@ -28,7 +30,7 @@ Nie zmieniono implementacji terminala lub dostępu agentek.
 
 To atrapa pseudokonsoli na Linux, nie odbiór prawdziwego ConPTY lub terminala logowania na Windows.
 
-## Chroniony test Core — tylko łatka do przeglądu
+## Historia wcześniejszej kwalifikacji testu
 
 [Łatka](patches/terminal-privacy-marker.patch) sprawdza pełny tekst i jego zapis base64,
 zamiast przypadkowej zbieżności czterech cyfr. SHA256:
@@ -38,7 +40,7 @@ Osobny worktree przeglądu: test Core `computer` **5/5**, Clippy tego celu **kod
 Log testu SHA256 `e407de71faf4184d690e7f4328e177b5f84e51dae1d2f7eaae2d019527412a21`;
 Clippy `4845b7fed88a33b66531b478a8ab4336a4d1cab6ba41e6cee2b189ee4c57696a`.
 
-Łatka nie jest zastosowana w gałęzi produktu; oczekuje na konkretny przegląd właściciela.
+W chwili pierwotnego wpisu łatka nie była zastosowana w gałęzi produktu i została odłożona do przeglądu.
 Wcześniejsze zgody na importy Brokera i SQLCipher nie obejmują tego testu. Nawet ewentualny
 sukces kolejnego CI bez łatki nie zamknie deterministycznie wykazanego problemu predykatu testu.
 
