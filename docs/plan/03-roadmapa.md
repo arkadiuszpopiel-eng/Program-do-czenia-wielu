@@ -1,5 +1,15 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Kodowanie10.11 — #70/#71/#72:** naprawa utraty końcowych błędów kompilatora, runtime132/0/0,
+Clippy0; skryptowany model z rzeczywistym Rust przeszedł kompilację, poprawkę, test i uruchomienie.
+Cykl sprawdzony dla4wbudowanych person i własnej. Qwen8B CPU sam poprawił dwa małe programy
+(błąd typu i logiki), ze sprawdzonymi wynikami procesów; to sonda poza Core/Brokerem.
+`dev_test` nie ogłasza zaliczenia przy kodzie0 bez wykonanych testów. Wspólne207/0/0
+dla12crate'ów, Clippy0. Chroniona łatka testu Core pozostaje do konkretnego przeglądu właściciela.
+[Plan kodowania](55-enterprise-lokalnie-chmura-i-wyszukiwanie.md#kodowanie-10-11) · [Raport](../reviews/2026-11-10-coding-workflow.md).
+Baza b4e2dbcd: CI180 **9/10**, Windows Rust3592/1/47 (predykat4417), Linux3567/0/26;
+Chromium945/945, Windows102 **4/4**, WebView2 63/0/5. Nie nazywamy pełnegoCI180 zielonym.
+
 **Nowe zlecenieUI i telefon10.11:** opcjonalny kokpitJarvis, większe cele dotykowe i kafelki.
 Baza13c8c88d ma pełneCI179/Windows101 zielone (Linux3567/0/26,Windows3593/0/47).
 NowyUI#68 ma57/57próbChromium; nie jest odbiorem telefonu. Brama/parowanie telefonu

@@ -111,3 +111,58 @@ Pierwsza karta: [#54](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-w
 Raport: [Router i przypadki awarii](../reviews/2026-11-09-enterprise-router.md).
 Pozostałe wiersze wymagają osobnych przyrostów i testów; ten plan nie oznacza ich wykonania.
 Nie scalać bez świeżego niezależnego przeglądu i zielonego CI. Odbiór sprzętowy pozostaje oddzielny.
+
+
+## Kodowanie 10.11
+
+Nowe polecenie właściciela 10.11 po zamknięciu prac nocnych: asystentki mają tworzyć,
+kompilować, uruchamiać, testować i poprawiać programy z wykorzystaniem narzędzi komputera.
+Stare harmonogramy pozostają wyłączone. Ten plan nie oznacza zakończonego odbioru Enterprise.
+
+### Zakres bieżącego przyrostu
+
+1. #70: deterministyczna próba prywatności terminala; osobna, konkretna łatka chronionego testu
+   Core do przeglądu właściciela. [Raport](../reviews/2026-11-10-terminal-privacy.md).
+2. #71: zachowanie końcowych błędów kompilatora w ograniczonym wyniku narzędzia. Początek,
+   jawne pominięcie środka i końcówka mieszczą się w istniejącym limicie; bez zwiększania progów.
+3. Test integracyjny runtime: skryptowane decyzje modelu i rzeczywisty Rust w prywatnym katalogu:
+   błąd kompilacji → zapis poprawki → kompilacja testu → test → uruchomienie → przegląd tylko do odczytu.
+4. Osobne małe próby rzeczywistego Qwen8B na CPU: błąd typu i błąd logiczny. Surowe odpowiedzi,
+   argumenty narzędzi, wyjścia procesów i czasy zachowane. To sondy poza Core/Brokerem.
+5. #72: kod0 bez rozpoznanego, wykonanego testu nie potwierdza zaliczenia. Pusty wynik,
+   zero testów po filtrze i same pominięcia mają jawny stan niepotwierdzony; kod procesu
+   jest również w tekście dla modelu. RED6/3 → GREEN14/0/0; wspólne207/0/0 i Clippy0.
+
+### Uprawnienia i możliwości
+
+Rola Koderki już obejmuje worktree i powłokę; `dev_git` i `dev_test` należą także do grupy
+`shell`. Kompilację i uruchomienie realizują istniejące narzędzia, a nie tekst odpowiedzi.
+`shell_terminal` przedstawia propozycję dla właściciela; `shell_run` wykonuje polecenie.
+Prywatny terminal logowania CLI pozostaje przeznaczony dla właściciela; asystentki korzystają
+z własnych narzędzi wykonawczych, bez odczytu tokenów i strumienia logowania.
+
+Właściciel wybiera istniejący Pełny/Max dostęp dla lokalnych/chmurowych modeli. Zmiana modelu
+lub persony nie nadaje dodatkowych praw. Instalacja pakietów podlega istniejącemu Brokerowi;
+Windowsowe podniesienie praw nadal wymaga rzeczywistego tokenu UAC. Cloud Linux nie potwierdza
+instalacji sterownika, rebootu, pracy ConPTY ani obsługi docelowego GPU.
+
+Główne modele lokalne pozostają 8–12B z rezerwą kontekstu na RTX2060 12GB. Bielik1.5B jest
+pomocniczy. Skonfigurowany lekki model chmurowy może pomóc po problemie lokalnym; trudne
+zadania zachowują dotychczasową hierarchię. Nie ma potwierdzonego konta/API tej sesji, więc
+nie deklarujemy wykonanej próby Luna/Haiku ani instalacji nowego dostawcy.
+
+### Kolejność dalszego odbioru
+
+1. Konkretna decyzja właściciela o łatce Core #70 i niezależny przegląd przyrostów; pełne CI
+   nowego heada. Wynik poprzednika zachowany, bez anulowania kompletnego przebiegu pushem.
+2. Rzeczywisty runtime z docelowym modelem i narzędziami na Windows: przygotowanie zależności,
+   poprawka błędu kompilacji oraz regresji logicznej, STOP, wznowienie i odtworzenie raportu.
+3. Na RTX2060 12GB: pamięć i czasy przy 8k kontekstu oraz obciążeniu głosu/ekranu. Po tym
+   próbki większych repozytoriów dla wszystkich przypisanych do kodowania person.
+4. Kontrolowana instalacja zwykłego pakietu i osobna próba administratora/sterownika na maszynie
+   testowej Windows, z odtwarzaniem stanu. Nie uznajemy samych zgód Brokera za instalację.
+5. Prawdziwe API/hybryda po skonfigurowaniu znanego konta; #41/#48 nadal wymagają pełnych prób
+   semantyki i faktów wykonania. Dostawca WWW i podpisy ADR dla kontroli telefonu pozostają otwarte.
+
+[Raport kodowania](../reviews/2026-11-10-coding-workflow.md) ·
+[Telefon i kokpit](56-kokpit-jarvis-i-panel-telefonu.md)
