@@ -73,6 +73,9 @@ oznacza pustą mapę; format wewnętrznego werdyktu Krytyczki pozostaje bez prof
 `Runtime::with_ext(deps, RuntimeExt{ locks: scheduler (SchedulerLite), autonomy: BrokerAutonomy(broker) })`; `start_with(spec, RunOptions{crew: obsada sesji z personas, models wg polityki ról})`; `RuntimeExecutor::new(&runtime, kurs)` jako wykonawczyni `ExecutorKind::Agent` w `SchedulerModule`; panel Agentki/Replay: `children` + `report` (kroki cofalne całego zadania, koszty).
 
 ## Testy akceptacyjne
+- `tests/coding_cycle.rs`: Alfa, Beta, Gama, Delta i własna persona w roli Koderki;
+  skryptowany dostawca, rzeczywisty rustc i prywatny tempdir: błąd → poprawka → test → wykonanie
+  → przegląd tylko do odczytu. Nie jest to odbiór modelu, Brokera lub UAC.
 - `ACC-F3-agent-runtime-01..03` (v0): `app-core/tests/agents.rs`, `control.rs`, `loop_flow.rs`, `props.rs` — zielone bez zmian.
 - `ACC-F5-agent-runtime-04` (F5-02): `tests/steering.rs` — 20/20 (10 tekst, 10 głos przez `StepGate`).
 - `ACC-F5-agent-runtime-05` (F5-01 w runtime): `tests/parallel.rs` — 3 agentki równolegle, 0 kolizji (+ 100 losowych scenariuszy, kontrola negatywna bez dzierżaw).

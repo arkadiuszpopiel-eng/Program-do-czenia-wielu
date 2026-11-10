@@ -9,7 +9,7 @@ use agent_runtime_contract::{AgentRuntime, RunOutcome};
 use agent_runtime_impl::RuntimeConfig;
 use async_trait::async_trait;
 use common::{answer, call, spec, world_with};
-use personas_contract::builtin_roles;
+use personas_contract::{NameForms, Persona, PersonaId, builtin_personas, builtin_roles};
 use providers_contract::{ContentBlock, ToolResultPart};
 use risk_classifier_contract::Reversibility;
 use safety_broker_contract::TaintSource;
@@ -151,8 +151,8 @@ fn observed(request: &providers_contract::ChatRequest) -> String {
         .collect()
 }
 
-#[tokio::test]
-async fn real_compiler_failure_repair_tests_execution_and_read_only_review() {
+async fn coding_cycle(persona: Persona) {
+    let name = persona.name.clone();
     let dir = Arc::new(tempfile::tempdir().unwrap());
     std::fs::write(dir.path().join("main.rs"), BROKEN).unwrap();
     let w = world_with(
@@ -176,6 +176,8 @@ async fn real_compiler_failure_repair_tests_execution_and_read_only_review() {
     w.provider
         .push_script(answer("WERYFIKACJA: OK — kod, test i wynik są spójne."));
     let mut s = spec();
+    s.agent = core_bus_contract::AgentId::new(persona.id.as_str());
+    s.persona = persona;
     s.goal = "Napraw, skompiluj, przetestuj i uruchom program; sprawdź wynik.".into();
     s.roles = builtin_roles()
         .into_iter()
@@ -193,6 +195,7 @@ async fn real_compiler_failure_repair_tests_execution_and_read_only_review() {
         }
     ));
     let requests = w.provider.requests();
+    assert!(requests[0].system.as_ref().unwrap().contains(&name));
     assert!(observed(&requests[1]).contains("error[E0308]"));
     assert!(observed(&requests[1]).contains("exit=1"));
     assert!(observed(&requests[3]).contains("1 passed; 0 failed"));
@@ -203,4 +206,45 @@ async fn real_compiler_failure_repair_tests_execution_and_read_only_review() {
         std::fs::read_to_string(dir.path().join("main.rs")).unwrap(),
         BROKEN.replace("\"42\"", "42")
     );
+}
+
+async fn builtin_coding_cycle(id: &str) {
+    coding_cycle(
+        builtin_personas()
+            .into_iter()
+            .find(|p| p.id.as_str() == id)
+            .unwrap(),
+    )
+    .await;
+}
+
+#[tokio::test]
+async fn alfa_compiles_repairs_tests_runs_and_reviews() {
+    builtin_coding_cycle("alfa").await;
+}
+
+#[tokio::test]
+async fn beta_compiles_repairs_tests_runs_and_reviews() {
+    builtin_coding_cycle("beta").await;
+}
+
+#[tokio::test]
+async fn gama_compiles_repairs_tests_runs_and_reviews() {
+    builtin_coding_cycle("gama").await;
+}
+
+#[tokio::test]
+async fn delta_compiles_repairs_tests_runs_and_reviews() {
+    builtin_coding_cycle("delta").await;
+}
+
+#[tokio::test]
+async fn custom_persona_compiles_repairs_tests_runs_and_reviews() {
+    let mut persona = builtin_personas().remove(0);
+    persona.id = PersonaId::new("custom-coder");
+    persona.name = "Nova".into();
+    persona.forms = NameForms::uniform("Nova");
+    persona.builtin = false;
+    persona.wake_phrases = vec!["Hej Nova".into()];
+    coding_cycle(persona).await;
 }
