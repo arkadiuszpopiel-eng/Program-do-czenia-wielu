@@ -73,3 +73,12 @@ Wyniki te dotyczą bazy,nie nowego DTO. Wymagane noweCI i niezależny przegląd 
 #41/#48 i jakość odpowiedzi modeli pozostają otwarte. To naprawa faktów projekcji,nie dowód,
 że model przestał wymyślać wykonanie czynności. Produkcyjny dostawca wyszukiwania WWW nadal
 nie jest skonfigurowany. Sprzęt docelowyRTX2060 12GB,prawdziwy mikrofon i API czekają na odbiór.
+
+## Pełna baza CI172/Windows94 — sprawdzona 10.11
+
+Dla9319 wszystkie10 zadańCI172 oraz4Windows94 zakończone sukcesem. Linux3523/0/26,
+Windows3549/0/47,po1129 wyników celów. Wszystkie915 E2E wykonane w częściach305/305/305,
+8,5/7,4/10,5min. WebView2 63/0/5 w2,4min.
+[Zapis z identyfikatorami zadań](artifacts/ci172-confirmation-baseline.json).
+To potwierdza projekcję i zgodność kodu; [próba#58](2026-11-10-branch-tool-facts.md)
+nadal wykazała fikcyjne potwierdzenia modelu. Brak odbioru GPU12GB/API/mikrofonu i świeżego przeglądu.

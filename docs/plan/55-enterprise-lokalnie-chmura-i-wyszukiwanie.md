@@ -1,9 +1,15 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**#58 — próba faktów narzędzi odrzucona:** prawdziwy Core + Bielik 1.5B, po 50 odpowiedzi
+obu wersji i 50/50 fikcyjnych potwierdzeń w każdej, mimo poprawnie przekazanych liczników 0.
+Kod aplikacji przywrócony do 9319; [raport, łatka i 100 surowych odpowiedzi](../reviews/2026-11-10-branch-tool-facts.md).
+#41/#48 nadal otwarte; nie uznajemy zielonego transportu za zaliczenie jakości.
+
 **Kandydat[#57](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/57):**
 propozycja narzędzia wymagająca potwierdzenia zachowuje osobny stan w rozmowie i Replay,
 bez oznaczania jako wykonana. [Wyniki lokalne i ograniczenia](../reviews/2026-11-10-tool-confirmation.md).
-Bazaaa2e75ff ma zieloneCI171 iWindows93;nowy przyrost wymaga osobnegoCI i przeglądu.
+Baza9319 ma zieloneCI172 iWindows94:Linux3523/0/26,Windows3549/0/47,Chromium915/915,
+WebView2 63/0/5. Niezależny przegląd i odbiór sprzętu pozostają otwarte.
 
 
 **Nowe okno właściciela:10.11.2026,Europe/Warsaw.** Rozwój i poprawki do05:30
