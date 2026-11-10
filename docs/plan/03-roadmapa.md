@@ -1,5 +1,10 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Kandydat #59 — deduplikacja źródeł:** powtórzony poprawny cel nie zajmuje kolejnego
+miejsca ani budżetu znaków, pierwszy oryginalny URL i kolejność są zachowane.
+Lokalnie 40/0/0 i Clippy bez ostrzeżeń; [raport i ograniczenia](../reviews/2026-11-10-search-dedup.md).
+Publikacja po zakończeniu pełnego CI poprzedniego heada; odbiór wyszukiwarki pozostaje otwarty.
+
 **#58 — próba faktów narzędzi odrzucona:** prawdziwy Core + Bielik 1.5B, po 50 odpowiedzi
 obu wersji i 50/50 fikcyjnych potwierdzeń w każdej, mimo poprawnie przekazanych liczników 0.
 Kod aplikacji przywrócony do 9319; [raport, łatka i 100 surowych odpowiedzi](../reviews/2026-11-10-branch-tool-facts.md).

@@ -1,5 +1,7 @@
 //! Projekcja niezaufanych źródeł bez ujawniania sekretów i bez nieograniczonego JSON.
 
+use std::collections::BTreeSet;
+
 use tools_common_contract::text;
 use tools_net_contract::{SearchHit, SearchOut};
 
@@ -24,16 +26,23 @@ pub(crate) fn project(hits: Vec<SearchHit>, max: u32, budget: usize) -> (SearchO
     };
     let mut remaining = budget;
     let mut limited = false;
+    let mut seen = BTreeSet::new();
     for hit in hits {
         if out.results.len() >= max as usize || remaining == 0 {
             limited = true;
             break;
         }
         let url_chars = hit.url.chars().count();
-        if url_chars > remaining
-            || hit.url.chars().any(char::is_control)
-            || checked_target(&hit.url, "źródło wyszukiwania").is_err()
-        {
+        if url_chars > remaining || hit.url.chars().any(char::is_control) {
+            limited = true;
+            continue;
+        }
+        let Ok(target) = checked_target(&hit.url, "źródło wyszukiwania") else {
+            limited = true;
+            continue;
+        };
+        // Klucz z już sprawdzonego celu, lecz źródło dla modelu zachowuje oryginalny URL.
+        if !seen.insert(target.as_str().to_owned()) {
             limited = true;
             continue;
         }

@@ -188,3 +188,107 @@ async fn zero_and_small_budgets_never_shorten_source_addresses() {
         }
     }
 }
+
+async fn projected(
+    hits: Vec<SearchHit>,
+    max: u32,
+    budget: usize,
+) -> tools_common_contract::ToolOutcome {
+    let h = harness_with(Opts {
+        search: Some(Arc::new(UnboundedSearch(hits))),
+        config: tools_net_contract::NetToolsConfig {
+            output_max_chars: budget,
+            ..Default::default()
+        },
+        ..Opts::default()
+    });
+    let out = h
+        .tool("net_search")
+        .call(json!({"query":"źródła","max_results":max}), &ctx())
+        .await;
+    assert!(out.is_ok(), "{}", out.text);
+    out
+}
+
+fn urls(out: &tools_common_contract::ToolOutcome) -> Vec<&str> {
+    out.data["results"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v["url"].as_str().unwrap())
+        .collect()
+}
+
+#[tokio::test]
+async fn duplicate_does_not_hide_next_source_at_result_limit() {
+    let a = "https://docs.example/a";
+    let b = "https://docs.example/b";
+    let out = projected(vec![hit(a), hit(a), hit(b)], 2, 4096).await;
+    assert_eq!(urls(&out), vec![a, b]);
+    assert!(out.text.contains("powtórzenia"), "{}", out.text);
+    assert!(out.untrusted.is_some());
+}
+
+#[tokio::test]
+async fn canonical_target_dedup_keeps_first_original_source_and_rank() {
+    let first = "HTTPS://DOCS.EXAMPLE:443/guide#start";
+    let mut source = hit(first);
+    source.title = "Pierwszy tytuł".into();
+    source.snippet = "Pierwszy opis".into();
+    let out = projected(
+        vec![
+            source,
+            hit("https://docs.example/guide#next"),
+            hit("https://docs.example/guide"),
+            hit("https://other.example/"),
+        ],
+        10,
+        4096,
+    )
+    .await;
+    assert_eq!(urls(&out), vec![first, "https://other.example/"]);
+    assert_eq!(out.data["results"][0]["title"], "Pierwszy tytuł");
+    assert_eq!(out.data["results"][0]["snippet"], "Pierwszy opis");
+}
+
+#[tokio::test]
+async fn duplicate_title_does_not_spend_budget_for_other_source() {
+    let a = "https://docs.example/a";
+    let b = "https://docs.example/b";
+    let mut duplicate = hit(a);
+    duplicate.title = "Duplikat ".repeat(1000);
+    let out = projected(vec![hit(a), duplicate, hit(b)], 10, 256).await;
+    assert_eq!(urls(&out), vec![a, b]);
+    assert_eq!(out.data["results"][1]["snippet"], hit(b).snippet);
+}
+
+#[tokio::test]
+async fn path_case_query_and_nondefault_port_remain_distinct() {
+    let sources = [
+        "https://docs.example/A",
+        "https://docs.example/a",
+        "https://docs.example/a?page=1",
+        "https://docs.example/a?page=2",
+        "https://docs.example:8443/a",
+    ];
+    let out = projected(sources.into_iter().map(hit).collect(), 10, 4096).await;
+    assert_eq!(urls(&out), sources);
+    assert!(!out.text.contains("pominięto"));
+}
+
+#[tokio::test]
+async fn secret_fragment_is_rejected_before_recording_seen_target() {
+    let safe = "https://docs.example/a#public";
+    let out = projected(
+        vec![
+            hit("https://docs.example/a#token=tajny123"),
+            hit(safe),
+            hit("https://docs.example/a#other"),
+        ],
+        10,
+        4096,
+    )
+    .await;
+    assert_eq!(urls(&out), vec![safe]);
+    assert!(!serde_json::to_string(&out).unwrap().contains("tajny123"));
+}

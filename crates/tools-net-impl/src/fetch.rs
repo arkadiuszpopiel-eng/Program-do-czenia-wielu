@@ -182,7 +182,7 @@ impl Core {
         let (out, limited) =
             crate::search_results::project(hits, max, self.config.output_max_chars);
         let notice = if limited {
-            "Część wyników dostawcy pominięto lub skrócono (kontrola adresów i limity).\n"
+            "Część wyników dostawcy pominięto lub skrócono (powtórzenia, kontrola adresów i limity).\n"
         } else {
             ""
         };

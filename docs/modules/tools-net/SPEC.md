@@ -28,6 +28,9 @@ Zdarzenia: `tool.net.fetch` (host, status, bajty), `tool.net.download` (ścieżk
 - **Limity:** treść `net_fetch` ≤ 2 MiB (przekroczenie = przerwanie odczytu, wynik obcięty), czas całkowity ≤ 30 s; pobieranie ≤ 200 MiB i ≤ 300 s; nagłówek `Content-Length` ponad limit = odmowa bez odczytu treści; anulowanie (kill-switch) przerywa odczyt i usuwa plik częściowy.
 - **Treść niezaufana:** `untrusted = Web`, taint sesji zgłaszany Brokerowi, sekrety redagowane, tekst tylko dla typów tekstowych.
 - **Wyniki wyszukiwania:** granica narzędzia egzekwuje `max_results`, niezależnie od dostawcy.
+  Powtórzony poprawny cel z istniejącej normalizacji `checked_target` (bez fragmentu) nie
+  zużywa miejsca ani znaków. Zachowujemy kolejność i pierwszy oryginalny URL/tytuł/opis;
+  różne ścieżki, query i porty pozostają osobne. Nie pobieramy dodatkowych wyników w celu uzupełnienia.
   Każdy zwracany URL przechodzi istniejącą walidację celu HTTPS/publicznego i sekretów; adres
   ze znakami sterującymi, niedozwolony lub zawierający wykryty sekret jest pomijany, nie
   przepisywany do wymyślonego źródła. Budżet `output_max_chars` ogranicza też sumę znaków pól
