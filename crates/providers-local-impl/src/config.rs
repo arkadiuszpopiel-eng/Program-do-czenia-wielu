@@ -230,7 +230,7 @@ pub struct LaunchPlan {
     pub program: PathBuf,
     /// Backend.
     pub backend: BackendKey,
-    /// Warstwy na GPU (`-ngl`).
+    /// Bloki modelu na GPU; dla całości `args` dolicza poziom wyjściowy llama.cpp do `-ngl`.
     pub gpu_layers: u32,
     /// Kontekst.
     pub ctx: u32,
@@ -266,6 +266,13 @@ impl LaunchPlan {
         port: u16,
         api_key: &str,
     ) -> Vec<String> {
+        // llama.cpp b11559 liczy poziom wyjściowy poza blokami modelu. Samo `entry.layers`
+        // pozostawia jeden blok na CPU. Limit częściowego odciążenia i zero są dosłowne.
+        let ngl = if self.gpu_layers > 0 && self.gpu_layers == entry.layers {
+            self.gpu_layers.saturating_add(1)
+        } else {
+            self.gpu_layers
+        };
         let mut args = vec![
             "--host".to_owned(),
             "127.0.0.1".into(),
@@ -280,7 +287,7 @@ impl LaunchPlan {
             "-c".into(),
             self.ctx.to_string(),
             "-ngl".into(),
-            self.gpu_layers.to_string(),
+            ngl.to_string(),
             "--threads".into(),
             self.threads.to_string(),
             "-np".into(),

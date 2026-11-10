@@ -140,7 +140,7 @@ async fn gpu_start_failure_falls_back_to_cpu_within_5s() {
     assert_eq!(launches.len(), 2);
     assert_eq!(
         arg(&launches[0], "-ngl").as_deref(),
-        Some("32"),
+        Some("33"),
         "desktop 16 GB: całość na GPU"
     );
     assert_eq!(arg(&launches[1], "-ngl").as_deref(), Some("0"));
@@ -228,7 +228,7 @@ async fn device_profile_and_residency_drive_arguments() {
     let first = env.launches().remove(0);
     assert_eq!(
         arg(&first, "-ngl").as_deref(),
-        Some("32"),
+        Some("33"),
         "dzierżawa GPU: pełne odciążenie"
     );
     assert_eq!(arg(&first, "--threads"), Some(threads));

@@ -39,7 +39,8 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
   start modelu nie jest milczeniem dla Routera), restart po awarii z limitem (`max_restarts` w `restart_window`),
   fallback GPU → CPU (`-ngl 0`), zwolnienie po bezczynności, `kill_on_drop`.
 - **Argumenty z profilu urządzenia:** backend (Vulkan/CUDA/CPU = osobne pliki `llama-server`; bateria lub słaby sprzęt
-  → CPU), `-ngl` z dzierżawy `model-residency` (GPU → wszystkie warstwy, CPU → 0) albo proporcjonalnie do budżetu VRAM,
+  → CPU), `-ngl` z dzierżawy `model-residency` (GPU → wszystkie bloki i dodatkowy poziom wyjściowy llama.cpp,
+  CPU → 0) albo proporcjonalnie do budżetu VRAM; częściowe odciążenie zachowuje jawny limit,
   `-c`, `--threads` (rdzenie fizyczne), `--alias`, `-np 1`, `--jinja` (narzędzia).
 - **Modele:** `models.toml` (GGUF, URL HF, rozmiar, SHA-256, kwant, warstwy, kontekst, szacunki VRAM/RAM, licencja);
   walidacja: `.gguf`, bez kwantów IQ, https. Historyczny domyślny: Bielik 4.5B v3.0 Instruct Q8_0 (fala 6; wcześniej Q4_K_M — brak w oficjalnym repozytorium).
@@ -142,9 +143,10 @@ zapisu; zachowują sprawdzenie instalacji po starcie bez restartu, bez retries i
   | --- | --- | --- | --- | --- | --- |
   | 4.5B Q8_0 | 5400 | 5600 | 60 | 5880 | 6080 |
   | 1.5B Q8_0 | 2200 | 2400 | 32 | 2456 | 2656 |
-- **Częściowe odciążenie z dzierżawą.** `-ngl` = `layers_for(budżet VRAM − rezerwa STT, ctx)`: całość, gdy się mieści,
+- **Częściowe odciążenie z dzierżawą.** Liczba bloków w planie = `layers_for(budżet VRAM − rezerwa STT, ctx)`: całość, gdy się mieści,
   inaczej (budżet − 550) / (VRAM całości − 550) × warstwy. Dzierżawa `model-residency` zgłasza VRAM dla tych warstw
-  (`ModelEntry::vram_for`) i RAM procesu z wagami/KV warstw na CPU (`ram_for`); dzierżawa na CPU → `-ngl 0`. Rezerwa
+  (`ModelEntry::vram_for`) i RAM procesu z wagami/KV warstw na CPU (`ram_for`); dzierżawa na CPU → `-ngl 0`.
+  Dla całości `LaunchPlan::args` dodaje do `-ngl` jeden poziom wyjściowy zgodnie z b11559; częściowy limit pozostaje dosłowny. Rezerwa
   STT (`stt_reserve_mb` = 1500, tyle co dzierżawa `voice-stt`) — gdy profil urządzenia przewiduje STT na GPU.
 - **Kontekst** (`LocalConfig::ctx_for`, `min_ctx` = 4096): na GPU zmniejszany (połowienie do `min_ctx`) **tylko
   wtedy, gdy pozwala to zmieścić model w całości** obok rezerwy STT; gdy i tak będzie częściowe odciążenie — pełny

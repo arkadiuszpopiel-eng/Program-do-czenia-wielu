@@ -11,6 +11,13 @@
 --threads <n> -np 1 [--device <id>] [--jinja]`. `--jinja` jest w b11559 domyślnie włączone (podajemy jawnie dla
 modeli z narzędziami). `--list-devices` — lista urządzeń (`devices.rs`).
 
+W b11559 `src/llama-model.cpp::n_gpu_layers()` liczy `n_layer_all + 1` dla pełnego odciążenia
+(dodatkowy poziom wyjściowy). `load_tensors()` ustawia początek GPU na
+`max(n_layer_all + 1 - n_gpu_layers, 0)`: samo `-ngl <liczba bloków>` pozostawia jeden blok na CPU.
+`LaunchPlan` przechowuje liczbę bloków dla rachunku pamięci; `args` dodaje jeden wyłącznie przy pełnym
+odciążeniu. Częściowy limit i `-ngl 0` pozostają dosłowne. Zweryfikowano źródła tagu i regresje argumentów;
+nie jest to pomiar GPU.
+
 ## HTTP, którego używamy
 - `GET /health` → 200 albo 503 (ładowanie). `GET /v1/models`.
 - `POST /v1/chat/completions` (`stream: true`, `stream_options.include_usage`, `max_tokens`): SSE
