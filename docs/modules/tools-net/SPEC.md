@@ -34,6 +34,9 @@ Zdarzenia: `tool.net.fetch` (host, status, bajty), `tool.net.download` (ścieżk
   przed startem pracy też sprawdza token i termin. Rozpoczętego synchronicznego I/O nie
   przerywamy w środku: część znika po jego powrocie i Drop, a komunikat przyznaje pracę w tle.
   Rozpoczęty commit pozostaje obserwowany do rzeczywistego wyniku, bez ukrywania efektu.
+  Gotowe nagłówki/chunk/EOF HTTP i wynik SearchPort nie omijają upłyniętego deadline:
+  termin sprawdzamy przed/po I/O i przed zwrotem danych; Stop ma pierwszeństwo. Dotychczasowe
+  limity pozostają te same, rozpoczęty commit pobrania nadal zachowuje rzeczywisty wynik.
   Wyszukiwanie sprawdza token ponownie po odpowiedzi dostawcy/zwolnieniu zgody i przed
   oddaniem wyniku. Stop zgłoszony przed zwrotem dostawcy nie staje się sukcesem ani błędem I/O.
   Anulowanie odbioru nie dowodzi, że dostawca nie otrzymał zapytania lub przerwał jego wykonanie.

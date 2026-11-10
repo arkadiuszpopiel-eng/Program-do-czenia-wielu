@@ -13,7 +13,7 @@ use tools_net_contract::{
     EVENT_FETCH, FetchArgs, FetchOut, HttpMethod, SearchArgs, url_carries_secret,
 };
 
-use crate::core::{Core, Step, fail, net_failure, network_cancelled, refuse};
+use crate::core::{Core, Step, check_deadline, fail, net_failure, network_cancelled, refuse};
 
 /// Czy typ treści jest tekstowy (brak typu — rozstrzyga dekodowanie).
 fn textual(content_type: Option<&str>) -> bool {
@@ -86,6 +86,7 @@ impl Core {
         if ctx.cancel.is_cancelled() {
             return Err(network_cancelled(&action));
         }
+        check_deadline(deadline, &action)?;
         let (body, cut) = read?;
         let bytes = body.len() as u64;
         report_untrusted(&self.gate, ctx, TaintSource::Web).await;
@@ -151,6 +152,7 @@ impl Core {
         if ctx.cancel.is_cancelled() {
             return Err(network_cancelled(&action));
         }
+        check_deadline(deadline, &action)?;
         o.truncated = out.truncated;
         o.approval = opened.grants.iter().find_map(|g| g.auth.approval);
         Ok(o)
@@ -181,18 +183,23 @@ impl Core {
         let deadline = Instant::now() + Duration::from_millis(self.config.fetch_timeout_ms);
         let grant = self.egress(ctx, m, target.host(), action).await?;
         let max = a.max_results.unwrap_or(10).clamp(1, 20);
-        let found = tokio::select! {
+        let found = if let Err(e) = check_deadline(deadline, action) {
+            Err(e)
+        } else {
+            tokio::select! {
             () = ctx.cancel.cancelled() => Err(search_cancelled()),
             r = tokio::time::timeout_at(deadline, port.search(&a.query, max)) => match r {
                 Ok(Ok(hits)) => Ok(hits),
                 Ok(Err(e)) => Err(net_failure(&e, action)),
                 Err(_) => Err(net_failure(&tools_net_contract::NetError::Timeout, action)),
             },
+            }
         };
         self.release(std::slice::from_ref(&grant)).await;
         if ctx.cancel.is_cancelled() {
             return Err(search_cancelled());
         }
+        check_deadline(deadline, action)?;
         let hits = found?;
         report_untrusted(&self.gate, ctx, TaintSource::Web).await;
         let (out, limited) =
@@ -220,6 +227,7 @@ impl Core {
         if ctx.cancel.is_cancelled() {
             return Err(search_cancelled());
         }
+        check_deadline(deadline, action)?;
         o.approval = grant.auth.approval;
         Ok(o)
     }

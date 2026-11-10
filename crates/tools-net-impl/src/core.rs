@@ -56,6 +56,20 @@ pub(crate) fn network_cancelled(action: &str) -> Box<ToolOutcome> {
     Box::new(out)
 }
 
+/// Gotowy wynik też musi mieścić się w dotychczasowym terminie.
+pub(crate) fn check_deadline(deadline: Instant, action: &str) -> Step<()> {
+    if Instant::now() >= deadline {
+        Err(fail(
+            ToolErrorKind::Timeout,
+            format!(
+                "Przekroczono czas oczekiwania: {action}. Żądanie mogło już dotrzeć do odbiorcy."
+            ),
+        ))
+    } else {
+        Ok(())
+    }
+}
+
 /// Zgoda na host z weryfikacją.
 pub(crate) struct HostGrant {
     pub(crate) host: String,
@@ -157,6 +171,7 @@ impl Core {
         if ctx.cancel.is_cancelled() {
             return Err(network_cancelled(action));
         }
+        check_deadline(deadline, action)?;
         let result = tokio::select! {
             () = ctx.cancel.cancelled() => Err(network_cancelled(action)),
             r = tokio::time::timeout_at(deadline, self.http.send(req)) => match r {
@@ -168,6 +183,7 @@ impl Core {
         if ctx.cancel.is_cancelled() {
             return Err(network_cancelled(action));
         }
+        check_deadline(deadline, action)?;
         result
     }
 
@@ -271,6 +287,7 @@ impl Core {
         if ctx.cancel.is_cancelled() {
             return Err(network_cancelled(action));
         }
+        check_deadline(deadline, action)?;
         let next = tokio::select! {
             () = ctx.cancel.cancelled() => return Err(network_cancelled(action)),
             r = tokio::time::timeout_at(deadline, body.chunk()) => r,
@@ -278,6 +295,7 @@ impl Core {
         if ctx.cancel.is_cancelled() {
             return Err(network_cancelled(action));
         }
+        check_deadline(deadline, action)?;
         match next {
             Err(_) => Err(net_failure(&NetError::Timeout, action)),
             Ok(Err(e)) => Err(net_failure(&e, action)),
