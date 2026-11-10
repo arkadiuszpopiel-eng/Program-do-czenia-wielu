@@ -240,6 +240,36 @@ fn chat(stream: &mut TcpStream, cfg: &Cfg, raw: &str) {
             .unwrap_or_default()
     };
     match kind {
+        "heartbeat_stall" => {
+            if let Some(first) = scenario["first_text"].as_str()
+                && !send(chunk(&json!({"content": first}), None))
+            {
+                return;
+            }
+            for _ in 0..200 {
+                let message = if scenario["metadata"] == true {
+                    chunk(&json!({"role": "assistant", "content": ""}), None)
+                        + "data: {\"choices\":[],\"usage\":{\"prompt_tokens\":7}}\n\n"
+                } else {
+                    ": ping\n\n".into()
+                };
+                if !send(message) {
+                    return;
+                }
+                std::thread::sleep(Duration::from_millis(50));
+            }
+        }
+        "delayed_first" => {
+            if !send(
+                chunk(&json!({"role": "assistant", "content": ""}), None)
+                    + "data: {\"choices\":[],\"usage\":{\"prompt_tokens\":7}}\n\n",
+            ) {
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(450));
+            let _ = send(chunk(&json!({"content": "Odpowiedź"}), None))
+                && send(chunk(&json!({}), Some("stop")));
+        }
         "stall" => std::thread::sleep(Duration::from_secs(30)),
         "tool" => {
             let args = scenario["arguments"].to_string();

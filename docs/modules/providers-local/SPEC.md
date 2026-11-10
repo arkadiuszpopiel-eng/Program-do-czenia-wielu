@@ -26,6 +26,13 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
 - **Protokół sidecara (rozstrzygnięte):** `llama-server` (OpenAI-compatible HTTP) na `127.0.0.1`, losowy port i losowy
   `--api-key` (192 bity, tylko w pamięci, redagowany w logach) per uruchomienie; nigdy `0.0.0.0`. Strumień przez wspólny
   silnik `lib-openai-compat` (ten sam co `providers-api`). Job Object / brak tokenu egress — przez `platform-windows` (F2).
+- **Postęp generacji lokalnej:** `LlamaCodec::content_timeouts` stosuje skonfigurowane
+  first-token/idle do niepustej treści po dekoderze (tekst, myślenie, narzędzia), nie do
+  bajtów/pingów, Started, Usage ani pustych delt. Przed treścią pozostaje absolutny first-token;
+  po treści idle od ostatniego postępu. Komentarze nie skracają pierwszego budżetu i nie
+  przedłużają żadnego. Domyślne60/30s bez zmian. Koperta narzędzia musi dać zdekodowany wynik
+  w tym budżecie. Limit nie gwarantuje szybkości modelu; błąd przed treścią ma after_output=false.
+  Zachowanie API chmurowych pozostaje dotychczasowe; Stop/anulowanie zachowują pierwszeństwo.
 - **Cykl życia:** start na żądanie (jeden naraz), zdrowie `GET /health`, `Started` od razu po przyjęciu żądania (zimny
   start modelu nie jest milczeniem dla Routera), restart po awarii z limitem (`max_restarts` w `restart_window`),
   fallback GPU → CPU (`-ngl 0`), zwolnienie po bezczynności, `kill_on_drop`.

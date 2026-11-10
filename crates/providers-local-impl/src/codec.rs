@@ -55,6 +55,10 @@ impl LlamaCodec {
 impl WireCodec for LlamaCodec {
     type Decoder = EnvelopeGuard<LeakGuard<ChatDecoder>>;
 
+    fn content_timeouts(&self) -> bool {
+        true
+    }
+
     fn build(&self, req: &ChatRequest, _opts: BuildOptions) -> Result<WireRequest, ProviderError> {
         let options = ChatOptions {
             max_tokens_field: MaxTokensField::MaxTokens,

@@ -178,8 +178,10 @@ impl<'a, C: WireCodec> Run<'a, C> {
                     (evs, true)
                 }
             };
-            seen = true;
-            deadline = Instant::now() + idle;
+            if !self.engine.codec.content_timeouts() || batch.iter().any(has_progress) {
+                seen = true;
+                deadline = Instant::now() + idle;
+            }
             for ev in batch {
                 match self.forward(ev).await {
                     Forward::Continue => {}
@@ -211,7 +213,12 @@ impl<'a, C: WireCodec> Run<'a, C> {
         if ev.is_terminal() {
             return Forward::Terminal(ev);
         }
-        if ev.is_content() && !self.emitted {
+        let content = if self.engine.codec.content_timeouts() {
+            has_progress(&ev)
+        } else {
+            ev.is_content()
+        };
+        if content && !self.emitted {
             self.emitted = true;
             self.ttft = Some(self.started.elapsed());
         }
@@ -220,6 +227,19 @@ impl<'a, C: WireCodec> Run<'a, C> {
             () = self.cancel.cancelled() => Forward::Terminal(cancelled()),
             r = self.tx.send(ev) => if r.is_ok() { Forward::Continue } else { Forward::Gone },
         }
+    }
+}
+
+/// Pusty fragment nie rozpoczyna ani nie przedłuża czasu generacji.
+fn has_progress(event: &ProviderEvent) -> bool {
+    match event {
+        ProviderEvent::TextDelta { text, .. } | ProviderEvent::ThinkingDelta { text, .. } => {
+            !text.is_empty()
+        }
+        ProviderEvent::ThinkingSignature { signature, .. } => !signature.is_empty(),
+        ProviderEvent::RedactedThinking { data, .. } => !data.is_empty(),
+        ProviderEvent::ToolCallDelta { partial_json, .. } => !partial_json.is_empty(),
+        _ => event.is_content(),
     }
 }
 
