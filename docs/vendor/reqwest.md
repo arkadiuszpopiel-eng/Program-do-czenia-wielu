@@ -29,5 +29,6 @@ Upuszczenie `Response`/strumienia bajtów przed końcem zamyka połączenie (HTT
 ## Pułapki
 - `send()` rozwiązuje się po nagłówkach — w dotychczasowych API limit „first-token" liczymy
   od wysłania do pierwszego zdarzenia SSE. Lokalny `LlamaCodec::content_timeouts()` wybiera
-  niepustą treść po dekoderze; pingi/metadane nie zmieniają jego first-token/idle ani TTFT.
+  niepustą generację SSE przed buforującą kopertą; pingi/metadane nie zmieniają first-token/idle.
+  TTFT i after_output pozostają oparte na zdekodowanej treści, nie na aktywności transportu.
 - Bez `json` nie ma `RequestBuilder::json`/`Response::json`.

@@ -43,9 +43,14 @@ pub trait WireCodec: Send + Sync + 'static {
     fn classify(&self, status: u16, headers: &HeaderMap, body: &str) -> ProviderError;
     /// Czy first-token/idle mierzą postęp treści zamiast porcje transportu.
     /// Domyślnie zachowuje dotychczasową semantykę API; lokalny adapter nie uznaje pingów
-    /// i metadanych za generację. Treść po dekodowaniu obejmuje też narzędzia i myślenie.
+    /// i metadanych za generację. Postęp określa event_progress albo zdarzenia po dekoderze.
     fn content_timeouts(&self) -> bool {
         false
+    }
+    /// Postęp generacji przed buforującym dekoderem, jeśli format dostawcy go ujawnia.
+    /// `None` używa niepustych zdarzeń po dekoderze. Nie poświadcza gotowego wyjścia/akcji.
+    fn event_progress(&self, _event: &SseEvent) -> Option<bool> {
+        None
     }
     /// Nagłówki stałe dla wszystkich żądań (np. `anthropic-version`).
     fn static_headers(&self) -> Vec<(&'static str, String)> {
