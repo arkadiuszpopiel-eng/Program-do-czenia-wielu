@@ -15,6 +15,10 @@ dev_test { runner?: cargo|npm|pnpm|yarn|pytest|go|dotnet, filter?, timeout_s? (1
   pnpm (pnpm-lock.yaml) / yarn (yarn.lock) / npm; go.mod → go; *.sln/*.csproj → dotnet;
   pytest.ini / pyproject.toml / setup.cfg / tox.ini / `tests` → pytest.
 - Parsery podsumowań: cargo, pytest, vitest/jest, go, dotnet (z nazwami niezaliczonych).
+- `TestSummary.ok` wymaga kodu0, rozpoznanego podsumowania, co najmniej jednego zaliczonego
+  testu i braku niezaliczonych. Pusty wynik, nierozpoznany format, filtr bez testów lub same
+  pominięcia dają `ok=false` i jawny komunikat „zaliczenie niepotwierdzone”. Samo wykonanie
+  narzędzia nadal ma `ToolStatus::Ok`; kod procesu znajduje się też w tekście dla modelu.
 - Argumenty z modelu: `safe_token` (litery, cyfry, `._/~:@-`, bez `-` na początku, bez `..`,
   bez `^`), `safe_path` (ścieżka względna, bez `..`, dysku i metaznaków; w cudzysłowie).
 

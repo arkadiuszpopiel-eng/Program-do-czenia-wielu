@@ -47,6 +47,37 @@ fn fail(kind: ToolErrorKind, text: impl Into<String>) -> Box<ToolOutcome> {
     Box::new(ToolOutcome::failed(kind, text))
 }
 
+fn test_heading(summary: &TestSummary, found: bool, timeout: u32) -> String {
+    if summary.timed_out {
+        return format!("Testy przerwane po {timeout} s (limit czasu).");
+    }
+    if !found {
+        return if summary.exit_code == Some(0) {
+            "Polecenie zakończyło się kodem 0, ale nie rozpoznano podsumowania testów. Zaliczenie niepotwierdzone.".into()
+        } else {
+            "Testy nie wystartowały albo zakończyły się błędem przed podsumowaniem (np. błąd kompilacji) — szczegóły niżej.".into()
+        };
+    }
+    if summary.passed == 0 && summary.failed == 0 {
+        return format!(
+            "Nie wykonano testów (pominięte {}). Zaliczenie niepotwierdzone.",
+            summary.skipped
+        );
+    }
+    format!(
+        "{}: zaliczone {}, niezaliczone {}, pominięte {} ({:.1} s).",
+        if summary.ok {
+            "Testy zaliczone"
+        } else {
+            "Testy z błędami"
+        },
+        summary.passed,
+        summary.failed,
+        summary.skipped,
+        summary.elapsed_ms as f64 / 1000.0
+    )
+}
+
 impl Core {
     fn workdir(&self, ctx: &ToolCtx) -> Step<String> {
         let dir = ctx.workdir.clone().ok_or_else(|| {
@@ -271,28 +302,14 @@ impl Core {
             failures: counts.failures,
             exit_code,
             timed_out: out.termination == ExecTermination::TimedOut,
-            ok: exit_code == Some(0) && counts.failed == 0,
+            ok: exit_code == Some(0) && counts.found && counts.passed > 0 && counts.failed == 0,
             elapsed_ms: out.elapsed_ms,
         };
         report_untrusted(&self.gate, ctx, TaintSource::File).await;
-        let mut head = if summary.timed_out {
-            format!("Testy przerwane po {timeout} s (limit czasu).")
-        } else if !counts.found && !summary.ok {
-            "Testy nie wystartowały albo zakończyły się błędem przed podsumowaniem (np. błąd kompilacji) — szczegóły niżej.".into()
-        } else {
-            format!(
-                "{}: zaliczone {}, niezaliczone {}, pominięte {} ({:.1} s).",
-                if summary.ok {
-                    "Testy zaliczone"
-                } else {
-                    "Testy z błędami"
-                },
-                summary.passed,
-                summary.failed,
-                summary.skipped,
-                summary.elapsed_ms as f64 / 1000.0
-            )
-        };
+        let mut head = test_heading(&summary, counts.found, timeout);
+        if let Some(code) = summary.exit_code {
+            head.push_str(&format!("\nKod wyjścia: {code}."));
+        }
         if !summary.failures.is_empty() {
             head.push_str(&format!("\nNiezaliczone: {}", summary.failures.join(", ")));
         }

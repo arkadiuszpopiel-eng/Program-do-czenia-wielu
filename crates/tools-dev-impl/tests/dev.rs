@@ -185,3 +185,58 @@ async fn workdir_required_and_deny_list() {
     assert!(matches!(out.status, ToolStatus::Denied { .. }), "{out:?}");
     assert!(h.exec.runs().is_empty());
 }
+
+async fn assert_unverified_test_output(output: &str) {
+    let h = harness();
+    h.exec.push(FakeRun::ok(output));
+    let out = h
+        .tool("dev_test")
+        .call(json!({"runner":"cargo"}), &h.ctx())
+        .await;
+    assert!(out.is_ok(), "wywołanie narzędzia wykonane");
+    assert_eq!(out.data["exit_code"], 0);
+    assert_eq!(
+        out.data["ok"], false,
+        "kod0 nie dowodzi wykonania testów: {}",
+        out.text
+    );
+    assert!(!out.text.contains("Testy zaliczone"));
+    assert!(out.text.contains("niepotwierdzone"));
+}
+
+#[tokio::test]
+async fn empty_success_is_not_a_test_pass() {
+    assert_unverified_test_output("").await;
+}
+
+#[tokio::test]
+async fn zero_selected_tests_are_not_a_test_pass() {
+    assert_unverified_test_output(
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 20 filtered out",
+    )
+    .await;
+}
+
+#[tokio::test]
+async fn only_ignored_tests_are_not_a_test_pass() {
+    assert_unverified_test_output("test result: ok. 0 passed; 0 failed; 5 ignored").await;
+}
+
+#[tokio::test]
+async fn actual_passes_require_a_successful_process_too() {
+    for (exit, ok) in [(0, true), (101, false)] {
+        let h = harness();
+        h.exec.push(FakeRun::exit(
+            exit,
+            "test result: ok. 3 passed; 0 failed; 0 ignored",
+            "",
+        ));
+        let out = h
+            .tool("dev_test")
+            .call(json!({"runner":"cargo"}), &h.ctx())
+            .await;
+        assert_eq!(out.data["ok"], ok);
+        assert_eq!(out.data["passed"], 3);
+        assert!(out.text.contains(&format!("Kod wyjścia: {exit}.")));
+    }
+}
