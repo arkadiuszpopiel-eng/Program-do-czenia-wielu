@@ -1,0 +1,185 @@
+{
+  "issue": 68,
+  "base": "13c8c88d9a2daeba8cf7fa32766df9bda2195f75",
+  "red": [
+    0,
+    2
+  ],
+  "first_green": [
+    2,
+    0
+  ],
+  "matrix_initial": [
+    18,
+    1
+  ],
+  "matrix_fixture_note": "voice opens settings page, not right-panel tab; corrected selector to existing aria-current",
+  "final_e2e": [
+    57,
+    0,
+    0
+  ],
+  "test_command": "PW_WORKERS=1 pnpm --filter @alfa/desktop-ui exec playwright test cockpit.spec.ts jarvis.spec.ts session-cards.spec.ts settings-geometry.spec.ts --workers=1",
+  "screenshots": [
+    {
+      "file": "after-desktop.png",
+      "sha256": "ae354925ce6b30265e0ebed73b792df1a544a744c239e02deeee955409c4db1b",
+      "inspected": true,
+      "scope": "Current audit fakeAPI/headlessLinuxChromium, not physical phone"
+    },
+    {
+      "file": "after-phone.png",
+      "sha256": "4f300db94927030526da93478b2d5fe5e317bafb5b1f297b0dfe0b71dd04deb3",
+      "inspected": true,
+      "scope": "Current audit fakeAPI/headlessLinuxChromium, not physical phone"
+    },
+    {
+      "file": "after-small-phone.png",
+      "sha256": "432b1cd77e615a11988d73f4c30e1e1dc193910d161b6f4d4628149e71357085",
+      "inspected": true,
+      "scope": "Current audit fakeAPI/headlessLinuxChromium, not physical phone"
+    },
+    {
+      "file": "before-desktop.png",
+      "sha256": "336f2ad318fd6a1955600b0eab565f58d7d583296590633891179feff29d254c",
+      "inspected": true,
+      "scope": "Current audit fakeAPI/headlessLinuxChromium, not physical phone"
+    },
+    {
+      "file": "before-phone.png",
+      "sha256": "4a26aab13422ad4d454dfd09e0917612260cd43dd53af2a10badcd4c510dfa34",
+      "inspected": true,
+      "scope": "Current audit fakeAPI/headlessLinuxChromium, not physical phone"
+    },
+    {
+      "file": "before-small-phone.png",
+      "sha256": "0dcdffd8006447eabf6136349085a8dda75aac8796b252539a253d40a05b39e2",
+      "inspected": true,
+      "scope": "Current audit fakeAPI/headlessLinuxChromium, not physical phone"
+    }
+  ],
+  "logs": {
+    "cockpit-red": {
+      "sha256": "68b38b9a2683f56d0fda23f1042c6dddb0538755696bcc9e73066a96028947a8",
+      "exit": "1"
+    },
+    "cockpit-green": {
+      "sha256": "131dee15d327f35b7634eee7276c1e6dd8a4502a50c26f797fc7d8e54532aa25",
+      "exit": "0"
+    },
+    "cockpit-matrix": {
+      "sha256": "e80b776d06e15c32292e7c9a288e4d10ade80ff93ca7697aab27f2cadf7b0a60",
+      "exit": "1"
+    },
+    "ui-regression": {
+      "sha256": "4bc47473a8611e84393a410f7694254d30f72cd735f503415906b7ef0fa67be1",
+      "exit": "0"
+    },
+    "baseline-build": {
+      "sha256": "e26733e0d07a68deb93756be33e9c636ac9b9f64ec3323a29fb732742e1d3639",
+      "exit": null
+    },
+    "ui-final-build": {
+      "sha256": "5ccdc19680e3467765cce8c1d5113ef9a7a0f78db9f6b32a22c5b6592ae0fbe6",
+      "exit": "0"
+    }
+  },
+  "prior_full_ci": {
+    "CI179": "10/10success",
+    "Windows101": "4/4success",
+    "linux": [
+      3567,
+      0,
+      26
+    ],
+    "windows": [
+      3593,
+      0,
+      47
+    ]
+  },
+  "limits": [
+    "newUI own fullCI and independent review pending",
+    "No physical phone, GPU, microphone or API acceptance",
+    "No real remote gateway/pairing implemented"
+  ],
+  "checks": [
+    {
+      "name": "ui-unit",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@alfa/desktop-ui",
+        "test"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:11:31.437705+00:00",
+      "finished_utc": "2026-11-10T09:11:56.716296+00:00",
+      "sha256": "0256553a6d362f182803ef1df3d196f0ce74aad189387a3d8f7b207cc8b10bed"
+    },
+    {
+      "name": "ui-check-final",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@alfa/desktop-ui",
+        "check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:11:56.718847+00:00",
+      "finished_utc": "2026-11-10T09:12:23.778835+00:00",
+      "sha256": "a653d7ec94c3345a3b014e67532e0ea7ea061e0eec183229e7e5b2c2c0d123db"
+    },
+    {
+      "name": "ui-lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:12:23.781565+00:00",
+      "finished_utc": "2026-11-10T09:12:49.339315+00:00",
+      "sha256": "69673ddb1e150bb51103362ca1afc763800d15c59ef4560961298e621d190d64"
+    },
+    {
+      "name": "ui-docs",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:12:49.342381+00:00",
+      "finished_utc": "2026-11-10T09:12:49.781239+00:00",
+      "sha256": "813aff687e70e641b4edb8a5400607b9071bc4c52f80f2cd71c2be0ef67adda0"
+    },
+    {
+      "name": "ui-docs-verify",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--verify"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:12:49.781637+00:00",
+      "finished_utc": "2026-11-10T09:12:50.162890+00:00",
+      "sha256": "e1efc1496f2e6b075eb82b4f296e93a104942365a9e88ee6014397d9241caa80"
+    },
+    {
+      "name": "ui-diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T09:12:50.163412+00:00",
+      "finished_utc": "2026-11-10T09:12:50.291408+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "unit_results": [
+    573,
+    0,
+    0
+  ]
+}

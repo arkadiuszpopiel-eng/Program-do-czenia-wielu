@@ -1,6 +1,12 @@
 # ui-shell — SPEC (szkic v0)
 
 ## Cel
+Opcjonalny kokpit Jarvis jest lokalnym wyborem wyglądu okna, zapamiętanym osobno od trybów
+zgód i sposobu współpracy person. Leniwie ładowany panel pokazuje bieżącą sesję/obsadę,
+kafelki istniejących funkcji, respektuje jasny/ciemny motyw i ograniczenie animacji.
+Na dotykowych ekranach do1100px główne przyciski belki mają44px; kontrolki okna pozostają
+wTauri, lecz są schowane w mobilnym podglądzie przeglądarki. Widok nie dowodzi łączności z telefonem.
+
 Powłoka UI (Tauri 2 + WebView2 + Svelte 5): okno główne z trzema warstwami (powierzchnia rozmowy, panele chowane, Ustawienia), pasek tytułu z obsadą i stanem, composer, kapsuła aktywności, karty/widok dzielony/odłączane okna, paleta `Ctrl+K`, skróty, tryb skupienia, responsywność, cykl życia okna vs zasobnik, IPC rdzeń → UI grupowane co klatkę (PLAN §14). Panele są osobnymi modułami UI ładowanymi leniwie.
 
 ## Fala i priorytet

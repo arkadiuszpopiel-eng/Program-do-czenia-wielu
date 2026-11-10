@@ -34,6 +34,12 @@ function writeFlag(key: string, on: boolean): void {
 }
 
 export class LayoutState {
+  /** Wygląd okna niezależny od trybu zgód i sposobu współpracy person. */
+  cockpit = $state(readFlag('alfa.ui.cockpit'));
+  toggleCockpit(): void {
+    this.cockpit = !this.cockpit;
+    writeFlag('alfa.ui.cockpit', this.cockpit);
+  }
   /** Szerokość okna w px CSS po uwzględnieniu zoomu. */
   width = $state(1280);
   leftWidth = $state(264);

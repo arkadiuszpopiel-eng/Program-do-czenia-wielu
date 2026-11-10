@@ -1,0 +1,33 @@
+const pl = {
+  title: 'Kokpit Jarvis',
+  on: 'Włącz kokpit Jarvis',
+  off: 'Wyłącz kokpit Jarvis',
+  heading: 'Twoje centrum dowodzenia',
+  session: 'Bieżąca rozmowa',
+  empty: 'Wybierz rozmowę',
+  navigation: 'Skróty kokpitu',
+  crew: 'Obsada rozmowy',
+  sessions: 'Rozmowy',
+  agents: 'Agentki',
+  tasks: 'Zadania',
+  voice: 'Głos',
+  models: 'Modele',
+  access: 'Uprawnienia',
+};
+const en: typeof pl = {
+  title: 'Jarvis cockpit',
+  on: 'Enable Jarvis cockpit',
+  off: 'Disable Jarvis cockpit',
+  heading: 'Your command centre',
+  session: 'Current conversation',
+  empty: 'Choose a conversation',
+  navigation: 'Cockpit shortcuts',
+  crew: 'Conversation cast',
+  sessions: 'Conversations',
+  agents: 'Agents',
+  tasks: 'Tasks',
+  voice: 'Voice',
+  models: 'Models',
+  access: 'Permissions',
+};
+export const cockpitCopy = (locale: string) => (locale === 'en' ? en : pl);

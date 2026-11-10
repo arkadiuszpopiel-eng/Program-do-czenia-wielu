@@ -1,5 +1,11 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Nowe zlecenieUI i telefon10.11:** opcjonalny kokpitJarvis, większe cele dotykowe i kafelki.
+Baza13c8c88d ma pełneCI179/Windows101 zielone (Linux3567/0/26,Windows3593/0/47).
+NowyUI#68 ma57/57próbChromium; nie jest odbiorem telefonu. Brama/parowanie telefonu
+nie istnieją; #69 zaczyna się od jawnego podglądu panelu, bez aktywnych poleceń.
+[Plan56](56-kokpit-jarvis-i-panel-telefonu.md) · [RaportUI](../reviews/2026-11-10-jarvis-mobile.md).
+
 **Nowe zlecenie właściciela po zamknięciu nocnego okna:** główne modele lokalne8–12B
 naRTX2060 12GB z zapasem kontekstu. Qwen3-8B Q4_K_M domyślny, Bielik11B Q4_K_M jako
 alternatywa tekstowa;1.5B tylko pomocniczy. Dostępna Luna/Haiku pomaga po problemie lokalnym;

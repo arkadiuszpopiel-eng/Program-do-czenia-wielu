@@ -18,6 +18,11 @@ body,
 body {
   min-height: 0;
 }
+@media (pointer: coarse) and (max-width: 1100px) {
+  :root {
+    --alfa-size-titlebar: 58px;
+  }
+}
 
 /* Przeładowanie strony (F5/Ctrl+R) i menu kontekstowe WebView wyłączane w JS — §14.8. */
 body {
