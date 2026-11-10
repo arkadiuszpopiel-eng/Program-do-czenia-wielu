@@ -2,20 +2,11 @@ diff --git a/crates/app-chat/src/history.rs b/crates/app-chat/src/history.rs
 index 4b8db892..61150b28 100644
 --- a/crates/app-chat/src/history.rs
 +++ b/crates/app-chat/src/history.rs
-@@ -26,7 +26,8 @@ impl ChatEngine {
-     }
- 
-     /// Wiadomości dla dostawcy: gałąź od korzenia do `leaf` (bez tur-błędów i komunikatów
+@@ -29 +29,2 @@ impl ChatEngine {
 -    /// systemowych), sąsiednie wiadomości tej samej roli scalone, zaczyna się od użytkownika.
 +    /// systemowych), sąsiednie wiadomości tej samej roli scalone. Przed bieżącym poleceniem
 +    /// oddzielna nota systemowa zawiera fakty rejestru wcześniejszej części wybranej gałęzi.
-     pub(crate) fn branch_messages(
-         &self,
-         session: &SessionId,
-@@ -35,6 +36,15 @@ impl ChatEngine {
-     ) -> Result<Vec<Message>, AppError> {
-         let path = self.inner.sessions.branch_projection(session, leaf)?;
-         let metas = self.inner.store.metas(session)?;
+@@ -37,0 +39,9 @@ impl ChatEngine {
 +        let facts = if path.iter().any(|t| t.role != Role::User) {
 +            crate::tool_facts::note(
 +                path.iter().filter(|t| t.role != Role::User).map(|t| t.id.0),
@@ -25,33 +16,18 @@ index 4b8db892..61150b28 100644
 +        } else {
 +            None
 +        };
-         let mut out: Vec<Message> = Vec::new();
-         for turn in &path {
-             let failed = metas
-@@ -69,6 +79,11 @@ impl ChatEngine {
-                 "Brak wiadomości użytkownika, na którą można odpowiedzieć.",
-             ));
-         }
+@@ -71,0 +82,5 @@ impl ChatEngine {
 +        // Pozostaje w historii także po wydzieleniu ostatniego polecenia do RunSpec.goal.
 +        // Nie zmienia treści polecenia właściciela ani zasad/autonomii narzędzi.
 +        if let Some(facts) = facts {
 +            out.insert(out.len() - 1, Message::system_text(facts));
 +        }
-         Ok(out)
-     }
- }
 diff --git a/crates/app-chat/src/lib.rs b/crates/app-chat/src/lib.rs
 index 38fd963a..62b3a069 100644
 --- a/crates/app-chat/src/lib.rs
 +++ b/crates/app-chat/src/lib.rs
-@@ -39,6 +39,7 @@ mod stage_route;
- mod stream;
- mod style;
- mod taint;
+@@ -41,0 +42 @@ mod taint;
 +mod tool_facts;
- mod undo;
- 
- pub use arena::{ARENA_MODELS, arena_model, arena_placement};
 diff --git a/crates/app-chat/src/tool_facts.rs b/crates/app-chat/src/tool_facts.rs
 new file mode 100644
 index 00000000..0e4d0359
@@ -408,15 +384,9 @@ diff --git a/crates/app-core/tests/jarvis_live.rs b/crates/app-core/tests/jarvis
 index e84bc634..c3fa2f38 100644
 --- a/crates/app-core/tests/jarvis_live.rs
 +++ b/crates/app-core/tests/jarvis_live.rs
-@@ -8,6 +8,8 @@
- mod common;
- #[path = "jarvis_live/model.rs"]
- mod probe_model;
+@@ -10,0 +11,2 @@ mod probe_model;
 +#[path = "jarvis_live/recorded_history.rs"]
 +mod recorded_history;
- 
- use app_core::dto::{AlfaEvent, SessionTemplate, SettingValue, WorkdirChoice};
- use app_core::ports::{BrainChoice, BrainError, BrainPort, BrainRequest, HeadlessShell};
 diff --git a/crates/app-core/tests/jarvis_live/first_visible.rs b/crates/app-core/tests/jarvis_live/first_visible.rs
 new file mode 100644
 index 00000000..f43c46c2

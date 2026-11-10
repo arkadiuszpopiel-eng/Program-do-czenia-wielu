@@ -1,4 +1,7 @@
-# Lokalny strumień bez postępu — #77, 10.11.2026
+# Lokalny strumień bez postępu — pierwszy przyrost #77, 10.11.2026
+
+Kolejna korekta chroni generację długich argumentów przed buforującą kopertą;
+[końcowy mechanizm i regresje](2026-11-10-tool-envelope-progress.md). Poniżej opis pierwszego przyrostu i zachowane wyniki.
 
 Kanoniczny kod8116740d22f7fa45c7b38e1540a3629fed0f5d75 wybiera dla lokalnego modelu
 limity według niepustej treści po dekoderze. Pingi, Started, Usage i puste delty nie
@@ -28,6 +31,8 @@ Bety/Jarvisa nie zwrócił treści w120s,121557ms do końca obserwacji, bez term
 Próba ciepła niewykonana; Rust0/1, kod101. Pingi rozwiązywały tylko aktywność transportu,
 więc **sam wariant kadencji odrzucono**. Nie ma flagi ping10 w aktualnym kodzie aplikacji.
 [Łatka](patches/local-cadence-only-rejected.patch) i surowe dane pozostają do odtworzenia.
+Format bez linii kontekstu wymaga `git apply --unidiff-zero`; sprawdzono identyczność
+całego odtwarzanego drzewa z aa02af79, bez zmiany kodu kandydata.
 
 ## Zmiana kodu
 

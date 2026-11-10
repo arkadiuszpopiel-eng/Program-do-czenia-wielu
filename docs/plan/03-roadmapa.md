@@ -1,16 +1,16 @@
 # 03 — Roadmapa (dokument żywy)
 
-**Odbiór kodu10.11:**46f515bf ma [CI185](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42892472297)
-**10/10**, Linux3595/0/26, Windows3617/0/47, Chromium945, Vitest573;
-[Windows108](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42892472263) **4/4**, WebView2 63/0/5.
-Zamknięto48 zweryfikowanych kart, w tym rzeczywistą próbę Luny po restarcie #43.
-Główny Qwen8B:50/50 tożsamości i50/50 świeżych pytań o brak działań; szerszy #58
-nadal niezaliczony: kandydat V1 ma30/30 transportu,0/30 wierności rejestrowi i został
+**Odbiór kodu10.11:**b85c5371 ma [CI186](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970574)
+**10/10**, Linux3600/0/27, Windows3622/0/48, Chromium945, Vitest573;
+[Windows109](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970490) **4/4**, WebView2 63/0/5.
+Zamknięto49 zweryfikowanych kart, w tym wąską próbę imion/zwięzłości głównego8B #31 i Lunę #43.
+#58 nadal niezaliczony: kandydat V1 ma30/30 transportu,0/30 wierności rejestrowi i został
 odrzucony. [Dane i łatka](../reviews/2026-11-10-history-receipts.md).
-Nowy8116740d mierzy lokalne first-token/idle według postępu treści: pingi/metadane nie
-przedłużają deadline. Limity60/30s i chmura bez zmian; sama kadencja10s odrzucona.
-[Raport #77](../reviews/2026-11-10-local-progress.md); wymaga własnego CI i odbioru.
-Otwarte #22/#31/#41/#48/#58/#68/#69/#77, GPU12GB/API/mikrofon/telefon i niezależny przegląd.
+Nowy69e33656 chroni generację długich argumentów przed buforującą kopertą; lokalne
+163/0/1,Clippy/fmt/lint0. [Raport #77](../reviews/2026-11-10-tool-envelope-progress.md); wymaga własnego CI.
+Bielik11B:zgodnySHA256, lecz surowa próbaCPU0odpowiedzi/1timeout/2niewykonane; jakośćNOT_EVALUATED.
+[Dane](../reviews/2026-11-10-bielik11b-cpu.md). Nowszy9B jest dopiero kandydatem do osobnej próby.
+Otwarte #22/#41/#48/#58/#68/#69/#77/#78 oraz GPU12GB/API/mikrofon/telefon i niezależny przegląd.
 [Pełny raport i zachowane porażki](../reviews/2026-11-10-defect-closure.md).
 
 **Domykanie usterek10.11:** #64 deadline68/0/0, #73 jawna odmowa135/0/0, #75 pomiar

@@ -1,0 +1,135 @@
+{
+  "source_commit": "69e336560ad0d6eade8a98fc3b30269fecb1dbf9",
+  "parent": "b85c53715558cf870b786b427e8f32a1ed5f5bd4",
+  "checks": [
+    {
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all"
+      ],
+      "exit": 0,
+      "start": "2026-11-10T22:45:21.123665+00:00",
+      "end": "2026-11-10T22:45:52.648608+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log": "/workspace/scratch/defect-closure/77-raw-progress-final-fmt.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "lib-openai-compat",
+        "-p",
+        "providers-local-impl",
+        "-p",
+        "providers-api-impl",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "start": "2026-11-10T22:45:52.651328+00:00",
+      "end": "2026-11-10T22:46:47.932177+00:00",
+      "sha256": "dc1b0b2a5bdf252974fe21c97947f464ee1e88886b82effaf589105575ec2941",
+      "log": "/workspace/scratch/defect-closure/77-raw-progress-final-test.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "lib-openai-compat",
+        "-p",
+        "providers-local-impl",
+        "-p",
+        "providers-api-impl",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "start": "2026-11-10T22:46:47.933409+00:00",
+      "end": "2026-11-10T22:47:01.383805+00:00",
+      "sha256": "a8bd028b9a520d82fbb4773a44df775310960406721f36c8056a90269d6df11b",
+      "log": "/workspace/scratch/defect-closure/77-raw-progress-final-clippy.log"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "start": "2026-11-10T22:47:01.386661+00:00",
+      "end": "2026-11-10T22:47:12.248767+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "log": "/workspace/scratch/defect-closure/77-raw-progress-final-fmt-check.log"
+    },
+    {
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "exit": 0,
+      "start": "2026-11-10T22:47:12.252301+00:00",
+      "end": "2026-11-10T22:48:20.356934+00:00",
+      "sha256": "a7c6f3c58d7986063410e6be8206164327cfb9675e0725bc7982282449a29128",
+      "log": "/workspace/scratch/defect-closure/77-raw-progress-final-lint.log"
+    }
+  ],
+  "red": {
+    "exit": 101,
+    "result": [
+      0,
+      2,
+      0
+    ],
+    "sha256": "6136c73a3f5fd7dd84937db68348c711b1e0bbabeeb6c5f672eea632b0c1fe76"
+  },
+  "initial_compile_error": "generic helper incorrectly acceptedVec while EOF parser returnsOption; bothfailedbuildlogs preserved, fixedwithIntoIterator beforetests",
+  "final_counts": [
+    163,
+    0,
+    1
+  ],
+  "groups": {
+    "lib_openai_compat": [
+      12,
+      0,
+      0
+    ],
+    "providers_api_impl": [
+      62,
+      0,
+      0
+    ],
+    "providers_local_impl": [
+      89,
+      0,
+      1
+    ]
+  },
+  "source_hashes": {
+    "crates/lib-openai-compat/src/run.rs": "f5004ea9197f94ae33c0d2ca17f9949338032a0e356e469a83fc10ccb92dc775",
+    "crates/lib-openai-compat/src/wire.rs": "851b522ce587e56498aadccdd35227e9cbc9857f3458b9011ad1901f3fde67b3",
+    "crates/lib-openai-compat/README.md": "326a2a42d24c65230787e24cd3ef9c6c81dfc6ef58ea9a22eeea540dd4083494",
+    "crates/providers-local-impl/src/codec.rs": "91512b1af8b5fc025fb18a27a68bf380e562e27380fff4fdcfd4b521a8a1fb8b",
+    "crates/providers-local-impl/tests/slow_envelope.rs": "3ae2c091444766f131b652b882cde7fd9d03a18eb0f9b85fb5cb5ee1eb0ec0ee",
+    "crates/providers-local-impl/tests/sse_progress.rs": "5970edcc97ceb043edd9baa6a77e5e0a99652cd112f7b55cba92c98679a1a999",
+    "docs/modules/providers-local/SPEC.md": "6829e3a1b3a613432921db60429dceedb347d18cc817b703dd214ee6acf175a1",
+    "docs/vendor/reqwest.md": "6a9121816a5ca0ccbe72f14494f53d83fff5fbc078189895fca24721ea8a36bc"
+  },
+  "not_execution_evidence": "raw delta only advancesgenerationclock; TTFT/after_output aredecoded; no actualfilesystem/tool action in newtests",
+  "model_probe_attribution": "actualQwen2responses onoldlocal036, notrerunhere; old11BrawtimeoutnotCore/GPUacceptance"
+}

@@ -1,0 +1,27 @@
+{
+  "at": "2026-11-10T22:32:58.213191+00:00",
+  "files": [
+    {
+      "original": "/workspace/scratch/defect-closure/jarvis-history-baseline",
+      "original_bytes": 305432312,
+      "original_sha256": "846bea4c9219c72ec668e3a6065a5e1d2ac6d6bc83b3f75e87f1739632641e2f",
+      "compressed": "/workspace/scratch/defect-closure/jarvis-history-baseline.gz",
+      "compressed_bytes": 88610427,
+      "compressed_sha256": "bed18367897b625f8946436c45fa8c8ca9a3f6b6852b135196235da16e4179dc",
+      "original_mode": 33216,
+      "restore": "gzip -dk <compressed>; chmod +x <original>; verify originalSHA256 before rerun",
+      "reason": "preserve frozen probe bytes while freeing disk after11B download; no active executable or source/log removed"
+    },
+    {
+      "original": "/workspace/scratch/defect-closure/jarvis-history-candidate",
+      "original_bytes": 305501776,
+      "original_sha256": "c7f741c1bd362d71be25ddff03901e66f78f1c2918b62b83e2cbe9403d914237",
+      "compressed": "/workspace/scratch/defect-closure/jarvis-history-candidate.gz",
+      "compressed_bytes": 88640343,
+      "compressed_sha256": "9ea4914bfad0ffa5685de487a9a1edca0623096e08edb2a4937af13155fb42d5",
+      "original_mode": 33216,
+      "restore": "gzip -dk <compressed>; chmod +x <original>; verify originalSHA256 before rerun",
+      "reason": "preserve frozen probe bytes while freeing disk after11B download; no active executable or source/log removed"
+    }
+  ]
+}

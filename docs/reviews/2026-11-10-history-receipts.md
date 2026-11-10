@@ -4,6 +4,8 @@
 wcześniejszą wypowiedzią asystentki, gdy przeczy ona rejestrowi narzędzi. Kandydat V1 jest
 zachowany jako [łatka do odtworzenia](patches/branch-tool-facts-v1-rejected.patch), bez
 włączenia do kodu aplikacji. Lokalny commit5538f59a nie został opublikowany jako naprawa.
+Łatka bez linii kontekstu wymaga `git apply --unidiff-zero`; sprawdzono identyczność
+źródeł względem5538f59a. Poprzedni format pozostaje w historii b85c5371.
 
 ## Odtworzenie i zakres
 

@@ -1,0 +1,32 @@
+{
+  "state": "completed",
+  "start": "2026-11-10T22:05:56.958283+00:00",
+  "model": {
+    "id": "bielik-11b-v2.3-instruct-q4-k-m",
+    "name": "Bielik 11B v2.3 Instruct (Q4_K_M)",
+    "url": "https://huggingface.co/speakleash/Bielik-11B-v2.3-Instruct-GGUF/resolve/b6b2f467358d9eca16fddcc2f0fd506ea3e87858/Bielik-11B-v2.3-Instruct.Q4_K_M.gguf",
+    "file": "Bielik-11B-v2.3-Instruct.Q4_K_M.gguf",
+    "size_mb": 6413,
+    "sha256": "ece698889c07d4a98a8fb7c9968ad7ad20961cf824c0b008895fe0506c87b834",
+    "params_b": 11.2,
+    "quant": "Q4_K_M",
+    "layers": 50,
+    "ctx": 32768,
+    "vram_mb": 6963,
+    "ram_mb": 7163,
+    "kv_mb_per_1k_ctx": 200,
+    "tools": false,
+    "license": "Apache-2.0"
+  },
+  "bytes": 6724050496,
+  "retries": 0,
+  "scope": "public pinned official model download only; no account/CLI credentials",
+  "max_download_s": 900,
+  "pid": 767061,
+  "group": 767061,
+  "exit": 0,
+  "actual_sha256": "ece698889c07d4a98a8fb7c9968ad7ad20961cf824c0b008895fe0506c87b834",
+  "verification": "MATCH",
+  "end": "2026-11-10T22:20:29.518427+00:00",
+  "elapsed_s": 872.558
+}

@@ -2,24 +2,15 @@ diff --git a/crates/providers-local-impl/src/config.rs b/crates/providers-local-
 index 87363a22..2652efb3 100644
 --- a/crates/providers-local-impl/src/config.rs
 +++ b/crates/providers-local-impl/src/config.rs
-@@ -285,6 +285,9 @@ impl LaunchPlan {
-             self.threads.to_string(),
-             "-np".into(),
-             "1".into(),
+@@ -287,0 +288,3 @@ impl LaunchPlan {
 +            // Domyślne30s serwera pokrywa się z idle30s klienta; ping ma mieć zapas.
 +            "--sse-ping-interval".into(),
 +            "10".into(),
-         ];
-         if let Some(device) = self.device.as_ref().filter(|_| self.gpu_layers > 0) {
-             args.push("--device".into());
 diff --git a/crates/providers-local-impl/tests/config.rs b/crates/providers-local-impl/tests/config.rs
 index 892526d4..a9eba552 100644
 --- a/crates/providers-local-impl/tests/config.rs
 +++ b/crates/providers-local-impl/tests/config.rs
-@@ -184,6 +184,35 @@ fn launch_args_are_localhost_only_and_secret_is_redacted() {
-     assert_eq!(BackendKey::of(Backend::Cuda).as_str(), "cuda");
- }
- 
+@@ -186,0 +187,29 @@ fn launch_args_are_localhost_only_and_secret_is_redacted() {
 +#[test]
 +fn owned_server_ping_has_margin_before_the_default_client_idle_deadline() {
 +    let config = LocalConfig::new("/m", "/bin/llama-server");
@@ -49,21 +40,12 @@ index 892526d4..a9eba552 100644
 +    }
 +}
 +
- #[test]
- fn errors_map_to_provider_errors_and_events_have_names() {
-     assert_eq!(
 diff --git a/crates/providers-local-impl/tests/lifecycle.rs b/crates/providers-local-impl/tests/lifecycle.rs
 index edc7da51..870fe1c6 100644
 --- a/crates/providers-local-impl/tests/lifecycle.rs
 +++ b/crates/providers-local-impl/tests/lifecycle.rs
-@@ -66,6 +66,7 @@ async fn starts_on_demand_on_localhost_with_random_port_and_key() {
-     let launches = env.launches();
-     assert_eq!(launches.len(), 2);
-     for a in &launches {
+@@ -68,0 +69 @@ async fn starts_on_demand_on_localhost_with_random_port_and_key() {
 +        assert_eq!(arg(a, "--sse-ping-interval").as_deref(), Some("10"));
-         assert_eq!(arg(a, "--host").as_deref(), Some("127.0.0.1"));
-         assert_eq!(arg(a, "--api-key").map(|k| k.len()), Some(48));
-         assert_eq!(arg(a, "--alias").as_deref(), Some(MODEL));
 diff --git a/crates/providers-local-impl/tests/live_ping.rs b/crates/providers-local-impl/tests/live_ping.rs
 new file mode 100644
 index 00000000..23e7924b
@@ -182,33 +164,20 @@ diff --git a/docs/modules/providers-local/SPEC.md b/docs/modules/providers-local
 index beb7a010..0084027a 100644
 --- a/docs/modules/providers-local/SPEC.md
 +++ b/docs/modules/providers-local/SPEC.md
-@@ -32,6 +32,9 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
- - **Argumenty z profilu urządzenia:** backend (Vulkan/CUDA/CPU = osobne pliki `llama-server`; bateria lub słaby sprzęt
-   → CPU), `-ngl` z dzierżawy `model-residency` (GPU → wszystkie warstwy, CPU → 0) albo proporcjonalnie do budżetu VRAM,
-   `-c`, `--threads` (rdzenie fizyczne), `--alias`, `-np 1`, `--jinja` (narzędzia).
+@@ -34,0 +35,3 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
 +  `--sse-ping-interval 10` daje zapas wobec domyślnego idle30s klienta; domyślne30s serwera
 +  wypadało na tej samej granicy. Ping jest wyłącznie aktywnością transportu, nie tokenem,
 +  postępem zadania ani potwierdzeniem zaliczenia TTFT. HTTP60/30s i zewnętrzne120s prób bez zmian.
- - **Modele:** `models.toml` (GGUF, URL HF, rozmiar, SHA-256, kwant, warstwy, kontekst, szacunki VRAM/RAM, licencja);
-   walidacja: `.gguf`, bez kwantów IQ, https. Historyczny domyślny: Bielik 4.5B v3.0 Instruct Q8_0 (fala 6; wcześniej Q4_K_M — brak w oficjalnym repozytorium).
- - **Pobieranie:** wznawianie HTTP Range z pliku `.part` (≤ 3 automatyczne wznowienia), SHA-256; zły hash → błąd
 diff --git a/docs/vendor/llama-cpp.md b/docs/vendor/llama-cpp.md
 index 50a7d90b..85f6baa3 100644
 --- a/docs/vendor/llama-cpp.md
 +++ b/docs/vendor/llama-cpp.md
-@@ -8,9 +8,14 @@
- 
- ## Uruchomienie (`LaunchPlan::args`)
- `llama-server --host 127.0.0.1 --port <wolny> --api-key <losowy> -m <gguf> --alias <id> -c <ctx> -ngl <warstwy>
+@@ -11 +11 @@
 ---threads <n> -np 1 [--device <id>] [--jinja]`. `--jinja` jest w b11559 domyślnie włączone (podajemy jawnie dla
 +--threads <n> -np 1 --sse-ping-interval 10 [--device <id>] [--jinja]`. `--jinja` jest w b11559 domyślnie włączone (podajemy jawnie dla
- modeli z narzędziami). `--list-devices` — lista urządzeń (`devices.rs`).
- 
+@@ -13,0 +14,5 @@ modeli z narzędziami). `--list-devices` — lista urządzeń (`devices.rs`).
 +`--sse-ping-interval N` (sekundy) potwierdzono w `--help` przypiętej binarki b11559,10.11.2026.
 +Domyślne30s pokrywa się z idle30s klienta;10s zostawia zapas między komentarzami SSE.
 +Komentarz `:\n\n` nie jest wygenerowanym tekstem. To ustawienie nie przyspiesza CPU ani nie
 +zwiększa limitów klienta; czas do widocznej odpowiedzi trzeba mierzyć osobno od keepalive.
 +
- ## HTTP, którego używamy
- - `GET /health` → 200 albo 503 (ładowanie). `GET /v1/models`.
- - `POST /v1/chat/completions` (`stream: true`, `stream_options.include_usage`, `max_tokens`): SSE

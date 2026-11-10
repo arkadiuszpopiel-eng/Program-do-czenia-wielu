@@ -1,0 +1,179 @@
+{
+  "head": "b85c53715558cf870b786b427e8f32a1ed5f5bd4",
+  "recorded_utc": "2026-11-10T23:06:30.272201+00:00",
+  "complete": true,
+  "runs": [
+    {
+      "id": 42912970490,
+      "name": "Próba generalna (Windows)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 109,
+      "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970490/jobs",
+      "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970490/logs",
+      "workflow_id": 376724312
+    },
+    {
+      "id": 42912970574,
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 186,
+      "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970574/jobs",
+      "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42912970574/logs",
+      "workflow_id": 371319063
+    }
+  ],
+  "CI186": {
+    "run": 42912970574,
+    "jobs": [
+      10,
+      0
+    ],
+    "linux": [
+      3600,
+      0,
+      27
+    ],
+    "windows": [
+      3622,
+      0,
+      48
+    ],
+    "targets_each": 1143,
+    "vitest": 573,
+    "vitest_files": 103,
+    "chromium": [
+      315,
+      315,
+      315
+    ],
+    "tauri": [
+      5,
+      4
+    ],
+    "fmt_clippy_deny_schema_docs": "success"
+  },
+  "Windows109": {
+    "run": 42912970490,
+    "jobs": [
+      4,
+      0
+    ],
+    "webview2": [
+      63,
+      0,
+      5
+    ],
+    "qwen8b_cpu": {
+      "first_token_ms": 15272,
+      "total_ms": 28100,
+      "tokens": 96,
+      "tok_per_s": 7.48
+    },
+    "bielik45_cpu": {
+      "first_token_ms": 12071,
+      "total_ms": 25754,
+      "tokens": 82,
+      "tok_per_s": 5.99
+    },
+    "bielik11b": "NOT_RUN_CPU_BUDGET0tokens",
+    "piper_ttfb_ms": 849,
+    "stt_fixture_wer": 0,
+    "stt_ms": 40423,
+    "hardware_gpu_or_real_microphone_test": false
+  },
+  "logs": {
+    "ci186-job-130169200566.log": {
+      "bytes": 92556,
+      "sha256": "a0821220ef61e40f255e47610e32bba4aa0ad3a10c2c5bac5f306bc2f9a5737e",
+      "targets": 0,
+      "counts": [
+        0,
+        0,
+        0
+      ]
+    },
+    "ci186-job-130168084102.log": {
+      "bytes": 895670,
+      "sha256": "6b5d909959aeefa8c432c3de72372a941f0578a13f8e271364bcdb77fbb64428",
+      "targets": 1143,
+      "counts": [
+        3600,
+        0,
+        27
+      ]
+    },
+    "ci186-job-130168084429.log": {
+      "bytes": 893512,
+      "sha256": "88451287db694a4f5848d0323940dbd96fff5e6ac0ff6702583a69bbaffa2102",
+      "targets": 1143,
+      "counts": [
+        3622,
+        0,
+        48
+      ]
+    },
+    "ci186-job-130169200723.log": {
+      "bytes": 91888,
+      "sha256": "29688eadcdef44d25deb8b8d7f95e345b035f8b34a4db2d40f66fcf84fbe6cdf",
+      "targets": 0,
+      "counts": [
+        0,
+        0,
+        0
+      ]
+    },
+    "ci186-job-130168083407.log": {
+      "bytes": 102138,
+      "sha256": "6e6eef6d417256ff33eda90de4164b166329732e1192c7d2c375fe37f9f6ad13",
+      "targets": 1,
+      "counts": [
+        1,
+        0,
+        0
+      ]
+    },
+    "ci186-job-130169200753.log": {
+      "bytes": 92962,
+      "sha256": "461d7a7a504c2c53a7d3521b4bd27d395293b662fc21a772d4fdeeac7f125a9a",
+      "targets": 0,
+      "counts": [
+        0,
+        0,
+        0
+      ]
+    },
+    "ci186-job-130168084358.log": {
+      "bytes": 142440,
+      "sha256": "93b425cbddf98fff5651ee6a7cf0ba90f619d37622ab26323cdb1600d822601f",
+      "targets": 0,
+      "counts": [
+        0,
+        0,
+        0
+      ]
+    },
+    "ci186-job-130168084458.log": {
+      "bytes": 127759,
+      "sha256": "eee716e08d86703f1a03fb8bb25e3e053f236ec42bc509a7641ad23c87ee12b3",
+      "targets": 2,
+      "counts": [
+        9,
+        0,
+        0
+      ]
+    },
+    "ci186-job-130168083007.log": {
+      "bytes": 118267,
+      "sha256": "67d0f26cc3084d2d97eea4a8ad29c2d19cbf51e04240976bf70a32d95638b33c",
+      "targets": 0,
+      "counts": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "log_format": "GitHub decoded UTF8; CRLFnormalizedLF, notarchivebytes"
+}

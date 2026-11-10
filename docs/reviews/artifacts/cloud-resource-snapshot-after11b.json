@@ -1,0 +1,14 @@
+{
+  "captured_utc": "2026-11-10T22:31:31.232840+00:00",
+  "kind": "resource snapshot after11Btrial; not GPU/VRAM acceptance",
+  "/sys/fs/cgroup/cpu.max": "800000 200000",
+  "/sys/fs/cgroup/memory.max": "17179869184",
+  "/sys/fs/cgroup/memory.current": "9817714688",
+  "/sys/fs/cgroup/cpu.stat": "usage_usec 161050111435\nuser_usec 142619276201\nsystem_usec 18430835234\nnice_usec 0\nnr_periods 955976\nnr_throttled 116350\nthrottled_usec 6225471804\nnr_bursts 0\nburst_usec 0",
+  "meminfo": {
+    "MemTotal": "       18440100 kB",
+    "MemAvailable": "   17493932 kB",
+    "SwapTotal": "             0 kB"
+  },
+  "disk": "Filesystem      Size  Used Avail Use% Mounted on\noverlay          32G   30G  312M  99% /\n"
+}

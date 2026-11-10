@@ -1,0 +1,36 @@
+{
+  "kind": "rawHTTP diagnostic outsideCore, synthetic previousledger no physical actions; nottoolcalling/GPU acceptance",
+  "model": "Bielik11Bv2.3Q4_K_M",
+  "model_sha256": "ece698889c07d4a98a8fb7c9968ad7ad20961cf824c0b008895fe0506c87b834",
+  "model_bytes": 6724050496,
+  "parameters": {
+    "cpu_threads": 4,
+    "context": 8192,
+    "max_tokens": 96,
+    "temperature": 0,
+    "first_event_s": 60,
+    "idle_s": 30,
+    "overall_http_s": 120,
+    "startup_s": 60,
+    "raw_only_ping_s": 10
+  },
+  "load_ms": 53722,
+  "completed_text_responses": 0,
+  "failed_attempts": 1,
+  "not_run": 2,
+  "failure": "no generated text within120014ms afterHTTPdispatch; onlySSEcomments",
+  "semantic_fidelity": "NOT_EVALUATED, cannot rankmodelquality",
+  "tool_calling": "NOT_SUPPORTED_IN_CURRENT_CATALOG/NOT_TESTED",
+  "gpu_vram_fit": "ESTIMATE_ONLY_NOT_MEASURED",
+  "raw_controller_exit": "0 means collected diagnostic/cleanup, NOT test acceptance",
+  "cleanup": "own process SIGTERM thenSIGKILL",
+  "server_exit": -9,
+  "protocol_note": "change field inherited from paired script description; actual source was only3mergedcases, verified script and savedrequest; comparison_scope+requests defineactualprotocol",
+  "truncation_usage": "raw collector did not savefinish_reason/usage; noresponsehere so no semanticpassclaim",
+  "hashes": {
+    "status.json": "38441a82de0d1ea53aef86c394088c57bbedce3b9cda4b3aa21230be0d8b4ecf",
+    "server.log": "17291658db64ecbc3bb76a4d3e41e1d874e2c90b00d6ae7c5f92d083b2998560",
+    "merged-empty_record-request.json": "ed4f7113c34c7f40011af98226fcba63740e7da033c8a33059a2316d51e34ee7",
+    "raw-bielik11b-ledger.py": "5b2a6a7d003664ef6e2ccee499f819453694212957d04ffee66831ea59112ba7"
+  }
+}
