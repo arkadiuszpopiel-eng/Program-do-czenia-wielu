@@ -125,7 +125,12 @@ impl RouterCore {
     }
 
     /// Kolejność prób według szczebli od szczebla startowego notatki.
-    pub(crate) fn arrange(&self, list: Vec<Candidate>, note: &DifficultyNote) -> Vec<Candidate> {
+    pub(crate) fn arrange(
+        &self,
+        list: Vec<Candidate>,
+        note: &DifficultyNote,
+        review: bool,
+    ) -> Vec<Candidate> {
         let local_first = self.difficulty_policy().local_first;
         let ranked = list
             .into_iter()
@@ -137,11 +142,12 @@ impl RouterCore {
                 candidate,
             })
             .collect();
-        order_by_rung(
+        let ordered = order_by_rung(
             ranked,
             note.start,
             local_first,
             note.escalated_from.as_ref(),
-        )
+        );
+        crate::main_local::prefer(self, ordered, note, review)
     }
 }

@@ -1,5 +1,13 @@
 # router — SPEC (v1, F1)
 
+## Role modeli — zlecenie właściciela10.11.2026
+
+Automatyczna główna praca na profilu lokalnym8–12B zaczyna się lokalnie; lekka chmura
+Luna/Haiku/odpowiednik z dostępnego konta jest pomocą przy problemie. Brak modelu lub konta
+nie daje fikcyjnego sukcesu. Trudne zadania/eskalacja, ręczne kolejki/przypięcia i istniejące
+bramki prywatności, możliwości i budżetu pozostają nadrzędne.1.5B local-light tylkoSummarize.
+
+
 ## Cel
 Deterministyczny wybór trasy dla zadania: klasa zadania (głos-szybka, rozmowa, kod, planowanie, GUI/wizja, streszczanie, embeddingi) × ograniczenia (tag prywatności i jurysdykcji, budżet, opóźnienie, możliwości) → dostawca/model lub backend agentowy; fallback, circuit breaker, limity okien planów; Mówczyni + Myślicielka (PLAN §5.4). Nie wywołuje modeli sam — zwraca decyzję i nadzoruje fallback.
 
