@@ -26,6 +26,7 @@ pub mod fetch;
 pub mod install;
 mod jobs;
 pub mod licenses;
+mod main_profile;
 pub mod pricing;
 pub mod qwen_asr;
 pub mod store;

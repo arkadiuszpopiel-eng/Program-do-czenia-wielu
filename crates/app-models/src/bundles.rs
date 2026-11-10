@@ -244,7 +244,7 @@ pub fn view(def: &Def, m: &Machine, recommended: bool, items: &[ModelItem]) -> M
         id: def.id.into(),
         rating: def.rating,
         name: LocalizedText::new(def.name.0, def.name.1),
-        summary: LocalizedText::new(def.summary.0, def.summary.1),
+        summary: crate::main_profile::summary(def, m),
         requirements: requirements(&def.need),
         size_bytes: found.iter().map(|(i, _)| i.size_bytes).sum(),
         missing_bytes: found.iter().map(|(i, _)| to_download(i)).sum(),
@@ -253,7 +253,7 @@ pub fn view(def: &Def, m: &Machine, recommended: bool, items: &[ModelItem]) -> M
         state: state_of(&rows),
         fit: fit(def, m),
         recommended,
-        quality: (def.quality)(),
+        quality: crate::main_profile::quality(def, m),
         items: rows,
     }
 }

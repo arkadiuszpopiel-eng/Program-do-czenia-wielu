@@ -1,5 +1,13 @@
 # models — SPEC (v1, menedżer modeli i silników, `app-models`)
 
+## Nowy profil główny — polecenie właściciela10.11.2026
+
+Qwen3-8B Q4_K_M jest pierwszym LLM katalogu. Pakiety dla osobnej karty12GB zastępują
+mały/historyczny LLM modelem głównym8B i pokazują zgodne opisy pamięci/jakości.
+Bielik1.5B jest pomocniczy; karty8B/11B i licencji pozostają jawnie niepotwierdzone przez
+człowieka. Poprzednie porażki jakości/CPU pozostają zachowane, GPU wymaga odbioru.
+
+
 ## Cel
 `catalog::builtin()` wybiera katalog hosta, a `catalog::builtin_for(Option<Target>)` pozwala jawnie
 sprawdzić dane innej platformy. Testy pakietów i fixture'ów Windows wybierają Windows x64 także
