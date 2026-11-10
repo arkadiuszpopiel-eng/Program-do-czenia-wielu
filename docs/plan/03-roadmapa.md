@@ -1,19 +1,14 @@
 # 03 — Roadmapa (dokument żywy)
 
-**Kandydat #61 — kodowane parametry źródeł:** istniejący detektor sprawdza również
-klucze i wartości po dekodowaniu query; poprawne URL pozostają oryginalne. Lokalnie **47/0/0**
-łącznie z #59/#60, Clippy/lint/format bez błędów; [raport i granice](../reviews/2026-11-10-search-encoded-params.md).
-Baza 74f09914 ma pełne zielone CI173 i Windows95; nowy przyrost wymaga własnego CI/przeglądu.
+**Kandydat #62 — Stop na granicach HTTP i pobrania:** nagłówki/chunk/EOF nie stają się
+sukcesem po zgłoszonym Stop; wątek zapisu sprawdza token przed commit. Prawdziwy wynik
+ukończonego commit pozostaje zachowany. Lokalnie **56/0/0**, Clippy/lint/format bez błędów.
+[Raport #62](../reviews/2026-11-10-http-cancel.md) · [zbiorczy raport postępu](../reviews/2026-11-10-enterprise-progress.md).
 
-**Kandydat #60 — Stop przy odpowiedzi wyszukiwarki:** już zgłoszone anulowanie nie
-staje się sukcesem lub błędem I/O. Komunikat nie zaprzecza możliwej wysyłce zapytania.
-Lokalnie 44/0/0, Clippy/lint/format bez błędów; [raport i granice](../reviews/2026-11-10-search-cancel.md).
-Publikacja wraz z #59 po zakończeniu pełnego CI poprzedniego heada.
-
-**Kandydat #59 — deduplikacja źródeł:** powtórzony poprawny cel nie zajmuje kolejnego
-miejsca ani budżetu znaków, pierwszy oryginalny URL i kolejność są zachowane.
-Lokalnie 40/0/0 i Clippy bez ostrzeżeń; [raport i ograniczenia](../reviews/2026-11-10-search-dedup.md).
-Publikacja po zakończeniu pełnego CI poprzedniego heada; odbiór wyszukiwarki pozostaje otwarty.
+**Opublikowane #59–#61 w 5fe2edd7:** deduplikacja, Stop przy odpowiedzi SearchPort i kontrola
+kodowanych query. Pełne **CI174 10/10 i Windows96 4/4 zielone**: Linux3535/0/26,
+Windows3561/0/47, Chromium915/915, WebView2 63/0/5. Nowy #62 wymaga własnego CI/przeglądu;
+odbiór rzeczywistego dostawcy WWW i sprzętu pozostaje otwarty.
 
 **#58 — próba faktów narzędzi odrzucona:** prawdziwy Core + Bielik 1.5B, po 50 odpowiedzi
 obu wersji i 50/50 fikcyjnych potwierdzeń w każdej, mimo poprawnie przekazanych liczników 0.

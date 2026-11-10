@@ -13,7 +13,7 @@ use tools_net_contract::{
     EVENT_FETCH, FetchArgs, FetchOut, HttpMethod, SearchArgs, url_carries_secret,
 };
 
-use crate::core::{Core, Step, fail, net_failure, refuse};
+use crate::core::{Core, Step, fail, net_failure, network_cancelled, refuse};
 
 /// Czy typ treści jest tekstowy (brak typu — rozstrzyga dekodowanie).
 fn textual(content_type: Option<&str>) -> bool {
@@ -83,6 +83,9 @@ impl Core {
             .await
         };
         self.release(&opened.grants).await;
+        if ctx.cancel.is_cancelled() {
+            return Err(network_cancelled(&action));
+        }
         let (body, cut) = read?;
         let bytes = body.len() as u64;
         report_untrusted(&self.gate, ctx, TaintSource::Web).await;
@@ -145,6 +148,9 @@ impl Core {
         );
         let mut o = ToolOutcome::ok(rendered, serde_json::to_value(&out).unwrap_or_default())
             .untrusted(TaintSource::Web);
+        if ctx.cancel.is_cancelled() {
+            return Err(network_cancelled(&action));
+        }
         o.truncated = out.truncated;
         o.approval = opened.grants.iter().find_map(|g| g.auth.approval);
         Ok(o)

@@ -50,6 +50,12 @@ pub(crate) fn net_failure(e: &NetError, action: &str) -> Box<ToolOutcome> {
     }
 }
 
+pub(crate) fn network_cancelled(action: &str) -> Box<ToolOutcome> {
+    let mut out = ToolOutcome::cancelled(action);
+    out.text = format!("Anulowano: {action}. Żądanie sieciowe mogło już dotrzeć do odbiorcy.");
+    Box::new(out)
+}
+
 /// Zgoda na host z weryfikacją.
 pub(crate) struct HostGrant {
     pub(crate) host: String,
@@ -148,14 +154,21 @@ impl Core {
         deadline: Instant,
         action: &str,
     ) -> Step<HttpResponse> {
-        tokio::select! {
-            () = ctx.cancel.cancelled() => Err(Box::new(ToolOutcome::cancelled(action))),
+        if ctx.cancel.is_cancelled() {
+            return Err(network_cancelled(action));
+        }
+        let result = tokio::select! {
+            () = ctx.cancel.cancelled() => Err(network_cancelled(action)),
             r = tokio::time::timeout_at(deadline, self.http.send(req)) => match r {
                 Ok(Ok(resp)) => Ok(resp),
                 Ok(Err(e)) => Err(net_failure(&e, action)),
                 Err(_) => Err(net_failure(&NetError::Timeout, action)),
             },
+        };
+        if ctx.cancel.is_cancelled() {
+            return Err(network_cancelled(action));
         }
+        result
     }
 
     /// Żądanie z przekierowaniami: nowy host = nowa zgoda Brokera; ten sam host — ta sama zgoda,
@@ -255,10 +268,16 @@ impl Core {
         deadline: Instant,
         action: &str,
     ) -> Step<Option<Vec<u8>>> {
+        if ctx.cancel.is_cancelled() {
+            return Err(network_cancelled(action));
+        }
         let next = tokio::select! {
-            () = ctx.cancel.cancelled() => return Err(Box::new(ToolOutcome::cancelled(action))),
+            () = ctx.cancel.cancelled() => return Err(network_cancelled(action)),
             r = tokio::time::timeout_at(deadline, body.chunk()) => r,
         };
+        if ctx.cancel.is_cancelled() {
+            return Err(network_cancelled(action));
+        }
         match next {
             Err(_) => Err(net_failure(&NetError::Timeout, action)),
             Ok(Err(e)) => Err(net_failure(&e, action)),

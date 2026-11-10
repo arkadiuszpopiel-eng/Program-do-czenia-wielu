@@ -1,0 +1,163 @@
+{
+  "updated_utc": "2026-11-10T02:51:36.247058+00:00",
+  "issue": 62,
+  "base": "5fe2edd7bb3c48d11f1cd4da8a2a9a14f7f6746a",
+  "initial_fixture_compile": "exit101 DenyListstype,testsnotrun;preservedred-initial-fixture-compile.log",
+  "RED": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "tools-net-impl",
+      "--test",
+      "http_cancel",
+      "-j2"
+    ],
+    "exit": 101,
+    "started_utc": "2026-11-10T02:38:52.253396+00:00",
+    "finished_utc": "2026-11-10T02:38:54.680246+00:00"
+  },
+  "RED_results": [
+    2,
+    7,
+    0
+  ],
+  "GREEN_results": [
+    56,
+    0,
+    0
+  ],
+  "target_results": 12,
+  "new_tests": 9,
+  "new_variants": 13,
+  "checks": [
+    {
+      "name": "green-full",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "tools-net-contract",
+        "-p",
+        "tools-net-impl",
+        "-p",
+        "tools-net-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T02:42:22.346086+00:00",
+      "finished_utc": "2026-11-10T02:42:30.619715+00:00",
+      "log_sha256": "58cc1492eba26eadbebd502859ecb72311d05b293d1cd3dccd2a4b598a2a2c0f"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "tools-net-contract",
+        "-p",
+        "tools-net-impl",
+        "-p",
+        "tools-net-fake",
+        "--all-features",
+        "--all-targets",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T02:42:30.620222+00:00",
+      "finished_utc": "2026-11-10T02:42:50.259415+00:00",
+      "log_sha256": "7fae2728b36e9b87ac544453b7c74f1e20cb24419861d8197b2e14cd0a650c42"
+    },
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T02:42:50.259903+00:00",
+      "finished_utc": "2026-11-10T02:42:59.166425+00:00",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "lint": {
+    "command": [
+      "pnpm",
+      "lint"
+    ],
+    "exit": 0,
+    "started_utc": "2026-11-10T02:46:17.379716+00:00",
+    "finished_utc": "2026-11-10T02:46:46.612937+00:00",
+    "log_sha256": "8cb4b01976046b699b9b739264ab35ba1da6e86b3078bf7060ff6bab633348f8"
+  },
+  "scope": "FakeHTTP/DownloadStore/Brokerharness only;no nativefilesystem/GPU/mic/APIacceptance;no protected/policy/eval/dependency/schema/budgetchanges",
+  "commit_boundary": "Cancelcheckedinsideblockingworkerbeforecommit;completedcommitkeepsreceipt/file;doesnotinterruptsynchronouscommitmidway",
+  "source_sha256": {
+    "crates/tools-net-impl/src/core.rs": "4a8666d762db6ca14e2784cf4147223596a7d40a784d3fb84c3ed8af70bac712",
+    "crates/tools-net-impl/src/fetch.rs": "ea63e3e20b0141521b2d5571ef2163a98fdcf75b6e8430465d14d979e410c7af",
+    "crates/tools-net-impl/src/download.rs": "8cdc4436086b3527e6dca1c55c9166587f3b4ca5ca1bce0c87387e6ebb640cda",
+    "crates/tools-net-impl/tests/http_cancel.rs": "70e50cf39cfa4163822001a8920aec5722994eef397b67d0bf19d4081b7f1f11",
+    "docs/modules/tools-net/SPEC.md": "97b67fed80b87d0f71da056e34accff618455fde054838cabd9a7bbf5bc7d12d"
+  },
+  "logs": {
+    "red-initial-fixture-compile.log": {
+      "bytes": 2379,
+      "sha256": "b3a82d8c3a658a8818c9ff6b23275b270dfd7c66e0dc583e07045ec662d23802"
+    },
+    "red.log": {
+      "bytes": 7585,
+      "sha256": "6cc61efb1df87ec5b7e39519f93bafe50202abbd6e0f2a6790516bfcb33715e7"
+    },
+    "green-full.log": {
+      "bytes": 5952,
+      "sha256": "58cc1492eba26eadbebd502859ecb72311d05b293d1cd3dccd2a4b598a2a2c0f"
+    },
+    "clippy.log": {
+      "bytes": 1949,
+      "sha256": "7fae2728b36e9b87ac544453b7c74f1e20cb24419861d8197b2e14cd0a650c42"
+    },
+    "fmt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "lint.log": {
+      "bytes": 405,
+      "sha256": "8cb4b01976046b699b9b739264ab35ba1da6e86b3078bf7060ff6bab633348f8"
+    },
+    "docs-generate.log": {
+      "bytes": 48,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs-check.log": {
+      "bytes": 48,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs-verify.log": {
+      "bytes": 59,
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    }
+  },
+  "docs": {
+    "pages": 102,
+    "problems": 0,
+    "generate_exit": 0,
+    "check_exit": 0,
+    "verify_exit": 0
+  },
+  "size_exit": 0
+}

@@ -18,7 +18,7 @@ use tools_common_contract::{
 };
 use tools_net_contract::{DownloadArgs, DownloadOut, EVENT_DOWNLOAD, HttpMethod, QUARANTINE_DIR};
 
-use crate::core::{Core, Step, fail, refuse};
+use crate::core::{Core, Step, fail, network_cancelled, refuse};
 use crate::fetch::checked_target;
 
 /// Bufor zapisu przed przekazaniem do wątku blokującego.
@@ -269,10 +269,18 @@ impl Core {
             sink = flush(sink, buf, action).await?;
         }
         let url = opened.final_url.clone();
-        let committed = tokio::task::spawn_blocking(move || sink.commit(&url)).await;
+        let cancel = ctx.cancel.clone();
+        let committed = tokio::task::spawn_blocking(move || {
+            if cancel.is_cancelled() {
+                return None;
+            }
+            Some(sink.commit(&url))
+        })
+        .await;
         let path = match committed {
-            Ok(Ok(p)) => p,
-            Ok(Err(e)) => {
+            Ok(Some(Ok(p))) => p,
+            Ok(None) => return Err(network_cancelled(action)),
+            Ok(Some(Err(e))) => {
                 return Err(fail(
                     ToolErrorKind::Io,
                     format!("Nie wykonano: {action} — {e}."),
