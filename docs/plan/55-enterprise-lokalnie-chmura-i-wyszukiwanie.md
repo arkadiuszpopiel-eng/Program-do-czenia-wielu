@@ -1,5 +1,12 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Nowe zlecenie właściciela po zamknięciu nocnego okna:** główne modele lokalne8–12B
+naRTX2060 12GB z zapasem kontekstu. Qwen3-8B Q4_K_M domyślny, Bielik11B Q4_K_M jako
+alternatywa tekstowa;1.5B tylko pomocniczy. Dostępna Luna/Haiku pomaga po problemie lokalnym;
+trudne zadania i zgody zachowują hierarchię. [Zmiany, testy i pamięć](../reviews/2026-11-10-model-roles.md).
+To nowe polecenie w określonym zakresie; poprzedni harmonogram nie jest wznawiany.
+Poniższe terminy i wyniki są historią zamkniętego okna, nie limitem nowego zlecenia.
+
 **Kandydat #63 — oczekiwanie na magazyn pobrania:** Stop i istniejący deadline kończą
 oczekiwanie na begin/write. Rozpoczęte I/O może jeszcze wracać w tle; sprzątanie następuje po
 powrocie pracownika. Rozpoczęty commit zachowuje rzeczywisty wynik. RED2/4 → GREEN62/0/0;

@@ -14,7 +14,7 @@ Bielik16k musi zejść do8k przy tych rezerwach. To szacunek, nie odbiór sprzę
 Bielik1.5B i poprzednie wyniki jakości pozostają zachowane; zmiana modelu ich nie zalicza.
 
 ## Cel
-Lokalny `ModelProvider`: wbudowany llama.cpp (Vulkan/CUDA/CPU) jako osobny proces; bez kluczy API jedyny „mózg" (MVP), z kluczami — komendy, fallback, offline. Ollama i LM Studio jako zewnętrzne endpointy przez adapter generyczny (w `providers-api`), nie tutaj. Pobieranie modelu 1,5–4,5B (oficjalny GGUF autorów; Bielik v3 — Q8_0, fala 6) w onboardingu (PLAN §1.2, §5.2, §16.2 F1).
+Lokalny `ModelProvider`: wbudowany llama.cpp (Vulkan/CUDA/CPU) jako osobny proces; bez kluczy API jedyny „mózg" (MVP), z kluczami — komendy, fallback, offline. Ollama i LM Studio jako zewnętrzne endpointy przez adapter generyczny (w `providers-api`), nie tutaj. Pobieranie głównych modeli8–12B i pomocniczego1.5B (oficjalne GGUF autorów; role według zlecenia10.11) w onboardingu (PLAN §1.2, §5.2, §16.2 F1).
 
 ## Fala i priorytet
 F1 (chat + embeddings lokalne, pobieranie modelu, Vulkan/CUDA/CPU). P0 — wymagany w MVP.
@@ -53,7 +53,7 @@ Zdarzenia: `local.model.download.progress/finished/failed`, `local.model.loaded/
 
 ## Niezmienniki
 - Model tylko GGUF z hashem (łańcuch dostaw, PLAN §8.7); nieznany hash = brak ładowania.
-- Bez kwantów IQ (crashe RDNA3/Vulkan); 8B tylko gdy STT idzie na CPU (rezydencja).
+- Bez kwantów IQ (crashe RDNA3/Vulkan); wagi, KV cache, mowa i zapas muszą mieścić się w budżecie rezydencji.
 - Crash sidecara nie zabija aplikacji; automatyczny fallback backendu (Vulkan → CPU) z ograniczoną liczbą prób i zdarzeniem.
 - Brak Pythona; brak dostępu sidecara do sieci (Job Object / brak tokenu egress) — dane nie wychodzą.
 - Tabela cen: koszt = 0 PLN, ale zużycie tokenów raportowane do `cost-meter` (statystyki).
