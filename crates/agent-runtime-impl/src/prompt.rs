@@ -51,7 +51,7 @@ fn loop_rules(spec: &RunSpec) -> Vec<String> {
         .any(|t| t.starts_with("shell_") || t.starts_with("fs_") || t.starts_with("browser_"));
     if let Some(env) = spec.environment.as_deref().filter(|_| works_on_machine) {
         rules.push(format!(
-            "Programy na tym komputerze (wykryte przez Alfę) — używaj ich, nie zakładaj innych; brakujące zaproponuj do instalacji właścicielowi:
+            "Programy na tym komputerze (wykryte przez Alfę) — używaj ich, nie zakładaj innych. Brakujące narzędzia potrzebne do zleconego zadania instaluj dostępnymi narzędziami wykonawczymi w ramach aktualnych zgód. Nie proś ponownie o zgodę już udzieloną. Sprawdź wynik instalacji; faktyczny brak uprawnień lub wymagane potwierdzenie zgłoś na podstawie wyniku narzędzia, bez obchodzenia odmowy:
 {env}"
         ));
     }

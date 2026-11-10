@@ -1,5 +1,12 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Pełna zgoda10.11 — #74:** właściciel potwierdził maksymalne dostępne możliwości po świadomym
+włączeniu pełnej zgody. Prompt nie wymaga już proponowania każdej brakującej instalacji:
+agentka ma działać w ramach aktywnych zgód, bez powtórnego pytania, i sprawdzić wynik.
+Runtime132/0/0 iClippy0; istniejące zakresy/utrwalenie Max/L4:6/0/0, tabelaautonomii3/0/0.
+[Decyzja](50-tryby-zgod-jak-claude-codex.md) · [Raport](../reviews/2026-11-10-full-consent.md).
+To nie dowodzi instalacji sterownika lub elewacjiWindows. Baza f6422855 ma CI181/Windows104 zielone.
+
 **Kodowanie10.11 — #70/#71/#72:** naprawa utraty końcowych błędów kompilatora, runtime132/0/0,
 Clippy0; skryptowany model z rzeczywistym Rust przeszedł kompilację, poprawkę, test i uruchomienie.
 Cykl sprawdzony dla4wbudowanych person i własnej. Qwen8B CPU sam poprawił dwa małe programy

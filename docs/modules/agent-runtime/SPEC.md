@@ -48,6 +48,9 @@ po cofnięciu nie trafia na nieznany wariant (punkty kontrolne go nie zawierają
 - **Adapter schedulera:** `RuntimeExecutor: TaskExecutor` — ładunek `AgentTaskPayload`, przebieg `task-<zadanie>-a<próba>` (wznowienie z checkpointu), agentka przydzielona przez scheduler z obsady, budżety ∩ zadanie, taint zadania, pochodzenie ≠ użytkownik → `CommandOrigin::Agent`; `Completed` → `Succeeded{run, verified}`, odrzucenie Krytyczki/pętla/odmowa → `Failed{retryable:false}`, błąd dostawcy → ponawialny, `Stop`/anulowanie → `Stopped`; porzucenie wykonania anuluje przebieg.
 
 ## Niezmienniki
+- Informacja o wykrytych programach nie nakazuje ponownego pytania o instalację. Potrzebne
+  do zadania narzędzia agentka instaluje dostępnymi narzędziami w ramach aktywnych zgód,
+  sprawdza wynik i zgłasza rzeczywistą odmowę lub wymagane potwierdzenie. Nie nadaje sobie praw.
 - Długi tekst obserwacji zachowuje początek (podsumowanie) i koniec (diagnostyka kompilatora),
   z jawnym znacznikiem pominiętego środka w dotychczasowym limicie znaków. Krótki tekst pozostaje
   bez zmian. Delimitacja niezaufanej treści i obrazy pozostają zachowane; skrót nie potwierdza wykonania.

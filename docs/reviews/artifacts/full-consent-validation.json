@@ -1,0 +1,168 @@
+{
+  "base": "f642285585b0926566929fcd39164a7be715a795",
+  "scope": "Ownerconfirm fullconsent productbehavior; promptguidanceonly, existingrights unchanged",
+  "checks": [
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "agent-runtime-contract",
+        "-p",
+        "agent-runtime-impl",
+        "-p",
+        "agent-runtime-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "start": "2026-11-10T16:19:34.337857+00:00",
+      "end": "2026-11-10T16:20:25.529835+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/full-consent/runtime-tests.log",
+      "sha256": "af3a9a5801b32dc2af8e6ba6515de987c48c5b3531317af27a846de46eab92ef"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "agent-runtime-contract",
+        "-p",
+        "agent-runtime-impl",
+        "-p",
+        "agent-runtime-fake",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start": "2026-11-10T16:20:25.530783+00:00",
+      "end": "2026-11-10T16:20:52.584345+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/full-consent/runtime-clippy.log",
+      "sha256": "9e9126e73f8c26563c4ddf6146a792149020731b68a084f5e6f02e2f69b437ef"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "safety-broker-impl",
+        "--test",
+        "max_access",
+        "--test",
+        "standing_level",
+        "-j2"
+      ],
+      "start": "2026-11-10T16:20:52.585050+00:00",
+      "end": "2026-11-10T16:21:07.173653+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/full-consent/max-access-existing-tests.log",
+      "sha256": "dcade0f46a211b15dffa209a1e88de5f7bdbb3760733f7572e1e8f5d02d0faa0"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "safety-broker-contract",
+        "--test",
+        "autonomy_table",
+        "-j2"
+      ],
+      "start": "2026-11-10T16:21:07.174241+00:00",
+      "end": "2026-11-10T16:21:11.513639+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/full-consent/autonomy-existing-tests.log",
+      "sha256": "b2bc1857dd939f0066ba2b10374d3b1a66fc2d3cc2e461dd41a6c9d46db89a79"
+    }
+  ],
+  "counts": {
+    "runtime": [
+      132,
+      0,
+      0
+    ],
+    "Max_and_persistence": [
+      6,
+      0,
+      0
+    ],
+    "autonomy_table": [
+      3,
+      0,
+      0
+    ]
+  },
+  "limitations": [
+    "No new LLM semanticmeasurement",
+    "No realinstallation/UAC/driver/GPU/mic acceptance",
+    "ProtectedCoreprivacytestpatchnotapplied"
+  ],
+  "baseline_CI": {
+    "CI181": "10/10success",
+    "Windows104": "4/4success"
+  },
+  "static_checks": [
+    {
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-11-10T16:22:46.401176+00:00",
+      "end": "2026-11-10T16:23:16.950052+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/full-consent/fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "start": "2026-11-10T16:23:16.954403+00:00",
+      "end": "2026-11-10T16:23:45.254572+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/full-consent/lint.log",
+      "sha256": "f42523257ecf1bdb71b98f7cadaaf2d0bc0e1bd33f8626c904fdede6f42af557"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--verify"
+      ],
+      "start": "2026-11-10T16:23:45.255518+00:00",
+      "end": "2026-11-10T16:23:46.033331+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/full-consent/docs.log",
+      "sha256": "e1efc1496f2e6b075eb82b4f296e93a104942365a9e88ee6014397d9241caa80"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-11-10T16:23:46.034167+00:00",
+      "end": "2026-11-10T16:23:46.057404+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/full-consent/diff.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

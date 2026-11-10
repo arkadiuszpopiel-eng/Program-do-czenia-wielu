@@ -1,5 +1,19 @@
 # 50 — Tryby zgód i uprawnień jak w Claude Code i Codex (etap Z)
 
+**Potwierdzenie właściciela10.11.2026:** po świadomym przełączeniu na pełną zgodę działania
+program ma mieć maksymalne dostępne możliwości i uprawnienia do realizacji zadania: pliki,
+terminal, tworzenie/kompilacja/uruchomienie/testy/poprawki oraz instalowanie potrzebnego
+oprogramowania i sterowników. Zwykłe kroki objęte tą zgodą nie wymagają kolejnego pytania.
+Zakres obejmuje persony pracujące z nadanymi im narzędziami, lokalnie i w chmurze zgodnie
+z wybranym zakresem Pełnego/Max dostępu. Systemowe podniesienie uprawnień Windows musi
+rzeczywiście nastąpić; samo ustawienie trybu go nie dowodzi.
+
+Przyrost#74 usuwał sprzeczne zalecenie promptu, aby zawsze proponować właścicielowi instalację
+brakującego programu. Agentka ma wykonać potrzebną instalację w ramach aktywnych zgód,
+sprawdzić wynik, a rzeczywistą odmowę lub wymagane potwierdzenie przekazać z narzędzia.
+Nie zmienia to decyzji Brokera, ról ani STOP. Instalacja/UAC/sterowniki na prawdziwym
+Windows pozostają do odbioru; [raport](../reviews/2026-11-10-full-consent.md).
+
 Stan na **2026-11-03**, wersja 0.0.84. Zlecenie właściciela z 3.11 (dwa zrzuty: menu trybów Claude Code i Codex na
 PC): „system zgód i uprawnień ma działać identycznie jak w Claude od Anthropic i Codex od OpenAI — sprawdź dokładnie,
 jak to jest w ich wersjach na PC, i tak zrób”. Odpowiedzi na pytania tego samego dnia:
