@@ -1,5 +1,8 @@
 # Role modeli: główny8–12B, lekka pomoc lokalna i chmurowa — 10.11.2026
 
+Aktualne [rozliczenieCI177/Windows99, wynikQwenCPU i korekta](2026-11-10-model-roles-ci.md).
+CI177/Windows99 są niezaliczone; nowe poprawki wymagają osobnegoCI.
+
 Nowe polecenie właściciela po zakończeniu nocnego okna. Prace wznowiono wyłącznie w tym
 zakresie; oba nocne harmonogramy pozostają wyłączone. Poprzedni raport i błędy zachowane.
 

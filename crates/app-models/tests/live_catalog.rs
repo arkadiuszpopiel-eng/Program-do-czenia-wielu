@@ -3,14 +3,15 @@
 //! jobie: `ALFA_LIVE_CATALOG=1 cargo test -p app-models --test live_catalog -- --ignored --nocapture`.
 //!
 //! Przez **prawdziwy** `ModelsApp` (katalog `builtin()`, HTTPS, zgoda TOFU jak kliknięcie w UI)
-//! pobiera i rozpakowuje: `llama-server` (CPU) + modele GGUF z katalogu (oficjalne Bielik v3.0 Q8_0:
-//! 1.5B ~1,6 GB i domyślny 4.5B ~4,8 GB — ten, który pobierze właściciel; `ALFA_LIVE_LLM=<id>` zawęża
+//! pobiera i rozpakowuje: `llama-server` (CPU) + oficjalne GGUF z katalogu (główny Qwen8B,
+//! pomocniczy1.5B, starszy4.5B i11B do odbioruGPU; `ALFA_LIVE_LLM=<id>` zawęża
 //! do jednego), `whisper-server` (CPU) + najmniejszy model whisper, `piper` + głos `pl_PL`; dodatkowo — tylko pobranie
 //! i rozpakowanie (bez GPU na runnerze) — `llama-server` Vulkan i CUDA (+ `cudart`) oraz
 //! `whisper-server` CUDA, jeśli są w katalogu. Silniki uruchamia kodem aplikacji:
 //! `app_modules::route::local` (`llama-server`, ta sama kompozycja co `app-core`),
 //! `app_modules::tts::engines` (Piper) i `app_modules::stt::whisper` (to samo co `app-voice`).
-//! Sprawdza: generację ≥ 16 tokenów po polsku (każdy model; z narzędziem, gdy `tools = true`) i wiersze
+//! Sprawdza: generację ≥ 16 tokenów dla modeli w budżecie; dla większych dokładną odmowę pamięci
+//! bez uruchomienia serwera (generacja NOT_RUN_CPU_BUDGET). Narzędzia dla tools=true i wiersze
 //! logu `llama-server` z architekturą i KV cache; „Dzień dobry, jestem Alfa.” → Piper → WAV →
 //! whisper → WER. Brak pozycji nie przerywa testu — dalsze etapy idą z tym, co się zainstalowało. Raport JSON (`ALFA_LIVE_REPORT`, domyślnie `<katalog>/live-report.json`):
 //! adres, rozmiar i **SHA-256** każdego pobranego pliku, układ drzewa, wersje i flagi CLI, czasy
@@ -55,7 +56,7 @@ const MAX_WER: f64 = 0.5;
 const PIPER_VOICE: &str = "piper-pl_PL-gosia-medium";
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-#[ignore = "pobiera ~4 GB z GitHub/Hugging Face i uruchamia silniki; ALFA_LIVE_CATALOG=1"]
+#[ignore = "pobiera duże GGUF i uruchamia rzeczywiste silniki; ALFA_LIVE_CATALOG=1"]
 async fn live_catalog_cpu_engines() {
     if std::env::var_os("ALFA_LIVE_CATALOG").is_none() {
         eprintln!("pominięte: ustaw ALFA_LIVE_CATALOG=1 (próba generalna, rehearsal.yml)");
@@ -126,6 +127,7 @@ async fn live_catalog_cpu_engines() {
         for llm in llms.iter().filter(|l| has(&l.id)) {
             llm_generation(&paths, &llm.id, &mut report).await;
         }
+        live::capacity::require_generation(&mut report);
     }
     if voice.iter().all(|id| has(id)) {
         voice_round_trip(&paths, &root, &mut report).await;
@@ -159,6 +161,7 @@ async fn llm_generation(paths: &AppPaths, model: &str, report: &mut Report) {
     req.params.max_tokens = Some(96);
     let t0 = Instant::now();
     let mut stream = provider.stream(req, CancellationToken::new());
+    let mut error_kind = None;
     let (mut first, mut text, mut tokens, mut error) = (None, String::new(), 0u64, None);
     while let Some(event) = stream.next().await {
         match event {
@@ -167,7 +170,10 @@ async fn llm_generation(paths: &AppPaths, model: &str, report: &mut Report) {
                 text.push_str(&t);
             }
             ProviderEvent::Usage(u) => tokens = u.output_tokens,
-            ProviderEvent::Error(e) => error = Some(e.to_string()),
+            ProviderEvent::Error(e) => {
+                error_kind = Some(e.kind.clone());
+                error = Some(e.to_string());
+            }
             _ => {}
         }
     }
@@ -204,12 +210,15 @@ async fn llm_generation(paths: &AppPaths, model: &str, report: &mut Report) {
             "text": text,
             "error": error,
     });
-    if error.is_some() || tokens < 16 || !pl {
+    let guarded = live::capacity::record(provider.as_ref(), model, error_kind.as_ref(), &mut entry);
+    if !guarded && (error.is_some() || tokens < 16 || !pl) {
         report.problem(format!(
             "LLM {model}: {tokens} tokenów, polskie litery: {pl}, błąd: {error:?}"
         ));
     }
-    entry["tools"] = if provider.entry(model).is_some_and(|e| e.tools) {
+    entry["tools"] = if guarded {
+        json!({"skipped":"NOT_RUN_CPU_BUDGET"})
+    } else if provider.entry(model).is_some_and(|e| e.tools) {
         tool_request(provider.as_ref(), model, report).await
     } else {
         // Lekki model bez narzędzi (`tools = false` w manifeście) — serwer bez `--jinja`.

@@ -234,3 +234,11 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   zakaz porad medycznych w OpenRAIL-M (Supertonic 3) — decyzje człowieka.
 - **UI:** rozwijana „Karta licencji” w wierszu pozycji (`LicenseCardInfo.svelte`, przycisk z `aria-expanded`),
   atrapa `fake/license-seeds.ts`, e2e `e2e/license-cards.spec.ts`.
+
+## PróbaCPU katalogu modeli o różnych wymaganiach
+
+Próba zachowuje budżetCPU8192MiB z rekomendacji runnera. Każdy model jest sprawdzany;
+przekraczający budżet musi zwrócić dokładną odmowę pamięci przed startem (osobny test ochrony).
+Jego generacja pozostajeNOT_RUN_CPU_BUDGET, błąd zostaje w raporcie. Nieoczekiwane błędy
+nie są ukrywane. Wspierane modele nadal muszą wygenerować≥16 tokenów z polskimi literami,
+a cały przebieg wymaga co najmniej jednej rzeczywistej generacji. To nie jest odbiórGPU.

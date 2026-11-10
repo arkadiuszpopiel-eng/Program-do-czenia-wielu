@@ -1,0 +1,201 @@
+{
+  "base": "3e972aa0b86f0498b75f1c8ac07d1aef99aac9cb",
+  "CI177": {
+    "run": 42773091535,
+    "conclusion": "failure",
+    "success_jobs": 8,
+    "failed_jobs": 2,
+    "rust_tests": "NOT RUN: Clippy failed",
+    "reason": "doc_lazy_continuation in app-models/lib.rs",
+    "chromium": [
+      915,
+      0,
+      0
+    ],
+    "shards": [
+      305,
+      305,
+      305
+    ],
+    "minutes": [
+      8.8,
+      9.8,
+      8.4
+    ],
+    "vitest": [
+      573,
+      0,
+      0
+    ]
+  },
+  "Windows99": {
+    "run": 42773091604,
+    "conclusion": "failure",
+    "success_jobs": 3,
+    "failed_jobs": 1,
+    "webview2": [
+      63,
+      0,
+      5
+    ],
+    "minutes": 2.8,
+    "reason": "11B CPU generation rejected by unchanged8192MiB residency budget"
+  },
+  "real_qwen_cpu": {
+    "model": "qwen3-8b-q4-k-m",
+    "threads": 4,
+    "startup_ms": 13951,
+    "first_token_ms": 15762,
+    "total_ms": 30296,
+    "tokens": 96,
+    "tok_per_s": 6.61,
+    "structured_tool_proposal": true,
+    "tool_proposal_ms": 19128,
+    "physical_tool_execution_proved": false,
+    "Core_or_GPU_acceptance": false
+  },
+  "bielik11_cpu_generation": "NOT RUN: resource guard rejected before startup",
+  "raw_logs": [
+    {
+      "file": "ci177-129685203152.log",
+      "sha256": "f9897d4f51edf06ba2796152544d6645e155a975fb0705c57adbb0bfc83e689d"
+    },
+    {
+      "file": "ci177-129685203551.log",
+      "sha256": "c29b294cc3c9d3688838e04ac471a0d348ab14dd669ceebcab22327097b4fa5d"
+    },
+    {
+      "file": "ci177-129685203685.log",
+      "sha256": "06a1a8f3fc25a821372c7ccc0c5582ae66eed20d6b51e462cb19c7075bf8c2f0"
+    },
+    {
+      "file": "ci177-129685203950.log",
+      "sha256": "c11caf3b269c7fec22339767d0977fa46fda41aad7b8223a457c407832e61a34"
+    },
+    {
+      "file": "ci177-129685936454.log",
+      "sha256": "54b446e84fe17beeb21e2a56ad6c594531f485d38c43a91246539099eb0730b6"
+    },
+    {
+      "file": "ci177-129685936462.log",
+      "sha256": "3f5cac52ad74de0030345737440e8ffe614a54f073504d5eb4ba7cb9f897f29b"
+    },
+    {
+      "file": "ci177-129685936475.log",
+      "sha256": "276aaf3fb50c140f72e3c54ae555e62cc3e52659455edcb515ba6368919f0e39"
+    },
+    {
+      "file": "windows99-live-cpu.log",
+      "sha256": "a0786a086ea7cf10b4aaf9bcd1f792240187d3a0b1e9864c5c264f0b16bc20eb"
+    }
+  ],
+  "local_doc_red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "clippy",
+      "--locked",
+      "-p",
+      "app-models",
+      "--all-targets",
+      "--all-features",
+      "-j2",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 101,
+    "started_utc": "2026-11-10T07:15:29.404780+00:00",
+    "finished_utc": "2026-11-10T07:15:36.093936+00:00",
+    "sha256": "a90e5f431037e42be99f09a2eb89310a100d0f0e3a7dcf6476752fff4f2e4da6",
+    "cwd": "/workspace/wt-nightly",
+    "note": "First local Clippy still targeted the published worktree, reproducing CI failure; GREEN verification runs explicitly in fixed worktree."
+  },
+  "local_doc_green": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "clippy",
+      "--locked",
+      "-p",
+      "app-models",
+      "--all-targets",
+      "--all-features",
+      "-j2",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "cwd": "/workspace/wt-models-ci-doc",
+    "exit": 0,
+    "started_utc": "2026-11-10T07:17:56.170871+00:00",
+    "finished_utc": "2026-11-10T07:19:31.706348+00:00",
+    "sha256": "99a05dc575c9804cba7bcfad54946bef6d77b328982d97a6a1b87043a7c412df"
+  },
+  "capacity_checks": [
+    {
+      "name": "capacity-final-tests",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "app-models",
+        "--test",
+        "live_catalog",
+        "-j2"
+      ],
+      "cwd": "/workspace/wt-main-bundles",
+      "exit": 0,
+      "started_utc": "2026-11-10T07:40:36.000118+00:00",
+      "finished_utc": "2026-11-10T07:40:43.337680+00:00",
+      "sha256": "2d74857559218d6b006631c004a808bc5be3f81b4129cbb9e36a99c243e3dea3"
+    },
+    {
+      "name": "capacity-final-clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "app-models",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "cwd": "/workspace/wt-models-ci-doc",
+      "exit": 0,
+      "started_utc": "2026-11-10T07:40:43.338107+00:00",
+      "finished_utc": "2026-11-10T07:40:44.581369+00:00",
+      "sha256": "32529dd9676ae36832892883a67ffe8e9610cd09ded6a9ab354ee1b7b89d5d7a"
+    }
+  ],
+  "full_manager": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "app-models",
+      "--all-features",
+      "-j2"
+    ],
+    "cwd": "/workspace/wt-main-bundles",
+    "exit": 0,
+    "started_utc": "2026-11-10T07:34:19.596848+00:00",
+    "finished_utc": "2026-11-10T07:34:49.246694+00:00",
+    "sha256": "6764705b2ca9281e2a6b9493102950964df0b198045f42f24b179dfda3009a62"
+  },
+  "full_manager_results": [
+    86,
+    0,
+    1
+  ],
+  "test_rules": "8192MiB unchanged; generation threshold16 and Polish letters unchanged; exact expected memory rejection is a separate negative test, not generation; at least one actual generation required"
+}
