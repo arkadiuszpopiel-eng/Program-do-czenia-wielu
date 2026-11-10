@@ -1,14 +1,13 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
-**Kandydat #62 — Stop na granicach HTTP i pobrania:** nagłówki/chunk/EOF nie stają się
-sukcesem po zgłoszonym Stop; wątek zapisu sprawdza token przed commit. Prawdziwy wynik
-ukończonego commit pozostaje zachowany. Lokalnie **56/0/0**, Clippy/lint/format bez błędów.
-[Raport #62](../reviews/2026-11-10-http-cancel.md) · [zbiorczy raport postępu](../reviews/2026-11-10-enterprise-progress.md).
+**Kandydat #63 — oczekiwanie na magazyn pobrania:** Stop i istniejący deadline kończą
+oczekiwanie na begin/write. Rozpoczęte I/O może jeszcze wracać w tle; sprzątanie następuje po
+powrocie pracownika. Rozpoczęty commit zachowuje rzeczywisty wynik. RED2/4 → GREEN62/0/0;
+Clippy i format kod0. [Raport #63](../reviews/2026-11-10-download-wait.md).
 
-**Opublikowane #59–#61 w 5fe2edd7:** deduplikacja, Stop przy odpowiedzi SearchPort i kontrola
-kodowanych query. Pełne **CI174 10/10 i Windows96 4/4 zielone**: Linux3535/0/26,
-Windows3561/0/47, Chromium915/915, WebView2 63/0/5. Nowy #62 wymaga własnego CI/przeglądu;
-odbiór rzeczywistego dostawcy WWW i sprzętu pozostaje otwarty.
+**Opublikowany #62 w cea4444a:** pełne **CI175 10/10 i Windows97 4/4 zielone**;
+Linux3544/0/26, Windows3570/0/47, Chromium915/915 i WebView2 63/0/5.
+[Dowody](../reviews/artifacts/ci175-disk-baseline.json). Nowy #63 wymaga własnego CI/przeglądu.
 
 **#58 — próba faktów narzędzi odrzucona:** prawdziwy Core + Bielik 1.5B, po 50 odpowiedzi
 obu wersji i 50/50 fikcyjnych potwierdzeń w każdej, mimo poprawnie przekazanych liczników 0.

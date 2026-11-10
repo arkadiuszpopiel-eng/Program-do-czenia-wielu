@@ -1,6 +1,6 @@
 # Raport postępu prac Enterprise — 10.11.2026
 
-Stan po przygotowaniu #62, przed jego pełnym CI; to nie jest raport końcowy o 06:00.
+Stan po przygotowaniu #63, przed jego pełnym CI; to nie jest raport końcowy o 06:00.
 Właściciel wyznaczył rozwój przed **05:30 Europe/Warsaw (04:30 UTC)**, potem tylko końcowe
 testy i raport, zakończenie **06:00 (05:00 UTC)**. Późniejsza korekta ma pierwszeństwo.
 
@@ -22,31 +22,34 @@ gałąź `feat/nightly-modes-jarvis`. Bez merge lub wydania; jakość Enterprise
   needs_confirmation w rozmowie/Replay/DTO; otwarcie terminala nie wykonuje polecenia (#57).
 - #59/#60/#61 w commitach `1495f724`, `102a5da2`, `5fe2edd7`: deduplikacja, Stop przy odpowiedzi
   wyszukiwarki i kontrola dekodowanych query. Lokalnie 47/0/0, 12 nowych testów.
-- #62 w tym przyroście: Stop przy nagłówkach/fragmencie/EOF HTTP i przed commit pobrania.
+- #62 w opublikowanym `cea4444a`: Stop przy nagłówkach/fragmencie/EOF HTTP i przed commit pobrania.
   Lokalnie **56/0/0**, 9 nowych testów. Udany commit zachowuje prawdziwy wynik pliku.
+
+- #63: Stop i dotychczasowy deadline podczas begin/write magazynu; RED2/4 → GREEN62/0/0.
+  Rozpoczęte synchroniczne I/O może wracać w tle; rozpoczęty commit zachowuje wynik.
 
 Szczegóły i dowody: [#59](2026-11-10-search-dedup.md), [#60](2026-11-10-search-cancel.md),
 [#61](2026-11-10-search-encoded-params.md), [#62](2026-11-10-http-cancel.md),
-[Router](2026-11-09-enterprise-router.md), [CI](2026-11-09-ci-ui-shards.md),
+[#63](2026-11-10-download-wait.md), [Router](2026-11-09-enterprise-router.md), [CI](2026-11-09-ci-ui-shards.md),
 [SQLCipher](2026-11-09-ci167-sqlite.md), [propozycje](2026-11-10-tool-confirmation.md).
 
 ## Pełne CI dokładnej bazy
 
-Kod 5fe2edd7 ma zielone **CI174 10/10 i Windows96 4/4**. Liczby: zaliczone/nieudane/ignorowane.
+Kod cea4444a ma zielone **CI175 10/10 i Windows97 4/4**. Liczby: zaliczone/nieudane/ignorowane.
 
 | Dowód | Wynik |
 | --- | --- |
-| Rust Linux, all-features | 3535/0/26, 1130 wyników celów |
-| Rust Windows, all-features | 3561/0/47, 1130 wyników celów |
-| Chromium | 915/915, 305/305/305, 8,3/8,5/9,4 min |
-| Windows/WebView2 | 63/0/5, 2,9 min |
+| Rust Linux, all-features | 3544/0/26, 1131 wyników celów |
+| Rust Windows, all-features | 3570/0/47, 1131 wyników celów |
+| Chromium | 915/915, 305/305/305, 9,8/9,9/8,1 min |
+| Windows/WebView2 | 63/0/5, 2,6 min |
 | Clippy | bez ostrzeżeń obu platform |
 | UI, schematy, zależności i cargo-deny | zadania zakończone sukcesem |
 
-[CI174](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42739332482) ·
-[Windows96](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42739332767) ·
-[wyniki](artifacts/ci174-http-baseline.json).
-Nie anulowano poprzednich pełnych przebiegów pushem. Nowy #62 wymaga własnego CI;
+[CI175](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42746088767) ·
+[Windows97](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42746088440) ·
+[wyniki](artifacts/ci175-disk-baseline.json).
+Nie anulowano poprzednich pełnych przebiegów pushem. Nowy #63 wymaga własnego CI;
 nie przypisujemy mu sukcesu bazy. Niezależny przegląd i kryteria sprzętowe pozostają otwarte.
 
 ## Niezaliczone próby modeli
@@ -65,7 +68,7 @@ pomiarem RTX 2060 12 GB. [Modele i niepowodzenia](2026-11-09-jarvis-model-repair
 
 ## Dalsze kroki
 
-1. Zebrać pełny wynik nowego CI #62 i rozliczyć porażki; zachować go przed kolejnym pushem.
+1. Zebrać pełny wynik nowego CI #63 i rozliczyć porażki; zachować go przed kolejnym pushem.
    Wymagany świeży niezależny przegląd przed scaleniem.
 2. Właściciel nie wybrał dostawcy WWW. Oczekują Brave Search API, Tavily API lub własny
    SearXNG; milczenie nie jest wyborem. Klucza nie podawać w czacie.

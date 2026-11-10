@@ -4,10 +4,11 @@
 //! rzeczywisty), przerwanie = usunięcie pliku częściowego, MOTW przy zatwierdzeniu.
 
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::time::Duration;
 
 use platform_apps_contract::{
-    DownloadSink, disposition_file_name, is_executable_name, sanitize_file_name,
+    DownloadSink, DownloadStore, disposition_file_name, is_executable_name, sanitize_file_name,
 };
 use safety_broker_contract::{Capability, TaintSource};
 use sha2::{Digest, Sha256};
@@ -50,23 +51,90 @@ fn file_name(arg: Option<&str>, disposition: Option<&str>, final_url: &str) -> S
     sanitize_file_name(&raw)
 }
 
-async fn flush(
-    sink: Box<dyn DownloadSink>,
-    buf: Vec<u8>,
-    action: &str,
-) -> Step<Box<dyn DownloadSink>> {
-    let joined = tokio::task::spawn_blocking(move || {
-        let mut sink = sink;
-        sink.write(&buf).map(|()| sink)
-    })
-    .await;
-    match joined {
-        Ok(Ok(s)) => Ok(s),
-        Ok(Err(e)) => Err(fail(
-            ToolErrorKind::Io,
-            format!("Nie wykonano: {action} — {e}."),
-        )),
-        Err(e) => Err(fail(ToolErrorKind::Internal, format!("Wątek zapisu: {e}."))),
+struct DiskWait<'a> {
+    ctx: &'a ToolCtx,
+    deadline: Instant,
+    action: &'a str,
+}
+
+impl DiskWait<'_> {
+    fn stopped(&self) -> Box<ToolOutcome> {
+        let mut out = network_cancelled(self.action);
+        out.text
+            .push_str(" Operacja dyskowa może jeszcze kończyć się w tle.");
+        out
+    }
+
+    fn timed_out(&self) -> Box<ToolOutcome> {
+        fail(
+            ToolErrorKind::Timeout,
+            format!(
+                "Przekroczono czas oczekiwania: {}. Operacja dyskowa może jeszcze kończyć się w tle.",
+                self.action
+            ),
+        )
+    }
+
+    async fn wait<T: Send + 'static>(&self, task: tokio::task::JoinHandle<T>) -> Step<T> {
+        let joined = tokio::select! {
+            () = self.ctx.cancel.cancelled() => return Err(self.stopped()),
+            result = tokio::time::timeout_at(self.deadline, task) => result,
+        };
+        if self.ctx.cancel.is_cancelled() {
+            return Err(self.stopped());
+        }
+        if Instant::now() >= self.deadline {
+            return Err(self.timed_out());
+        }
+        match joined {
+            Ok(Ok(value)) => Ok(value),
+            Ok(Err(e)) => Err(fail(ToolErrorKind::Internal, format!("Wątek zapisu: {e}."))),
+            Err(_) => Err(self.timed_out()),
+        }
+    }
+
+    async fn begin(
+        &self,
+        store: Arc<dyn DownloadStore>,
+        dir: PathBuf,
+        name: String,
+    ) -> Step<Box<dyn DownloadSink>> {
+        let cancel = self.ctx.cancel.clone();
+        let deadline = self.deadline;
+        let task = tokio::task::spawn_blocking(move || {
+            if cancel.is_cancelled() || Instant::now() >= deadline {
+                None
+            } else {
+                Some(store.begin(&dir, &name))
+            }
+        });
+        match self.wait(task).await? {
+            Some(Ok(sink)) => Ok(sink),
+            Some(Err(e)) => Err(refuse(DenialReason::Policy, self.action, &e.to_string())),
+            None if self.ctx.cancel.is_cancelled() => Err(self.stopped()),
+            None => Err(self.timed_out()),
+        }
+    }
+
+    async fn flush(
+        &self,
+        mut sink: Box<dyn DownloadSink>,
+        buf: Vec<u8>,
+    ) -> Step<Box<dyn DownloadSink>> {
+        let cancel = self.ctx.cancel.clone();
+        let deadline = self.deadline;
+        let task = tokio::task::spawn_blocking(move || {
+            if cancel.is_cancelled() || Instant::now() >= deadline {
+                return Ok(sink);
+            }
+            sink.write(&buf).map(|()| sink)
+        });
+        self.wait(task).await?.map_err(|e| {
+            fail(
+                ToolErrorKind::Io,
+                format!("Błąd zapisu: {} — {e}.", self.action),
+            )
+        })
     }
 }
 
@@ -236,13 +304,14 @@ impl Core {
         self.gate
             .verify(fs_auth, fs_cap, &ctx.holder)
             .map_err(|e| Box::new(e.into_outcome(action)))?;
-        let (store, d, n) = (self.downloads.clone(), dir.to_path_buf(), name.clone());
-        let begun = tokio::task::spawn_blocking(move || store.begin(&d, &n)).await;
-        let mut sink = match begun {
-            Ok(Ok(s)) => s,
-            Ok(Err(e)) => return Err(refuse(DenialReason::Policy, action, &e.to_string())),
-            Err(e) => return Err(fail(ToolErrorKind::Internal, format!("Wątek zapisu: {e}."))),
+        let disk = DiskWait {
+            ctx,
+            deadline,
+            action,
         };
+        let mut sink = disk
+            .begin(self.downloads.clone(), dir.to_path_buf(), name.clone())
+            .await?;
         let mut hasher = Sha256::new();
         let mut buf: Vec<u8> = Vec::new();
         let mut total: u64 = 0;
@@ -262,16 +331,16 @@ impl Core {
             hasher.update(&chunk);
             buf.extend_from_slice(&chunk);
             if buf.len() >= FLUSH_BYTES {
-                sink = flush(sink, std::mem::take(&mut buf), action).await?;
+                sink = disk.flush(sink, std::mem::take(&mut buf)).await?;
             }
         }
         if !buf.is_empty() {
-            sink = flush(sink, buf, action).await?;
+            sink = disk.flush(sink, buf).await?;
         }
         let url = opened.final_url.clone();
         let cancel = ctx.cancel.clone();
         let committed = tokio::task::spawn_blocking(move || {
-            if cancel.is_cancelled() {
+            if cancel.is_cancelled() || Instant::now() >= deadline {
                 return None;
             }
             Some(sink.commit(&url))
@@ -279,7 +348,8 @@ impl Core {
         .await;
         let path = match committed {
             Ok(Some(Ok(p))) => p,
-            Ok(None) => return Err(network_cancelled(action)),
+            Ok(None) if ctx.cancel.is_cancelled() => return Err(disk.stopped()),
+            Ok(None) => return Err(disk.timed_out()),
             Ok(Some(Err(e))) => {
                 return Err(fail(
                     ToolErrorKind::Io,

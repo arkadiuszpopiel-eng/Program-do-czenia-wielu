@@ -30,6 +30,10 @@ Zdarzenia: `tool.net.fetch` (host, status, bajty), `tool.net.download` (ścieżk
   go również w wątku zapisu przed wywołaniem commit; porzucenie usuwa część. Udany commit
   zachowuje wynik i ślad pliku, jeśli Stop przyszedł już po zatwierdzeniu. Anulowanie odbioru
   nie dowodzi braku wcześniejszego żądania do serwera.
+  Oczekiwanie na begin/flush magazynu obserwuje Stop i ten sam deadline pobrania; zadanie
+  przed startem pracy też sprawdza token i termin. Rozpoczętego synchronicznego I/O nie
+  przerywamy w środku: część znika po jego powrocie i Drop, a komunikat przyznaje pracę w tle.
+  Rozpoczęty commit pozostaje obserwowany do rzeczywistego wyniku, bez ukrywania efektu.
   Wyszukiwanie sprawdza token ponownie po odpowiedzi dostawcy/zwolnieniu zgody i przed
   oddaniem wyniku. Stop zgłoszony przed zwrotem dostawcy nie staje się sukcesem ani błędem I/O.
   Anulowanie odbioru nie dowodzi, że dostawca nie otrzymał zapytania lub przerwał jego wykonanie.
