@@ -47,8 +47,7 @@ pub(crate) fn prefer(
     note: &DifficultyNote,
     review: bool,
 ) -> Vec<Candidate> {
-    if review
-        || note.start == Rung::Strong
+    if note.start == Rung::Strong
         || note.escalated_from.is_some()
         || !core.difficulty_policy().local_first
         || !(list.iter().any(|c| main_local(core, c))
@@ -67,14 +66,14 @@ pub(crate) fn prefer(
     // Ranking nie omija check(): prywatność, możliwości, stan i budżet pozostają bramkami.
     list.sort_by_key(|c| {
         if main_local(core, c) {
-            return 0;
+            return u8::from(review);
         }
         if core
             .registered(&c.provider)
             .is_some_and(|r| r.kind == RouteKind::Api)
         {
             if helper(&c.model) && core.rung_of(c) != Rung::Strong {
-                1
+                u8::from(!review)
             } else if core.rung_of(c) == Rung::Strong {
                 3
             } else {

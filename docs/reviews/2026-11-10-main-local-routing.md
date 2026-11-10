@@ -21,3 +21,7 @@ bez dostępnegoAPI, blokadę niedozwolonej chmury i budżetu. Nie są testem sem
 tych modeli, prawdziwegoAPI lubGPU. #41/#48 pozostają otwarte.
 [Walidacja](artifacts/main-local-routing-validation.json). Bez nowych zgód lub rozszerzania
 uprawnień i bez zmian progów ewaluacji. Nocne harmonogramy pozostają wyłączone.
+
+Dodatkowy RED0/1: przy samejLunie sprawdzenie wybierało ponownie lokalny8B. Teraz lekka
+chmura może sprawdzić wynik (review), gdy istniejące bramki na to pozwalają. Ręczny mocny
+szczebel sprawdzania i kolejki nadal mają pierwszeństwo. Ponowne pełne64/0/0 i Clippy0.

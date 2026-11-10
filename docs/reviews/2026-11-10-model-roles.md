@@ -19,6 +19,10 @@ zakresie; oba nocne harmonogramy pozostają wyłączone. Poprzedni raport i bł�
   przypięcia, ustawienia właściciela, prywatność, zgodność, możliwości i budżety są respektowane.
   Ta zmiana nie nadaje modelowi dodatkowych uprawnień do narzędzi.
 
+Lekka chmura może też sprawdzić wynik lokalnego8B. Regresja z samąLuną wykryła
+powtórny wybór tego samego lokalnego modelu; poprawka ma ponowne64/0/0 i Clippy0.
+Sprawdzanie nadal respektuje ręczne kolejki i mocny szczebel ustawiony przez właściciela.
+
 ## Pamięć docelowej RTX2060 12GB
 
 Wszystko wMiB; szacunki, nie pomiarGPU. Wagi/narzut zawierają550MiB runtime; dołożono

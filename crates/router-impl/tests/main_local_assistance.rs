@@ -156,7 +156,7 @@ fn local_problem_uses_only_a_configured_light_cloud_model() {
 }
 #[test]
 fn hard_tasks_and_escalation_keep_the_strong_rung_and_manual_choice() {
-    let (c, _, _) = setup(None);
+    let (c, _, api) = setup(None);
     let mut r = req("Zadanie");
     r.meta.route.difficulty = Some(Difficulty::Hard);
     assert!([SOL, OPUS].contains(&choose(&c, TaskClass::Planning, &r).chosen.model.as_str()));
@@ -173,6 +173,10 @@ fn hard_tasks_and_escalation_keep_the_strong_rung_and_manual_choice() {
     r.meta.route.escalate_from = None;
     r.model = format!("anthropic:{HAIKU}");
     assert_eq!(choose(&c, TaskClass::Conversation, &r).chosen.model, HAIKU);
+    api[1].off.store(true, Ordering::SeqCst);
+    r.model = "auto".into();
+    r.meta.route.review = true;
+    assert_eq!(choose(&c, TaskClass::Conversation, &r).chosen.model, LUNA);
 }
 #[test]
 fn private_data_rejects_disallowed_cloud_and_small_model_stays_auxiliary() {

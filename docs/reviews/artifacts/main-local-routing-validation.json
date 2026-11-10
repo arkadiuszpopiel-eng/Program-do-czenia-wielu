@@ -142,5 +142,73 @@
     0
   ],
   "targets": 16,
-  "scope": "Configured provider inventory only; no liveAPI, CLIsecret, security policy or eval threshold change"
+  "scope": "Configured provider inventory only; no liveAPI, CLIsecret, security policy or eval threshold change",
+  "review_only_luna_red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "router-impl",
+      "--test",
+      "main_local_assistance",
+      "hard_tasks_and",
+      "-j2"
+    ],
+    "exit": 101,
+    "sha256": "d3ae96fdb509115bf04ebffccb4496c432a038af7f59ce76f0cf49436867b959"
+  },
+  "latest_checks": [
+    {
+      "name": "router-review-green",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T07:03:06.296971+00:00",
+      "finished_utc": "2026-11-10T07:03:14.173316+00:00",
+      "sha256": "59bb348dffd81ce79771596b831d369cb9fd01a91b26d014b0286bdb928a7447"
+    },
+    {
+      "name": "router-review-clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T07:03:14.173892+00:00",
+      "finished_utc": "2026-11-10T07:03:16.351078+00:00",
+      "sha256": "96253c67ee67f56636dde5c9209cfa3659862d1147066d20fb23d56708aafb6c"
+    }
+  ],
+  "latest_source_sha256": {
+    "crates/router-impl/src/main_local.rs": "d127b6363ae4d50169363b0466508c68b6440a913f258f343959203fa6214c0e",
+    "crates/router-impl/tests/main_local_assistance.rs": "1d972bd151e19734c4dc59191ccf2e0672b0db1373d32045d1249d957ea89308"
+  }
 }
