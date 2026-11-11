@@ -69,6 +69,36 @@ impl ChatEngine {
                 "Brak wiadomości użytkownika, na którą można odpowiedzieć.",
             ));
         }
+        // Odczyt zapisów aplikacji to dane kontekstowe, nie wywołanie wykonane przez model.
+        // Bieżąca wiadomość zostaje ostatnia: NativeRunSpec wyodrębnia z niej rzeczywisty cel.
+        let selected: Vec<_> = path
+            .iter()
+            .filter(|turn| {
+                turn.role == Role::Assistant
+                    || (turn.role == Role::System
+                        && metas
+                            .get(&turn.id.0)
+                            .is_some_and(|m| m.agent.is_some() || !m.tools.is_empty()))
+            })
+            .map(|turn| turn.id)
+            .collect();
+        let known_tools = self
+            .inner
+            .agents
+            .as_ref()
+            .map(|stack| stack.tools.names().into_iter().collect())
+            .unwrap_or_default();
+        if let Some(records) =
+            self.inner
+                .store
+                .execution_records(session, &selected, &known_tools)?
+        {
+            let data = serde_json::to_string(&records).map_err(AppError::internal)?;
+            out.insert(
+                out.len() - 1,
+                Message::user_text(format!("[Zapis czynności aplikacji]\n{data}")),
+            );
+        }
         Ok(out)
     }
 }
