@@ -136,8 +136,9 @@ async fn branch_records_reach_provider_without_rewriting_history_or_creating_act
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn native_write_and_undo_are_projected_independently_of_the_answer() {
-    use common::agents::{agents, run_turn};
-    let mut a = agents().await;
+    use common::agents::run_turn;
+    let (mut a, secrets) = restartable_agents().await;
+    std::fs::write(a.workdir.join("fact.txt"), "wcześniejsza treść").unwrap();
     a.h.core
         .settings_set(
             "agents.interaction_mode".into(),
@@ -147,9 +148,15 @@ async fn native_write_and_undo_are_projected_independently_of_the_answer() {
         .unwrap();
     a.h.provider.push(Script::tool_call(
         FAKE_MODEL,
+        "read-1",
+        "fs_read",
+        &serde_json::json!({"path":"fact.txt"}),
+    ));
+    a.h.provider.push(Script::tool_call(
+        FAKE_MODEL,
         "write-1",
         "fs_write",
-        &serde_json::json!({"path":"fact.txt", "content":"testowy wynik"}),
+        &serde_json::json!({"path":"fact.txt", "mode":"overwrite", "content":"testowy wynik"}),
     ));
     a.h.provider.push(Script::text(
         FAKE_MODEL,
@@ -172,8 +179,24 @@ async fn native_write_and_undo_are_projected_independently_of_the_answer() {
         .unwrap();
     for undone in [false, true] {
         if undone {
+            // Nowy Core nad tą samą zaszyfrowaną historią i sejfem fixture.
+            drop(a.h.core);
+            let mut opts = common::options(Some(a.h.provider.clone()), a.h.shell.clone());
+            opts.secrets = Some(secrets.clone());
+            opts.exec = Some(a.exec.clone());
+            a.h.core = AppCore::build(AppPaths::under(a.h.dir.path()), opts)
+                .await
+                .unwrap();
+            a.h.rx = a.h.core.subscribe_events();
+            assert_eq!(
+                std::fs::read_to_string(a.workdir.join("fact.txt")).unwrap(),
+                "testowy wynik"
+            );
             a.h.core.turns_undo_step(token.clone()).await.unwrap();
-            assert!(!a.workdir.join("fact.txt").exists());
+            assert_eq!(
+                std::fs::read_to_string(a.workdir.join("fact.txt")).unwrap(),
+                "wcześniejsza treść"
+            );
         }
         a.h.provider.push(Script::text(
             FAKE_MODEL,
@@ -183,10 +206,10 @@ async fn native_write_and_undo_are_projected_independently_of_the_answer() {
         let request = a.h.provider.requests().last().cloned().unwrap();
         assert_eq!(
             request.messages.last().unwrap().visible_text(),
-            history_seed::QUERY
+            format!("Zadanie od właściciela: {}", history_seed::QUERY)
         );
         let facts = records(&request).expect("brak zapisu wykonanego fs_write");
-        assert_eq!(facts["counts"]["recorded_done"], u64::from(!undone));
+        assert_eq!(facts["counts"]["recorded_done"], 1 + u64::from(!undone));
         assert_eq!(facts["counts"]["undone"], u64::from(undone));
         let record = facts["records"]
             .as_array()
@@ -217,4 +240,63 @@ async fn native_write_and_undo_are_projected_independently_of_the_answer() {
             "odczyt nie uruchamia dodatkowego narzędzia"
         );
     }
+}
+
+async fn restartable_agents() -> (
+    common::agents::Agents,
+    Arc<dyn accounts_hub_contract::SecretStore>,
+) {
+    let dir = tempfile::tempdir().unwrap();
+    let provider = Arc::new(ScriptedProvider::new(Duration::from_millis(1)));
+    let shell = Arc::new(HeadlessShell::default());
+    let exec = Arc::new(platform_fake::FakeExec::new());
+    let mut opts = common::options(Some(provider.clone()), shell.clone());
+    let secrets = opts.secrets.clone().unwrap();
+    opts.exec = Some(exec.clone());
+    let core = AppCore::build(AppPaths::under(dir.path()), opts)
+        .await
+        .unwrap();
+    let mut a = common::agents::agents_on(core, provider, shell, dir).await;
+    a.exec = exec;
+    (a, secrets)
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_rejected_file_operation_is_not_reported_as_a_recorded_success() {
+    use common::agents::{agents, run_turn};
+    let mut a = agents().await;
+    a.h.provider.push(Script::tool_call(
+        FAKE_MODEL,
+        "denied-1",
+        "fs_write",
+        &serde_json::json!({"path":"../outside-blocked.txt", "content":"private payload"}),
+    ));
+    a.h.provider
+        .push(Script::text(FAKE_MODEL, &["Zapisałam mimo odmowy."]));
+    run_turn(&mut a, "Sprawdź odmowę operacji poza katalogiem.").await;
+    assert!(
+        !a.workdir
+            .parent()
+            .unwrap()
+            .join("outside-blocked.txt")
+            .exists()
+    );
+    a.h.provider.push(Script::text(FAKE_MODEL, &["Meldunek."]));
+    run_turn(&mut a, history_seed::QUERY).await;
+    let request = a.h.provider.requests().last().cloned().unwrap();
+    let facts = records(&request).expect("brak zapisu odrzuconego fs_write");
+    assert_eq!(facts["counts"]["recorded_done"], 0);
+    assert_eq!(facts["counts"]["error_or_denied"], 1);
+    assert!(
+        !serde_json::to_string(&facts)
+            .unwrap()
+            .contains("private payload")
+    );
+    assert!(
+        request
+            .messages
+            .iter()
+            .any(|m| m.visible_text().contains("Zapisałam mimo odmowy.")),
+        "nie podmieniamy błędnej odpowiedzi w historii"
+    );
 }
