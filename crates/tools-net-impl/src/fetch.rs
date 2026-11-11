@@ -10,11 +10,10 @@ use tools_common_contract::{
     text,
 };
 use tools_net_contract::{
-    EVENT_FETCH, FetchArgs, FetchOut, HttpMethod, SearchArgs, SearchHit, SearchOut,
-    url_carries_secret,
+    EVENT_FETCH, FetchArgs, FetchOut, HttpMethod, SearchArgs, url_carries_secret,
 };
 
-use crate::core::{Core, Step, fail, net_failure, refuse};
+use crate::core::{Core, Step, check_deadline, fail, net_failure, network_cancelled, refuse};
 
 /// Czy typ treści jest tekstowy (brak typu — rozstrzyga dekodowanie).
 fn textual(content_type: Option<&str>) -> bool {
@@ -48,6 +47,13 @@ pub(crate) fn checked_target(url: &str, action: &str) -> Step<lib_netguard::Targ
     Ok(target)
 }
 
+fn search_cancelled() -> Box<ToolOutcome> {
+    let mut out = ToolOutcome::cancelled("odbiór wyników wyszukiwania");
+    out.text =
+        "Anulowano odbiór wyników wyszukiwania. Zapytanie mogło już dotrzeć do dostawcy.".into();
+    Box::new(out)
+}
+
 impl Core {
     /// `net_fetch`.
     pub(crate) async fn fetch(
@@ -77,6 +83,10 @@ impl Core {
             .await
         };
         self.release(&opened.grants).await;
+        if ctx.cancel.is_cancelled() {
+            return Err(network_cancelled(&action));
+        }
+        check_deadline(deadline, &action)?;
         let (body, cut) = read?;
         let bytes = body.len() as u64;
         report_untrusted(&self.gate, ctx, TaintSource::Web).await;
@@ -139,6 +149,10 @@ impl Core {
         );
         let mut o = ToolOutcome::ok(rendered, serde_json::to_value(&out).unwrap_or_default())
             .untrusted(TaintSource::Web);
+        if ctx.cancel.is_cancelled() {
+            return Err(network_cancelled(&action));
+        }
+        check_deadline(deadline, &action)?;
         o.truncated = out.truncated;
         o.approval = opened.grants.iter().find_map(|g| g.auth.approval);
         Ok(o)
@@ -169,26 +183,31 @@ impl Core {
         let deadline = Instant::now() + Duration::from_millis(self.config.fetch_timeout_ms);
         let grant = self.egress(ctx, m, target.host(), action).await?;
         let max = a.max_results.unwrap_or(10).clamp(1, 20);
-        let found = tokio::select! {
-            () = ctx.cancel.cancelled() => Err(Box::new(ToolOutcome::cancelled(action))),
+        let found = if let Err(e) = check_deadline(deadline, action) {
+            Err(e)
+        } else {
+            tokio::select! {
+            () = ctx.cancel.cancelled() => Err(search_cancelled()),
             r = tokio::time::timeout_at(deadline, port.search(&a.query, max)) => match r {
                 Ok(Ok(hits)) => Ok(hits),
                 Ok(Err(e)) => Err(net_failure(&e, action)),
                 Err(_) => Err(net_failure(&tools_net_contract::NetError::Timeout, action)),
             },
+            }
         };
         self.release(std::slice::from_ref(&grant)).await;
+        if ctx.cancel.is_cancelled() {
+            return Err(search_cancelled());
+        }
+        check_deadline(deadline, action)?;
         let hits = found?;
         report_untrusted(&self.gate, ctx, TaintSource::Web).await;
-        let out = SearchOut {
-            results: hits
-                .into_iter()
-                .map(|h| SearchHit {
-                    title: text::redact_secrets(&h.title),
-                    url: h.url,
-                    snippet: text::redact_secrets(&h.snippet),
-                })
-                .collect(),
+        let (out, limited) =
+            crate::search_results::project(hits, max, self.config.output_max_chars);
+        let notice = if limited {
+            "Część wyników dostawcy pominięto lub skrócono (powtórzenia, kontrola adresów i limity).\n"
+        } else {
+            ""
         };
         let lines: Vec<String> = out
             .results
@@ -196,11 +215,19 @@ impl Core {
             .map(|h| format!("- {} — {}\n  {}", h.title, h.url, h.snippet))
             .collect();
         let (rendered, _) = text::truncate_chars(
-            &format!("Wyniki ({}):\n{}", out.results.len(), lines.join("\n")),
+            &format!(
+                "Wyniki ({}):\n{notice}{}",
+                out.results.len(),
+                lines.join("\n")
+            ),
             self.config.output_max_chars,
         );
         let mut o = ToolOutcome::ok(rendered, serde_json::to_value(&out).unwrap_or_default())
             .untrusted(TaintSource::Web);
+        if ctx.cancel.is_cancelled() {
+            return Err(search_cancelled());
+        }
+        check_deadline(deadline, action)?;
         o.approval = grant.auth.approval;
         Ok(o)
     }

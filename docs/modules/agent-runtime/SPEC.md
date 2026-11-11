@@ -14,7 +14,7 @@ pub enum RunOutcome { Completed { summary, verified }, BudgetExceeded { budget }
 // v1
 pub struct RunOptions { parent: Option<RunId>, depth, grant: Option<RunGrant>, crew: Option<Crew>, inherited_taint, trusted_context, untrusted_context, label }
 pub struct RunGrant { tools, capabilities, read_only, budget, max_autonomy }   // attenuate(): potomek ≤ rodzic; is_within(); permits()
-pub struct Crew { cast: Cast, personas, roles, models: BTreeMap<RoleId, String> }
+pub struct Crew { cast: Cast, personas, roles, models: BTreeMap<RoleId, String>, persona_roles, persona_instructions }
 pub struct DelegateArgs { role, persona?, goal, tools?, max_steps? }           // narzędzie `delegate_task` (grupa ról `delegate`)
 pub struct AgentTaskPayload { spec: RunSpec, options: RunOptions }            // TaskSpec::payload dla schedulera
 pub struct RunReport { run, goal, outcome, done, not_done, undoable, verification, steering, tainted, usage, children } // from_events, total_usage, summary_pl
@@ -48,6 +48,16 @@ po cofnięciu nie trafia na nieznany wariant (punkty kontrolne go nie zawierają
 - **Adapter schedulera:** `RuntimeExecutor: TaskExecutor` — ładunek `AgentTaskPayload`, przebieg `task-<zadanie>-a<próba>` (wznowienie z checkpointu), agentka przydzielona przez scheduler z obsady, budżety ∩ zadanie, taint zadania, pochodzenie ≠ użytkownik → `CommandOrigin::Agent`; `Completed` → `Succeeded{run, verified}`, odrzucenie Krytyczki/pętla/odmowa → `Failed{retryable:false}`, błąd dostawcy → ponawialny, `Stop`/anulowanie → `Stopped`; porzucenie wykonania anuluje przebieg.
 
 ## Niezmienniki
+- Końcowa odpowiedź po odmowie zasad narzędzia zawiera stałą informację runtime o liczbie
+  niewykonanych operacji. Pochodzi ona z utrwalonego `denied_calls`, nie z narracji modelu;
+  przeżywa wznowienie i nie ujawnia argumentów. Twarda odmowa nadal kończy przebieg `Refused`
+  przed kolejną turą modelu. Dopisek nie zmienia werdyktu weryfikacji ani uprawnień.
+- Informacja o wykrytych programach nie nakazuje ponownego pytania o instalację. Potrzebne
+  do zadania narzędzia agentka instaluje dostępnymi narzędziami w ramach aktywnych zgód,
+  sprawdza wynik i zgłasza rzeczywistą odmowę lub wymagane potwierdzenie. Nie nadaje sobie praw.
+- Długi tekst obserwacji zachowuje początek (podsumowanie) i koniec (diagnostyka kompilatora),
+  z jawnym znacznikiem pominiętego środka w dotychczasowym limicie znaków. Krótki tekst pozostaje
+  bez zmian. Delimitacja niezaufanej treści i obrazy pozostają zachowane; skrót nie potwierdza wykonania.
 - Każdy krok to zdarzenie; stan odtwarzalny z dziennika; `StepStarted` = `usage.steps`; checkpoint po każdej turze.
 - Narzędzie tylko przez Brokera (token jednorazowy); odmowa = `Denied`, nigdy obejście. Potomek ≤ rodzic (koperta, budżet, autonomia, sesja).
 - Taint monotoniczny w przebiegu i dziedziczony; argumenty z niezaufanej treści oznaczane (`untrusted_args`).
@@ -57,9 +67,22 @@ po cofnięciu nie trafia na nieznany wariant (punkty kontrolne go nie zawierają
 Brak własnych zdolności (tokeny per akcja). `inproc`, `on-demand`. RAM ≤ 10 MB per przebieg; narzut pętli ≤ 20 ms na krok.
 
 ## Integracja (`app-*`, opis — podpina sesja kompozycji)
+
+Projekcja kroku narzędzia w rozmowie zachowuje `NeedsConfirmation` jako osobne
+`ToolStatus::NeedsConfirmation` (`needs_confirmation` w IPC), zgodne z Replay. Propozycja
+otwarcia terminala lub czynność czekająca na potwierdzenie nie są `Done`. Wątek pokazuje jawny
+opis PL/EN i nie oferuje dla takiego kroku „Cofnij”. Ten stan nie zmienia decyzji Brokera ani
+nie dowodzi późniejszego wykonania przez właściciela; samo otwarcie terminala nie wykonuje komendy.
+`Crew.persona_instructions` przypina profil współpracy każdej persony do nowych delegacji (8.11).
+Potomkini dostaje własny profil zamiast stylu odpowiedzi rodzica. Brak mapy w starszym checkpoincie
+oznacza pustą mapę; format wewnętrznego werdyktu Krytyczki pozostaje bez profilu współpracy.
+
 `Runtime::with_ext(deps, RuntimeExt{ locks: scheduler (SchedulerLite), autonomy: BrokerAutonomy(broker) })`; `start_with(spec, RunOptions{crew: obsada sesji z personas, models wg polityki ról})`; `RuntimeExecutor::new(&runtime, kurs)` jako wykonawczyni `ExecutorKind::Agent` w `SchedulerModule`; panel Agentki/Replay: `children` + `report` (kroki cofalne całego zadania, koszty).
 
 ## Testy akceptacyjne
+- `tests/coding_cycle.rs`: Alfa, Beta, Gama, Delta i własna persona w roli Koderki;
+  skryptowany dostawca, rzeczywisty rustc i prywatny tempdir: błąd → poprawka → test → wykonanie
+  → przegląd tylko do odczytu. Nie jest to odbiór modelu, Brokera lub UAC.
 - `ACC-F3-agent-runtime-01..03` (v0): `app-core/tests/agents.rs`, `control.rs`, `loop_flow.rs`, `props.rs` — zielone bez zmian.
 - `ACC-F5-agent-runtime-04` (F5-02): `tests/steering.rs` — 20/20 (10 tekst, 10 głos przez `StepGate`).
 - `ACC-F5-agent-runtime-05` (F5-01 w runtime): `tests/parallel.rs` — 3 agentki równolegle, 0 kolizji (+ 100 losowych scenariuszy, kontrola negatywna bez dzierżaw).

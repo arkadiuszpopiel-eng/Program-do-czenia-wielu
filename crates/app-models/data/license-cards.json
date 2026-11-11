@@ -129,83 +129,173 @@
     "voices": [
       {
         "id": "F1",
-        "name": { "pl": "F1 — kobiecy, ciepły (domyślnie: Alfa)", "en": "F1 — female, warm (default: Alfa)" },
+        "name": {
+          "pl": "F1 — kobiecy, ciepły (domyślnie: Alfa)",
+          "en": "F1 — female, warm (default: Alfa)"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       },
       {
         "id": "F2",
-        "name": { "pl": "F2 — kobiecy (domyślnie: Beta)", "en": "F2 — female (default: Beta)" },
+        "name": {
+          "pl": "F2 — kobiecy (domyślnie: Beta)",
+          "en": "F2 — female (default: Beta)"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       },
       {
         "id": "F3",
-        "name": { "pl": "F3 — kobiecy", "en": "F3 — female" },
+        "name": {
+          "pl": "F3 — kobiecy",
+          "en": "F3 — female"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       },
       {
         "id": "F4",
-        "name": { "pl": "F4 — kobiecy (domyślnie: Gama)", "en": "F4 — female (default: Gama)" },
+        "name": {
+          "pl": "F4 — kobiecy (domyślnie: Gama)",
+          "en": "F4 — female (default: Gama)"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       },
       {
         "id": "F5",
-        "name": { "pl": "F5 — kobiecy, wyrazisty (domyślnie: Delta)", "en": "F5 — female, expressive (default: Delta)" },
+        "name": {
+          "pl": "F5 — kobiecy, wyrazisty (domyślnie: Delta)",
+          "en": "F5 — female, expressive (default: Delta)"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       },
       {
         "id": "M1",
-        "name": { "pl": "M1 — męski", "en": "M1 — male" },
+        "name": {
+          "pl": "M1 — męski",
+          "en": "M1 — male"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       },
       {
         "id": "M2",
-        "name": { "pl": "M2 — męski", "en": "M2 — male" },
+        "name": {
+          "pl": "M2 — męski",
+          "en": "M2 — male"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       },
       {
         "id": "M3",
-        "name": { "pl": "M3 — męski", "en": "M3 — male" },
+        "name": {
+          "pl": "M3 — męski",
+          "en": "M3 — male"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       },
       {
         "id": "M4",
-        "name": { "pl": "M4 — męski", "en": "M4 — male" },
+        "name": {
+          "pl": "M4 — męski",
+          "en": "M4 — male"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       },
       {
         "id": "M5",
-        "name": { "pl": "M5 — męski", "en": "M5 — male" },
+        "name": {
+          "pl": "M5 — męski",
+          "en": "M5 — male"
+        },
         "license": "OpenRAIL-M",
-        "origin": { "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)", "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)" },
+        "origin": {
+          "pl": "Barwa wbudowana w model Supertonic 3 (plik stylu z repozytorium autora)",
+          "en": "Timbre built into the Supertonic 3 model (style file from the author's repository)"
+        },
         "commercial": "conditional",
-        "notes": { "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).", "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)." }
+        "notes": {
+          "pl": "Warunki jak wagi modelu; nie wolno jej używać do podszywania się pod prawdziwą osobę. Pochodzenie nagrań wzorcowych barwy — do potwierdzenia przez człowieka (C5.6).",
+          "en": "Same terms as the model weights; must not be used to impersonate a real person. Origin of the reference recordings behind the timbre — to be confirmed by a human (C5.6)."
+        }
       }
     ]
   },
@@ -291,11 +381,20 @@
     "voices": [
       {
         "id": "pl_PL-gosia-medium",
-        "name": { "pl": "Gosia (pl_PL, medium) — kobiecy, głos zapasowy agentek", "en": "Gosia (pl_PL, medium) — female, the agents' fallback voice" },
+        "name": {
+          "pl": "Gosia (pl_PL, medium) — kobiecy, głos zapasowy agentek",
+          "en": "Gosia (pl_PL, medium) — female, the agents' fallback voice"
+        },
         "license": "do potwierdzenia — MODEL_CARD",
-        "origin": { "pl": "Model głosu Pipera wytrenowany na zbiorze nagrań opisanym w MODEL_CARD", "en": "Piper voice model trained on the recording set described in MODEL_CARD" },
+        "origin": {
+          "pl": "Model głosu Pipera wytrenowany na zbiorze nagrań opisanym w MODEL_CARD",
+          "en": "Piper voice model trained on the recording set described in MODEL_CARD"
+        },
         "commercial": "unknown",
-        "notes": { "pl": "Agentki różnią się w nim tylko wysokością i tempem. Licencja nagrań — do potwierdzenia przez człowieka.", "en": "The agents differ in it only by pitch and pace. Recording licence — to be confirmed by a human." }
+        "notes": {
+          "pl": "Agentki różnią się w nim tylko wysokością i tempem. Licencja nagrań — do potwierdzenia przez człowieka.",
+          "en": "The agents differ in it only by pitch and pace. Recording licence — to be confirmed by a human."
+        }
       }
     ]
   },
@@ -461,19 +560,37 @@
     "voices": [
       {
         "id": "pl-f1",
-        "name": { "pl": "pl-f1 — mówczyni bazowa 1 (Alfa, Gama)", "en": "pl-f1 — base speaker 1 (Alfa, Gama)" },
+        "name": {
+          "pl": "pl-f1 — mówczyni bazowa 1 (Alfa, Gama)",
+          "en": "pl-f1 — base speaker 1 (Alfa, Gama)"
+        },
         "license": "CC-BY-4.0 (do potwierdzenia)",
-        "origin": { "pl": "Głos modelu społeczności „Pocket TTS PL” — pochodzenie nagrań do wyjaśnienia (C5.1, C5.6)", "en": "Voice of the community “Pocket TTS PL” model — origin of the recordings to be clarified (C5.1, C5.6)" },
+        "origin": {
+          "pl": "Głos modelu społeczności „Pocket TTS PL” — pochodzenie nagrań do wyjaśnienia (C5.1, C5.6)",
+          "en": "Voice of the community “Pocket TTS PL” model — origin of the recordings to be clarified (C5.1, C5.6)"
+        },
         "commercial": "unknown",
-        "notes": { "pl": "Agentki różnią się w nim wysokością i tempem. Licencja i pochodzenie — do potwierdzenia przez człowieka.", "en": "The agents differ in it by pitch and pace. Licence and origin — to be confirmed by a human." }
+        "notes": {
+          "pl": "Agentki różnią się w nim wysokością i tempem. Licencja i pochodzenie — do potwierdzenia przez człowieka.",
+          "en": "The agents differ in it by pitch and pace. Licence and origin — to be confirmed by a human."
+        }
       },
       {
         "id": "pl-f2",
-        "name": { "pl": "pl-f2 — mówczyni bazowa 2 (Beta, Delta)", "en": "pl-f2 — base speaker 2 (Beta, Delta)" },
+        "name": {
+          "pl": "pl-f2 — mówczyni bazowa 2 (Beta, Delta)",
+          "en": "pl-f2 — base speaker 2 (Beta, Delta)"
+        },
         "license": "CC-BY-4.0 (do potwierdzenia)",
-        "origin": { "pl": "Głos modelu społeczności „Pocket TTS PL” — pochodzenie nagrań do wyjaśnienia (C5.1, C5.6)", "en": "Voice of the community “Pocket TTS PL” model — origin of the recordings to be clarified (C5.1, C5.6)" },
+        "origin": {
+          "pl": "Głos modelu społeczności „Pocket TTS PL” — pochodzenie nagrań do wyjaśnienia (C5.1, C5.6)",
+          "en": "Voice of the community “Pocket TTS PL” model — origin of the recordings to be clarified (C5.1, C5.6)"
+        },
         "commercial": "unknown",
-        "notes": { "pl": "Agentki różnią się w nim wysokością i tempem. Licencja i pochodzenie — do potwierdzenia przez człowieka.", "en": "The agents differ in it by pitch and pace. Licence and origin — to be confirmed by a human." }
+        "notes": {
+          "pl": "Agentki różnią się w nim wysokością i tempem. Licencja i pochodzenie — do potwierdzenia przez człowieka.",
+          "en": "The agents differ in it by pitch and pace. Licence and origin — to be confirmed by a human."
+        }
       }
     ]
   },
@@ -490,6 +607,38 @@
     "notes": {
       "pl": "Licencja zależy od sposobu zbudowania programu: build LGPL można rozpowszechniać z aplikacją pod warunkami LGPL, build z elementami GPL podlega GPL. Alfa go nie pobiera (instalacja ręczna) — który build: Do potwierdzenia przez człowieka.",
       "en": "The licence depends on how the program was built: an LGPL build may be shipped with an app under LGPL terms, a build with GPL parts falls under the GPL. Alfa does not download it (manual install) — which build: To be confirmed by a human."
+    },
+    "confirmed": false
+  },
+  "qwen3-8b-q4-k-m": {
+    "id": "Apache-2.0",
+    "name": "Apache License 2.0",
+    "url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF",
+    "author": {
+      "pl": "Qwen (Alibaba)",
+      "en": "Qwen (Alibaba)"
+    },
+    "commercial": "conditional",
+    "attribution": true,
+    "notes": {
+      "pl": "Apache-2.0 według oficjalnych metadanych modelu. Do potwierdzenia przez człowieka przed wydaniem komercyjnym; nie jest to zmiana polityki licencji zależności.",
+      "en": "Apache-2.0 per official model metadata. To be confirmed by a human before commercial release; does not change dependency licence policy."
+    },
+    "confirmed": false
+  },
+  "bielik-11b-v2.3-instruct-q4-k-m": {
+    "id": "Apache-2.0",
+    "name": "Apache License 2.0",
+    "url": "https://huggingface.co/speakleash/Bielik-11B-v2.3-Instruct-GGUF",
+    "author": {
+      "pl": "SpeakLeash / ACK Cyfronet AGH",
+      "en": "SpeakLeash / ACK Cyfronet AGH"
+    },
+    "commercial": "conditional",
+    "attribution": true,
+    "notes": {
+      "pl": "Apache-2.0 według oficjalnych metadanych modelu. Do potwierdzenia przez człowieka przed wydaniem komercyjnym; nie jest to zmiana polityki licencji zależności.",
+      "en": "Apache-2.0 per official model metadata. To be confirmed by a human before commercial release; does not change dependency licence policy."
     },
     "confirmed": false
   }

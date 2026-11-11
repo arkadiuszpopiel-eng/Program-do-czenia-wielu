@@ -37,12 +37,42 @@
   let anchor = $state<HTMLElement | null>(null);
   let panel = $state<HTMLElement | null>(null);
   let upward = $state(false);
+  let maxHeight = $state<number | undefined>();
+  let left = $state<number | undefined>();
 
-  // Kierunek liczony przy każdym otwarciu (także z zewnątrz, np. `bind:open`).
-  $effect.pre(() => {
-    if (!open || !anchor) return;
-    // Wymiary elementów są w jednostkach po skali interfejsu, okno — w pikselach okna.
-    upward = anchor.getBoundingClientRect().bottom > (window.innerHeight / uiZoom()) * 0.6;
+  // Prostokąt przycisku i okno są w pikselach okna; limit CSS przeliczamy przez zoom.
+  $effect(() => {
+    if (!open || !anchor || !panel) return;
+    const target = anchor;
+    const content = panel;
+    const update = () => {
+      const zoom = uiZoom();
+      const rect = target.getBoundingClientRect();
+      const inset = 14 * zoom; // 6 px odstępu od przycisku + 8 px od krawędzi okna.
+      const above = Math.max(0, rect.top - inset);
+      const below = Math.max(0, window.innerHeight - rect.bottom - inset);
+      const up = above > below;
+      upward = up;
+      maxHeight = (up ? above : below) / zoom;
+      const panelWidth = content.offsetWidth * zoom;
+      const desired = align === 'end' ? rect.right - panelWidth : rect.left;
+      const edge = 8 * zoom;
+      const bounded = Math.max(edge, Math.min(desired, window.innerWidth - panelWidth - edge));
+      left = (bounded - rect.left) / zoom;
+    };
+    update();
+    const resize = new ResizeObserver(update);
+    resize.observe(target);
+    resize.observe(content); // Także po doładowaniu zawartości przez Lazy.
+    resize.observe(document.documentElement);
+    const scale = new MutationObserver(update);
+    scale.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
+    window.addEventListener('resize', update);
+    return () => {
+      resize.disconnect();
+      scale.disconnect();
+      window.removeEventListener('resize', update);
+    };
   });
 
   async function toggle() {
@@ -84,6 +114,9 @@
       id={panelId}
       tabindex="-1"
       style:width="{width}px"
+      style:max-height={maxHeight === undefined ? undefined : `${maxHeight}px`}
+      style:left={left === undefined ? undefined : `${left}px`}
+      style:right={left === undefined ? undefined : 'auto'}
       bind:this={panel}
       onkeydown={onKey}
     >
@@ -98,10 +131,14 @@
     display: inline-flex;
   }
   .popover {
+    box-sizing: border-box;
     position: absolute;
     top: calc(100% + 6px);
     z-index: 60;
     max-width: calc(var(--alfa-vw, 100vw) - 16px);
+    overflow-y: auto;
+    scroll-padding-block: var(--alfa-space-2);
+    overscroll-behavior: contain;
     padding: var(--alfa-space-3) var(--alfa-space-4);
     border: 1px solid var(--alfa-color-border);
     border-radius: var(--alfa-radius-card);

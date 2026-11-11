@@ -1,0 +1,148 @@
+{
+  "at": "2026-11-09T15:13:30.889513+00:00",
+  "base_commit": "cc6f0ac994185387c348ba60ab6edf88908cd28e",
+  "candidate_publication": "patch-only; withheld from production sources after failed realmodel quality checks",
+  "patch": "docs/reviews/patches/jarvis-model-identity-candidate.patch",
+  "patch_sha256": "b40086a352a0d65aa4c304ad38f41072fc366ee2df0182ea7d13110c4e200ffd",
+  "source_files": [
+    {
+      "path": "crates/app-chat/src/interaction.rs",
+      "sha256": "af640c14ad8d12bcefca2cf3afcfac39e7eac09e72d8047c0d4a91a4d5e6042c"
+    },
+    {
+      "path": "crates/app-chat/src/project_context.rs",
+      "sha256": "3a67c0449eec4a370757345f9f2fadf87166c2d52596300a3308ba8b999ae397"
+    },
+    {
+      "path": "crates/app-chat/src/stream.rs",
+      "sha256": "13dbc8f5cea8803529c5d05c9b9463cc6f8e8613ebebfea3e16e504baccf08e5"
+    },
+    {
+      "path": "crates/app-core/tests/jarvis.rs",
+      "sha256": "6c68414c4d76bf364b396b436904e1dbe5663d2e4a08542b1b5f1e068ee54ea7"
+    },
+    {
+      "path": "crates/app-core/tests/jarvis_custom.rs",
+      "sha256": "253a656eac9217552e6767e2722907d0d5c9bfdbfa061fc5c10fbf671d05c38a"
+    },
+    {
+      "path": "crates/app-core/tests/jarvis_live.rs",
+      "sha256": "2c45899f7ea17e134ec53721bc1b84e18bcd4d82be6c0f2ad82919d3c314b10a"
+    },
+    {
+      "path": "crates/app-core/tests/project_prompt_context.rs",
+      "sha256": "f2104175729d489dbf7a6eecd6018a93bd5e1cbca61954b37d14d69b0e5bed16"
+    },
+    {
+      "path": "crates/personas-contract/src/prompt.rs",
+      "sha256": "2feb36777f6a879e1e1769ed2a1d4d0c02e714104ce9f9c6d8f7d40f7e8cec6e"
+    },
+    {
+      "path": "docs/modules/personas/INTERACTION.md",
+      "sha256": "9892167736ab92ceb7a6a786c8425a83752debc3939eb12bc9e89a0e02a44225"
+    }
+  ],
+  "checks": {
+    "updated_utc": "2026-11-09T15:01:51.774812+00:00",
+    "results": [
+      {
+        "phase": "unit",
+        "started_utc": "2026-11-09T14:59:09.022378+00:00",
+        "finished_utc": "2026-11-09T14:59:21.006521+00:00",
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "-p",
+          "app-chat",
+          "-p",
+          "personas-contract",
+          "-p",
+          "personas-impl",
+          "-p",
+          "personas-fake",
+          "-p",
+          "agent-runtime-impl"
+        ],
+        "exit": 0,
+        "stdout": "/workspace/scratch/jarvis-final-unit.log",
+        "stderr": null
+      },
+      {
+        "phase": "core",
+        "started_utc": "2026-11-09T14:59:21.006799+00:00",
+        "finished_utc": "2026-11-09T15:00:56.736138+00:00",
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "-p",
+          "app-core",
+          "--test",
+          "jarvis",
+          "--test",
+          "jarvis_custom",
+          "--test",
+          "jarvis_voice",
+          "--test",
+          "reply_style",
+          "--test",
+          "project_prompt_context"
+        ],
+        "exit": 0,
+        "stdout": "/workspace/scratch/jarvis-final-core.log",
+        "stderr": null
+      },
+      {
+        "phase": "build-live",
+        "started_utc": "2026-11-09T15:00:56.749134+00:00",
+        "finished_utc": "2026-11-09T15:01:08.883704+00:00",
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "-p",
+          "app-core",
+          "--test",
+          "jarvis_live",
+          "--no-run",
+          "--message-format=json"
+        ],
+        "exit": 0,
+        "stdout": "/workspace/scratch/jarvis-final-build-live.jsonl",
+        "stderr": "/workspace/scratch/jarvis-final-build-live.log",
+        "standalone_binary": "/workspace/scratch/model-grounding-final/bin/jarvis_live",
+        "binary_sha256": "4f38076e2dd30b4e27c31249e3bd1ffdf74c0cd2c454a57c2766c9f474ead83d"
+      },
+      {
+        "phase": "clippy",
+        "started_utc": "2026-11-09T15:01:10.939497+00:00",
+        "finished_utc": "2026-11-09T15:01:51.774314+00:00",
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "clippy",
+          "-p",
+          "app-chat",
+          "-p",
+          "personas-contract",
+          "-p",
+          "app-core",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit": 0,
+        "stdout": "/workspace/scratch/jarvis-final-clippy.log",
+        "stderr": null
+      }
+    ],
+    "state": "finished",
+    "all_exit_zero": true
+  },
+  "protected_changes": false,
+  "eval_or_policy_changes": false,
+  "independent_review": "pending",
+  "note": "Green unit/integration/Clippy checks do not override failed model semantics or timeout."
+}

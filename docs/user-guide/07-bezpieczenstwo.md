@@ -8,22 +8,23 @@ dziennika Audytu, którego nie da się po cichu poprawić.
 
 „Jak bardzo agentka działa sama”. Domyślnie **Automatycznie (L3)**.
 
-| Tryb                           | Co to znaczy                                                                                                                                                                                                                                                                                       |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| L0 Tylko podgląd               | Agentka tylko czyta i podpowiada, nic nie zmienia.                                                                                                                                                                                                                                                 |
-| L1 Pytaj o wszystko            | Każda zmiana wymaga Twojego „tak”.                                                                                                                                                                                                                                                                 |
-| L2 Pytaj o ryzykowne           | Drobiazgi robi sama; pyta przy usuwaniu, wysyłaniu danych na zewnątrz i instalacji (tylko w Ustawieniach).                                                                                                                                                                                         |
-| L3 Automatycznie (domyślny)    | Działa sama w Twoim profilu i we wskazanych aplikacjach; pyta przy rzeczach nieodwracalnych poza zakresem, operacjach administracyjnych, destrukcji zleconej głosem albo gdy działa na podstawie niezaufanej treści (mail, strona, plik).                                                         |
-| L4 Pełna automatyka            | Bez żadnych pytań — okno Sędziego Cieni nie pokazuje się wcale, aż obniżysz tryb (decyzja z 31.10). Wybrana raz zostaje po restarcie. Obowiązują tylko twarde blokady Jądra, STOP (`Ctrl+Shift+F12`) i dziennik. Uwaga: także wysyłka danych po kontakcie z niezaufaną treścią (strona, mail, plik) i polecenia obcym głosem przechodzą bez pytania. |
+| Tryb | Co to znaczy |
+| --- | --- |
+| Plan (L0) | Agentka czyta i przygotowuje plan, bez zmieniania plików i systemu. Plan dotyczy bieżącej rozmowy. |
+| Ręcznie (L1) | Każda zmiana wymaga Twojej zgody. |
+| Akceptuj edycje (L2) | Edycje w katalogu roboczym wykonuje bez osobnego pytania; inne działania nadal ocenia Sędzia Cieni. |
+| Automatycznie (L3, domyślny) | Zwykłe działania w dozwolonym zakresie wykonuje sama. Przy prośbie o zgodę model-sędzia może ocenić ją w granicach reguł; decyzje zastrzeżone dla właściciela trafiają do Ciebie. |
+| Pełny dostęp (L4) | Działa bez pytań w zakresie twardych blokad Jądra. Pozostają STOP i dziennik. Podniesienie poziomu zatwierdzasz w osobnym oknie Sędziego. |
 
-**Menu „Tryb pracy” w pasku pisania** (tarcza z nazwą trybu; przy Pełnej automatyce także bursztynowy znak w
-pasku tytułu): cztery tryby z opisem, klawisze `1`–`4` wybierają
-tryb, `Esc` zamyka menu. To samo otworzysz z palety (`Ctrl+K` → „Tryb pracy”) i z okienka stanu (kropka
-połączenia → „Zmień tryb pracy”). Menu pokazuje tryb ogólny zapisany w Alfie; po zmianie sprawdza go jeszcze raz
-i mówi wprost, gdy zmiana się nie udała. Gdy otwarta rozmowa ma własny tryb, menu mówi to w notce. Pełne ustawienia, także L2 i zmiana tylko dla jednej sesji, są w **Ustawienia →
-Uprawnienia i bezpieczeństwo**. **Obniżenie** działa od razu. **Podniesienie** potwierdza się wyłącznie w oknie
-Sędziego Cieni, jeden raz, bez odliczania (gdy okna nie ma — patrz niżej — kończy się odmową). Agentka nigdy nie podniesie
-poziomu sama.
+**Menu „Tryb pracy” w pasku pisania**: pięć trybów, klawisze `1`–`5`, `Esc` zamyka menu.
+Wybierz **Ta rozmowa** lub **Wszystkie rozmowy** przed zmianą. Plan, wyjście z Planu oraz odblokowanie
+„do końca rozmowy” zachowują zakres bieżącej rozmowy. Menu pokazuje poziom wybranego zakresu.
+`Alt+M` przechodzi do następnego trybu rozmowy; skrót nie włącza Pełnego dostępu.
+
+To samo menu otworzysz z palety (`Ctrl+K` → „Tryb pracy”). Pełne ustawienia są w **Ustawienia →
+Uprawnienia i bezpieczeństwo**. Obniżenie działa od razu. Podniesienie potwierdzasz w oknie Sędziego Cieni;
+komunikat o zatwierdzeniu pojawia się po odczytaniu jego stanu. Agentka sama nie podnosi poziomu.
+Profil współpracy **Jarvis** jest osobnym wyborem w panelu Agentki i zachowuje ten tryb zgód.
 
 ## Czego nie da się zrobić na żadnym poziomie (także L4)
 
@@ -44,7 +45,8 @@ Zatwierdzenia nigdy nie dzieją się w oknie rozmowy ani w powiadomieniu. Służ
 którego programy (także agentki) nie potrafią „kliknąć” za Ciebie: `Enter` niczego nie zatwierdza (`Tab` i `Spacja`
 albo kliknięcie), `Esc` oznacza odmowę. Na górze okna jest „?” w kółku (albo `F1`) — rozwija opis, czym jest Sędzia
 Cieni i jak ma się do trybu pracy. Okno pokazuje najpierw, **co dokładnie** agentka chce zrobić (np. „trwałe usunięcie
-pliku C:\…aport.xlsx”), potem kto, gdzie, ryzyko, źródło polecenia i dlaczego pyta (z trybem pracy). Na „Pełnej
+pliku C:\…
+aport.xlsx”), potem kto, gdzie, ryzyko, źródło polecenia i dlaczego pyta (z trybem pracy). Na „Pełnej
 automatyce” okno się nie pokazuje. W rozmowie widzisz kartę „czeka na zatwierdzenie” z opisem: co, dlaczego,
 czy da się cofnąć, poziom ryzyka.
 

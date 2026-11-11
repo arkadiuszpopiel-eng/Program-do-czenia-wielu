@@ -1,0 +1,47 @@
+{
+  "kind": "identity",
+  "source": {
+    "binary": "/workspace/scratch/defect-closure/core-identity/jarvis-live-baseline",
+    "sha256": "f9f809517dac9db2bed09a4a719ea666d4e2489b5a0bbb9fbb8da3fb67879af9",
+    "source_commit": "632e5d435016d4b7e5d5939a42a12d079c156ebf",
+    "note": "Original code; same-host control after environment restart"
+  },
+  "model_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "platform": "Linux Cloud CPU after18:16 restart; forced LocalBrain; no GPU, microphone, Windows or external API",
+  "max_tokens": 96,
+  "temperature": 0,
+  "threads": 4,
+  "first_token_s": 60,
+  "idle_s": 30,
+  "turn_timeout_s": 120,
+  "command": [
+    "/workspace/scratch/defect-closure/core-identity/jarvis-live-baseline",
+    "--ignored",
+    "--exact",
+    "all_personas_on_local_model",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start": "2026-11-10T18:26:40.602092+00:00",
+  "state": "completed",
+  "owned_servers": {
+    "742506": {
+      "pid": 742506,
+      "state": "Z",
+      "group": 742499,
+      "birth": "17880390",
+      "comm": "llama-server"
+    }
+  },
+  "peak_rss_kib": 9636452,
+  "cleanup": [],
+  "pid": 742499,
+  "group": 742499,
+  "exit": 0,
+  "elapsed_s": 490.582,
+  "end": "2026-11-10T18:34:51.185444+00:00",
+  "logs_sha256": {
+    "test.log": "eca75e00f20ab2258ef80c49bb519eaac4f4b9b775950b8d1d61076d92190bf6",
+    "responses.json": "9e5292f07da9c7a0258a9d9e52684f415397bc9df5f2c82e02640fa8802e8dc2"
+  }
+}

@@ -1,0 +1,1157 @@
+{
+  "source": "12d44af48df812d59f9978a9b5b902011e3a6ab1",
+  "platform": "Cloud Linux; Rust1.94.1; --all-features; fake/headless OS/audio where applicable",
+  "finished_utc": "2026-11-09T05:37:57.037190+00:00",
+  "counts": {
+    "passed": 3495,
+    "failed": 0,
+    "ignored": 25
+  },
+  "integration_targets": [
+    "accounts_keys",
+    "accounts_models",
+    "accounts_rotate",
+    "accounts_shared_queue",
+    "advanced",
+    "agent_access",
+    "agent_costs",
+    "agents",
+    "autonomy_guard",
+    "autonomy_notice",
+    "autonomy_raises",
+    "autonomy_standing",
+    "backup_account",
+    "bridges",
+    "bridges_check",
+    "cameras",
+    "catalog_debt_memory",
+    "catalog_debt_projects",
+    "catalog_debt_settings",
+    "catalog_debt_skills",
+    "catalog_debt_system",
+    "catalog_debt_turns",
+    "child_lock",
+    "commands",
+    "computer",
+    "conductor_dynamic_model",
+    "conductor_handoff",
+    "conductor_tools",
+    "conductor_tools_extra",
+    "context_after_fallback",
+    "diag",
+    "dto_roundtrip",
+    "errors",
+    "feature_catalog",
+    "files",
+    "ipc_signatures",
+    "jarvis",
+    "jarvis_custom",
+    "jarvis_live",
+    "jarvis_voice",
+    "key_watch",
+    "kill_switch",
+    "live_mic",
+    "max_access",
+    "mcp_servers",
+    "memory",
+    "model_routing",
+    "modules",
+    "pipeline_routing",
+    "plugins",
+    "project_prompt_context",
+    "prompt_templates",
+    "quick_commands",
+    "reply_style",
+    "review",
+    "review_queue",
+    "review_voice",
+    "routing",
+    "scenario",
+    "signals",
+    "soon_inventory",
+    "spy",
+    "spy_modes",
+    "spy_work",
+    "task_continuity",
+    "task_extension",
+    "tasks",
+    "tool_approvals",
+    "tool_diag",
+    "tool_sweep",
+    "transfer",
+    "units",
+    "voice",
+    "voice_clock",
+    "voice_talk_keys",
+    "wiring",
+    "workdir"
+  ],
+  "target_results": 1121,
+  "exit_code": 0,
+  "commands": [
+    {
+      "name": "clean-app-core-start",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.5,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "9cd4f6ec4eb185b3e59b19a609f49fb0e16836db14f9d5a4d1c3cdc3e3065356"
+    },
+    {
+      "name": "workspace-except-app-core",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "--workspace",
+        "--exclude",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 703.5,
+      "counts": [
+        3286,
+        0,
+        22
+      ],
+      "target_results": 1042,
+      "log_sha256": "15ae7a4450a562c77b2bce79afa9dc93d94a2d4e4f2f9a8bebb2a364f8afe114"
+    },
+    {
+      "name": "app-core-lib",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--lib",
+        "--no-fail-fast",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 18.1,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 1,
+      "log_sha256": "8ff22f05fd633cf62e5f5d36461d0214c1a779c8a4e10cf693c9e276ed080ff0"
+    },
+    {
+      "name": "app-core-01",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "accounts_keys",
+        "--test",
+        "accounts_models",
+        "--test",
+        "accounts_rotate",
+        "--test",
+        "accounts_shared_queue"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 49.9,
+      "counts": [
+        12,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "0e7a851bc0b88c45597a9ebdcb3a7e5003683a60312a0303e4349ac31076527b"
+    },
+    {
+      "name": "clean-app-core-01",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.1,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "7a723679d0948369cd5143af908327bec32dcbcd558355e92f24b25022657efd"
+    },
+    {
+      "name": "app-core-02",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "advanced",
+        "--test",
+        "agent_access",
+        "--test",
+        "agent_costs",
+        "--test",
+        "agents"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 70.6,
+      "counts": [
+        16,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "f857bc50cd8a8a015c9827d16de6fe4c057ab5c655bc8deea3eeb8600fec2c28"
+    },
+    {
+      "name": "clean-app-core-02",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.7,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "ebd75234707d7412a84bc1d6f37fba87ac9013dabefba2eb7564c89e9d0a5165"
+    },
+    {
+      "name": "app-core-03",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "autonomy_guard",
+        "--test",
+        "autonomy_notice",
+        "--test",
+        "autonomy_raises",
+        "--test",
+        "autonomy_standing"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 202.4,
+      "counts": [
+        9,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "88b6af8e01b7e9b4913f5eb391ee30a98951d7527920cb0e1c608978049b25a6"
+    },
+    {
+      "name": "clean-app-core-03",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.8,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "ebd75234707d7412a84bc1d6f37fba87ac9013dabefba2eb7564c89e9d0a5165"
+    },
+    {
+      "name": "app-core-04",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "backup_account",
+        "--test",
+        "bridges",
+        "--test",
+        "bridges_check",
+        "--test",
+        "cameras"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 53.0,
+      "counts": [
+        15,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "83b4c033f512947e0db0631007083a5c3d61c288bcaa1091b219b9ed364f5729"
+    },
+    {
+      "name": "clean-app-core-04",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.1,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "ebd75234707d7412a84bc1d6f37fba87ac9013dabefba2eb7564c89e9d0a5165"
+    },
+    {
+      "name": "app-core-05",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "catalog_debt_memory",
+        "--test",
+        "catalog_debt_projects",
+        "--test",
+        "catalog_debt_settings",
+        "--test",
+        "catalog_debt_skills"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 49.0,
+      "counts": [
+        18,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "8f97a50356fa2705dfe39582dbcc6b3542e8a593538cbd4a18b87ac67ce55922"
+    },
+    {
+      "name": "clean-app-core-05",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.9,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "ebd75234707d7412a84bc1d6f37fba87ac9013dabefba2eb7564c89e9d0a5165"
+    },
+    {
+      "name": "app-core-06",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "catalog_debt_system",
+        "--test",
+        "catalog_debt_turns",
+        "--test",
+        "child_lock",
+        "--test",
+        "commands"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 54.4,
+      "counts": [
+        16,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "2878073a59384fa9bc1730a021fe49f1233d11dfac7cf6b85c03bf1e98570174"
+    },
+    {
+      "name": "clean-app-core-06",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.3,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "ebd75234707d7412a84bc1d6f37fba87ac9013dabefba2eb7564c89e9d0a5165"
+    },
+    {
+      "name": "app-core-07",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "computer",
+        "--test",
+        "conductor_dynamic_model",
+        "--test",
+        "conductor_handoff",
+        "--test",
+        "conductor_tools"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 65.4,
+      "counts": [
+        16,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "0087f53c1e3ec46c5d0858035682bfb823022547b90fb48571c1dfaf498dcb98"
+    },
+    {
+      "name": "clean-app-core-07",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.8,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "81d17c7b0f52a41bd9a70313e1c739002fb8275a84f29e5e72caa5de6e2139c6"
+    },
+    {
+      "name": "app-core-08",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "conductor_tools_extra",
+        "--test",
+        "context_after_fallback",
+        "--test",
+        "diag",
+        "--test",
+        "dto_roundtrip"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 52.8,
+      "counts": [
+        8,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "d0ae162526be33fcff711eba66285e07238ef5b20ed7fd9141d09a9277cea0a4"
+    },
+    {
+      "name": "clean-app-core-08",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.8,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "3326b981794224923ed049e0322c6335dbdcdd2526f07bb6a0b17f2337ae99af"
+    },
+    {
+      "name": "app-core-09",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "errors",
+        "--test",
+        "feature_catalog",
+        "--test",
+        "files",
+        "--test",
+        "ipc_signatures"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 59.8,
+      "counts": [
+        11,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "7d9acfb382b3ab9a0313422672e49d9d8910a6e16edeafa9c1bb3d7ffe7a3689"
+    },
+    {
+      "name": "clean-app-core-09",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.8,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "182701529f17a861fb1f550430dcfa084cabeb91e72546496a5567043354c95b"
+    },
+    {
+      "name": "app-core-10",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "jarvis",
+        "--test",
+        "jarvis_custom",
+        "--test",
+        "jarvis_live",
+        "--test",
+        "jarvis_voice"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 55.6,
+      "counts": [
+        8,
+        0,
+        2
+      ],
+      "target_results": 4,
+      "log_sha256": "9a3e4cab3f7574c9e14fba3d9fa126001be0b38d8e4d51de064c5353a5c40df6"
+    },
+    {
+      "name": "clean-app-core-10",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.2,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "ebd75234707d7412a84bc1d6f37fba87ac9013dabefba2eb7564c89e9d0a5165"
+    },
+    {
+      "name": "app-core-11",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "key_watch",
+        "--test",
+        "kill_switch",
+        "--test",
+        "live_mic",
+        "--test",
+        "max_access"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 46.8,
+      "counts": [
+        6,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "1923c8206978df1259fa2ec062f2e90ebaffc4b8b526291516d8c6e6471cc470"
+    },
+    {
+      "name": "clean-app-core-11",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.9,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "7a04f2769ee29951ef420b484a508081b8122032e47e6558921a9498e5448944"
+    },
+    {
+      "name": "app-core-12",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "mcp_servers",
+        "--test",
+        "memory",
+        "--test",
+        "model_routing",
+        "--test",
+        "modules"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 48.3,
+      "counts": [
+        7,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "c6a05324e6d535479109c1485211b57e4f2949418714a1b83b3f9c78af40b655"
+    },
+    {
+      "name": "clean-app-core-12",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.6,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "ebd75234707d7412a84bc1d6f37fba87ac9013dabefba2eb7564c89e9d0a5165"
+    },
+    {
+      "name": "app-core-13",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "pipeline_routing",
+        "--test",
+        "plugins",
+        "--test",
+        "project_prompt_context",
+        "--test",
+        "prompt_templates"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 55.2,
+      "counts": [
+        5,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "5fa8b8da00328a101395c958a062c6ab07913582e7b1714462571c8a4a5abc8f"
+    },
+    {
+      "name": "clean-app-core-13",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.2,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "81d17c7b0f52a41bd9a70313e1c739002fb8275a84f29e5e72caa5de6e2139c6"
+    },
+    {
+      "name": "app-core-14",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "quick_commands",
+        "--test",
+        "reply_style",
+        "--test",
+        "review",
+        "--test",
+        "review_queue"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 54.6,
+      "counts": [
+        11,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "7796c738af07e2daf14be8649419b019aa1578d6eb21b5cb81295800ea531e73"
+    },
+    {
+      "name": "clean-app-core-14",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.6,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "ebd75234707d7412a84bc1d6f37fba87ac9013dabefba2eb7564c89e9d0a5165"
+    },
+    {
+      "name": "app-core-15",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "review_voice",
+        "--test",
+        "routing",
+        "--test",
+        "scenario",
+        "--test",
+        "signals"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 54.1,
+      "counts": [
+        9,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "d89129b4a06122f70bfcef9e452485270f937e2b88095c81a25a49a8bd32da2a"
+    },
+    {
+      "name": "clean-app-core-15",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.7,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "ebd75234707d7412a84bc1d6f37fba87ac9013dabefba2eb7564c89e9d0a5165"
+    },
+    {
+      "name": "app-core-16",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "soon_inventory",
+        "--test",
+        "spy",
+        "--test",
+        "spy_modes",
+        "--test",
+        "spy_work"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 55.2,
+      "counts": [
+        5,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "d5d6a2f37432a67d3eb96caa5ac9bbdd47927ac2a2bc750549b2a51bd110a111"
+    },
+    {
+      "name": "clean-app-core-16",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.2,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "cbf0f144f8ef113b3dad7796885feb002405123b980946a594bb9e34538e593e"
+    },
+    {
+      "name": "app-core-17",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "task_continuity",
+        "--test",
+        "task_extension",
+        "--test",
+        "tasks",
+        "--test",
+        "tool_approvals"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 59.0,
+      "counts": [
+        9,
+        0,
+        1
+      ],
+      "target_results": 4,
+      "log_sha256": "76d451ba055f329209d3cc397316a51c0b2a6b2929793a04e4b06cecf27ddce0"
+    },
+    {
+      "name": "clean-app-core-17",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 1.3,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "81d17c7b0f52a41bd9a70313e1c739002fb8275a84f29e5e72caa5de6e2139c6"
+    },
+    {
+      "name": "app-core-18",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "tool_diag",
+        "--test",
+        "tool_sweep",
+        "--test",
+        "transfer",
+        "--test",
+        "units"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 54.1,
+      "counts": [
+        15,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "1fe1f4bdd65caafb4825fd64ad99b5f471c69fee19ab4fd0741f40040d77f14e"
+    },
+    {
+      "name": "clean-app-core-18",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 2.4,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "f1f459936407b152f2452166e2d7b9b95e2b5d8cc8a4b029a77298b16bd7aa2e"
+    },
+    {
+      "name": "app-core-19",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "voice",
+        "--test",
+        "voice_clock",
+        "--test",
+        "voice_talk_keys",
+        "--test",
+        "wiring"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 49.7,
+      "counts": [
+        9,
+        0,
+        0
+      ],
+      "target_results": 4,
+      "log_sha256": "04590be502220dbafbd8360fcd674aff36071a94c5f41acebda4e6f3ef64e20f"
+    },
+    {
+      "name": "clean-app-core-19",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.8,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "33dd5f32c44ef041e6902f8d6b967812d3168d5142dfb55c895bf6e57a8799c6"
+    },
+    {
+      "name": "app-core-20",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--no-fail-fast",
+        "-j",
+        "2",
+        "--test",
+        "workdir"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 39.2,
+      "counts": [
+        4,
+        0,
+        0
+      ],
+      "target_results": 1,
+      "log_sha256": "9d441e182a5136e7d41ee1f10149c3fab33dd90d9e16d9569a16ccb74b8d9c9c"
+    },
+    {
+      "name": "clean-app-core-20",
+      "command": [
+        "cargo",
+        "clean",
+        "-p",
+        "app-core"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.7,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 0,
+      "log_sha256": "f3877d19ac5ec470374315025c8359ab6862ed26d66889479952c4e2e3a64505"
+    },
+    {
+      "name": "app-core-doc",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--all-features",
+        "-p",
+        "app-core",
+        "--doc",
+        "-j",
+        "2"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 26.3,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "target_results": 1,
+      "log_sha256": "e3d504505357d0aa804789dca18bd37e5373042103f2f55a0ae31ed8e8bdd386"
+    }
+  ],
+  "limits": "mainHEAD+Rustsourcesfrozen; no realmodel or localUI load; -j2; profilesdebug0; incremental0; batch4; protectedClippywarningunchanged"
+}

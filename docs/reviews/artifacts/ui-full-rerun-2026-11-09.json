@@ -1,0 +1,93 @@
+{
+  "source": "bd389207b710370f0a56d0a721d5fbc23c9fa664",
+  "equivalent_ui_in_published_source": "7752ac7019c302f6dc2f1698964a9864930ef35e",
+  "environment": "Cloud Linux, headless Chromium, fake backend/audio; no Windows/WebView2 or real microphone acceptance",
+  "command": [
+    "pnpm",
+    "--dir",
+    "apps/desktop/ui",
+    "exec",
+    "playwright",
+    "test",
+    "--reporter=list,json"
+  ],
+  "workers": 2,
+  "runner_state": {
+    "pid": 283485,
+    "phase": "finished",
+    "command": [
+      "pnpm",
+      "--dir",
+      "apps/desktop/ui",
+      "exec",
+      "playwright",
+      "test",
+      "--reporter=list,json"
+    ],
+    "source": "bd389207b710370f0a56d0a721d5fbc23c9fa664",
+    "equivalent_ui_in_published_source": "7752ac7019c302f6dc2f1698964a9864930ef35e",
+    "started_at": "2026-11-09T00:07:52.143524+00:00",
+    "workers": 2,
+    "updated_at": "2026-11-09T00:45:44.245486+00:00",
+    "child_pid": null,
+    "exit_code": 1,
+    "finished_at": "2026-11-09T00:45:44.245034+00:00"
+  },
+  "stats": {
+    "startTime": "2026-11-09T00:07:54.277Z",
+    "duration": 2269703.991,
+    "expected": 877,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  },
+  "case_count": 879,
+  "counts": {
+    "expected": 877,
+    "unexpected": 2
+  },
+  "failures": [
+    {
+      "file": "plan-mode.spec.ts",
+      "line": 9,
+      "title": "plan-mode.spec.ts / tryb Plan — glass light",
+      "status": "unexpected",
+      "expected_status": "passed",
+      "project": "chromium",
+      "attempts": [
+        {
+          "status": "failed",
+          "duration_ms": 6926,
+          "retry": 0,
+          "errors": [
+            "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('article', { name: 'Plan gotowy — co dalej?' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" with timeout 5000ms\n  - waiting for getByRole('article', { name: 'Plan gotowy — co dalej?' })\n\n\n  28 |       await composer.press('Enter');\n  29 |       const plan = page.getByRole('article', { name: 'Plan gotowy — co dalej?' });\n> 30 |       await expect(plan).toBeVisible();\n     |                          ^\n  31 |       await expect(plan.getByRole('button')).toHaveText([\n  32 |         /Tak, i działaj automatycznie/,\n  33 |         /Tak, zatwierdzam ręcznie/,\n    at /workspace/wt-ui-geometry/apps/desktop/ui/e2e/plan-mode.spec.ts:30:26"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "plan-mode.spec.ts",
+      "line": 9,
+      "title": "plan-mode.spec.ts / tryb Plan — glass dark",
+      "status": "unexpected",
+      "expected_status": "passed",
+      "project": "chromium",
+      "attempts": [
+        {
+          "status": "failed",
+          "duration_ms": 6621,
+          "retry": 0,
+          "errors": [
+            "Error: expect(locator).toBeVisible() failed\n\nLocator: getByRole('article', { name: 'Plan gotowy — co dalej?' })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" with timeout 5000ms\n  - waiting for getByRole('article', { name: 'Plan gotowy — co dalej?' })\n\n\n  28 |       await composer.press('Enter');\n  29 |       const plan = page.getByRole('article', { name: 'Plan gotowy — co dalej?' });\n> 30 |       await expect(plan).toBeVisible();\n     |                          ^\n  31 |       await expect(plan.getByRole('button')).toHaveText([\n  32 |         /Tak, i działaj automatycznie/,\n  33 |         /Tak, zatwierdzam ręcznie/,\n    at /workspace/wt-ui-geometry/apps/desktop/ui/e2e/plan-mode.spec.ts:30:26"
+          ]
+        }
+      ]
+    }
+  ],
+  "global_errors": [],
+  "raw_report_sha256": "379185fb1b7c1bb6bb05598b56e618b372edc1df43882df2c8375f2a1735d7f2",
+  "raw_report_bytes": 971174,
+  "raw_report_path": "/workspace/scratch/ui-full-rerun/report.json",
+  "log_path": "/workspace/scratch/ui-full-rerun/playwright.log",
+  "collected_at": "2026-11-09T00:45:48.687423+00:00"
+}

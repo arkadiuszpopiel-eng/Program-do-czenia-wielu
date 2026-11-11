@@ -1,0 +1,49 @@
+{
+  "source": "25c4e788b4373540fb26dce561a25824cdd8cba4",
+  "ci_run": 42524101617,
+  "rehearsal_run": 42524101627,
+  "windows_rust": {
+    "passed": 3504,
+    "failed": 5,
+    "ignored": 45,
+    "failures": [
+      "conductor_handoff::later_refusal_does_not_erase_recorded_command_output",
+      "conductor_handoff::receipts_survive_limit_and_core_restart_without_repeating_delegate",
+      "files::attachment_taint_reaches_broker_and_survives_restart",
+      "exec_low::powershell_runs_at_low_integrity",
+      "shell_utf8::cmd_output_is_decoded_from_the_oem_code_page"
+    ]
+  },
+  "linux_rust": {
+    "clippy": "failed, protected broker test unused imports; tests skipped",
+    "patch": "../patches/linux-broker-test-imports.patch"
+  },
+  "ui": {
+    "passed": 852,
+    "failed": 4,
+    "failures": [
+      "jarvis: session scope radio outside viewport",
+      "overlap-sweep: junior light plugin spans overlap",
+      "overlap-sweep: junior dark plugin spans overlap",
+      "responsive360: API head-actions overflow"
+    ]
+  },
+  "windows_webview2": {
+    "passed": 60,
+    "failed": 2,
+    "skipped": 5,
+    "failures": [
+      "hide panels: target page/context closed",
+      "test instance: data-test-instance attribute missing"
+    ]
+  },
+  "success": [
+    "Tauri build/clippy/production+e2e shell tests",
+    "cargo-deny",
+    "UI lint/types/unit/build/bundle/storybook",
+    "live CPU engines rehearsal",
+    "model catalog URLs+hashes",
+    "setup-dev/install-on-drive PowerShell5.1+7"
+  ],
+  "acceptance": "GitHub hosted runners; no owner hardware or real microphone acceptance"
+}

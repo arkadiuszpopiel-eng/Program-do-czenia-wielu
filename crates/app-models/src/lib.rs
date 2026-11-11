@@ -1,7 +1,6 @@
 //! Menedżer modeli i silników w aplikacji (`app-*`, crates/README.md; SPEC: `docs/modules/models/SPEC.md`):
 //! - [`catalog`] — pozycje (LLM z `providers-local`, embeddery z `lib_embed::CATALOG`, whisper, Piper,
-//!   Silero VAD, cechy openWakeWord, model mówcy, sidecary) z rozmiarem, licencją, źródłem,
-//!   SHA-256 (gdzie przypięty) i miejscem docelowym; pozycje niepotwierdzone — „do potwierdzenia”;
+//!   Silero VAD, cechy openWakeWord, model mówcy, sidecary) z rozmiarem, licencją, źródłem, SHA-256 (gdzie przypięty) i miejscem docelowym; pozycje niepotwierdzone — „do potwierdzenia”;
 //! - [`fetch`] — HTTPS z `Range` i wznawianiem, SHA-256 w locie, limit rozmiaru, anulowanie;
 //! - [`unpack`] — bezpieczne rozpakowanie ZIP (path traversal, dowiązania, duplikaty, zip-bomb);
 //! - zadania: limit równoległości, postęp, zgoda TOFU dla pozycji bez hasha, weryfikacja, usuwanie;
@@ -26,6 +25,7 @@ pub mod fetch;
 pub mod install;
 mod jobs;
 pub mod licenses;
+mod main_profile;
 pub mod pricing;
 pub mod qwen_asr;
 pub mod store;

@@ -19,7 +19,7 @@ use crate::candidate::Candidate;
 )]
 #[serde(rename_all = "snake_case")]
 pub enum Rung {
-    /// Mały model lokalny albo tani model API (`mini`, `flash`, `haiku`, do 9 mld parametrów).
+    /// Mały model lokalny albo tani model API (`mini`, `flash`, `haiku`, poniżej8 mld parametrów).
     Light,
     /// Model główny rodziny albo lokalny średni (do 40 mld parametrów, np. Qwen 27B).
     Standard,
@@ -118,7 +118,7 @@ fn has_word(model: &str, words: &[&str]) -> bool {
 /// Nieznany model lokalny i nieznany model API — średni.
 pub fn rung_by_name(model: &str) -> Rung {
     if let Some(b) = params_billions(model) {
-        return if b <= 9.0 {
+        return if b < 8.0 {
             Rung::Light
         } else if b <= 40.0 {
             Rung::Standard

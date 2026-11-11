@@ -3554,7 +3554,7 @@ export interface ToolIntent {
 }
 
 /** Stan kroku narzędzia. */
-export type ToolStatus = 'running' | 'done' | 'error';
+export type ToolStatus = 'running' | 'done' | 'error' | 'needs_confirmation';
 
 /** Krok narzędzia. */
 export interface ToolStep {

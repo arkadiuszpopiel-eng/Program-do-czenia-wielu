@@ -19,6 +19,7 @@ mod fallback;
 mod gate;
 mod helpers;
 mod history;
+mod main_local;
 mod module;
 mod routed;
 mod router_trait;

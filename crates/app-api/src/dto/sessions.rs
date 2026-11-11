@@ -157,6 +157,8 @@ pub enum ToolStatus {
     Running,
     Done,
     Error,
+    /// Propozycja wymagająca potwierdzenia — nie oznacza wykonania czynności.
+    NeedsConfirmation,
 }
 
 /// Krok narzędzia.

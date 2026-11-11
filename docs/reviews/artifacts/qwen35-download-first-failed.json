@@ -1,0 +1,30 @@
+{
+  "state": "failed",
+  "start": "2026-11-10T23:10:06.945800+00:00",
+  "model": {
+    "id": "qwen3.5-9b-q4-k-m",
+    "name": "Qwen3.5 9B Q4_K_M (Unsloth, prywatna próba)",
+    "url": "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/3885219b6810b007914f3a7950a8d1b469d598a5/Qwen3.5-9B-Q4_K_M.gguf",
+    "file": "Qwen3.5-9B-Q4_K_M.gguf",
+    "size_mb": 5418,
+    "sha256": "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8",
+    "params_b": 9.0,
+    "quant": "Q4_K_M",
+    "layers": 32,
+    "ctx": 262144,
+    "vram_mb": 6800,
+    "ram_mb": 8000,
+    "kv_mb_per_1k_ctx": 32,
+    "tools": true,
+    "license": "Apache-2.0"
+  },
+  "bytes": 2332745728,
+  "retries": 0,
+  "scope": "public pinned official model download only; no account/CLI credentials",
+  "max_download_s": 900,
+  "pid": 771039,
+  "group": 771039,
+  "exit": 92,
+  "end": "2026-11-10T23:17:16.924796+00:00",
+  "elapsed_s": 429.981
+}

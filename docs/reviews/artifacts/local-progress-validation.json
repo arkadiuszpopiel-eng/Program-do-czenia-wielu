@@ -1,0 +1,267 @@
+{
+  "source_commit": "03680732336d4094ae088a8d63c14029f04062b4",
+  "published_base": "46f515bfc10fa7beaed7499b976f888d81bb9ccb",
+  "checks": [
+    {
+      "name": "77-progress-initial-fixture-error",
+      "exit": 101,
+      "counts": [
+        0,
+        4,
+        0
+      ],
+      "sha256": "5bf03b5602d13e5a38c1cfbf5a21704087634b1b716b9d52385ac7c947dbb811"
+    },
+    {
+      "name": "77-progress-red-valid",
+      "exit": 101,
+      "counts": [
+        0,
+        4,
+        0
+      ],
+      "sha256": "13131039265cda7c9876b9c686040b34e4afb5a8383b4eebd755425ff882dd9d"
+    },
+    {
+      "name": "77-progress-green-target",
+      "exit": 0,
+      "counts": [
+        4,
+        0,
+        0
+      ],
+      "sha256": "d1de1ab24bad626103c42903d994eeff4df5e99671672639bafd7bfaca2efc66"
+    },
+    {
+      "name": "77-progress-cancel-fixture-error",
+      "exit": 101,
+      "counts": [
+        142,
+        1,
+        0
+      ],
+      "sha256": "1f122f249d6d75c93bb98e4d5d11bb822f6994b6668172fcda160b9f30c6903b"
+    },
+    {
+      "name": "77-progress-final-test",
+      "exit": 0,
+      "counts": [
+        159,
+        0,
+        1
+      ],
+      "sha256": "f3d49508fc96d33a24937c9a40c6792c78815e0a0bf75e533871196f8d1c63fa"
+    },
+    {
+      "name": "77-progress-clippy",
+      "exit": 0,
+      "counts": [
+        0,
+        0,
+        0
+      ],
+      "sha256": "08a2d61d3957e1510786dea99f1289e7c03e5e4069b94aa7756c7cdb896cbc87"
+    }
+  ],
+  "unique_final": {
+    "lib_openai_compat": [
+      12,
+      0,
+      0
+    ],
+    "providers_api_impl": [
+      62,
+      0,
+      0
+    ],
+    "providers_local_impl": [
+      85,
+      0,
+      1
+    ],
+    "total": [
+      159,
+      0,
+      1
+    ]
+  },
+  "clock": "local first deadline from HTTP dispatch after separate serverstartup; visible manual metric starts adaptercall",
+  "budgets_s": {
+    "first_content": 60,
+    "idle_after_content": 30,
+    "manual_turn": 120
+  },
+  "production_ping_changed": false,
+  "cadence_only_rejected_commit": "aa02af79a3aab0be9cb39eb2b189d06b598a91f5",
+  "real_replay": {
+    "rust": "FAILED0/1 exit101",
+    "elapsed_s": 95.664,
+    "responses_completed": 2,
+    "transport_errors": 0,
+    "cold": {
+      "first_visible_ms": 83898,
+      "elapsed_ms": 89499,
+      "within_visible60s": false
+    },
+    "warm": {
+      "first_visible_ms": 414,
+      "elapsed_ms": 6061,
+      "within_visible60s": true
+    },
+    "actual_failure": "cold visible budget; NOT FirstToken timeout, warm WAS executed",
+    "comparison": "not a causal cold latency benchmark"
+  },
+  "source_hashes": {
+    "crates/lib-openai-compat/src/engine.rs": "c966efcdb1d2ed74c868bdf10e0a405272c7b00acbd017f344cfda4fc7260a43",
+    "crates/lib-openai-compat/src/run.rs": "7595c43a7ba27f7a22ce9a8ef07bd03e347ef9bb8e968a38570cb831cdda7729",
+    "crates/providers-local-impl/src/codec.rs": "eabbdc45238a6f72aedef4162f119c0c5da6e338dda01fc452d8c70e7fd9bded"
+  },
+  "final_source_commit": "8116740d22f7fa45c7b38e1540a3629fed0f5d75",
+  "wire_extraction": {
+    "identical_public_type_block": true,
+    "normalized_block_sha256": "dd5dcc3ff78a4afcb3be48f7e5061a6f96114561323314baf069187f64e1a229",
+    "runtime_run_rs_and_local_codec_unchanged_since_model_probe": true
+  },
+  "final_checks": [
+    {
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all"
+      ],
+      "start": "2026-11-10T21:59:24.314054+00:00",
+      "end": "2026-11-10T21:59:32.515457+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/77-final-fmt-write.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "lib-openai-compat",
+        "-p",
+        "providers-local-impl",
+        "-p",
+        "providers-api-impl",
+        "--all-features",
+        "-j2"
+      ],
+      "start": "2026-11-10T21:59:32.517166+00:00",
+      "end": "2026-11-10T22:00:43.534063+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/77-final-test.log",
+      "sha256": "f35e806819212c347191b51afa9922175b34628cd356e8188591a28556afe4d2"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "lib-openai-compat",
+        "-p",
+        "providers-local-impl",
+        "-p",
+        "providers-api-impl",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "start": "2026-11-10T22:00:43.535445+00:00",
+      "end": "2026-11-10T22:00:55.178137+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/77-final-clippy.log",
+      "sha256": "c7f3f190cd27065cb89a6ca76e8885dccd05250a1e72f7ea6705aed158cc6103"
+    },
+    {
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "start": "2026-11-10T22:00:55.179260+00:00",
+      "end": "2026-11-10T22:01:04.147426+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/77-final-fmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "start": "2026-11-10T22:01:04.149954+00:00",
+      "end": "2026-11-10T22:01:35.465905+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/77-final-lint.log",
+      "sha256": "6048a4db2e6b1c76ed0f7459526de3e5daff3fb5ec4c0af576afcae35b3ee615"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/docs-html.mjs"
+      ],
+      "start": "2026-11-10T22:01:35.468208+00:00",
+      "end": "2026-11-10T22:01:36.508929+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/77-final-docs-generate.log",
+      "sha256": "813aff687e70e641b4edb8a5400607b9071bc4c52f80f2cd71c2be0ef67adda0"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--check"
+      ],
+      "start": "2026-11-10T22:01:36.511364+00:00",
+      "end": "2026-11-10T22:01:37.061832+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/77-final-docs-check.log",
+      "sha256": "813aff687e70e641b4edb8a5400607b9071bc4c52f80f2cd71c2be0ef67adda0"
+    },
+    {
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--verify"
+      ],
+      "start": "2026-11-10T22:01:37.062419+00:00",
+      "end": "2026-11-10T22:01:37.533212+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/77-final-docs-verify.log",
+      "sha256": "e1efc1496f2e6b075eb82b4f296e93a104942365a9e88ee6014397d9241caa80"
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "start": "2026-11-10T22:01:37.534328+00:00",
+      "end": "2026-11-10T22:01:37.736454+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/defect-closure/77-final-diff-check.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "final_source_hashes": {
+    "crates/lib-openai-compat/src/engine.rs": "0c033df7829695108722a43e29ce56ef6af48cbcf933c656b41fe4360f852613",
+    "crates/lib-openai-compat/src/wire.rs": "bb147e8bc87c1947104a64f350b86fa9b59e2f78cbfbfa9aed3692b70b2bbfa3",
+    "crates/lib-openai-compat/src/run.rs": "7595c43a7ba27f7a22ce9a8ef07bd03e347ef9bb8e968a38570cb831cdda7729",
+    "crates/providers-local-impl/src/codec.rs": "eabbdc45238a6f72aedef4162f119c0c5da6e338dda01fc452d8c70e7fd9bded"
+  },
+  "tested_snapshot_before_squash": "df0b02c8046cfe2a30c2b9c754be1fe9cdd6ea2f",
+  "identical_tested_tree": "63cec382b44cc979852214eb1e7eb8599177f492"
+}

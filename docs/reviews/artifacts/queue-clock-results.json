@@ -1,0 +1,214 @@
+{
+  "source_local": "c7956f66",
+  "fixture_undo_ms": 300,
+  "full_review": {
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0
+  },
+  "first_attempt_new_expiry_case": {
+    "passed": 3,
+    "failed": 1,
+    "ignored": 0,
+    "reason": "advance does not wait for timer handling; sleep_until probe added"
+  },
+  "stress": {
+    "source": "c7956f66",
+    "binary": "/workspace/target-nightly/debug/deps/review-d84a3051c24f4ba9",
+    "results": [
+      {
+        "repeat": 1,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 2,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 3,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 4,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 5,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 6,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 7,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 8,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 9,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 10,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 11,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 12,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 13,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 14,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 15,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 16,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 17,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 18,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 19,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      },
+      {
+        "repeat": 20,
+        "exit_code": 0,
+        "counts": [
+          2,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "adjacent": {
+    "passed": 4,
+    "failed": 0,
+    "ignored": 0
+  },
+  "clippy_exit_code": 0,
+  "production_files_changed": false,
+  "full_rust_prior_source": "988d13f3",
+  "full_rust_prior_result": {
+    "passed": 3485,
+    "failed": 1,
+    "ignored": 24
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "head": "bb13c48d75c8a909c102678917f314508d63ee13",
+  "code_commit": "69e336560ad0d6eade8a98fc3b30269fecb1dbf9",
+  "recorded_utc": "2026-11-10T23:51:36.040478+00:00",
+  "complete": true,
+  "runs": [
+    {
+      "id": 42921565976,
+      "name": "Próba generalna (Windows)",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 110,
+      "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565976/jobs",
+      "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565976/logs",
+      "workflow_id": 376724312
+    },
+    {
+      "id": 42921565989,
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "success",
+      "run_number": 187,
+      "jobs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565989/jobs",
+      "logs_url": "https://api.github.com/repos/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565989/logs",
+      "workflow_id": 371319063
+    }
+  ],
+  "CI187": {
+    "run": 42921565989,
+    "jobs": [
+      10,
+      0
+    ],
+    "linux": [
+      3604,
+      0,
+      27
+    ],
+    "windows": [
+      3626,
+      0,
+      48
+    ],
+    "targets_each": 1145,
+    "vitest": 573,
+    "vitest_files": 103,
+    "chromium": [
+      315,
+      315,
+      315
+    ],
+    "tauri": [
+      5,
+      4
+    ],
+    "fmt_clippy_deny_schema_graph_docs": "success"
+  },
+  "Windows110": {
+    "run": 42921565976,
+    "jobs": [
+      4,
+      0
+    ],
+    "webview2": [
+      63,
+      0,
+      5
+    ],
+    "qwen8b_cpu": {
+      "first_token_ms": 20753,
+      "total_ms": 34854,
+      "tokens": 96,
+      "tok_per_s": 6.81
+    },
+    "bielik45_cpu": {
+      "first_token_ms": 16288,
+      "total_ms": 36838,
+      "tokens": 96,
+      "tok_per_s": 4.67
+    },
+    "bielik11b": "NOT_RUN_CPU_BUDGET0tokens",
+    "piper_ttfb_ms": 1039,
+    "piper_audio_ms": 2162,
+    "piper_rtf": 0.481,
+    "stt_fixture_wer": 0,
+    "stt_ms": 55235,
+    "stt_rtf": 25.55,
+    "hardware_acceptance": "no GPU/microphone/phone; recordedfixtureCPUonly; tool_calledproposal isnotexecutedaction"
+  },
+  "logs": {
+    "ci187-job-130197433361.log": "c02f6f2ba30d296e53062c126ed8ee5fea25365e16d2d44ddca0373fd847ad2e",
+    "ci187-job-130197433736.log": "8258d8713566340a138fb0167230d57d00b8af9dfbc99bee7566a956fe72f9e9",
+    "ci187-job-130197433770.log": "67d5aed2f663ba398ddb2dd194a74bb27c1cd7122f90d11ce3f685e390d012e6",
+    "ci187-job-130197433804.log": "6a3786fbf66e9d644d5e37831c198f4be3763ea098c9f225bb1221af2656816b",
+    "ci187-job-130197433823.log": "90402a734c031526528b1f7db0f84673075873e7ab0496005a82feb1d95353fd",
+    "ci187-job-130197434078.log": "c3d62cda813a272d0e4dd332696a45aed3b036b8c7c305ca842b293ed815593b",
+    "ci187-job-130198280713.log": "7d54b82e58feba20d151a108c667db114d6ee4c78a8c23a885a1d3fb375d2b6a",
+    "ci187-job-130198280763.log": "5bbdcf89abb14ae98fbde567ab6a8bd498f8459ca02fcfc5acc1a8893cd25b01",
+    "ci187-job-130198280769.log": "2435a339b48ea47fcb200701ec69ecae33c037d29b128a3c96c28a3dd8b9bf42"
+  },
+  "log_format": "decodedUTF8 CRLF→LF, not ZIP bytes; metadataall14jobscomplete savedseparately",
+  "CI_cancelled": false
+}

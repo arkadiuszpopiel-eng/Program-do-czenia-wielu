@@ -6,6 +6,8 @@
 
 #![cfg_attr(test, allow(clippy::unwrap_used, clippy::expect_used))]
 
+mod storage;
+
 use std::sync::{Arc, Mutex, MutexGuard, RwLock};
 
 use async_trait::async_trait;
@@ -14,7 +16,7 @@ use core_registry_contract::{
     HealthStatus, ManifestError, Module, ModuleContext, ModuleError, ModuleManifest,
 };
 use personas_contract::{
-    Cast, CastChange, CastTemplate, Catalog, ChangeOrigin, Persona, PersonaId, Personas,
+    Cast, CastChange, CastStore, CastTemplate, Catalog, ChangeOrigin, Persona, PersonaId, Personas,
     PersonasError, PersonasExport, PersonasState, Role, TemplateId,
 };
 
@@ -26,6 +28,7 @@ pub struct PersonasModule {
     manifest: ModuleManifest,
     state: Mutex<PersonasState>,
     bus: RwLock<Option<Arc<dyn EventBus>>>,
+    store: RwLock<Option<Arc<dyn CastStore>>>,
 }
 
 impl PersonasModule {
@@ -40,6 +43,7 @@ impl PersonasModule {
             manifest: ModuleManifest::parse_toml(MODULE_TOML)?,
             state: Mutex::new(PersonasState::new(catalog)),
             bus: RwLock::new(None),
+            store: RwLock::new(None),
         })
     }
 
@@ -55,9 +59,21 @@ impl PersonasModule {
 
     /// Import paczki `.alfa` (elementy własne + obsady); publikuje zmiany obsad.
     pub async fn import(&self, export: &PersonasExport) -> Result<Vec<CastChange>, PersonasError> {
-        let bus = self.bus()?;
-        let changes = self.state().import(export)?;
-        publish(&bus, changes.iter().flat_map(CastChange::events)).await;
+        self.bus()?;
+        let mut catalog = export.clone();
+        catalog.casts.clear();
+        self.state().import(&catalog)?;
+        let mut changes = Vec::new();
+        for (session, cast) in &export.casts {
+            changes.push(
+                self.set_cast(
+                    &SessionId::new(session.as_str()),
+                    cast.clone(),
+                    ChangeOrigin::Import,
+                )
+                .await?,
+            );
+        }
         Ok(changes)
     }
 
@@ -78,7 +94,10 @@ impl PersonasModule {
         f: impl FnOnce(&mut PersonasState) -> Result<CastChange, PersonasError>,
     ) -> Result<CastChange, PersonasError> {
         let bus = self.bus()?;
-        let change = f(&mut self.state())?;
+        let change = self.transaction(|s| {
+            let change = f(s)?;
+            Ok((change.clone(), vec![change]))
+        })?;
         publish(&bus, change.events()).await;
         Ok(change)
     }
@@ -134,7 +153,18 @@ impl Personas for PersonasModule {
         origin: ChangeOrigin,
     ) -> Result<Option<CastChange>, PersonasError> {
         let bus = self.bus()?;
-        let change = self.state().apply_command(session, text, origin)?;
+        let is_command = {
+            let state = self.state();
+            personas_contract::parse_cast_command(text, state.catalog(), &state.cast(session))
+                .is_some()
+        };
+        if !is_command {
+            return Ok(None);
+        }
+        let change = self.transaction(|s| {
+            let change = s.apply_command(session, text, origin)?;
+            Ok((change.clone(), change.into_iter().collect()))
+        })?;
         if let Some(change) = &change {
             publish(&bus, change.events()).await;
         }

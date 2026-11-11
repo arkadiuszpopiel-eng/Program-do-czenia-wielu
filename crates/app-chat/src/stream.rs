@@ -105,6 +105,7 @@ pub(crate) async fn prepare(
             .unwrap_or_default()
     };
     let style = setting(core.config_value(style::STYLE_KEY).await);
+    system = core.interaction_prompt(&req.agent, system).await;
     if let Some(system) = style::with_style(system, &style) {
         request = request.with_system(system);
     }

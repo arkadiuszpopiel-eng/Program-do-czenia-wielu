@@ -161,4 +161,9 @@ pub trait SessionDbProvider: Send + Sync {
     fn session_db(&self, id: &SessionId) -> Result<Arc<Db>, SessionError>;
     /// Wszystkie istniejące sesje (także w koszu i archiwum) — dla wyszukiwania „wszędzie” w UI.
     fn session_ids(&self) -> Result<Vec<SessionId>, SessionError>;
+
+    /// Zwalnia nieużywane połączenie po jednorazowym odczycie (np. obsad przy starcie).
+    /// Nie usuwa bazy ani nie zamyka połączenia trzymanego przez innego odbiorcę.
+    /// Dostawcy bez bufora połączeń nie muszą nic robić.
+    fn release_idle(&self, _id: &SessionId) {}
 }

@@ -28,12 +28,15 @@ export interface ModeRequest {
 }
 
 let stopWatch: (() => void) | null = null;
+let generation = 0;
 
 /** Zmienia tryb pracy globalnie; nowa prośba kończy czekanie na poprzednią. */
 export async function requestMode(level: AutonomyLevel, io: ModeRequest): Promise<void> {
-  const result = await io.request(level);
+  const mine = ++generation;
   stopWatch?.();
   stopWatch = null;
+  const result = await io.request(level);
+  if (mine !== generation) return;
   if (result.status === 'applied') {
     io.notify('applied', level);
     return;
@@ -51,6 +54,7 @@ export async function requestMode(level: AutonomyLevel, io: ModeRequest): Promis
 
 /** Przerywa czekanie (testy, wylogowanie widoku). */
 export function stopModeWatch(): void {
+  generation += 1;
   stopWatch?.();
   stopWatch = null;
 }

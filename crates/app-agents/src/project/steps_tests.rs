@@ -95,3 +95,34 @@ fn unresolved_request_is_logged_as_expired() {
     assert_eq!(audit[0].0, EventLevel::Warn);
     assert!(audit[0].1.starts_with("Prośba o zgodę wygasła"));
 }
+
+#[test]
+fn confirmation_proposal_retains_its_status_in_replay_and_conversation() {
+    let mut p = projector();
+    let result = p.apply(&env(
+        1,
+        RunEvent::StepFinished {
+            step: 1,
+            kind: StepKind::Tool,
+            tool: Some("shell_terminal".into()),
+            status: StepStatus::NeedsConfirmation,
+            input: "Get-Date".into(),
+            output: "Zaproponowano, nie wykonano".into(),
+            untrusted: false,
+            undo: None,
+            intent: None,
+            approval: None,
+        },
+    ));
+    assert_eq!(
+        result.steps[0].status,
+        app_api::dto::ReplayStatus::NeedsConfirmation
+    );
+    assert_eq!(
+        p.tool_steps()[0].status,
+        app_api::dto::ToolStatus::NeedsConfirmation
+    );
+    assert!(result.events.iter().any(|e| matches!(e,
+        app_api::dto::AlfaEvent::ToolCall { step, .. }
+            if step.status == app_api::dto::ToolStatus::NeedsConfirmation)));
+}

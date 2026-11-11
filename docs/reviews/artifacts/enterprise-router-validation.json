@@ -1,0 +1,68 @@
+{
+  "updated_utc": "2026-11-09T20:19:08.406791+00:00",
+  "base_commit": "e3f70a8b24083e00ca2b724239226ca6b5004a17",
+  "issue": 54,
+  "platform": "LinuxCloud4CPU; deterministic providers, not liveAPI/GPU/microphone",
+  "red": {
+    "command": "cargo +1.94.1 test --locked -p router-impl --test cancel_stalled -j2",
+    "exit": 101,
+    "passed": 0,
+    "failed": 3,
+    "ignored": 0,
+    "cause": "Each waits until100ms virtualwatchdog despitecancel"
+  },
+  "production_change": "Router attempt independently selects parentcancel; reportCancelled,sendStopCancelled,dropchildstream; no policy/timeouts/eval changes",
+  "full": {
+    "command": "cargo +1.94.1 test --locked -p router-contract -p router-impl -p router-fake --all-features -j2",
+    "exit": 0,
+    "totals": [
+      58,
+      0,
+      0
+    ],
+    "target_results": 15
+  },
+  "clippy": {
+    "command": "cargo +1.94.1 clippy --locked -p router-contract -p router-impl -p router-fake --all-targets --all-features -j2 -- -D warnings",
+    "status": "passed",
+    "exit": 0,
+    "elapsed_seconds": 18.31
+  },
+  "acceptance": "not yet independent review, Windows/GPU/liveAPI application acceptance",
+  "cases": "cancelLocal/API beforefirst,afterStarted,afterpartial,toolstart,halfopen; single/backup; hybridtools2directions+standalone+nodupaftertoolstart",
+  "logs": {
+    "red.log": "96931d8bcebbdc428e83bf7c694121bfa432e9a89a309ee477dc8e521a8ab733",
+    "green.log": "c347d7e68e1ca499ebffefff6547a946503e73a8300343e82c0d8e586b31bc4e",
+    "full.log": "393d056544a888571646446057513e3a11a06e5d303cb47fba31b1f55abe2383",
+    "full-final.log": "5a4b24ceaa4f9959a8b0bd67b4ca58c42050ddc02faaa2a2007e24249d498723",
+    "clippy.log": "5d0ed3def69f7f49c2168ff50c8f6c6df442ce2040714a872904e3b0394d905d"
+  },
+  "checks": {
+    "fmt": {
+      "exit": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "lint": {
+      "exit": 0,
+      "sha256": "a8a3e9660ece14f2600424871129e99a94d01bab7599d56727aeeebe273703c1"
+    },
+    "docs_generate": {
+      "exit": 0,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs_check": {
+      "exit": 0,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs_verify": {
+      "exit": 0,
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    },
+    "docs_pages": 102
+  },
+  "source_files": {
+    "crates/router-impl/src/fallback.rs": "5e1b2139f69aabd505df572afb4cd2f0b056af960b0a89236a29950d6611470e",
+    "crates/router-impl/tests/cancel_stalled.rs": "e946f43189b49ecce4d816a4ef5c0b3a8e7d23105934a8c79f82f6d05b426597",
+    "crates/router-impl/tests/hybrid_tools.rs": "fa3cb30daa2007d9a2e679462b9679ccbf5306b0631544ab3b29b148f8591eaf"
+  }
+}

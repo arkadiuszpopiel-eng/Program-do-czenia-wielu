@@ -1,0 +1,164 @@
+{
+  "base": "cea4444a007724b652f3a95a8dfb37a550f7cb2d",
+  "issue": 63,
+  "red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "tools-net-impl",
+      "--test",
+      "download_wait",
+      "-j2"
+    ],
+    "exit": 101,
+    "started_utc": "2026-11-10T03:34:54.641405+00:00",
+    "finished_utc": "2026-11-10T03:35:32.975507+00:00",
+    "log_sha256": "5be2f3aa57f7da3354bbf7cd061a3b08f17aa78c36e814fb90a4e8c5e7c33510"
+  },
+  "red_result": {
+    "passed": 2,
+    "failed": 4,
+    "ignored": 0
+  },
+  "checks": [
+    {
+      "name": "green-full",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "tools-net-contract",
+        "-p",
+        "tools-net-impl",
+        "-p",
+        "tools-net-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T03:37:37.144578+00:00",
+      "finished_utc": "2026-11-10T03:37:45.873962+00:00",
+      "log_sha256": "094f30816a0d7d3632d083af4dc0d0105b9897c92238cb521c034dc5147ccf4c"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "tools-net-contract",
+        "-p",
+        "tools-net-impl",
+        "-p",
+        "tools-net-fake",
+        "--all-features",
+        "--all-targets",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T03:37:45.881400+00:00",
+      "finished_utc": "2026-11-10T03:38:03.509642+00:00",
+      "log_sha256": "39c937e009f547c4f60934c12bc6111c013f1261d577fe6841c155ced0859ab6"
+    },
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T03:38:03.510587+00:00",
+      "finished_utc": "2026-11-10T03:38:11.478369+00:00",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "pnpm lint",
+      "cwd": "/workspace/wt-download-wait",
+      "exit": 0,
+      "finished_utc": "2026-11-10T03:42:23.961866+00:00",
+      "sha256": "ba96058a1e38568949018275815b89beda5daf65e7839fb42da3b228d9e7d8b4"
+    },
+    {
+      "name": "docs-check",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T03:43:47.514669+00:00",
+      "finished_utc": "2026-11-10T03:43:48.738388+00:00",
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    {
+      "name": "docs-verify",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--verify"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T03:43:48.747460+00:00",
+      "finished_utc": "2026-11-10T03:43:49.478873+00:00",
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    },
+    {
+      "name": "size",
+      "command": [
+        "node",
+        "scripts/check-size.mjs"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T03:43:49.480687+00:00",
+      "finished_utc": "2026-11-10T03:43:49.706620+00:00",
+      "sha256": "64cfb4db809243cf56aada55dc7cd9b419af0082c7945fcdc38b650f726056e4"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T03:43:49.707780+00:00",
+      "finished_utc": "2026-11-10T03:43:49.895820+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "green_result": {
+    "passed": 62,
+    "failed": 0,
+    "ignored": 0,
+    "targets": 13
+  },
+  "source_sha256": {
+    "crates/tools-net-impl/src/download.rs": "5223be2cb5290ac3fa98c12aed1237d151f21b96bf332cadc1120abdd0a3b80b",
+    "crates/tools-net-impl/tests/download_wait.rs": "b11d8dfeb77c7b0d875ed4181b280bd445c5df8d3f5c6b63b835152585c8b45a"
+  },
+  "limitations": [
+    "Controlled fake storage/HTTP; no GPU, microphone, external API, or hardware acceptance",
+    "Already running synchronous I/O can finish in background; cleanup occurs after return/Drop",
+    "Started commit remains observed; no forced interruption or invented cancellation of its effect"
+  ],
+  "preliminary_command_error": {
+    "command": "pnpm lint",
+    "cwd": "/workspace",
+    "exit": 1,
+    "reason": "No package.json; rerun from correct worktree succeeded; not a product/test failure"
+  }
+}

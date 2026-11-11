@@ -9,6 +9,11 @@ Wcześniej — 0.0.78 (raport [`44`](44-raport-2026-10-30-noc.md)): C2.3 i C2.8.
 Źródło prawdy o kryteriach: [`../STATUS.md`](../STATUS.md). Liczby o kodzie: [`../CATALOG.md`](../CATALOG.md).
 Opis zmian po ludzku: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 
+
+Prace rozwojowe 8–9.11 w Cloud: [plan 54](54-jarvis-i-tryby-2026-11-08.md), etap J roadmapy.
+Jarvis dla każdej persony, zakres pięciu trybów, regresje i szerokie testy są w toku;
+stan tej serii nie zamyka kryteriów sprzętowych ani niezależnego przeglądu.
+
 Projekt jest prowadzony na zmianę na dwóch komputerach — dysk E: z repozytorium przechodzi między nimi. Przy każdej
 liczbie ze sprzętu podana jest maszyna; czasów z dwóch maszyn nie porównujemy.
 

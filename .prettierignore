@@ -19,3 +19,6 @@ CLAUDE.md
 Cargo.lock
 # Generowany przez Rust (`crates/app-models/tests/bundles_ui.rs`, ALFA_UPDATE_FIXTURES=1).
 apps/desktop/ui/src/lib/api/fake/bundles.json
+# Przypięte źródło mapy i odtwarzalny SVG (scripts/cockpit-map.mjs --check).
+scripts/data/ne_110m_land.geojson
+apps/desktop/ui/src/lib/components/cockpit/assets/world-land.svg

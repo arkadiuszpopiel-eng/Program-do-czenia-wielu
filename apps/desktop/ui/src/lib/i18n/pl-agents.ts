@@ -54,6 +54,8 @@ export const plAgents = {
   },
   'undo.stepLabel': 'Cofnij: {label}',
   'intent.terminal': 'Uruchom w terminalu',
+  'conv.toolNeedsConfirmation': 'Wymaga potwierdzenia',
+  'conv.toolsNeedConfirmation': 'Do potwierdzenia: {n}',
   'intent.terminalHint':
     'Polecenie nie zostało wykonane. Otwórz terminal w „{cwd}”, wklej je i uruchom sama/sam.',
   'intent.copy': 'Kopiuj polecenie',

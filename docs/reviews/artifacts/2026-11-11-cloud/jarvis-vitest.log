@@ -1,0 +1,16 @@
+
+> @alfa/desktop-ui@0.0.85 test /workspace/wt-jarvis/apps/desktop/ui
+> vitest run
+
+
+ RUN  v5.0.3 /workspace/wt-jarvis/apps/desktop/ui
+
+
+ Test Files  103 passed (103)
+      Tests  573 passed (573)
+   Start at  19:53:08
+   Duration  105.39s (import 50%, transform 36%, tests 12%, worker 1%)
+
+  Transform  transforming modules took 73.75s · 36% of tracked time, re-done on every run
+             persist transforms across runs with fsModuleCache: true
+             learn more: https://vitest.dev/guide/improving-performance#caching-between-reruns

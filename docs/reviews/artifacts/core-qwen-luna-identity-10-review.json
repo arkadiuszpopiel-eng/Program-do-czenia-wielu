@@ -1,0 +1,108 @@
+{
+  "scope": "author review of exact synthetic identity/no-actions question only; not general quality or physical execution",
+  "source_sha256": "7e17b370b6d795c66495306c39dbd1fad95161e0288c49c9b35c067295dba808",
+  "passed": 10,
+  "total": 10,
+  "rows": [
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Jestem Luna, gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Jestem Luna, gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Jestem Luna, gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Jestem Luna, gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Jestem Luna, gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Jestem Luną i jestem gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Jestem Luną i jestem gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Jestem Luną i jestem gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Jestem Luną i jestem gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Jestem Luną i jestem gotowa pomóc.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    }
+  ]
+}

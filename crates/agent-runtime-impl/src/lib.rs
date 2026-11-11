@@ -39,6 +39,7 @@ mod handle;
 mod invalid;
 mod location;
 mod locks;
+mod observation;
 mod prompt;
 mod registry;
 mod shared;

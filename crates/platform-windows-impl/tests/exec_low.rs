@@ -134,7 +134,7 @@ fn powershell_runs_at_low_integrity() {
     let (work, beside) = dirs("pwsh");
     let outside = beside.join("poza.txt");
     let command = format!(
-        "Set-Content -Path wynik.txt -Value 'zażółć'; Get-Content wynik.txt; \
+        "Set-Content -Path wynik.txt -Value 'zażółć' -Encoding UTF8; Get-Content wynik.txt -Encoding UTF8; \
          try {{ Set-Content -Path '{}' -Value x -ErrorAction Stop; 'zapisano-poza' }} catch {{ 'odmowa-poza' }}",
         outside.display()
     );

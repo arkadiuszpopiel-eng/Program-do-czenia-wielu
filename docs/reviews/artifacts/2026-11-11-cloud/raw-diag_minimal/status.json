@@ -1,0 +1,132 @@
+{
+  "variant": "diag_minimal",
+  "state": "completed",
+  "start": "2026-11-11T19:50:38.937632+00:00",
+  "model": {
+    "id": "qwen3-8b-q4-k-m",
+    "name": "Qwen3-8B (Q4_K_M, główny)",
+    "url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/resolve/7c41481f57cb95916b40956ab2f0b139b296d974/Qwen3-8B-Q4_K_M.gguf",
+    "file": "Qwen3-8B-Q4_K_M.gguf",
+    "size_mb": 4795,
+    "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+    "params_b": 8.2,
+    "quant": "Q4_K_M",
+    "layers": 36,
+    "ctx": 40960,
+    "vram_mb": 5345,
+    "ram_mb": 5545,
+    "kv_mb_per_1k_ctx": 144,
+    "tools": true,
+    "license": "Apache-2.0"
+  },
+  "scope": "rawHTTP outsideCore; syntheticpriorledger; no businessaction executed",
+  "hypothesis": "minimal transport diagnostic after two first-generation deadlines; no ledger or productquality test",
+  "fixture_sha256": "6f1b4ee0a08c93d1acf79907d4bf14f435deb092392e8f7fb1e2209d864ac70d",
+  "script_sha256": "b6cb54fa140cdd132c2667dd4744f55976d90a5d3a8da20a98f775699a782a82",
+  "startup_s": 60,
+  "first_generation_s": 60,
+  "idle_generation_s": 30,
+  "turn_s": 120,
+  "max_tokens": 8,
+  "temperature": 0,
+  "threads": 4,
+  "ping_setting": "unchanged server default",
+  "server_args": [
+    "/workspace/tools/llama/llama-b11559/llama-server",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "59593",
+    "-m",
+    "/workspace/models/Qwen3-8B-Q4_K_M.gguf",
+    "-c",
+    "8192",
+    "-ngl",
+    "0",
+    "--threads",
+    "4",
+    "-np",
+    "1",
+    "--jinja",
+    "--alias",
+    "qwen3-8b-q4-k-m",
+    "--chat-template-kwargs",
+    "{\"enable_thinking\":false}",
+    "--perf",
+    "--log-verbosity",
+    "4",
+    "--api-key",
+    "<ephemeral-test-auth-redacted>"
+  ],
+  "results": [
+    {
+      "scenario": "empty_record",
+      "text": "GOTOWA",
+      "reasoning_chars": 0,
+      "error": null,
+      "first_text_http_ms": 6489,
+      "first_generation_http_ms": 6489,
+      "finish_reasons": [
+        "stop"
+      ],
+      "usage": {
+        "completion_tokens": 5,
+        "prompt_tokens": 22,
+        "total_tokens": 27,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "events": [
+        {
+          "ms": 6488,
+          "text_chars": 0,
+          "reasoning_chars": 0,
+          "tool_calls": []
+        },
+        {
+          "ms": 6489,
+          "text_chars": 1,
+          "reasoning_chars": 0,
+          "tool_calls": []
+        },
+        {
+          "ms": 7811,
+          "text_chars": 2,
+          "reasoning_chars": 0,
+          "tool_calls": []
+        },
+        {
+          "ms": 9042,
+          "text_chars": 2,
+          "reasoning_chars": 0,
+          "tool_calls": []
+        },
+        {
+          "ms": 10110,
+          "text_chars": 1,
+          "reasoning_chars": 0,
+          "tool_calls": []
+        },
+        {
+          "ms": 11722,
+          "text_chars": 0,
+          "reasoning_chars": 0,
+          "tool_calls": []
+        },
+        {
+          "ms": 11724
+        }
+      ],
+      "http_status": 200,
+      "elapsed_ms": 11728,
+      "first_text_within_http60": true
+    }
+  ],
+  "pid": 24316,
+  "group": 24316,
+  "birth": "1102560",
+  "load_ms": 23288,
+  "server_exit": 0,
+  "end": "2026-11-11T19:51:14.498882+00:00"
+}

@@ -20,6 +20,7 @@
   import { load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BuilderForm from './BuilderForm.svelte';
+  import BuilderInteraction from './BuilderInteraction.svelte';
   import BuilderPreview from './BuilderPreview.svelte';
   import './work.css';
 
@@ -107,6 +108,11 @@
     await reload();
   }
 
+  function colorLabel(key: string): string {
+    const index = policy?.palette.indexOf(key) ?? -1;
+    return index < 0 ? t('builder.color') : t('builder.colorN', { n: index + 1 });
+  }
+
   async function voice() {
     await step(() => app.client.builder.voicePreview(draft));
   }
@@ -167,6 +173,7 @@
 
 <section class="wk-card" aria-labelledby="bd-library">
   <h3 id="bd-library">{t('builder.library')}</h3>
+  <BuilderInteraction />
   {#if loaded && library.length === 0}
     <p class="wk-meta">{t('builder.libraryEmpty')}</p>
   {:else if library.length}
@@ -174,7 +181,7 @@
       {#each library as a (a.persona)}
         <li>
           <strong>{a.name}</strong>
-          <span class="wk-meta">{a.role} · {a.autonomy} · {a.color}</span>
+          <span class="wk-meta">{a.role} · {a.autonomy} · {colorLabel(a.color)}</span>
         </li>
       {/each}
     </ul>

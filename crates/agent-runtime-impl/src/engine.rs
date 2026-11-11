@@ -310,7 +310,15 @@ impl Engine {
         }
     }
 
-    async fn finish(&mut self, outcome: RunOutcome) -> Exit {
+    async fn finish(&mut self, mut outcome: RunOutcome) -> Exit {
+        if let RunOutcome::Completed { summary, .. } = &mut outcome
+            && !self.cp.denied_calls.is_empty()
+        {
+            summary.push_str(&format!(
+                "\n\n[Wynik wykonania] Odmowa narzędzia: nie wykonano {} operacji, ponieważ zasady narzędzia na nie nie pozwoliły. Szczegóły są w krokach zadania.",
+                self.cp.denied_calls.len()
+            ));
+        }
         self.cp.finished = Some(outcome.clone());
         self.cp.pending.clear();
         self.checkpoint().await;

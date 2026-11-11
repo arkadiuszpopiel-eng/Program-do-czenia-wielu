@@ -1,0 +1,60 @@
+{
+  "at": "2026-11-10T22:04:57.080984+00:00",
+  "reason": "authorized11B semantic check; preserve primaryQwen8B/aux1.5B,source/logs/manualprobe binaries",
+  "files": [
+    {
+      "path": "/workspace/models/Bielik-4.5B-v3.0-Instruct.Q8_0.gguf",
+      "bytes": 5061215424,
+      "sha256": "562f2291de257890adf2b4a914da8b194affe6a7a838a6b7ef3d342f306c1b7f",
+      "kind": "owned re-downloadable obsolete4.5B cache",
+      "restore_model": {
+        "id": "bielik-4.5b-v3.0-instruct-q8_0",
+        "name": "Bielik 4.5B v3.0 Instruct (Q8_0)",
+        "url": "https://huggingface.co/speakleash/Bielik-4.5B-v3.0-Instruct-GGUF/resolve/3ee7b47bcd0ad7bc6a4c45bb7bad3e0b2fe066ad/Bielik-4.5B-v3.0-Instruct.Q8_0.gguf",
+        "file": "Bielik-4.5B-v3.0-Instruct.Q8_0.gguf",
+        "size_mb": 4826,
+        "sha256": "562f2291de257890adf2b4a914da8b194affe6a7a838a6b7ef3d342f306c1b7f",
+        "params_b": 4.8,
+        "quant": "Q8_0",
+        "layers": 60,
+        "ctx": 8192,
+        "vram_mb": 5400,
+        "ram_mb": 5600,
+        "kv_mb_per_1k_ctx": 60,
+        "tools": true,
+        "license": "Apache-2.0"
+      }
+    },
+    {
+      "path": "/workspace/target-nightly/debug/deps/jarvis_live-2b1b1be5c60d4bd9",
+      "bytes": 305501776,
+      "sha256": "c7f741c1bd362d71be25ddff03901e66f78f1c2918b62b83e2cbe9403d914237",
+      "kind": "completed inactive reproducible Cargo test executable",
+      "restore_model": null
+    },
+    {
+      "path": "/workspace/target-nightly/debug/deps/history_receipts-e322e151ab5a2c7a",
+      "bytes": 305246608,
+      "sha256": "9d2ceab040af1e9380071167387c77c4500fa3562db6334b3513a127618d60bf",
+      "kind": "completed inactive reproducible Cargo test executable",
+      "restore_model": null
+    }
+  ],
+  "new_model": {
+    "id": "bielik-11b-v2.3-instruct-q4-k-m",
+    "name": "Bielik 11B v2.3 Instruct (Q4_K_M)",
+    "url": "https://huggingface.co/speakleash/Bielik-11B-v2.3-Instruct-GGUF/resolve/b6b2f467358d9eca16fddcc2f0fd506ea3e87858/Bielik-11B-v2.3-Instruct.Q4_K_M.gguf",
+    "file": "Bielik-11B-v2.3-Instruct.Q4_K_M.gguf",
+    "size_mb": 6413,
+    "sha256": "ece698889c07d4a98a8fb7c9968ad7ad20961cf824c0b008895fe0506c87b834",
+    "params_b": 11.2,
+    "quant": "Q4_K_M",
+    "layers": 50,
+    "ctx": 32768,
+    "vram_mb": 6963,
+    "ram_mb": 7163,
+    "kv_mb_per_1k_ctx": 200,
+    "tools": false,
+    "license": "Apache-2.0"
+  }
+}

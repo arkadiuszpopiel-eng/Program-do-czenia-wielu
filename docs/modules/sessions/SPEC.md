@@ -139,3 +139,7 @@ Panel Sesje (lista, wyszukiwanie, projekty, tagi, przypięte, kropka aktywności
   odczyt, luka, `ReadOnly` innej przestrzeni), `sessions-impl/tests/rollback.rs` (historia czytelna po rollbacku,
   czytelny błąd zapisu, indeks bez `prepare`, addytywna → dopisywanie), `sessions-impl/tests/f7_migrations.rs` (runner
   scenariuszy `sqlite.sessions`: m-20, m-23).
+
+Adaptery jednorazowego odczytu mogą wywołać `SessionDbProvider::release_idle`: implementacja
+SQLCipher zwalnia tylko połączenie bez innych referencjiArc, zachowując dane i jedną instancjęDb
+dla czynnych odbiorców. Odtwarzanie obsad przy starcie nie zatrzymuje w RAM wszystkich baz.

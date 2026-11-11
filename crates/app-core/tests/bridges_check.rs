@@ -24,9 +24,11 @@ struct Probe {
 
 impl CliProbe for Probe {
     fn locate(&self, program: &str) -> Option<PathBuf> {
-        ["claude", "codex", "agy"]
-            .contains(&program)
-            .then(|| PathBuf::from(format!(r"C:\narzedzia\{program}.exe")))
+        ["claude", "codex", "agy"].contains(&program).then(|| {
+            std::env::temp_dir()
+                .join("alfa-cli-test-bin")
+                .join(format!("{program}.exe"))
+        })
     }
 
     fn version_output(&self, _path: &Path) -> Option<String> {

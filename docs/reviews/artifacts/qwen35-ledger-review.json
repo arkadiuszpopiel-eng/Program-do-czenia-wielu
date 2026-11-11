@@ -1,0 +1,71 @@
+{
+  "model": {
+    "id": "qwen3.5-9b-q4-k-m",
+    "name": "Qwen3.5 9B Q4_K_M (Unsloth, prywatna próba)",
+    "url": "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/3885219b6810b007914f3a7950a8d1b469d598a5/Qwen3.5-9B-Q4_K_M.gguf",
+    "file": "Qwen3.5-9B-Q4_K_M.gguf",
+    "size_mb": 5418,
+    "sha256": "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8",
+    "params_b": 9.0,
+    "quant": "Q4_K_M",
+    "layers": 32,
+    "ctx": 262144,
+    "vram_mb": 6800,
+    "ram_mb": 8000,
+    "kv_mb_per_1k_ctx": 32,
+    "tools": true,
+    "license": "Apache-2.0"
+  },
+  "kind": "manual semantic review of all3rawresponses, notCore/GPU/productionacceptance",
+  "method": "same3synthetichistorycasesasV1; completeSystemmergedatbeginningrequiredbytemplate;96tokens/temp0/8192/CPU4;60/30/120 unchanged",
+  "results": [
+    {
+      "scenario": "empty_record",
+      "ledger_fidelity": true,
+      "unsupported_extra_cause": "no projectselected presentedasreasonfornopastexecution; currentselectiondoesnotprovehistory"
+    },
+    {
+      "scenario": "recorded_done",
+      "ledger_fidelity": false,
+      "error": "deniesearlierexecutionsdespiterecorded_done1; earlierassistantNo overrulesreceipt"
+    },
+    {
+      "scenario": "needs_confirmation",
+      "ledger_fidelity": true,
+      "unsupported_extra_cause": "no projectselected presentedasreasonfornopastexecution; currentselectiondoesnotprovehistory"
+    }
+  ],
+  "summary": {
+    "transport_responses": 3,
+    "transport_errors": 0,
+    "truncations": 0,
+    "ledger_fidelity_pass": 2,
+    "ledger_fidelity_fail": 1,
+    "unsupported_extra_causes": 2,
+    "finish_reasons": [
+      "stop",
+      "stop",
+      "stop"
+    ],
+    "http_first_visible_within60s": 3,
+    "first_visible_ms": [
+      51839,
+      27982,
+      26494
+    ],
+    "total_ms": [
+      75604,
+      39433,
+      49284
+    ]
+  },
+  "middleSystemProbe": "HTTP500templateSystemmustbeatbeginning;0responses,1requestfailed,2unrun;notqualityevaluation",
+  "decision": "NOT_ACCEPTED: doesnotclose58; no catalog/defaultchange; nofull30Coretrialafterfailedpilot",
+  "raw_scripts_sha256": {
+    "raw-qwen35-ledger.py": "cb17b83f5e12e2af5d4b61d01ee8c8235bf19ea3f6e1120516c9b72cb7254e6d",
+    "raw-qwen35-ledger-merged.py": "076a88a15ae07569e50da6fa6ae45a92be620c9eb5c0f21ca973650e4c6fe857",
+    "download-qwen35.py": "7626d142e26fcdc3305c4feb8fc378fde334a27c3a895ca5607d9b98c19c144e",
+    "download-qwen35-resume.py": "b2bf5a8680d71942516e2bbb0d99b66ef0c91399078e0b11b4cec0b39b344c8c"
+  },
+  "reviewed_at": "2026-11-10T23:39:37.504154+00:00"
+}

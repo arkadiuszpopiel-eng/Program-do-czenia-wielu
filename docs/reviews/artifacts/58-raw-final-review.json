@@ -1,0 +1,40 @@
+{
+  "disposition": "REJECTED_V1_NOT_PUBLISHED_AS_CODE",
+  "source_local_commit": "5538f59a68373cc857770890f0a5dee64f993f96",
+  "patch_sha256": "8b3fdd184802931b150057a9fa818d37764e3718ae34ed01dac23ea4f05016b9",
+  "candidate": {
+    "transport_completed": 30,
+    "semantic_fidelity": 0,
+    "unsupported_confirmations": 20,
+    "done_omissions": 10,
+    "core_visible_beyond60s": 1
+  },
+  "baseline": {
+    "transport_completed": 6,
+    "transport_failed": 1,
+    "not_run": 23
+  },
+  "raw_only": {
+    "middle_and_merged": {
+      "responses": 6,
+      "semantic_fidelity": 0
+    },
+    "natural": {
+      "responses": 3,
+      "semantic_fidelity": 0,
+      "http_visible_beyond60s": 1
+    },
+    "user_context": {
+      "responses": 3,
+      "semantic_fidelity": 0
+    },
+    "first_merged": {
+      "transport_failed": 1,
+      "not_run": 2
+    }
+  },
+  "no_more_prompt_variants_without_new_evidence": true,
+  "classification": "missing evidence projection deterministically reproduced; projection alone does not resolve model reliance on prior unverified text; no output rewriting, policy/evals/threshold changes",
+  "context_patch_previous_sha256": "26e32341e42b6530f24bda1d9ebf6b5ff9f6bbd1d9c1cab9ad816367b61f8f86",
+  "patch_apply_command": "git apply --unidiff-zero"
+}

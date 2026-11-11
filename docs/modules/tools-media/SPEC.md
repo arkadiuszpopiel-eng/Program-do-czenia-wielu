@@ -52,6 +52,10 @@ Pozycja ffmpeg na stronie „Modele i silniki” (stan, licencja, instrukcja ins
 ## Fake
 `tools-media-fake`: `FakeTools`, `FakeTranscoder` (poprawne nagłówki formatu docelowego, „brak ffmpeg”), `FakePlayer` (zapis klipów, kolejka).
 
+Diagnostyka kompozycji `AppCore` zachowuje `FfmpegTranscoder` nad `FakeExec`, który zapisuje
+wynik konwersji. Matcher atrapy wskazuje pełną ścieżkę `app_agents::ffmpeg_path` dla hosta;
+pusty plik testowy nigdy nie jest uruchamiany. Wzorzec wyników i progi diagnostyki pozostają stałe.
+
 ## Otwarte pytania
 - Kamera i mikrofon jako narzędzia (PLAN §7.2 „Multimedia”) — po decyzji o prywatności nagrań.
 - Pełny parser EBML (Matroska/WebM: ścieżki, czas) — dziś tylko rozpoznanie formatu.

@@ -5,7 +5,7 @@
 
 [workspace]
 resolver = "2"
-exclude = ["apps/desktop/src-tauri"]
+exclude = ["apps/desktop/src-tauri", "vendor/libsqlite3-sys"]
 members = ["crates/*"]
 
 [workspace.package]
@@ -34,7 +34,7 @@ futures-util = "0.3.31"
 tokio-stream = { version = "0.1.19", features = ["sync"] }
 proptest = "1.11.0"
 # Dane (ADR 0008, spike i): SQLCipher w pakiecie z OpenSSL (vendored) + FTS5 w bundlu; sqlite-vec statycznie.
-rusqlite = { version = "0.40.2", default-features = false, features = ["cache", "bundled-sqlcipher-vendored-openssl"] }
+rusqlite = { version = "0.41.1", default-features = false, features = ["cache", "bundled-sqlcipher-vendored-openssl"] }
 sqlite-vec = "0.1.9"
 # Archiwa ZIP (tekst z DOCX/XLSX/PPTX, archiwa silników i modeli, kontener .alfa, paczki aktualizacji):
 # tylko deflate przez flate2 (backend wybierają crate'y — miniz_oxide, czysty Rust), bez AES/bzip2/zstd/lzma (MIT).
@@ -89,3 +89,7 @@ lto = "fat"
 strip = true
 codegen-units = 1
 opt-level = 3
+
+# Przypięty adapter z poprawionym SQLCipher, ADR 0030; bez zmiany źródeł w deny.toml.
+[patch.crates-io]
+libsqlite3-sys = { path = "vendor/libsqlite3-sys" }

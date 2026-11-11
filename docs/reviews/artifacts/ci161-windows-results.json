@@ -1,0 +1,51 @@
+{
+  "source": "12d44af48df812d59f9978a9b5b902011e3a6ab1",
+  "run": 42564408250,
+  "job": 128987662628,
+  "target_results": 1121,
+  "counts": {
+    "passed": 3521,
+    "failed": 0,
+    "ignored": 46
+  },
+  "selected": [
+    {
+      "target": "conductor_handoff",
+      "counts": [
+        4,
+        0,
+        0
+      ],
+      "line": "2026-11-09T05:34:31.6203960Z test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.21s"
+    },
+    {
+      "target": "files",
+      "counts": [
+        3,
+        0,
+        0
+      ],
+      "line": "2026-11-09T05:35:00.4753973Z test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.13s"
+    },
+    {
+      "target": "exec_low",
+      "counts": [
+        5,
+        0,
+        0
+      ],
+      "line": "2026-11-09T05:39:55.0509944Z test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 29.31s"
+    },
+    {
+      "target": "shell_utf8",
+      "counts": [
+        2,
+        0,
+        0
+      ],
+      "line": "2026-11-09T05:40:19.0684045Z test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.75s"
+    }
+  ],
+  "conclusion": "success",
+  "parser": "only original timestamp+test result lines; grep duplicates excluded"
+}

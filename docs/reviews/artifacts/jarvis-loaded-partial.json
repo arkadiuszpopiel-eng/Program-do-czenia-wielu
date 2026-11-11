@@ -1,0 +1,26 @@
+{
+  "max_tokens": 96,
+  "model": "bielik-1.5b-v3.0-instruct-q8_0",
+  "platform": "Linux Cloud CPU; headless core, no microphone",
+  "results": [
+    {
+      "agent": "alfa",
+      "elapsed_ms": 64684,
+      "error": null,
+      "mentions_own_name": true,
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc."
+    },
+    {
+      "agent": "beta",
+      "elapsed_ms": 107573,
+      "error": null,
+      "mentions_own_name": false,
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc."
+    }
+  ],
+  "temperature": 0.0
+}

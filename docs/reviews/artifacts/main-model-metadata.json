@@ -1,0 +1,101 @@
+{
+  "checked_utc": "2026-11-10",
+  "sources": [
+    {
+      "repo": "Qwen/Qwen3-8B-GGUF",
+      "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+      "file": {
+        "rfilename": "Qwen3-8B-Q4_K_M.gguf",
+        "blobId": "d4ee8ae7f4de3a5046b1a29776a3f011ba28017e",
+        "size": 5027783488,
+        "lfs": {
+          "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+          "size": 5027783488,
+          "pointerSize": 135
+        }
+      },
+      "license_from_metadata": "apache-2.0"
+    },
+    {
+      "repo": "speakleash/Bielik-11B-v2.3-Instruct-GGUF",
+      "revision": "b6b2f467358d9eca16fddcc2f0fd506ea3e87858",
+      "file": {
+        "rfilename": "Bielik-11B-v2.3-Instruct.Q4_K_M.gguf",
+        "blobId": "2ffb31e52fd7abf6d80cab54985082af629b3c8e",
+        "size": 6724050496,
+        "lfs": {
+          "sha256": "ece698889c07d4a98a8fb7c9968ad7ad20961cf824c0b008895fe0506c87b834",
+          "size": 6724050496,
+          "pointerSize": 135
+        }
+      },
+      "license_from_metadata": "apache-2.0"
+    }
+  ],
+  "qwen_local_header": {
+    "general.architecture": "qwen3",
+    "qwen3.block_count": 36,
+    "qwen3.context_length": 40960,
+    "qwen3.embedding_length": 4096,
+    "qwen3.attention.head_count": 32,
+    "qwen3.attention.head_count_kv": 8,
+    "qwen3.attention.key_length": 128,
+    "qwen3.attention.value_length": 128
+  },
+  "qwen_config": {
+    "architectures": [
+      "Qwen3ForCausalLM"
+    ],
+    "attention_bias": false,
+    "attention_dropout": 0.0,
+    "bos_token_id": 151643,
+    "eos_token_id": 151645,
+    "head_dim": 128,
+    "hidden_act": "silu",
+    "hidden_size": 4096,
+    "initializer_range": 0.02,
+    "intermediate_size": 12288,
+    "max_position_embeddings": 40960,
+    "max_window_layers": 36,
+    "model_type": "qwen3",
+    "num_attention_heads": 32,
+    "num_hidden_layers": 36,
+    "num_key_value_heads": 8,
+    "rms_norm_eps": 1e-06,
+    "rope_scaling": null,
+    "rope_theta": 1000000,
+    "sliding_window": null,
+    "tie_word_embeddings": false,
+    "torch_dtype": "bfloat16",
+    "transformers_version": "4.51.0",
+    "use_cache": true,
+    "use_sliding_window": false,
+    "vocab_size": 151936
+  },
+  "bielik11_config": {
+    "architectures": [
+      "MistralForCausalLM"
+    ],
+    "attention_dropout": 0.0,
+    "bos_token_id": 1,
+    "eos_token_id": 32001,
+    "hidden_act": "silu",
+    "hidden_size": 4096,
+    "initializer_range": 0.02,
+    "intermediate_size": 14336,
+    "max_position_embeddings": 32768,
+    "model_type": "mistral",
+    "num_attention_heads": 32,
+    "num_hidden_layers": 50,
+    "num_key_value_heads": 8,
+    "rms_norm_eps": 1e-05,
+    "rope_theta": 1000000,
+    "sliding_window": null,
+    "tie_word_embeddings": false,
+    "torch_dtype": "float16",
+    "transformers_version": "4.44.2",
+    "use_cache": true,
+    "vocab_size": 32128
+  },
+  "hardware_acceptance": false
+}

@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "name": "final-lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:57:33.491108+00:00",
+      "finished_utc": "2026-11-10T06:58:00.597712+00:00",
+      "sha256": "4ccb3a723d399e742be1b85def2c43338bf116a604efdd374bc32da4bf506b9e"
+    },
+    {
+      "name": "final-docs",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:58:00.599334+00:00",
+      "finished_utc": "2026-11-10T06:58:01.073773+00:00",
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    {
+      "name": "final-docs-links",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--verify"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:58:01.074253+00:00",
+      "finished_utc": "2026-11-10T06:58:01.493729+00:00",
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    },
+    {
+      "name": "final-fmt",
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:58:01.494461+00:00",
+      "finished_utc": "2026-11-10T06:58:08.932664+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "final-schema-diff",
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "--",
+        "packages/schemas"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:58:08.935296+00:00",
+      "finished_utc": "2026-11-10T06:58:08.943496+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "initial_lint": [
+    {
+      "name": "final-lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "exit": 1,
+      "started_utc": "2026-11-10T06:54:36.767755+00:00",
+      "finished_utc": "2026-11-10T06:54:57.415091+00:00",
+      "sha256": "40232acee3b958830682ed72c2b4b7f8af703247d24fdfdbfd226af44985f604"
+    }
+  ],
+  "lint_fix": "Removed one empty Rust doc line from app-models/lib.rs to meet400-line cap; no limit change.",
+  "tested_source_commits": {
+    "providers-local-impl": "0ce5c835",
+    "app-models": "6856619e",
+    "router-contract/router-impl": "a0e63b5e"
+  },
+  "combined_production_logic_matches_tested_components": true,
+  "ci_note": "Local component gates only, not fullCI or GPU/API acceptance."
+}

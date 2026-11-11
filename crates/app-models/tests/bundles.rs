@@ -9,11 +9,12 @@ use app_api::dto::{
     BundleFitKind as F, BundleState as B, LocalizedText, ModelBundle, ModelItem,
     ModelItemState as S, ModelProgressView,
 };
+use app_models::ItemSpec;
 use app_models::bundle_data::{
     DEFS, LLAMA_CPU, LLAMA_CUDA, LLAMA_VULKAN, WHISPER_CPU, WHISPER_CUDA,
 };
 use app_models::bundles::{self, Accel, Machine};
-use app_models::{ItemSpec, builtin};
+use app_models::catalog::{Target, builtin_for};
 use device_profile_contract::{CpuInfo, GpuInfo, GpuVendor, Profile, fixtures};
 
 fn model_item(s: &ItemSpec) -> ModelItem {
@@ -40,7 +41,10 @@ fn model_item(s: &ItemSpec) -> ModelItem {
 }
 
 fn catalog_items() -> Vec<ModelItem> {
-    builtin().iter().map(model_item).collect()
+    builtin_for(Some(Target::WINDOWS_X64))
+        .iter()
+        .map(model_item)
+        .collect()
 }
 
 fn machine(gpu: Option<(GpuVendor, u32)>, ram_mb: u32, cores: u32) -> Machine {
@@ -99,7 +103,10 @@ fn ids(b: &ModelBundle) -> Vec<(&str, bool)> {
 fn definitions_are_ordered_and_every_item_exists_in_the_catalog() {
     let ratings: Vec<u8> = DEFS.iter().map(|d| d.rating).collect();
     assert_eq!(ratings, [6, 5, 4, 3, 2, 1]);
-    let catalog: Vec<String> = builtin().into_iter().map(|s| s.id).collect();
+    let catalog: Vec<String> = builtin_for(Some(Target::WINDOWS_X64))
+        .into_iter()
+        .map(|s| s.id)
+        .collect();
     for def in &DEFS {
         for accel in [Accel::Cuda, Accel::Vulkan, Accel::Cpu] {
             for (id, _) in bundles::members(def, accel) {
@@ -284,7 +291,13 @@ fn small_or_unknown_gpus_fall_back_to_the_cpu_path() {
 fn sizes_counts_and_state_follow_the_items() {
     let m = machine(None, 8_192, 6);
     let mut items = catalog_items();
-    let size_of = |id: &str| builtin().iter().find(|s| s.id == id).unwrap().size();
+    let size_of = |id: &str| {
+        builtin_for(Some(Target::WINDOWS_X64))
+            .iter()
+            .find(|s| s.id == id)
+            .unwrap()
+            .size()
+    };
     let minimal = |items: &[ModelItem]| bundles::views(&m, items).pop().unwrap();
     let b = minimal(&items);
     assert_eq!(b.rating, 1);

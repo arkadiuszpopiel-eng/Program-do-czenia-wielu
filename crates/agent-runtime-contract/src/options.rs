@@ -32,6 +32,10 @@ pub struct Crew {
     /// Pusta mapa zachowuje zachowanie starszych checkpointów.
     #[serde(default)]
     pub persona_roles: BTreeMap<PersonaId, Vec<Role>>,
+    /// Instrukcje współpracy person dla nowych delegacji; bez dziedziczenia stylu rodzica.
+    /// Pusta mapa zachowuje zachowanie starszych checkpointów i format Krytyczki.
+    #[serde(default)]
+    pub persona_instructions: BTreeMap<PersonaId, String>,
     /// Model per rola (brak = model przebiegu-rodzica).
     #[serde(default)]
     pub models: BTreeMap<RoleId, String>,
@@ -126,4 +130,28 @@ pub struct AgentTaskPayload {
     /// Opcje v1.
     #[serde(default)]
     pub options: RunOptions,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn crew_instructions_round_trip_and_old_checkpoint_defaults_to_empty() {
+        let mut crew = Crew::default();
+        crew.persona_instructions
+            .insert(PersonaId::delta(), "Krótki meldunek.".into());
+        let mut value = serde_json::to_value(&crew).unwrap();
+        assert_eq!(serde_json::from_value::<Crew>(value.clone()).unwrap(), crew);
+        value
+            .as_object_mut()
+            .unwrap()
+            .remove("persona_instructions");
+        assert!(
+            serde_json::from_value::<Crew>(value)
+                .unwrap()
+                .persona_instructions
+                .is_empty()
+        );
+    }
 }

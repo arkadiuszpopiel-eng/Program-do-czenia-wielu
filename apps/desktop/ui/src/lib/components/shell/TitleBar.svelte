@@ -21,6 +21,7 @@
   import ParentReadsBadge from './ParentReadsBadge.svelte';
   import TitleLed from './TitleLed.svelte';
   import WindowControls from './WindowControls.svelte';
+  import CockpitToggle from '../cockpit/CockpitToggle.svelte';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -142,6 +143,7 @@
     <ParentReadsBadge />
     <ModeBadge />
     <div class="group tools">
+      <CockpitToggle />
       {#if app.view !== 'settings' && !simple}
         <IconButton
           label={place.right === 'hidden' ? t('titlebar.showRight') : t('titlebar.hideRight')}
@@ -328,6 +330,27 @@
     }
     .crumbs {
       padding: 0 var(--alfa-space-1);
+    }
+  }
+  @media (pointer: coarse) and (max-width: 1100px) {
+    .titlebar {
+      --bar-h: 44px;
+      gap: 2px;
+    }
+    .titlebar :global(.icon-btn.sm),
+    .titlebar :global(.live button),
+    .titlebar :global(button.mic) {
+      min-width: 44px;
+      min-height: 44px;
+    }
+    .crumbs {
+      flex: 1;
+    }
+  }
+  /* Przy320px tytuł ustępuje kontrolkom; F2 i panel Sesje zachowują zmianę nazwy. */
+  @media (max-width: 360px) {
+    .crumbs {
+      display: none;
     }
   }
   @media (max-width: 380px) {

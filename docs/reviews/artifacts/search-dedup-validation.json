@@ -1,0 +1,78 @@
+{
+  "updated_utc": "2026-11-10T01:20:06.728754+00:00",
+  "issue": 59,
+  "base": "74f0991477300ee7a33281dcc89610e4dcef1c01",
+  "RED": {
+    "passed": 7,
+    "failed": 4,
+    "ignored": 0,
+    "exit": 101
+  },
+  "GREEN": {
+    "passed": 40,
+    "failed": 0,
+    "ignored": 0,
+    "target_results": 10,
+    "search_results": 11,
+    "new_tests": 5,
+    "exit": 0
+  },
+  "Clippy": {
+    "all_targets": true,
+    "all_features": true,
+    "exit": 0,
+    "warnings": 0,
+    "seconds": 22.82
+  },
+  "format_exit": 0,
+  "lint_exit": 0,
+  "source_sha256": {
+    "crates/tools-net-impl/src/search_results.rs": "272a60198824ce5d82f94e3627db9872b4c9b362d9208c4818301072b2782908",
+    "crates/tools-net-impl/src/fetch.rs": "8af7959b9bf78c67bbda21b91d823a9ad20281980d7bdb64a62da5e887a71d29",
+    "crates/tools-net-impl/tests/search_results.rs": "c0de12c32a0093b205ec0e14acc1dc765220a28893eb24d74f57844d6a438784",
+    "docs/modules/tools-net/SPEC.md": "5a4adb8ba32cda01b326cad07bccf6852cc9a8a43461f6a13f1d68c422978caa"
+  },
+  "logs": {
+    "red.log": {
+      "bytes": 4925,
+      "sha256": "2ac8e0888c5f85afd8cae1afa0c5d5601d680e0b8c894ee6c0b6d82f24dfc645"
+    },
+    "green-full.log": {
+      "bytes": 4446,
+      "sha256": "fe84ad2f381fc2b339db31cd26a58d141646b17ad140f82ddc7eb782aedb9fd7"
+    },
+    "clippy.log": {
+      "bytes": 1969,
+      "sha256": "93e3f383a2fd4ce1cf8ceef748b1559c08b628ebdfdd4deefe76ec37dbebc663"
+    },
+    "lint.log": {
+      "bytes": 406,
+      "sha256": "280e2020f24d74a6ed0a089b8ec12ccd12c0c3a2fe93fe99707a61ece8696606"
+    },
+    "fmt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs-generate.log": {
+      "bytes": 48,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs-check.log": {
+      "bytes": 48,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs-verify.log": {
+      "bytes": 59,
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    }
+  },
+  "scope": "Synthetic SearchPort and Brokerharness only; no realsearch/API/GPU/microphone; no policy/dependency/eval changes",
+  "publication_gate": "Preserve complete CI173/Windows95 before pushing; fresh candidateCI/reviewrequired",
+  "docs": {
+    "pages": 102,
+    "problems": 0,
+    "generate_exit": 0,
+    "check_exit": 0,
+    "verify_exit": 0
+  }
+}

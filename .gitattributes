@@ -10,3 +10,6 @@
 *.wav binary
 *.gguf binary
 *.onnx binary
+
+# Wyłącznie publiczne syntetyczne fixture szyfrowanej bazy z WAL.
+/crates/lib-sqlstore/tests/fixtures/sqlcipher-4.14/*.fixture binary

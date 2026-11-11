@@ -34,4 +34,7 @@ Każda decyzja techniczna z `docs/PLAN.md` §1.2 ma swój ADR. Decyzje są odwra
 | [0028](0028-directml-dla-glosu-i-mowa-na-kartach-amd-intel.md) | DirectML dla głosu Supertonic (opcjonalnie, karta ≥ 12 GB) i Qwen3-ASR przez Vulkan na kartach AMD/Intel | **Proponowany** |
 | [0029](0029-konta-dzieci.md) | Konta dzieci: przedziały wieku, podgląd rodzica, zgoda na chmurę, odznaki osobiste | **Przyjęty** |
 
+| [0030](0030-sqlcipher-rustsec-2026-0459.md) | Naprawiony SQLCipher bez wyjątku advisory RUSTSEC-2026-0459 | **Proponowany; wąska łatka licencji zatwierdzona** |
+| [0031](0031-wbudowana-przegladarka-webview2.md) | Wbudowana przeglądarka WebView2, dodatki i rzeczywiste wyszukiwanie | **Proponowany** |
+
 Statusy: **Zaakceptowany** — obowiązuje; dopisek „(spike …)" oznacza, że wartości liczbowe lub wykonalność potwierdza wskazany spike w F0 bez zmiany kierunku. **Tymczasowy** — kierunek przyjęty, ale ADR wraca do przeglądu po wskazanym spike'u. **Proponowany** — projekt przygotowany przez sesję AI; nie obowiązuje do podpisu właściciela.

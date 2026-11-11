@@ -6,6 +6,10 @@
 
 mod common;
 
+#[cfg(unix)]
+#[path = "common/process_exit.rs"]
+mod process_exit;
+
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use agent_backends_contract::contract_tests::scenario::Scenario;
@@ -155,12 +159,6 @@ async fn progress_latency_within_budget() {
     }
 }
 
-#[cfg(unix)]
-fn alive(pid: u32) -> bool {
-    std::fs::read_to_string(format!("/proc/{pid}/stat"))
-        .is_ok_and(|s| s.split_whitespace().nth(2).is_none_or(|state| state != "Z"))
-}
-
 #[tokio::test(flavor = "multi_thread")]
 async fn cancel_kills_process_tree() {
     for bridge in BridgeKind::ALL {
@@ -196,14 +194,11 @@ async fn cancel_kills_process_tree() {
         assert!(started.elapsed() <= limit);
         #[cfg(unix)]
         {
-            let deadline = std::time::Instant::now() + limit;
-            while alive(grandchild) && std::time::Instant::now() < deadline {
-                tokio::time::sleep(Duration::from_millis(20)).await;
-            }
-            assert!(
-                !alive(grandchild),
-                "{bridge}: proces-wnuk {grandchild} przeżył anulowanie"
-            );
+            process_exit::wait_for_exit(grandchild, limit)
+                .await
+                .unwrap_or_else(|error| {
+                    panic!("{bridge}: proces-wnuk {grandchild} przeżył anulowanie: {error}")
+                });
         }
         assert_eq!(
             h.backend.cancel(&handle.task).await,

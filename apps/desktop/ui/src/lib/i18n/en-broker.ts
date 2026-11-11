@@ -43,6 +43,8 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'titlebar.modeTip': 'Agents’ work mode — click to change (1–5), or Alt+M: next mode',
   'shortcut.mode.cycle': 'Next work mode (never Full access)',
   'mode.title': 'Work mode',
+  'mode.needsSession':
+    'Open a conversation to use Plan mode. Plan applies only to that conversation.',
   'status.changeMode': 'Change work mode',
   'mode.L0.name': 'Plan',
   'mode.L0.desc': 'Plan first, changes after you accept it. This conversation only.',
@@ -56,14 +58,14 @@ export const enBroker: Record<keyof typeof plBroker, Message> = {
   'mode.L4.name': 'Full access',
   'mode.L4.desc': 'No questions. Choose once — it stays after a restart.',
   'mode.note':
-    'Applies to all conversations. You confirm a raise once in the Shadow Judge window. On Full access the Shadow Judge window never shows until you lower the mode. Always kept: Ctrl+Shift+F12, the journal and the Kernel’s hard blocks.',
+    'Applies to the selected scope: this conversation or all conversations. Plan applies only to this conversation. Confirm a raise in the Shadow Judge window. On Full access the Shadow Judge window never shows until you lower the mode. Always kept: Ctrl+Shift+F12, the journal and the Kernel’s hard blocks.',
   'mode.more': 'More in Settings → Permissions',
   'mode.applied': 'Work mode: {mode}.',
   'mode.requested': 'Confirm "{mode}" in the Shadow Judge window — once is enough.',
   'mode.raised': 'Work mode: {mode} — approved and remembered.',
   'mode.notApplied': 'The Shadow Judge did not accept "{mode}" — "{current}" is in effect.',
   'mode.sessionOwn':
-    'This conversation has its own mode: {mode}. The choice here changes the other conversations; change this one in Permissions.',
+    'This conversation has its own mode: {mode}. To change only this one, select “This conversation”.',
   'mode.badge': 'Full access is on — agents act without asking. Click to change the work mode',
   // Denial with "tell the agent what to do instead" (plan 50 §4.2).
   'approval.feedback.open': 'Tell the agent what to do instead',

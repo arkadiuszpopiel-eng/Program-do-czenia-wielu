@@ -115,8 +115,8 @@ jobs:
         with:
           command: check advisories bans licenses sources
 
-  ui:
-    name: UI (Svelte 5)
+  ui-build:
+    name: UI — kontrole i build
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -145,6 +145,35 @@ jobs:
         run: pnpm --filter @alfa/ui-kit build-storybook
       - name: Testy jednostkowe UI (vitest)
         run: pnpm --filter @alfa/desktop-ui test
+      - name: Zbudowane UI dla wszystkich części E2E
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-e2e-dist
+          path: apps/desktop/ui/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  ui-e2e:
+    name: UI E2E + axe (${{ matrix.shard }}/3)
+    runs-on: ubuntu-24.04
+    needs: ui-build
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: To samo zbudowane UI z bieżącego przebiegu
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-e2e-dist
+          path: apps/desktop/ui/dist
       # Instalacja przeglądarki potrafi zawisnąć na pobieraniu (f406ae4: 50 min bez postępu) —
       # limit czasu i jedna ponowna próba zamiast czekania na 6-godzinny limit joba.
       - name: Przeglądarka dla E2E
@@ -157,7 +186,20 @@ jobs:
           exit 1
       - name: E2E + axe (Playwright)
         timeout-minutes: 30
-        run: pnpm --filter @alfa/desktop-ui test:e2e
+        run: pnpm --filter @alfa/desktop-ui test:e2e --shard=${{ matrix.shard }}/3
+
+  # Zachowujemy nazwę dotychczasowej bramki: nie jest zielona po samym buildzie.
+  ui:
+    name: UI (Svelte 5)
+    runs-on: ubuntu-24.04
+    needs: [ui-build, ui-e2e]
+    if: always()
+    steps:
+      - name: Kontrole i wszystkie trzy części E2E zaliczone
+        env:
+          BUILD_RESULT: ${{ needs.ui-build.result }}
+          E2E_RESULT: ${{ needs.ui-e2e.result }}
+        run: test "$BUILD_RESULT" = success && test "$E2E_RESULT" = success
 
   docs:
     name: Dokumentacja

@@ -1,0 +1,82 @@
+{
+  "58-core-carrier-red-v2.log": {
+    "bytes": 33166,
+    "sha256": "d0fa64dcf0cfb83c84587575aa51e3e7d51fc03596933894608304ce031cebf7"
+  },
+  "58-core-carrier-red.log": {
+    "bytes": 15149,
+    "sha256": "23ca108d1114e4a00fea555e27f5d53361633aafcd9218531b0c77907d837aaa"
+  },
+  "core-jarvis-regression.log": {
+    "bytes": 3315,
+    "sha256": "377c6518737a69da69de87a61196444c179be9cc00af06c7bd4ef7221b510835"
+  },
+  "jarvis-build-final.log": {
+    "bytes": 11783,
+    "sha256": "816876370ca31871325abb6597acf37841e526c05014cc9f497dbe246a44acc3"
+  },
+  "jarvis-check-final.log": {
+    "bytes": 278,
+    "sha256": "d0458b9e9d827ca11ce84ac1d8cf46ab8e481ed3b556de15691e38dcd0a29e99"
+  },
+  "jarvis-diff-final.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "jarvis-e2e-existing.log": {
+    "bytes": 3701,
+    "sha256": "a412a62f03095a5af6c021c157587c076d2da91325a58ccd5dc46c4324d64ddd"
+  },
+  "jarvis-e2e-final.log": {
+    "bytes": 5045,
+    "sha256": "e76e467ae15d60ca34ef0038fd2771cc9d4bda077167ab398d92a3eb7717468a"
+  },
+  "jarvis-e2e-v1.log": {
+    "bytes": 5713,
+    "sha256": "a48146293843a1969af514bef3f3febb346c34e3800640ae72376d1e7f907ca5"
+  },
+  "jarvis-e2e-v2-isolated.log": {
+    "bytes": 1731,
+    "sha256": "9ee997f9904dcd5068bb0d5fee7bf29766114276c2084dfd41260773742c682b"
+  },
+  "jarvis-format-final-v3.log": {
+    "bytes": 66,
+    "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+  },
+  "jarvis-format.log": {
+    "bytes": 167,
+    "sha256": "7a86a844bf6cf0d5eb5b3fc5193aacce82811c8b23e85ad929c236a3ee1e9b83"
+  },
+  "jarvis-lint-final.log": {
+    "bytes": 548,
+    "sha256": "a0971b7f6632008ff78fa4fa7bd6510c3d87ae44ecf01d69efeff2c0311a7c49"
+  },
+  "jarvis-systems-red.log": {
+    "bytes": 1677,
+    "sha256": "fd622ec3e1ee3e1cde5eb00bcc50c4f3604fe14828f6dc4d4ecf14749bdfa7ea"
+  },
+  "jarvis-touch-red.log": {
+    "bytes": 2191,
+    "sha256": "706fd1c1f6515d90a78c66ede198554240e898fd301db4b9e165f91452587088"
+  },
+  "jarvis-vitest.log": {
+    "bytes": 546,
+    "sha256": "6a0a06cdc1e03609aee2e73ea4b1b8e97f836ccaff81d7d4f9b21b8e4948a7c5"
+  },
+  "phone-touch-red.log": {
+    "bytes": 1751,
+    "sha256": "243d7da1a23d5441831391e2240515189957e96d6931414bd218446c7058ed9e"
+  },
+  "raw-current_text_only/server.log": {
+    "bytes": 1037,
+    "sha256": "c95fcdf9102ddd2d6c4aa785ebcefcad2cae335b4bfd8a96537312c7309e0674"
+  },
+  "raw-diag_minimal/server.log": {
+    "bytes": 17878,
+    "sha256": "939d01c162e840bb9188e2b82c06a82a76d3013789b195adef326640c95c140e"
+  },
+  "raw-host_lookup/server.log": {
+    "bytes": 1037,
+    "sha256": "cf3603d707adae11cea094a0431b7f0c47b95a51b86f094f3653cde69775c7bd"
+  }
+}

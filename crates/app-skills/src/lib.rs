@@ -12,12 +12,14 @@
 
 mod builder;
 mod diff;
+mod restore;
 mod skill_md;
 mod skills;
 
 use std::path::Path;
 use std::sync::Arc;
 
+use agent_builder_contract::AgentBuilder;
 use agent_builder_impl::{AgentBuilderModule, CeilingSource, DirManifestStore, FixedCeiling};
 use app_api::EventHub;
 use app_api::ports::{ShellPort, VoicePort};
@@ -132,6 +134,7 @@ pub async fn open(d: WorkDeps) -> Work {
             Arc::new(store),
             ceiling,
         )?;
+        restore::restore_catalog(d.personas.as_ref(), module.library()).await?;
         start(module, "agent-builder", &d.bus).await
     }
     .await;

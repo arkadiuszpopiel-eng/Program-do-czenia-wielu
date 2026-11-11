@@ -1,0 +1,15 @@
+--- a/deny.toml
++++ b/deny.toml
+@@ -31,6 +31,12 @@
+ # Crate'y własne workspace mają `license = "UNLICENSED"` (do ustalenia) — nie są publikowane.
+ private = { ignore = true }
+
++# Propozycja do przeglądu właściciela: tylko naprawiony pakiet SQLCipher420.
++# Nie rozszerza globalnej listy licencji ani wyjątków advisory.
++exceptions = [
++    { crate = "sqlcipher-src@=420.0.0", allow = ["blessing", "WTFPL"] },
++]
++
+ [bans]
+ multiple-versions = "warn"
+ wildcards = "deny"

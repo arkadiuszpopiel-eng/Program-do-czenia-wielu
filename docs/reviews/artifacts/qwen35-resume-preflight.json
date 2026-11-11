@@ -1,0 +1,7 @@
+{
+  "initial_resume_exit": 1,
+  "reason": "assertion caught stale progress snapshot before starting curl",
+  "actual_partial_bytes": 2333288820,
+  "first_status_bytes": 2332745728,
+  "no_download_or_inference_started": true
+}

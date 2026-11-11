@@ -1,0 +1,620 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.26
+   Compiling serde_core v1.0.229
+   Compiling syn v3.0.6
+   Compiling serde v1.0.229
+   Compiling libc v0.2.189
+   Compiling cfg-if v1.0.5
+   Compiling libm v0.2.16
+   Compiling autocfg v1.5.1
+   Compiling memchr v2.8.3
+   Compiling num-traits v0.2.19
+   Compiling serde_derive v1.0.229
+   Compiling itoa v1.0.18
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.151
+   Compiling rand_core v0.10.1
+   Compiling getrandom v0.4.3
+   Compiling dyn-clone v1.0.20
+   Compiling thiserror v2.0.21
+   Compiling thiserror-impl v2.0.21
+   Compiling ref-cast v1.0.27
+   Compiling ref-cast-impl v1.0.27
+   Compiling iana-time-zone v0.1.65
+   Compiling chrono v0.4.45
+   Compiling serde_derive_internals v0.30.0
+   Compiling schemars_derive v1.2.2
+   Compiling uuid v1.26.1
+   Compiling futures-core v0.3.34
+   Compiling async-trait v0.1.92
+   Compiling schemars v1.2.2
+   Compiling log v0.4.34
+   Compiling smallvec v1.16.2
+   Compiling pin-project-lite v0.2.17
+   Compiling bytes v1.12.1
+   Compiling core-bus-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/core-bus-contract)
+   Compiling mio v1.2.3
+   Compiling errno v0.3.14
+   Compiling signal-hook-registry v1.4.8
+   Compiling tokio-macros v2.7.2
+   Compiling socket2 v0.6.5
+   Compiling foldhash v0.2.0
+   Compiling tokio v1.54.1
+   Compiling zeroize v1.9.0
+   Compiling equivalent v1.0.2
+   Compiling allocator-api2 v0.2.21
+   Compiling synstructure v0.14.0
+   Compiling zerofrom-derive v0.1.8
+   Compiling hashbrown v0.17.1
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling stable_deref_trait v1.2.1
+   Compiling yoke v0.8.3
+   Compiling zerovec-derive v0.11.6
+   Compiling zerovec v0.11.8
+   Compiling displaydoc v0.2.7
+   Compiling tinystr v0.8.4
+   Compiling litemap v0.8.3
+   Compiling writeable v0.6.4
+   Compiling zerotrie v0.2.5
+   Compiling icu_locale_core v2.3.0
+   Compiling potential_utf v0.1.6
+   Compiling icu_properties_data v2.3.0
+   Compiling icu_normalizer_data v2.3.0
+   Compiling utf8_iter v1.0.4
+   Compiling icu_collections v2.3.0
+   Compiling icu_provider v2.3.1
+   Compiling platform-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-contract)
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling indexmap v2.14.2
+   Compiling futures-sink v0.3.34
+   Compiling tokio-util v0.7.19
+   Compiling syn v2.0.119
+   Compiling compliance-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/compliance-contract)
+   Compiling providers-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/providers-contract)
+   Compiling typenum v1.20.1
+   Compiling regex-syntax v0.8.11
+   Compiling toml_datetime v0.6.11
+   Compiling serde_spanned v0.6.9
+   Compiling aho-corasick v1.1.5
+   Compiling winnow v0.7.15
+   Compiling toml_write v0.1.2
+   Compiling regex-automata v0.4.18
+   Compiling toml_edit v0.22.27
+   Compiling risk-classifier-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/risk-classifier-contract)
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.14
+   Compiling cc v1.5.1
+   Compiling toml v0.8.23
+   Compiling version_check v0.9.5
+   Compiling regex v1.13.1
+   Compiling watchdog-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/watchdog-contract)
+   Compiling approval-judge-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/approval-judge-contract)
+   Compiling semver v1.0.28
+   Compiling safety-broker-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/safety-broker-contract)
+   Compiling subtle v2.6.1
+   Compiling bitflags v2.13.2
+   Compiling generic-array v0.14.7
+   Compiling crypto-common v0.1.7
+   Compiling core-registry-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/core-registry-contract)
+   Compiling personas-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/personas-contract)
+   Compiling tools-common-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-common-contract)
+   Compiling once_cell v1.21.4
+   Compiling block-buffer v0.10.4
+   Compiling cpufeatures v0.2.17
+   Compiling digest v0.10.7
+   Compiling sha2 v0.10.9
+   Compiling tracing-core v0.1.36
+   Compiling tracing-attributes v0.1.31
+   Compiling slab v0.4.12
+   Compiling futures-macro v0.3.34
+   Compiling tracing v0.1.44
+   Compiling futures-task v0.3.34
+   Compiling rtrb v0.4.0
+   Compiling futures-util v0.3.34
+   Compiling voice-audio-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-audio-contract)
+   Compiling pkg-config v0.3.34
+   Compiling vcpkg v0.2.15
+   Compiling openssl-src v300.6.1+3.6.3
+   Compiling scopeguard v1.2.0
+   Compiling sqlcipher-src v420.0.0+sqlcipher-4.20.0-sqlite-3.54.1-libtomcrypt-1.18.2
+   Compiling openssl-sys v0.9.117
+   Compiling libsqlite3-sys v0.39.1 (/workspace/wt-ledger-core-test/vendor/libsqlite3-sys)
+   Compiling tinyvec v1.13.3
+   Compiling unicode-normalization v0.1.25
+   Compiling sqlite-vec v0.1.9
+   Compiling accounts-hub-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/accounts-hub-contract)
+   Compiling hashlink v0.12.2
+   Compiling num-integer v0.1.47
+   Compiling parking_lot_core v0.9.12
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling fallible-iterator v0.3.0
+   Compiling lock_api v0.4.14
+   Compiling parking_lot v0.12.5
+   Compiling num-complex v0.4.6
+   Compiling base64 v0.22.1
+   Compiling anyhow v1.0.104
+   Compiling zerocopy v0.8.59
+   Compiling zerocopy-derive v0.8.59
+   Compiling percent-encoding v2.3.2
+   Compiling cost-meter-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/cost-meter-contract)
+   Compiling ring v0.17.14
+   Compiling http v1.5.0
+   Compiling either v1.18.0
+   Compiling simd-adler32 v0.3.10
+   Compiling heck v0.5.0
+   Compiling http-body v1.1.0
+   Compiling form_urlencoded v1.2.2
+   Compiling voice-tts-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-tts-contract)
+   Compiling rustls-pki-types v1.15.1
+   Compiling getrandom v0.2.17
+   Compiling unicase v2.9.0
+   Compiling untrusted v0.9.0
+   Compiling cpufeatures v0.3.1
+   Compiling httparse v1.10.1
+   Compiling crc32fast v1.5.2
+   Compiling agent-runtime-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/agent-runtime-contract)
+   Compiling strength_reduce v0.2.4
+   Compiling fnv v1.0.7
+   Compiling tower-service v0.3.3
+   Compiling rustls v0.23.46
+   Compiling same-file v1.0.6
+   Compiling try-lock v0.2.5
+   Compiling atomic-waker v1.1.2
+   Compiling h2 v0.4.19
+   Compiling want v0.3.1
+   Compiling walkdir v2.5.0
+   Compiling transpose v0.2.3
+   Compiling rustls-webpki v0.103.16
+   Compiling url v2.5.8
+   Compiling primal-check v0.3.4
+   Compiling core-config-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/core-config-contract)
+   Compiling futures-channel v0.3.34
+   Compiling rustix v1.1.5
+   Compiling hyper v1.11.1
+   Compiling rustfft v6.4.1
+   Compiling mime_guess v2.0.5
+   Compiling voice-dsp-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-dsp-contract)
+   Compiling device-profile-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/device-profile-contract)
+   Compiling pc-diag-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/pc-diag-contract)
+   Compiling sync_wrapper v1.0.2
+   Compiling maplit v1.0.2
+   Compiling tower-layer v0.3.3
+   Compiling openssl-probe v0.2.1
+   Compiling linux-raw-sys v0.12.1
+   Compiling base64 v0.23.1
+   Compiling ipnet v2.12.2
+   Compiling anymap3 v1.1.0
+   Compiling hyper-util v0.1.21
+   Compiling rustls-native-certs v0.8.4
+   Compiling tower v0.5.3
+   Compiling tokio-rustls v0.26.6
+   Compiling scheduler-lite-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/scheduler-lite-contract)
+   Compiling core-log-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/core-log-contract)
+   Compiling ryu v1.0.23
+   Compiling similar v3.2.0
+   Compiling mime v0.3.17
+   Compiling serde_urlencoded v0.7.1
+   Compiling hyper-rustls v0.27.10
+   Compiling tower-http v0.6.11
+   Compiling agent-builder-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/agent-builder-contract)
+   Compiling http-body-util v0.1.5
+   Compiling num-bigint v0.4.8
+   Compiling num-rational v0.4.2
+   Compiling reqwest v0.12.28
+   Compiling voice-vad-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-vad-contract)
+   Compiling platform-apps-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-apps-contract)
+   Compiling unicode-xid v0.2.6
+   Compiling siphasher v1.0.4
+   Compiling phf_shared v0.14.0
+   Compiling nom v8.0.0
+   Compiling cranelift-srcgen v0.123.20
+   Compiling cranelift-assembler-x64-meta v0.123.20
+   Compiling matrixmultiply v0.3.11
+   Compiling adler2 v2.0.1
+   Compiling miniz_oxide v0.9.1
+   Compiling itertools v0.14.0
+   Compiling pulley-macros v36.0.20
+   Compiling getrandom v0.3.4
+   Compiling rawpointer v0.2.1
+   Compiling fastrand v2.5.0
+   Compiling memo-map v0.3.4
+   Compiling minijinja v2.24.0
+   Compiling phf_generator v0.14.0
+   Compiling half v2.7.1
+   Compiling flate2 v1.1.10
+   Compiling ahash v0.8.12
+   Compiling hashbrown v0.16.1
+   Compiling cranelift-bitset v0.123.20
+   Compiling typeid v1.0.3
+   Compiling foldhash v0.1.5
+   Compiling cranelift-isle v0.123.20
+   Compiling pulley-interpreter v36.0.20
+   Compiling hashbrown v0.15.5
+   Compiling string-interner v0.20.0
+   Compiling tract-linalg v0.23.8
+   Compiling ndarray v0.17.2
+   Compiling nom-language v0.1.0
+   Compiling model-residency-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/model-residency-contract)
+   Compiling itertools v0.15.0
+   Compiling num-iter v0.1.46
+   Compiling tokio-stream v0.1.19
+   Compiling bumpalo v3.20.3
+   Compiling erased-serde v0.4.10
+   Compiling downcast-rs v2.0.2
+   Compiling cranelift-codegen-shared v0.123.20
+   Compiling target-lexicon v0.13.5
+   Compiling rustversion v1.0.23
+   Compiling dyn-hash v1.0.0
+   Compiling inventory v0.3.24
+   Compiling lazy_static v1.5.0
+   Compiling tract-data v0.23.8
+   Compiling cranelift-codegen-meta v0.123.20
+   Compiling num v0.4.3
+   Compiling cranelift-entity v0.123.20
+   Compiling string_cache_codegen v0.11.2
+   Compiling phf_codegen v0.14.0
+   Compiling cranelift-assembler-x64 v0.123.20
+   Compiling agent-backends-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/agent-backends-contract)
+   Compiling hybrid-array v0.4.15
+   Compiling derive-new v0.7.0
+   Compiling bit-vec v0.8.0
+   Compiling crossbeam-utils v0.8.23
+   Compiling bit-vec v0.10.1
+   Compiling new_debug_unreachable v1.0.6
+   Compiling jsonschema-value v0.58.3
+   Compiling byteorder v1.5.0
+   Compiling pastey v0.2.3
+   Compiling unicode-general-category v1.1.0
+   Compiling borrow-or-share v0.2.4
+   Compiling fluent-uri v0.4.1
+   Compiling bit-set v0.11.1
+   Compiling bit-set v0.8.0
+   Compiling web_atoms v0.3.0
+   Compiling cranelift-codegen v0.123.20
+   Compiling fraction v0.17.0
+   Compiling derive_more-impl v2.1.1
+   Compiling chacha20 v0.10.2
+   Compiling strum_macros v0.28.0
+   Compiling lib-sidecar-guard v0.0.85 (/workspace/wt-ledger-core-test/crates/lib-sidecar-guard)
+   Compiling undo-journal-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/undo-journal-contract)
+   Compiling gimli v0.32.3
+   Compiling wasmtime-internal-math v36.0.20
+   Compiling rand_core v0.6.4
+   Compiling wasm-encoder v0.236.1
+   Compiling micromap v0.3.0
+   Compiling bytecount v0.6.9
+   Compiling base64ct v1.8.3
+   Compiling rustc-hash v2.1.3
+   Compiling arbitrary v1.4.2
+   Compiling precomputed-hash v0.1.1
+   Compiling num-cmp v0.1.0
+   Compiling outref v0.5.2
+   Compiling typed-path v0.12.3
+   Compiling vsimd v0.8.0
+   Compiling crossbeam-epoch v0.9.21
+   Compiling uuid-simd v0.8.0
+   Compiling zip v9.0.5
+   Compiling string_cache v0.11.0
+   Compiling cranelift-control v0.123.20
+   Compiling regalloc2 v0.12.2
+   Compiling password-hash v0.5.0
+   Compiling referencing v0.58.3
+   Compiling strum v0.28.0
+   Compiling rand v0.10.3
+   Compiling derive_more v2.1.1
+   Compiling encoding_rs v0.8.42
+   Compiling tract-core v0.23.8
+   Compiling fancy-regex v0.19.2
+   Compiling cranelift-bforest v0.123.20
+   Compiling phf v0.14.0
+   Compiling xattr v1.6.1
+   Compiling sonora-simd v0.2.0
+   Compiling blake2 v0.10.6
+   Compiling inout v0.1.4
+   Compiling jsonschema-regex v0.58.3
+   Compiling email_address v0.2.9
+   Compiling filetime v0.2.29
+   Compiling object v0.37.3
+   Compiling leb128fmt v0.1.0
+   Compiling wasmparser v0.236.1
+   Compiling inotify-sys v0.1.8
+   Compiling data-encoding v2.11.1
+   Compiling crossbeam-deque v0.8.8
+   Compiling sonora-fft v0.2.0
+   Compiling jsonschema v0.58.3
+   Compiling tar v0.4.46
+   Compiling cipher v0.4.4
+   Compiling argon2 v0.5.3
+   Compiling sonora-common-audio v0.2.0
+   Compiling tendril v0.5.1
+   Compiling voice-wake-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-wake-contract)
+   Compiling voice-stt-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-stt-contract)
+   Compiling universal-hash v0.5.1
+   Compiling bytemuck_derive v1.12.1
+   Compiling dtoa v1.0.11
+   Compiling simdutf8 v0.1.5
+   Compiling core_detect v1.0.0
+   Compiling opaque-debug v0.3.1
+   Compiling multiversion_no_op v1.0.0
+   Compiling rayon-core v1.13.0
+   Compiling poly1305 v0.8.0
+   Compiling dtoa-short v0.3.5
+   Compiling bytemuck v1.25.2
+   Compiling markup5ever v0.40.0
+   Compiling chacha20 v0.9.1
+   Compiling tract-nnef v0.23.8
+   Compiling rusqlite v0.41.1
+   Compiling lib-sqlstore v0.0.85 (/workspace/wt-ledger-core-test/crates/lib-sqlstore)
+   Compiling sessions-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/sessions-contract)
+   Compiling memory-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/memory-contract)
+   Compiling search-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/search-contract)
+   Compiling artifacts-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/artifacts-contract)
+   Compiling app-api v0.0.85 (/workspace/wt-ledger-core-test/crates/app-api)
+   Compiling transfer-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/transfer-contract)
+   Compiling crypto-common v0.2.2
+   Compiling scheduler-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/scheduler-contract)
+   Compiling lib-openai-compat v0.0.85 (/workspace/wt-ledger-core-test/crates/lib-openai-compat)
+   Compiling generic_singleton v0.5.3
+   Compiling realfft v3.5.0
+   Compiling tools-window-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-window-contract)
+   Compiling tools-screen-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-screen-contract)
+   Compiling hmac v0.12.1
+   Compiling aead v0.5.2
+   Compiling wasmtime-internal-versioned-export-macros v36.0.20
+   Compiling voice-turn-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-turn-contract)
+   Compiling cobs v0.3.0
+   Compiling wasmtime-internal-component-util v36.0.20
+   Compiling array-init v2.1.0
+   Compiling pulldown-cmark v0.13.6
+   Compiling termcolor v1.4.1
+   Compiling id-arena v2.3.0
+   Compiling wit-parser v0.236.1
+   Compiling wasmprinter v0.236.1
+   Compiling easyfft v0.4.2
+   Compiling postcard v1.1.3
+   Compiling chacha20poly1305 v0.10.1
+   Compiling safety-broker-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/safety-broker-impl)
+   Compiling memory-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/memory-impl)
+   Compiling memory-consolidation-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/memory-consolidation-contract)
+   Compiling inotify v0.11.5
+   Compiling html5ever v0.40.1
+   Compiling sonora-agc2 v0.2.0
+   Compiling cssparser v0.38.0
+   Compiling sonora-aec3 v0.2.0
+   Compiling sonora-ns v0.2.0
+   Compiling router-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/router-contract)
+   Compiling platform-windows-kernel-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-windows-kernel-impl)
+   Compiling broker-ui-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/broker-ui-contract)
+   Compiling notify-types v2.1.0
+   Compiling platform-windows-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-windows-impl)
+   Compiling wasmtime-internal-component-macro v36.0.20
+   Compiling wasmtime-internal-unwinder v36.0.20
+   Compiling notify v8.2.0
+   Compiling router-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/router-impl)
+   Compiling sonora v0.2.0
+   Compiling ammonia v4.2.4
+   Compiling rayon v1.12.0
+   Compiling memory-consolidation-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/memory-consolidation-impl)
+   Compiling wasmtime-environ v36.0.20
+   Compiling nnnoiseless v0.5.2
+   Compiling wasmtime-internal-wit-bindgen v36.0.20
+   Compiling wasmtime v36.0.20
+   Compiling providers-local-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/providers-local-impl)
+   Compiling providers-api-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/providers-api-impl)
+   Compiling tract-extra v0.23.8
+   Compiling cranelift-native v0.123.20
+   Compiling cranelift-frontend v0.123.20
+   Compiling rand_distr v0.6.0
+   Compiling block-padding v0.4.2
+   Compiling prost-derive v0.14.4
+   Compiling lib-netguard v0.0.85 (/workspace/wt-ledger-core-test/crates/lib-netguard)
+   Compiling camera-hub-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/camera-hub-contract)
+   Compiling float-ord v0.3.2
+   Compiling tract-transformers v0.23.8
+   Compiling prost v0.14.4
+   Compiling inout v0.2.4
+   Compiling tract-onnx-opl v0.23.8
+   Compiling wasmtime-internal-cranelift v36.0.20
+   Compiling lib-markdown v0.0.85 (/workspace/wt-ledger-core-test/crates/lib-markdown)
+   Compiling voice-dsp-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-dsp-impl)
+   Compiling app-memory v0.0.85 (/workspace/wt-ledger-core-test/crates/app-memory)
+   Compiling core-config-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/core-config-impl)
+   Compiling app-broker v0.0.85 (/workspace/wt-ledger-core-test/crates/app-broker)
+   Compiling transfer-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/transfer-impl)
+   Compiling voice-turn-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-turn-impl)
+   Compiling tools-vision-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-vision-contract)
+   Compiling voice-stt-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-stt-impl)
+   Compiling accounts-hub-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/accounts-hub-impl)
+   Compiling tract-hir v0.23.8
+   Compiling undo-journal-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/undo-journal-impl)
+   Compiling voice-tts-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-tts-impl)
+   Compiling model-residency-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/model-residency-impl)
+   Compiling platform-windows-sys-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-windows-sys-impl)
+   Compiling memfd v0.6.6
+   Compiling cost-meter-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/cost-meter-impl)
+   Compiling wasmtime-internal-jit-icache-coherence v36.0.20
+   Compiling lib-quick v0.0.85 (/workspace/wt-ledger-core-test/crates/lib-quick)
+   Compiling lib-media v0.0.85 (/workspace/wt-ledger-core-test/crates/lib-media)
+   Compiling wasmtime-internal-asm-macros v36.0.20
+   Compiling memmap2 v0.9.11
+   Compiling wasmtime-internal-slab v36.0.20
+   Compiling tract-onnx v0.23.8
+   Compiling app-modules v0.0.85 (/workspace/wt-ledger-core-test/crates/app-modules)
+   Compiling cipher v0.5.2
+   Compiling tools-net-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-net-contract)
+   Compiling triggers-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/triggers-contract)
+   Compiling block-buffer v0.12.1
+   Compiling plugin-runtime-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/plugin-runtime-contract)
+   Compiling tools-engine-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-engine-contract)
+   Compiling tools-shell-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-shell-contract)
+   Compiling tools-input-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-input-contract)
+   Compiling tools-uia-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-uia-contract)
+   Compiling const-oid v0.10.2
+   Compiling digest v0.11.3
+   Compiling tools-input-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-input-impl)
+   Compiling tools-uia-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-uia-impl)
+   Compiling plugin-runtime-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/plugin-runtime-impl)
+   Compiling tools-media-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-media-contract)
+   Compiling tools-screen-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-screen-impl)
+   Compiling tools-window-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-window-impl)
+   Compiling skills-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/skills-contract)
+   Compiling platform-windows-gui-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-windows-gui-impl)
+   Compiling tools-system-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-system-contract)
+   Compiling tools-browser-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-browser-contract)
+   Compiling tools-office-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-office-contract)
+   Compiling platform-windows-office-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-windows-office-impl)
+   Compiling evals-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/evals-contract)
+   Compiling mcp-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/mcp-contract)
+   Compiling tools-clipboard-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-clipboard-contract)
+   Compiling tools-dev-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-dev-contract)
+   Compiling tools-fs-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-fs-contract)
+   Compiling voice-cmd-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-cmd-contract)
+   Compiling voice-persona-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-persona-contract)
+   Compiling alloc-no-stdlib v2.0.4
+   Compiling alloc-stdlib v0.2.4
+   Compiling tools-fs-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-fs-impl)
+   Compiling tools-dev-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-dev-impl)
+   Compiling tools-clipboard-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-clipboard-impl)
+   Compiling tools-office-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-office-impl)
+   Compiling tools-system-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-system-impl)
+   Compiling tools-browser-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-browser-impl)
+   Compiling app-gui v0.0.85 (/workspace/wt-ledger-core-test/crates/app-gui)
+   Compiling app-plugins v0.0.85 (/workspace/wt-ledger-core-test/crates/app-plugins)
+   Compiling tools-media-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-media-impl)
+   Compiling tools-shell-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-shell-impl)
+   Compiling tools-engine-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-engine-impl)
+   Compiling marshal-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/marshal-contract)
+   Compiling tools-net-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-net-impl)
+   Compiling tools-vision-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-vision-impl)
+   Compiling platform-windows-ocr-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-windows-ocr-impl)
+   Compiling agent-runtime-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/agent-runtime-impl)
+   Compiling voice-audio-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-audio-impl)
+   Compiling updater-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/updater-contract)
+   Compiling voice-speaker-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-speaker-contract)
+   Compiling unicode-bidi v0.3.18
+   Compiling unicode-properties v0.1.4
+   Compiling cpubits v0.1.1
+   Compiling aes v0.9.3
+   Compiling stringprep v0.1.5
+   Compiling app-agents v0.0.85 (/workspace/wt-ledger-core-test/crates/app-agents)
+   Compiling marshal-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/marshal-impl)
+   Compiling brotli-decompressor v5.0.3
+   Compiling voice-dialog-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-dialog-contract)
+   Compiling mcp-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/mcp-impl)
+   Compiling improver-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/improver-contract)
+   Compiling sha2 v0.11.1
+   Compiling md-5 v0.11.0
+   Compiling triggers-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/triggers-impl)
+   Compiling cbc v0.2.1
+   Compiling ecb v0.2.1
+   Compiling scheduler-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/scheduler-impl)
+   Compiling diagnostician-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/diagnostician-contract)
+   Compiling rangemap v1.8.0
+   Compiling minisign-verify v0.3.0
+   Compiling weezl v0.2.1
+   Compiling updater-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/updater-impl)
+   Compiling lopdf v0.45.0
+   Compiling diagnostician-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/diagnostician-impl)
+   Compiling app-tasks v0.0.85 (/workspace/wt-ledger-core-test/crates/app-tasks)
+   Compiling improver-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/improver-impl)
+   Compiling voice-pipeline-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-pipeline-contract)
+   Compiling agent-backends-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/agent-backends-impl)
+   Compiling evals-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/evals-impl)
+   Compiling voice-readaloud-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-readaloud-contract)
+   Compiling voice-dictation-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-dictation-contract)
+   Compiling ui-terminal-contract v0.0.85 (/workspace/wt-ledger-core-test/crates/ui-terminal-contract)
+   Compiling unicode-segmentation v1.13.3
+   Compiling ui-terminal-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/ui-terminal-impl)
+   Compiling voice-dictation-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-dictation-impl)
+   Compiling lib-embed v0.0.85 (/workspace/wt-ledger-core-test/crates/lib-embed)
+   Compiling voice-readaloud-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-readaloud-impl)
+   Compiling app-bridges v0.0.85 (/workspace/wt-ledger-core-test/crates/app-bridges)
+   Compiling app-health v0.0.85 (/workspace/wt-ledger-core-test/crates/app-health)
+   Compiling voice-pipeline-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-pipeline-impl)
+   Compiling app-files v0.0.85 (/workspace/wt-ledger-core-test/crates/app-files)
+   Compiling voice-speaker-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-speaker-impl)
+   Compiling voice-persona-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-persona-impl)
+   Compiling skills-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/skills-impl)
+   Compiling voice-vad-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-vad-impl)
+   Compiling voice-wake-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-wake-impl)
+   Compiling app-store v0.0.85 (/workspace/wt-ledger-core-test/crates/app-store)
+   Compiling search-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/search-impl)
+   Compiling sessions-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/sessions-impl)
+   Compiling agent-builder-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/agent-builder-impl)
+   Compiling pc-diag-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/pc-diag-impl)
+   Compiling platform-windows-diag-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-windows-diag-impl)
+   Compiling approval-judge-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/approval-judge-impl)
+   Compiling platform-windows-pty-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-windows-pty-impl)
+   Compiling sysinfo v0.38.4
+   Compiling unicode-width v0.2.2
+   Compiling wast v236.0.1
+   Compiling device-profile-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/device-profile-impl)
+   Compiling app-terminal v0.0.85 (/workspace/wt-ledger-core-test/crates/app-terminal)
+   Compiling app-judge v0.0.85 (/workspace/wt-ledger-core-test/crates/app-judge)
+   Compiling app-diag v0.0.85 (/workspace/wt-ledger-core-test/crates/app-diag)
+   Compiling app-skills v0.0.85 (/workspace/wt-ledger-core-test/crates/app-skills)
+   Compiling app-chat v0.0.85 (/workspace/wt-ledger-core-test/crates/app-chat)
+   Compiling app-models v0.0.85 (/workspace/wt-ledger-core-test/crates/app-models)
+   Compiling app-voice v0.0.85 (/workspace/wt-ledger-core-test/crates/app-voice)
+   Compiling app-updates v0.0.85 (/workspace/wt-ledger-core-test/crates/app-updates)
+   Compiling app-mcp v0.0.85 (/workspace/wt-ledger-core-test/crates/app-mcp)
+   Compiling camera-hub-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/camera-hub-impl)
+   Compiling broker-ui-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/broker-ui-impl)
+   Compiling artifacts-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/artifacts-impl)
+   Compiling core-bus-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/core-bus-impl)
+   Compiling core-log-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/core-log-impl)
+   Compiling app-logs v0.0.85 (/workspace/wt-ledger-core-test/crates/app-logs)
+   Compiling watchdog-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/watchdog-impl)
+   Compiling core-registry-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/core-registry-impl)
+   Compiling personas-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/personas-impl)
+   Compiling risk-classifier-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/risk-classifier-impl)
+   Compiling compliance-impl v0.0.85 (/workspace/wt-ledger-core-test/crates/compliance-impl)
+   Compiling tempfile v3.27.0
+   Compiling app-core v0.0.85 (/workspace/wt-ledger-core-test/crates/app-core)
+   Compiling app-safety v0.0.85 (/workspace/wt-ledger-core-test/crates/app-safety)
+   Compiling wat v1.236.1
+   Compiling voice-persona-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-persona-fake)
+   Compiling voice-cmd-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-cmd-fake)
+   Compiling tools-engine-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-engine-fake)
+   Compiling tools-net-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-net-fake)
+   Compiling tools-vision-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/tools-vision-fake)
+   Compiling voice-turn-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-turn-fake)
+   Compiling voice-stt-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-stt-fake)
+   Compiling voice-wake-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-wake-fake)
+   Compiling agent-backends-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/agent-backends-fake)
+   Compiling platform-apps-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-apps-fake)
+   Compiling voice-vad-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-vad-fake)
+   Compiling scheduler-lite-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/scheduler-lite-fake)
+   Compiling pc-diag-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/pc-diag-fake)
+   Compiling device-profile-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/device-profile-fake)
+   Compiling voice-dsp-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-dsp-fake)
+   Compiling voice-tts-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-tts-fake)
+   Compiling providers-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/providers-fake)
+   Compiling voice-audio-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/voice-audio-fake)
+   Compiling platform-fake v0.0.85 (/workspace/wt-ledger-core-test/crates/platform-fake)
+    Finished `test` profile [unoptimized] target(s) in 17m 10s
+     Running tests/execution_ledger_context.rs (/workspace/target-repair/debug/deps/execution_ledger_context-7f1dd61880da1723)
+
+running 1 test
+test host_ledger_read_reaches_the_actual_provider_without_creating_business_actions ... FAILED
+
+failures:
+
+---- host_ledger_read_reaches_the_actual_provider_without_creating_business_actions stdout ----
+
+thread 'host_ledger_read_reaches_the_actual_provider_without_creating_business_actions' (21585) panicked at crates/app-core/tests/execution_ledger_context.rs:137:8:
+brak wyniku rzeczywistego odczytu rejestru przez aplikację
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    host_ledger_read_reaches_the_actual_provider_without_creating_business_actions
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.61s
+
+error: test failed, to rerun pass `-p app-core --test execution_ledger_context`

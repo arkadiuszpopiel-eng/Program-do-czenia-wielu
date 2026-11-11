@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { expectAccessible, openApp, waitForChat } from './helpers';
+import { expectAccessible, openApp, pickOption, waitForChat } from './helpers';
 
 async function settings(page: Page, section: string) {
   const nav = page.getByRole('navigation', { name: 'Sekcje ustawień' });
@@ -91,6 +91,10 @@ for (const theme of ['light', 'dark'] as const) {
         .fill('Agentka o imieniu Zofia, która porządkuje pobrane pliki.');
       await page.getByRole('button', { name: 'Zaproponuj szkic' }).click();
       await expect(page.getByLabel('Imię', { exact: true })).toHaveValue('Zofia');
+      await pickOption(
+        page.getByRole('combobox', { name: 'Kolor', exact: true }),
+        'color.agent.custom-3',
+      );
       await page.getByRole('button', { name: 'Pokaż podgląd' }).click();
       const preview = page.getByRole('region', { name: 'Podgląd persony' });
       await expect(preview.getByText('Zofię')).toBeVisible();
@@ -101,9 +105,10 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(preview.getByText('Test na sucho zaliczony')).toBeVisible();
       await save.click();
       await expect(page.getByText('Zapisano agentkę Zofia.')).toBeVisible();
-      await expect(
-        page.getByRole('region', { name: 'Agentki z Kreatora' }).getByText('Zofia'),
-      ).toBeVisible();
+      const library = page.getByRole('region', { name: 'Agentki z Kreatora' });
+      await expect(library.getByText('Zofia')).toBeVisible();
+      await expect(library).toContainText('Kolor 3');
+      await expect(library).not.toContainText('color.agent.');
     });
 
     test('Replay: podprzebieg Krytyczki i powrót do przebiegu głównego', async ({ page }) => {

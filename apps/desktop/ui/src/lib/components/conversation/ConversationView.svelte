@@ -28,15 +28,20 @@
   );
   // Pasek „rozmowa na żywo” — tylko gdy tor głosu pracuje; poza budżetem startowym okna.
   const loadLive = () => import('../voice/VoiceLiveStrip.svelte');
+  const loadCockpit = () => import('../cockpit/CockpitPanel.svelte');
   const loadFind = () => import('./FindBar.svelte'); // tylko po Ctrl+F
 </script>
 
 <section class="conv" data-surface="app" aria-label={t('conv.label')}>
+  {#if app.layout.cockpit}<Lazy load={loadCockpit} props={{}} label={t('common.loading')} />{/if}
   <div class="top">
     <SystemBanners />
     {#if app.findOpen && conv}
-      <Lazy load={loadFind} label={t('common.loading')}
-        props={{ path: conv.path, onfocus: (id: string | null) => (focusTurn = id) }} />
+      <Lazy
+        load={loadFind}
+        label={t('common.loading')}
+        props={{ path: conv.path, onfocus: (id: string | null) => (focusTurn = id) }}
+      />
     {/if}
   </div>
   {#if conv && conv.loaded && conv.path.length > 0}

@@ -62,6 +62,11 @@ impl PersonasState {
             .unwrap_or_else(|| self.catalog.default_cast(false))
     }
 
+    /// Zapomina obsadę ostatecznie usuniętej sesji.
+    pub fn forget_session(&mut self, session: &SessionId) {
+        self.casts.remove(session);
+    }
+
     /// Waliduje i zapisuje obsadę; zwraca zmianę (zdarzenia: `CastChange::events`).
     pub fn set_cast(
         &mut self,

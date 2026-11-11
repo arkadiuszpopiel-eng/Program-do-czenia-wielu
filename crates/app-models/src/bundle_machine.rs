@@ -95,6 +95,7 @@ pub fn def(id: &str) -> Option<&'static Def> {
 /// Pozycje pakietu dla maszyny: (identyfikator, silnik zapasowy?).
 pub fn members_for(def: &Def, m: &Machine) -> Vec<(&'static str, bool)> {
     let mut out = members(def, m.accel());
+    crate::main_profile::members(&mut out, m);
     let llama = def.engines.contains(&Engine::Llama);
     // Laptop NVIDIA z kartą zintegrowaną: lekki model liczy na niej przez Vulkan (zapas dla CUDA).
     if m.accel() == Accel::Cuda && m.igpu && llama {

@@ -1,0 +1,119 @@
+{
+  "pid": 241113,
+  "source": "4de47089b3c7b58c771934c3dde113f1a3edc4c5",
+  "results": [
+    {
+      "name": "fs-system-portability-tests",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "--locked",
+        "-p",
+        "tools-fs-impl",
+        "-p",
+        "tools-system-impl",
+        "--no-fail-fast",
+        "-j",
+        "2"
+      ]
+    },
+    {
+      "name": "fs-system-portability-clippy",
+      "exit_code": 0,
+      "command": [
+        "clippy",
+        "--locked",
+        "-p",
+        "tools-fs-impl",
+        "-p",
+        "tools-system-impl",
+        "--all-targets",
+        "-j",
+        "2",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    },
+    {
+      "name": "core-portability-tests",
+      "exit_code": 0,
+      "command": [
+        "test",
+        "--locked",
+        "-p",
+        "app-core",
+        "--test",
+        "bridges_check",
+        "--test",
+        "commands",
+        "--no-fail-fast",
+        "-j",
+        "2"
+      ]
+    },
+    {
+      "name": "core-portability-clippy",
+      "exit_code": 0,
+      "command": [
+        "clippy",
+        "--locked",
+        "-p",
+        "app-core",
+        "--lib",
+        "--test",
+        "bridges_check",
+        "--test",
+        "commands",
+        "-j",
+        "2",
+        "--",
+        "-D",
+        "warnings"
+      ]
+    }
+  ],
+  "phase": "finished",
+  "updated_at": "2026-11-08T22:54:06.923976+00:00",
+  "app_agents": {
+    "source": "576f16d6",
+    "module_tree": "a61b6ea5690e85f997362704ab9a70ca8e2449ed",
+    "passed": 32,
+    "failed": 0,
+    "ignored": 3,
+    "clippy_exit_code": 0
+  },
+  "fs_system": {
+    "passed": 56,
+    "failed": 0,
+    "ignored": 0
+  },
+  "app_core_selected": {
+    "passed": 7,
+    "failed": 0,
+    "ignored": 0
+  },
+  "first_fs_system_attempt": {
+    "passed": 55,
+    "failed": 1,
+    "ignored": 0,
+    "failure": "software::tests::scan_finds_tools_versions_and_browsers: missing Edge fixture"
+  },
+  "scope": "Linux Cloud; fakes, no actual CLI bridges or owner hardware",
+  "final_fs_system": {
+    "source": "fc7e8fa7882559fbaa15d2474ae86d5d92210e2d",
+    "passed": 56,
+    "failed": 0,
+    "ignored": 0,
+    "clippy_exit_code": 0,
+    "reason": "extract test module to preserve400lines cap"
+  },
+  "size": {
+    "first_violation": "tools-fs-impl/src/core.rs412lines >400",
+    "final_violations": 0,
+    "files": 3481,
+    "crates": 264,
+    "existing_exceptions": 11,
+    "new_exceptions": 0
+  }
+}

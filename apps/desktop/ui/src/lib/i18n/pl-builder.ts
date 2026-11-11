@@ -79,6 +79,8 @@ export const plBuilder = {
   'builder.group.web': 'internet',
   'builder.group.browser': 'przeglądarka',
   'builder.group.mcp': 'serwery MCP',
+  'builder.group.system': 'narzędzia systemowe',
+  'builder.group.vision': 'analiza obrazu',
   'builder.group.memory': 'pamięć',
   'health.title': 'Zdrowie systemu',
   'health.intro':

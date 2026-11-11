@@ -1,0 +1,101 @@
+{
+  "issue": 65,
+  "base": "4c683568582586343c6c1cc26daed309fec2ee62",
+  "red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "providers-local-impl",
+      "--test",
+      "main_models",
+      "-j2"
+    ],
+    "exit": 101,
+    "started_utc": "2026-11-10T06:22:00.787774+00:00",
+    "finished_utc": "2026-11-10T06:22:33.451432+00:00",
+    "log_sha256": "9ebcf268f5b2ef6ac86451ea88757f1df2e977e49a2aa930574a8a6505b6ffcb"
+  },
+  "red_results": [
+    1,
+    3,
+    0
+  ],
+  "fallback_red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "providers-local-impl",
+      "--test",
+      "main_models",
+      "main_route_never",
+      "-j2"
+    ],
+    "exit": 101,
+    "sha256": "02d33185f3560776346c8925eb1fd0628c7dcbfdac8f1d921e2642ac0c84607f"
+  },
+  "full_results": [
+    80,
+    0,
+    0
+  ],
+  "targets": 12,
+  "checks": [
+    {
+      "name": "green-full",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "providers-local-impl",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:24:48.366231+00:00",
+      "finished_utc": "2026-11-10T06:25:01.329850+00:00",
+      "log_sha256": "cb30f332142337fdae53941b01b8b5cd847e1ebad379810b8097354b13212694"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "providers-local-impl",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:25:01.331159+00:00",
+      "finished_utc": "2026-11-10T06:25:27.607462+00:00",
+      "log_sha256": "56dfa34de953ec36b9f22f6b38929c72a5931f78e9c4d2f836fa49ebcea58ba5"
+    }
+  ],
+  "final_memory_test": {
+    "results": [
+      5,
+      0,
+      0
+    ],
+    "sha256": "ea2f99dd526635504f8b6753b858afaaef2c52a85684c8b5c3c1466c69db4d34"
+  },
+  "limitations": [
+    "No GPU/microphone/liveAPI acceptance",
+    "Qwen previous CoreCPU idle failure remains evidence",
+    "Bielik11 tools false; no new model-quality success claim"
+  ]
+}

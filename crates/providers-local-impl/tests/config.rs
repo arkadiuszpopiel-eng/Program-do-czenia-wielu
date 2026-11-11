@@ -72,7 +72,10 @@ fn bielik_q8_kv_cache_and_layout_on_the_6_gb_laptop() {
     let (b45, b15) = (&models[0], &models[1]);
     assert_eq!(b45.id, "bielik-4.5b-v3.0-instruct-q8_0");
     assert_eq!(b15.id, "bielik-1.5b-v3.0-instruct-q8_0");
-    assert_eq!(LocalConfig::new("/m", "/s").default_model, b45.id);
+    assert_eq!(
+        LocalConfig::new("/m", "/s").default_model,
+        providers_local_impl::MAIN_MODEL
+    );
     // 60 warstw × 2 głowice KV × 128 × 2 (K, V) × 2 B = 60 MiB na 1024 tokeny.
     assert_eq!(b45.kv_mb_per_1k_ctx, 60);
     assert_eq!((b45.kv_mb(8_192), b45.kv_mb(4_096)), (480, 240));

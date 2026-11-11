@@ -1,6 +1,19 @@
 # models — SPEC (v1, menedżer modeli i silników, `app-models`)
 
+## Nowy profil główny — polecenie właściciela10.11.2026
+
+Qwen3-8B Q4_K_M jest pierwszym LLM katalogu. Pakiety dla osobnej karty12GB zastępują
+mały/historyczny LLM modelem głównym8B i pokazują zgodne opisy pamięci/jakości.
+Bielik1.5B jest pomocniczy; karty8B/11B i licencji pozostają jawnie niepotwierdzone przez
+człowieka. Poprzednie porażki jakości/CPU pozostają zachowane, GPU wymaga odbioru.
+
+
 ## Cel
+`catalog::builtin()` wybiera katalog hosta, a `catalog::builtin_for(Option<Target>)` pozwala jawnie
+sprawdzić dane innej platformy. Testy pakietów i fixture'ów Windows wybierają Windows x64 także
+na Linuxie; nie uruchamiają tych binarek. Metadane archiwów Windows zachowują nazwy `.exe`
+niezależnie od hosta. Brak znanego celu udostępnia wyłącznie pozycje przenośne.
+
 
 Jedno miejsce w aplikacji do pobrania, sprawdzenia i usunięcia wszystkiego, czego Alfa potrzebuje lokalnie: modele
 rozmowy (GGUF z `providers-local`), STT (whisper GGML), głosy TTS (Piper; Pocket — ręcznie), VAD (Silero), cechy
@@ -47,6 +60,9 @@ Stan wykrywany tanio (bez hashowania): zadanie w toku → błąd → rekord `sta
 - Pobieranie do katalogu roboczego `%LOCALAPPDATA%\Alfa\downloads\<id>\` (`.part`, `Range: bytes=n-`, ≤ 3
   automatyczne wznowienia, twardy limit 2× rozmiar z katalogu, min. +64 MiB); na miejsce docelowe trafia dopiero
   plik zweryfikowany. Przypięty SHA-256 niezgodny → plik usunięty, stan `failed`.
+- HTTP5xx/429: przed ponowieniem przerwy250/500/1000ms, anulowalne dotychczasowym tokenem.
+  Nadal najwyżej cztery żądania i te same timeouty15/30s. Zerwany strumień/Range wznawiany jak wcześniej.
+  Trwała awaria kończy się jawnym błędem; odpowiedź błędu nie nadpisuje pliku częściowego.
 - Plik bez przypiętego hasha → `needs_trust`: UI pokazuje policzony SHA-256 i licencję; instalacja wyłącznie po
   `models_trust_hash` z hashami równymi policzonym, a przed instalacją pliki są hashowane ponownie (podmiana po
   pobraniu → usunięcie). Rekord instalacji zapamiętuje `trusted: true`.
@@ -218,3 +234,11 @@ wybór przy starcie). `app-core/tests/commands.rs::model_manager_lists_catalog_a
   zakaz porad medycznych w OpenRAIL-M (Supertonic 3) — decyzje człowieka.
 - **UI:** rozwijana „Karta licencji” w wierszu pozycji (`LicenseCardInfo.svelte`, przycisk z `aria-expanded`),
   atrapa `fake/license-seeds.ts`, e2e `e2e/license-cards.spec.ts`.
+
+## PróbaCPU katalogu modeli o różnych wymaganiach
+
+Próba zachowuje budżetCPU8192MiB z rekomendacji runnera. Każdy model jest sprawdzany;
+przekraczający budżet musi zwrócić dokładną odmowę pamięci przed startem (osobny test ochrony).
+Jego generacja pozostajeNOT_RUN_CPU_BUDGET, błąd zostaje w raporcie. Nieoczekiwane błędy
+nie są ukrywane. Wspierane modele nadal muszą wygenerować≥16 tokenów z polskimi literami,
+a cały przebieg wymaga co najmniej jednej rzeczywistej generacji. To nie jest odbiórGPU.

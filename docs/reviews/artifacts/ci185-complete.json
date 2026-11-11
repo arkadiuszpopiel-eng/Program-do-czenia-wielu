@@ -1,0 +1,114 @@
+{
+  "commit": "46f515bfc10fa7beaed7499b976f888d81bb9ccb",
+  "CI185": {
+    "run_id": 42892472297,
+    "jobs_success": 10,
+    "jobs_total": 10,
+    "linux": {
+      "passed": 3595,
+      "failed": 0,
+      "ignored": 26,
+      "target_results": 1141
+    },
+    "windows": {
+      "passed": 3617,
+      "failed": 0,
+      "ignored": 47,
+      "target_results": 1141
+    },
+    "vitest": {
+      "passed": 573,
+      "files": 103
+    },
+    "chromium_shards": [
+      315,
+      315,
+      315
+    ],
+    "tauri_production": 5,
+    "tauri_e2e": 4,
+    "clippy_fmt_deny_schema_docs": "success"
+  },
+  "Windows108": {
+    "run_id": 42892472263,
+    "jobs_success": 4,
+    "jobs_total": 4,
+    "webview2": {
+      "passed": 63,
+      "failed": 0,
+      "skipped": 5
+    },
+    "qwen8b_cpu": {
+      "first_token_ms": 11738,
+      "total_ms": 25387,
+      "output_tokens": 96,
+      "tok_per_s": 7.03
+    },
+    "bielik45b_cpu": {
+      "first_token_ms": 12089,
+      "total_ms": 24041,
+      "output_tokens": 71,
+      "tok_per_s": 5.94
+    },
+    "bielik11b": "NOT_RUN_CPU_BUDGET;0tokens",
+    "tts_piper": {
+      "ttfb_ms": 838,
+      "audio_ms": 2196,
+      "rtf": 0.382
+    },
+    "stt_fixture": {
+      "wer": 0,
+      "similarity": 1,
+      "rtf": 18.52,
+      "total_ms": 40672
+    },
+    "limitations": "CPU and recorded audio fixture, no GPU or real microphone; tool_called is only model proposal, not physical execution"
+  },
+  "logs": {
+    "ci185-job-130096887846.log": {
+      "sha256": "c4e3e588d3e5d4caa4f2b00e35972dcb2fdfba3be2331b718a247df13d03a5a2",
+      "bytes": 892993,
+      "kind": "GitHub decoded UTF8, CRLF normalized LF"
+    },
+    "ci185-job-130096888174.log": {
+      "sha256": "7b5f0dfaf29716ef0ee9a93253a5b09d1f46cf192bd597b6bd8fee3d0d494478",
+      "bytes": 116536,
+      "kind": "GitHub decoded UTF8, CRLF normalized LF"
+    },
+    "ci185-job-130097740157.log": {
+      "sha256": "3ce30f3db79584997949803bb880ee7bf1273a82ce37c026725aed9a9783ac39",
+      "bytes": 91887,
+      "kind": "GitHub decoded UTF8, CRLF normalized LF"
+    },
+    "ci185-job-130096888015.log": {
+      "sha256": "741de7096ef4a5ad68a083222c7ee2a47269ee2527c3d0969ea7ed2ce9ba0ef7",
+      "bytes": 893959,
+      "kind": "GitHub decoded UTF8, CRLF normalized LF"
+    },
+    "ci185-job-130097740092.log": {
+      "sha256": "6e7c9cfeaf6bec4c0b42b3f5b19098b41cb0307dc3f2c4381b6893d21cf9fed0",
+      "bytes": 92550,
+      "kind": "GitHub decoded UTF8, CRLF normalized LF"
+    },
+    "ci185-job-130096888232.log": {
+      "sha256": "051bb4c083e22850eb5e926f7002b71686fdab3325de841b54d34fe686249a3b",
+      "bytes": 102216,
+      "kind": "GitHub decoded UTF8, CRLF normalized LF"
+    },
+    "ci185-job-130096888230.log": {
+      "sha256": "931f6486f6ee989b95289007080358b41693e4e1254042c4cca708c8de087cfb",
+      "bytes": 142162,
+      "kind": "GitHub decoded UTF8, CRLF normalized LF"
+    },
+    "ci185-job-130097739965.log": {
+      "sha256": "8db0f81fe54472c87b7d9c91dabd70394d4f6e965cb85563e4e73b47b404cb41",
+      "bytes": 92956,
+      "kind": "GitHub decoded UTF8, CRLF normalized LF"
+    },
+    "ci185-job-130096887166.log": {
+      "sha256": "9c6d63674db8e0b1a095b392d3293de122dead6553ff149428259cb97ac6a51c",
+      "bytes": 128219,
+      "kind": "GitHub decoded UTF8, CRLF normalized LF"
+    }
+  }
+}

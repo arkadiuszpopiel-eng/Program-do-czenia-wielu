@@ -4,6 +4,7 @@
 //! urządzenia, tłumienie szumu i wykrywanie mowy na żywych ramkach. Nic nie jest odtwarzane
 //! (czat testowy nie odpowiada) i nic nie jest zapisywane — test czyta tylko poziom sygnału.
 
+#![cfg(windows)]
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
 use std::io::Write as _;

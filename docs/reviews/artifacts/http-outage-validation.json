@@ -1,0 +1,65 @@
+{
+  "base": "9d2b35fa69b1be475a8a5b23269cbf6039a0603e",
+  "platform": "Cloud Linux; local syntheticHTTP server, not proof of external Windows availability",
+  "red": {
+    "passed": 3,
+    "failed": 1,
+    "ignored": 0,
+    "duration_s": 0.09,
+    "failed_case": "http_504_cooldown_preserves_range_and_verified_bytes",
+    "error": "Network HTTP504 before server cooldown expires"
+  },
+  "green_new_cases": {
+    "passed": 4,
+    "failed": 0,
+    "duration_s": 1.83
+  },
+  "all_app_models_default_features": {
+    "passed": 82,
+    "failed": 0,
+    "ignored": 1,
+    "target_results": 16,
+    "command": "cargo +1.94.1 test --locked -p app-models -j2"
+  },
+  "clippy": {
+    "command": "cargo +1.94.1 clippy --locked -p app-models --all-targets -j2 -- -D warnings",
+    "warnings": 0,
+    "exit": 0,
+    "duration": "1m38s"
+  },
+  "unchanged": {
+    "MAX_RESUMES": 3,
+    "maximum_requests": 4,
+    "connect_timeout_seconds": 15,
+    "read_timeout_seconds": 30,
+    "pins_urls_and_hashes": true,
+    "evals_policies_and_versions": true
+  },
+  "added_waits_ms": [
+    250,
+    500,
+    1000
+  ],
+  "cases": [
+    "HTTP504 timed recovery with existing Range and completeSHA256",
+    "persistent504 exactly4requests, unchangedpartial and no targetfile",
+    "429 cancellation during waiting, no nextrequest",
+    "404 one request andRejected"
+  ],
+  "source_blobs": {
+    "crates/app-models/src/fetch.rs": "649fd88974e15cef47257ec12332da3f61b3c0ef",
+    "crates/app-models/tests/common/http.rs": "8aa5b63a8ea86666e847914af460d6bc79da3968",
+    "crates/app-models/tests/http_outage.rs": "1268e4cba68cc8fc2dc5de1a3126854fa3504649"
+  },
+  "log_sha256": {
+    "http-outage-red.log": "d33fbc65ca9897915d5a06a16d4a43c0aaa20957c9f4a2b671c2b4f0de229562",
+    "http-outage-green-models.log": "82c3170d9274b2509ec33645ec9f6bde37015713afa79e5af64a7515f667c127",
+    "http-outage-clippy.log": "3a7197ccfd65f379032fe1aa7df8279dbf894587c385fc69d34640d43d9d74ce"
+  },
+  "external_control": {
+    "rehearsal86_run": 42586480249,
+    "source": "9d2b35fa before this fix",
+    "result": "1passed0failed2filtered280.50s; STT WER0/37198ms/RTF16.17",
+    "meaning": "Intermittent upstream recovered; does not demonstrate causality of new backoff"
+  }
+}

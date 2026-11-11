@@ -15,3 +15,13 @@ z tego samego silnika bez zależności od cudzego `-impl` (`scripts/check-deps.s
 | konfiguracja | `HttpConfig`, `AuthScheme`, `Timeouts`, `RetryPolicy`, `ProviderProfile`, `ConfigError` (re-eksportowane przez `providers-api-impl` bez zmian API) |
 
 Zależności: `providers-contract` + `reqwest 0.12.28` (rustls/ring), `tokio`, `serde_json` (wersje jak w `providers-api-impl`).
+
+`WireCodec::content_timeouts()` domyślnie zwraca false: dotychczasowe API nadal mierzą
+aktywność transportu. Lokalny `LlamaCodec` wybiera true: first-token/idle odnoszą się do
+niepustej generacji SSE. TTFT/after_output nadal wynikają ze zdekodowanej treści.
+Pingi, Started, Usage i puste delty nie zmieniają deadline ani TTFT.
+`event_progress()` pozwala lokalnemu kodekowi wskazać niepuste delty generacji przed
+buforującą kopertą narzędzia. Ten sygnał zmienia wyłącznie zegar generacji: TTFT/after_output
+pozostają oparte na zdekodowanym wyjściu, a gotowe argumenty nadal wymagają walidacji.
+Domyślne None zachowuje regułę dekodera; domyślny content_timeouts=false zachowuje API.
+Wartości budżetów pozostają konfiguracją wywołującego, bez nowych progów lub retries.

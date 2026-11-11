@@ -1,0 +1,86 @@
+{
+  "issue": 48,
+  "source": "974ae45e app-core manual-test binary897e96078a16e4ca; production unchanged through12d44af4",
+  "started_utc": "2026-11-09T05:00:05.165480+00:00",
+  "finished_utc": "2026-11-09T05:03:56.432875+00:00",
+  "direct_replay_identical_to_app_texts": 45,
+  "text_differences": [
+    {
+      "index": 40,
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 1,
+      "app": "Luna, jestem gotowa do rozmowy i pomocy.",
+      "direct": "Luna, jestem gotowa do pomocy."
+    },
+    {
+      "index": 41,
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 2,
+      "app": "Luna, jestem gotowa do rozmowy i pomocy.",
+      "direct": "Luna, jestem gotowa do pomocy."
+    },
+    {
+      "index": 42,
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 3,
+      "app": "Luna, jestem gotowa do rozmowy i pomocy.",
+      "direct": "Luna, jestem gotowa do pomocy."
+    },
+    {
+      "index": 43,
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 4,
+      "app": "Luna, jestem gotowa do rozmowy i pomocy.",
+      "direct": "Luna, jestem gotowa do pomocy."
+    },
+    {
+      "index": 44,
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 5,
+      "app": "Luna, jestem gotowa do rozmowy i pomocy.",
+      "direct": "Luna, jestem gotowa do pomocy."
+    }
+  ],
+  "requests_captured": 50,
+  "luna_system_identical_wire_router_prior_real": 10,
+  "templates_full_system_and_user_preserved": 2,
+  "fake_transport_tests": [
+    "all_personas_on_local_model:40/40",
+    "custom_persona_on_local_model_after_catalog_restart:10/10"
+  ],
+  "direct_replay": {
+    "completed": 50,
+    "finish_stop": 50,
+    "jarvis_correct_name": 25,
+    "jarvis_one_sentence": 0,
+    "standard_beta_gama_name_errors": 10
+  },
+  "limitations": [
+    "Different server history: Luna follows40 built-in turns, original Luna started separate server; no attribution of5 textual differences to decoder.",
+    "Template assertions coverLuna2profiles, not all10 distinct prompts.",
+    "Captured50 bodies are from fake transport, replay50 is direct real-model HTTP, not second end-to-end app run."
+  ],
+  "files": {
+    "requests.jsonl": {
+      "bytes": 152885,
+      "sha256": "b0ea84e5410aea5e91dda4ddb5de5e8d91afe7f72426ff50ca684382d34cb283"
+    },
+    "direct-results.json": {
+      "bytes": 25648,
+      "sha256": "bfac399a787cf82660ec4659417bffb97cbc02fb8cedcceb4308e4f1391eb37a"
+    },
+    "templates.json": {
+      "bytes": 5286,
+      "sha256": "470b5e56710dbe344c98cd9dcea14558a793db372ed6d4cb3c7db8a7e78512b0"
+    },
+    "replay.py": {
+      "bytes": 6206,
+      "sha256": "55e9aec8bd2cb15a6fe9db3108f1db3aa467cd0aa6e3cc92dd24b0a87e82e3bb"
+    }
+  }
+}

@@ -93,11 +93,11 @@
     </div>
     {#if !wizard}
       <div class="head-actions">
-        <Button variant="secondary" disabled={importing} onclick={() => void importEnv()}>
+        <Button variant="secondary" wrap disabled={importing} onclick={() => void importEnv()}>
           {#snippet icon()}<Download size={14} strokeWidth={1.5} />{/snippet}
           {t('env.button')}
         </Button>
-        <Button variant="primary" onclick={() => (wizard = true)}>
+        <Button variant="primary" wrap onclick={() => (wizard = true)}>
           {#snippet icon()}<Plus size={14} strokeWidth={1.5} />{/snippet}
           {t('hub.add')}
         </Button>
@@ -155,6 +155,8 @@
 
 <style>
   .head-actions {
+    min-width: 0;
+    max-width: 100%;
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;

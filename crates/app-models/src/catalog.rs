@@ -243,6 +243,12 @@ pub fn note(pl: &str, en: &str) -> LocalizedText {
 /// Katalog produkcyjny: modele GGUF z manifestu `providers-local`, embeddery z `lib_embed::CATALOG`
 /// i pozycje głosu/sidecarów z [`crate::data`].
 pub fn builtin() -> Vec<ItemSpec> {
+    builtin_for(Target::host())
+}
+
+/// Katalog dla jawnej platformy (np. fixture'y Windows generowane w Cloud Linux).
+/// Nieznana platforma otrzymuje tylko pozycje przenośne, jak nieznany host w `builtin`.
+pub fn builtin_for(host: Option<Target>) -> Vec<ItemSpec> {
     let mut out = Vec::new();
     match providers_local_impl::builtin_models() {
         Ok(models) => out.extend(models.iter().map(|m| ItemSpec {
@@ -264,17 +270,14 @@ pub fn builtin() -> Vec<ItemSpec> {
             // hasha (Bielik: Regulamin bielik.ai i licencja modelu bazowego czekają na właściciela).
             confirmed: false,
             targets: Vec::new(),
-            note: note(
-                "Lokalny model rozmowy (llama.cpp). Wymaga sidecara llama-server.",
-                "Local chat model (llama.cpp). Requires the llama-server sidecar.",
-            ),
+            note: crate::main_profile::model_note(&m.id),
         })),
         Err(e) => tracing::warn!(error = %e, "manifest modeli lokalnych niepoprawny — pomijam"),
     }
+    out.sort_by_key(|s| u8::from(s.id != providers_local_impl::MAIN_MODEL));
     out.extend(lib_embed::CATALOG.iter().map(embed_item));
-    out.extend(crate::data::voice_and_sidecars());
+    out.extend(crate::data::voice_and_sidecars_for(host));
     // Binarki zbudowane pod inny system albo procesor nie trafiają do katalogu (B.6).
-    let host = Target::host();
     out.retain(|i| i.runs_on(host));
     out
 }

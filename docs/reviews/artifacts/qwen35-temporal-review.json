@@ -1,0 +1,46 @@
+{
+  "hypothesis": {
+    "hypothesis": "Currentproject target_selectedfalse isbeingusedtoclaimnopastexecutions, despiteDone1. Onecontexttemporalclarificationwithoutreadyanswers; retainall3previousresults. Ifstillfails, reject anddo not keepmutatingpromptagainst3cases.",
+    "model": "same9B",
+    "cases": "same3fullmergedSystem",
+    "budgets_unchanged": "96/temp0/8192/CPU4/60–30–120",
+    "scope": "rawdiagnosticonly, notproductionfix",
+    "script_sha256": "f7f195838908d4806bdd7aa8045fb72bf4cc39e77de71225dbe2d71f05b55392",
+    "declared_at": "2026-11-10T23:40:18.909213+00:00"
+  },
+  "ledger_fidelity": [
+    true,
+    false,
+    true
+  ],
+  "unsupported_extra_cause": [
+    true,
+    false,
+    false
+  ],
+  "summary": {
+    "transport_responses": 3,
+    "transport_errors": 0,
+    "truncations": 0,
+    "ledger_fidelity_pass": 2,
+    "ledger_fidelity_fail": 1,
+    "unsupported_extra_causes": 1,
+    "http_visible60_pass": 2,
+    "http_visible60_fail": 1,
+    "first_visible_ms": [
+      65601,
+      28917,
+      28115
+    ],
+    "elapsed_ms": [
+      84311,
+      96694,
+      42856
+    ],
+    "fully_grounded_answers": 1
+  },
+  "decision": "REJECTED_NO_PRODUCTION_PROMPTCHANGE_NO_MORE_FITTING_THESE3CASES",
+  "timing_limitations": "raw client accepts transportpings; visible65601>60000 failsindicator. recorded_done has41266ms gapbetweenchunkslargerthan3bytes; payloadsnotretained, notexactdecoded-idlemeasurement. Rawtransportcompletiondoesnotproveproduction60/30acceptance.",
+  "own_server_exit": 0,
+  "reviewed_at": "2026-11-10T23:45:52.960777+00:00"
+}

@@ -1,0 +1,157 @@
+{
+  "updated_utc": "2026-11-10T01:54:13.086174+00:00",
+  "issue": 61,
+  "published_base": "74f0991477300ee7a33281dcc89610e4dcef1c01",
+  "parent_local": "38306b39c008101f0526aa81d7fb4adb30963cd4",
+  "RED": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "tools-net-impl",
+      "--test",
+      "search_results",
+      "-j2"
+    ],
+    "exit": 101,
+    "started_utc": "2026-11-10T01:49:07.902270+00:00",
+    "finished_utc": "2026-11-10T01:49:27.123385+00:00"
+  },
+  "RED_results": [
+    12,
+    2,
+    0
+  ],
+  "GREEN_results": [
+    47,
+    0,
+    0
+  ],
+  "target_results": 11,
+  "new_tests": 3,
+  "new_variants": 7,
+  "combined_new_tests59_60_61": 12,
+  "checks": [
+    {
+      "name": "green-full",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "tools-net-contract",
+        "-p",
+        "tools-net-impl",
+        "-p",
+        "tools-net-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T01:51:22.162479+00:00",
+      "finished_utc": "2026-11-10T01:51:29.962201+00:00",
+      "log_sha256": "0b168a7292418d4f6b0935aa65236cc1b69965d3afa3ba2a17ec1091080a1af6"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "tools-net-contract",
+        "-p",
+        "tools-net-impl",
+        "-p",
+        "tools-net-fake",
+        "--all-features",
+        "--all-targets",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T01:51:29.963506+00:00",
+      "finished_utc": "2026-11-10T01:51:46.914700+00:00",
+      "log_sha256": "c40ff17b803889a90bd4ff963c3923204c4f3e6d5a45083832d12dc2cde0ae4e"
+    },
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T01:51:46.915903+00:00",
+      "finished_utc": "2026-11-10T01:51:55.774342+00:00",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "lint": {
+    "command": [
+      "pnpm",
+      "lint"
+    ],
+    "exit": 0,
+    "started_utc": "2026-11-10T01:51:45.544036+00:00",
+    "finished_utc": "2026-11-10T01:52:13.428837+00:00",
+    "log_sha256": "f003d142e3db211b4858090fdbc6cc60102f1efe6a3a38a34afff6b5474460c8"
+  },
+  "source_sha256": {
+    "crates/tools-net-impl/src/search_results.rs": "60e4101741a42920755d699386e5375df45f40c307a7376c88f048922d08dd46",
+    "crates/tools-net-impl/tests/search_results.rs": "967c9d5fd0728acce9f4efaa93c3e3d69ebf98efcdd7c37dc7390f78c4537852",
+    "docs/modules/tools-net/SPEC.md": "d07a210f74560556888021ee19faccba4ce06d589f1f632dc796980ef9a01775"
+  },
+  "logs": {
+    "red.log": {
+      "bytes": 4284,
+      "sha256": "b09ffa042188083f4f26340f571d1dbdaea261a000f39de314627b7318053621"
+    },
+    "green-full.log": {
+      "bytes": 5199,
+      "sha256": "0b168a7292418d4f6b0935aa65236cc1b69965d3afa3ba2a17ec1091080a1af6"
+    },
+    "clippy.log": {
+      "bytes": 2009,
+      "sha256": "c40ff17b803889a90bd4ff963c3923204c4f3e6d5a45083832d12dc2cde0ae4e"
+    },
+    "fmt.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "lint.log": {
+      "bytes": 408,
+      "sha256": "f003d142e3db211b4858090fdbc6cc60102f1efe6a3a38a34afff6b5474460c8"
+    },
+    "docs-generate.log": {
+      "bytes": 48,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs-check.log": {
+      "bytes": 48,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs-verify.log": {
+      "bytes": 59,
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    }
+  },
+  "scope": "Decodedquerypairs projectedwithunchangeddetector;onelevelonly;no globalpolicy/dependency/evalchanges;fakeSearchPort/Brokerharness;notliveAPI/hardware",
+  "publication_gate": "CI173/Windows95completed successbeforefeatureupdate;newheadCIandindependentreviewrequired",
+  "docs": {
+    "pages": 102,
+    "problems": 0,
+    "generate_exit": 0,
+    "check_exit": 0,
+    "verify_exit": 0
+  }
+}

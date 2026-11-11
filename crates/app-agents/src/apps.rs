@@ -27,7 +27,7 @@ pub struct AppsDeps {
 }
 
 /// Porty narzędzi podmieniane w testach rdzenia (`None` — porty systemowe): aplikacje
-/// i system/sieć oraz silnik gier. Przegląd narzędzi (`app-core/tests/tool_sweep*.rs`) wywołuje
+/// i system/sieć, OCR oraz silnik gier. Przegląd narzędzi (`app-core/tests/tool_sweep*.rs`) wywołuje
 /// każde narzędzie na atrapach — nic nie sięga do pulpitu, sieci ani Kosza właściciela.
 #[derive(Clone, Default)]
 pub struct PortOverrides {
@@ -35,6 +35,8 @@ pub struct PortOverrides {
     pub apps: Option<AppsDeps>,
     /// Silnik gier NextGO.Gray.
     pub engine: Option<Arc<dyn tools_engine_contract::EnginePort>>,
+    /// Rozpoznawanie tekstu (domyślnie port Windows).
+    pub ocr: Option<Arc<dyn tools_vision_contract::OcrPort>>,
 }
 
 impl PortOverrides {

@@ -1,0 +1,408 @@
+{
+  "scope": "author review of exact synthetic identity/no-actions question only; not general quality or physical execution",
+  "source_sha256": "a5ad7669d88fe5cddfa2efda1dfbecbae880ac5551a10fe39965c8236c6a6431",
+  "passed": 40,
+  "total": 40,
+  "rows": [
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Nie, jeszcze nie — czekałam na Twoje polecenie, by zacząć pracę.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Nie, jeszcze nie — czekałam na Twoje polecenie, by uruchomić narzędzia lub sprawdzić pliki.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Nie, jeszcze nie — czekałam na Twoje polecenie, by uruchomić narzędzia lub sprawdzić pliki.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Nie, jeszcze nie — czekałam na Twoje polecenie, by uruchomić narzędzia lub sprawdzić pliki.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Nie, jeszcze nie — czekałam na Twoje polecenie, by uruchomić narzędzia lub sprawdzić pliki.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Nie, jeszcze nie — czekam na Twoje polecenie, by uruchomić narzędzia lub sprawdzić pliki.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Nie, nie uruchomiłam narzędzi ani nie sprawdziłam plików — czekam na Twoje polecenie.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Nie, jeszcze nie — czekam na Twoje polecenie, by uruchomić narzędzia lub sprawdzić pliki.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Nie, nie uruchomiłam narzędzi ani nie sprawdziłam plików — czekam na Twoje polecenie.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Nie, jeszcze nie — czekam na Twoje polecenie, by uruchomić narzędzia lub sprawdzić pliki.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Nie, nie uruchomiłam narzędzi ani nie sprawdziłam plików — czekam na Twoje polecenie.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Nie, jeszcze nie — czekam na Twoje polecenie, by uruchomić narzędzia lub sprawdzić pliki.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Nie, nie uruchomiłam narzędzi ani nie sprawdziłam plików — czekam na Twoje polecenie.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Nie, jeszcze nie — czekam na Twoje polecenie, by uruchomić narzędzia lub sprawdzić pliki.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Nie, w tej rozmowie nie uruchomiłam narzędzi ani nie sprawdziłam plików.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Nie, nie uruchomiłam narzędzi ani nie sprawdziłam plików — czekam na Twoje polecenie.",
+      "error": null,
+      "truncated": false,
+      "transport": true,
+      "semantic": true
+    }
+  ]
+}

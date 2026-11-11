@@ -327,34 +327,8 @@ pub(crate) fn undo_failure(e: &UndoError, action: &str) -> ToolOutcome {
 }
 
 #[cfg(test)]
-mod same_entry_tests {
-    use super::*;
-
-    /// `fs_stat` zwracał rozmiar 0, gdy model podał ścieżkę z `/` i inną wielkością liter niż na dysku.
-    #[test]
-    fn separators_and_case_do_not_matter_when_matching_a_listed_entry() {
-        let listed = Path::new(r"C:\Dane\docs").join("readme.md");
-        assert!(same_ignoring_case(
-            &listed,
-            Path::new(r"C:\Dane\DOCS\README.MD")
-        ));
-        if cfg!(windows) {
-            assert!(same_ignoring_case(
-                &listed,
-                Path::new("C:/Dane/docs/README.MD")
-            ));
-            assert!(same_entry(&listed, Path::new("c:/dane/docs/Readme.md")));
-        }
-        assert!(!same_ignoring_case(
-            &listed,
-            Path::new(r"C:\Dane\docs\readme.txt")
-        ));
-        assert!(!same_ignoring_case(
-            &listed,
-            Path::new(r"C:\Dane\readme.md")
-        ));
-    }
-}
+#[path = "core_entry_tests.rs"]
+mod same_entry_tests;
 
 #[cfg(test)]
 mod shown_tests {

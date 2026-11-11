@@ -1,7 +1,7 @@
 //! S-05 (docs/reviews/2026-10-08-tools-shell-clipboard-net-review.md) na prawdziwych procesach:
 //! polecenie złożone tak jak w `shell_run` (`ShellToolsConfig::invocation`) i uruchomione przez
 //! prawdziwy `ExecPort` oddaje polskie znaki w UTF-8. Bez przedrostka kodowania Windows PowerShell
-//! i `cmd.exe` piszą do potoku w stronie kodowej OEM (CP852) i model dostawał znaki zastępcze.
+//! i `cmd.exe` piszą do potoku w stronie kodowej OEM systemu i model dostawał znaki zastępcze.
 //! PowerShell dostaje przedrostek kodowania; wyjście `cmd.exe` dekoduje warstwa platformy.
 
 #![cfg(windows)]
@@ -59,12 +59,61 @@ fn windows_powershell_output_keeps_polish_characters() {
     assert_eq!(out.trim(), TEXT);
 }
 
-/// `cmd.exe` pisze w stronie kodowej OEM — tekst odzyskuje `ExecPort::decode_output` (to, czego
-/// używa `shell_run`), bez zmiany samego polecenia.
+/// Konfiguracja OEM i koder .NET tworzą dane emitera niezależnie od dekodera `ExecPort`.
+/// Port PowerShell jest już używany przez ten test; kod Rust zachowuje zakaz `unsafe`.
+fn oem_fixture() -> (u32, String, Vec<u8>) {
+    let report = run(
+        ShellKind::Powershell,
+        r#"
+$cp = [int][Microsoft.Win32.Registry]::GetValue('HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Nls\CodePage', 'OEMCP', $null)
+if ($cp -le 0) { throw 'Brak konfiguracji OEM' }
+$enc = [Text.Encoding]::GetEncoding($cp, [Text.EncoderExceptionFallback]::new(), [Text.DecoderExceptionFallback]::new())
+$strictUtf8 = [Text.UTF8Encoding]::new($false, $true)
+foreach ($text in @('zażółć gęślą jaźń', 'é', 'ü', 'Ж', 'Ω', 'א', 'ا', 'ก', 'あ', '中', '한')) {
+    try { $encoded = $enc.GetBytes($text) } catch [Text.EncoderFallbackException] { continue }
+    $isUtf8 = $true
+    try { $null = $strictUtf8.GetString($encoded) } catch [Text.DecoderFallbackException] { $isUtf8 = $false }
+    if ($cp -ne 65001 -and $isUtf8) { continue }
+    [Console]::WriteLine($cp)
+    [Console]::WriteLine([BitConverter]::ToString([Text.Encoding]::UTF8.GetBytes($text)).Replace('-', ''))
+    [Console]::WriteLine([BitConverter]::ToString($encoded).Replace('-', ''))
+    return
+}
+throw 'Brak reprezentowalnego znaku spoza ASCII dla OEM'
+"#,
+    );
+    let mut lines = report.lines().filter(|line| !line.trim().is_empty());
+    let cp = lines
+        .next()
+        .expect("strona OEM")
+        .trim()
+        .parse()
+        .expect("numer OEM");
+    let text = String::from_utf8(unhex(lines.next().expect("tekst UTF-8"))).expect("tekst fixture");
+    let encoded = unhex(lines.next().expect("bajty OEM"));
+    assert!(
+        lines.next().is_none(),
+        "nieoczekiwane dodatkowe dane fixture"
+    );
+    assert!(!encoded.is_empty());
+    (cp, text, encoded)
+}
+
+fn unhex(text: &str) -> Vec<u8> {
+    let text = text.trim();
+    assert!(text.len().is_multiple_of(2));
+    text.as_bytes()
+        .chunks_exact(2)
+        .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+        .collect()
+}
+
+/// `cmd.exe` emituje znaki reprezentowalne w OEM, a `ExecPort` odzyskuje oryginalny tekst.
 #[test]
 fn cmd_output_is_decoded_from_the_oem_code_page() {
+    let (cp, expected, encoded) = oem_fixture();
     let (program, args, raw_args) =
-        ShellToolsConfig::default().invocation(ShellKind::Cmd, &format!("echo {TEXT}"));
+        ShellToolsConfig::default().invocation(ShellKind::Cmd, &format!("echo {expected}"));
     let spec = ExecSpec {
         process: ProcessSpec {
             cmd: PathBuf::from(program),
@@ -83,9 +132,16 @@ fn cmd_output_is_decoded_from_the_oem_code_page() {
         .run_captured(spec, &ExecControl::new())
         .expect("start cmd");
     assert!(matches!(out.termination, ExecTermination::Exited(0)));
-    assert!(
-        String::from_utf8(out.stdout.clone()).is_err(),
-        "cmd zaczął pisać UTF-8 — dekodowanie OEM przestało być potrzebne"
+    assert_eq!(
+        out.stdout.trim_ascii(),
+        encoded.as_slice(),
+        "emiter OEM{cp}"
     );
-    assert_eq!(exec.decode_output(&out.stdout).trim(), TEXT);
+    if cp != 65001 {
+        assert!(
+            String::from_utf8(out.stdout.clone()).is_err(),
+            "wejście OEM{cp} ma wymagać dekodowania OEM"
+        );
+    }
+    assert_eq!(exec.decode_output(&out.stdout).trim(), expected);
 }

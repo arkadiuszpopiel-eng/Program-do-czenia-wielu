@@ -55,6 +55,39 @@ impl LlamaCodec {
 impl WireCodec for LlamaCodec {
     type Decoder = EnvelopeGuard<LeakGuard<ChatDecoder>>;
 
+    fn content_timeouts(&self) -> bool {
+        true
+    }
+
+    fn event_progress(&self, event: &lib_openai_compat::sse::SseEvent) -> Option<bool> {
+        let Ok(value) = serde_json::from_str::<serde_json::Value>(&event.data) else {
+            return Some(false);
+        };
+        Some(value["choices"].as_array().is_some_and(|choices| {
+            choices.iter().any(|choice| {
+                let delta = &choice["delta"];
+                ["content", "reasoning_content", "reasoning", "refusal"]
+                    .iter()
+                    .any(|key| {
+                        delta
+                            .get(*key)
+                            .and_then(serde_json::Value::as_str)
+                            .is_some_and(|text| !text.is_empty())
+                    })
+                    || delta["tool_calls"].as_array().is_some_and(|calls| {
+                        calls.iter().any(|call| {
+                            ["name", "arguments"].iter().any(|key| {
+                                call["function"]
+                                    .get(*key)
+                                    .and_then(serde_json::Value::as_str)
+                                    .is_some_and(|text| !text.is_empty())
+                            })
+                        })
+                    })
+            })
+        }))
+    }
+
     fn build(&self, req: &ChatRequest, _opts: BuildOptions) -> Result<WireRequest, ProviderError> {
         let options = ChatOptions {
             max_tokens_field: MaxTokensField::MaxTokens,

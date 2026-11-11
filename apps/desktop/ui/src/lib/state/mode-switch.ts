@@ -23,16 +23,14 @@ export interface ModeView {
   readonly scoped?: boolean;
 }
 
-export function modeView(app: AppState): ModeView {
+export function modeView(app: AppState, scope: 'global' | 'session' = 'global'): ModeView {
   const session = app.sessions.active;
   const planning = session?.autonomy === 'L0';
   const here = app.autonomy.openHere(session?.id);
-  const current: AutonomyLevel = planning
-    ? 'L0'
-    : here && session
-      ? session.autonomy
-      : (app.autonomy.global ?? session?.autonomy ?? 'L3');
-  return { current, sessionId: session?.id ?? null, planning, here };
+  const scoped = planning || here || (scope === 'session' && Boolean(session));
+  const current: AutonomyLevel =
+    scoped && session ? session.autonomy : (app.autonomy.global ?? session?.autonomy ?? 'L3');
+  return { current, sessionId: session?.id ?? null, planning, here, scoped };
 }
 
 /**
@@ -52,9 +50,11 @@ export function behindLock(app: AppState, view: ModeView, level: AutonomyLevel):
   return app.autonomy.locked && !view.here && level > 'L1';
 }
 
-/** Następny tryb skrótu; przy kłódce tylko Plan ↔ Ręcznie. */
+/** Następny tryb skrótu; Plan wymaga rozmowy, przy kłódce tylko Plan ↔ Ręcznie. */
 export function nextMode(app: AppState, view: ModeView): AutonomyLevel {
-  const cycle = MODE_CYCLE.filter((l) => !behindLock(app, view, l));
+  const cycle = MODE_CYCLE.filter(
+    (l) => !behindLock(app, view, l) && (l !== 'L0' || Boolean(view.sessionId)),
+  );
   const at = cycle.indexOf(view.current);
   return cycle[(at + 1) % cycle.length] ?? 'L1';
 }
@@ -94,6 +94,10 @@ export async function switchMode(
   view: ModeView,
   level: AutonomyLevel,
 ): Promise<void> {
+  if (level === 'L0' && !view.sessionId) {
+    app.toasts.show({ kind: 'info', message: app.i18n.t('mode.needsSession') });
+    return;
+  }
   if (behindLock(app, view, level)) {
     app.toasts.show({ kind: 'info', message: app.i18n.t('child.lockedNote') });
     return;

@@ -1,0 +1,32 @@
+
+Running 1 test using 1 worker
+
+(node:22267) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22267) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › e2e/cockpit-systems.spec.ts:3:1 › mapa i systemy otwierają się z kokpitu bez zmiany trybu zgód (1.0m)
+
+
+  1) [chromium] › e2e/cockpit-systems.spec.ts:3:1 › mapa i systemy otwierają się z kokpitu bez zmiany trybu zgód
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: 'Mapa i systemy', exact: true })[22m
+
+
+       8 |   await page.getByRole('button', { name: 'Włącz kokpit Jarvis', exact: true }).click();
+       9 |   const launch = page.getByRole('button', { name: 'Mapa i systemy', exact: true });
+    > 10 |   await launch.click();
+         |                ^
+      11 |   const dialog = page.getByRole('dialog', { name: 'Mapa i systemy', exact: true });
+      12 |   await expect(dialog).toBeVisible();
+      13 |   await expect(dialog.getByText('Mapa offline · Natural Earth', { exact: true })).toBeVisible();
+        at /workspace/wt-jarvis/apps/desktop/ui/e2e/cockpit-systems.spec.ts:10:16
+
+    Error Context: test-results/cockpit-systems-mapa-i-sys-edd33-kpitu-bez-zmiany-trybu-zgód-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/cockpit-systems.spec.ts:3:1 › mapa i systemy otwierają się z kokpitu bez zmiany trybu zgód

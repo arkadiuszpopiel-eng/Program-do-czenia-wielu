@@ -80,6 +80,8 @@ export const enBuilder: Record<keyof typeof plBuilder, Message> = {
   'builder.group.web': 'web',
   'builder.group.browser': 'browser',
   'builder.group.mcp': 'MCP servers',
+  'builder.group.system': 'system tools',
+  'builder.group.vision': 'image analysis',
   'builder.group.memory': 'memory',
   'health.title': 'System health',
   'health.intro':

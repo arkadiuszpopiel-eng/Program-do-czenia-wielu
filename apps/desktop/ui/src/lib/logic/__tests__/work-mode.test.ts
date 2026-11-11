@@ -2,6 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AutonomyLevel } from '../../api/types';
 import { modeItems, requestMode, stopModeWatch } from '../work-mode';
 
+function deferred<T>() {
+  let resolve: (value: T) => void = () => undefined;
+  const promise = new Promise<T>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+}
+
 describe('tryb pracy z paska tytułu', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -61,5 +69,39 @@ describe('tryb pracy z paska tytułu', () => {
     global = 'L4';
     await vi.advanceTimersByTimeAsync(10_000);
     expect(notify).not.toHaveBeenCalledWith('raised', 'L4');
+  });
+
+  it('spóźniona odpowiedź starej prośby nie zastępuje nowszego trybu', async () => {
+    const old = deferred<{ status: 'opened_broker'; request_id: string }>();
+    const notify = vi.fn();
+    const first = requestMode('L4', {
+      request: () => old.promise,
+      readGlobal: () => Promise.resolve('L4'),
+      notify,
+    });
+    await requestMode('L1', {
+      request: () => Promise.resolve({ status: 'applied', request_id: '' }),
+      readGlobal: () => Promise.resolve('L1'),
+      notify,
+    });
+    old.resolve({ status: 'opened_broker', request_id: 'old' });
+    await first;
+    await vi.advanceTimersByTimeAsync(4_000);
+    expect(notify.mock.calls).toEqual([['applied', 'L1']]);
+  });
+
+  it('opuszczenie widoku unieważnia również żądanie, które jeszcze nie wróciło', async () => {
+    const pending = deferred<{ status: 'opened_broker'; request_id: string }>();
+    const notify = vi.fn();
+    const first = requestMode('L3', {
+      request: () => pending.promise,
+      readGlobal: () => Promise.resolve('L3'),
+      notify,
+    });
+    stopModeWatch();
+    pending.resolve({ status: 'opened_broker', request_id: 'late' });
+    await first;
+    await vi.advanceTimersByTimeAsync(4_000);
+    expect(notify).not.toHaveBeenCalled();
   });
 });

@@ -1,5 +1,4 @@
-//! Części kompozycji: jądro (sekrety, katalog, konfiguracja, logi, zdarzenia, sprzęt) i budowa
-//! poszczególnych modułów wywoływana w kolejności z rejestru (`compose.rs`).
+//! Jądro i moduły kompozycji budowane w kolejności rejestru (`compose.rs`).
 
 mod agents;
 pub(crate) mod backup_account;
@@ -322,6 +321,7 @@ impl Built {
         );
         let provider: Arc<dyn SessionDbProvider> = sessions.clone();
         let store = Arc::new(AppStore::new(provider));
+        personas.bind_store(store.clone())?;
         let costs = need(&self.costs, "cost-meter")?;
         let chat = app_chat::ChatEngine::new(app_chat::ChatDeps {
             sessions: sessions.clone(),

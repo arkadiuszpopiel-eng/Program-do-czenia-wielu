@@ -138,12 +138,10 @@ try {
     if ($null -ne (Get-Cdp 'version')) { throw "Port $Port już odpowiada — inna przeglądarka/WebView2 z debugowaniem; zamknij ją." }
 
     Write-Host "Start: $Exe"
-    # Port inny niż domyślny = instancja testowa obok uruchomionej Alfy właściciela: własny port CDP
-    # i bez przekazywania argumentów istniejącej instancji (src-tauri/src/cdp.rs, docs/plan/24 §2.7).
-    if ($Port -ne 9222) {
-        $env:ALFA_E2E_CDP_PORT = "$Port"
-        $env:ALFA_E2E_INSTANCE = '1'
-    }
+    # Każdy przebieg harnessu jest instancją testową, także na domyślnym porcie 9222.
+    # Powłoka oznacza okno i wybiera katalog roboczy testu wyłącznie w buildzie e2e.
+    $env:ALFA_E2E_CDP_PORT = "$Port"
+    $env:ALFA_E2E_INSTANCE = '1'
     # Aplikacja dostaje środowisko bez kluczy API (import kluczy ze zmiennych nie może zrobić konta
     # z prawdziwego klucza). Zmiana dotyczy tylko uruchamianego procesu. Katalog użytkownika
     # instancji testowej ustawia sama powłoka (src-tauri/src/lib.rs) — podmiana USERPROFILE

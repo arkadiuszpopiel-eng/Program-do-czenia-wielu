@@ -13,6 +13,8 @@ Lokalny `ModelProvider` (docs/modules/providers-local/SPEC.md, ADR 0014): llama.
   (pełne odciążenie albo tyle warstw, ile mieści się po stałym narzucie 550 MB), `-c` (na GPU zmniejszany do
   4096 tylko wtedy, gdy pozwala to zmieścić model w całości), `--threads` (rdzenie fizyczne), `--alias`, `-np 1`,
   `--jinja` (modele z narzędziami).
+  Pełne odciążenie przekazuje do `-ngl` także dodatkowy poziom wyjściowy llama.cpp (np. Qwen8B: 36 bloków → 37);
+  częściowe odciążenie i CPU zachowują jawny limit. Jest to zgodność argumentów, nie pomiar CUDA/Vulkan.
 - **Pamięć**: `vram_mb`/`ram_mb` z manifestu bez KV cache + `kv_mb_per_1k_ctx` × kontekst; dzierżawa
   `model-residency` liczy VRAM i RAM dla liczby warstw na karcie (`ModelEntry::vram_for`/`ram_for`), w trakcie
   żądania jest oznaczona jako używana i odświeżana po nim (bez zwalniania co 10 min w trakcie rozmowy).

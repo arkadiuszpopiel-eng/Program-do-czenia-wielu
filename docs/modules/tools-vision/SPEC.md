@@ -53,6 +53,11 @@ Brak nowych widoków; wynik w wątku jak każde narzędzie (tekst). Pakiety jęz
 ## Fake
 `tools-vision-fake`: `FakeTools` (manifesty, walidacja, skrypt), `FakeOcr` (deterministyczny, zapis obrazów), `FakeDescriber` (reguła prywatności), `FakePrivacy`.
 
+Kompozycja `AppCore` przyjmuje opcjonalny `PortOverrides.ocr` (`OcrPort`) przez `MediaPorts::ocr`.
+Brak nadpisania pozostawia `WinOcr` z dotychczasowym limitem pikseli. Diagnostyka na atrapach
+wstrzykuje `FakeOcr` i wymaga zapisanego wywołania; zrzut, maskowanie, Broker i schemat wyniku
+przechodzą przez zwykłe `VisionTools`. Nadpisanie jest zależnością startową, bez ustawienia IPC.
+
 ## Otwarte pytania
 - Tesseract/PaddleOCR jako zapas poza Windows (PLAN §7.2) — po decyzji o modelach OCR.
 - Opis obrazu jako osobny token Brokera (`net.egress(dostawca)`) dla tras chmurowych — do decyzji człowieka.

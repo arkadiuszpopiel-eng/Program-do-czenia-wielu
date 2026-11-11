@@ -1,0 +1,1093 @@
+{
+  "base": "b4e2dbcdfd64e5379b1499f870014aa39d8a011a",
+  "local_code": "1cb8ac8da15ea8e56f5acb112c95b1c099bf1e0b",
+  "local_integration": "fabf1f0f",
+  "scope": "owner coding workflow, old schedules disabled",
+  "CI_baseline": {
+    "head": "b4e2dbcdfd64e5379b1499f870014aa39d8a011a",
+    "CI180": {
+      "run_id": 42792899943,
+      "jobs_success": 9,
+      "jobs_failure": 1
+    },
+    "Windows102": {
+      "run_id": 42792900078,
+      "jobs_success": 4,
+      "jobs_failure": 0
+    },
+    "ci180-windows-rust.log": {
+      "passed": 3592,
+      "failed": 1,
+      "ignored": 47,
+      "targets": 1135,
+      "sha256": "d2acda53f17063e7446b2cdb1c294a85897dc4d163dd3dd68d44c516cd32344a"
+    },
+    "job-129750599482.log": {
+      "passed": 3567,
+      "failed": 0,
+      "ignored": 26,
+      "targets": 1135,
+      "sha256": "f836462779c3c9ea882f39954b0f443fd3ed2d895bfc8331ccb33063acfd38c4"
+    },
+    "129751577074": {
+      "passed": [
+        "315"
+      ],
+      "skipped": [],
+      "sha256": "9ce00b741ab669d6ce55b8e02ec55e16c9123bb75d9e3a2402d7b54efbed80d9"
+    },
+    "129751577090": {
+      "passed": [
+        "315"
+      ],
+      "skipped": [],
+      "sha256": "1138b110f8b8cf22dc298154cf532ae62558a56e8f3565d2667f34bc53a784ed"
+    },
+    "129751577104": {
+      "passed": [
+        "315"
+      ],
+      "skipped": [],
+      "sha256": "14892db96c3c047292d18151ca341e51258f758c37bf97c4c5fb6acc107e85c0"
+    },
+    "129750603276": {
+      "passed": [
+        "63"
+      ],
+      "skipped": [
+        "5"
+      ],
+      "sha256": "ff862fcecf641643b3038f30b066042e687fe159319368f59538d38e4e19af59"
+    }
+  },
+  "checks": {
+    "runtime-full-checks": [
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "--locked",
+          "-p",
+          "agent-runtime-contract",
+          "-p",
+          "agent-runtime-impl",
+          "-p",
+          "agent-runtime-fake",
+          "--all-features",
+          "-j2"
+        ],
+        "start": "2026-11-10T13:20:56.119937+00:00",
+        "end": "2026-11-10T13:21:14.457940+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/runtime-full-test.log",
+        "sha256": "52778b8136f4b14e6912f993a76262d7acd32f48c75516276eab38b352b24c95"
+      },
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "clippy",
+          "--locked",
+          "-p",
+          "agent-runtime-contract",
+          "-p",
+          "agent-runtime-impl",
+          "-p",
+          "agent-runtime-fake",
+          "--all-targets",
+          "--all-features",
+          "-j2",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "start": "2026-11-10T13:21:14.459190+00:00",
+        "end": "2026-11-10T13:21:39.219000+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/runtime-full-clippy.log",
+        "sha256": "99076c4017642512e1091e8ee2e545d77fbb3ae522f737908d7f94223ecbb8f9"
+      }
+    ],
+    "terminal-privacy-final-v2": [
+      {
+        "name": "terminal-privacy-green-v2",
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "--locked",
+          "-p",
+          "ui-terminal-contract",
+          "-p",
+          "ui-terminal-impl",
+          "-p",
+          "ui-terminal-fake",
+          "--all-features",
+          "-j2"
+        ],
+        "exit": 0,
+        "started": "2026-11-10T13:00:01.562254+00:00",
+        "finished": "2026-11-10T13:00:03.080370+00:00",
+        "sha256": "7f6bf865c4ee90c6343fdd31d55eaa0feac82f7b8d0d0a4b25b7908331d2a925"
+      },
+      {
+        "name": "terminal-privacy-clippy-v2",
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "clippy",
+          "--locked",
+          "-p",
+          "ui-terminal-contract",
+          "-p",
+          "ui-terminal-impl",
+          "-p",
+          "ui-terminal-fake",
+          "--all-targets",
+          "--all-features",
+          "-j2",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit": 0,
+        "started": "2026-11-10T13:00:03.080881+00:00",
+        "finished": "2026-11-10T13:00:15.066212+00:00",
+        "sha256": "0a976b102f423a2b7558697659d85d96a07a486706417f3da5633d1e8052f7b4"
+      }
+    ],
+    "core-terminal-patch-checks": [
+      {
+        "name": "core-terminal-patch-test",
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "--locked",
+          "-p",
+          "app-core",
+          "--test",
+          "computer",
+          "-j2"
+        ],
+        "exit": 0,
+        "started": "2026-11-10T13:02:43.526977+00:00",
+        "finished": "2026-11-10T13:06:40.366900+00:00",
+        "sha256": "e407de71faf4184d690e7f4328e177b5f84e51dae1d2f7eaae2d019527412a21"
+      },
+      {
+        "name": "core-terminal-patch-clippy",
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "clippy",
+          "--locked",
+          "-p",
+          "app-core",
+          "--test",
+          "computer",
+          "-j2",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit": 0,
+        "started": "2026-11-10T13:06:40.369972+00:00",
+        "finished": "2026-11-10T13:11:18.032940+00:00",
+        "sha256": "4845b7fed88a33b66531b478a8ab4336a4d1cab6ba41e6cee2b189ee4c57696a"
+      }
+    ],
+    "shell-dev-audit-exit": {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "tools-shell-contract",
+        "-p",
+        "tools-shell-impl",
+        "-p",
+        "tools-shell-fake",
+        "-p",
+        "tools-dev-contract",
+        "-p",
+        "tools-dev-impl",
+        "-p",
+        "tools-dev-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "start": "2026-11-10T13:22:39.444849+00:00",
+      "end": "2026-11-10T13:23:12.119011+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/coding-workflow/shell-dev-audit.log",
+      "sha256": "074a2a86b7eb64833d547e4d8d410a5f3e9d6d128265c20e09840b8006f96666"
+    },
+    "observation-red-exit": {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "agent-runtime-impl",
+        "--test",
+        "observations",
+        "-j2"
+      ],
+      "exit": 101,
+      "started": "2026-11-10T13:07:58.249151+00:00",
+      "finished": "2026-11-10T13:11:44.761324+00:00",
+      "sha256": "f7769152b1476e5d4f80fdf26bf9f5b7245730a95ab5a712827021fca8fbad86"
+    },
+    "observation-green-exit": {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "agent-runtime-impl",
+        "--test",
+        "observations",
+        "--lib",
+        "-j2"
+      ],
+      "start": "2026-11-10T13:17:16.664915+00:00",
+      "end": "2026-11-10T13:17:25.427218+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/coding-workflow/observation-green.log",
+      "sha256": "741e6bc80c1214b5a6c656dffe10abd0d9d3e676a2681e122c40a6ebc14d8edc"
+    },
+    "coding-cycle-first-exit": {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "agent-runtime-impl",
+        "--test",
+        "coding_cycle",
+        "-j2"
+      ],
+      "start": "2026-11-10T13:19:12.964308+00:00",
+      "end": "2026-11-10T13:19:14.262874+00:00",
+      "exit": 101,
+      "log": "/workspace/scratch/coding-workflow/coding-cycle-first.log",
+      "sha256": "814a8cf9b1123ce50199027ed1dfa5ef6b8680cdaf6d0e6ef412d15722ca89e6"
+    },
+    "coding-cycle-green-exit": {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "agent-runtime-impl",
+        "--test",
+        "coding_cycle",
+        "-j2"
+      ],
+      "start": "2026-11-10T13:20:11.856906+00:00",
+      "end": "2026-11-10T13:20:15.440892+00:00",
+      "exit": 0,
+      "log": "/workspace/scratch/coding-workflow/coding-cycle-green.log",
+      "sha256": "9536f8270559053d07e7adf670dd93e0639a9bc895c4b74e8b88da8cfb1a63ea"
+    },
+    "runtime-personas-checks": [
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "--locked",
+          "-p",
+          "agent-runtime-contract",
+          "-p",
+          "agent-runtime-impl",
+          "-p",
+          "agent-runtime-fake",
+          "--all-features",
+          "-j2"
+        ],
+        "start": "2026-11-10T13:31:26.354627+00:00",
+        "end": "2026-11-10T13:31:34.993222+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/runtime-personas-test.log",
+        "sha256": "42f69bbbcee9854cc797270b6adfdae86b9b34fb9d14f7e53f4634068419492f"
+      },
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "clippy",
+          "--locked",
+          "-p",
+          "agent-runtime-contract",
+          "-p",
+          "agent-runtime-impl",
+          "-p",
+          "agent-runtime-fake",
+          "--all-targets",
+          "--all-features",
+          "-j2",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "start": "2026-11-10T13:31:34.993947+00:00",
+        "end": "2026-11-10T13:31:36.203112+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/runtime-personas-clippy.log",
+        "sha256": "31365d74036374395687c87ca2f46fa24ce4305445d70fd98dc38e6db2c7188a"
+      }
+    ],
+    "dev-evidence": [
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "--locked",
+          "-p",
+          "tools-dev-contract",
+          "-p",
+          "tools-dev-impl",
+          "-p",
+          "tools-dev-fake",
+          "--all-features",
+          "-j2"
+        ],
+        "start": "2026-11-10T13:36:21.812915+00:00",
+        "end": "2026-11-10T13:36:25.446223+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/dev-evidence-green.log",
+        "sha256": "c8ec1829808a2b153819b9251bc508874490d8b941e3c1453ecf6c4fb2d1441c"
+      },
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "clippy",
+          "--locked",
+          "-p",
+          "tools-dev-contract",
+          "-p",
+          "tools-dev-impl",
+          "-p",
+          "tools-dev-fake",
+          "--all-targets",
+          "--all-features",
+          "-j2",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "start": "2026-11-10T13:36:25.446982+00:00",
+        "end": "2026-11-10T13:36:40.340139+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/dev-evidence-clippy.log",
+        "sha256": "f1decb48e5bf2b2af05fc65e3abc1d40371f656941cd47bd8666586a0f3ee97d"
+      }
+    ],
+    "combined": [
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "test",
+          "--locked",
+          "-p",
+          "agent-runtime-contract",
+          "-p",
+          "agent-runtime-impl",
+          "-p",
+          "agent-runtime-fake",
+          "-p",
+          "tools-dev-contract",
+          "-p",
+          "tools-dev-impl",
+          "-p",
+          "tools-dev-fake",
+          "-p",
+          "tools-shell-contract",
+          "-p",
+          "tools-shell-impl",
+          "-p",
+          "tools-shell-fake",
+          "-p",
+          "ui-terminal-contract",
+          "-p",
+          "ui-terminal-impl",
+          "-p",
+          "ui-terminal-fake",
+          "--all-features",
+          "-j2"
+        ],
+        "start": "2026-11-10T13:37:36.126211+00:00",
+        "end": "2026-11-10T13:38:29.372270+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/combined-test.log",
+        "sha256": "354a22776a4c482db2062fece44330458f6a06e41c0c8ea1be622d35032fd3e7"
+      },
+      {
+        "command": [
+          "cargo",
+          "+1.94.1",
+          "clippy",
+          "--locked",
+          "-p",
+          "agent-runtime-contract",
+          "-p",
+          "agent-runtime-impl",
+          "-p",
+          "agent-runtime-fake",
+          "-p",
+          "tools-dev-contract",
+          "-p",
+          "tools-dev-impl",
+          "-p",
+          "tools-dev-fake",
+          "-p",
+          "tools-shell-contract",
+          "-p",
+          "tools-shell-impl",
+          "-p",
+          "tools-shell-fake",
+          "-p",
+          "ui-terminal-contract",
+          "-p",
+          "ui-terminal-impl",
+          "-p",
+          "ui-terminal-fake",
+          "--all-targets",
+          "--all-features",
+          "-j2",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "start": "2026-11-10T13:38:29.373031+00:00",
+        "end": "2026-11-10T13:39:01.049605+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/combined-clippy.log",
+        "sha256": "c6ae48e1f41b767f42640efc36c2edd3325be30cf701478880dc591f6ab976bd"
+      }
+    ],
+    "dev-red-NoSpace": {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "tools-dev-impl",
+        "--test",
+        "dev",
+        "-j2"
+      ],
+      "start": "2026-11-10T13:33:40.214605+00:00",
+      "end": "2026-11-10T13:33:56.668513+00:00",
+      "exit": 101,
+      "log": "/workspace/scratch/coding-workflow/dev-test-evidence-red.log",
+      "sha256": "147900dda21ebc3805f58334901b449069e5047e058d4cc330c9479b7e6e6cb0",
+      "classification": "infrastructure NoSpace, not a reproduced test failure"
+    },
+    "dev-red": {
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "tools-dev-impl",
+        "--test",
+        "dev",
+        "-j2"
+      ],
+      "start": "2026-11-10T13:34:54.592915+00:00",
+      "end": "2026-11-10T13:35:14.268666+00:00",
+      "exit": 101,
+      "log": "/workspace/scratch/coding-workflow/dev-test-evidence-red-v2.log",
+      "sha256": "7d21d990421247a491508e2018f41bee3d4a6ff029f65cfeb16948d6d26bfa8e"
+    },
+    "static": [
+      {
+        "command": [
+          "cargo",
+          "+1.94",
+          "fmt",
+          "--all",
+          "--",
+          "--check"
+        ],
+        "start": "2026-11-10T13:41:50.685971+00:00",
+        "end": "2026-11-10T13:41:58.300368+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/final-fmt.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "pnpm",
+          "lint"
+        ],
+        "start": "2026-11-10T13:41:58.301476+00:00",
+        "end": "2026-11-10T13:42:35.002629+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/final-lint.log",
+        "sha256": "235ad2ce14552f5cce95369b4ca1cc2933e361af17ddb5d86b3c3616d4c582dc"
+      },
+      {
+        "command": [
+          "bash",
+          "scripts/check-deps.sh"
+        ],
+        "start": "2026-11-10T13:42:35.005044+00:00",
+        "end": "2026-11-10T13:42:50.793451+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/final-module-graph.log",
+        "sha256": "512cb66c34c847f0f9309d4205e051d56f08c6142e083b94d268337842d260b3"
+      },
+      {
+        "command": [
+          "node",
+          "scripts/docs-html.mjs",
+          "--check"
+        ],
+        "start": "2026-11-10T13:42:50.845623+00:00",
+        "end": "2026-11-10T13:42:52.393422+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/final-docs-check.log",
+        "sha256": "813aff687e70e641b4edb8a5400607b9071bc4c52f80f2cd71c2be0ef67adda0"
+      },
+      {
+        "command": [
+          "node",
+          "scripts/docs-html.mjs",
+          "--verify"
+        ],
+        "start": "2026-11-10T13:42:52.394074+00:00",
+        "end": "2026-11-10T13:42:53.421332+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/final-docs-verify.log",
+        "sha256": "e1efc1496f2e6b075eb82b4f296e93a104942365a9e88ee6014397d9241caa80"
+      },
+      {
+        "command": [
+          "git",
+          "diff",
+          "--check"
+        ],
+        "start": "2026-11-10T13:42:53.424605+00:00",
+        "end": "2026-11-10T13:42:53.582130+00:00",
+        "exit": 0,
+        "log": "/workspace/scratch/coding-workflow/final-diff-check.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "failing_attempts": {
+    "terminal-privacy-test.log": {
+      "sha256": "d91bf2ab2847f4f928a434661d2f05908133921083c4ceebf7c89306948f0a75",
+      "bytes": 3284
+    },
+    "terminal-privacy-green.log": {
+      "sha256": "10b5a2a989f485c455b1bc55710278502715cc6b6bf3e2a53c82207540861a53",
+      "bytes": 2278
+    },
+    "observation-red.log": {
+      "sha256": "f7769152b1476e5d4f80fdf26bf9f5b7245730a95ab5a712827021fca8fbad86",
+      "bytes": 31292
+    },
+    "coding-cycle-first.log": {
+      "sha256": "814a8cf9b1123ce50199027ed1dfa5ef6b8680cdaf6d0e6ef412d15722ca89e6",
+      "bytes": 639
+    }
+  },
+  "protected_patch": {
+    "state": "awaiting_owner_review_not_applied",
+    "sha256": "636b5802fba693d6ffe951abab4ad538b094dc539bfcd15a80b08a92636e1e82"
+  },
+  "counts": {
+    "runtime": {
+      "passed": 132,
+      "failed": 0,
+      "ignored": 0,
+      "targets": 29
+    },
+    "shell_dev": {
+      "passed": 62,
+      "failed": 0,
+      "ignored": 0,
+      "targets": 23
+    },
+    "ui_terminal": {
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "targets": 10
+    },
+    "core_patch_only": {
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0
+    },
+    "combined": {
+      "passed": 207,
+      "failed": 0,
+      "ignored": 0,
+      "targets": 62
+    },
+    "tools_dev": {
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "targets": 8
+    }
+  },
+  "model_type_probe": {
+    "first_probe_harness_sha256": "0d1a21782ce615500c71c3d8bd5f87d21344796445f74efa0090865d1ed23a32",
+    "completed": {
+      "updated_utc": "2026-11-10T13:26:32.099635+00:00",
+      "phase": "passed_restricted_toy",
+      "kind": "DIRECT local CPU screening; not Core/GPU/Windows/mic acceptance",
+      "model_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+      "fixed_gates_s": {
+        "first_body": 60,
+        "idle_body": 30,
+        "total": 120
+      },
+      "max_tokens": 224,
+      "max_turns": 6,
+      "rows": [
+        {
+          "turn": 0,
+          "total_s": 26.205,
+          "first_body_s": 20.738,
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "jXciidY05FG4YF504HONUOrmO3cccoX8",
+              "type": "function",
+              "function": {
+                "name": "check_program",
+                "arguments": "{}"
+              }
+            }
+          ],
+          "finish_reason": "tool_calls",
+          "usage": {
+            "completion_tokens": 16,
+            "prompt_tokens": 495,
+            "total_tokens": 511,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          }
+        },
+        {
+          "turn": 1,
+          "total_s": 17.335,
+          "first_body_s": 9.447,
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "4YyTFepLDGVqOaIh4sUtS2vZTsFhTibA",
+              "type": "function",
+              "function": {
+                "name": "read_source",
+                "arguments": "{}"
+              }
+            }
+          ],
+          "finish_reason": "tool_calls",
+          "usage": {
+            "completion_tokens": 16,
+            "prompt_tokens": 688,
+            "total_tokens": 704,
+            "prompt_tokens_details": {
+              "cached_tokens": 491
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "total_s": 22.507,
+          "first_body_s": 4.145,
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "pVeS4EbK5oeXGRQBjPsVum3YplDriHDF",
+              "type": "function",
+              "function": {
+                "name": "replace_source",
+                "arguments": "{\"old\": \"fn answer() -> u32 { \\\"42\\\" }\", \"new\": \"fn answer() -> u32 { 42 }\"}"
+              }
+            }
+          ],
+          "finish_reason": "tool_calls",
+          "usage": {
+            "completion_tokens": 49,
+            "prompt_tokens": 759,
+            "total_tokens": 808,
+            "prompt_tokens_details": {
+              "cached_tokens": 684
+            }
+          }
+        },
+        {
+          "turn": 3,
+          "total_s": 9.861,
+          "first_body_s": 4.016,
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "qDacKdtT3TyZUNfqbTDNJA8wiuijxeIB",
+              "type": "function",
+              "function": {
+                "name": "check_program",
+                "arguments": "{}"
+              }
+            }
+          ],
+          "finish_reason": "tool_calls",
+          "usage": {
+            "completion_tokens": 16,
+            "prompt_tokens": 830,
+            "total_tokens": 846,
+            "prompt_tokens_details": {
+              "cached_tokens": 755
+            }
+          }
+        },
+        {
+          "turn": 4,
+          "total_s": 27.491,
+          "first_body_s": 12.512,
+          "content": "Program został naprawiony. Zwraca 42, przeszedł test i wypisał 42. ✅",
+          "tool_calls": [],
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 30,
+            "prompt_tokens": 1085,
+            "total_tokens": 1115,
+            "prompt_tokens_details": {
+              "cached_tokens": 826
+            }
+          }
+        }
+      ],
+      "executions": [
+        {
+          "argv": [
+            "/home/agent/.cargo/bin/rustc",
+            "+1.94.1",
+            "--test",
+            "main.rs",
+            "-o",
+            "checks"
+          ],
+          "exit": 1,
+          "stdout": "",
+          "stderr": "error[E0308]: mismatched types\n --> main.rs:1:22\n  |\n1 | fn answer() -> u32 { \"42\" }\n  |                ---   ^^^^ expected `u32`, found `&str`\n  |                |\n  |                expected `u32` because of return type\n\nerror: aborting due to 1 previous error\n\nFor more information about this error, try `rustc --explain E0308`.\n"
+        },
+        {
+          "argv": [
+            "/home/agent/.cargo/bin/rustc",
+            "+1.94.1",
+            "--test",
+            "main.rs",
+            "-o",
+            "checks"
+          ],
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/scratch/coding-workflow/qwen-toy/checks"
+          ],
+          "exit": 0,
+          "stdout": "\nrunning 1 test\ntest answer_is_42 ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/home/agent/.cargo/bin/rustc",
+            "+1.94.1",
+            "main.rs",
+            "-o",
+            "program"
+          ],
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/scratch/coding-workflow/qwen-toy/program"
+          ],
+          "exit": 0,
+          "stdout": "42\n",
+          "stderr": ""
+        }
+      ],
+      "final": "Program został naprawiony. Zwraca 42, przeszedł test i wypisał 42. ✅",
+      "server_pid": 685465,
+      "closed_utc": "2026-11-10T13:26:32.417336+00:00",
+      "server_exit": 0
+    },
+    "harness": "qwen-coding-probe.py"
+  },
+  "model_logic_probe": {
+    "harness_sha256": "d44f8101f0f45cbb298b6d55a0d76711d2112039c8019aac3038394276f26fe0",
+    "completed": {
+      "updated_utc": "2026-11-10T13:30:06.881879+00:00",
+      "phase": "passed_restricted_toy",
+      "kind": "DIRECT local CPU screening; not Core/GPU/Windows/mic acceptance",
+      "model_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+      "fixed_gates_s": {
+        "first_body": 60,
+        "idle_body": 30,
+        "total": 120
+      },
+      "max_tokens": 224,
+      "max_turns": 6,
+      "rows": [
+        {
+          "turn": 0,
+          "total_s": 26.131,
+          "first_body_s": 21.008,
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "5l2zv5hlepICIm96gdmqbrAfzmIGzLOB",
+              "type": "function",
+              "function": {
+                "name": "check_program",
+                "arguments": "{}"
+              }
+            }
+          ],
+          "finish_reason": "tool_calls",
+          "usage": {
+            "completion_tokens": 16,
+            "prompt_tokens": 509,
+            "total_tokens": 525,
+            "prompt_tokens_details": {
+              "cached_tokens": 0
+            }
+          }
+        },
+        {
+          "turn": 1,
+          "total_s": 27.132,
+          "first_body_s": 20.15,
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "b1QZxcyrfahccRt1aXJhU5iRbVaJm1Q7",
+              "type": "function",
+              "function": {
+                "name": "read_source",
+                "arguments": "{}"
+              }
+            }
+          ],
+          "finish_reason": "tool_calls",
+          "usage": {
+            "completion_tokens": 16,
+            "prompt_tokens": 923,
+            "total_tokens": 939,
+            "prompt_tokens_details": {
+              "cached_tokens": 505
+            }
+          }
+        },
+        {
+          "turn": 2,
+          "total_s": 39.943,
+          "first_body_s": 6.098,
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "NslvaMAAOLP9fqay7mgLVDIWtOFrerLv",
+              "type": "function",
+              "function": {
+                "name": "replace_source",
+                "arguments": "{\"old\": \"sum_to(n: u32) -> u32 { (0..n).sum() }\", \"new\": \"sum_to(n: u32) -> u32 { (0..=n).sum() }\"}"
+              }
+            }
+          ],
+          "finish_reason": "tool_calls",
+          "usage": {
+            "completion_tokens": 67,
+            "prompt_tokens": 1045,
+            "total_tokens": 1112,
+            "prompt_tokens_details": {
+              "cached_tokens": 919
+            }
+          }
+        },
+        {
+          "turn": 3,
+          "total_s": 10.558,
+          "first_body_s": 4.799,
+          "content": "",
+          "tool_calls": [
+            {
+              "id": "I1lkml2PNXlMyz5EgUKkAvPry9fJarRh",
+              "type": "function",
+              "function": {
+                "name": "check_program",
+                "arguments": "{}"
+              }
+            }
+          ],
+          "finish_reason": "tool_calls",
+          "usage": {
+            "completion_tokens": 16,
+            "prompt_tokens": 1134,
+            "total_tokens": 1150,
+            "prompt_tokens_details": {
+              "cached_tokens": 1041
+            }
+          }
+        },
+        {
+          "turn": 4,
+          "total_s": 22.659,
+          "first_body_s": 14.135,
+          "content": "Program działa poprawnie. Wynik to 55.",
+          "tool_calls": [],
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 14,
+            "prompt_tokens": 1405,
+            "total_tokens": 1419,
+            "prompt_tokens_details": {
+              "cached_tokens": 1130
+            }
+          }
+        }
+      ],
+      "executions": [
+        {
+          "argv": [
+            "/home/agent/.cargo/bin/rustc",
+            "+1.94.1",
+            "--test",
+            "main.rs",
+            "-o",
+            "checks"
+          ],
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/scratch/coding-workflow/qwen-logic/qwen-toy/checks"
+          ],
+          "exit": 101,
+          "stdout": "\nrunning 3 tests\ntest zero ... ok\ntest one ... FAILED\ntest ten ... FAILED\n\nfailures:\n\n---- one stdout ----\n\nthread 'one' (685787) panicked at main.rs:4:20:\nassertion `left == right` failed\n  left: 0\n right: 1\n\n---- ten stdout ----\n\nthread 'ten' (685788) panicked at main.rs:5:20:\nassertion `left == right` failed\n  left: 45\n right: 55\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    one\n    ten\n\ntest result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/home/agent/.cargo/bin/rustc",
+            "+1.94.1",
+            "main.rs",
+            "-o",
+            "program"
+          ],
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/scratch/coding-workflow/qwen-logic/qwen-toy/program"
+          ],
+          "exit": 0,
+          "stdout": "45\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/home/agent/.cargo/bin/rustc",
+            "+1.94.1",
+            "--test",
+            "main.rs",
+            "-o",
+            "checks"
+          ],
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/scratch/coding-workflow/qwen-logic/qwen-toy/checks"
+          ],
+          "exit": 0,
+          "stdout": "\nrunning 3 tests\ntest one ... ok\ntest ten ... ok\ntest zero ... ok\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/home/agent/.cargo/bin/rustc",
+            "+1.94.1",
+            "main.rs",
+            "-o",
+            "program"
+          ],
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "argv": [
+            "/workspace/scratch/coding-workflow/qwen-logic/qwen-toy/program"
+          ],
+          "exit": 0,
+          "stdout": "55\n",
+          "stderr": ""
+        }
+      ],
+      "final": "Program działa poprawnie. Wynik to 55.",
+      "server_pid": 685752,
+      "closed_utc": "2026-11-10T13:30:07.448659+00:00",
+      "server_exit": 0
+    }
+  },
+  "canonical_commits": {
+    "1cb8ac8da15ea8e56f5acb112c95b1c099bf1e0b": {
+      "sha": "ffb98c41b58838fa51150067faa2034c36b9b5d6",
+      "tree": "b1a1240fb25cda90de3f9310e92660ea01ac72e3",
+      "parent": "b4e2dbcdfd64e5379b1499f870014aa39d8a011a"
+    },
+    "fabf1f0f8c0c8401174c925bbdafb5654885c141": {
+      "sha": "c081b93686db2fec036287bc31f469298832a027",
+      "tree": "5a08f7629fe1345e8a74b4d002982913ad8d198a",
+      "parent": "ffb98c41b58838fa51150067faa2034c36b9b5d6"
+    },
+    "c000d461d9fd6ce77ed6519455cf9a7fedb96696": {
+      "sha": "111bf1544e922561b21a79fcba4902be2b4a5deb",
+      "tree": "5651b346809d700712214128aed0abdc69bbecce",
+      "parent": "c081b93686db2fec036287bc31f469298832a027"
+    },
+    "297fc64dbd720228fd23b1d7a861515278e6ac5a": {
+      "sha": "c6cf62622a728582981a8c835008ae9250089b54",
+      "tree": "179d9ff76ce8d3e9cc92c2e241d68d0c7f56760c",
+      "parent": "111bf1544e922561b21a79fcba4902be2b4a5deb"
+    }
+  },
+  "final_tested_tree": "179d9ff76ce8d3e9cc92c2e241d68d0c7f56760c",
+  "static_note": "Initial manually run docs check rejected an anchor kodowanie-1011. Corrected to generated kodowanie-10-11; final logs preserve actual final results. No implementation changes after combinedtests."
+}

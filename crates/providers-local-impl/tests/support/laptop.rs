@@ -1,7 +1,7 @@
 //! Laptop właściciela na atrapach (fala 6): i7-13700H (14 rdzeni / 20 wątków), RTX 4050 Laptop
 //! 6 GB + Iris Xe, 16 GB RAM — `FakeDeviceProfile::laptop()` (PLAN §3.5 Laptop-CUDA, §6.3 D-CUDA),
 //! zarządca rezydencji z budżetem z rekomendacji (6 GB VRAM − rezerwa pulpitu), **prawdziwy wpis
-//! manifestu** (Bielik 4.5B Q8_0 albo 1.5B Q8_0) i fałszywy `llama-server` skopiowany do katalogów sidecarów
+//! manifestu** (Bielik 4.5B Q8_0 albo 1.5B Q8_0) i fałszywy `llama-server` udostępniony w katalogach sidecarów
 //! jak w aplikacji (`sidecars/llama-<backend>/`; kolejność kandydatów jak
 //! `app_modules::route::local::candidates`).
 
@@ -48,8 +48,7 @@ pub fn server_path(env: &Env, dir: &str) -> PathBuf {
 
 pub fn install_server(env: &Env, dir: &str) -> PathBuf {
     let path = server_path(env, dir);
-    std::fs::create_dir_all(path.parent().unwrap()).unwrap();
-    std::fs::copy(fake_server(), &path).unwrap();
+    env.install_server_at(&path);
     path
 }
 

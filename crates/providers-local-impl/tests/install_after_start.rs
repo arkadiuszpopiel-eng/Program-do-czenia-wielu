@@ -81,8 +81,7 @@ async fn server_installed_after_start_works_without_restart() {
         before.iter().any(|e| matches!(e, ProviderEvent::Error(_))),
         "brak pliku serwera → czytelny błąd: {before:?}"
     );
-    std::fs::create_dir_all(installed.parent().unwrap()).unwrap();
-    std::fs::copy(fake_server(), &installed).unwrap();
+    env.install_server_at(&installed);
     let after = reply(&p, "po instalacji").await;
     assert_eq!(echo(&after), "Echo: po instalacji", "{after:?}");
     let (_, plan, _) = p.sidecar().running_plan().await.unwrap();

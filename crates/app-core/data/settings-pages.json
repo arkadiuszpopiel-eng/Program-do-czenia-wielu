@@ -1370,6 +1370,194 @@
   "custom": null,
   "settings": [
    {
+    "key": "agents.interaction_mode",
+    "label": {
+     "pl": "Wspólny sposób współpracy",
+     "en": "Common interaction style"
+    },
+    "description": {
+     "pl": "Jarvis: krótkie meldunki i wykonywanie zleconych zadań. Zachowuje wybrany tryb zgód, role i limity. Mikrofon włączasz osobno. Zmiana działa od następnego zadania.",
+     "en": "Jarvis: concise updates and execution of requested tasks. Keeps the selected approval mode, roles and limits. Turn the microphone on separately. Applies to the next task."
+    },
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "standard",
+       "label": {
+        "pl": "Standardowy",
+        "en": "Standard"
+       }
+      },
+      {
+       "value": "jarvis",
+       "label": {
+        "pl": "Jarvis — rozmowa i zadania",
+        "en": "Jarvis — conversation and tasks"
+       }
+      }
+     ]
+    },
+    "default": "standard",
+    "scope": "global"
+   },
+   {
+    "key": "agents.alfa.interaction_mode",
+    "label": {
+     "pl": "Alfa — sposób współpracy",
+     "en": "Alfa — interaction style"
+    },
+    "description": {
+     "pl": "Jarvis: krótkie meldunki i wykonywanie zleconych zadań. Zachowuje wybrany tryb zgód, role i limity. Mikrofon włączasz osobno. Zmiana działa od następnego zadania.",
+     "en": "Jarvis: concise updates and execution of requested tasks. Keeps the selected approval mode, roles and limits. Turn the microphone on separately. Applies to the next task."
+    },
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "inherit",
+       "label": {
+        "pl": "Jak ustawienie wspólne",
+        "en": "Use common setting"
+       }
+      },
+      {
+       "value": "standard",
+       "label": {
+        "pl": "Standardowy",
+        "en": "Standard"
+       }
+      },
+      {
+       "value": "jarvis",
+       "label": {
+        "pl": "Jarvis — rozmowa i zadania",
+        "en": "Jarvis — conversation and tasks"
+       }
+      }
+     ]
+    },
+    "default": "inherit",
+    "scope": "global"
+   },
+   {
+    "key": "agents.beta.interaction_mode",
+    "label": {
+     "pl": "Beta — sposób współpracy",
+     "en": "Beta — interaction style"
+    },
+    "description": {
+     "pl": "Jarvis: krótkie meldunki i wykonywanie zleconych zadań. Zachowuje wybrany tryb zgód, role i limity. Mikrofon włączasz osobno. Zmiana działa od następnego zadania.",
+     "en": "Jarvis: concise updates and execution of requested tasks. Keeps the selected approval mode, roles and limits. Turn the microphone on separately. Applies to the next task."
+    },
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "inherit",
+       "label": {
+        "pl": "Jak ustawienie wspólne",
+        "en": "Use common setting"
+       }
+      },
+      {
+       "value": "standard",
+       "label": {
+        "pl": "Standardowy",
+        "en": "Standard"
+       }
+      },
+      {
+       "value": "jarvis",
+       "label": {
+        "pl": "Jarvis — rozmowa i zadania",
+        "en": "Jarvis — conversation and tasks"
+       }
+      }
+     ]
+    },
+    "default": "inherit",
+    "scope": "global"
+   },
+   {
+    "key": "agents.gama.interaction_mode",
+    "label": {
+     "pl": "Gama — sposób współpracy",
+     "en": "Gama — interaction style"
+    },
+    "description": {
+     "pl": "Jarvis: krótkie meldunki i wykonywanie zleconych zadań. Zachowuje wybrany tryb zgód, role i limity. Mikrofon włączasz osobno. Zmiana działa od następnego zadania.",
+     "en": "Jarvis: concise updates and execution of requested tasks. Keeps the selected approval mode, roles and limits. Turn the microphone on separately. Applies to the next task."
+    },
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "inherit",
+       "label": {
+        "pl": "Jak ustawienie wspólne",
+        "en": "Use common setting"
+       }
+      },
+      {
+       "value": "standard",
+       "label": {
+        "pl": "Standardowy",
+        "en": "Standard"
+       }
+      },
+      {
+       "value": "jarvis",
+       "label": {
+        "pl": "Jarvis — rozmowa i zadania",
+        "en": "Jarvis — conversation and tasks"
+       }
+      }
+     ]
+    },
+    "default": "inherit",
+    "scope": "global"
+   },
+   {
+    "key": "agents.delta.interaction_mode",
+    "label": {
+     "pl": "Delta — sposób współpracy",
+     "en": "Delta — interaction style"
+    },
+    "description": {
+     "pl": "Jarvis: krótkie meldunki i wykonywanie zleconych zadań. Zachowuje wybrany tryb zgód, role i limity. Mikrofon włączasz osobno. Zmiana działa od następnego zadania.",
+     "en": "Jarvis: concise updates and execution of requested tasks. Keeps the selected approval mode, roles and limits. Turn the microphone on separately. Applies to the next task."
+    },
+    "control": {
+     "kind": "select",
+     "options": [
+      {
+       "value": "inherit",
+       "label": {
+        "pl": "Jak ustawienie wspólne",
+        "en": "Use common setting"
+       }
+      },
+      {
+       "value": "standard",
+       "label": {
+        "pl": "Standardowy",
+        "en": "Standard"
+       }
+      },
+      {
+       "value": "jarvis",
+       "label": {
+        "pl": "Jarvis — rozmowa i zadania",
+        "en": "Jarvis — conversation and tasks"
+       }
+      }
+     ]
+    },
+    "default": "inherit",
+    "scope": "global"
+   },
+   {
     "key": "agents.max_steps",
     "label": {
      "pl": "Limit kroków zadania",

@@ -4,6 +4,7 @@
 
 #![allow(dead_code, clippy::unwrap_used, clippy::expect_used)]
 
+pub mod capacity;
 pub mod probe;
 pub mod serverlog;
 pub mod setup;

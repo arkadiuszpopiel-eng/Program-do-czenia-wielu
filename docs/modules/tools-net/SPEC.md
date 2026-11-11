@@ -26,7 +26,33 @@ Zdarzenia: `tool.net.fetch` (host, status, bajty), `tool.net.download` (ścieżk
 - **DNS rebinding:** resolver klienta odrzuca host, gdy **którykolwiek** rozwiązany adres jest niepubliczny; połączenie idzie wyłącznie na adresy sprawdzone w tym samym rozwiązaniu (bez drugiego zapytania DNS); każde przekierowanie i każde wywołanie rozwiązuje i sprawdza od nowa.
 - **Bez proxy systemowego**, bez ciasteczek, bez nagłówków od modelu; adres wyglądający na zawierający sekret (wzorce `tools-common::text`) → odmowa (eksfiltracja przez URL).
 - **Limity:** treść `net_fetch` ≤ 2 MiB (przekroczenie = przerwanie odczytu, wynik obcięty), czas całkowity ≤ 30 s; pobieranie ≤ 200 MiB i ≤ 300 s; nagłówek `Content-Length` ponad limit = odmowa bez odczytu treści; anulowanie (kill-switch) przerywa odczyt i usuwa plik częściowy.
+  HTTP sprawdza token przed i po gotowej odpowiedzi oraz fragmencie/EOF. Pobranie sprawdza
+  go również w wątku zapisu przed wywołaniem commit; porzucenie usuwa część. Udany commit
+  zachowuje wynik i ślad pliku, jeśli Stop przyszedł już po zatwierdzeniu. Anulowanie odbioru
+  nie dowodzi braku wcześniejszego żądania do serwera.
+  Oczekiwanie na begin/flush magazynu obserwuje Stop i ten sam deadline pobrania; zadanie
+  przed startem pracy też sprawdza token i termin. Rozpoczętego synchronicznego I/O nie
+  przerywamy w środku: część znika po jego powrocie i Drop, a komunikat przyznaje pracę w tle.
+  Rozpoczęty commit pozostaje obserwowany do rzeczywistego wyniku, bez ukrywania efektu.
+  Gotowe nagłówki/chunk/EOF HTTP i wynik SearchPort nie omijają upłyniętego deadline:
+  termin sprawdzamy przed/po I/O i przed zwrotem danych; Stop ma pierwszeństwo. Dotychczasowe
+  limity pozostają te same, rozpoczęty commit pobrania nadal zachowuje rzeczywisty wynik.
+  Wyszukiwanie sprawdza token ponownie po odpowiedzi dostawcy/zwolnieniu zgody i przed
+  oddaniem wyniku. Stop zgłoszony przed zwrotem dostawcy nie staje się sukcesem ani błędem I/O.
+  Anulowanie odbioru nie dowodzi, że dostawca nie otrzymał zapytania lub przerwał jego wykonanie.
 - **Treść niezaufana:** `untrusted = Web`, taint sesji zgłaszany Brokerowi, sekrety redagowane, tekst tylko dla typów tekstowych.
+- **Wyniki wyszukiwania:** granica narzędzia egzekwuje `max_results`, niezależnie od dostawcy.
+  Powtórzony poprawny cel z istniejącej normalizacji `checked_target` (bez fragmentu) nie
+  zużywa miejsca ani znaków. Zachowujemy kolejność i pierwszy oryginalny URL/tytuł/opis;
+  różne ścieżki, query i porty pozostają osobne. Nie pobieramy dodatkowych wyników w celu uzupełnienia.
+  Każdy zwracany URL przechodzi istniejącą walidację celu HTTPS/publicznego i sekretów.
+  Adres ze znakami sterującymi, niedozwolony lub zawierający wykryty sekret jest pomijany,
+  nie przepisywany do wymyślonego źródła. Klucze i wartości parametrów query są sprawdzane
+  dotychczasowym detektorem po jednym standardowym dekodowaniu, bez nowych wzorców.
+  Budżet `output_max_chars` ogranicza też sumę znaków pól
+  `url/title/snippet` w wyniku strukturalnym; długiego URL nie skracamy. Pominięcie lub
+  skrócenie jest jawne w tekście wyniku. To nie jest pobranie źródeł ani sprawdzenie DNS:
+  rzeczywisty odczyt nadal wymaga osobnego `net_fetch` z Brokerem i kontrolą DNS.
 - **Pobieranie:** wyłącznie do kwarantanny `<katalog roboczy sesji>\Kwarantanna` (albo `%USERPROFILE%\Alfa\Kwarantanna\<sesja>`), drugi token `fs.write(plik)`; nazwa od serwera oczyszczona (bez separatorów, ADS, nazw urządzeń, kropek/spacji na końcu), plik `.part` tworzony jako nowy i przemianowywany bez nadpisania, katalog i jego przodkowie w kwarantannie nie mogą być dowiązaniem/junction, SHA-256 liczone w locie, MOTW (`Zone.Identifier`, `ZoneId=3`, `HostUrl`) na Windows; rozszerzenia wykonywalne oznaczone w wyniku.
 
 ## Zdolności / uprawnienia

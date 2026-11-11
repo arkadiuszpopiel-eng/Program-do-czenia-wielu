@@ -28,7 +28,7 @@ fn zip_of(entries: &[(&str, &[u8])]) -> Vec<u8> {
 
 #[test]
 fn catalog_has_pinned_cuda_build_with_cudart() {
-    let items = app_models::builtin();
+    let items = app_models::catalog::builtin_for(Some(app_models::catalog::Target::WINDOWS_X64));
     let cuda = items
         .iter()
         .find(|i| i.id == "sidecar-llama-cuda")

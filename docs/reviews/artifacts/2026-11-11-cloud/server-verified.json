@@ -1,0 +1,7 @@
+{
+  "server": "/workspace/tools/llama/llama-b11559/llama-server",
+  "sha256": "16c4e5fc3e0a74400033d958722e487a797dbb51c676f5ce1ec9066f1673efd5",
+  "archive_sha256": "a454867b975dec288f731c6d3589f132b0e356f7dbad8d711f48d231ee67d7d9",
+  "version_exit": 0,
+  "utc": "2026-11-11T18:59:03.765474+00:00"
+}

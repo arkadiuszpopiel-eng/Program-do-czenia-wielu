@@ -1,0 +1,41 @@
+[
+  {
+    "command": [
+      "pnpm",
+      "lint"
+    ],
+    "start": "2026-11-11T20:04:15.234176+00:00",
+    "exit": 0,
+    "log": "jarvis-lint-final.log",
+    "sha256": "a0971b7f6632008ff78fa4fa7bd6510c3d87ae44ecf01d69efeff2c0311a7c49"
+  },
+  {
+    "command": [
+      "pnpm",
+      "exec",
+      "prettier",
+      "--check",
+      "package.json",
+      "scripts/cockpit-map.mjs",
+      "scripts/data/NATURAL-EARTH.md",
+      "apps/desktop/ui/src/lib/components/cockpit",
+      "apps/desktop/ui/e2e/cockpit-systems.spec.ts",
+      "apps/desktop/ui/e2e/remote-preview.spec.ts"
+    ],
+    "start": "2026-11-11T20:04:53.802159+00:00",
+    "exit": 0,
+    "log": "jarvis-format-final-v3.log",
+    "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "start": "2026-11-11T20:04:57.588296+00:00",
+    "exit": 0,
+    "log": "jarvis-diff-final.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

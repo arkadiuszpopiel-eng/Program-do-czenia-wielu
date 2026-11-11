@@ -1,0 +1,9 @@
+{
+  "hypothesis": "Currentproject target_selectedfalse isbeingusedtoclaimnopastexecutions, despiteDone1. Onecontexttemporalclarificationwithoutreadyanswers; retainall3previousresults. Ifstillfails, reject anddo not keepmutatingpromptagainst3cases.",
+  "model": "same9B",
+  "cases": "same3fullmergedSystem",
+  "budgets_unchanged": "96/temp0/8192/CPU4/60–30–120",
+  "scope": "rawdiagnosticonly, notproductionfix",
+  "script_sha256": "f7f195838908d4806bdd7aa8045fb72bf4cc39e77de71225dbe2d71f05b55392",
+  "declared_at": "2026-11-10T23:40:18.909213+00:00"
+}

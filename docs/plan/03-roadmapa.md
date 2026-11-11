@@ -1,5 +1,120 @@
 # 03 — Roadmapa (dokument żywy)
 
+**11.11 — obecny przyrost:** kodUI`2f3cf3e3`: Atlas Jarvisa, zarys świata offline,
+stany aplikacji, skróty i poprawione cele dotykowe32→44px. Końcowe41/41Chromium,
+573/573Vitest,typy0/0,lint/build/format/generator0; [raport i ograniczenia](../reviews/2026-11-11-jarvis-atlas.md).
+Baza`bfd69b97` zakończyłaCI18810/10 iWindows1114/4; nowy head wymaga własnego CI.
+#79 zamknięta w zakresie kodu argumentówGPU. **22,41,48,58,68,69,77,78 nadal otwarte.**
+#58: w nowymCloud oba ekranyCPU bez odpowiedzi, po1timeout60s/2niewykonane;
+[zachowane dane](../reviews/2026-11-11-ledger-diagnosis.md). Sprzęt i API niewykonane.
+[Projekt przeglądarki #78](../ADR/0031-wbudowana-przegladarka-webview2.md) oraz
+[pakiet telefonu #69](../reviews/2026-11-11-remote-design-review.md) nie oznaczają wdrożenia.
+Starych harmonogramów nie wznawiano; dawne wyniki niżej są historią.
+
+**Stan testów z 10.11:** bb13c48d (kod69e33656) ma [CI187](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565989)
+**10/10**, Linux3604/0/27, Windows3626/0/48, po1145celów; Chromium945, Vitest573;
+[Windows110](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565976) **4/4**, WebView2 63/0/5.
+[Pełne dane](../reviews/artifacts/ci187-complete.json). Nie przerwano poprzedniego CI kolejną publikacją.
+Zamknięto49 zweryfikowanych kart. Nowy kod54dfabf7 poprawia pełne odciążenieGPU: dodatkowy
+poziom wyjściowy llama.cpp, bez zwiększenia budżetów. Lokalne91/0/1,Clippy/fmt/lint0;
+[raport #79](../reviews/2026-11-10-full-gpu-offload.md). Następny head wymaga własnegoCI.
+#58 pozostaje niezaliczony: V1 Qwen8B ma30/30 transportu i0/30 wierności rejestrowi, odrzucony.
+Nowy Qwen3.5-9B mimo zgodnego SHA ma2/3 zgodności z licznikami w każdej z dwóch diagnoz; Done1 nadal pominięte,
+dodatkowe niepoparte przyczyny i widoczny tekst65601>60000ms w drugim wariancie.
+[Pełne wyniki9B](../reviews/2026-11-10-qwen35-9b-cpu.md); nie zmieniono modelu domyślnego lub promptu.
+Bielik11B:0 odpowiedzi/1 timeout/2 niewykonane na CPU; jakość NOT_EVALUATED.
+[Dane11B](../reviews/2026-11-10-bielik11b-cpu.md). [Naprawiony zegar narzędzi #77](../reviews/2026-11-10-tool-envelope-progress.md)
+ma pełneCI187; odbiór zimnego i ciepłego startu na GPU12GB nadal niewykonany.
+Otwarte #22/#41/#48/#58/#68/#69/#77/#78 oraz nowy #79 do zakończenia CI; wymaganeGPU/API/mikrofon/telefon i niezależny przegląd.
+[Pełny raport i zachowane porażki](../reviews/2026-11-10-defect-closure.md).
+
+**Domykanie usterek10.11:** #64 deadline68/0/0, #73 jawna odmowa135/0/0, #75 pomiar
+zakończenia procesu59/0/1 i20/20 anulowań ×3 mosty-atrapy przy2s; Clippy0. Baza574b3391
+ma CI182 **9/10** (Linux3580/1/26, #75), Windows105 **4/4**, WebView2 63/0/5.
+[Raport i ograniczenia](../reviews/2026-11-10-defect-closure.md). Nowe poprawki wymagają własnegoCI;
+Core Qwen8B, sprzęt i przegląd pozostają otwarte. Bez merge i zmiany polityk/progów.
+
+**Pełna zgoda10.11 — #74:** właściciel potwierdził maksymalne dostępne możliwości po świadomym
+włączeniu pełnej zgody. Prompt nie wymaga już proponowania każdej brakującej instalacji:
+agentka ma działać w ramach aktywnych zgód, bez powtórnego pytania, i sprawdzić wynik.
+Runtime132/0/0 iClippy0; istniejące zakresy/utrwalenie Max/L4:6/0/0, tabelaautonomii3/0/0.
+[Decyzja](50-tryby-zgod-jak-claude-codex.md) · [Raport](../reviews/2026-11-10-full-consent.md).
+To nie dowodzi instalacji sterownika lub elewacjiWindows. Baza f6422855 ma CI181/Windows104 zielone.
+
+**Kodowanie10.11 — #70/#71/#72:** naprawa utraty końcowych błędów kompilatora, runtime132/0/0,
+Clippy0; skryptowany model z rzeczywistym Rust przeszedł kompilację, poprawkę, test i uruchomienie.
+Cykl sprawdzony dla4wbudowanych person i własnej. Qwen8B CPU sam poprawił dwa małe programy
+(błąd typu i logiki), ze sprawdzonymi wynikami procesów; to sonda poza Core/Brokerem.
+`dev_test` nie ogłasza zaliczenia przy kodzie0 bez wykonanych testów. Wspólne207/0/0
+dla12crate'ów, Clippy0. Łatka zwykłego testu app-core #70 jest opublikowana w bf9ffe05;
+wcześniejsza kwalifikacja jako chronionego core-* była zbyt szeroka. Przegląd przed merge pozostaje otwarty.
+[Plan kodowania](55-enterprise-lokalnie-chmura-i-wyszukiwanie.md#kodowanie-10-11) · [Raport](../reviews/2026-11-10-coding-workflow.md).
+Baza b4e2dbcd: CI180 **9/10**, Windows Rust3592/1/47 (predykat4417), Linux3567/0/26;
+Chromium945/945, Windows102 **4/4**, WebView2 63/0/5. Nie nazywamy pełnegoCI180 zielonym.
+
+**Nowe zlecenieUI i telefon10.11:** opcjonalny kokpitJarvis, większe cele dotykowe i kafelki.
+Baza13c8c88d ma pełneCI179/Windows101 zielone (Linux3567/0/26,Windows3593/0/47).
+NowyUI#68 ma57/57próbChromium; nie jest odbiorem telefonu. Brama/parowanie telefonu
+nie istnieją; #69 ma jawny podgląd panelu bez aktywnych poleceń,58/58próbChromium.
+[Plan56](56-kokpit-jarvis-i-panel-telefonu.md) · [RaportUI](../reviews/2026-11-10-jarvis-mobile.md).
+
+**Nowe zlecenie właściciela po zamknięciu nocnego okna:** główne modele lokalne8–12B
+naRTX2060 12GB z zapasem kontekstu. Qwen3-8B Q4_K_M domyślny, Bielik11B Q4_K_M jako
+alternatywa tekstowa;1.5B tylko pomocniczy. Dostępna Luna/Haiku pomaga po problemie lokalnym;
+trudne zadania i zgody zachowują hierarchię. [Zmiany, testy i pamięć](../reviews/2026-11-10-model-roles.md).
+To nowe polecenie w określonym zakresie; poprzedni harmonogram nie jest wznawiany.
+Poniższe terminy i wyniki są historią zamkniętego okna, nie limitem nowego zlecenia.
+
+**Kandydat #63 — oczekiwanie na magazyn pobrania:** Stop i istniejący deadline kończą
+oczekiwanie na begin/write. Rozpoczęte I/O może jeszcze wracać w tle; sprzątanie następuje po
+powrocie pracownika. Rozpoczęty commit zachowuje rzeczywisty wynik. RED2/4 → GREEN62/0/0;
+Clippy i format kod0. [Raport #63](../reviews/2026-11-10-download-wait.md).
+
+**Opublikowany #62 w cea4444a:** pełne **CI175 10/10 i Windows97 4/4 zielone**;
+Linux3544/0/26, Windows3570/0/47, Chromium915/915 i WebView2 63/0/5.
+[Dowody](../reviews/artifacts/ci175-disk-baseline.json). Nowy #63 wymaga własnego CI/przeglądu.
+
+**#58 — próba faktów narzędzi odrzucona:** prawdziwy Core + Bielik 1.5B, po 50 odpowiedzi
+obu wersji i 50/50 fikcyjnych potwierdzeń w każdej, mimo poprawnie przekazanych liczników 0.
+Kod aplikacji przywrócony do 9319; [raport, łatka i 100 surowych odpowiedzi](../reviews/2026-11-10-branch-tool-facts.md).
+#41/#48 nadal otwarte; nie uznajemy zielonego transportu za zaliczenie jakości.
+
+**Kandydat[#57](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/57):**
+propozycja narzędzia wymagająca potwierdzenia zachowuje osobny stan w rozmowie i Replay,
+bez oznaczania jako wykonana. [Wyniki lokalne i ograniczenia](../reviews/2026-11-10-tool-confirmation.md).
+Baza9319 ma zieloneCI172 iWindows94:Linux3523/0/26,Windows3549/0/47,Chromium915/915,
+WebView2 63/0/5. Niezależny przegląd i odbiór sprzętu pozostają otwarte.
+
+
+**Nowe okno właściciela:10.11.2026,Europe/Warsaw.** Rozwój i poprawki do05:30
+(04:30UTC), potem wyłącznie końcowe testy i raport, zakończenie06:00 (05:00UTC).
+Późniejsza korekta właściciela ma pierwszeństwo. Długie testy uruchamiać odpowiednio wcześnie;
+nie zaczynać nowych prób po terminie i jawnie zgłosić niewykonane lub nieukończone kontrole.
+
+**Baza23300f82 ma zieloneCI170 iWindows92.** Linux3514/0/26,Windows3540/0/47;
+E2E302+302+301=905,bez porażek,w8,1–9,7min na część. WebView2 63/0/5. Nie jest to
+odbiór GPU12GB,prawdziwegoAPI lub mikrofonu. Kolejna naprawa[#56](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/56)
+dotyczy sekretów w URL i limitów wyników wyszukiwania; [raport](../reviews/2026-11-10-search-results.md).
+
+
+**Nowe zlecenie właściciela9.11 `/goal`: wznowione naprawy i ulepszenia do jakości Enterprise.**
+[Plan55 — lokalnie/chmura, narzędzia i wyszukiwanie](55-enterprise-lokalnie-chmura-i-wyszukiwanie.md)
+zastępuje wcześniejszy STOP i zamrożenie funkcji. Pierwszy przyrost: anulowanie zawieszonego
+adapteraRoutera[#54](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/54).
+Dalsze wpisy z wcześniejszego okna są historią; kryteria przeglądu i sprzętu pozostają otwarte.
+
+**Naprawa SQLCipher potwierdzona pełnymCI168:** [RUSTSEC-2026-0459 / SQLite–SQLCipher](../reviews/2026-11-09-ci167-sqlite.md).
+Kod050f86c7 używa SQLCipher4.20/SQLite3.54.1/OpenSSL; wąska łatka licencji51e27c10 zatwierdzona
+wyłącznie przez właściciela. CI168 wszystkie6 zadań zielone:Linux3506/0/26,Windows3532/0/47,
+Clippy0,Chromium905/905,Vitest573/573. Windows90 wszystkie4 zielone:WebView2 63/0/5,
+syntetyczne silnikiCPU1/0/2 filtrowane. Jakość Bielika#41/#48 i niezależny przegląd pozostają otwarte.
+Eksperymenty kontekstu wycofano; nie opublikowano kolejnej zmiany instrukcji modelu.
+
+Właściciel zlecił próbę modelu8–9B i wskazał **RTX2060 12GB**. Qwen3-8BQ4 w sondzie ma30/30
+poprawnych treści (imiona/format,brak fikcyjnych działań,arytmetyka); pełnyCoreCPU niezaliczony
+po2/40próbach z powoduIdle Bety. GPU12GB,prawdziwe narzędzia i mikrofon nie są odebrane.
+Produkcyjnego katalogu/defaultu nie zmieniono; #41/#48 pozostają otwarte.
+
 **24.10.2026 — poprawki lokalne 0.0.72:** limit 500 kroków i wspólny budżet
 orkiestracji, profile narzędzi każdej agentki, przebudowa Pipeline z doborem modeli
 etapów, menu obsady i ustawienia po prawej. Wgrane do kopii właściciela;
@@ -9,7 +124,24 @@ testy i natywna weryfikacja: [raport](../repairs-2026-10-24/REPORT.md).
 krótkie komendy `tool_call`, odtwarzanie odkrytych schematów i wspólny selektor
 estymacji Routera/runtime: [raport i pomiary](../tool-routing-2026-10-24/REPORT.md).
 
-Ostatnia aktualizacja: **2026-11-08** (wersja programu 0.0.85; ostatnia praca: [Z.8 — testy integracyjne sędziego](../reviews/2026-11-08-z8-app-judge.md), Linux/atrapy; próba Windows pozostaje otwarta). Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: patrz [`README.md`](README.md).
+Ostatnia aktualizacja: **2026-11-09** (wersja programu0.0.85, etapJ bez wydania).
+Obraz całości: [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md). Statusy: [`README.md`](README.md).
+
+**Korekta właściciela06:53UTC:** wyłącznie obecne usterki z [planu54](54-jarvis-i-tryby-2026-11-08.md),
+bez nowych funkcji; po rozliczeniu napraw, pełnym raporcie i zapisie STOP do odwołania.
+Pierwotny termin07:00UTC został zastąpiony. Automatyzacja pozostaje wyłączona.
+
+**Naprawione #53/#37/#51/#52:** etykiety Kreatora, trwała obsada, zatwierdzone importy Brokera,
+odstępy po chwilowymHTTP504. Baza cc6f0ac9 ma pełneCI166: Linux3504/0/25,
+Windows3530/0/46, Clippy0, Chromium905/905, Vitest573/573; Windows87 WebView2 63/0/5,
+syntetyczne silniki1/0/2 filtrowane. Historia awariiHTTP504 pozostaje w raporcie.
+
+**#41/#48 otwarte:** nieopublikowany kandydat1.5B miał imię i gotowość50/50, ale jedno zdanie19/50
+i14/28 innych pytań, w tym6 fikcyjnych potwierdzeń wykonania; został odrzucony.
+Nie zamykamy jakości odpowiedzi wynikiem samych testów kodu. Szczegóły i niezaliczone próby:
+[raport napraw](../reviews/2026-11-09-jarvis-model-repair.md). Niezależny przegląd i odbiór sprzętu
+pozostają otwarte; bez scalenia, nowej wersji lub nowych funkcji.
+
 Stan kryteriów akceptacji żyje w [`../STATUS.md`](../STATUS.md); tu są zadania i etapy.
 
 Zasada kolejności: **etap A ma pierwszeństwo**. Etap B można prowadzić równolegle z A, bo nie dodaje funkcji.
@@ -249,6 +381,20 @@ Plan: [`50-tryby-zgod-jak-claude-codex.md`](50-tryby-zgod-jak-claude-codex.md) (
 | Z.6 | Profil Dziecko z kłódkami i PIN-em rodzica | zrobione | 2026-11-04 | kłódka w Sędzim (sufit L1), PIN Argon2id z blokadą; scalone 6.11; skrót PIN-u w prywatnym pliku Sędziego — zatwierdzone 6.11 (konto dziecka może zmieniać własny Menedżer poświadczeń, katalogu usługi nie) |
 | Z.7 | Dziennik rodzica pod PIN-em | zrobione | 2026-11-05 | scalone 6.11 za zgodą właściciela; tematy rozmów i działania z osi czasu (od 5.11 także zgody, odmowy, werdykty sędziego, zmiany trybu, Max dostęp i próby PIN-u); pełna treść rozmów włączana PIN-em (przełącznik w Sędzim, znak „Rodzic czyta” w belce); otwarcie „do końca rozmowy” (5.11 noc) |
 | Z.8 | Testy trybów, ataków i prawdziwej aplikacji | w toku | 2026-11-08 | tabela tryb × kategoria działania (`modes_matrix.rs`), ataki na kłódkę w Sędzim (głos, agentka, Max dostęp lokalny, zgadywanie PIN-u — `child_lock_attacks.rs`), kłódka w menu/palecie w każdym stylu i motywie; wstrzyknięcia do modelu-sędziego ACC-Z4-judge-04 (5.11, prawdziwy Bielik); prawdziwa aplikacja (6.11): kłódka w menu, wpisy w dzienniku rozmowy, „do końca rozmowy” z zamknięciem po zmianie rozmowy, Max dostęp odrzucony przy kłódce, obniżenie trybu z paska pisania; zostaje model-sędzia w prawdziwej aplikacji z modelem lokalnym; 8.11: osiem testów integracyjnych składania sędziego (16 wariantów) + regresja pochodzenia najnowszej odpowiedzi — 49 testów zielonych, 1 pomiar lokalny pominięty; poprawione dziedziczenie pochodzenia ze starszej tury; [raport](../reviews/2026-11-08-z8-app-judge.md). Z.8 na Windows nadal otwarte |
+
+
+## Etap J — Jarvis dla każdej agentki i dalszy rozwój trybów
+
+Zlecenie właściciela 8.11; [plan nocny 54](54-jarvis-i-tryby-2026-11-08.md), [karta #22](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/issues/22).
+
+| ID | Zadanie | Stan | Data | Uwagi |
+| --- | --- | --- | --- | --- |
+| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-09 | kod rozmowy, przebiegów, delegacji i zadań w tle; #31 Jarvis20/20 imion w próbie Bielika, jedno zdanie0/20; #41 świeża baza i2 warianty po40 tur również0/20, zmiany cofnięte; #35–36 własna Luna, delegacja i odtworzenie katalogu na atrapach; #43 Luna10/10 tur Bielika, Jarvis po restarcie, jedno zdanie0/5; #48:50 ciał HTTP+50 odtworzeń modelu, Jarvis0/25 jednego zdania przed dekoderem,45/50 tekstów zgodnych; #37 naprawione i potwierdzone pełnymCI168; przegląd oraz próba sprzętowa otwarte |
+| J.2 | Panel Agentki: wybór Jarvisa i przejście do sterowania głosem | w toku | 2026-11-08 | 4 style × 2 motywy; #44 wspólny profil w bibliotece Kreatora,9/9 nowych E2E (także EN), typy0/0; pełny899/899 naaf5a2bc5 i CI161901/901 na12d44af4 zaliczone; #49 pełnyCI162901/901+573 zaliczony; #50 nowy nativeprzepływ i2/2 Chromium, dalszyCI otwarty; testy na atrapach i axe |
+| J.3 | Zakres każdego z pięciu trybów i odporność na spóźnione odpowiedzi | w toku | 2026-11-08 | jawny wybór rozmowa / globalnie; Plan i kłódka zachowują zakres rozmowy; regresje wyścigu żądań; karta #25: Plan bez rozmowy nie zmienia poziomu globalnego, Alt+M pomija niedostępny Plan |
+| J.4 | Próby wszystkich person na rzeczywistym modelu i w torze głosowym | w toku | 2026-11-08 | Linux Cloud CPU i syntetyczne audio; Windows i mikrofon pozostają osobną próbą |
+| J.5 | Regresje CI i raport nocny | w toku | 2026-11-09 | pełny Linux169a6004:3492/0/24; nowy12d44af4 --all-features3495/0/25; CI159 Windows3516/5/45, oba testy kolejki #39 zaliczone; CI156 zawieszony zachowano jako historię; lokalny UI877/2/0, osobno CI156 UI879/879 i573 jednostkowe; WebView2 rehearsal78:61/1/5; #35–36:15 testów; #38:16 wariantów+10 powtórzeń; #40:3 testy viewportu, CI159 Chromium890/890+573 jednostkowe; Windows80 dokowanie zaliczone, całość60/1/6, diagnostyka #42 wskazała klik za modalem Głosu; #47:RED+2/2 po zamknięciu modalu, Windows82 już62/0/5, kłódka3,0s; CI160 Windows3516/5/46, WebView81:60/1/6; #45–46 potwierdzone CI161 Windows3521/0/46,14/14 w poprawianych celach, Clippy0; CI162Windows3521/0/46 i UI901/901; #51 prywatnałatkaClippy0+4/4, niecommitowana; #52 HTTP504 silników83 dwa razy; chroniona łatka Brokera otwarta |
+| J.6 | Atlas Jarvisa, mapa offline i cele dotykowe | w toku | 2026-11-11 | kod2f3cf3e3,41/41Chromium,573Vitest,typy0/0; dwie regresje CSS naprawione; pełny nowyCI i fizyczny telefon pozostają osobno; [raport](../reviews/2026-11-11-jarvis-atlas.md) |
 
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 

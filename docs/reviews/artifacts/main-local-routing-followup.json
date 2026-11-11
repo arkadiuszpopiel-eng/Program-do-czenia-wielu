@@ -1,0 +1,327 @@
+{
+  "opaque_alias_red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "router-impl",
+      "--test",
+      "main_local_assistance",
+      "explicit_light_rung",
+      "-j2"
+    ],
+    "exit": 101,
+    "started_utc": "2026-11-10T07:58:28.029528+00:00",
+    "finished_utc": "2026-11-10T07:58:39.105118+00:00",
+    "sha256": "dc1b45ba44afc6119dfd4b56b04950289187de0763ec5f331b58ac5e896d3598"
+  },
+  "opaque_alias_checks": [
+    {
+      "name": "opaque-helper-green",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:01:48.595782+00:00",
+      "finished_utc": "2026-11-10T08:01:57.275209+00:00",
+      "sha256": "a89b57e0a2e08a1280082a1e94de1d6aa36d051751cf0fb4634abfdd1ae14617"
+    },
+    {
+      "name": "opaque-helper-clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:01:57.276094+00:00",
+      "finished_utc": "2026-11-10T08:02:05.140038+00:00",
+      "sha256": "4eb25e3298912ab5336a15bde63feae5206ca8ad80aea4108ea004d9948e6d20"
+    }
+  ],
+  "opaque_alias": "Explicit owner Light rung supports configured API aliases; cached sort; Strong override still respected",
+  "opaque_final_checks": [
+    {
+      "name": "opaque-fmt",
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:10:19.223416+00:00",
+      "finished_utc": "2026-11-10T08:10:26.031096+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "opaque-docs-generate",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:10:26.032205+00:00",
+      "finished_utc": "2026-11-10T08:10:26.561714+00:00",
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    {
+      "name": "opaque-docs-check",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:10:26.562124+00:00",
+      "finished_utc": "2026-11-10T08:10:27.122019+00:00",
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    {
+      "name": "opaque-docs-verify",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--verify"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:10:27.122605+00:00",
+      "finished_utc": "2026-11-10T08:10:27.533190+00:00",
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    },
+    {
+      "name": "opaque-lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:10:27.533748+00:00",
+      "finished_utc": "2026-11-10T08:10:52.100122+00:00",
+      "sha256": "9c7a391bd72c8386c5e9c55ff29e01b19c84bf37de53257dad6a0687c3ae04c9"
+    },
+    {
+      "name": "opaque-diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:10:52.101313+00:00",
+      "finished_utc": "2026-11-10T08:10:52.232823+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "docs_setup": "Initial fresh worktree lacked marked dependency. Linked existing pinned node_modules, then all six gates passed.",
+  "manual_queue_red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "router-impl",
+      "--test",
+      "main_local_assistance",
+      "reordered_account_queue",
+      "-j2"
+    ],
+    "exit": 101,
+    "started_utc": "2026-11-10T08:13:33.991676+00:00",
+    "finished_utc": "2026-11-10T08:13:36.803218+00:00",
+    "sha256": "7a7fa89627cc1ec722ceb13d1757b60ef096d2980f56a1b5bf1ac811fbf932c1"
+  },
+  "manual_queue_checks": [
+    {
+      "name": "manual-queue-green",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:14:14.315028+00:00",
+      "finished_utc": "2026-11-10T08:14:22.006332+00:00",
+      "sha256": "c33ae48301d30d2332f0d72627496edd6c133526b099fb2fa32718f668cd3413"
+    },
+    {
+      "name": "manual-queue-clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:14:22.006881+00:00",
+      "finished_utc": "2026-11-10T08:14:23.990948+00:00",
+      "sha256": "e3ba348e0e9bf0caeef5b780ba966278270719398d6c849de5038432d07d0008"
+    }
+  ],
+  "issue": 67,
+  "results": [
+    66,
+    0,
+    0
+  ],
+  "targets": 16,
+  "latest_source_sha256": {
+    "crates/router-impl/src/main_local.rs": "9418499998ad7e301cef92008a9ee7a8c8b7414b7014565c296448e82b4ed601",
+    "crates/router-impl/src/routing.rs": "e038eb1e2dfe4e3089da45fa7927b945282a5568dc9c756f536ef6b6aa850106",
+    "crates/router-impl/src/difficulty.rs": "b1c97505b50d621e204fb5c2d6c476d492e74aecd43158147246f2d84be1aaa8",
+    "crates/router-impl/tests/main_local_assistance.rs": "844dc1b5f8683dcdfb5bee95dec4a8ff2f5fcccadce39d31728ffca95b3c7903"
+  },
+  "core_unchanged_test": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "app-core",
+      "--test",
+      "model_routing",
+      "-j2"
+    ],
+    "exit": 0,
+    "started_utc": "2026-11-10T08:15:31.605474+00:00",
+    "finished_utc": "2026-11-10T08:19:42.785214+00:00",
+    "sha256": "355a97afe6d064fd5423b0caf164eb9466854531ae5dec9f00da4d8b97bd76a8"
+  },
+  "core_results": [
+    2,
+    0,
+    0
+  ],
+  "core_test_integrity": {
+    "path": "crates/app-core/tests/model_routing.rs",
+    "same_as_failed_ci178_head_a3": true,
+    "sha256": "8b8d07a0dfb5bb83639741661780c2e34d8d10b5ccfc3acc677267ee5d4a2087",
+    "production_changes": "Router only; no Core modifications"
+  },
+  "final_checks": [
+    {
+      "name": "manual-fmt",
+      "command": [
+        "cargo",
+        "+1.94",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:18:33.136744+00:00",
+      "finished_utc": "2026-11-10T08:18:41.277496+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "manual-docs-generate",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:18:41.277986+00:00",
+      "finished_utc": "2026-11-10T08:18:41.830016+00:00",
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    {
+      "name": "manual-docs-check",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:18:41.830565+00:00",
+      "finished_utc": "2026-11-10T08:18:42.368499+00:00",
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    {
+      "name": "manual-docs-verify",
+      "command": [
+        "node",
+        "scripts/docs-html.mjs",
+        "--verify"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:18:42.371421+00:00",
+      "finished_utc": "2026-11-10T08:18:42.929574+00:00",
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    },
+    {
+      "name": "manual-lint",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:18:42.931693+00:00",
+      "finished_utc": "2026-11-10T08:19:12.775204+00:00",
+      "sha256": "9c7a391bd72c8386c5e9c55ff29e01b19c84bf37de53257dad6a0687c3ae04c9"
+    },
+    {
+      "name": "manual-diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T08:19:12.777973+00:00",
+      "finished_utc": "2026-11-10T08:19:12.889595+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

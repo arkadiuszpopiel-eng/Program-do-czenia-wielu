@@ -1,0 +1,24 @@
+{
+  "target_results": 1121,
+  "counts": [
+    3516,
+    5,
+    45
+  ],
+  "failures": [
+    "conductor_handoff::later_refusal_does_not_erase_recorded_command_output",
+    "conductor_handoff::receipts_survive_limit_and_core_restart_without_repeating_delegate",
+    "files::attachment_taint_reaches_broker_and_survives_restart",
+    "exec_low::powershell_runs_at_low_integrity",
+    "shell_utf8::cmd_output_is_decoded_from_the_oem_code_page"
+  ],
+  "source": "169a6004b414d9fa610f10fdacde565de3bd2410",
+  "run": 42549736330,
+  "job": 128942473689,
+  "command": "cargo test --workspace --all-features --no-fail-fast",
+  "complete": true,
+  "numbered_grep_duplicates_excluded": 7,
+  "queue_tests_passed": true,
+  "custom_persona_restart_passed": true,
+  "files_fixture_cleanup_result": "failed;moduleRowreadybutkernel_brokerNone"
+}

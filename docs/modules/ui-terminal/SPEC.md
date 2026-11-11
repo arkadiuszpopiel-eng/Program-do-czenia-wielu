@@ -21,6 +21,8 @@ pub mod ui_only { pub fn user_gesture() -> UserGesture }   // tylko w obsłudze 
 // impl: platform-windows-pty-impl::WinPty (CreatePseudoConsole + Job Object), atrapa: platform-fake::FakePty
 ```
 Zdarzenia magistrali (bez treści): `terminal.opened` (`terminal`, `profile`, `pid`), `terminal.exited` (`terminal`, `code`), `terminal.closed` (`terminal`).
+Test `metadata_privacy` wymusza PID `4417`, taki sam jak cyfry w testowym wejściu:
+sprawdza brak pełnej treści i ścisły zestaw pól metadanych. Same cyfry PID nie oznaczają wycieku.
 
 ### Do dodania w UI/`app-*` (inna sesja)
 Komendy: `terminal_open { profile, cols, rows, cwd?, channel }` → `{ terminal }`; `terminal_input { terminal, data_b64 }` (xterm.js `onData`); `terminal_resize { terminal, cols, rows }`; `terminal_close { terminal }`; `terminal_list {}`. Strumień: `tauri::ipc::Channel<TerminalFrame>` przekazany w `terminal_open` (`{kind:"output", data_b64}` | `{kind:"exit", code}`) — `TerminalSink` zapisuje **tylko** do kanału; nigdy przez `app-api` events/bus/log. `UserGesture` tworzy wyłącznie handler komendy. Programy profili z wykrycia mostów (`accounts-hub`); `default_cwd` = `%USERPROFILE%`.

@@ -1,0 +1,75 @@
+{
+  "updated_utc": "2026-11-09T20:27:07.777273+00:00",
+  "base": "3054e9e9fbb44e61f57005a90d9c51fe7dba9514",
+  "source_UI": "e3f70a8b unchangedUI",
+  "issue": 55,
+  "full_count": 905,
+  "shards": [
+    302,
+    302,
+    301
+  ],
+  "union_equals_full": true,
+  "pairwise_disjoint": true,
+  "all905retained": true,
+  "step_timeout_minutes": 30,
+  "test_thresholds": "UNCHANGED",
+  "aggregate_gate_preserves_name": "UI (Svelte 5)",
+  "aggregate_requires": [
+    "ui-build",
+    "ui-e2e/all3"
+  ],
+  "gate_truth_table_cases": 16,
+  "gate_fail_closed": true,
+  "execution": "LIST ONLY; fullnewshardsCI required; previousCI169905passed30.1m butjobfailedtimeout",
+  "initial_command_error": "MissingUIworkspace dependencies resolvedPythonPlaywrightCLI,unknowncommandtest,exit1;linkpinnedJSdependencies thenall4lists pass. Not anE2Etestfailure.",
+  "source_ui_log_sha256": "70f96d11c5240047de7cd8152aeadf7d4976be9e59c5ad6e88b2793bf70e0389",
+  "manifest_sha256": {
+    "all.json": "8423a8770a49a087673dccd97729bf4f6a4dce8f236c33430dd03219108c4c98",
+    "shard-1.json": "de63ef247442aaa7bafdbd2ef84d55c1abfe50e68916eb46191f0940906ac76d",
+    "shard-2.json": "26e785bcdeb6adf04a0ceeb768fe1e20b4f8a2a47bc88354683d466f7fc6dee8",
+    "shard-3.json": "3db229d03e41f8dd216cf706f4d68724ccbe8f8f069696f8cd3cb7115d75946e"
+  },
+  "artifact_transfer": {
+    "files": 144,
+    "byte_identical": true,
+    "simulation": "tar transfer ofsamebuiltUI;GitHubartifacthandoffstillrequiresCI"
+  },
+  "artifact_smoke": {
+    "scope": "builder-jarvis9 cases split across3shards,headlessLinuxChromium,notWindowsGPUrealmic",
+    "passed": [
+      3,
+      3,
+      3
+    ],
+    "failed": 0,
+    "earlier_labels_scope": "2cases;thirdshardempty validCLIexit0,alllogsretained"
+  },
+  "checks": {
+    "ui_build": {
+      "exit": 0,
+      "sha256": "a17f744874f14be20082b065d5aa97bdd532bc2d0b75d1fec1c93bfa74b3417e"
+    },
+    "lint": {
+      "exit": 0,
+      "sha256": "7b9e8475af5d6c8a1d85f2d5353fa163715f4241cd4ebc19017c73066474c1d4"
+    },
+    "docs_generate": {
+      "exit": 0,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs_check": {
+      "exit": 0,
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225"
+    },
+    "docs_verify": {
+      "exit": 0,
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38"
+    }
+  },
+  "smoke_log_sha256": {
+    "jarvis-smoke-1.log": "83e7c03bde927f2fd292a414f0bf37cbc80fea43b7766dcc0c5cf6e972c105e7",
+    "jarvis-smoke-2.log": "198d1152b97d1f99360b400faec805392bf1a643628dac496fa2d1b25bdc5575",
+    "jarvis-smoke-3.log": "443ed629c20104804cd383058f841340c2f7993a445fd69e2786d6263d9c9b85"
+  }
+}

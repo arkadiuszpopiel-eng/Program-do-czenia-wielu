@@ -40,6 +40,7 @@ pub struct Rig {
     pub workdir: PathBuf,
     pub fs: Arc<FakeFs>,
     pub exec: Arc<FakeExec>,
+    pub ocr: Arc<tools_vision_fake::FakeOcr>,
     pub targets: Targets,
     /// Sesja narzędzi przeglądarki (przeglądarka należy do sesji `browser_open`).
     pub browser_session: String,
@@ -197,7 +198,8 @@ pub async fn rig_with(kernel: Option<KernelFor<'_>>) -> Rig {
     let exec = Arc::new(FakeExec::new());
     exec.set_default(platform_fake::FakeRun::ok("wynik atrapy\n"));
     // ffmpeg atrapy zapisuje plik wynikowy (ostatni argument `file:<ścieżka>`), jak konwersja.
-    let is_ffmpeg = |spec: &ExecSpec| spec.process.cmd.ends_with("ffmpeg.exe");
+    let command = ffmpeg.to_string_lossy().into_owned();
+    let is_ffmpeg = move |spec: &ExecSpec| spec.process.cmd == command;
     let write_output = |spec: &ExecSpec| {
         let out = spec
             .process
@@ -229,11 +231,13 @@ pub async fn rig_with(kernel: Option<KernelFor<'_>>) -> Rig {
     let script = Script::text(FAKE_MODEL, &["Biały piksel na białym tle."]);
     let vision = FakeProvider::new("diag-wizja").with_default_script(script);
     opts.providers = vec![(Arc::new(vision), router_contract::RouteKind::Local)];
+    let ocr = Arc::new(tools_vision_fake::FakeOcr::default());
     opts.tool_ports = PortOverrides {
         apps: Some(apps(&paths.local, sys, desktop)),
         engine: Some(Arc::new(tools_engine_fake::FakeEngine::new(
             paths.local.join("engine"),
         ))),
+        ocr: Some(ocr.clone()),
     };
     let core = AppCore::build(paths, opts).await.unwrap();
     let browser_session = core
@@ -253,6 +257,7 @@ pub async fn rig_with(kernel: Option<KernelFor<'_>>) -> Rig {
         workdir,
         fs,
         exec,
+        ocr,
         targets,
         browser_session,
         _dir: dir,

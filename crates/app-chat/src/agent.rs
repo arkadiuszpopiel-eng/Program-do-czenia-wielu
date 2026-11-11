@@ -115,7 +115,7 @@ pub(crate) async fn run(
     let rate = u64::from(core.inner.costs.current_rate().rate_e4);
     let window = core.inner.broker.approval_window();
     let role = setup.roles.first().map(|r| r.id.as_str().to_owned());
-    let spec = run_spec(
+    let mut spec = run_spec(
         SpecInput {
             session: req.session.clone(),
             persona: setup.persona,
@@ -132,6 +132,7 @@ pub(crate) async fn run(
         rate,
         window,
     );
+    core.apply_interaction(&mut spec).await;
     let approval_timeout_ms = spec.approval_timeout_ms;
     // v1: obsada sesji → delegacja (`delegate_task`) i Krytyczka jako podprzebiegi w Replay.
     let mut options = stack.launch.options(&req.session, None);

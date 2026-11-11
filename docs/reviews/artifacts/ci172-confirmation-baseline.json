@@ -1,0 +1,167 @@
+{
+  "checked_utc": "2026-11-10 00:46:28 UTC",
+  "commit": "9319f1624ea0943e6430280ed50e98aef3fc0fd1",
+  "CI172": {
+    "run": 42724707041,
+    "status": "completed success",
+    "jobs": [
+      {
+        "id": 129527248052,
+        "name": "Rust (ubuntu-24.04)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527248397,
+        "name": "UI — kontrole i build",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527248400,
+        "name": "cargo-deny",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527248452,
+        "name": "Rust (windows-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527248582,
+        "name": "Powłoka Tauri (Windows)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527248609,
+        "name": "Dokumentacja",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527909331,
+        "name": "UI E2E + axe (3/3)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527909417,
+        "name": "UI E2E + axe (1/3)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527909433,
+        "name": "UI E2E + axe (2/3)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129532921631,
+        "name": "UI (Svelte 5)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "linux": {
+      "passed": 3523,
+      "failed": 0,
+      "ignored": 26,
+      "target_results": 1129,
+      "log_job": 129527248052
+    },
+    "other_results": [
+      {
+        "job_id": 129527248452,
+        "sha_pending": true,
+        "targets": 1129,
+        "Rust": {
+          "passed": 3549,
+          "failed": 0,
+          "ignored": 47
+        },
+        "playwright": []
+      },
+      {
+        "job_id": 129527909331,
+        "sha_pending": true,
+        "targets": 0,
+        "Rust": {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        "playwright": [
+          "2026-11-10T00:11:22.4592305Z   305 passed (10.5m)"
+        ]
+      },
+      {
+        "job_id": 129527909417,
+        "sha_pending": true,
+        "targets": 0,
+        "Rust": {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        "playwright": [
+          "2026-11-10T00:09:18.6285984Z   305 passed (8.5m)"
+        ]
+      },
+      {
+        "job_id": 129527909433,
+        "sha_pending": true,
+        "targets": 0,
+        "Rust": {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        "playwright": [
+          "2026-11-10T00:08:03.8030025Z   305 passed (7.4m)"
+        ]
+      }
+    ]
+  },
+  "Windows94": {
+    "run": 42724707038,
+    "status": "completed success",
+    "jobs": [
+      {
+        "id": 129527248441,
+        "name": "Prawdziwa aplikacja — E2E przez CDP (WebView2)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527248833,
+        "name": "setup-dev.ps1 (PowerShell 5.1 i 7)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527248874,
+        "name": "Silniki na żywo (CPU)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129527248886,
+        "name": "Hugging Face — adresy z katalogów modeli",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "WebView2": {
+      "passed": 63,
+      "failed": 0,
+      "skipped": 5,
+      "elapsed_minutes": 2.4,
+      "job": 129527248441
+    }
+  },
+  "qualification": "Exact previous head CI, not candidate branch; no GPU or real microphone acceptance"
+}

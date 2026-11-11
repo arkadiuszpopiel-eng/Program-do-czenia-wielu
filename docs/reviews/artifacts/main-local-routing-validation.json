@@ -1,0 +1,217 @@
+{
+  "issue": 67,
+  "initial_red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "router-impl",
+      "--test",
+      "main_local_assistance",
+      "-j2"
+    ],
+    "exit": 101,
+    "started_utc": "2026-11-10T06:40:50.629450+00:00",
+    "finished_utc": "2026-11-10T06:41:01.594099+00:00",
+    "sha256": "fb378555f50d38531f7865c309a292525a871b019aba9bcdfe0210265d8845ad"
+  },
+  "corrected_red_results": [
+    3,
+    3,
+    0
+  ],
+  "fixture_note": "Initial API privacy tag was allowed by existing policy; test corrected to a disallowed unknown tag. No privacy policy changed.",
+  "missing_main_red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "router-impl",
+      "--test",
+      "main_local_assistance",
+      "local_problem_uses",
+      "-j2"
+    ],
+    "exit": 101,
+    "sha256": "c203537ecf3783f955257e320ad669571a107140eee0aeb07e610b48024ee0f7"
+  },
+  "first_checks": [
+    {
+      "name": "router-green",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:44:47.530031+00:00",
+      "finished_utc": "2026-11-10T06:44:58.348328+00:00",
+      "sha256": "92dce5ae3ff99b8b64794ed227c5355b9224a3e5fc27b3767918875bb7ffb4da"
+    },
+    {
+      "name": "router-clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 101,
+      "started_utc": "2026-11-10T06:44:58.349442+00:00",
+      "finished_utc": "2026-11-10T06:45:05.401496+00:00",
+      "sha256": "fdb73bebec63a61b8fa078c0342fe1fec82be9bf1edc7efea0d77d96307d360b"
+    }
+  ],
+  "clippy_note": "First Clippy rejected one unused HealthState import; removed, no allow or limit change.",
+  "final_checks": [
+    {
+      "name": "router-green-final",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:47:46.016198+00:00",
+      "finished_utc": "2026-11-10T06:47:53.541461+00:00",
+      "sha256": "aec3c51bc9f12fb0a20d272f02f6ba5fb1192c17a05fbc063eb85ea862f32041"
+    },
+    {
+      "name": "router-clippy-final",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:47:53.542247+00:00",
+      "finished_utc": "2026-11-10T06:47:55.823280+00:00",
+      "sha256": "0905ec8d154734958c71f5d26ccaf993e27a9158853211193556dec663c22018"
+    }
+  ],
+  "results": [
+    66,
+    0,
+    0
+  ],
+  "targets": 16,
+  "scope": "Configured provider inventory only; no liveAPI, CLIsecret, security policy or eval threshold change",
+  "review_only_luna_red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "router-impl",
+      "--test",
+      "main_local_assistance",
+      "hard_tasks_and",
+      "-j2"
+    ],
+    "exit": 101,
+    "sha256": "d3ae96fdb509115bf04ebffccb4496c432a038af7f59ce76f0cf49436867b959"
+  },
+  "latest_checks": [
+    {
+      "name": "router-review-green",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T07:03:06.296971+00:00",
+      "finished_utc": "2026-11-10T07:03:14.173316+00:00",
+      "sha256": "59bb348dffd81ce79771596b831d369cb9fd01a91b26d014b0286bdb928a7447"
+    },
+    {
+      "name": "router-review-clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "router-contract",
+        "-p",
+        "router-impl",
+        "-p",
+        "router-fake",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T07:03:14.173892+00:00",
+      "finished_utc": "2026-11-10T07:03:16.351078+00:00",
+      "sha256": "96253c67ee67f56636dde5c9209cfa3659862d1147066d20fb23d56708aafb6c"
+    }
+  ],
+  "latest_source_sha256": {
+    "crates/router-impl/src/main_local.rs": "9418499998ad7e301cef92008a9ee7a8c8b7414b7014565c296448e82b4ed601",
+    "crates/router-impl/src/routing.rs": "e038eb1e2dfe4e3089da45fa7927b945282a5568dc9c756f536ef6b6aa850106",
+    "crates/router-impl/src/difficulty.rs": "b1c97505b50d621e204fb5c2d6c476d492e74aecd43158147246f2d84be1aaa8",
+    "crates/router-impl/tests/main_local_assistance.rs": "844dc1b5f8683dcdfb5bee95dec4a8ff2f5fcccadce39d31728ffca95b3c7903"
+  },
+  "followup_artifact": "main-local-routing-followup.json"
+}

@@ -7,9 +7,10 @@
 use app_api::dto::{
     BundleFitKind as F, LocalizedText, ModelBundle, ModelItem, ModelItemState as S,
 };
+use app_models::ItemSpec;
 use app_models::bundle_data::{LLAMA_CPU, LLAMA_CUDA, LLAMA_VULKAN};
 use app_models::bundles::{self, Accel, Machine};
-use app_models::{ItemSpec, builtin};
+use app_models::catalog::{Target, builtin_for};
 use device_profile_contract::{GpuInfo, GpuVendor, fixtures};
 
 fn model_item(s: &ItemSpec) -> ModelItem {
@@ -36,7 +37,10 @@ fn model_item(s: &ItemSpec) -> ModelItem {
 }
 
 fn catalog_items() -> Vec<ModelItem> {
-    builtin().iter().map(model_item).collect()
+    builtin_for(Some(Target::WINDOWS_X64))
+        .iter()
+        .map(model_item)
+        .collect()
 }
 
 fn bundle(views: &[ModelBundle], rating: u8) -> &ModelBundle {

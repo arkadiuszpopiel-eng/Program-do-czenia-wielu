@@ -1,0 +1,52 @@
+{
+  "kind": "identity",
+  "source": {
+    "binary": "/workspace/target-nightly/debug/deps/jarvis_live-2b1b1be5c60d4bd9",
+    "sha256": "ebb620ab1bd7cbc8a8f7cd4d017c16bc1343d317bdf02cb8dcb8f2f960e94107",
+    "source_commit": "ed710717afe56a49be98d48ad2f664e5e8059598",
+    "note": "Order-only persona default prompt candidate; not yet published or model-accepted"
+  },
+  "model_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "platform": "Linux Cloud CPU after18:16 restart; forced LocalBrain; no GPU, microphone, Windows or external API",
+  "max_tokens": 96,
+  "temperature": 0,
+  "threads": 4,
+  "first_token_s": 60,
+  "idle_s": 30,
+  "turn_timeout_s": 120,
+  "command": [
+    "/workspace/target-nightly/debug/deps/jarvis_live-2b1b1be5c60d4bd9",
+    "--ignored",
+    "--exact",
+    "all_personas_on_local_model",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "start": "2026-11-10T18:37:54.679824+00:00",
+  "state": "completed",
+  "owned_servers": {
+    "742600": {
+      "pid": 742600,
+      "state": "R",
+      "group": 742593,
+      "birth": "17947800",
+      "comm": "llama-server"
+    }
+  },
+  "peak_rss_kib": 10090908,
+  "cleanup": [
+    {
+      "pid": 742600,
+      "signal": "SIGTERM"
+    }
+  ],
+  "pid": 742593,
+  "group": 742593,
+  "exit": 0,
+  "elapsed_s": 488.655,
+  "end": "2026-11-10T18:46:03.336426+00:00",
+  "logs_sha256": {
+    "test.log": "e4255524f8107e7c750fa8ae3eb817c8ed0cce4f0301327000aab9832a44af96",
+    "responses.json": "8943036a1915cd495fa2b4b02f9a9a3591b0201e54bb41d6a78c11fa86f06b4f"
+  }
+}

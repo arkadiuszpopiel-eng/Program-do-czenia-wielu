@@ -45,6 +45,8 @@ export const enAgents: Record<keyof typeof plAgents, Message> = {
   'undo.cardTitle': { one: '{n} step can be undone', other: '{n} steps can be undone' },
   'undo.stepLabel': 'Undo: {label}',
   'intent.terminal': 'Run in terminal',
+  'conv.toolNeedsConfirmation': 'Requires confirmation',
+  'conv.toolsNeedConfirmation': 'Awaiting confirmation: {n}',
   'intent.terminalHint':
     'The command was not run. Open a terminal in “{cwd}”, paste it and run it yourself.',
   'intent.copy': 'Copy command',

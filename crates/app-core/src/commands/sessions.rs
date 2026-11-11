@@ -1,5 +1,4 @@
-//! Komendy `sessions_*`: lista, tworzenie, metadane, usuwanie z cofnięciem (potem
-//! crypto-shredding), duplikat, eksport (⟶ transfer), wyszukiwanie FTS, szkice.
+//! Komendy `sessions_*`: katalog, cofalne usuwanie, crypto-shredding, transfer, FTS i szkice.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::time::Duration;
@@ -83,8 +82,7 @@ impl AppCore {
         self.patch_session(&session_id, patch).await
     }
 
-    /// `sessions_set_project`: projekt sesji (pamięć projektu dzielą sesje tego projektu);
-    /// `null`/pusty = poza projektem.
+    /// `sessions_set_project`: projekt dzieli pamięć sesji; `null`/pusty = poza projektem.
     pub async fn sessions_set_project(
         &self,
         session_id: String,
@@ -189,7 +187,10 @@ impl AppCore {
         }
         self.inner.sessions.close_session(id);
         match self.inner.sessions.delete_session(id) {
-            Ok(report) => tracing::info!(sesja = %id, klucz = report.key_deleted, "sesja usunięta"),
+            Ok(report) => {
+                self.inner.personas.forget_session(id);
+                tracing::info!(sesja = %id, klucz = report.key_deleted, "sesja usunięta");
+            }
             Err(e) => tracing::error!(sesja = %id, error = %e, "usuwanie sesji nie powiodło się"),
         }
         self.inner.store.forget(id);
@@ -286,9 +287,8 @@ impl AppCore {
         Ok(out)
     }
 
-    /// `sessions_cards`: dane kart rozmów (agentki, ostatnia wiadomość, model, koszt w PLN).
-    /// Czyta bazy sesji (blokująco, osobny wątek); bazy, które otworzyło dopiero to wywołanie,
-    /// zamyka po odczycie — widok kart nie trzyma otwartych wszystkich rozmów.
+    /// `sessions_cards`: agentki, wiadomość, model i koszt; odczyt w osobnym wątku.
+    /// Zamyka bazy otwarte dopiero przez ten odczyt — karty nie trzymają wszystkich rozmów.
     pub async fn sessions_cards(
         &self,
         session_ids: Vec<String>,

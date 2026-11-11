@@ -1,0 +1,62 @@
+{
+  "source": "169a6004b414d9fa610f10fdacde565de3bd2410",
+  "protocol": "4builtinpersonas x 2profiles x 5freshsessions;96tokens,temp0,120s/turn,CPU4,tools=false",
+  "platform": "LinuxCloudCPU/headlessCore/fakeaudio,nomicorWindows",
+  "elapsed_s": [
+    236.32,
+    211.03,
+    238.42
+  ],
+  "attempts": [
+    {
+      "file": "jarvis-bielik-2026-11-09-before.json",
+      "sha256": "0a45b76c6628488e6e0f6bd0bceba333434f3e6dfcea7b6855d3154bf6d366a9",
+      "rows": 40,
+      "errors": 0,
+      "truncated": 0,
+      "wrong_authors": 0,
+      "jarvis_single_sentence": 0,
+      "jarvis_correct_identity": 20,
+      "unique_jarvis_texts": {
+        "Jestem Alfą. Jestem gotowa pomóc.": 5,
+        "Jestem Betą. Jestem gotowa pomóc.": 5,
+        "Jestem Gamą. Jestem gotowa pomóc.": 5,
+        "Jestem Deltą. Jestem gotowa pomóc.": 5
+      }
+    },
+    {
+      "file": "jarvis-bielik-2026-11-09-after.json",
+      "sha256": "b3e2ad390d5a3d7811feccc7aa2bde5f1adf46ae47fb77c1acffb5bc31ad575c",
+      "rows": 40,
+      "errors": 0,
+      "truncated": 0,
+      "wrong_authors": 0,
+      "jarvis_single_sentence": 0,
+      "jarvis_correct_identity": 20,
+      "unique_jarvis_texts": {
+        "Jestem Alfą. Jestem gotowa pomóc.": 5,
+        "Jestem Betą. Jestem gotowa pomóc.": 5,
+        "Jestem Gamą. Jestem gotowa pomóc.": 5,
+        "Jestem Deltą. Jestem gotowa pomóc.": 5
+      }
+    },
+    {
+      "file": "jarvis-bielik-2026-11-09-after-v2.json",
+      "sha256": "6fbd17c8123284da6a1358bc8244184c109501e208fda0050189a8ff7aa1aef0",
+      "rows": 40,
+      "errors": 0,
+      "truncated": 0,
+      "wrong_authors": 0,
+      "jarvis_single_sentence": 0,
+      "jarvis_correct_identity": 20,
+      "unique_jarvis_texts": {
+        "Jestem Alfą. Jestem gotowa pomóc.": 5,
+        "Jestem Betą. Jestem gotowa pomóc.": 5,
+        "Jestem Gamą. Jestem gotowa pomóc.": 5,
+        "Jestem Deltą. Jestem gotowa pomóc.": 5
+      }
+    }
+  ],
+  "all_texts_identical_to_before": true,
+  "outcome": "Bothinstructionattemptsfailedone-sentenceconditionandwerereverted;qualityremainsincomplete"
+}

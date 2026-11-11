@@ -1,0 +1,576 @@
+{
+  "start": "2026-11-10T23:40:19.250205+00:00",
+  "scope": "raw HTTP diagnostic outside Core, synthetic prior ledger; no physical actions",
+  "comparison_scope": "Qwen3.5-9B mergedSystem3, same syntheticinputs as previousQwen3-8B mergedSystem3; rawonly, notCore/GPU acceptance",
+  "change": "One prespecifieddiagnostic: clarifycurrentprojectselection isnotpastexecutionevidence, motivatedby2unsupportedcausesinfirst9Bpilot; allotherinputunchanged; no readyanswerorchangedgate",
+  "model": {
+    "id": "qwen3.5-9b-q4-k-m",
+    "name": "Qwen3.5 9B Q4_K_M (Unsloth, prywatna próba)",
+    "url": "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/3885219b6810b007914f3a7950a8d1b469d598a5/Qwen3.5-9B-Q4_K_M.gguf",
+    "file": "Qwen3.5-9B-Q4_K_M.gguf",
+    "size_mb": 5418,
+    "sha256": "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8",
+    "params_b": 9.0,
+    "quant": "Q4_K_M",
+    "layers": 32,
+    "ctx": 262144,
+    "vram_mb": 6800,
+    "ram_mb": 8000,
+    "kv_mb_per_1k_ctx": 32,
+    "tools": true,
+    "license": "Apache-2.0"
+  },
+  "startup_budget_s": 60,
+  "max_tokens": 96,
+  "temperature": 0,
+  "first_event_s": 60,
+  "idle_s": 30,
+  "turn_s": 120,
+  "server_args": [
+    "/workspace/tools/llama/llama-b11559/llama-server",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "44999",
+    "-m",
+    "/workspace/models/Qwen3.5-9B-Q4_K_M.gguf",
+    "-c",
+    "8192",
+    "-ngl",
+    "0",
+    "--threads",
+    "4",
+    "-np",
+    "1",
+    "--jinja",
+    "--alias",
+    "qwen3.5-9b-q4-k-m",
+    "--chat-template-kwargs",
+    "{\"enable_thinking\":false}",
+    "--sse-ping-interval",
+    "10",
+    "--api-key",
+    "<ephemeral-test-auth-redacted>"
+  ],
+  "results": [
+    {
+      "placement": "merged",
+      "scenario": "empty_record",
+      "text": "Nie, w tej rozmowie nie uruchomiłam żadnych narzędzi ani nie sprawdziłam plików, ponieważ nie wybrano jeszcze konkretnego projektu ani katalogu roboczego.",
+      "first_visible_since_http_ms": 65601,
+      "first_visible_since_server_start_ms": 98503,
+      "error": null,
+      "chunks": [
+        {
+          "ms": 10143,
+          "bytes": 3
+        },
+        {
+          "ms": 20149,
+          "bytes": 3
+        },
+        {
+          "ms": 30981,
+          "bytes": 3
+        },
+        {
+          "ms": 40993,
+          "bytes": 3
+        },
+        {
+          "ms": 51006,
+          "bytes": 3
+        },
+        {
+          "ms": 61014,
+          "bytes": 3
+        },
+        {
+          "ms": 65601,
+          "bytes": 520
+        },
+        {
+          "ms": 66015,
+          "bytes": 249
+        },
+        {
+          "ms": 66406,
+          "bytes": 250
+        },
+        {
+          "ms": 66788,
+          "bytes": 252
+        },
+        {
+          "ms": 67212,
+          "bytes": 253
+        },
+        {
+          "ms": 67607,
+          "bytes": 252
+        },
+        {
+          "ms": 68208,
+          "bytes": 252
+        },
+        {
+          "ms": 68703,
+          "bytes": 254
+        },
+        {
+          "ms": 69194,
+          "bytes": 251
+        },
+        {
+          "ms": 69642,
+          "bytes": 252
+        },
+        {
+          "ms": 70103,
+          "bytes": 257
+        },
+        {
+          "ms": 70646,
+          "bytes": 256
+        },
+        {
+          "ms": 71146,
+          "bytes": 250
+        },
+        {
+          "ms": 71599,
+          "bytes": 252
+        },
+        {
+          "ms": 72198,
+          "bytes": 252
+        },
+        {
+          "ms": 72621,
+          "bytes": 254
+        },
+        {
+          "ms": 73079,
+          "bytes": 251
+        },
+        {
+          "ms": 73533,
+          "bytes": 252
+        },
+        {
+          "ms": 74001,
+          "bytes": 251
+        },
+        {
+          "ms": 74467,
+          "bytes": 253
+        },
+        {
+          "ms": 75048,
+          "bytes": 249
+        },
+        {
+          "ms": 75850,
+          "bytes": 258
+        },
+        {
+          "ms": 76319,
+          "bytes": 252
+        },
+        {
+          "ms": 76756,
+          "bytes": 251
+        },
+        {
+          "ms": 77261,
+          "bytes": 250
+        },
+        {
+          "ms": 77799,
+          "bytes": 251
+        },
+        {
+          "ms": 78340,
+          "bytes": 256
+        },
+        {
+          "ms": 78830,
+          "bytes": 255
+        },
+        {
+          "ms": 79367,
+          "bytes": 250
+        },
+        {
+          "ms": 79798,
+          "bytes": 251
+        },
+        {
+          "ms": 80257,
+          "bytes": 257
+        },
+        {
+          "ms": 80741,
+          "bytes": 252
+        },
+        {
+          "ms": 81204,
+          "bytes": 256
+        },
+        {
+          "ms": 81626,
+          "bytes": 249
+        },
+        {
+          "ms": 82078,
+          "bytes": 252
+        },
+        {
+          "ms": 82745,
+          "bytes": 251
+        },
+        {
+          "ms": 83374,
+          "bytes": 251
+        },
+        {
+          "ms": 83836,
+          "bytes": 249
+        },
+        {
+          "ms": 84310,
+          "bytes": 817
+        },
+        {
+          "ms": 84310,
+          "bytes": 14
+        }
+      ],
+      "finish_reasons": [
+        "stop"
+      ],
+      "usage": {
+        "completion_tokens": 39,
+        "prompt_tokens": 1005,
+        "total_tokens": 1044,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "http_status": 200,
+      "elapsed_ms": 84311,
+      "http_first_visible_within60s": false
+    },
+    {
+      "placement": "merged",
+      "scenario": "recorded_done",
+      "text": "Nie, w tej rozmowie nie uruchomiłam żadnych narzędzi ani nie sprawdziłam plików.",
+      "first_visible_since_http_ms": 28917,
+      "first_visible_since_server_start_ms": 146134,
+      "error": null,
+      "chunks": [
+        {
+          "ms": 10118,
+          "bytes": 3
+        },
+        {
+          "ms": 20132,
+          "bytes": 3
+        },
+        {
+          "ms": 28917,
+          "bytes": 520
+        },
+        {
+          "ms": 29374,
+          "bytes": 249
+        },
+        {
+          "ms": 29811,
+          "bytes": 250
+        },
+        {
+          "ms": 30268,
+          "bytes": 252
+        },
+        {
+          "ms": 30719,
+          "bytes": 253
+        },
+        {
+          "ms": 31157,
+          "bytes": 252
+        },
+        {
+          "ms": 31717,
+          "bytes": 252
+        },
+        {
+          "ms": 32164,
+          "bytes": 254
+        },
+        {
+          "ms": 32666,
+          "bytes": 251
+        },
+        {
+          "ms": 33117,
+          "bytes": 252
+        },
+        {
+          "ms": 33702,
+          "bytes": 257
+        },
+        {
+          "ms": 34198,
+          "bytes": 256
+        },
+        {
+          "ms": 34646,
+          "bytes": 250
+        },
+        {
+          "ms": 35110,
+          "bytes": 252
+        },
+        {
+          "ms": 35591,
+          "bytes": 252
+        },
+        {
+          "ms": 46152,
+          "bytes": 3
+        },
+        {
+          "ms": 52133,
+          "bytes": 254
+        },
+        {
+          "ms": 62322,
+          "bytes": 3
+        },
+        {
+          "ms": 74595,
+          "bytes": 3
+        },
+        {
+          "ms": 84092,
+          "bytes": 3
+        },
+        {
+          "ms": 93399,
+          "bytes": 251
+        },
+        {
+          "ms": 94611,
+          "bytes": 252
+        },
+        {
+          "ms": 95122,
+          "bytes": 251
+        },
+        {
+          "ms": 95743,
+          "bytes": 253
+        },
+        {
+          "ms": 96176,
+          "bytes": 249
+        },
+        {
+          "ms": 96693,
+          "bytes": 821
+        },
+        {
+          "ms": 96693,
+          "bytes": 14
+        }
+      ],
+      "finish_reasons": [
+        "stop"
+      ],
+      "usage": {
+        "completion_tokens": 22,
+        "prompt_tokens": 1000,
+        "total_tokens": 1022,
+        "prompt_tokens_details": {
+          "cached_tokens": 489
+        }
+      },
+      "http_status": 200,
+      "elapsed_ms": 96694,
+      "http_first_visible_within60s": true
+    },
+    {
+      "placement": "merged",
+      "scenario": "needs_confirmation",
+      "text": "Nie, w tej rozmowie nie uruchomiłam żadnych narzędzi ani nie sprawdziłam plików; poprzednia moja odpowiedź była błędem.",
+      "first_visible_since_http_ms": 28115,
+      "first_visible_since_server_start_ms": 242031,
+      "error": null,
+      "chunks": [
+        {
+          "ms": 10101,
+          "bytes": 3
+        },
+        {
+          "ms": 20101,
+          "bytes": 3
+        },
+        {
+          "ms": 28115,
+          "bytes": 520
+        },
+        {
+          "ms": 28570,
+          "bytes": 249
+        },
+        {
+          "ms": 29082,
+          "bytes": 250
+        },
+        {
+          "ms": 29530,
+          "bytes": 252
+        },
+        {
+          "ms": 29982,
+          "bytes": 253
+        },
+        {
+          "ms": 30456,
+          "bytes": 252
+        },
+        {
+          "ms": 30934,
+          "bytes": 252
+        },
+        {
+          "ms": 31402,
+          "bytes": 254
+        },
+        {
+          "ms": 31845,
+          "bytes": 251
+        },
+        {
+          "ms": 32295,
+          "bytes": 252
+        },
+        {
+          "ms": 32856,
+          "bytes": 257
+        },
+        {
+          "ms": 33344,
+          "bytes": 256
+        },
+        {
+          "ms": 33793,
+          "bytes": 250
+        },
+        {
+          "ms": 34265,
+          "bytes": 252
+        },
+        {
+          "ms": 34769,
+          "bytes": 252
+        },
+        {
+          "ms": 35215,
+          "bytes": 254
+        },
+        {
+          "ms": 35652,
+          "bytes": 251
+        },
+        {
+          "ms": 36112,
+          "bytes": 252
+        },
+        {
+          "ms": 36569,
+          "bytes": 251
+        },
+        {
+          "ms": 37027,
+          "bytes": 253
+        },
+        {
+          "ms": 37490,
+          "bytes": 249
+        },
+        {
+          "ms": 37980,
+          "bytes": 256
+        },
+        {
+          "ms": 38459,
+          "bytes": 251
+        },
+        {
+          "ms": 39020,
+          "bytes": 253
+        },
+        {
+          "ms": 39537,
+          "bytes": 257
+        },
+        {
+          "ms": 40041,
+          "bytes": 250
+        },
+        {
+          "ms": 40481,
+          "bytes": 254
+        },
+        {
+          "ms": 40979,
+          "bytes": 252
+        },
+        {
+          "ms": 41457,
+          "bytes": 251
+        },
+        {
+          "ms": 41940,
+          "bytes": 250
+        },
+        {
+          "ms": 42396,
+          "bytes": 249
+        },
+        {
+          "ms": 42855,
+          "bytes": 821
+        },
+        {
+          "ms": 42855,
+          "bytes": 14
+        }
+      ],
+      "finish_reasons": [
+        "stop"
+      ],
+      "usage": {
+        "completion_tokens": 32,
+        "prompt_tokens": 1005,
+        "total_tokens": 1037,
+        "prompt_tokens_details": {
+          "cached_tokens": 489
+        }
+      },
+      "http_status": 200,
+      "elapsed_ms": 42856,
+      "http_first_visible_within60s": true
+    }
+  ],
+  "state": "completed",
+  "pid": 773325,
+  "group": 773325,
+  "birth": "19762167",
+  "load_ms": 32896,
+  "server_exit": 0,
+  "end": "2026-11-10T23:44:38.009956+00:00"
+}

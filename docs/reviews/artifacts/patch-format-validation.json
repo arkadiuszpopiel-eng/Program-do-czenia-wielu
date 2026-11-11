@@ -1,0 +1,27 @@
+{
+  "why": "git whitespacecheck2 on literal unifieddiff blankcontext lines; publication script continued, retained asnotpassed",
+  "source_change": false,
+  "patches": [
+    {
+      "path": "docs/reviews/patches/branch-tool-facts-v1-rejected.patch",
+      "previous_sha256": "26e32341e42b6530f24bda1d9ebf6b5ff9f6bbd1d9c1cab9ad816367b61f8f86",
+      "sha256": "8b3fdd184802931b150057a9fa818d37764e3718ae34ed01dac23ea4f05016b9",
+      "target_commit": "5538f59a68373cc857770890f0a5dee64f993f96",
+      "exact_source_tree_or_subset": true,
+      "apply": "git apply --unidiff-zero",
+      "scope": [
+        "crates/app-chat",
+        "crates/app-core"
+      ]
+    },
+    {
+      "path": "docs/reviews/patches/local-cadence-only-rejected.patch",
+      "previous_sha256": "e331710fc0178c57280f49e5068ddaec6d871fba89866e361b8d20bb1aa6ea7f",
+      "sha256": "1665c6a0565e85560f9c3af9cb0c9db75a031ca7916efac4c4405c6c6e1eba2b",
+      "target_commit": "aa02af79a3aab0be9cb39eb2b189d06b598a91f5",
+      "exact_source_tree_or_subset": true,
+      "apply": "git apply --unidiff-zero",
+      "scope": "all changed files"
+    }
+  ]
+}

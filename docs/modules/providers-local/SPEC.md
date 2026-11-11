@@ -1,7 +1,20 @@
 # providers-local — SPEC (v1, F1)
 
+## Role modeli — zlecenie10.11.2026
+
+Domyślny Qwen3-8B Q4_K_M (8k kontekstu, szablon bez thinking); Bielik11B Q4_K_M jako
+alternatywa tekstowa bez deklaracji narzędzi. Oficjalne pliki/revizje/SHA256 są przypięte.
+Bielik11B ma mniejszy margines i wymaga odbioru GPU; głównym wyborem pozostaje8B.
+Bielik1.5B służy wyłącznie lekkiej pomocy. Brak głównego8–12B nie promuje zainstalowanego
+1.5B/4.5B do domyślnej trasy. Jawna konfiguracja pomocnika zachowuje własny model.
+Pamięć: Qwen5345+1152MiB przy8k, Bielik6963+1600MiB; dodatkowo1500MiB mowy i768MiB
+ekranu oraz600MiB syntezy głosu pozostawia na12GiB odpowiednio2923 i857MiB.
+Qwen16k mieści też rezerwę512MiB;
+Bielik16k musi zejść do8k przy tych rezerwach. To szacunek, nie odbiór sprzętu.
+Bielik1.5B i poprzednie wyniki jakości pozostają zachowane; zmiana modelu ich nie zalicza.
+
 ## Cel
-Lokalny `ModelProvider`: wbudowany llama.cpp (Vulkan/CUDA/CPU) jako osobny proces; bez kluczy API jedyny „mózg" (MVP), z kluczami — komendy, fallback, offline. Ollama i LM Studio jako zewnętrzne endpointy przez adapter generyczny (w `providers-api`), nie tutaj. Pobieranie modelu 1,5–4,5B (oficjalny GGUF autorów; Bielik v3 — Q8_0, fala 6) w onboardingu (PLAN §1.2, §5.2, §16.2 F1).
+Lokalny `ModelProvider`: wbudowany llama.cpp (Vulkan/CUDA/CPU) jako osobny proces; bez kluczy API jedyny „mózg" (MVP), z kluczami — komendy, fallback, offline. Ollama i LM Studio jako zewnętrzne endpointy przez adapter generyczny (w `providers-api`), nie tutaj. Pobieranie głównych modeli8–12B i pomocniczego1.5B (oficjalne GGUF autorów; role według zlecenia10.11) w onboardingu (PLAN §1.2, §5.2, §16.2 F1).
 
 ## Fala i priorytet
 F1 (chat + embeddings lokalne, pobieranie modelu, Vulkan/CUDA/CPU). P0 — wymagany w MVP.
@@ -13,14 +26,24 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
 - **Protokół sidecara (rozstrzygnięte):** `llama-server` (OpenAI-compatible HTTP) na `127.0.0.1`, losowy port i losowy
   `--api-key` (192 bity, tylko w pamięci, redagowany w logach) per uruchomienie; nigdy `0.0.0.0`. Strumień przez wspólny
   silnik `lib-openai-compat` (ten sam co `providers-api`). Job Object / brak tokenu egress — przez `platform-windows` (F2).
+- **Postęp generacji lokalnej:** `LlamaCodec::content_timeouts` stosuje skonfigurowane
+  first-token/idle do niepustej treści generacji SSE (tekst, myślenie, nazwa/argumenty narzędzia),
+  nie do bajtów/pingów, Started, Usage ani pustych delt. Przed treścią pozostaje absolutny first-token;
+  po treści idle od ostatniego postępu. Komentarze nie skracają pierwszego budżetu i nie
+  przedłużają żadnego. Domyślne60/30s bez zmian. event_progress widzi generację przed buforującą
+  kopertą: długie poprawne argumenty nie muszą być gotowe w first-token, jeśli postęp trwa.
+  TTFT/after_output nadal dotyczą zdekodowanej treści; niedokończony JSON nie jest wyjściem,
+  gotowym wywołaniem ani wykonaniem. Pingi po jego fragmencie dają Idle/after_output=false.
+  Zachowanie API chmurowych pozostaje dotychczasowe; Stop/anulowanie zachowują pierwszeństwo.
 - **Cykl życia:** start na żądanie (jeden naraz), zdrowie `GET /health`, `Started` od razu po przyjęciu żądania (zimny
   start modelu nie jest milczeniem dla Routera), restart po awarii z limitem (`max_restarts` w `restart_window`),
   fallback GPU → CPU (`-ngl 0`), zwolnienie po bezczynności, `kill_on_drop`.
 - **Argumenty z profilu urządzenia:** backend (Vulkan/CUDA/CPU = osobne pliki `llama-server`; bateria lub słaby sprzęt
-  → CPU), `-ngl` z dzierżawy `model-residency` (GPU → wszystkie warstwy, CPU → 0) albo proporcjonalnie do budżetu VRAM,
+  → CPU), `-ngl` z dzierżawy `model-residency` (GPU → wszystkie bloki i dodatkowy poziom wyjściowy llama.cpp,
+  CPU → 0) albo proporcjonalnie do budżetu VRAM; częściowe odciążenie zachowuje jawny limit,
   `-c`, `--threads` (rdzenie fizyczne), `--alias`, `-np 1`, `--jinja` (narzędzia).
 - **Modele:** `models.toml` (GGUF, URL HF, rozmiar, SHA-256, kwant, warstwy, kontekst, szacunki VRAM/RAM, licencja);
-  walidacja: `.gguf`, bez kwantów IQ, https. Domyślny: Bielik 4.5B v3.0 Instruct Q8_0 (fala 6; wcześniej Q4_K_M — brak w oficjalnym repozytorium).
+  walidacja: `.gguf`, bez kwantów IQ, https. Historyczny domyślny: Bielik 4.5B v3.0 Instruct Q8_0 (fala 6; wcześniej Q4_K_M — brak w oficjalnym repozytorium).
 - **Pobieranie:** wznawianie HTTP Range z pliku `.part` (≤ 3 automatyczne wznowienia), SHA-256; zły hash → błąd
   i usunięcie `.part`. Hash nieznany w manifeście (`sha256 = ""`) → zapis przy pierwszym pobraniu (`<plik>.sha256`,
   zaufanie przy pierwszym użyciu) + ostrzeżenie w logach; model bez zapisanego hasha = niezainstalowany.
@@ -40,7 +63,7 @@ Zdarzenia: `local.model.download.progress/finished/failed`, `local.model.loaded/
 
 ## Niezmienniki
 - Model tylko GGUF z hashem (łańcuch dostaw, PLAN §8.7); nieznany hash = brak ładowania.
-- Bez kwantów IQ (crashe RDNA3/Vulkan); 8B tylko gdy STT idzie na CPU (rezydencja).
+- Bez kwantów IQ (crashe RDNA3/Vulkan); wagi, KV cache, mowa i zapas muszą mieścić się w budżecie rezydencji.
 - Crash sidecara nie zabija aplikacji; automatyczny fallback backendu (Vulkan → CPU) z ograniczoną liczbą prób i zdarzeniem.
 - Brak Pythona; brak dostępu sidecara do sieci (Job Object / brak tokenu egress) — dane nie wychodzą.
 - Tabela cen: koszt = 0 PLN, ale zużycie tokenów raportowane do `cost-meter` (statystyki).
@@ -72,6 +95,10 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
 
 ## Fake
 `providers-local-fake`: udaje sidecar (skryptowane odpowiedzi, tok/s z wirtualnym zegarem), pobieranie z lokalnych fixture'ów, symulacja OOM/crash.
+
+Integracyjne fixture'y instalacji serwera publikują niezmienną binarkę Cargo jako nowy regularny
+plik przez dowiązanie twarde w tym samym systemie plików. Nie otwierają wykonywanego inode do
+zapisu; zachowują sprawdzenie instalacji po starcie bez restartu, bez retries i zwiększenia czasu.
 
 ## Otwarte pytania
 - Próg jakości tool-use po polsku na Bielik 4.5B — pomiar F3.
@@ -116,9 +143,10 @@ Onboarding: pobieranie modelu (postęp, wznawianie); Ustawienia → Modele i dos
   | --- | --- | --- | --- | --- | --- |
   | 4.5B Q8_0 | 5400 | 5600 | 60 | 5880 | 6080 |
   | 1.5B Q8_0 | 2200 | 2400 | 32 | 2456 | 2656 |
-- **Częściowe odciążenie z dzierżawą.** `-ngl` = `layers_for(budżet VRAM − rezerwa STT, ctx)`: całość, gdy się mieści,
+- **Częściowe odciążenie z dzierżawą.** Liczba bloków w planie = `layers_for(budżet VRAM − rezerwa STT, ctx)`: całość, gdy się mieści,
   inaczej (budżet − 550) / (VRAM całości − 550) × warstwy. Dzierżawa `model-residency` zgłasza VRAM dla tych warstw
-  (`ModelEntry::vram_for`) i RAM procesu z wagami/KV warstw na CPU (`ram_for`); dzierżawa na CPU → `-ngl 0`. Rezerwa
+  (`ModelEntry::vram_for`) i RAM procesu z wagami/KV warstw na CPU (`ram_for`); dzierżawa na CPU → `-ngl 0`.
+  Dla całości `LaunchPlan::args` dodaje do `-ngl` jeden poziom wyjściowy zgodnie z b11559; częściowy limit pozostaje dosłowny. Rezerwa
   STT (`stt_reserve_mb` = 1500, tyle co dzierżawa `voice-stt`) — gdy profil urządzenia przewiduje STT na GPU.
 - **Kontekst** (`LocalConfig::ctx_for`, `min_ctx` = 4096): na GPU zmniejszany (połowienie do `min_ctx`) **tylko
   wtedy, gdy pozwala to zmieścić model w całości** obok rezerwy STT; gdy i tak będzie częściowe odciążenie — pełny

@@ -15,7 +15,7 @@ use crate::engine::{
     BuildOptions, Engine, StreamDecoder, WireCodec, cancelled, classify_transport, timeout_err,
     to_bytes,
 };
-use crate::sse::SseParser;
+use crate::sse::{SseEvent, SseParser};
 
 pub(crate) enum Failure {
     Cancelled,
@@ -144,7 +144,7 @@ impl<'a, C: WireCodec> Run<'a, C> {
                 () = self.tx.closed() => return None,
                 r = timeout_at(deadline, body.next()) => r,
             };
-            let (batch, eof) = match next {
+            let (batch, eof, progress) = match next {
                 Err(_) => {
                     let phase = if seen {
                         TimeoutPhase::Idle
@@ -161,25 +161,21 @@ impl<'a, C: WireCodec> Run<'a, C> {
                     return Some(self.fail(err));
                 }
                 Ok(Some(Ok(bytes))) => {
-                    let evs: Vec<ProviderEvent> = parser
-                        .push(&bytes)
-                        .into_iter()
-                        .flat_map(|e| decoder.on_event(e))
-                        .collect();
-                    (evs, false)
+                    let (evs, progress) =
+                        decode_events(&self.engine.codec, &mut decoder, parser.push(&bytes));
+                    (evs, false, progress)
                 }
                 Ok(None) => {
-                    let mut evs: Vec<ProviderEvent> = parser
-                        .finish()
-                        .into_iter()
-                        .flat_map(|e| decoder.on_event(e))
-                        .collect();
+                    let (mut evs, progress) =
+                        decode_events(&self.engine.codec, &mut decoder, parser.finish());
                     evs.extend(decoder.on_eof());
-                    (evs, true)
+                    (evs, true, progress)
                 }
             };
-            seen = true;
-            deadline = Instant::now() + idle;
+            if !self.engine.codec.content_timeouts() || progress {
+                seen = true;
+                deadline = Instant::now() + idle;
+            }
             for ev in batch {
                 match self.forward(ev).await {
                     Forward::Continue => {}
@@ -211,7 +207,12 @@ impl<'a, C: WireCodec> Run<'a, C> {
         if ev.is_terminal() {
             return Forward::Terminal(ev);
         }
-        if ev.is_content() && !self.emitted {
+        let content = if self.engine.codec.content_timeouts() {
+            has_progress(&ev)
+        } else {
+            ev.is_content()
+        };
+        if content && !self.emitted {
             self.emitted = true;
             self.ttft = Some(self.started.elapsed());
         }
@@ -220,6 +221,35 @@ impl<'a, C: WireCodec> Run<'a, C> {
             () = self.cancel.cancelled() => Forward::Terminal(cancelled()),
             r = self.tx.send(ev) => if r.is_ok() { Forward::Continue } else { Forward::Gone },
         }
+    }
+}
+
+fn decode_events<C: WireCodec>(
+    codec: &C,
+    decoder: &mut C::Decoder,
+    events: impl IntoIterator<Item = SseEvent>,
+) -> (Vec<ProviderEvent>, bool) {
+    let mut out = Vec::new();
+    let mut progress = false;
+    for event in events {
+        let hint = codec.event_progress(&event);
+        let decoded = decoder.on_event(event);
+        progress |= hint.unwrap_or_else(|| decoded.iter().any(has_progress));
+        out.extend(decoded);
+    }
+    (out, progress)
+}
+
+/// Pusty fragment nie rozpoczyna ani nie przedłuża czasu generacji.
+fn has_progress(event: &ProviderEvent) -> bool {
+    match event {
+        ProviderEvent::TextDelta { text, .. } | ProviderEvent::ThinkingDelta { text, .. } => {
+            !text.is_empty()
+        }
+        ProviderEvent::ThinkingSignature { signature, .. } => !signature.is_empty(),
+        ProviderEvent::RedactedThinking { data, .. } => !data.is_empty(),
+        ProviderEvent::ToolCallDelta { partial_json, .. } => !partial_json.is_empty(),
+        _ => event.is_content(),
     }
 }
 

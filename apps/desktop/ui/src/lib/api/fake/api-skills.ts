@@ -276,7 +276,17 @@ export class FakeBuilder {
     return {
       policy: () =>
         core.reply({
-          groups: ['fs', 'fs.read', 'shell', 'memory', 'gui.control', 'web', 'delegate'],
+          groups: [
+            'fs',
+            'fs.read',
+            'shell',
+            'memory',
+            'gui.control',
+            'web',
+            'delegate',
+            'system',
+            'vision',
+          ],
           ceiling: 'L3' as const,
           palette: Array.from({ length: 8 }, (_, i) => `color.agent.custom-${i + 1}`),
           voices: ['pl-f1', 'pl-f2', 'pl_PL-gosia-medium'],

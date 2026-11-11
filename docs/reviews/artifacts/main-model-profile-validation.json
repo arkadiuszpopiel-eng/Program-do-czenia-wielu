@@ -1,0 +1,92 @@
+{
+  "issue": 66,
+  "red": {
+    "command": [
+      "cargo",
+      "+1.94.1",
+      "test",
+      "--locked",
+      "-p",
+      "app-models",
+      "--test",
+      "main_profile",
+      "-j2"
+    ],
+    "exit": 101,
+    "started_utc": "2026-11-10T06:29:54.394712+00:00",
+    "finished_utc": "2026-11-10T06:32:56.132834+00:00",
+    "sha256": "1e849f05ccdd2d15687668f81aaad9381a46ca513db339060cb408553b17a372"
+  },
+  "red_results": [
+    0,
+    3,
+    0
+  ],
+  "first_build_failure": [
+    {
+      "name": "manager-green",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "app-models",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 101,
+      "started_utc": "2026-11-10T06:35:44.470418+00:00",
+      "finished_utc": "2026-11-10T06:36:12.311488+00:00",
+      "sha256": "dc3ed0d8822d04b3582573a04b92ecda541ef46e27cb9c25b34cb3dfd69ff334"
+    }
+  ],
+  "failure_note": "Linker SIGBUS after filesystem exhaustion; failure retained. Cache cleanup and preservation manifest in scratch; no thresholds changed.",
+  "checks": [
+    {
+      "name": "manager-green-retry",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "test",
+        "--locked",
+        "-p",
+        "app-models",
+        "--all-features",
+        "-j2"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:38:29.201117+00:00",
+      "finished_utc": "2026-11-10T06:38:38.466514+00:00",
+      "sha256": "9eee7124e26e059e4e91ad5100ebcb4bec352d9e0422b16d32e1f6f12c056c1f"
+    },
+    {
+      "name": "manager-clippy",
+      "command": [
+        "cargo",
+        "+1.94.1",
+        "clippy",
+        "--locked",
+        "-p",
+        "app-models",
+        "--all-targets",
+        "--all-features",
+        "-j2",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit": 0,
+      "started_utc": "2026-11-10T06:38:38.467195+00:00",
+      "finished_utc": "2026-11-10T06:40:02.626067+00:00",
+      "sha256": "d0c466e82629844513853294c53213cd7240b249fe222e564b23e93425f02800"
+    }
+  ],
+  "results": [
+    85,
+    0,
+    1
+  ],
+  "targets": 17,
+  "ignored": "live_catalog: real engine/model test is opt-in; not performed here"
+}

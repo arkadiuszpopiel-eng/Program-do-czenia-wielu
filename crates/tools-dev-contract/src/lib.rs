@@ -138,7 +138,7 @@ pub struct TestSummary {
     pub exit_code: Option<i32>,
     /// Przekroczony limit czasu.
     pub timed_out: bool,
-    /// Wszystko zaliczone (kod 0, bez niezaliczonych).
+    /// Potwierdzone zaliczenie: kod 0, rozpoznane podsumowanie, ≥1 zaliczony i 0 niezaliczonych.
     pub ok: bool,
     /// Czas (ms).
     pub elapsed_ms: u64,

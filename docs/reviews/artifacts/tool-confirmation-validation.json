@@ -1,0 +1,212 @@
+{
+  "updated_utc": "2026-11-09T23:55:27.554286+00:00",
+  "issue": 57,
+  "base_commit": "aa2e75ffaa296b9b09293e8ba39362d4c955da64",
+  "red": {
+    "Rust": "0/1/13filtered,exit101",
+    "UI": "0/1classiclight,exit1;oldUIbundle23300/UIidenticalaa2"
+  },
+  "Rust": {
+    "command": "cargo +1.94.1 test --locked -p app-api -p app-agents --all-features -j2",
+    "totals": [
+      73,
+      0,
+      3
+    ],
+    "target_results": 20,
+    "exit": 0
+  },
+  "schema": {
+    "command": "UPDATE_SCHEMAS=1 cargo +1.94.1 test --locked -p app-api --test ipc_schema -j2;node scripts/gen-ipc-types.mjs",
+    "passed": 4,
+    "included_in_Rust_total": true,
+    "hand_edited_generated_files": false
+  },
+  "Clippy": {
+    "all_targets": true,
+    "all_features": true,
+    "exit": 0,
+    "elapsed_seconds": 116
+  },
+  "UI": {
+    "Vitest": "573/573,103files,exit0",
+    "Svelte": "0errors0warningsbothworkspaces",
+    "firstE2E": "10/10,1.0m",
+    "finalE2E": "10/10afterreview,1.1m,4stylesx2themes+EN+360px;no retries/thresholdchanges",
+    "coverage": {
+      "full": 915,
+      "shards": [
+        305,
+        305,
+        305
+      ],
+      "original905_retained": true,
+      "added_cases": 10,
+      "pairwise_disjoint": true
+    },
+    "not_qualified": "Notfull915execution onnewhead;notWindows/WebView2/GPU/realAPI/microphone"
+  },
+  "size": "initialpl-app417>exception416;keysrelocatedagentsfiles,0violations,noexceptionincrease",
+  "guard_review": "OnlyNeedsConfirmationexcludedfromundo;legacyotherstateundo_tokencontrols preserved includingerrorpartialeffects",
+  "source_sha256": {
+    "crates/app-api/src/dto/sessions.rs": "b64ab11d37bd38ea5811c634a2bf16bbc87cb3ffe567b760acc6dff584298a3f",
+    "crates/app-agents/src/map.rs": "17d2be5187f08515f99016a667d9bec1f1df7ee6b5130793987b6e507ef99771",
+    "crates/app-agents/src/project/steps_tests.rs": "833df0330e7be886bfc0f8bccd7c0ba3ca4210401e5801561d8035bc3f8d5390",
+    "packages/schemas/ipc.v1.json": "35a2b2a8882c331b0cf86d054325bb827f551823502bce0140afbafb76718e4b",
+    "apps/desktop/ui/src/lib/api/generated/ipc.ts": "7cb42d980f74ae384b6a3fc15f75e85df927448df119a172653e2c2531fcd373",
+    "apps/desktop/ui/src/lib/components/conversation/ToolSteps.svelte": "d2b64e62da188d192d42c4b071fb8c4743d7a543efd24556949a274a07290bf6",
+    "apps/desktop/ui/e2e/tool-confirmation.spec.ts": "d8d280801bb9264281cc21d3b4396ba5b7ffe20f1e9ec23d43e74fe842d50301"
+  },
+  "log_sha256": {
+    "red.log": "6b88218a1bc14efb2ac430c9a29b5b09978947f1b6243c44acfd7f96f15491a5",
+    "ui-red.log": "2ef91c9fd9a072c58761ec7d3fd39abed62006e09fca5dd9531d098961d41801",
+    "rust-full.log": "33ecc6b015249107092ce73ef240c9ab8e71eae4ef80836ce256dcd87fc0b3b6",
+    "schema.log": "3efbfc0d7498738523f2cdb8c5f8a118b761f452f280fe0ac83388d3dfb8ac62",
+    "types-generate.log": "c99a0ab9a4e181c22a98adda567e297663a71795b6766171c68098f5fb8b2ce9",
+    "clippy.log": "0f62dbe172c7fac8d82f11beb8e64959bef1889151200214756198466da49be8",
+    "check-reviewed.log": "b5a599b222b5cb5c261467f734f4bb53172192cd9d306017bb2f3e4aebc2f840",
+    "vitest-final.log": "6435adb8f396bfbfbae42c5fc8ae11e3ab3b169c95ffcd9bb308e8794c7d4dd9",
+    "build-reviewed.log": "6a8517cc52ac869b98bff43dda1073ab9579b8e7193d93d0edfe619edde8082f",
+    "ui-green.log": "92e0118ef1404b88314d37acff511a85f00cf6529e593e3f9bdf988ef539e7a5",
+    "ui-final.log": "00630db96a0373a0eea97714d63fee993d167dc1e1cb46382f1835a0ed6b7a58",
+    "ui-reviewed.log": "701a2f254682f3b85a734938fc2118042607ddd42938a19826bfce87fe67e82e",
+    "lint.log": "e7f76b3500142de09dfc474c346bd26d5138a4d2df8f14d5709df0ce9ef6c292",
+    "coverage.json": "a8dc5b3b10928cd2701ee52ed0aaae317b8fd8c67688e7cb242caeb65655e087",
+    "fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "screenshots": {
+    "confirmation-mobile.png": "bc53b2e81120a2b1490abefb5ba369c8471bde95ff32d02ef0f4c4184d74705a",
+    "confirmation-classic.png": "d4c423d4479b66115a97bf48a743ee79fa3b45bebd408211b248224279053f60"
+  },
+  "baseline": {
+    "commit": "aa2e75ffaa296b9b09293e8ba39362d4c955da64",
+    "CI171": "10/10success",
+    "Windows93": "4/4success beforepublication",
+    "jobs": [
+      {
+        "job": "RustWindows",
+        "id": 129504018742,
+        "targets": 1129,
+        "totals": [
+          3546,
+          0,
+          47
+        ],
+        "lines": []
+      },
+      {
+        "job": "RustLinux",
+        "id": 129504019074,
+        "targets": 1129,
+        "totals": [
+          3520,
+          0,
+          26
+        ],
+        "lines": []
+      },
+      {
+        "job": "UIbuild",
+        "id": 129504019127,
+        "targets": 0,
+        "totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T23:08:26.7111128Z packages/ui-kit check: svelte-check found 0 errors and 0 warnings",
+          "2026-11-09T23:08:38.2480577Z apps/desktop/ui check: svelte-check found 0 errors and 0 warnings",
+          "2026-11-09T23:09:26.5916270Z  Test Files  103 passed (103)",
+          "2026-11-09T23:09:26.5918435Z       Tests  573 passed (573)"
+        ]
+      },
+      {
+        "job": "UI1/3",
+        "id": 129504808357,
+        "targets": 0,
+        "totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T23:18:08.9815870Z   302 passed (8.2m)"
+        ]
+      },
+      {
+        "job": "UI3/3",
+        "id": 129504808382,
+        "targets": 0,
+        "totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T23:19:57.1884670Z   301 passed (9.9m)"
+        ]
+      },
+      {
+        "job": "UI2/3",
+        "id": 129504808534,
+        "targets": 0,
+        "totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T23:17:18.6559669Z   302 passed (7.3m)"
+        ]
+      },
+      {
+        "job": "Windows93WebView2",
+        "id": 129504010867,
+        "targets": 0,
+        "totals": [
+          0,
+          0,
+          0
+        ],
+        "lines": [
+          "2026-11-09T23:16:18.7418525Z   5 skipped\r",
+          "2026-11-09T23:16:18.7418872Z   63 passed (2.9m)\r"
+        ]
+      }
+    ]
+  },
+  "publication": "priorCI171/Windows93bothcompletedSUCCESS;newheadCI+independentfreshreviewrequired",
+  "scope": "Projectionstatusonly;modelclaims41/48notfixed;existingpersistedDonevaluesnotrewritten;noBroker/policy/eval/promptchanges",
+  "work_window": "implementationbefore2026-11-10T04:30:00Z;tests/reportuntil05:00ZthenSTOP",
+  "checks": {
+    "lint": {
+      "sha256": "e7f76b3500142de09dfc474c346bd26d5138a4d2df8f14d5709df0ce9ef6c292",
+      "exit": 0
+    },
+    "typecheck": {
+      "sha256": "b5a599b222b5cb5c261467f734f4bb53172192cd9d306017bb2f3e4aebc2f840",
+      "exit": 0
+    },
+    "fmt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exit": 0
+    },
+    "types_check": {
+      "sha256": "037ed31cd977afc07dd1c5583ba58daecb90a9ebcb13cc1a8356a8185270a635",
+      "exit": 0
+    },
+    "bundle": {
+      "sha256": "285790271747c8510fc508c00e42670991ea1e11a4c49772e9243fec8aaf6dff",
+      "exit": 0
+    },
+    "docs_check": {
+      "sha256": "802f60ab3485787beab7567e6fb6b6bfde9b2263515ea85e54300e8d550b6225",
+      "exit": 0
+    },
+    "docs_verify": {
+      "sha256": "a6b41c61d598afa72e19c3d30646a0511dcfc22605d3450425388c6b47f80c38",
+      "exit": 0
+    }
+  }
+}

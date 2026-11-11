@@ -2,8 +2,8 @@
   Menu „Tryb pracy” (decyzja właściciela 27.10, od 29.10 w pasku pisania, od 3.11 pięć trybów na
   zasadzie Claude Code i Codex — plan 50): Plan, Ręcznie, Akceptuj edycje,
   Automatycznie, Pełny dostęp. Tryb
-  obowiązuje we wszystkich rozmowach; podniesienie potwierdzasz raz w oknie Brokera i zostaje po
-  restarcie. Zaznaczony jest poziom globalny odczytany z Brokera, a komunikat o zmianie pojawia
+  może obowiązywać w tej rozmowie lub globalnie; podniesienie potwierdzasz w oknie Brokera.
+  Zaznaczony jest poziom wybranego zakresu odczytany z Brokera, a komunikat o zmianie pojawia
   się dopiero, gdy Broker ją przyjął. Klawisze 1–5 wybierają tryb, strzałki przesuwają zaznaczenie.
   Na dole czerwony przełącznik „Max dostęp” (plan 50 §8.1). „Plan” (L0) obowiązuje tylko otwartą
   rozmowę (Z.5); w rozmowie w trybie Plan wybór innego trybu zmienia poziom tej rozmowy.
@@ -25,14 +25,20 @@
 
   const app = useApp();
   const { t, tk } = app.i18n;
+  const en = $derived(app.i18n.locale === 'en');
+  let scope = $state<'global' | 'session'>('global');
   const session = $derived(app.sessions.active);
   // Bieżący tryb i zakres zmiany: Plan i „do końca rozmowy” dotyczą tej rozmowy (Z.5, Z.7).
-  const view = $derived(modeView(app));
+  const view = $derived(modeView(app, scope));
   const current = $derived(view.current);
   const here = $derived(view.here);
+  $effect(() => {
+    if (view.planning || here) scope = 'session';
+  });
   // Rozmowa z własnym poziomem (Ustawienia → Uprawnienia) — menu zmienia tryb globalny.
   const own = $derived(
-    session &&
+    scope === 'global' &&
+      session &&
       !view.planning &&
       !here &&
       app.autonomy.global &&
@@ -83,6 +89,30 @@
 
 <div class="menu">
   <h3 class="h" id="mode-title">{t('mode.title')}</h3>
+  <fieldset class="scope">
+    <legend>{en ? 'Apply mode to' : 'Zakres trybu'}</legend>
+    <label
+      ><input
+        type="radio"
+        name="mode-scope"
+        value="session"
+        bind:group={scope}
+        disabled={!session}
+      />{en ? 'This conversation' : 'Ta rozmowa'}</label
+    >
+    <label
+      ><input
+        type="radio"
+        name="mode-scope"
+        value="global"
+        bind:group={scope}
+        disabled={view.planning || here}
+      />{en ? 'All conversations' : 'Wszystkie rozmowy'}</label
+    >
+  </fieldset>
+  {#if view.planning || here}<p class="note">
+      {en ? 'This change applies to the current conversation.' : 'Zmiana dotyczy bieżącej rozmowy.'}
+    </p>{/if}
   <div
     class="list"
     role="menu"
@@ -126,6 +156,24 @@
 </div>
 
 <style>
+  .scope {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--alfa-space-2);
+    border: 0;
+    margin: 0;
+    padding: var(--alfa-space-2);
+  }
+  .scope legend {
+    font-size: var(--alfa-font-size-xs);
+    color: var(--alfa-color-text-muted);
+  }
+  .scope label {
+    display: flex;
+    align-items: center;
+    gap: var(--alfa-space-1);
+    font-size: var(--alfa-font-size-xs);
+  }
   .menu {
     display: flex;
     flex-direction: column;

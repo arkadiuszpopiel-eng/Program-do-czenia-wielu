@@ -651,6 +651,7 @@ dependencies = [
  "tools-engine-fake",
  "tools-net-fake",
  "tools-system-contract",
+ "tools-vision-fake",
  "tracing",
  "transfer-contract",
  "transfer-impl",
@@ -1069,6 +1070,7 @@ dependencies = [
  "core-registry-contract",
  "futures-util",
  "personas-contract",
+ "personas-fake",
  "risk-classifier-contract",
  "safety-broker-contract",
  "semver",
@@ -1086,6 +1088,7 @@ version = "0.0.85"
 dependencies = [
  "app-api",
  "lib-sqlstore",
+ "personas-contract",
  "serde",
  "serde_json",
  "sessions-contract",
@@ -3604,13 +3607,12 @@ checksum = "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
 
 [[package]]
 name = "libsqlite3-sys"
-version = "0.38.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1d20bef17f513b9b3004532233187769cd072d790971f4e4da0e346eb6401e8"
+version = "0.39.1"
 dependencies = [
  "cc",
  "openssl-sys",
  "pkg-config",
+ "sqlcipher-src",
  "vcpkg",
 ]
 
@@ -5437,9 +5439,9 @@ checksum = "9278fb35b3e730abe136e9b395b5b81b96d06b9f5478a50f0c8430a2237b22de"
 
 [[package]]
 name = "rusqlite"
-version = "0.40.2"
+version = "0.41.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23f2a97da3e3873c73cb2a2e71b35c40ff95e0b1eefa8d72d8499a6928c3b5b3"
+checksum = "da9bba6f3506135e120a6586df05be18b48d18896600646a4bec8f993d91a594"
 dependencies = [
  "bitflags",
  "fallible-iterator",
@@ -6216,6 +6218,12 @@ dependencies = [
  "sqlite-vec",
  "thiserror",
 ]
+
+[[package]]
+name = "sqlcipher-src"
+version = "420.0.0+sqlcipher-4.20.0-sqlite-3.54.1-libtomcrypt-1.18.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fd6b5280ed2593d07b2816ec531821c15c306903bcca224716f1fbcc2bbfedfe"
 
 [[package]]
 name = "sqlite-vec"

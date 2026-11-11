@@ -12881,12 +12881,21 @@
     },
     "ToolStatus": {
       "description": "Stan kroku narzędzia.",
-      "enum": [
-        "running",
-        "done",
-        "error"
-      ],
-      "type": "string"
+      "oneOf": [
+        {
+          "enum": [
+            "running",
+            "done",
+            "error"
+          ],
+          "type": "string"
+        },
+        {
+          "const": "needs_confirmation",
+          "description": "Propozycja wymagająca potwierdzenia — nie oznacza wykonania czynności.",
+          "type": "string"
+        }
+      ]
     },
     "ToolStep": {
       "description": "Krok narzędzia.",

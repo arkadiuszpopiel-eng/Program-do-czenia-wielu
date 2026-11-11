@@ -50,10 +50,10 @@ impl Extra {
             Some(bus.clone()),
             monitor,
         ));
-        let media = app_agents::MediaPorts::new(gui, sessions, locks.clone(), paths);
-        let media = media.with(self.routers.as_ref(), self.audio.as_ref());
-        let media = media.exec(self.exec.clone());
-        // Zestaw multimediów trafia też do kill-switcha (zatrzymanie odtwarzania `media_play`).
+        let media = app_agents::MediaPorts::new(gui, sessions, locks.clone(), paths)
+            .with(self.routers.as_ref(), self.audio.as_ref())
+            .exec(self.exec.clone())
+            .ocr(options.tool_ports.ocr.clone());
         let (media_tools, media) =
             media.toolsets(gate.clone(), journal.clone(), platform_fs(options), bus);
         extra.extend(media_tools);

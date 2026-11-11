@@ -7,6 +7,8 @@ oraz pokazuje, co z planu v5 jest już wykonane i sprawdzone.
 
 Wersja do czytania w przeglądarce: [`../html/index.html`](../html/index.html) (otwierana dwuklikiem, bez serwera).
 
+Najnowsza seria rozwojowa: [54 — Jarvis i tryby, 8–9.11.2026](54-jarvis-i-tryby-2026-11-08.md).
+
 ## Co gdzie jest
 
 | Plik                                                                                                                       | Co zawiera                                                                                                                                                                                                                                                                                                                     | Kiedy się zmienia                                |

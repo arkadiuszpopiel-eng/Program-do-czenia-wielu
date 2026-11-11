@@ -1,0 +1,127 @@
+{
+  "head": "13c8c88d9a2daeba8cf7fa32766df9bda2195f75",
+  "CI179": {
+    "id": 42782180714,
+    "jobs": [
+      {
+        "id": 129714600635,
+        "name": "Rust (windows-latest)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129714600862,
+        "name": "Rust (ubuntu-24.04)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129714600872,
+        "name": "Powłoka Tauri (Windows)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129714600980,
+        "name": "UI — kontrole i build",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129714601003,
+        "name": "Dokumentacja",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129714601016,
+        "name": "cargo-deny",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129715553842,
+        "name": "UI E2E + axe (3/3)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129715554021,
+        "name": "UI E2E + axe (1/3)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129715554084,
+        "name": "UI E2E + axe (2/3)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129720672721,
+        "name": "UI (Svelte 5)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "linux": {
+      "results": [
+        3567,
+        0,
+        26
+      ],
+      "targets": 1135
+    },
+    "windows": {
+      "results": [
+        3593,
+        0,
+        47
+      ],
+      "targets": 1135
+    }
+  },
+  "Windows101": {
+    "id": 42782180750,
+    "jobs": [
+      {
+        "id": 129714600820,
+        "name": "setup-dev.ps1 (PowerShell 5.1 i 7)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129714600875,
+        "name": "Hugging Face — adresy z katalogów modeli",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129714600890,
+        "name": "Silniki na żywo (CPU)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 129714601030,
+        "name": "Prawdziwa aplikacja — E2E przez CDP (WebView2)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "webview2": [
+      63,
+      0,
+      5
+    ],
+    "qwen_cpu": {
+      "tokens": 96,
+      "first_token_ms": 20609,
+      "total_ms": 35141,
+      "tok_s": 6.61,
+      "tool_proposal_ms": 28773
+    },
+    "bielik11": "NOT_RUN_CPU_BUDGET,0tokens"
+  },
+  "limits": "Baseline prior head only; not new UI/phone acceptance; CPU proposal not executed physical action"
+}

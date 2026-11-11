@@ -1,0 +1,183 @@
+diff --git a/crates/providers-local-impl/src/config.rs b/crates/providers-local-impl/src/config.rs
+index 87363a22..2652efb3 100644
+--- a/crates/providers-local-impl/src/config.rs
++++ b/crates/providers-local-impl/src/config.rs
+@@ -287,0 +288,3 @@ impl LaunchPlan {
++            // Domyślne30s serwera pokrywa się z idle30s klienta; ping ma mieć zapas.
++            "--sse-ping-interval".into(),
++            "10".into(),
+diff --git a/crates/providers-local-impl/tests/config.rs b/crates/providers-local-impl/tests/config.rs
+index 892526d4..a9eba552 100644
+--- a/crates/providers-local-impl/tests/config.rs
++++ b/crates/providers-local-impl/tests/config.rs
+@@ -186,0 +187,29 @@ fn launch_args_are_localhost_only_and_secret_is_redacted() {
++#[test]
++fn owned_server_ping_has_margin_before_the_default_client_idle_deadline() {
++    let config = LocalConfig::new("/m", "/bin/llama-server");
++    assert_eq!(
++        config.timeouts.first_token,
++        std::time::Duration::from_secs(60)
++    );
++    assert_eq!(config.timeouts.idle, std::time::Duration::from_secs(30));
++    for backend in [BackendKey::Cpu, BackendKey::Cuda, BackendKey::Vulkan] {
++        let plan = LaunchPlan {
++            program: "/bin/llama-server".into(),
++            backend,
++            gpu_layers: u32::from(backend != BackendKey::Cpu),
++            ctx: 8192,
++            threads: 4,
++            device: None,
++        };
++        for entry in builtin_models().unwrap() {
++            let args = plan.args(&entry, std::path::Path::new("/m/x.gguf"), 4321, "test");
++            let seconds: u64 = support::arg(&args, "--sse-ping-interval")
++                .expect("jawny ping serwera zamiast domyślnych30s na granicy idle")
++                .parse()
++                .unwrap();
++            assert!(seconds > 0);
++            assert!(std::time::Duration::from_secs(seconds * 3) <= config.timeouts.idle);
++        }
++    }
++}
++
+diff --git a/crates/providers-local-impl/tests/lifecycle.rs b/crates/providers-local-impl/tests/lifecycle.rs
+index edc7da51..870fe1c6 100644
+--- a/crates/providers-local-impl/tests/lifecycle.rs
++++ b/crates/providers-local-impl/tests/lifecycle.rs
+@@ -68,0 +69 @@ async fn starts_on_demand_on_localhost_with_random_port_and_key() {
++        assert_eq!(arg(a, "--sse-ping-interval").as_deref(), Some("10"));
+diff --git a/crates/providers-local-impl/tests/live_ping.rs b/crates/providers-local-impl/tests/live_ping.rs
+new file mode 100644
+index 00000000..23e7924b
+--- /dev/null
++++ b/crates/providers-local-impl/tests/live_ping.rs
+@@ -0,0 +1,108 @@
++//! Ręczne odtworzenie żądania na lokalnym modelu: zimny i ciepły adapter, bez Core/GPU/mikrofonu.
++//! ALFA_PING_SERVER, ALFA_PING_MODELS, ALFA_PING_INPUT, ALFA_PING_REPORT; wejście: {system,query}.
++#![allow(clippy::unwrap_used, clippy::expect_used)]
++
++use futures_util::StreamExt;
++use providers_contract::{CancellationToken, ChatRequest, Message, ModelProvider, ProviderEvent};
++use providers_local_impl::{
++    LaunchSpec, LocalConfig, LocalError, LocalProvider, Sidecar, SidecarLauncher, SidecarProcess,
++    TokioLauncher, builtin_models,
++};
++use serde_json::{Value, json};
++use std::sync::{Arc, Mutex};
++use std::time::{Duration, Instant};
++
++#[derive(Default)]
++struct ObserveLaunch(Mutex<Vec<String>>);
++
++impl SidecarLauncher for ObserveLaunch {
++    fn spawn(&self, spec: &LaunchSpec) -> Result<Box<dyn SidecarProcess>, LocalError> {
++        // Odczyt wyłącznie jawnej kadencji; nie zapisujemy klucza ani całego argv.
++        let ping = spec
++            .args
++            .windows(2)
++            .find(|a| a[0] == "--sse-ping-interval")
++            .map_or("default", |a| a[1].as_str());
++        self.0.lock().unwrap().push(ping.into());
++        TokioLauncher::default().spawn(spec)
++    }
++}
++
++async fn sample(provider: &LocalProvider, request: ChatRequest, phase: &str) -> Value {
++    let start = Instant::now();
++    let mut first_visible = None;
++    let mut text = String::new();
++    let mut received = Vec::new();
++    let mut stream = provider.stream(request, CancellationToken::new());
++    let finished = tokio::time::timeout(Duration::from_secs(120), async {
++        while let Some(event) = stream.next().await {
++            if let ProviderEvent::TextDelta { text: chunk, .. } = &event
++                && !chunk.is_empty()
++            {
++                first_visible.get_or_insert_with(|| start.elapsed().as_millis());
++                text.push_str(chunk);
++            }
++            received.push(event);
++        }
++    })
++    .await
++    .is_ok();
++    let errors: Vec<_> = received
++        .iter()
++        .filter(|e| matches!(e, ProviderEvent::Error(_)))
++        .collect();
++    let stopped = matches!(received.last(), Some(ProviderEvent::Stop { .. }));
++    json!({"phase":phase,"elapsed_ms":start.elapsed().as_millis(),"text":text,
++        "first_visible_ms":first_visible,"first_visible_within60s":first_visible.is_some_and(|t|t<=60_000),
++        "completed_within120s":finished,"stopped":stopped,"errors":errors,
++        "events":received})
++}
++
++#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
++#[ignore = "rzeczywisty model CPU; ALFA_PING_*; surowy raport i TTFT oddzielnie od pingów"]
++async fn cold_and_warm_request_keep_transport_and_visible_budgets_separate() {
++    let input: Value =
++        serde_json::from_slice(&std::fs::read(std::env::var("ALFA_PING_INPUT").unwrap()).unwrap())
++            .unwrap();
++    let mut config = LocalConfig::new(
++        std::env::var("ALFA_PING_MODELS").unwrap(),
++        std::env::var("ALFA_PING_SERVER").unwrap(),
++    );
++    config.threads = Some(4);
++    let model = config.default_model.clone();
++    let launcher = Arc::new(ObserveLaunch::default());
++    let sidecar = Sidecar::new(config, launcher.clone(), None, None).unwrap();
++    let provider = LocalProvider::new(builtin_models().unwrap(), sidecar.clone());
++    let mut request = ChatRequest::new(
++        &model,
++        vec![Message::user_text(input["query"].as_str().unwrap())],
++    );
++    request.system = Some(input["system"].as_str().unwrap().into());
++    request.params.max_tokens = Some(96);
++    request.params.temperature = Some(0.0);
++    let cold = sample(&provider, request.clone(), "cold").await;
++    let results = if cold["errors"].as_array().unwrap().is_empty() && cold["stopped"] == true {
++        vec![cold, sample(&provider, request, "warm").await]
++    } else {
++        vec![cold]
++    };
++    sidecar.stop("koniec ręcznej próby pingów").await;
++    let report = json!({"scope":"real LocalProvider replay; no Core, GPU, microphone or physical action",
++        "model":model,"threads":4,"context":8192,"max_tokens":96,"temperature":0,
++        "first_event_s":60,"idle_s":30,"turn_s":120,"visible_budget_ms":60000,
++        "transport_success_is_not_timing_acceptance":true,
++        "launch_ping_seconds":*launcher.0.lock().unwrap(),"input":input,"results":results});
++    std::fs::write(
++        std::env::var("ALFA_PING_REPORT").unwrap(),
++        serde_json::to_vec_pretty(&report).unwrap(),
++    )
++    .unwrap();
++    assert_eq!(report["launch_ping_seconds"], json!(["10"]));
++    assert_eq!(results.len(), 2, "niewykonane próby nie są zaliczone");
++    for result in results {
++        assert_eq!(result["completed_within120s"], true);
++        assert_eq!(result["stopped"], true);
++        assert_eq!(result["errors"], json!([]));
++        assert_eq!(result["first_visible_within60s"], true);
++    }
++}
+diff --git a/docs/modules/providers-local/SPEC.md b/docs/modules/providers-local/SPEC.md
+index beb7a010..0084027a 100644
+--- a/docs/modules/providers-local/SPEC.md
++++ b/docs/modules/providers-local/SPEC.md
+@@ -34,0 +35,3 @@ Kontrakt = `providers-contract::ModelProvider` (ADR 0014); implementacja `crates
++  `--sse-ping-interval 10` daje zapas wobec domyślnego idle30s klienta; domyślne30s serwera
++  wypadało na tej samej granicy. Ping jest wyłącznie aktywnością transportu, nie tokenem,
++  postępem zadania ani potwierdzeniem zaliczenia TTFT. HTTP60/30s i zewnętrzne120s prób bez zmian.
+diff --git a/docs/vendor/llama-cpp.md b/docs/vendor/llama-cpp.md
+index 50a7d90b..85f6baa3 100644
+--- a/docs/vendor/llama-cpp.md
++++ b/docs/vendor/llama-cpp.md
+@@ -11 +11 @@
+---threads <n> -np 1 [--device <id>] [--jinja]`. `--jinja` jest w b11559 domyślnie włączone (podajemy jawnie dla
++--threads <n> -np 1 --sse-ping-interval 10 [--device <id>] [--jinja]`. `--jinja` jest w b11559 domyślnie włączone (podajemy jawnie dla
+@@ -13,0 +14,5 @@ modeli z narzędziami). `--list-devices` — lista urządzeń (`devices.rs`).
++`--sse-ping-interval N` (sekundy) potwierdzono w `--help` przypiętej binarki b11559,10.11.2026.
++Domyślne30s pokrywa się z idle30s klienta;10s zostawia zapas między komentarzami SSE.
++Komentarz `:\n\n` nie jest wygenerowanym tekstem. To ustawienie nie przyspiesza CPU ani nie
++zwiększa limitów klienta; czas do widocznej odpowiedzi trzeba mierzyć osobno od keepalive.
++

@@ -10,6 +10,9 @@ use providers_contract::ProviderPrivacy;
 
 use crate::manifest::{GPU_OVERHEAD_MB, ModelEntry};
 
+/// Główny model lokalny; Bielik1.5B pozostaje jawnym pomocnikiem.
+pub const MAIN_MODEL: &str = "qwen3-8b-q4-k-m";
+
 /// Najmniejszy kontekst przy automatycznym zmniejszaniu (rozmowa z promptem systemowym i kilkoma
 /// turami mieści się z zapasem; mniej — ryzyko „za długiej rozmowy" po kilku wymianach).
 pub const MIN_CTX: u32 = 4_096;
@@ -133,7 +136,7 @@ impl LocalConfig {
                 .map(|k| (k, server.clone()))
                 .collect(),
             server_candidates: BTreeMap::new(),
-            default_model: "bielik-4.5b-v3.0-instruct-q8_0".into(),
+            default_model: MAIN_MODEL.into(),
             gpu_name: None,
             pin_device: false,
             shared_memory: false,
@@ -227,7 +230,7 @@ pub struct LaunchPlan {
     pub program: PathBuf,
     /// Backend.
     pub backend: BackendKey,
-    /// Warstwy na GPU (`-ngl`).
+    /// Bloki modelu na GPU; dla całości `args` dolicza poziom wyjściowy llama.cpp do `-ngl`.
     pub gpu_layers: u32,
     /// Kontekst.
     pub ctx: u32,
@@ -263,6 +266,13 @@ impl LaunchPlan {
         port: u16,
         api_key: &str,
     ) -> Vec<String> {
+        // llama.cpp b11559 liczy poziom wyjściowy poza blokami modelu. Samo `entry.layers`
+        // pozostawia jeden blok na CPU. Limit częściowego odciążenia i zero są dosłowne.
+        let ngl = if self.gpu_layers > 0 && self.gpu_layers == entry.layers {
+            self.gpu_layers.saturating_add(1)
+        } else {
+            self.gpu_layers
+        };
         let mut args = vec![
             "--host".to_owned(),
             "127.0.0.1".into(),
@@ -277,7 +287,7 @@ impl LaunchPlan {
             "-c".into(),
             self.ctx.to_string(),
             "-ngl".into(),
-            self.gpu_layers.to_string(),
+            ngl.to_string(),
             "--threads".into(),
             self.threads.to_string(),
             "-np".into(),
@@ -289,6 +299,13 @@ impl LaunchPlan {
         }
         if entry.tools {
             args.push("--jinja".into());
+        }
+        if entry.id == MAIN_MODEL {
+            // Qwen3: budżet odpowiedzi służy odpowiedzi, bez ukrytego łańcucha rozumowania.
+            args.extend([
+                "--chat-template-kwargs".into(),
+                r#"{"enable_thinking":false}"#.into(),
+            ]);
         }
         args
     }

@@ -20,12 +20,12 @@
       "en": "SpeakLeash (Spichlerz Foundation) with ACK Cyfronet AGH, Poland; based on Qwen2.5 (Alibaba), further trained on Polish text"
     },
     "purpose": {
-      "pl": "Lekki model rozmowy po polsku na słabszy sprzęt: krótkie odpowiedzi i proste polecenia",
-      "en": "Lightweight Polish chat model for weaker hardware: short answers and simple commands"
+      "pl": "Lekki model pomocniczy do krótkich streszczeń, tytułów i porządków pamięci.",
+      "en": "Light auxiliary model for short summaries, titles and memory housekeeping."
     },
     "limits": {
-      "pl": "Mały model: częściej się myli i gubi wątek w dłuższej rozmowie; nie nadaje się do porad ani pracy wymagającej precyzji",
-      "en": "Small model: makes mistakes more often and loses track in longer conversations; not suitable for advice or precision work"
+      "pl": "Nie jest modelem głównym: błędne fakty i potwierdzenia działań w testach. Bez narzędzi; wynik wymaga sprawdzenia przez model główny.",
+      "en": "Not a main model: produced wrong facts and action confirmations in tests. No tools; output needs checking by the main model."
     },
     "generative": true
   },
@@ -358,5 +358,35 @@
       "en": "Software, not an AI model — processes existing files, generates nothing"
     },
     "generative": false
+  },
+  "qwen3-8b-q4-k-m": {
+    "origin": {
+      "pl": "Qwen (Alibaba); oficjalne repozytorium GGUF i przypięty SHA256.",
+      "en": "Qwen (Alibaba); official GGUF repository and pinned SHA256."
+    },
+    "purpose": {
+      "pl": "Qwen3-8B Q4_K_M — główny model lokalny8–12B na docelowej karcie12GB.",
+      "en": "Qwen3-8B Q4_K_M — main local8–12B model targeting a12GB GPU."
+    },
+    "limits": {
+      "pl": "Narzędzia i jakość wymagają własnych prób; poprzedni CoreCPU przekroczył limit. GPU12GB nieodebrany.",
+      "en": "Model quality, tool reliability, latency and actual12GB GPU memory need separate acceptance. No hardware success is claimed."
+    },
+    "generative": true
+  },
+  "bielik-11b-v2.3-instruct-q4-k-m": {
+    "origin": {
+      "pl": "SpeakLeash / ACK Cyfronet AGH; oficjalne repozytorium GGUF i przypięty SHA256.",
+      "en": "SpeakLeash / ACK Cyfronet AGH; official GGUF repository and pinned SHA256."
+    },
+    "purpose": {
+      "pl": "Bielik11B v2.3 Q4_K_M — główny model lokalny8–12B na docelowej karcie12GB.",
+      "en": "Bielik11B v2.3 Q4_K_M — main local8–12B model targeting a12GB GPU."
+    },
+    "limits": {
+      "pl": "Bez potwierdzonego wywoływania narzędzi. Mały margines VRAM przy8k i mowie; brak odbioruGPU.",
+      "en": "Model quality, tool reliability, latency and actual12GB GPU memory need separate acceptance. No hardware success is claimed."
+    },
+    "generative": true
   }
 }

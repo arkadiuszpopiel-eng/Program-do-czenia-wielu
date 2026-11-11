@@ -1,0 +1,13 @@
+{
+  "source": "d18d94336058f41ded5df3ab2eecdc8b12a2a4fe",
+  "run": 42569520902,
+  "job": 129003421686,
+  "counts": {
+    "passed": 3521,
+    "failed": 0,
+    "ignored": 46
+  },
+  "target_results": 1121,
+  "conclusion": "success",
+  "clippy": "success"
+}

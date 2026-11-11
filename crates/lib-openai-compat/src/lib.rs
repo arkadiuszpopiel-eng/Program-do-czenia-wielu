@@ -22,6 +22,7 @@ mod engine;
 mod retry;
 mod run;
 pub mod sse;
+mod wire;
 
 pub use chat::{ChatDecoder, ChatOptions, MaxTokensField};
 pub use config::{AuthScheme, ConfigError, HttpConfig, ProviderProfile, RetryPolicy, Timeouts};

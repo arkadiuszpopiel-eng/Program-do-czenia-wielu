@@ -7,7 +7,7 @@
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
@@ -15,6 +15,9 @@ use tokio::net::{TcpListener, TcpStream};
 #[derive(Default)]
 pub struct State {
     pub files: HashMap<String, Vec<u8>>,
+    /// Awaria (status, czas od pierwszego żądania); szybkie ponawianie jej nie skraca.
+    pub outage: Option<(u16, Duration)>,
+    pub outage_since: Option<Instant>,
     /// Następna odpowiedź z treścią: tylko tyle bajtów, potem zerwanie połączenia.
     pub cut_next_after: Option<usize>,
     /// Następna odpowiedź z treścią: tyle bajtów, potem zawieszenie (bez zamykania).
@@ -82,17 +85,30 @@ async fn serve(mut stream: TcpStream, state: Arc<Mutex<State>>) {
         let (k, v) = l.split_once(':')?;
         k.eq_ignore_ascii_case("range").then(|| v.trim().to_owned())
     });
-    let (file, no_range, cut, stall) = {
+    let (file, no_range, cut, stall, status) = {
         let mut st = state.lock().unwrap();
         st.requests.push((path.clone(), range.clone()));
+        let status = st.outage.and_then(|(code, duration)| {
+            let since = st.outage_since.get_or_insert_with(Instant::now);
+            (since.elapsed() < duration).then_some(code)
+        });
         let file = st.files.get(&path).cloned();
-        let (cut, stall) = if file.is_some() {
+        let (cut, stall) = if file.is_some() && status.is_none() {
             (st.cut_next_after.take(), st.stall_next_after.take())
         } else {
             (None, None)
         };
-        (file, st.no_range, cut, stall)
+        (file, st.no_range, cut, stall, status)
     };
+    if let Some(status) = status {
+        let body = "temporary test outage";
+        let response = format!(
+            "HTTP/1.1 {status} Test Outage\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+            body.len()
+        );
+        let _ = stream.write_all(response.as_bytes()).await;
+        return;
+    }
     let Some(file) = file else {
         let _ = stream
             .write_all(b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")

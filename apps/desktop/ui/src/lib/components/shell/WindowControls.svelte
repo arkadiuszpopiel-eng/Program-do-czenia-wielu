@@ -10,6 +10,7 @@
   import X from '@lucide/svelte/icons/x';
   import { windowControls, type WindowControls } from '../../api/window';
   import { useApp } from '../../state/context';
+  import { isTauri } from '../../api';
 
   const app = useApp();
   const { t } = app.i18n;
@@ -34,7 +35,12 @@
   });
 </script>
 
-<div class="window-controls" role="group" aria-label={t('window.controls')}>
+<div
+  class="window-controls"
+  data-native-window={isTauri()}
+  role="group"
+  aria-label={t('window.controls')}
+>
   <button
     type="button"
     class="wc"
@@ -69,6 +75,11 @@
 </div>
 
 <style>
+  @media (pointer: coarse) and (max-width: 1100px) {
+    .window-controls[data-native-window='false'] {
+      display: none;
+    }
+  }
   .window-controls {
     display: flex;
     align-self: stretch;

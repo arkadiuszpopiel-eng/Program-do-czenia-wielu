@@ -1,0 +1,22 @@
+{
+  "source": "d18d94336058f41ded5df3ab2eecdc8b12a2a4fe",
+  "run": 42569520994,
+  "job": 129003421746,
+  "attempt": 1,
+  "test": "live_catalog_cpu_engines",
+  "result": {
+    "passed": 0,
+    "failed": 1,
+    "ignored": 0,
+    "filtered": 2,
+    "elapsed_seconds": 288.66
+  },
+  "problems": [
+    "sidecar-whisper-cpu: HTTP504",
+    "sidecar-llama-cuda: HTTP504",
+    "sidecar-whisper-cuda: HTTP504",
+    "voice roundtrip not executed: missingwhisperCPU"
+  ],
+  "bielik_generation": "both1.5B and4.5B generated responses; CPUinstalled hashverified",
+  "thresholds_changed": false
+}

@@ -213,6 +213,7 @@ impl From<artifacts_contract::ArtifactError> for AppError {
 impl From<personas_contract::PersonasError> for AppError {
     fn from(e: personas_contract::PersonasError) -> Self {
         match e {
+            personas_contract::PersonasError::Storage(why) => Self::storage(why),
             personas_contract::PersonasError::NotStarted => Self::internal(e),
             other => Self::invalid(other.to_string()),
         }

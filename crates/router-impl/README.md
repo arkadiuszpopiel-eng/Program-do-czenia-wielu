@@ -21,3 +21,8 @@ referencyjny); ACC-F1-router-02/F1-04 (50 prób 5xx/timeout na `providers-fake`:
 sama historia; pomiar w czasie rzeczywistym); ACC-F1-router-03 (trasa wyłączona: 0 wywołań w 100 próbach);
 prywatność/jurysdykcja, polityka domyślna (profil A → klucz dodany), budżet, TTFT, obwód half-open, okno 429,
 anulowanie ≤ 100 ms, pochodzenie myślenia.
+
+`tests/cancel_stalled.rs`: anulowanie mimo adaptera ignorującego token — lokalnie/API,
+z zapasem i bez, przed zdarzeniem, po `Started`, po częściowym tekście i rozpoczęciu narzędzia;
+zachowanie treści oraz zwolnienie próby half-open bez naliczenia awarii. Zegar wirtualny,
+bez połączeń z chmurą i bez odbioru GPU.

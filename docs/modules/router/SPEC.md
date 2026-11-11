@@ -1,5 +1,15 @@
 # router — SPEC (v1, F1)
 
+## Role modeli — zlecenie właściciela10.11.2026
+
+Automatyczna główna praca na profilu lokalnym8–12B zaczyna się lokalnie; lekka chmura
+Luna/Haiku/odpowiednik z dostępnego konta jest pomocą przy problemie. Brak modelu lub konta
+nie daje fikcyjnego sukcesu. Trudne zadania/eskalacja, ręczne kolejki/przypięcia i istniejące
+bramki prywatności, możliwości i budżetu pozostają nadrzędne.1.5B local-light tylkoSummarize.
+Jawny lekki szczebel działa także dla firmowego aliasu API. Kolejka konta z włączonym
+przestawianiem zachowuje dobór według trudności; pomoc chmury nie zmienia jej szczebli.
+
+
 ## Cel
 Deterministyczny wybór trasy dla zadania: klasa zadania (głos-szybka, rozmowa, kod, planowanie, GUI/wizja, streszczanie, embeddingi) × ograniczenia (tag prywatności i jurysdykcji, budżet, opóźnienie, możliwości) → dostawca/model lub backend agentowy; fallback, circuit breaker, limity okien planów; Mówczyni + Myślicielka (PLAN §5.4). Nie wywołuje modeli sam — zwraca decyzję i nadzoruje fallback.
 
@@ -39,6 +49,10 @@ Zdarzenia (bez treści): `router.decision`, `router.fallback` (z → na, przyczy
   → natychmiast następny cel z tą samą historią; zdarzenia przed
   treścią buforowane (jedno `Started`). Błąd **po** treści (`after_output`) — bez cichego przełączenia: konsument dostaje
   błąd, a tura zawiera częściową odpowiedź.
+- Anulowanie jest obserwowane także przez Router podczas oczekiwania na zdarzenie. Zawieszony
+  adapter ignorujący token nie blokuje zakończenia trasy. Router zwalnia jego strumień, raportuje
+  `Cancelled` (zwolnienie próby half-open bez naliczenia awarii), kończy jednym `Stop(Cancelled)`
+  i nie uruchamia celu zapasowego. Wysłana treść i rozpoczęte wywołanie narzędzia nie są powtarzane.
 - Przełączają też błędy `InvalidRequest` dotyczące samego modelu, nie treści: model nieistniejący albo bez narzędzi
   (`model_unavailable`) i **żądanie za długie dla okna modelu** (`context_overflow`: llama-server
   `exceed_context_size_error`, OpenAI `context_length_exceeded`) — następny cel, zwykle z większym oknem (1.11).

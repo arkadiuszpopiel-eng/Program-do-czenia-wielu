@@ -1,0 +1,866 @@
+{
+  "started_utc": "2026-11-09T05:00:05.165480+00:00",
+  "platform": "Linux Cloud CPU; direct HTTP replay, no app decoder/microphone",
+  "server_build": "b11559",
+  "model": "bielik-1.5b-v3.0-instruct-q8_0",
+  "model_sha256": "e206ebbd9ee00cc8f14af5a096ad3f193a59608c63905316e8dc680c96655a60",
+  "source": "HTTP bodies from existing app-core tests on fake-llama-server",
+  "max_tokens": 96,
+  "temperature": 0,
+  "tool_capability": false,
+  "results": [
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 724,
+        "total_tokens": 736,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "elapsed_ms": 22010,
+      "body_sha256": "55943e11a4542cfa20ca45deec9dab0d08704b9755a9e5c1b7846f4b905178ef"
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 44,
+        "prompt_tokens": 587,
+        "total_tokens": 631,
+        "prompt_tokens_details": {
+          "cached_tokens": 6
+        }
+      },
+      "elapsed_ms": 20946,
+      "body_sha256": "65f3524fe7ae8b83b3b0756676fad090b203b870e1a8db27d1d435ceaa1993b8"
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 58,
+        "prompt_tokens": 694,
+        "total_tokens": 752,
+        "prompt_tokens_details": {
+          "cached_tokens": 6
+        }
+      },
+      "elapsed_ms": 24602,
+      "body_sha256": "ed14f77a45e4fe66de739cbc1ec18d0be9d714d4361d42df361fcfd1e0824b47"
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 601,
+        "total_tokens": 613,
+        "prompt_tokens_details": {
+          "cached_tokens": 6
+        }
+      },
+      "elapsed_ms": 15449,
+      "body_sha256": "c42c06bf671f3463a5c5bc59c1ad6fa3906a84c70d0eb7d0d6c7806223d88e93"
+    },
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 724,
+        "total_tokens": 736,
+        "prompt_tokens_details": {
+          "cached_tokens": 723
+        }
+      },
+      "elapsed_ms": 1813,
+      "body_sha256": "55943e11a4542cfa20ca45deec9dab0d08704b9755a9e5c1b7846f4b905178ef"
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 44,
+        "prompt_tokens": 587,
+        "total_tokens": 631,
+        "prompt_tokens_details": {
+          "cached_tokens": 586
+        }
+      },
+      "elapsed_ms": 5507,
+      "body_sha256": "65f3524fe7ae8b83b3b0756676fad090b203b870e1a8db27d1d435ceaa1993b8"
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 58,
+        "prompt_tokens": 694,
+        "total_tokens": 752,
+        "prompt_tokens_details": {
+          "cached_tokens": 693
+        }
+      },
+      "elapsed_ms": 7100,
+      "body_sha256": "ed14f77a45e4fe66de739cbc1ec18d0be9d714d4361d42df361fcfd1e0824b47"
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 601,
+        "total_tokens": 613,
+        "prompt_tokens_details": {
+          "cached_tokens": 600
+        }
+      },
+      "elapsed_ms": 1502,
+      "body_sha256": "c42c06bf671f3463a5c5bc59c1ad6fa3906a84c70d0eb7d0d6c7806223d88e93"
+    },
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 724,
+        "total_tokens": 736,
+        "prompt_tokens_details": {
+          "cached_tokens": 723
+        }
+      },
+      "elapsed_ms": 1772,
+      "body_sha256": "55943e11a4542cfa20ca45deec9dab0d08704b9755a9e5c1b7846f4b905178ef"
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 44,
+        "prompt_tokens": 587,
+        "total_tokens": 631,
+        "prompt_tokens_details": {
+          "cached_tokens": 586
+        }
+      },
+      "elapsed_ms": 6051,
+      "body_sha256": "65f3524fe7ae8b83b3b0756676fad090b203b870e1a8db27d1d435ceaa1993b8"
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 58,
+        "prompt_tokens": 694,
+        "total_tokens": 752,
+        "prompt_tokens_details": {
+          "cached_tokens": 693
+        }
+      },
+      "elapsed_ms": 8084,
+      "body_sha256": "ed14f77a45e4fe66de739cbc1ec18d0be9d714d4361d42df361fcfd1e0824b47"
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 601,
+        "total_tokens": 613,
+        "prompt_tokens_details": {
+          "cached_tokens": 600
+        }
+      },
+      "elapsed_ms": 2217,
+      "body_sha256": "c42c06bf671f3463a5c5bc59c1ad6fa3906a84c70d0eb7d0d6c7806223d88e93"
+    },
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 724,
+        "total_tokens": 736,
+        "prompt_tokens_details": {
+          "cached_tokens": 723
+        }
+      },
+      "elapsed_ms": 1763,
+      "body_sha256": "55943e11a4542cfa20ca45deec9dab0d08704b9755a9e5c1b7846f4b905178ef"
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 44,
+        "prompt_tokens": 587,
+        "total_tokens": 631,
+        "prompt_tokens_details": {
+          "cached_tokens": 586
+        }
+      },
+      "elapsed_ms": 5228,
+      "body_sha256": "65f3524fe7ae8b83b3b0756676fad090b203b870e1a8db27d1d435ceaa1993b8"
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 58,
+        "prompt_tokens": 694,
+        "total_tokens": 752,
+        "prompt_tokens_details": {
+          "cached_tokens": 693
+        }
+      },
+      "elapsed_ms": 6469,
+      "body_sha256": "ed14f77a45e4fe66de739cbc1ec18d0be9d714d4361d42df361fcfd1e0824b47"
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 601,
+        "total_tokens": 613,
+        "prompt_tokens_details": {
+          "cached_tokens": 600
+        }
+      },
+      "elapsed_ms": 2176,
+      "body_sha256": "c42c06bf671f3463a5c5bc59c1ad6fa3906a84c70d0eb7d0d6c7806223d88e93"
+    },
+    {
+      "agent": "alfa",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Cześć! Jestem Alfa. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 724,
+        "total_tokens": 736,
+        "prompt_tokens_details": {
+          "cached_tokens": 723
+        }
+      },
+      "elapsed_ms": 1571,
+      "body_sha256": "55943e11a4542cfa20ca45deec9dab0d08704b9755a9e5c1b7846f4b905178ef"
+    },
+    {
+      "agent": "beta",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Cześć! Jestem Betta, jedna z agentek programu Alfa. Jestem pogodna, uporządkowana i troskliwa. Zawsze mówię po polsku i w rodzaju żeńskim. Cieszę się, że mogę Ci pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 44,
+        "prompt_tokens": 587,
+        "total_tokens": 631,
+        "prompt_tokens_details": {
+          "cached_tokens": 586
+        }
+      },
+      "elapsed_ms": 6636,
+      "body_sha256": "65f3524fe7ae8b83b3b0756676fad090b203b870e1a8db27d1d435ceaa1993b8"
+    },
+    {
+      "agent": "gama",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Gamma (γ) — jedna z agentek programu Alfa. Jestem rzeczowa, dociekliwa i wolniejsza. Jestem Myślicielką / Planistką, Krytyczką / Weryfikatorką i Badaczką. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 58,
+        "prompt_tokens": 694,
+        "total_tokens": 752,
+        "prompt_tokens_details": {
+          "cached_tokens": 693
+        }
+      },
+      "elapsed_ms": 7398,
+      "body_sha256": "ed14f77a45e4fe66de739cbc1ec18d0be9d714d4361d42df361fcfd1e0824b47"
+    },
+    {
+      "agent": "delta",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Delta (δ) jest gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 12,
+        "prompt_tokens": 601,
+        "total_tokens": 613,
+        "prompt_tokens_details": {
+          "cached_tokens": 600
+        }
+      },
+      "elapsed_ms": 1532,
+      "body_sha256": "c42c06bf671f3463a5c5bc59c1ad6fa3906a84c70d0eb7d0d6c7806223d88e93"
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 949,
+        "total_tokens": 958,
+        "prompt_tokens_details": {
+          "cached_tokens": 694
+        }
+      },
+      "elapsed_ms": 7072,
+      "body_sha256": "0e81cdf65e843072911c175c20a7d826f689176e25b36e8784ca3153ddeb211e"
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 812,
+        "total_tokens": 821,
+        "prompt_tokens_details": {
+          "cached_tokens": 557
+        }
+      },
+      "elapsed_ms": 6997,
+      "body_sha256": "a00f254819e6b83653810ded240106880fb068a5f8b2ac60e1b5370932711cc3"
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 919,
+        "total_tokens": 928,
+        "prompt_tokens_details": {
+          "cached_tokens": 664
+        }
+      },
+      "elapsed_ms": 6760,
+      "body_sha256": "c99fe964656931da73ed73c0b056694384bb7c887d59cabb11d74bd806c75000"
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 826,
+        "total_tokens": 835,
+        "prompt_tokens_details": {
+          "cached_tokens": 571
+        }
+      },
+      "elapsed_ms": 7053,
+      "body_sha256": "664d7c3eaab2f76ec717378fbe1dc0f359ebc70063324e06fb3537047d185bad"
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 949,
+        "total_tokens": 958,
+        "prompt_tokens_details": {
+          "cached_tokens": 948
+        }
+      },
+      "elapsed_ms": 1632,
+      "body_sha256": "0e81cdf65e843072911c175c20a7d826f689176e25b36e8784ca3153ddeb211e"
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 812,
+        "total_tokens": 821,
+        "prompt_tokens_details": {
+          "cached_tokens": 811
+        }
+      },
+      "elapsed_ms": 1237,
+      "body_sha256": "a00f254819e6b83653810ded240106880fb068a5f8b2ac60e1b5370932711cc3"
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 919,
+        "total_tokens": 928,
+        "prompt_tokens_details": {
+          "cached_tokens": 918
+        }
+      },
+      "elapsed_ms": 1135,
+      "body_sha256": "c99fe964656931da73ed73c0b056694384bb7c887d59cabb11d74bd806c75000"
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 826,
+        "total_tokens": 835,
+        "prompt_tokens_details": {
+          "cached_tokens": 825
+        }
+      },
+      "elapsed_ms": 1161,
+      "body_sha256": "664d7c3eaab2f76ec717378fbe1dc0f359ebc70063324e06fb3537047d185bad"
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 949,
+        "total_tokens": 958,
+        "prompt_tokens_details": {
+          "cached_tokens": 948
+        }
+      },
+      "elapsed_ms": 1241,
+      "body_sha256": "0e81cdf65e843072911c175c20a7d826f689176e25b36e8784ca3153ddeb211e"
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 812,
+        "total_tokens": 821,
+        "prompt_tokens_details": {
+          "cached_tokens": 811
+        }
+      },
+      "elapsed_ms": 1131,
+      "body_sha256": "a00f254819e6b83653810ded240106880fb068a5f8b2ac60e1b5370932711cc3"
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 919,
+        "total_tokens": 928,
+        "prompt_tokens_details": {
+          "cached_tokens": 918
+        }
+      },
+      "elapsed_ms": 989,
+      "body_sha256": "c99fe964656931da73ed73c0b056694384bb7c887d59cabb11d74bd806c75000"
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 826,
+        "total_tokens": 835,
+        "prompt_tokens_details": {
+          "cached_tokens": 825
+        }
+      },
+      "elapsed_ms": 973,
+      "body_sha256": "664d7c3eaab2f76ec717378fbe1dc0f359ebc70063324e06fb3537047d185bad"
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 949,
+        "total_tokens": 958,
+        "prompt_tokens_details": {
+          "cached_tokens": 948
+        }
+      },
+      "elapsed_ms": 969,
+      "body_sha256": "0e81cdf65e843072911c175c20a7d826f689176e25b36e8784ca3153ddeb211e"
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 812,
+        "total_tokens": 821,
+        "prompt_tokens_details": {
+          "cached_tokens": 811
+        }
+      },
+      "elapsed_ms": 1084,
+      "body_sha256": "a00f254819e6b83653810ded240106880fb068a5f8b2ac60e1b5370932711cc3"
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 919,
+        "total_tokens": 928,
+        "prompt_tokens_details": {
+          "cached_tokens": 918
+        }
+      },
+      "elapsed_ms": 1088,
+      "body_sha256": "c99fe964656931da73ed73c0b056694384bb7c887d59cabb11d74bd806c75000"
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 826,
+        "total_tokens": 835,
+        "prompt_tokens_details": {
+          "cached_tokens": 825
+        }
+      },
+      "elapsed_ms": 1130,
+      "body_sha256": "664d7c3eaab2f76ec717378fbe1dc0f359ebc70063324e06fb3537047d185bad"
+    },
+    {
+      "agent": "alfa",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Jestem Alfą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 949,
+        "total_tokens": 958,
+        "prompt_tokens_details": {
+          "cached_tokens": 948
+        }
+      },
+      "elapsed_ms": 1211,
+      "body_sha256": "0e81cdf65e843072911c175c20a7d826f689176e25b36e8784ca3153ddeb211e"
+    },
+    {
+      "agent": "beta",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Jestem Betą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 812,
+        "total_tokens": 821,
+        "prompt_tokens_details": {
+          "cached_tokens": 811
+        }
+      },
+      "elapsed_ms": 1209,
+      "body_sha256": "a00f254819e6b83653810ded240106880fb068a5f8b2ac60e1b5370932711cc3"
+    },
+    {
+      "agent": "gama",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Jestem Gamą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 919,
+        "total_tokens": 928,
+        "prompt_tokens_details": {
+          "cached_tokens": 918
+        }
+      },
+      "elapsed_ms": 1018,
+      "body_sha256": "c99fe964656931da73ed73c0b056694384bb7c887d59cabb11d74bd806c75000"
+    },
+    {
+      "agent": "delta",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Jestem Deltą. Jestem gotowa pomóc.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 826,
+        "total_tokens": 835,
+        "prompt_tokens_details": {
+          "cached_tokens": 825
+        }
+      },
+      "elapsed_ms": 977,
+      "body_sha256": "664d7c3eaab2f76ec717378fbe1dc0f359ebc70063324e06fb3537047d185bad"
+    },
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 1,
+      "text": "Luna, jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 544,
+        "total_tokens": 553,
+        "prompt_tokens_details": {
+          "cached_tokens": 6
+        }
+      },
+      "elapsed_ms": 12985,
+      "body_sha256": "fe68a716ca1aa5821b269972020ef089bb09cc2facd1e81ad9c2fd8ce06d6e1a"
+    },
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 2,
+      "text": "Luna, jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 544,
+        "total_tokens": 553,
+        "prompt_tokens_details": {
+          "cached_tokens": 543
+        }
+      },
+      "elapsed_ms": 1113,
+      "body_sha256": "fe68a716ca1aa5821b269972020ef089bb09cc2facd1e81ad9c2fd8ce06d6e1a"
+    },
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 3,
+      "text": "Luna, jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 544,
+        "total_tokens": 553,
+        "prompt_tokens_details": {
+          "cached_tokens": 543
+        }
+      },
+      "elapsed_ms": 1034,
+      "body_sha256": "fe68a716ca1aa5821b269972020ef089bb09cc2facd1e81ad9c2fd8ce06d6e1a"
+    },
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 4,
+      "text": "Luna, jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 544,
+        "total_tokens": 553,
+        "prompt_tokens_details": {
+          "cached_tokens": 543
+        }
+      },
+      "elapsed_ms": 1053,
+      "body_sha256": "fe68a716ca1aa5821b269972020ef089bb09cc2facd1e81ad9c2fd8ce06d6e1a"
+    },
+    {
+      "agent": "luna",
+      "mode": "standard",
+      "repeat": 5,
+      "text": "Luna, jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 9,
+        "prompt_tokens": 544,
+        "total_tokens": 553,
+        "prompt_tokens_details": {
+          "cached_tokens": 543
+        }
+      },
+      "elapsed_ms": 1047,
+      "body_sha256": "fe68a716ca1aa5821b269972020ef089bb09cc2facd1e81ad9c2fd8ce06d6e1a"
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 1,
+      "text": "Jestem Luną. Jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 10,
+        "prompt_tokens": 769,
+        "total_tokens": 779,
+        "prompt_tokens_details": {
+          "cached_tokens": 514
+        }
+      },
+      "elapsed_ms": 6989,
+      "body_sha256": "6e851fc9ed5675cfc37ea1a108d3fb127417ef2e00b98d8f6267b9f694010d2d"
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 2,
+      "text": "Jestem Luną. Jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 10,
+        "prompt_tokens": 769,
+        "total_tokens": 779,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        }
+      },
+      "elapsed_ms": 1341,
+      "body_sha256": "6e851fc9ed5675cfc37ea1a108d3fb127417ef2e00b98d8f6267b9f694010d2d"
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 3,
+      "text": "Jestem Luną. Jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 10,
+        "prompt_tokens": 769,
+        "total_tokens": 779,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        }
+      },
+      "elapsed_ms": 1368,
+      "body_sha256": "6e851fc9ed5675cfc37ea1a108d3fb127417ef2e00b98d8f6267b9f694010d2d"
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 4,
+      "text": "Jestem Luną. Jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 10,
+        "prompt_tokens": 769,
+        "total_tokens": 779,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        }
+      },
+      "elapsed_ms": 1274,
+      "body_sha256": "6e851fc9ed5675cfc37ea1a108d3fb127417ef2e00b98d8f6267b9f694010d2d"
+    },
+    {
+      "agent": "luna",
+      "mode": "jarvis",
+      "repeat": 5,
+      "text": "Jestem Luną. Jestem gotowa do pomocy.",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 10,
+        "prompt_tokens": 769,
+        "total_tokens": 779,
+        "prompt_tokens_details": {
+          "cached_tokens": 768
+        }
+      },
+      "elapsed_ms": 1293,
+      "body_sha256": "6e851fc9ed5675cfc37ea1a108d3fb127417ef2e00b98d8f6267b9f694010d2d"
+    }
+  ],
+  "updated_utc": "2026-11-09T05:03:56.431368+00:00",
+  "finished_utc": "2026-11-09T05:03:56.432875+00:00",
+  "completed": true
+}

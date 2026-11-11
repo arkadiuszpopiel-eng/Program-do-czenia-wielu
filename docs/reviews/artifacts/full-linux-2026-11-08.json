@@ -1,0 +1,205 @@
+{
+  "source_commit": "9b8b7416eefbaa55a3102303dfdbb7b605e49a22",
+  "platform": "Linux Cloud x86_64, 4 CPU quota",
+  "rust": {
+    "scope": "workspace excluding app-core, then app-core lib/doc and all76 integration targets in batches8, no-fail-fast",
+    "profile": {
+      "debug": 0,
+      "incremental": false,
+      "jobs": 2
+    },
+    "passed": 3461,
+    "failed": 20,
+    "ignored": 24,
+    "groups": [
+      {
+        "log": "app-core-01.log",
+        "passed": 28,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "log": "app-core-02.log",
+        "passed": 22,
+        "failed": 2,
+        "ignored": 0
+      },
+      {
+        "log": "app-core-03.log",
+        "passed": 33,
+        "failed": 1,
+        "ignored": 0
+      },
+      {
+        "log": "app-core-04.log",
+        "passed": 22,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "log": "app-core-05.log",
+        "passed": 20,
+        "failed": 0,
+        "ignored": 1
+      },
+      {
+        "log": "app-core-06.log",
+        "passed": 11,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "log": "app-core-07.log",
+        "passed": 15,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "log": "app-core-08.log",
+        "passed": 17,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "log": "app-core-09.log",
+        "passed": 20,
+        "failed": 1,
+        "ignored": 1
+      },
+      {
+        "log": "app-core-10.log",
+        "passed": 12,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "log": "app-core-doc.log",
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "log": "app-core-lib.log",
+        "passed": 0,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "passed": 3261,
+        "failed": 16,
+        "ignored": 22
+      }
+    ],
+    "failures": [
+      {
+        "log": "app-core-02.log",
+        "target": "Running tests/bridges_check.rs",
+        "test": "antigravity_login_seen_in_the_window_is_remembered"
+      },
+      {
+        "log": "app-core-02.log",
+        "target": "Running tests/bridges_check.rs",
+        "test": "check_reports_login_plan_and_never_the_account_data"
+      },
+      {
+        "log": "app-core-03.log",
+        "target": "Running tests/commands.rs",
+        "test": "model_manager_lists_catalog_and_switches_embedder"
+      },
+      {
+        "log": "app-core-09.log",
+        "target": "Running tests/tool_diag.rs",
+        "test": "every_agent_tool_runs_with_valid_arguments_on_fakes"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running unittests src/lib.rs",
+        "test": "engine::tests::setting_value_becomes_an_absolute_path"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running unittests src/lib.rs",
+        "test": "cards::tests::every_catalog_item_has_a_complete_card"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running unittests src/lib.rs",
+        "test": "licenses::tests::every_catalog_item_has_a_complete_license_card"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/bundles.rs",
+        "test": "amd_cards_use_vulkan_and_cpu_whisper_and_recommend_reference"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/bundles.rs",
+        "test": "nvidia_6_gb_laptop_recommends_5_and_reference_is_tight"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/bundles.rs",
+        "test": "definitions_are_ordered_and_every_item_exists_in_the_catalog"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/bundles.rs",
+        "test": "sizes_counts_and_state_follow_the_items"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/bundles.rs",
+        "test": "without_gpu_cores_decide_between_good_and_balanced"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/bundles_gpu.rs",
+        "test": "vulkan_cards_get_qwen_and_big_cards_get_directml"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/bundles_gpu.rs",
+        "test": "integrated_cards_use_vulkan_without_counting_as_vram"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/bundles_ui.rs",
+        "test": "ui_fake_bundles_json_is_generated_from_rust"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/bundles_ui.rs",
+        "test": "ui_fake_bundles_match_rust"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/cuda.rs",
+        "test": "catalog_has_pinned_cuda_build_with_cudart"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running tests/layout.rs",
+        "test": "catalog_sidecars_install_from_release_like_archives"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running unittests src/lib.rs",
+        "test": "core::same_entry_tests::separators_and_case_do_not_matter_when_matching_a_listed_entry"
+      },
+      {
+        "log": "workspace-except-app-core.log",
+        "target": "Running unittests src/lib.rs",
+        "test": "software::tests::scan_finds_tools_versions_and_browsers"
+      }
+    ]
+  },
+  "ui": {
+    "command": "PW_WORKERS=2 pnpm exec playwright test",
+    "browser": "Chromium, Playwright1.56.1",
+    "passed": 856,
+    "failed": 0,
+    "duration_minutes": 48.6
+  },
+  "limits": "Functional fake/headless/Chromium evidence. Not owner hardware, Windows/WebView2 or live microphone acceptance."
+}
