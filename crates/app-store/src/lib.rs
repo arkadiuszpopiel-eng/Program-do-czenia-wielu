@@ -11,7 +11,13 @@
 
 mod agents;
 mod casts;
+mod execution_records;
+mod execution_replay;
 mod recovery;
+
+pub use execution_records::{
+    ActionRecord, ExecutionCounts, ExecutionRecords, RecordOrigin, RecordedState,
+};
 
 use std::collections::{BTreeMap, HashSet};
 use std::sync::{Arc, Mutex, PoisonError};
