@@ -51,8 +51,8 @@ async fn create_persona(core: &AppCore, session: &str) {
         saved.persona,
         vec![wire["role_id"].as_str().unwrap().into()],
     )
-        .await
-        .unwrap();
+    .await
+    .unwrap();
 }
 
 async fn ask(h: &mut Harness, session: &str) -> ChatRequest {
