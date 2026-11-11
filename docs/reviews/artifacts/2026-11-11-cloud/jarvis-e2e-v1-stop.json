@@ -1,0 +1,6 @@
+{
+  "at": "2026-11-11T19:41:00.544960+00:00",
+  "pid": 22639,
+  "signal": "SIGINT",
+  "reason": "first2newtestsfailed; collectfailurebeforecontinuing; remainingnotpassed"
+}

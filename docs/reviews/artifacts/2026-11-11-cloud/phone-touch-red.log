@@ -1,0 +1,34 @@
+
+Running 1 test using 1 worker
+
+(node:25706) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25706) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › e2e/remote-preview.spec.ts:3:1 › panel telefonu nie udaje połączenia ani nie odblokowuje poleceń (2.1s)
+[31mTesting stopped early after 1 maximum allowed failures.[39m
+
+
+  1) [chromium] › e2e/remote-preview.spec.ts:3:1 › panel telefonu nie udaje połączenia ani nie odblokowuje poleceń
+
+    Error: cel dotykowy podglądu telefonu
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m44[39m
+    Received:    [31m32[39m
+
+      21 |   for (const button of await dialog.getByRole('button').all()) {
+      22 |     const box = await button.boundingBox();
+    > 23 |     expect(box?.height, 'cel dotykowy podglądu telefonu').toBeGreaterThanOrEqual(44);
+         |                                                           ^
+      24 |     expect(box?.width, 'cel dotykowy podglądu telefonu').toBeGreaterThanOrEqual(44);
+      25 |   }
+      26 |   expect(sockets).toEqual([]);
+        at /workspace/wt-jarvis/apps/desktop/ui/e2e/remote-preview.spec.ts:23:59
+
+    Error Context: test-results/remote-preview-panel-telef-3f7dd-ani-nie-odblokowuje-poleceń-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/remote-preview.spec.ts:3:1 › panel telefonu nie udaje połączenia ani nie odblokowuje poleceń
+  1 error was not a part of any test, see above for details
