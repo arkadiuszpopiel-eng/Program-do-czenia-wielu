@@ -94,6 +94,7 @@ async fn branch_records_reach_provider_without_rewriting_history_or_creating_act
                 .all(|b| matches!(b, ContentBlock::Text { .. }))
         );
         let facts = records(&request).expect("brak rzeczywistych zapisów gałęzi w żądaniu");
+        capture(scenario, &request);
         assert_eq!(
             facts["counts"]["recorded_done"],
             u64::from(scenario == "recorded_done")
@@ -131,6 +132,19 @@ async fn branch_records_reach_provider_without_rewriting_history_or_creating_act
             .unwrap();
         until(&mut events, ends(&turn)).await;
         assert!(records(provider.requests().last().unwrap()).is_none());
+    }
+}
+
+// Opcjonalny eksport żądań wyłącznie z syntetycznego fixture do lokalnego pilota modelu.
+fn capture(scenario: &str, request: &ChatRequest) {
+    if let Some(root) = std::env::var_os("ALFA_RECORDS_CAPTURE") {
+        let root = std::path::PathBuf::from(root);
+        std::fs::create_dir_all(&root).unwrap();
+        std::fs::write(
+            root.join(format!("{scenario}.json")),
+            serde_json::to_vec_pretty(request).unwrap(),
+        )
+        .unwrap();
     }
 }
 
@@ -229,17 +243,21 @@ async fn native_write_and_undo_are_projected_independently_of_the_answer() {
                 .tools
                 .is_empty()
         );
-        let replay = a.h.core.agents_runs(a.sid.clone()).await.unwrap();
-        assert_eq!(
-            replay
-                .iter()
-                .flat_map(|r| &r.steps)
-                .filter(|s| s.tool.as_deref() == Some("fs_write"))
-                .count(),
-            1,
-            "odczyt nie uruchamia dodatkowego narzędzia"
-        );
+        assert_single_write(&a).await;
     }
+}
+
+async fn assert_single_write(a: &common::agents::Agents) {
+    let replay = a.h.core.agents_runs(a.sid.clone()).await.unwrap();
+    assert_eq!(
+        replay
+            .iter()
+            .flat_map(|r| &r.steps)
+            .filter(|s| s.tool.as_deref() == Some("fs_write"))
+            .count(),
+        1,
+        "odczyt nie uruchamia dodatkowego narzędzia"
+    );
 }
 
 async fn restartable_agents() -> (
