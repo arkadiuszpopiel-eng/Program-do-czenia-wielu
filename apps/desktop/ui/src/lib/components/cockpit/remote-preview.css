@@ -78,7 +78,7 @@
   display: flex;
   justify-content: flex-end;
 }
-.phone-panel button {
+.phone-panel button.btn {
   min-height: 44px;
 }
 @media (max-width: 520px) {

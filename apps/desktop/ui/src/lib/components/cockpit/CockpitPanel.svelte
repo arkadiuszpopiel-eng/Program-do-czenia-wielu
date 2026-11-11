@@ -8,6 +8,7 @@
   import Cpu from '@lucide/svelte/icons/cpu';
   import ShieldCheck from '@lucide/svelte/icons/shield-check';
   import Smartphone from '@lucide/svelte/icons/smartphone';
+  import Globe from '@lucide/svelte/icons/globe';
   import Lazy from '../shell/Lazy.svelte';
   import { useApp } from '../../state/context';
   import { cockpitCopy } from './copy';
@@ -17,6 +18,13 @@
   const cast = $derived(app.activeId ? (app.agents[app.activeId] ?? []) : []);
   let remote = $state(false);
   let launch = $state<HTMLButtonElement | null>(null);
+  let systems = $state(false);
+  let systemsLaunch = $state<HTMLButtonElement | null>(null);
+  const loadSystems = () => import('./SystemsPanel.svelte');
+  const closeSystems = () => {
+    systems = false;
+    requestAnimationFrame(() => systemsLaunch?.focus());
+  };
   const loadRemote = () => import('./RemotePreview.svelte');
   const closeRemote = () => {
     remote = false;
@@ -82,6 +90,13 @@
     {/if}
     <button
       type="button"
+      class="cockpit-phone cockpit-systems"
+      bind:this={systemsLaunch}
+      onclick={() => (systems = true)}
+      ><Globe size={20} strokeWidth={1.5} aria-hidden="true" /><span>{copy.systems}</span></button
+    >
+    <button
+      type="button"
       class="cockpit-phone"
       bind:this={launch}
       aria-label={copy.phone}
@@ -94,6 +109,11 @@
   {#if remote}<Lazy
       load={loadRemote}
       props={{ onclose: closeRemote }}
+      label={app.i18n.t('common.loading')}
+    />{/if}
+  {#if systems}<Lazy
+      load={loadSystems}
+      props={{ onclose: closeSystems }}
       label={app.i18n.t('common.loading')}
     />{/if}
 </section>

@@ -14,6 +14,7 @@ const pl = {
   models: 'Modele',
   access: 'Uprawnienia',
   phone: 'Podgląd panelu telefonu',
+  systems: 'Mapa i systemy',
 };
 const en: typeof pl = {
   title: 'Jarvis cockpit',
@@ -31,5 +32,6 @@ const en: typeof pl = {
   models: 'Models',
   access: 'Permissions',
   phone: 'Preview phone panel',
+  systems: 'Map and systems',
 };
 export const cockpitCopy = (locale: string) => (locale === 'en' ? en : pl);

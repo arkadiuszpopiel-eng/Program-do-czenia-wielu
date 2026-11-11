@@ -18,6 +18,11 @@ test('panel telefonu nie udaje połączenia ani nie odblokowuje poleceń', async
   const actions = dialog.locator('[data-remote-action]');
   await expect(actions).toHaveCount(8);
   for (const action of await actions.all()) await expect(action).toBeDisabled();
+  for (const button of await dialog.getByRole('button').all()) {
+    const box = await button.boundingBox();
+    expect(box?.height, 'cel dotykowy podglądu telefonu').toBeGreaterThanOrEqual(44);
+    expect(box?.width, 'cel dotykowy podglądu telefonu').toBeGreaterThanOrEqual(44);
+  }
   expect(sockets).toEqual([]);
   await expectAccessible(page, 'panel telefonu bez połączenia');
   await page.keyboard.press('Escape');

@@ -126,12 +126,13 @@
 }
 .cockpit-footer {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 .cockpit-footer .cockpit-cast {
-  flex: 1;
+  flex: 1 1 300px;
   margin-top: 0;
 }
 .cockpit-phone {
@@ -149,6 +150,13 @@
 .cockpit-phone:focus-visible {
   outline: 2px solid var(--alfa-color-focus);
   outline-offset: 2px;
+}
+.cockpit-systems {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-left: auto;
 }
 .cockpit-cast button {
   display: inline-flex;
