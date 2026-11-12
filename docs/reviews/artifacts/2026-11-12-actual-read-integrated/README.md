@@ -9,3 +9,8 @@ korzysta z rzeczywistego świeżego plikuTEMP, porty modelu/sprzętu są atrapam
 Nie jest to odbiór autonomicznej decyzji8B, Windows/GPU/mikrofonu/telefonu/API.
 Surowa wcześniejsza próba native:0tekstu/FirstToken60s/exit101, zachowana oddzielnie
 w archiwum2026-11-12-actual-read. Manifest i logi nie zamieniają jej w zaliczenie.
+
+Późniejsza korekta workflow ma osobny zapis report-status-structure.json. Odtworzenie
+sprawdzenia zakresu (PyYAML): `python3 docs/reviews/artifacts/2026-11-12-actual-read-integrated/verify-workflow.py a2b47cf2 .`.
+To porównanie całego YAML z dozwolonymi zmianami ID/warunku/podsumowania, nie wykonanie
+PowerShell lub odbiór modelu. Wcześniejszy manifest pozostaje dowodem pierwotnych źródeł.
