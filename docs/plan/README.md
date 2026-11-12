@@ -1,5 +1,7 @@
 # Plan Alfy — wersja 6 (rozszerzona)
 
+Aktualna decyzja modeli: [27B do kodowania, mniejsze do rozmowy, pomoc chmury](57-role-modeli-27b-i-pomoc-chmury.md). Wdrożenie i odbiór sprzętowy pozostają otwarte.
+
 Stan na 2026-10-22 (wersja 0.0.72; co doszło ostatnio — [`38-raport-2026-10-22-0072.md`](38-raport-2026-10-22-0072.md),
 całość na jednej stronie — [`16-plan-zbiorczy.md`](16-plan-zbiorczy.md)). Ten katalog jest **rozszerzeniem** zatwierdzonego planu [`../PLAN.md`](../PLAN.md) (wersja 5):
 niczego w nim nie kasuje, tylko dopisuje nowe cele — kolejne systemy, sterowanie przez Internet i nowe funkcje —
