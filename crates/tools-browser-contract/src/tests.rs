@@ -7,7 +7,7 @@ use super::*;
 #[test]
 fn manifests_are_valid() {
     let ms = manifests();
-    assert_eq!(ms.len(), 12);
+    assert_eq!(ms.len(), 13);
     for m in &ms {
         m.validate().unwrap();
         assert_eq!(m.capabilities, vec!["net.egress".to_owned()]);

@@ -6,6 +6,12 @@ Pierwsza ścieżka #78: wyszukiwanie w przeglądarce bez kluczaAPI. Nie oznacza 
 wdrożonego transportu/embeddingu; konkretne poprawki Brokera nadal osobno do przeglądu.
 [Zapis zgody i zakres](../reviews/2026-11-12-owner-decisions.md).
 
+**Przyrost #78 po wyborze właściciela:** `browser_search` bezAPI, jawny silnik
+DuckDuckGo/Google/Bing, ta sama zgoda Brokera i BrowserPort. Potwierdza tylko HTTPS/host
+strony, wymaga browser_read i oceny źródeł. Lokalne55/0/3 +1kontrola kataloguCore,
+pełnyClippy0bezostrzeżeń; nie jest to żyweWWW ani osadzonyWebView2.
+[Zakres i dowody](../reviews/2026-11-12-browser-search-no-api.md). Karta #78 nadal otwarta.
+
 **Najnowsze CI12.11, kod372bfcd5:** CI191 **10/10**; RustLinux3631/0/28,
 Windows3653/0/49; Vitest593, Chromium **963/963** bez pominięć/flaky.
 Windows115 **3/4**, WebView263/0/5. Nowa macierz Core8B zatrzymała się na pierwszym

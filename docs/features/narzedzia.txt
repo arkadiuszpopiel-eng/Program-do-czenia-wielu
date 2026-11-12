@@ -7,6 +7,7 @@ browser_open
 browser_read
 browser_screenshot
 browser_scroll
+browser_search
 browser_select
 browser_type
 browser_wait

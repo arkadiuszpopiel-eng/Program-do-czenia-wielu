@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 121 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 72 |
-| Linie Rust (z testami) | 482 266 |
-| Testy (`#[test]`, `#[tokio::test]`) | 3732 |
+| Linie Rust (z testami) | 482 732 |
+| Testy (`#[test]`, `#[tokio::test]`) | 3742 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -111,7 +111,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `scheduler` | F5 | service | inproc | C · I · F | 7599 | 29 | [scheduler](modules/scheduler/SPEC.md) | DAG zadań, równoległe agentki z atomowym przydziałem zasobów, priorytety voice-first, trwałość. |
 | `scheduler-lite` | F2 | service | inproc | C · I · F | 3427 | 15 | [scheduler-lite](modules/scheduler-lite/SPEC.md) | Zasoby wyłączne (mikrofon, głośnik), kolejka mowy, wykrywanie zakleszczeń. |
 | `skills` | F5 | service | inproc | C · I · F | 3201 | 20 | [skills](modules/skills/SPEC.md) | Wersjonowane umiejętności, instalacja po przeglądzie z hashem, kwarantanna treści z zewnątrz. |
-| `tools-browser` | F6 | tool | inproc | C · I · F | 2243 | 10 | [tools-browser](modules/tools-browser/SPEC.md) | Przeglądarka z profilem Alfy i CDP przez potok; każdy host przez Brokera; bez haseł; pobrania w kwarantannie. |
+| `tools-browser` | F6 | tool | inproc | C · I · F | 2709 | 20 | [tools-browser](modules/tools-browser/SPEC.md) | Przeglądarka z profilem Alfy i CDP przez potok; każdy host przez Brokera; bez haseł; pobrania w kwarantannie. |
 | `tools-clipboard` | F3 | tool | inproc | C · I · F | 1060 | 10 | [tools-clipboard](modules/tools-clipboard/SPEC.md) | Odczyt (taint) i zapis schowka z cofaniem; historia schowka — szkic. |
 | `tools-common` | F3 | — | — | C | 2277 | 25 | [tools-common](modules/tools-common/SPEC.md) | Wspólny kontrakt narzędzi: manifest, `Tool`, `BrokerGate`, zasady ścieżek i treści niezaufanej. |
 | `tools-fs` | F3 | tool | inproc | C · I · F | 3729 | 41 | [tools-fs](modules/tools-fs/SPEC.md) | 11 narzędzi plikowych przez Brokera i dziennik cofania; usuwanie do Kosza. |

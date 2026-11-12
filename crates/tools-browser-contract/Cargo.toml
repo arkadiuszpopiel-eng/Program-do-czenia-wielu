@@ -21,6 +21,7 @@ platform-apps-contract = { path = "../platform-apps-contract" }
 serde.workspace = true
 serde_json.workspace = true
 schemars.workspace = true
+form_urlencoded = "1.2.2"
 
 [lints]
 workspace = true
