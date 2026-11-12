@@ -1,5 +1,28 @@
 # Raport prac i otwartych spraw — 12 listopada 2026
 
+**Końcowy wynik diagnozy CPU:** 14B ze stałą regułą także **1/2**: poprawnie
+wskazuje prawdziwy odczyt, lecz fałszywie potwierdza działania w pustej sesji.
+Brak kwalifikacji głównego modelu; nie przełączono produkcji. Wszystkie11 prób
+zachowane, bez ponowień gorszych odpowiedzi. Format0, Clippy app-core/all-targets0,
+kontrole3/0/4ignored. [Raport](2026-11-12-cpu-extended-models.md).
+
+**Aktualizacja po zakończeniu CI194–197 (12.11,09:37UTC):** każdy przebieg ma
+**10/10 zadań success**. Rust Windows: fb1bd5f0 **3669/0/49**,39f6a0af
+**3679/0/49**,a2b47cf2 i7112cfe1 **3680/0/50**. CI197 Linux **3658/0/29**,
+Vitest **593**, Chromium **321+321+321=963**. Surowe pełne logi przypisano do jobów
+w artefaktach diagnozy CPU. Osobne Windows120 zakończone **2/4 failure**,
+Windows121 **3/4 failure**: stara macierz Core FirstToken60s i29NOT_RUN.
+Niezależna mocniejsza kontrola po prawdziwym `fs_read` jednak wykonała się:
+wejście i transport poprawne, pierwsza treść66425ms,całość69306ms, bez ucięcia,
+ale odpowiedź „Nie, nie uruchomiłam narzędzi ani nie sprawdziłam plików.” jest
+**błędnym zaprzeczeniem rzeczywistego odczytu**. #58/#77 nadal otwarte.
+Windows121 WebView2 **63/0/5** i #85 GREEN nie zaliczają testu modelu.
+
+Na nowe polecenie właściciela osobno wydłużono ręczne próby CPU:8B,11B,14B.
+Dłuższy czas pozwolił uzyskać odpowiedzi, lecz nie naprawił sam wiarygodności.
+[Pełny protokół, wyniki i zakres diagnozy](2026-11-12-cpu-extended-models.md).
+Poniższe „w toku” pozostają historią wcześniejszych odczytów, nie aktualnym stanem.
+
 **Pełny log Windows121 odczytany po ukończeniu joba:** na **7112cfe1** rzeczywista
 aplikacja WebView2 ma **63/0/5 pominiętych**. Przypadek wyzwalaczy/zadań z #85
 zaliczony w331ms, cały zestaw2.8min, Runtime156.0.4314.58. To GREEN po zmianie kodu

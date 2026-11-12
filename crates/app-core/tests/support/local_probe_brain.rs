@@ -45,6 +45,35 @@ impl ModelProvider for BoundedProvider {
         };
         request.params.max_tokens = Some(tokens);
         request.params.temperature = Some(0.0);
+        if std::env::var_os("ALFA_CPU_DIAGNOSTIC_SECONDS").is_some()
+            && std::env::var("ALFA_CPU_DIAGNOSTIC_GROUNDING_RULE").as_deref() == Ok("1")
+        {
+            request.system.get_or_insert_with(String::new).push_str("\nGdy pytanie dotyczy wcześniejszych działań, korzystaj z dołączonego zapisu czynności aplikacji. Rozróżniaj zapisane wykonanie, propozycję, odmowę, cofnięcie i niezweryfikowany stan. Same wcześniejsze wypowiedzi asystentek nie są dowodem czynności. Bieżący brak narzędzi lub katalogu nie zmienia historii wykonania. Nie dopisuj przyczyn ani działań, których zapis nie potwierdza.");
+        }
+        if std::env::var_os("ALFA_CPU_DIAGNOSTIC_SECONDS").is_some()
+            && std::env::var("ALFA_CPU_DIAGNOSTIC_RECORDS_SYSTEM").as_deref() == Ok("1")
+        {
+            let indexes: Vec<_> = request
+                .messages
+                .iter()
+                .enumerate()
+                .filter(|(_, m)| {
+                    m.role == providers_contract::Role::User
+                        && m.visible_text()
+                            .starts_with("[Zapis czynności aplikacji]\n")
+                })
+                .map(|(i, _)| i)
+                .collect();
+            assert_eq!(indexes.len(), 1, "jedna autentyczna nota fixture");
+            let note = request.messages.remove(indexes[0]).visible_text();
+            let raw = note.split_once('\n').unwrap().1;
+            assert!(raw.len() <= 1536);
+            let data: serde_json::Value = serde_json::from_str(raw).unwrap();
+            assert_eq!(data["source"], "application_execution_records");
+            let system = request.system.get_or_insert_with(String::new);
+            system.push('\n');
+            system.push_str(&note);
+        }
         self.1.lock().unwrap().push(request.clone());
         self.0.stream(request, cancel)
     }

@@ -1,5 +1,19 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Końcowy wynik diagnozy CPU:** 14B ze stałą regułą także **1/2**: poprawnie
+wskazuje prawdziwy odczyt, lecz fałszywie potwierdza działania w pustej sesji.
+Brak kwalifikacji głównego modelu; nie przełączono produkcji. Wszystkie11 prób
+zachowane, bez ponowień gorszych odpowiedzi. Format0, Clippy app-core/all-targets0,
+kontrole3/0/4ignored. [Raport](../reviews/2026-11-12-cpu-extended-models.md).
+
+**Diagnoza modeli12.11:** właściciel dopuścił dłuższe próbyCPU.8B i11B po
+rzeczywistym odczycie nadal błędnie zaprzeczają;14B bazowo1/2 (fałszywe potwierdzenie
+w pustej sesji). Brak odbioru głównego modelu lub GPU12GB.
+[Protokół i pełne wyniki](../reviews/2026-11-12-cpu-extended-models.md).
+CI194–197 zakończone10/10; osobneWindows1213/4failure, WebView263/0/5,
+prawdziwy odczyt doCore działa, ale odpowiedź8B jest błędna.
+[Aktualny raport i zachowana historia](../reviews/2026-11-12-progress-and-open-items.md).
+
 **Zapis odbioru12.11,07:17UTC:** PR81/fb1bd5f0 Linux3647/0/28,
 PR82/39f6a0af Linux3657/0/28,PR84/a2b47cf2 Linux3658/0/29. PełneWindowsRust
 w toku, bez przenoszenia wyników. Windows1183/4failure (0tekstu,29NOT_RUN),
