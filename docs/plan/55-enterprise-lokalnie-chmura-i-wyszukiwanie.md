@@ -1,5 +1,12 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Zapis odbioru12.11,07:17UTC:** PR81/fb1bd5f0 Linux3647/0/28,
+PR82/39f6a0af Linux3657/0/28,PR84/a2b47cf2 Linux3658/0/29. PełneWindowsRust
+w toku, bez przenoszenia wyników. Windows1183/4failure (0tekstu,29NOT_RUN),
+Windows1194/4, ale30odpowiedzi„Nie” i tylko metadaneDone:semantykaNOT_ACCEPTED.
+PR86/7112cfe1 poprawia testWebView2 #85 i niezależność kontroliodczytu;
+CI197/Windows121w toku. [Pełny raport z linkami i wynikami](../reviews/2026-11-12-progress-and-open-items.md).
+
 **Odbiór Windows — #85:** Windows120 na a2b47cf2 ma WebView2 62/1/5.
 Test ponawiał zadanie przed końcem asynchronicznego anulowania; poprawka czeka
 na done w dotychczasowym expect15s. Core tasks3/0/0, lint/format0; listowanie68
