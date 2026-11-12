@@ -91,7 +91,7 @@
     {#if status === 'pending'}
       <span class="hint">{text.hint}</span>
       {#if onopenbroker}
-        <Button variant="primary" size="sm" onclick={onopenbroker}>{text.open}</Button>
+        <Button variant="primary" size="sm" wrap onclick={onopenbroker}>{text.open}</Button>
       {/if}
     {:else}
       <span class="done" role="status">{text.status[status]}</span>
@@ -122,11 +122,12 @@
   .head {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--alfa-space-2);
   }
   .who {
     flex: 1;
-    min-width: 0;
+    min-width: min(100%, 12ch);
     overflow-wrap: anywhere;
     font-weight: var(--alfa-weight-semibold);
   }
@@ -173,5 +174,10 @@
   .done {
     color: var(--alfa-color-text-muted);
     font-weight: var(--alfa-weight-semibold);
+  }
+  @media (max-width: 640px) {
+    .foot > :global(.btn) {
+      min-height: 44px;
+    }
   }
 </style>

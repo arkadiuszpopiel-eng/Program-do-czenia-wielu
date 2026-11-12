@@ -12,8 +12,33 @@ test.afterEach(async ({ page }, info) => {
     body: JSON.stringify(pageErrors.get(page)),
     contentType: 'application/json',
   });
-  if (info.status !== info.expectedStatus)
+  if (info.status !== info.expectedStatus) {
+    const geometry = await page
+      .locator('article.msg')
+      .evaluateAll((messages) =>
+        messages.map((message) => ({
+          width: message.clientWidth,
+          scroll: message.scrollWidth,
+          overflow: [...message.querySelectorAll('*')]
+            .filter(
+              (el) => el.getBoundingClientRect().right > message.getBoundingClientRect().right,
+            )
+            .map((el) => ({
+              tag: el.tagName,
+              classes: el.getAttribute('class'),
+              width: el.getBoundingClientRect().width,
+              font: getComputedStyle(el).fontFamily,
+              whiteSpace: getComputedStyle(el).whiteSpace,
+            })),
+        })),
+      )
+      .catch(() => []);
+    await info.attach('overflow-geometry', {
+      body: JSON.stringify(geometry),
+      contentType: 'application/json',
+    });
     await page.screenshot({ path: info.outputPath('failure.png') }).catch(() => undefined);
+  }
 });
 
 for (const theme of ['light', 'dark'] as const) {
@@ -44,6 +69,10 @@ test('persona z identyfikatorem 64 znaki mieści się na telefonie 320px', async
   const id = 'w'.repeat(64);
   const message = page.getByRole('article', { name: new RegExp(id) }).first();
   await expect(message).toBeVisible();
+  // Karta ładuje się leniwie; wymiar sprawdzamy także po jej pojawieniu się.
+  await expect(
+    message.getByRole('button', { name: 'Otwórz w oknie Sędziego Cieni', exact: true }),
+  ).toBeVisible();
   expect(await message.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBeTruthy();
   await page.getByRole('button', { name: 'Włącz kokpit Jarvis', exact: true }).click();
   const person = page
@@ -71,3 +100,42 @@ test('persona z identyfikatorem 64 znaki mieści się na telefonie 320px', async
   await page.screenshot({ path: test.info().outputPath('recipient-320.png') });
   expect(pageErrors.get(page)).toEqual([]);
 });
+
+for (const locale of ['pl', 'en'] as const) {
+  test(`karta zgody na320px mieści pełny przycisk przy szerszym foncie — ${locale}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 844 });
+    await openApp(page, {
+      theme: 'dark',
+      path: `/?scenario=custom-persona-long&locale=${locale}`,
+    });
+    await waitForChat(page);
+    // W Cloud system-ui to OpenAI Sans; domyślne fonty Linuksa mają inne metryki.
+    await page.addStyleTag({
+      content: ':root { --alfa-font-sans: "DejaVu Sans", monospace; }',
+    });
+    const message = page.getByRole('article', { name: new RegExp('w'.repeat(64)) }).first();
+    const label =
+      locale === 'pl' ? 'Otwórz w oknie Sędziego Cieni' : 'Open in the Shadow Judge window';
+    const button = message.getByRole('button', { name: label, exact: true });
+    await expect(button).toBeVisible();
+    expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    expect(await message.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBeTruthy();
+    expect(await button.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBeTruthy();
+    const card = button.locator('xpath=ancestor::article[1]');
+    const title = card.getByText((await card.getAttribute('aria-label'))!, { exact: true });
+    // Tytuł nie może być ściskany przez znacznik ryzyka do pionowej kolumny liter.
+    expect((await title.boundingBox())!.width).toBeGreaterThanOrEqual(
+      (await card.boundingBox())!.width / 2,
+    );
+    expect(
+      await button.evaluate(
+        (el) =>
+          el.getBoundingClientRect().right <= el.closest('article')!.getBoundingClientRect().right,
+      ),
+    ).toBeTruthy();
+    await page.screenshot({ path: test.info().outputPath(`approval-font-${locale}.png`) });
+    expect(pageErrors.get(page)).toEqual([]);
+  });
+}
