@@ -1,0 +1,8 @@
+{
+  "files": 302,
+  "raw_bytes": 58708942,
+  "archive_bytes": 17529243,
+  "archive_sha256": "9c9836fa74b770f6321e5659d78f269f3105dd73df4df4a08767f5cc99565438",
+  "manifest_sha256": "0eec0b9ae93368a82371c6cf0b16215a371e0d74cbabb8479cb9056e2681e91f",
+  "scope": "Exact original bytes. Synthetic fixtures only; no model weights, binary dependencies, private user sessions or actual provider credentials."
+}

@@ -1,5 +1,17 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**12.11 — fakty czynności i własne persony:** kod UI `894798a7`, backend `c7664edc`,
+test formatu `c2c461e7`. Naprawiono brak danych wybranej gałęzi w kontekście kolejnej
+tury, awarie kart/kokpitu dla własnych person oraz przypisanie roli z Kreatora.
+Pełny Rust na c502: **3628/0/27**, 71/71 etapów i pełny spis celów. Core/API na c766:
+15/0/0; kodek: 1 integracja, 30 przypadków/60 ciał, dostawca jako atrapa. Vitest na32a:
+593/593; pełne UI na894: **961/961 po powtórzeniu całej drugiej części**. Pierwotna
+porażka345/1/615 zachowana, przyczyna opóźnienia niepotwierdzona; bez zmiany limitów.
+Nowa próba prawdziwego8B: dwa timeouty60s, cztery niewykonane, **NOT_EVALUATED**.
+CI189/Windows113 dla cd55 nadal queued; kandydat ma osobną gałąź, bez własnego CI.
+Karty22/41/48/58/68/69/77/78 pozostają otwarte. [Raport i surowe dane](../reviews/2026-11-12-execution-records-personas.md).
+Linux/Chromium/fake nie jest odbiorem Windows/WebView2, telefonu, API, RTX12GB lub mikrofonu.
+
 **Aktualizacja11.11:** nowe zlecenie obejmuje #58/#78/#68/#69/#22/#41/#48. Baza
 `bfd69b97` ma pełne **CI18810/10 i Windows1114/4**; #79 już zamknięta w zakresie
 argumentów pełnego odciążeniaGPU. Nowy kod UI`2f3cf3e3`: Atlas Jarvisa, mapa offline,

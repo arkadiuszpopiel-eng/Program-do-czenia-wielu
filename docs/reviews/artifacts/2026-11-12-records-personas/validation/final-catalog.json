@@ -1,0 +1,17 @@
+{
+  "command": [
+    "node",
+    "scripts/catalog.mjs"
+  ],
+  "cwd": "/workspace/wt-jarvis",
+  "source_head": "af687d78839ad685e5b4f8fcab6e62c6d3eda19f",
+  "source_status": "M crates/app-core/README.md\n M docs/README.md\n M docs/plan/03-roadmapa.md\n M docs/plan/55-enterprise-lokalnie-chmura-i-wyszukiwanie.md\n M docs/plan/56-kokpit-jarvis-i-panel-telefonu.md\n?? docs/reviews/2026-11-12-execution-records-personas.md\n?? docs/reviews/artifacts/2026-11-12-records-personas/",
+  "start": "2026-11-12T02:40:13.946255+00:00",
+  "state": "completed",
+  "pid": 155160,
+  "group": 155160,
+  "birth": "3560061",
+  "exit": 0,
+  "end": "2026-11-12T02:40:14.276508+00:00",
+  "log_sha256": "4412ce462bd3b0480a2a61cddce9a416b4d1356d2b9ee3213dad426b18b3fa1e"
+}

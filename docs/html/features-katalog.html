@@ -325,9 +325,9 @@ blockquote {
 <p><strong>Razem: 611 funkcji, z testem 611 (100 %), w długu 0.</strong></p>
 <div class="tbl"><table><thead><tr><th>Rodzaj</th><th style="text-align:right">Funkcji</th><th style="text-align:right">Z testem</th><th style="text-align:right">rdzeń</th><th style="text-align:right">interfejs</th><th style="text-align:right">przeglądarka</th><th style="text-align:right">aplikacja</th><th style="text-align:right">eval</th><th style="text-align:right">przegląd ogólny</th></tr></thead><tbody><tr><td>Polecenia rdzenia</td><td style="text-align:right">285</td><td style="text-align:right">285 (100 %)</td><td style="text-align:right">208</td><td style="text-align:right">3</td><td style="text-align:right">2</td><td style="text-align:right">274</td><td style="text-align:right">1</td><td style="text-align:right">0</td></tr>
 <tr><td>Polecenia palety i skróty</td><td style="text-align:right">63</td><td style="text-align:right">63 (100 %)</td><td style="text-align:right">2</td><td style="text-align:right">7</td><td style="text-align:right">9</td><td style="text-align:right">3</td><td style="text-align:right">0</td><td style="text-align:right">51</td></tr>
-<tr><td>Strony Ustawień</td><td style="text-align:right">38</td><td style="text-align:right">38 (100 %)</td><td style="text-align:right">0</td><td style="text-align:right">3</td><td style="text-align:right">34</td><td style="text-align:right">12</td><td style="text-align:right">0</td><td style="text-align:right">38</td></tr>
-<tr><td>Ustawienia</td><td style="text-align:right">103</td><td style="text-align:right">103 (100 %)</td><td style="text-align:right">22</td><td style="text-align:right">12</td><td style="text-align:right">7</td><td style="text-align:right">9</td><td style="text-align:right">2</td><td style="text-align:right">103</td></tr>
-<tr><td>Narzędzia agentek</td><td style="text-align:right">81</td><td style="text-align:right">81 (100 %)</td><td style="text-align:right">81</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">3</td><td style="text-align:right">52</td><td style="text-align:right">81</td></tr>
+<tr><td>Strony Ustawień</td><td style="text-align:right">38</td><td style="text-align:right">38 (100 %)</td><td style="text-align:right">0</td><td style="text-align:right">3</td><td style="text-align:right">34</td><td style="text-align:right">13</td><td style="text-align:right">0</td><td style="text-align:right">38</td></tr>
+<tr><td>Ustawienia</td><td style="text-align:right">103</td><td style="text-align:right">103 (100 %)</td><td style="text-align:right">23</td><td style="text-align:right">12</td><td style="text-align:right">7</td><td style="text-align:right">10</td><td style="text-align:right">2</td><td style="text-align:right">103</td></tr>
+<tr><td>Narzędzia agentek</td><td style="text-align:right">81</td><td style="text-align:right">81 (100 %)</td><td style="text-align:right">80</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">3</td><td style="text-align:right">52</td><td style="text-align:right">81</td></tr>
 <tr><td>Zdarzenia rdzenia</td><td style="text-align:right">41</td><td style="text-align:right">41 (100 %)</td><td style="text-align:right">35</td><td style="text-align:right">25</td><td style="text-align:right">5</td><td style="text-align:right">1</td><td style="text-align:right">1</td><td style="text-align:right">41</td></tr></tbody></table></div>
 <h2 id="polecenia-rdzenia">Polecenia rdzenia</h2>
 <div class="tbl"><table><thead><tr><th>Funkcja</th><th>Testy</th><th>Uwagi</th></tr></thead><tbody><tr><td><code>accounts_add</code></td><td>rdzeń, aplikacja</td><td></td></tr>
@@ -694,7 +694,7 @@ blockquote {
 <tr><td><code>plugins</code></td><td>przeglądarka, przegląd ogólny</td><td>Wtyczki</td></tr>
 <tr><td><code>mcp</code></td><td>przeglądarka, przegląd ogólny</td><td>Serwery MCP</td></tr>
 <tr><td><code>diag</code></td><td>przeglądarka, przegląd ogólny</td><td>Diagnostyka komputera</td></tr>
-<tr><td><code>builder</code></td><td>przeglądarka, przegląd ogólny</td><td>Kreator agentek</td></tr>
+<tr><td><code>builder</code></td><td>przeglądarka, aplikacja, przegląd ogólny</td><td>Kreator agentek</td></tr>
 <tr><td><code>triggers</code></td><td>przeglądarka, przegląd ogólny</td><td>Zadania w tle i wyzwalacze</td></tr>
 <tr><td><code>marshal</code></td><td>przeglądarka, przegląd ogólny</td><td>Reguły Marszałka</td></tr>
 <tr><td><code>permissions</code></td><td>przeglądarka, aplikacja, przegląd ogólny</td><td>Uprawnienia i bezpieczeństwo</td></tr>
@@ -756,8 +756,8 @@ blockquote {
 <tr><td><code>voice.talk_language</code></td><td>rdzeń, przegląd ogólny</td><td>Język rozpoznawania mowy</td></tr>
 <tr><td><code>voice.mode</code></td><td>interfejs, przegląd ogólny</td><td>Włączanie mikrofonu</td></tr>
 <tr><td><code>voice.show_pill</code></td><td>przegląd ogólny</td><td>Pigułka głosowa</td></tr>
-<tr><td><code>agents.interaction_mode</code></td><td>rdzeń, przegląd ogólny</td><td>Wspólny sposób współpracy</td></tr>
-<tr><td><code>agents.alfa.interaction_mode</code></td><td>przegląd ogólny</td><td>Alfa — sposób współpracy</td></tr>
+<tr><td><code>agents.interaction_mode</code></td><td>rdzeń, aplikacja, przegląd ogólny</td><td>Wspólny sposób współpracy</td></tr>
+<tr><td><code>agents.alfa.interaction_mode</code></td><td>rdzeń, przegląd ogólny</td><td>Alfa — sposób współpracy</td></tr>
 <tr><td><code>agents.beta.interaction_mode</code></td><td>rdzeń, przegląd ogólny</td><td>Beta — sposób współpracy</td></tr>
 <tr><td><code>agents.gama.interaction_mode</code></td><td>przegląd ogólny</td><td>Gama — sposób współpracy</td></tr>
 <tr><td><code>agents.delta.interaction_mode</code></td><td>rdzeń, przegląd ogólny</td><td>Delta — sposób współpracy</td></tr>
@@ -863,7 +863,7 @@ blockquote {
 <tr><td><code>fs_read</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_rename</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_search</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
-<tr><td><code>fs_stat</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
+<tr><td><code>fs_stat</code></td><td>eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>fs_write</code></td><td>rdzeń, interfejs, aplikacja, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>input_click</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>
 <tr><td><code>input_keys</code></td><td>rdzeń, eval, przegląd ogólny</td><td></td></tr>

@@ -1,5 +1,17 @@
 # 03 — Roadmapa (dokument żywy)
 
+**12.11 — fakty czynności i własne persony:** kod UI `894798a7`, backend `c7664edc`,
+test formatu `c2c461e7`. Naprawiono brak danych wybranej gałęzi w kontekście kolejnej
+tury, awarie kart/kokpitu dla własnych person oraz przypisanie roli z Kreatora.
+Pełny Rust na c502: **3628/0/27**, 71/71 etapów i pełny spis celów. Core/API na c766:
+15/0/0; kodek: 1 integracja, 30 przypadków/60 ciał, dostawca jako atrapa. Vitest na32a:
+593/593; pełne UI na894: **961/961 po powtórzeniu całej drugiej części**. Pierwotna
+porażka345/1/615 zachowana, przyczyna opóźnienia niepotwierdzona; bez zmiany limitów.
+Nowa próba prawdziwego8B: dwa timeouty60s, cztery niewykonane, **NOT_EVALUATED**.
+CI189/Windows113 dla cd55 nadal queued; kandydat ma osobną gałąź, bez własnego CI.
+Karty22/41/48/58/68/69/77/78 pozostają otwarte. [Raport i surowe dane](../reviews/2026-11-12-execution-records-personas.md).
+Linux/Chromium/fake nie jest odbiorem Windows/WebView2, telefonu, API, RTX12GB lub mikrofonu.
+
 **11.11 — obecny przyrost:** kodUI`2f3cf3e3`: Atlas Jarvisa, zarys świata offline,
 stany aplikacji, skróty i poprawione cele dotykowe32→44px. Końcowe41/41Chromium,
 573/573Vitest,typy0/0,lint/build/format/generator0; [raport i ograniczenia](../reviews/2026-11-11-jarvis-atlas.md).
@@ -389,12 +401,12 @@ Zlecenie właściciela 8.11; [plan nocny 54](54-jarvis-i-tryby-2026-11-08.md), [
 
 | ID | Zadanie | Stan | Data | Uwagi |
 | --- | --- | --- | --- | --- |
-| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-09 | kod rozmowy, przebiegów, delegacji i zadań w tle; #31 Jarvis20/20 imion w próbie Bielika, jedno zdanie0/20; #41 świeża baza i2 warianty po40 tur również0/20, zmiany cofnięte; #35–36 własna Luna, delegacja i odtworzenie katalogu na atrapach; #43 Luna10/10 tur Bielika, Jarvis po restarcie, jedno zdanie0/5; #48:50 ciał HTTP+50 odtworzeń modelu, Jarvis0/25 jednego zdania przed dekoderem,45/50 tekstów zgodnych; #37 naprawione i potwierdzone pełnymCI168; przegląd oraz próba sprzętowa otwarte |
+| J.1 | Profil Jarvis wspólny i osobny dla każdej persony | w toku | 2026-11-12 | 12.11: własne ID person i jawne role_id Kreatora; Core/API15/0/0, kodek30przypadków/60ciał bez prawdziwego modelu; nowy8B dwa timeouty, semantyka NOT_EVALUATED; [raport](../reviews/2026-11-12-execution-records-personas.md); historia wcześniejszych prób: kod rozmowy, przebiegów, delegacji i zadań w tle; #31 Jarvis20/20 imion w próbie Bielika, jedno zdanie0/20; #41 świeża baza i2 warianty po40 tur również0/20, zmiany cofnięte; #35–36 własna Luna, delegacja i odtworzenie katalogu na atrapach; #43 Luna10/10 tur Bielika, Jarvis po restarcie, jedno zdanie0/5; #48:50 ciał HTTP+50 odtworzeń modelu, Jarvis0/25 jednego zdania przed dekoderem,45/50 tekstów zgodnych; #37 naprawione i potwierdzone pełnymCI168; przegląd oraz próba sprzętowa otwarte |
 | J.2 | Panel Agentki: wybór Jarvisa i przejście do sterowania głosem | w toku | 2026-11-08 | 4 style × 2 motywy; #44 wspólny profil w bibliotece Kreatora,9/9 nowych E2E (także EN), typy0/0; pełny899/899 naaf5a2bc5 i CI161901/901 na12d44af4 zaliczone; #49 pełnyCI162901/901+573 zaliczony; #50 nowy nativeprzepływ i2/2 Chromium, dalszyCI otwarty; testy na atrapach i axe |
 | J.3 | Zakres każdego z pięciu trybów i odporność na spóźnione odpowiedzi | w toku | 2026-11-08 | jawny wybór rozmowa / globalnie; Plan i kłódka zachowują zakres rozmowy; regresje wyścigu żądań; karta #25: Plan bez rozmowy nie zmienia poziomu globalnego, Alt+M pomija niedostępny Plan |
 | J.4 | Próby wszystkich person na rzeczywistym modelu i w torze głosowym | w toku | 2026-11-08 | Linux Cloud CPU i syntetyczne audio; Windows i mikrofon pozostają osobną próbą |
 | J.5 | Regresje CI i raport nocny | w toku | 2026-11-09 | pełny Linux169a6004:3492/0/24; nowy12d44af4 --all-features3495/0/25; CI159 Windows3516/5/45, oba testy kolejki #39 zaliczone; CI156 zawieszony zachowano jako historię; lokalny UI877/2/0, osobno CI156 UI879/879 i573 jednostkowe; WebView2 rehearsal78:61/1/5; #35–36:15 testów; #38:16 wariantów+10 powtórzeń; #40:3 testy viewportu, CI159 Chromium890/890+573 jednostkowe; Windows80 dokowanie zaliczone, całość60/1/6, diagnostyka #42 wskazała klik za modalem Głosu; #47:RED+2/2 po zamknięciu modalu, Windows82 już62/0/5, kłódka3,0s; CI160 Windows3516/5/46, WebView81:60/1/6; #45–46 potwierdzone CI161 Windows3521/0/46,14/14 w poprawianych celach, Clippy0; CI162Windows3521/0/46 i UI901/901; #51 prywatnałatkaClippy0+4/4, niecommitowana; #52 HTTP504 silników83 dwa razy; chroniona łatka Brokera otwarta |
-| J.6 | Atlas Jarvisa, mapa offline i cele dotykowe | w toku | 2026-11-11 | kod2f3cf3e3,41/41Chromium,573Vitest,typy0/0; dwie regresje CSS naprawione; pełny nowyCI i fizyczny telefon pozostają osobno; [raport](../reviews/2026-11-11-jarvis-atlas.md) |
+| J.6 | Atlas Jarvisa, mapa offline i cele dotykowe | w toku | 2026-11-12 | kod894798a7: własne persony, długie nazwy320px, mapa i skróty; pełny UI961/961 po powtórce części2, pierwotne345/1/615 zachowane; Vitest593 na32a; nowyCI i sprzęt otwarte; [raport](../reviews/2026-11-12-execution-records-personas.md) |
 
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 

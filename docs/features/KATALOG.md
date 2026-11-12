@@ -10,9 +10,9 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Polecenia rdzenia | 285 | 285 (100 %) | 208 | 3 | 2 | 274 | 1 | 0 |
 | Polecenia palety i skróty | 63 | 63 (100 %) | 2 | 7 | 9 | 3 | 0 | 51 |
-| Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 12 | 0 | 38 |
-| Ustawienia | 103 | 103 (100 %) | 22 | 12 | 7 | 9 | 2 | 103 |
-| Narzędzia agentek | 81 | 81 (100 %) | 81 | 1 | 1 | 3 | 52 | 81 |
+| Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 13 | 0 | 38 |
+| Ustawienia | 103 | 103 (100 %) | 23 | 12 | 7 | 10 | 2 | 103 |
+| Narzędzia agentek | 81 | 81 (100 %) | 80 | 1 | 1 | 3 | 52 | 81 |
 | Zdarzenia rdzenia | 41 | 41 (100 %) | 35 | 25 | 5 | 1 | 1 | 41 |
 
 ## Polecenia rdzenia
@@ -391,7 +391,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `plugins` | przeglądarka, przegląd ogólny | Wtyczki |
 | `mcp` | przeglądarka, przegląd ogólny | Serwery MCP |
 | `diag` | przeglądarka, przegląd ogólny | Diagnostyka komputera |
-| `builder` | przeglądarka, przegląd ogólny | Kreator agentek |
+| `builder` | przeglądarka, aplikacja, przegląd ogólny | Kreator agentek |
 | `triggers` | przeglądarka, przegląd ogólny | Zadania w tle i wyzwalacze |
 | `marshal` | przeglądarka, przegląd ogólny | Reguły Marszałka |
 | `permissions` | przeglądarka, aplikacja, przegląd ogólny | Uprawnienia i bezpieczeństwo |
@@ -457,8 +457,8 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `voice.talk_language` | rdzeń, przegląd ogólny | Język rozpoznawania mowy |
 | `voice.mode` | interfejs, przegląd ogólny | Włączanie mikrofonu |
 | `voice.show_pill` | przegląd ogólny | Pigułka głosowa |
-| `agents.interaction_mode` | rdzeń, przegląd ogólny | Wspólny sposób współpracy |
-| `agents.alfa.interaction_mode` | przegląd ogólny | Alfa — sposób współpracy |
+| `agents.interaction_mode` | rdzeń, aplikacja, przegląd ogólny | Wspólny sposób współpracy |
+| `agents.alfa.interaction_mode` | rdzeń, przegląd ogólny | Alfa — sposób współpracy |
 | `agents.beta.interaction_mode` | rdzeń, przegląd ogólny | Beta — sposób współpracy |
 | `agents.gama.interaction_mode` | przegląd ogólny | Gama — sposób współpracy |
 | `agents.delta.interaction_mode` | rdzeń, przegląd ogólny | Delta — sposób współpracy |
@@ -568,7 +568,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `fs_read` | rdzeń, eval, przegląd ogólny |  |
 | `fs_rename` | rdzeń, eval, przegląd ogólny |  |
 | `fs_search` | rdzeń, eval, przegląd ogólny |  |
-| `fs_stat` | rdzeń, eval, przegląd ogólny |  |
+| `fs_stat` | eval, przegląd ogólny |  |
 | `fs_write` | rdzeń, interfejs, aplikacja, eval, przegląd ogólny |  |
 | `input_click` | rdzeń, eval, przegląd ogólny |  |
 | `input_keys` | rdzeń, eval, przegląd ogólny |  |

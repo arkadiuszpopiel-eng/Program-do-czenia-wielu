@@ -160,6 +160,10 @@ Identyfikatory DTO niosą sesję: tura `"<sesja>:t<n>"`, plik `"<sesja>:a<id>"`,
 
 ## Testy
 
+- `tests/execution_records_context.rs` — fakty wybranej gałęzi w rzeczywistym Core;
+  odczyt/nadpisanie TEMP, następna tura, restart, Undo i odmowa bez skutku. Dostawca jako atrapa.
+- `tests/execution_records_wire.rs` — 30 przypadków (pięć person × dwa profile × trzy stany),
+  60 ciał produkcyjnego LlamaCodec native-tools/JSONSchema; bez HTTP lub oceny jakości modelu.
 - `tests/dto_roundtrip.rs` (+ `tests/dto_spec/`) — każdy ładunek atrapy UI (162 komendy, 32 typy zdarzeń) deserializuje się
   do DTO i wraca bez strat; zbiór komend = COMMANDS.md = `app_core::COMMANDS`.
 - `tests/ipc_signatures.rs` — sygnatury z `with_commands!` istnieją w `AppCore`, przyszłości `Send + 'static`

@@ -48,6 +48,8 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 | [`compliance/`](compliance/subscription-routes.md) | Zgodność tras abonamentowych, rejestr tras |
 | [`AI_WORKFLOW.md`](AI_WORKFLOW.md) | Jak pracują sesje AI: kolejność pracy nad modułem, recenzja, Definition of Done, bramki ludzkie |
 
+Bieżący przyrost12.11: [fakty czynności, własne persony, testy i otwarte odbiory](reviews/2026-11-12-execution-records-personas.md).
+
 ## Poza `docs/`
 
 | Miejsce | Co zawiera |
