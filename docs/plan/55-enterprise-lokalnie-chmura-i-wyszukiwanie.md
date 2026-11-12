@@ -1,5 +1,12 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Aktualizacja12.11 — CI192 zakończone:** kod5f265ba3, CI8/10 (lockfileTauri iWindows spy),
+Linux3646/0/28,Windows3667/1/49,Vitest593,Chromium963; Windows1164/4,WebView2 63/0/5.
+Naprawy942c3f3d/fc80d880: metadata101→0 i kolejnośćStop RED0/1→10/0/0, Clippy0.
+MacierzCore30ma transport/wejścia30/30, ale same„Nie” i tylko metadaneDone1:
+semantykaNOT_ACCEPTED, #58 otwarte. Nowe źródła wymagają własnegoCI/przeglądu.
+[Pełny raport i dowody](../reviews/2026-11-12-ci192-and-fixes.md).
+
 **Decyzje właściciela12.11:** zatwierdzony projekt telefonu jako podpis ADR0019–0023
 (D.0), własnyWSS/E2E, pierwsze parowanie lokalne, osobne dowody zgód, WWW bez kluczaAPI.
 Pierwsza ścieżka #78: wyszukiwanie w przeglądarce bez kluczaAPI. Nie oznacza to
