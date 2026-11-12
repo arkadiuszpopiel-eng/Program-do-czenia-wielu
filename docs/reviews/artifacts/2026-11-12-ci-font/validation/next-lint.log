@@ -1,0 +1,9 @@
+
+> alfa-monorepo@0.0.0 lint /workspace/wt-jarvis
+> eslint . && node scripts/check-svelte5.mjs && node scripts/check-css.mjs && node scripts/check-size.mjs && node scripts/vendor-sqlite.mjs --check && node scripts/cockpit-map.mjs --check
+
+check-svelte5: 248 plików .svelte, 0 naruszeń
+check-css: 389 plików, 0 naruszeń
+check-size: 3577 plików, 264 crate'ów, wyjątków 11; naruszenia: 0
+vendor-sqlite: 29 plików; odciski i pin zgodne
+cockpit-map: /workspace/wt-jarvis/apps/desktop/ui/src/lib/components/cockpit/assets/world-land.svg, 28254 B

@@ -200,6 +200,36 @@ jobs:
         env:
           ALFA_LIVE_CATALOG: "1"
         run: cargo test -p app-models --test live_catalog -- --ignored --nocapture
+      - name: Build ekranu Core na rzeczywistym modelu
+        if: github.event_name != 'schedule'
+        run: cargo test --locked -p app-core --test execution_records_live --no-run
+      - name: Zapis gałęzi — macierz Core i Qwen8B na CPU
+        if: github.event_name != 'schedule'
+        shell: pwsh
+        run: |
+          $env:ALFA_LIVE_SERVER = Join-Path $env:ALFA_LIVE_DIR 'local\sidecars\llama-cpu\llama-server.exe'
+          $env:ALFA_LIVE_MODELS_DIR = Join-Path $env:ALFA_LIVE_DIR 'local\models'
+          $env:ALFA_LIVE_MODEL = 'qwen3-8b-q4-k-m'
+          $env:ALFA_RECORDS_LIVE_REPORT = Join-Path $env:ALFA_LIVE_DIR 'core-records-screen.json'
+          $env:ALFA_RECORDS_LIVE_CASES = '30'
+          cargo test --locked -p app-core --test execution_records_live -- --ignored --nocapture
+          exit $LASTEXITCODE
+      - name: Odpowiedzi Core do przeglądu semantyki
+        if: always() && github.event_name != 'schedule'
+        shell: pwsh
+        run: |
+          $reportFile = Join-Path $env:ALFA_LIVE_DIR 'core-records-screen.json'
+          if (-not (Test-Path -LiteralPath $reportFile)) {
+            'Core: brak raportu, próba modelu niewykonana.'
+            exit 0
+          }
+          $report = Get-Content -LiteralPath $reportFile -Raw -Encoding utf8 | ConvertFrom-Json
+          'Core: transport/wejście to osobne kontrole; semantyka wymaga oceny surowych tekstów.'
+          "Stan: $($report.state); odpowiedzi: $(@($report.results).Count); niewykonane: $(@($report.not_run).Count)"
+          foreach ($row in $report.results) {
+            "$($row.agent)/$($row.mode)/$($row.scenario): $($row.text)"
+            if ($row.error) { "Błąd: $($row.error | ConvertTo-Json -Compress)" }
+          }
       - name: Podsumowanie (SHA-256, układ archiwów, czasy)
         if: always()
         shell: pwsh
@@ -264,6 +294,7 @@ jobs:
           path: |
             ${{ env.ALFA_LIVE_DIR }}/live-report.json
             ${{ env.ALFA_LIVE_DIR }}/tts-alfa.wav
+            ${{ env.ALFA_LIVE_DIR }}/core-records-screen.json
           if-no-files-found: warn
           retention-days: 30
 

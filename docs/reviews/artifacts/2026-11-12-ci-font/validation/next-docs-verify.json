@@ -1,0 +1,18 @@
+{
+  "command": [
+    "node",
+    "scripts/docs-html.mjs",
+    "--verify"
+  ],
+  "cwd": "/workspace/wt-jarvis",
+  "source_head": "76ac2cbdefea0cf43dbdb3741febb1c9909dcd4a",
+  "source_status": "M .github/workflows/rehearsal.yml\n M crates/app-core/README.md\n M docs/CATALOG.md\n M docs/html/plan-03-roadmapa.html\n M docs/html/plan-55-enterprise-lokalnie-chmura-i-wyszukiwanie.html\n M docs/html/plan-56-kokpit-jarvis-i-panel-telefonu.html\n M docs/plan-prac.html\n M docs/plan/03-roadmapa.md\n M docs/plan/55-enterprise-lokalnie-chmura-i-wyszukiwanie.md\n M docs/plan/56-kokpit-jarvis-i-panel-telefonu.md\n M docs/reviews/2026-11-12-execution-records-personas.md\n?? docs/reviews/artifacts/2026-11-12-ci-font/",
+  "start": "2026-11-12T03:43:28.175449+00:00",
+  "state": "completed",
+  "pid": 161966,
+  "group": 161966,
+  "birth": "3939484",
+  "exit": 0,
+  "end": "2026-11-12T03:43:28.610599+00:00",
+  "log_sha256": "2fd989b0642e24b15f1e016296ea4ecedd9427aef74aa3999a873490d5e0cc30"
+}

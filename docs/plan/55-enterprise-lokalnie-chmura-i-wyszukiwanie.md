@@ -1,5 +1,12 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Korekta po CI190:**45df ma8/10zadań (UI960/1; ten sam błąd bramki zbiorczej),
+RustLinux3630/0/27,Windows3652/0/48; Windows1144/4,WebView263/0/5.
+Kodf03: odtworzone przepełnienie przycisku i ściśnięty tytuł, dwaRED0/2→48/48;
+pełny nowy zestaw963 w przygotowaniu. Testye95: natywny Core/LocalProvider,
+macierz30 przygotowana do osobnej oceny odpowiedzi, jeszcze niewykonana.
+[Raport i ograniczenia](../reviews/2026-11-12-execution-records-personas.md).
+
 **12.11 — fakty czynności i własne persony:** kod UI `894798a7`, backend `c7664edc`,
 test formatu `c2c461e7`. Naprawiono brak danych wybranej gałęzi w kontekście kolejnej
 tury, awarie kart/kokpitu dla własnych person oraz przypisanie roli z Kreatora.

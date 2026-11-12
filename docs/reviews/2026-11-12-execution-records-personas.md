@@ -1,5 +1,58 @@
 # Fakty czynności, własne persony i Jarvis — 12.11.2026
 
+## Aktualizacja po CI190 — karta zgody i rzeczywisty Core8B
+
+CI190 dla `45df9fe8` zakończone **8/10 zadań**, wynik ogólny failure. Rust:
+Linux **3630/0/27**, Windows **3652/0/48**, po1148 podsumowań libtest; osobny
+no_alloc bez harnessu. Tauri **5+4**, Vitest **593**. Chromium **960/1**:
+321/0 +319/1 +320/0. Bramka zbiorcza UI również czerwona z powodu tej samej porażki.
+Nie anulowano przebiegu; komplet wyników zachowano przed następnym pushem.
+
+Błąd CI: wiadomość własnej persony na320px ma większy scrollWidth niż clientWidth.
+Pobrano dokładną paczkę CI i sprawdzono SHA256. W Cloud system-ui używa OpenAI Sans;
+20 świeżych nawigacji tej paczki nie wykazało problemu. Jawny szerszy font DejaVu Sans
+odtworzył przepełnienie:303>288px, przycisk243,5px. Nie podmieniano fontów programu
+ani nie dodawano fontu webowego; stres dotyczy wyłącznie testu i metryk systemowych.
+
+Kod `f03bde37`: przycisk karty zgody korzysta z istniejącego Button.wrap, ma pełny tekst
+oraz minimum44px na wąskim ekranie. Nagłówek może zawinąć znacznik ryzyka, pozostawiając
+czytelne miejsce na długie ID. Nowe PL/EN najpierw **0/2** dla przepełnienia, następnie
+**0/2** dla ściśniętego tytułu; po poprawkach **48/48** wspólnej serii UI. Typy0/0,
+lint/build/bundle/format kod0. Dodano geometrię i zrzut przy porażce oraz artefakty
+niezaliczonego sharda CI. Nie zmieniono limitów, trzech shardów lub kryterium0overlap.
+Nowy cały zestaw ma **963 przypadki**; jego pełny wynik nie jest jeszcze potwierdzony.
+Dawne961/961 odnoszą się do894, a CI960/1 do45df — nie do nowej poprawki.
+
+Windows114 dla45df ma **4/4 zadań**. WebView2 **63/0/5 pominiętych**, runtime156.0.4314.58.
+Pominięto profil instancji z pełnym dostępem, okno logowania doCLI, natywny eksport i dwa
+skróty głosowe. To nie jest odbiór całego przepływu pełnych praw na komputerze właściciela.
+Qwen8B CPU: pierwszy token14485ms, całość25475ms,96tokenów,8,74tok/s; prosty test
+wywołania narzędzia11064ms. Bielik4.5B:11518/24557ms,88tokenów,6,75tok/s;
+11B niewykonany z powodu budżetu CPU. Piper717ms/2185ms audio,RTF0,328;
+STT z nagrania WER0,total27932ms,RTF12,78 i fallbackCUDA→CPU. Brak odbioru GPU/mikrofonu.
+Proste wywołanie narzędzia testowego nie jest dowodem wykonania zadań #58.
+
+Kod testów `e95ae0a7`: osobny Core→LocalProvider dla macierzy pięciu person×dwa profile×
+trzy stany. Wspólny adapter z dotychczasowym jarvis_live zachowuje96tokenów/temp0;
+naprawiono mylący stały opisLinux w raportach uruchamianych także naWindows.
+Domyślne testy: **1/0/3 pominięte** (test zamkniętego strumienia zaliczony; trzy
+rzeczywiste próby modeli jawnie wymagają --ignored). Clippy workspace/all-targets0
+bez ostrzeżeń. Pierwszy błąd kompilacji samego testu E0277 zachowano, nie nazywamy go
+behawioralnym RED. Produkcyjny Rust pozostał identyczny zc766.
+
+Próba realnego Core jest przygotowana w jobieCPU po istniejących silnikach, z tymi
+samymi zweryfikowanymi plikami modelu/serwera, bez dodatkowego pobrania i bez zmiany
+limitów. Nie uruchamia się z harmonogramu. Pierwsze trzy przypadki Alfy/Standard są
+początkiem zadeklarowanej macierzy30; po błędzie transportu/wejścia test przerywa,
+zapisuje nieukończone pozycje i zatrzymuje własny serwer. Pełne żądania i odpowiedzi
+mają osobny core-records-screen.json, bez nadpisania raportu silników. **Zaliczenie
+transportu nie zalicza semantyki**: teksty wymagają osobnej oceny względem zapisów.
+Na ten moment ta próba jeszcze nie została wykonana na Windows; #58 nadal otwarte.
+
+[Dowody CI190, próby fontów, źródła i zrzuty](artifacts/2026-11-12-ci-font/README.md).
+
+## Zapis wcześniejszego przyrostu — źródła pozostają przypisane do wyników
+
 **Kandydat do przeglądu, nie zakończony odbiór Enterprise.** Naprawiono brak danych
 czynności w kontekście kolejnej tury oraz awarie UI dla własnych person. Jakość
 odpowiedzi prawdziwego modelu w sprzecznej historii nadal nie została odebrana.
@@ -76,7 +129,7 @@ Liczby poniżej nie są sumowane między nakładającymi się seriami.
 
 Produkcyjne źródła Rust c766 są identyczne w UI894. Późniejszy c2 dodaje wyłącznie
 integrację testową i zależność deweloperską; nie jest powtórzeniem pełnego Rust na
-innym commicie. Po połączeniu porównanie apps/desktop/ui i packages z 894 jest puste; pełny UI dotyczy identycznych wejść frontendu.
+innym commicie. Dla45df porównanie apps/desktop/ui i packages z894 było puste. Późniejsza poprawka f03 zmienia kartę; jej pełnego CI nie zastępujemy wynikiem961.
 
 Rzeczywisty test pliku TEMP: odczyt → nadpisanie → następna tura → ponowna budowa
 Core nad tą samą zaszyfrowaną bazą i sejfem testowym → Undo odtwarzające poprzednie
