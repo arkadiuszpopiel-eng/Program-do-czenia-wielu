@@ -215,6 +215,7 @@ jobs:
           cargo test --locked -p app-core --test execution_records_live -- --ignored --nocapture
           exit $LASTEXITCODE
       - name: Rzeczywisty odczyt TEMP — kontrola Core i Qwen8B
+        id: actual_read_control
         if: github.event_name != 'schedule'
         shell: pwsh
         run: |
@@ -227,10 +228,16 @@ jobs:
       - name: Odpowiedź po rzeczywistym odczycie — dane do przeglądu
         if: always() && github.event_name != 'schedule'
         shell: pwsh
+        env:
+          ALFA_ACTUAL_READ_STEP_OUTCOME: ${{ steps.actual_read_control.outcome }}
         run: |
           $path = Join-Path $env:ALFA_LIVE_DIR 'actual-read-screen.json'
           if (-not (Test-Path -LiteralPath $path)) {
-            'Rzeczywisty odczyt + model: próba niewykonana (brak raportu).'
+            if ($env:ALFA_ACTUAL_READ_STEP_OUTCOME -eq 'skipped') {
+              'Rzeczywisty odczyt + model: NOT_RUN — krok pominięty, brak raportu.'
+            } else {
+              "Rzeczywisty odczyt + model: brak raportu; stan kroku: $env:ALFA_ACTUAL_READ_STEP_OUTCOME. Wynik niepotwierdzony."
+            }
             exit 0
           }
           $r = Get-Content -LiteralPath $path -Raw -Encoding utf8 | ConvertFrom-Json

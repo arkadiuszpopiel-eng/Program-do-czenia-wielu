@@ -1,0 +1,8 @@
+{
+  "yaml": "valid",
+  "triggers": "unchanged",
+  "concurrency": "unchanged",
+  "all_jobs_commands_timeouts_conditions_except_report_text": "unchanged",
+  "diff": "step ID, outcome in summary environment, absence wording classified using actual step outcome",
+  "PS_runtime": "NOT_RUN locally; no pwsh available; text-only reporting change"
+}

@@ -34,6 +34,13 @@ macierzy30. Jeżeli wcześniejszy krok nie przejdzie, nowy zostanie niewykonany 
 jakoNOT_RUN. Bez harmonogramu, bez nowych progów/timeoutów lub continue-on-error.
 Raporty silników i starejmacierzy pozostają oddzielne i zachowane.
 
+Korekta raportowania po przeglądzie: brak pliku sam w sobie nie dowodzi pominięcia.
+Krok ma własny ID, a podsumowanie odczytuje jego rzeczywisty outcome. NOT_RUN tylko
+dla skipped; przy pozostałych stanach brak raportu jest wynikiem niepotwierdzonym.
+Nie zmieniono komend, limitów, warunków wykonania, wyzwalaczy lub współbieżności.
+Sprawdzenie struktury całego YAML:0; lokalny PowerShell niewykonany (brak pwsh).
+[Zapis kontroli](artifacts/2026-11-12-actual-read-integrated/report-status-structure.json).
+
 **#58 pozostaje otwarte.** Brak zaliczonej odpowiedzi na tej mocniejszej kontroli;
 brak odbioru wszystkich person, pięciu trybów, GPU12GB, telefonu, prawdziwegoAPI i mikrofonu.
 Kolejny krok: odczytać surową odpowiedź Windows, ocenić względem prawdziwego Replay,
