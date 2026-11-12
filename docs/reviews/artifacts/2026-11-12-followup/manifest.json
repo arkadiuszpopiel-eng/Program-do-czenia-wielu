@@ -1,0 +1,103 @@
+{
+  "base": "7112cfe1058e89f1668f8895293c751578181295",
+  "scope": "Snapshot2026-11-12T07:17UTC:CI194/195/196 completed Linux Rust jobs; other OS pending. Windows1194/4 but all30 negative on metadata-only fixture; no semantic/hardware acceptance. CI197/Windows121 newly active.",
+  "files": [
+    {
+      "path": "ci194-196-linux-counts.json",
+      "bytes": 597,
+      "sha256": "470d78837e0831d5cf1bc4d0f7703b6b531be64e0601dbefedf7b4b0b9728158"
+    },
+    {
+      "path": "ci194-rust-linux-decoded.json",
+      "bytes": 944125,
+      "sha256": "7087cc234ac0081a02bd0cfbfc7fb6781a338685e4c8487e0603622885855fe0"
+    },
+    {
+      "path": "ci195-rust-linux-decoded.json",
+      "bytes": 1092846,
+      "sha256": "d52efde9e4502713ea32fe265ca64491407c7d7761abff4725a5fb9984892e9d"
+    },
+    {
+      "path": "ci196-rust-linux-decoded.json",
+      "bytes": 1093398,
+      "sha256": "40c990ab4df0c9605c8f6bfd2178a9ed09349a35807ffdb23425b1a5c0d0502a"
+    },
+    {
+      "path": "final-snapshot-jobs-43169813550.json",
+      "bytes": 23083,
+      "sha256": "266774b54e859d6a2f436645111866582edd45e32a0e8ad04d60c75be829842e"
+    },
+    {
+      "path": "final-snapshot-jobs-43169813635.json",
+      "bytes": 9947,
+      "sha256": "52c1879597151e96b0f68eeed58008996fa9e98351f980ce6b2453d2f6a6a8f2"
+    },
+    {
+      "path": "final-snapshot-jobs-43170199163.json",
+      "bytes": 23083,
+      "sha256": "a2eaae8034f1caf583605a4518efcc44d0b97302ea2854ea216993711ff59872"
+    },
+    {
+      "path": "final-snapshot-jobs-43170199196.json",
+      "bytes": 9947,
+      "sha256": "1559bb1e4940eac785a229a1bd5f6010130417f85ba75706f2f99f9134ef5ef4"
+    },
+    {
+      "path": "final-snapshot-jobs-43171040421.json",
+      "bytes": 22884,
+      "sha256": "5aa2401e98b2d94a14913ec466dcd72850afc5d6303d4c7015e72d5c0b6aad52"
+    },
+    {
+      "path": "final-snapshot-jobs-43171040447.json",
+      "bytes": 10120,
+      "sha256": "afa36087b9c473218ab8faf1131bef1f277a522925fb1e98412b22c6cb6ccb7e"
+    },
+    {
+      "path": "final-snapshot-jobs-43173642131.json",
+      "bytes": 21349,
+      "sha256": "d84c9eaf437f94656a813a6f0ab1e06aaa3cae8fbbe2b27557f6d855550fb3b3"
+    },
+    {
+      "path": "final-snapshot-jobs-43173642177.json",
+      "bytes": 9914,
+      "sha256": "527ac427d238954a924573805d0cbbe43a6dfa699096eb084d367dc5d605e331"
+    },
+    {
+      "path": "windows118-webview-decoded.json",
+      "bytes": 136691,
+      "sha256": "89869c9ea186083c4340b417638e7d537a0c95e12e9e4245357d4db69d6850a9"
+    },
+    {
+      "path": "windows119-live/core-records-screen.json",
+      "bytes": 168310,
+      "sha256": "1917b99e81100c09eeeeee3d7c981f87c5d7a68c0ba05637b8a18a7e0b18fa0b"
+    },
+    {
+      "path": "windows119-live/live-report.json",
+      "bytes": 61644,
+      "sha256": "beb1099c45a4152ab53133b4f29cbdb65bf9eea9287514cdcf22659132274eef"
+    },
+    {
+      "path": "windows119-live/tts-alfa.wav",
+      "bytes": 106610,
+      "sha256": "ad5929fbfbe41dc3d9e07febf37d9fdc4cf97b4f52826c271993492629c6fc0a"
+    },
+    {
+      "path": "windows119-live-decoded.json",
+      "bytes": 158404,
+      "sha256": "46a49e25b5b619e9d49cd6fd2c49b6b846f9c5a59f6d040e8bfe4ddc82a846e4"
+    },
+    {
+      "path": "windows119-manual-review.json",
+      "bytes": 9355,
+      "sha256": "405aa54370b7d16d9f0c84965b8c9f3935d005b73011011f6e6d64d72a6ad691"
+    },
+    {
+      "path": "windows119-webview-decoded.json",
+      "bytes": 133717,
+      "sha256": "a322fcd5435cf59e4d10a126fbc3cfeebbc864cee356ede5dbd53a365dbc2769"
+    }
+  ],
+  "sources": [],
+  "archive_sha256": "88bf0d62da3a7f6445efbaac85d0ace2f39044ed45aa81c1d80ff86ceacb4c71"
+}

@@ -1,5 +1,33 @@
 # Raport prac i otwartych spraw — 12 listopada 2026
 
+**Najnowszy zapis: 12.11.2026, 07:17 UTC (08:17 Europe/Warsaw).**
+Kod najnowszego kandydata: **7112cfe1058e89f1668f8895293c751578181295**,
+[PR86](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/pull/86).
+Raport publikowany osobno, bez kolejnego pusha przerywającego testy tego heada.
+
+| Źródło i przyrost | Ukończony Rust Linux | Cały CI / Windows na moment zapisu |
+|---|---|---|
+| fb1bd5f0 / PR81 | **3647/0/28**, 1154 podsumowania | CI194: 9/10 ukończonych, Rust Windows w toku; Windows118 **3/4 failure** |
+| 39f6a0af / PR82 | **3657/0/28**, 1155 podsumowań | CI195: 9/10 ukończonych, Rust Windows w toku; Windows119 **4/4** |
+| a2b47cf2 / PR84 | **3658/0/29**, 1156 podsumowań | CI196 nieukończone; Windows120: WebView2 **62/1/5**, job modelu w toku |
+| 7112cfe1 / PR86 | nowy przebieg, jeszcze niezaliczony | CI197/Windows121 w toku |
+
+[CI194](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/43169813550) ·
+[CI195](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/43170199163) ·
+[CI196](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/43171040421) ·
+[CI197](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/43173642131) ·
+[Windows121](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/43173642177).
+
+Windows119 na39f6a0af: WebView2 **63/0/5**, Core **30/30 wejść i transportów**,
+0NOT_RUN, wszystkie odpowiedzi „Nie”. Pierwszy widoczny tekst Core **12094–74785 ms**;
+nie oznacza to odbioru czasu odpowiedzi lub zimnego startu. Dodatni fixture nadal
+tylko TurnMeta, więc semantyka **NOT_ACCEPTED**, #58/#77 pozostają otwarte.
+[Surowe wyniki, hashe i snapshoty wszystkich przebiegów](artifacts/2026-11-12-followup/README.md).
+Nie wykonano rerun niezaliczonych jobów i nie anulowano wcześniejszych przebiegów.
+
+Poniższa historia opisuje źródła i wyniki poszczególnych przyrostów. Nieukończone
+kontrole pozostają niezaliczone; aktualizacja raportu nie jest odbiorem produktu.
+
 To zapis wykonanych przyrostów, a nie deklaracja zakończenia jakości Enterprise.
 
 **Dalsza kontrola Windows:** Windows118 na fb1bd5f0 zakończyło się **3/4 failure**:
@@ -116,3 +144,11 @@ Kolejne kroki:
 
 Cloud bez GPU/mikrofonu nie zastępuje tych pomiarów. Nie uruchamiano mostówCLI,
 subagentów ani harmonogramów, nie czytano sekretów lub cookies użytkownika.
+
+Pozostają też bazowe ostrzeżenia cargo-deny i deprecacje narzędzi. Wcześniejszy
+pełny Prettier wskazał 16 nietkniętych plików źródłowych, 2 wyniki generowane i
+2 przypięte pliki vendor; nie wykonywano masowego formatowania poza zakresem.
+Zmienione pliki i kontrole Clippy/typów miały własne zerowe wyniki, co nie oznacza
+zera wszystkich ostrzeżeń w całym projekcie. Szczegóły w zachowanym raporcie CI191.
+Bielik11B na CPU był NOT_RUN_CPU_BUDGET przy limicie RAM8192MB; to nie pomiar
+dopasowania modelu i kontekstu do RTX2060 12GB. Realne API/hybryda nadal bez odbioru.
