@@ -2,10 +2,17 @@
 
 | Pole | Wartość |
 |---|---|
-| Status | Proponowany — czeka na podpis właściciela |
+| Status | Projekt zatwierdzony przez właściciela12.11.2026 z doprecyzowaniem poniżej |
 | Data | 2026-10-09 |
 | Powiązane | decyzja właściciela nr 1 z 2026-10-09; plan v6: `docs/plan/09-dostep-zdalny-i-bezpieczenstwo.md` (połączenie, parowanie, lista urządzeń, R1–R11), `03-roadmapa.md` (D.2–D.4, D.8, D.9); `docs/THREAT_MODEL.md` (S13, S14); ADR 0019, 0020, 0022 |
 | Zmienia | model zagrożeń: dopisuje scenariusze R1–R11; reguła „żadnego nasłuchu” (S14, test F4-07) **zostaje i jest rozszerzona** na nowe moduły |
+
+## Podpis właściciela12.11.2026
+
+Właściciel zatwierdził konkretny [pakiet projektu](../reviews/2026-11-11-remote-design-review.md)
+jako podpis ADR0019–0023. [Zapis decyzji i zakres](../reviews/2026-11-12-owner-decisions.md).
+To zatwierdzenie architektury, bez odbioru implementacji; chronione poprawki Brokera
+i polityk nadal wymagają konkretnego przeglądu.
 
 ## Kontekst
 
@@ -22,7 +29,7 @@ uwierzytelnieniem, a nie złagodzeniem starych reguł.
 | Kierunek połączeń | **obie strony wychodzą** do przekaźnika (WebSocket po TLS); host nie nasłuchuje; zapora i router bez zmian |
 | Reguła „żadnego nasłuchu” | pozostaje prawdziwa dla hosta; statyczny test obejmuje dodatkowo `remote-gateway`, `device-pairing`, `host-headless` |
 | Kanał E2E | wewnątrz połączenia strony zestawiają kanał według wzorca Noise (biblioteka `snow`): wzajemne uwierzytelnienie kluczami urządzeń, utajnienie z wyprzedzeniem; ramki z licznikiem — powtórzenie odrzucane |
-| Dobór wzorca Noise | **do ustalenia** przed kodem (w katalogu funkcji oznaczony jako niepotwierdzony) — wymaga przeglądu człowieka |
+| Dobór wzorca Noise | Zatwierdzony kierunek dla klienta natywnego: `Noise_XX_25519_ChaChaPoly_SHA256`; biblioteka, klient WWW i implementacja wymagają przeglądu zgodnie z pakietem12.11 |
 | Co widzi przekaźnik | losowy identyfikator hosta, adresy IP stron, rozmiary i czas ramek; nie zna treści, nazw, kluczy ani kont |
 | Przekaźnik | moduł `remote-relay`: jeden plik wykonywalny / obraz kontenera; **właściciel może postawić własny**; limit połączeń na identyfikator hosta (R9) |
 | Parowanie | kod QR ważny 2 minuty: adres przekaźnika, identyfikator hosta, klucz publiczny hosta, jednorazowy sekret; urządzenie tworzy własną parę kluczy w bezpiecznym magazynie (Android Keystore; w przeglądarce klucz dostępu WebAuthn) |

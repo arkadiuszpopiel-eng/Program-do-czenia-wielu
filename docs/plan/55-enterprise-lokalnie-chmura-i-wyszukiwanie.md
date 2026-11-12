@@ -1,5 +1,11 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Decyzje właściciela12.11:** zatwierdzony projekt telefonu jako podpis ADR0019–0023
+(D.0), własnyWSS/E2E, pierwsze parowanie lokalne, osobne dowody zgód, WWW bez kluczaAPI.
+Pierwsza ścieżka #78: wyszukiwanie w przeglądarce bez kluczaAPI. Nie oznacza to
+wdrożonego transportu/embeddingu; konkretne poprawki Brokera nadal osobno do przeglądu.
+[Zapis zgody i zakres](../reviews/2026-11-12-owner-decisions.md).
+
 **Korekta po CI190:**45df ma8/10zadań (UI960/1; ten sam błąd bramki zbiorczej),
 RustLinux3630/0/27,Windows3652/0/48; Windows1144/4,WebView263/0/5.
 Kodf03: odtworzone przepełnienie przycisku i ściśnięty tytuł, dwaRED0/2→48/48;

@@ -50,6 +50,8 @@ Każdy dokument ma jedno miejsce i jedno zadanie. Jeśli nie wiesz, gdzie coś j
 
 Bieżący przyrost12.11: [fakty czynności, własne persony, testy i otwarte odbiory](reviews/2026-11-12-execution-records-personas.md).
 
+[Decyzje właściciela12.11 — podpisD.0 i wyszukiwanie bezAPI](reviews/2026-11-12-owner-decisions.md).
+
 ## Poza `docs/`
 
 | Miejsce | Co zawiera |

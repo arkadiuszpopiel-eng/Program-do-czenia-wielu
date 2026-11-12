@@ -1,5 +1,9 @@
 # Fakty czynności, własne persony i Jarvis — 12.11.2026
 
+**Późniejsza decyzja właściciela:** D.0 zatwierdzone; pierwsze wyszukiwanie w przeglądarce bezAPI.
+[Zakres zgody](2026-11-12-owner-decisions.md). Poniższe wcześniejsze wpisy „czeka na podpis”
+pozostają historią; nie są aktualną blokadą projektu. Transport i embedding nadal niewdrożone.
+
 ## Aktualizacja po CI190 — karta zgody i rzeczywisty Core8B
 
 CI190 dla `45df9fe8` zakończone **8/10 zadań**, wynik ogólny failure. Rust:

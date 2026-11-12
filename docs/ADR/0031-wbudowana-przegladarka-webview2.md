@@ -1,5 +1,8 @@
 # ADR 0031 — Lekka przeglądarka wbudowana i wyszukiwanie WWW
 
+**Wybór właściciela12.11:** pierwsza ścieżka to wyszukiwanie w przeglądarce bez klucza API.
+[Zapis decyzji](../reviews/2026-11-12-owner-decisions.md). Embedding WebView2 nadal wymaga implementacji i odbioru.
+
 | Pole | Wartość |
 |---|---|
 | Status | Propozycja do przeglądu, bez wdrożenia |

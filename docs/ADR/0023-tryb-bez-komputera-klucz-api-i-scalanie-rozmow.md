@@ -2,10 +2,17 @@
 
 | Pole | Wartość |
 |---|---|
-| Status | Proponowany — czeka na podpis właściciela |
+| Status | Projekt zatwierdzony przez właściciela12.11.2026 z doprecyzowaniem poniżej |
 | Data | 2026-10-09 |
 | Powiązane | decyzja właściciela nr 3 z 2026-10-09; plan v6: `docs/plan/09-dostep-zdalny-i-bezpieczenstwo.md` (praca bez komputera, R4, R11), `04-nowe-funkcje.md` (F.6, sprawy do rozstrzygnięcia), `03-roadmapa.md` (E.6, F.6); ADR 0006, 0021, 0022 |
 | Zmienia | ustalenia planu v5: „sekrety nigdy nie opuszczają komputera” (`AGENTS.md`: sekrety tylko w Windows Credential Manager) oraz „bez synchronizacji — tylko import/eksport `.alfa`” |
+
+## Podpis właściciela12.11.2026
+
+Właściciel zatwierdził konkretny [pakiet projektu](../reviews/2026-11-11-remote-design-review.md)
+jako podpis ADR0019–0023. [Zapis decyzji i zakres](../reviews/2026-11-12-owner-decisions.md).
+To zatwierdzenie architektury, bez odbioru implementacji; chronione poprawki Brokera
+i polityk nadal wymagają konkretnego przeglądu.
 
 ## Kontekst
 
@@ -30,7 +37,7 @@ bez komputera musi też wrócić do historii, choć plan v5 nie przewiduje synch
 | Koszty | doliczane do licznika kosztów po scaleniu |
 | Zakres | to nie jest synchronizacja: dane płyną w jedną stronę (urządzenie → host) i dotyczą tylko tur rozmowy; pełna synchronizacja (CRDT) pozostaje tematem badawczym H.7 |
 
-## Otwarte pytanie do właściciela — klucz API w przeglądarce
+## Rozstrzygnięcie właściciela — wariantA bez klucza API w przeglądarce
 
 Przeglądarka nie ma magazynu równie bezpiecznego jak telefon. Opcje z katalogu funkcji:
 
@@ -40,7 +47,7 @@ Przeglądarka nie ma magazynu równie bezpiecznego jak telefon. Opcje z katalogu
 | B — przechowywać zaszyfrowany | klucz API w pamięci przeglądarki, zaszyfrowany kluczem pochodnym z klucza dostępu WebAuthn; odszyfrowanie wymaga potwierdzenia kluczem dostępu | po odszyfrowaniu klucz jest w pamięci strony — przejęcie hostingu panelu (R7) lub złośliwe rozszerzenie mogą go odczytać |
 
 Sesja nie rekomenduje opcji B bez osobnego przeglądu bezpieczeństwa panelu (CSP, integralność zasobów, hosting).
-Do rozstrzygnięcia obowiązuje stan z wiersza „Klucz API — panel WWW”.
+12.11.2026 właściciel wybrał wariantA; obowiązuje stan z wiersza „Klucz API — panel WWW”.
 
 ## Alternatywy (odrzucone)
 

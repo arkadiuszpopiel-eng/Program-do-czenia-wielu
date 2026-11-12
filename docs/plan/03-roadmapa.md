@@ -1,5 +1,11 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Decyzje właściciela12.11:** zatwierdzony projekt telefonu jako podpis ADR0019–0023
+(D.0), własnyWSS/E2E, pierwsze parowanie lokalne, osobne dowody zgód, WWW bez kluczaAPI.
+Pierwsza ścieżka #78: wyszukiwanie w przeglądarce bez kluczaAPI. Nie oznacza to
+wdrożonego transportu/embeddingu; konkretne poprawki Brokera nadal osobno do przeglądu.
+[Zapis zgody i zakres](../reviews/2026-11-12-owner-decisions.md).
+
 **Korekta po CI190:**45df ma8/10zadań (UI960/1; ten sam błąd bramki zbiorczej),
 RustLinux3630/0/27,Windows3652/0/48; Windows1144/4,WebView263/0/5.
 Kodf03: odtworzone przepełnienie przycisku i ściśnięty tytuł, dwaRED0/2→48/48;
@@ -435,7 +441,7 @@ Plan: [`41-tryb-dla-dzieci.md`](41-tryb-dla-dzieci.md) (zlecenie właściciela 2
 
 | ID  | Zadanie                                                                   | Stan  | Data | Uwagi                                            |
 | --- | ------------------------------------------------------------------------- | ----- | ---- | ------------------------------------------------ |
-| D.0 | Podpis właściciela pod ADR 0019–0023                                      | czeka | —    | bez tego nie powstaje kod                        |
+| D.0 | Podpis właściciela pod ADR 0019–0023 | zrobione | 2026-11-12 | zatwierdzony konkretny projekt; [zakres zgody](../reviews/2026-11-12-owner-decisions.md), implementacja/Broker nadal osobno |
 | D.1 | `remote-gateway`: sesje klientów, ACL, ramki, wznowienie                  | czeka | —    | po B.1–B.3, B.5                                  |
 | D.2 | `device-pairing`: QR, klucze urządzeń, lista, odwołanie                   | czeka | —    |                                                  |
 | D.3 | `remote-relay`: przekaźnik szyfrogramu + obraz kontenera + instrukcja     | czeka | —    |                                                  |

@@ -2,10 +2,17 @@
 
 | Pole | Wartość |
 |---|---|
-| Status | Proponowany — czeka na podpis właściciela |
+| Status | Projekt zatwierdzony przez właściciela12.11.2026 z doprecyzowaniem poniżej |
 | Data | 2026-10-09 |
 | Powiązane | plan v6: `docs/plan/02-architektura-docelowa.md` (szew 4), `09-dostep-zdalny-i-bezpieczenstwo.md` (test 6), `03-roadmapa.md` (D.1, D.7, D.8); ADR 0001, 0003, 0007, 0019, 0021 |
 | Zmienia | założenie, że host żyje wyłącznie wewnątrz procesu okna Tauri; nie zmienia Brokera, watchdoga ani launchera |
+
+## Podpis właściciela12.11.2026
+
+Właściciel zatwierdził konkretny [pakiet projektu](../reviews/2026-11-11-remote-design-review.md)
+jako podpis ADR0019–0023. [Zapis decyzji i zakres](../reviews/2026-11-12-owner-decisions.md).
+To zatwierdzenie architektury, bez odbioru implementacji; chronione poprawki Brokera
+i polityk nadal wymagają konkretnego przeglądu.
 
 ## Kontekst
 
