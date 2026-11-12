@@ -1,0 +1,52 @@
+{
+  "base": "8b66e957fb6e0c6cb53df2334e2851817a637cf1",
+  "scope": "Linux, fake model/host ports; lifecycle ordering, no hardware acceptance",
+  "files": [
+    {
+      "path": "finish-order-red.json",
+      "bytes": 593,
+      "sha256": "2184a636e1cd4c113bee2bef14d588bc18c7942ad6dba3842667e5b7f228940e"
+    },
+    {
+      "path": "finish-order-red.log",
+      "bytes": 19722,
+      "sha256": "7c2b616aaab106902ffb0095612cc87d3f122de75fd88e137c0007049f8a1bd8"
+    },
+    {
+      "path": "finish-order-green.json",
+      "bytes": 738,
+      "sha256": "959c0b764aea0c492b16a61d6b86abc035481c4ff17c1b45b86d44980dec0f7a"
+    },
+    {
+      "path": "finish-order-green.log",
+      "bytes": 1839,
+      "sha256": "84a19207597f0d32c63bbc5b7b6028503e53a65a55aa42b5ddecb20c1d7c287b"
+    },
+    {
+      "path": "finish-order-clippy.json",
+      "bytes": 675,
+      "sha256": "ae37b41ea85ae6f70cb1a1d01cd0f7b52cfaf1a0868a020e22dafc6110732f37"
+    },
+    {
+      "path": "finish-order-clippy.log",
+      "bytes": 18983,
+      "sha256": "087e9a4b657934ca58a6861fbe8e6f5a97485854418a29dfcd9b74f72eabd19a"
+    },
+    {
+      "path": "finish-order-red-source.tar.gz",
+      "bytes": 4648,
+      "sha256": "32320bada8e15667426416329d10767bebc47bdf7704489daee8c1cf89dcbad5"
+    }
+  ],
+  "sources": [
+    {
+      "path": "crates/app-chat/src/finish.rs",
+      "sha256": "faad7df0710e2d1ba6217751a10589ec39f75a24553b6c2e14543526ee5cf8f1"
+    },
+    {
+      "path": "crates/app-core/tests/finish_order.rs",
+      "sha256": "42ba0b9236b545a26c4ae3004b8deab9deec5504bc44afe5c54136f64452ecb8"
+    }
+  ],
+  "archive_sha256": "c0426aa847616a26d3523fb26d317a6e3bddedeccacf3dffa04504f634f15acc"
+}

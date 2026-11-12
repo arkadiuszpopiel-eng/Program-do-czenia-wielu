@@ -2,10 +2,17 @@
 
 | Pole | Wartość |
 |---|---|
-| Status | Proponowany — czeka na podpis właściciela |
+| Status | Projekt zatwierdzony przez właściciela12.11.2026 z doprecyzowaniem poniżej |
 | Data | 2026-10-09 |
 | Powiązane | plan v6: `docs/plan/02-architektura-docelowa.md` (szew 3), `09-dostep-zdalny-i-bezpieczenstwo.md` (uprawnienia klientów, R10), `03-roadmapa.md` (B.1–B.3, B.5, D.1, D.6); ADR 0013, 0020, 0021 |
 | Zmienia | wykonuje ADR 0013 (typy TS generowane z Rust zamiast pisanych ręcznie); nie zmienia listy poleceń ani zdarzeń |
+
+## Podpis właściciela12.11.2026
+
+Właściciel zatwierdził konkretny [pakiet projektu](../reviews/2026-11-11-remote-design-review.md)
+jako podpis ADR0019–0023. [Zapis decyzji i zakres](../reviews/2026-11-12-owner-decisions.md).
+To zatwierdzenie architektury, bez odbioru implementacji; chronione poprawki Brokera
+i polityk nadal wymagają konkretnego przeglądu.
 
 ## Kontekst
 

@@ -3701,6 +3701,42 @@
       ],
       "type": "string"
     },
+    "CommandFrame": {
+      "additionalProperties": false,
+      "description": "Format polecenia, nie dowód tożsamości ani zgody. Nieznane pola są błędem.",
+      "properties": {
+        "args": {
+          "additionalProperties": true,
+          "description": "Argumenty obiektowe; ich typ sprawdza odbiorca konkretnej komendy.",
+          "type": "object"
+        },
+        "cmd": {
+          "description": "Nazwa z rejestru komend; parser nie rozstrzyga jej uprawnień.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Ściśle rosnący identyfikator w zakresie 1..=2^53−1.",
+          "format": "uint64",
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "v": {
+          "description": "Wersja wynegocjowana dla połączenia.",
+          "format": "uint16",
+          "maximum": 65535,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "v",
+        "id",
+        "cmd",
+        "args"
+      ],
+      "type": "object"
+    },
     "CommercialUse": {
       "description": "Czy licencja pozwala na użycie komercyjne.",
       "oneOf": [
@@ -18788,6 +18824,9 @@
       "SessionWorkdir.path",
       "ToolIntent.cwd"
     ]
+  },
+  "remote_command": {
+    "$ref": "#/$defs/CommandFrame"
   },
   "terminal_frame": {
     "$ref": "#/$defs/TerminalFrame"

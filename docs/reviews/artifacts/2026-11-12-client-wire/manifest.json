@@ -1,0 +1,139 @@
+{
+  "scope": "Local Linux; pure parser and app-api tests with synthetic data, no network/authentication/control/hardware acceptance",
+  "files": [
+    {
+      "path": "wire-parser-red.json",
+      "bytes": 518,
+      "sha256": "49061c2180917b66aaaee87f5dfb40d3cc0e5340d5eaa7a1408f1525fda5678f"
+    },
+    {
+      "path": "wire-parser-red.log",
+      "bytes": 2462,
+      "sha256": "065c8a07a82787b80bc0dac8bf022f57fc46be8a3cf8b2792f069d146e18fffe"
+    },
+    {
+      "path": "wire-parser-behavior-red.json",
+      "bytes": 548,
+      "sha256": "0e1c93570c951c3bfdf4e5e96be14bd6b22b6c327cd33763a95e955db12a3330"
+    },
+    {
+      "path": "wire-parser-behavior-red.log",
+      "bytes": 3097,
+      "sha256": "3682ef11fe52c8beb4ca74de988afc2ac38110926bb0e6a30e74f1b77b4bb57c"
+    },
+    {
+      "path": "wire-parser-green.json",
+      "bytes": 546,
+      "sha256": "58607db40f0140894f68c4974e336a4d603f5df5abdf6a9dfa9e8393f3f291b5"
+    },
+    {
+      "path": "wire-parser-green.log",
+      "bytes": 1365,
+      "sha256": "a98f8e7d7a0b96036f8eb32ff51b18e875bc3e8f356b970e90e177090a81c976"
+    },
+    {
+      "path": "wire-extra-green.json",
+      "bytes": 672,
+      "sha256": "0c03ab431283510bbad477465dbc419c8a6b9d1c0f794ff544b7db3916cc97a2"
+    },
+    {
+      "path": "wire-extra-green.log",
+      "bytes": 2187,
+      "sha256": "398c30ac2c3ce31c788926b6b473bbbb046eda8232d9f5e992b4a3be2ac29dc4"
+    },
+    {
+      "path": "wire-schema-build.json",
+      "bytes": 682,
+      "sha256": "fa9bd62e5f62ada982a5804cb899bc563414c69d5ba56bf4fc314133765e9392"
+    },
+    {
+      "path": "wire-schema-build.log",
+      "bytes": 3088,
+      "sha256": "7c0c1cabd3cdd9bcc5c95fc6b52d4b559fcac36610ff3eb9fc632c2a0c8f708b"
+    },
+    {
+      "path": "wire-api-tests.json",
+      "bytes": 782,
+      "sha256": "6eb2abdd7f377f93cc490265148d07e5836a9d858d91b49e75531d3b2ed8f946"
+    },
+    {
+      "path": "wire-api-tests.log",
+      "bytes": 8397,
+      "sha256": "29f03fde575c74977c7e65de05ffc6dca2de3ac05d5a66e1676be606035fd5b1"
+    },
+    {
+      "path": "wire-clippy.json",
+      "bytes": 802,
+      "sha256": "bbcde0ac0138908f2acc7f3af184e474f9f6908ee657dd6940245732dba5b32a"
+    },
+    {
+      "path": "wire-clippy.log",
+      "bytes": 25015,
+      "sha256": "b5343e08a1e91357186e19ee0fda323a38bbf62c6c6b149b3e812cfb442e9710"
+    },
+    {
+      "path": "wire-deny.json",
+      "bytes": 828,
+      "sha256": "6f574e442f1d6df516a18db0ab27443fd2b16ee5dee28889dae864eb4ddaf216"
+    },
+    {
+      "path": "wire-deny.log",
+      "bytes": 1880001,
+      "sha256": "f7907d3838eea4af570cf23a93c1126aa79313dcb4764bbafaa550f290c577c1"
+    },
+    {
+      "path": "wire-validation.json",
+      "bytes": 1027,
+      "sha256": "e452ef44d76eb7b35b6a73dd860fa48d0847e1f2cff06c0e462884a9f0d6df3c"
+    },
+    {
+      "path": "wire-validation.log",
+      "bytes": 65182,
+      "sha256": "b09ac6838e6447590f10f0e9349c060eef2ef7797e695c2d19002d32244dd1c8"
+    },
+    {
+      "path": "wire-pnpm-setup.json",
+      "bytes": 1005,
+      "sha256": "b281c4bf60e7c2b735cc31c8eea6235d42d22930967ce5015cf4be02a3872d8b"
+    },
+    {
+      "path": "wire-pnpm-setup.log",
+      "bytes": 582,
+      "sha256": "483f93ac72c8c41b058e26745dda029e9c44770758977fcd99a0376a72506291"
+    },
+    {
+      "path": "wire-types-installed.json",
+      "bytes": 961,
+      "sha256": "fbb3904795771f42770f94c839cd9cdae98f9b6284fc3413d5a4eabfdb16a98e"
+    },
+    {
+      "path": "wire-types-installed.log",
+      "bytes": 785,
+      "sha256": "e3e3126ff5db29b5bf1775f41d4f0827ba3f290f8aa452d1407c8989101d458f"
+    },
+    {
+      "path": "wire-parser-red-source.tar.gz",
+      "bytes": 3831,
+      "sha256": "737c31a71c2f769bbc1cb6b036a983629e426b8dcd8f7e90436305fda3c1a639"
+    },
+    {
+      "path": "wire-final-source.json",
+      "bytes": 1668,
+      "sha256": "eab34f4332e0d68df6ad33131b057dc10d24c54dabcb9995f92ef685a1d87486"
+    },
+    {
+      "path": "wire-validation-commands.json",
+      "bytes": 839,
+      "sha256": "de40c226d6b9c4d1f4e3a68841803526f231703e585b621f16f2eb3e0051b18d"
+    },
+    {
+      "path": "validate-wire.py",
+      "bytes": 766,
+      "sha256": "df5558d1f8e583a380d50f77d26335d88556a056efa8fce80e4b9cb4f53618e7"
+    }
+  ],
+  "archive": {
+    "bytes": 131761,
+    "sha256": "b5bd0e0279ded4682082aced76567f14dc2924e813ca5e3e9753ee87a51e4145"
+  }
+}

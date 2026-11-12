@@ -12,6 +12,7 @@ repository.workspace = true
 # (limit 8 000 linii na crate). Zależy wyłącznie od `*-contract`; używa go tylko `app-core`
 # (i przez jego reeksport — powłoka Tauri).
 [dependencies]
+lib-client-wire = { path = "../lib-client-wire" }
 accounts-hub-contract = { path = "../accounts-hub-contract" }
 # Szkic Kreatora agentów (`AgentDraft`) jako DTO komend `builder_*` — ten sam kształt serde.
 agent-builder-contract = { path = "../agent-builder-contract" }

@@ -1,0 +1,110 @@
+{
+  "candidate": "372bfcd550f1a4f37a48580d050bc20de28ca270",
+  "scope": "Decoded GitHub logs, synthetic model inputs and CPU diagnostics; not original job-log ZIP bytes",
+  "files": [
+    {
+      "path": "jobs-43150453166.json",
+      "bytes": 12780,
+      "sha256": "6c94f5c6c5916455aee61e4db448abbfe91aea5ada5c13218587fd0b3279ecc9"
+    },
+    {
+      "path": "jobs-43150453104.json",
+      "bytes": 5619,
+      "sha256": "b04a268aa46bd1ff29bc109ae45959a9acabf4dfc4c9fd1334a68fc5f98c7392"
+    },
+    {
+      "path": "ci191-rust-linux-decoded.json",
+      "bytes": 939955,
+      "sha256": "4755e73bde40eda717a910d598495d0d96ade53a323fa726525b8f8ba1c98629"
+    },
+    {
+      "path": "ci191-rust-windows-decoded.json",
+      "bytes": 970742,
+      "sha256": "ef729797051d169fbe7abe4387342b5ab516651c1044e2e6539c795eec1b006e"
+    },
+    {
+      "path": "ci191-ui-controls-decoded.json",
+      "bytes": 182382,
+      "sha256": "1de37a2289e1bbe03e746607861f0cb445581990cf209bd50d7802afaeec421a"
+    },
+    {
+      "path": "windows115-webview-decoded.json",
+      "bytes": 135744,
+      "sha256": "6a526e6e505e3716d6772c9d77f239c328d60b710a81e5c3ead4cbc9bb43d271"
+    },
+    {
+      "path": "windows115-live-failure-decoded.json",
+      "bytes": 165212,
+      "sha256": "630c04d13524d85471336b7bb35367fec9fdf09db69d37a41653a2dcc1c4c864"
+    },
+    {
+      "path": "ci191-completion-counts.json",
+      "bytes": 1649,
+      "sha256": "59adc93b1b6709960b59f3fb8ab56288ebddffc778d5234a232b93fd3050d452"
+    },
+    {
+      "path": "ci191-ui-verification.json",
+      "bytes": 821,
+      "sha256": "9fad4996f62d44b66819ea4fc478b2480f8d2b3a741ee68238145f7cca54268f"
+    },
+    {
+      "path": "ci191-ui-list.json",
+      "bytes": 516,
+      "sha256": "9b215259428da7c0abd6df56c1fdc64e5c96095754105a506d13defa787c171e"
+    },
+    {
+      "path": "ci191-ui-list.log",
+      "bytes": 606933,
+      "sha256": "acc7a0e111c2e7e602e30d0e0ab110a977715dae80719b8266ede3a50db9a515"
+    },
+    {
+      "path": "cpu-prefill-256.json",
+      "bytes": 2152,
+      "sha256": "9b63b2047d6fafb6d94560c222964a9afc67c960aa3c20b2b59880d62a600432"
+    },
+    {
+      "path": "cpu-prefill-256.log",
+      "bytes": 1377,
+      "sha256": "9a28509880eb75dc7a1607864d102b115130bf150abe04d0dac7f23485f4776b"
+    },
+    {
+      "path": "windows115-approx-chatml.txt",
+      "bytes": 3526,
+      "sha256": "91e5a3ba9700ab12b30f8e8b25d32fe3af75ffee6675bf369540fb061c4410ad"
+    },
+    {
+      "path": "windows115-tokenizer.log",
+      "bytes": 6774,
+      "sha256": "8ab7ffc7117127cc2b69f116526353388f916c9847fc16c147c61dd032ea6490"
+    },
+    {
+      "path": "ci191-ui-shard1-decoded.json",
+      "bytes": 94778,
+      "sha256": "4d18df00997888718e4b6e38642745e45347aa13ac1bea6ae7d257fb17a03469"
+    },
+    {
+      "path": "ci191-ui-shard2-decoded.json",
+      "bytes": 94018,
+      "sha256": "f746c915001aa8b000b107b158b0f496be95b2c7d97956ab8e5f231e2b056693"
+    },
+    {
+      "path": "ci191-ui-shard3-decoded.json",
+      "bytes": 95409,
+      "sha256": "d8d844095486dff156bf79cc8862311efa9aae5c6c299ac77781a03a1d230627"
+    },
+    {
+      "path": "windows115-live/core-records-screen.json",
+      "bytes": 7748,
+      "sha256": "9929d2fd0a5b857b98f07fc2c1a6760d78bff3185f206fc6f16daf80178861df"
+    },
+    {
+      "path": "windows115-live/live-report.json",
+      "bytes": 61582,
+      "sha256": "1efe0cbe57f17f430163c5b909f898b169f9d1a70c571d589691c8f45a9c1c54"
+    }
+  ],
+  "archive": {
+    "bytes": 554707,
+    "sha256": "4d6962bbcb80acf0414c1be46b064d4c39e9ead7898396e77ee4c3f0d2a86522"
+  }
+}

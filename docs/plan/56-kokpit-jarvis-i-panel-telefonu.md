@@ -1,5 +1,19 @@
 # 56 — kokpit Jarvis, kafelki telefonu i panel zdalny
 
+**Decyzje właściciela12.11:** zatwierdzony projekt telefonu jako podpis ADR0019–0023
+(D.0), własnyWSS/E2E, pierwsze parowanie lokalne, osobne dowody zgód, WWW bez kluczaAPI.
+Pierwsza ścieżka #78: wyszukiwanie w przeglądarce bez kluczaAPI. Nie oznacza to
+wdrożonego transportu/embeddingu; konkretne poprawki Brokera nadal osobno do przeglądu.
+[Zapis zgody i zakres](../reviews/2026-11-12-owner-decisions.md).
+
+**Najnowsze CI12.11, kod372bfcd5:** CI191 **10/10**; RustLinux3631/0/28,
+Windows3653/0/49; Vitest593, Chromium **963/963** bez pominięć/flaky.
+Windows115 **3/4**, WebView263/0/5. Nowa macierz Core8B zatrzymała się na pierwszym
+przypadku: FirstToken60s,0 odpowiedzi,29NOT_RUN, semantykaNOT_EVALUATED.
+#58 pozostaje otwarte; nie zmieniono limitów ani nie ukryto czerwonego testu.
+[Raport i dowody](../reviews/2026-11-12-execution-records-personas.md).
+Poniższe wcześniejsze wyniki i blokady podpisu zachowują historię; aktualna decyzja D.0 jest powyżej.
+
 **Korekta po CI190:**45df ma8/10zadań (UI960/1; ten sam błąd bramki zbiorczej),
 RustLinux3630/0/27,Windows3652/0/48; Windows1144/4,WebView263/0/5.
 Kodf03: odtworzone przepełnienie przycisku i ściśnięty tytuł, dwaRED0/2→48/48;

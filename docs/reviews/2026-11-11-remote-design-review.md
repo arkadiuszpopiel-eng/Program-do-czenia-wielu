@@ -1,18 +1,19 @@
 # #69 — pakiet decyzji dla rzeczywistego sterowania telefonem
 
-**Stan: projekt do przeglądu, bez kodu transportu i bez odbioru telefonu.**
+**Stan: projekt zatwierdzony przez właściciela12.11.2026, bez kodu transportu i bez odbioru telefonu.**
 Pełna zgoda na dostępne operacje komputera została udzielona; poniższy zakres dotyczy
-osobnych, niepodpisanych decyzji architektury i dowodów zgód urządzenia.
+osobnych decyzji architektury i dowodów zgód urządzenia. [Podpis i zakres](2026-11-12-owner-decisions.md).
 
 ## Warunek zapisany w repozytorium
 
 [ADR0021](../ADR/0021-dostep-zdalny-przekaznik-e2e-i-parowanie.md):
 „Kod powstaje dopiero po podpisie ADR 0019–0023 (zadanie D.0).”
-Dobór Noise jest tam „do ustalenia przed kodem” i wymaga przeglądu człowieka.
+Wzorzec Noise dla klienta natywnego zatwierdzono razem z projektem; bibliotekę, klienta WWW
+i konkretną implementację nadal trzeba zweryfikować.
 [ADR0022](../ADR/0022-zgody-zdalne-dowod-urzadzenia-sparowanego.md) wymaga osobnego
-przeglądu zmiany Brokera. Te dokumenty pozostają propozycjami, nie zostały tu zmienione.
+przeglądu zmiany Brokera. Właściciel12.11 zatwierdził projekt jako podpis tych ADR; konkretna implementacja Brokera nadal osobno do przeglądu.
 
-## Proponowane rozstrzygnięcia do podpisu
+## Rozstrzygnięcia projektu zatwierdzone12.11.2026
 
 | Zakres | Konkretna propozycja | Co pozostaje do sprawdzenia |
 |---|---|---|
@@ -24,7 +25,7 @@ przeglądu zmiany Brokera. Te dokumenty pozostają propozycjami, nie zostały tu
 | WebAuthn | Osobny klucz zgód od klucza kanału; challenge wiąże wersję, urządzenie, requestHash, nonce i termin | Broker weryfikuje podpis, rpIdHash, origin, challenge, UP/UV i ważność; nie ufa przesłanemu `user_verified=true`; problem klonowanego/zerowego signCount rozwiązuje nonce |
 | ADR0023 | Panel WWW bez hosta: wariantA, bez klucza API w przeglądarce; Android może dostać klucz wyłącznie po odrębnej zgodzie i przeglądzie magazynu | Windows Credential Manager → E2E → magazyn Androida wymaga zatwierdzonej zmiany polityki; odwołanie nie gwarantuje usunięcia z nieosiągalnego telefonu |
 
-Wybór własnego przekaźnika jest rekomendacją, nie uruchomioną usługą lub zgodą na koszty.
+Wybór własnego przekaźnika jest zatwierdzony; nie jest to uruchomiona usługa lub zgoda na koszty.
 Nie ma automatycznej instalacji nowych zależności, publikacji panelu ani odczytu kluczy.
 Nie zatwierdzono tu nowego progu czasu odwołania, wielkości ramki lub limitu zgód.
 

@@ -323,7 +323,10 @@ blockquote {
 <p>Brama klientów po stronie hosta: prowadzi sesje klientów (okno lokalne, urządzenia sparowane), sprawdza, które
 polecenia wolno wywołać danemu klientowi, numeruje zdarzenia i obsługuje wznowienie po przerwie. Moduł
 <strong>nie</strong> szyfruje kanału sam z siebie poza użyciem uzgodnionych kluczy, nie paruje urządzeń (<code>device-pairing</code>),
-nie zatwierdza działań i nie wytwarza dowodów zgody — tylko je przenosi do Brokera. Stan: propozycja.</p>
+nie zatwierdza działań i nie wytwarza dowodów zgody — tylko je przenosi do Brokera.
+Projekt D.0 zatwierdzony12.11.2026. Moduł wykonawczy nadal planowany; pierwszy przyrost
+<code>lib-client-wire</code> dostarcza tylko czysty format ramki (schema Rust→TS), wersję, jawny limit bajtów
+i rosnące ID. Bez sieci/ACL/parowania/dispatchera; <a href="../../crates/lib-client-wire/README.md">zakres biblioteki</a>.</p>
 <h2 id="fala-i-priorytet">Fala i priorytet</h2>
 <p>Plan v6, <strong>etap D</strong> (zadanie D.1), po B.1–B.3 i B.5 oraz po podpisie ADR 0019–0023 (D.0). Priorytet: do
 ustalenia przez właściciela. v0: brama <strong>wewnątrz</strong> procesu aplikacji (krok 1 z ADR 0020). v1: brama w <code>alfa-host</code>.</p>
@@ -390,7 +393,7 @@ połączenia i gubienie ramek, klient testowy z dowolną ACL; służy też jako 
 <h2 id="otwarte-pytania">Otwarte pytania</h2>
 <ul>
 <li>ADR 0019 — rozmiar bufora zdarzeń, limit ramki, lista poleceń <code>local_only</code> i ich zdalnych odpowiedników.</li>
-<li>ADR 0021 — dobór wzorca Noise (niepotwierdzony); czy kanał E2E żyje w tym module, czy w osobnej bibliotece
+<li>ADR 0021 — wzorzec Noise_XX_25519_ChaChaPoly_SHA256 zatwierdzony w D.0; czy kanał E2E żyje w tym module, czy w osobnej bibliotece
 <code>lib-*</code> wspólnej dla hosta i klientów.</li>
 <li>ADR 0022 — jak brama przekazuje <code>DeviceApprovalProof</code> do Brokera działającego w osobnym procesie.</li>
 <li>ADR 0020 — przeniesienie bramy z procesu aplikacji do <code>alfa-host</code> bez zrywania sparowanych urządzeń.</li>

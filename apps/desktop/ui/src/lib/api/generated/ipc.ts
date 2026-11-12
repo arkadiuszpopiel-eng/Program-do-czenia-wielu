@@ -1016,6 +1016,18 @@ export interface ChildLockState {
 /** Rozwiązanie kolizji. */
 export type CollisionResolution = 'keep_local' | 'take_imported' | 'keep_both';
 
+/** Format polecenia, nie dowód tożsamości ani zgody. Nieznane pola są błędem. */
+export interface CommandFrame {
+  /** Argumenty obiektowe; ich typ sprawdza odbiorca konkretnej komendy. */
+  readonly args: Readonly<Record<string, unknown>>;
+  /** Nazwa z rejestru komend; parser nie rozstrzyga jej uprawnień. */
+  readonly cmd: string;
+  /** Ściśle rosnący identyfikator w zakresie 1..=2^53−1. */
+  readonly id: number;
+  /** Wersja wynegocjowana dla połączenia. */
+  readonly v: number;
+}
+
 /** Czy licencja pozwala na użycie komercyjne. */
 export type CommercialUse = 'yes' | 'no' | 'conditional' | 'unknown';
 
@@ -5126,6 +5138,8 @@ export type IpcCommandName = keyof IpcCommands;
 export type IpcEventFrame = EventFrame;
 /** Odrzucenie komendy. */
 export type IpcError = AppError;
+/** Format polecenia zdalnego; nie dowód tożsamości ani zgody. */
+export type IpcRemoteCommand = CommandFrame;
 
 /** Powód, dla którego polecenie wymaga lokalnej maszyny (B.5, `crates/app-api/data/local-only.json`). */
 export type LocalReason = 'system_dialog' | 'asset_preview' | 'host_path' | 'host_desktop';

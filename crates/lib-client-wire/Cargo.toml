@@ -1,0 +1,21 @@
+[package]
+name = "lib-client-wire"
+description = "Czysty parser ramek klient–host: format, wersja, budżet bajtów i licznik; bez sieci, uwierzytelniania i uprawnień"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+
+[dependencies]
+schemars.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

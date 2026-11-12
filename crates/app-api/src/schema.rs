@@ -52,6 +52,7 @@ pub fn ipc_schema() -> Value {
     let error = generator.subschema_for::<AppError>();
     // Kanał `Channel` otwarcia terminala — poza komendami i zdarzeniami, ale też część łącza.
     let terminal = generator.subschema_for::<TerminalFrame>();
+    let remote_command = generator.subschema_for::<lib_client_wire::CommandFrame>();
     let definitions = generator.take_definitions(true);
     json!({
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -62,6 +63,7 @@ pub fn ipc_schema() -> Value {
         "events_resume": resume,
         "error": error,
         "terminal_frame": terminal,
+        "remote_command": remote_command,
         // Polecenia zakładające lokalną maszynę i pola ze ścieżką hosta (B.5, `local_only`).
         "local_only": serde_json::from_str::<Value>(crate::local_only::LOCAL_ONLY_JSON)
             .unwrap_or(Value::Null),

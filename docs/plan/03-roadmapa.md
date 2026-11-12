@@ -1,5 +1,26 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Aktualizacja12.11 — CI192 zakończone:** kod5f265ba3, CI8/10 (lockfileTauri iWindows spy),
+Linux3646/0/28,Windows3667/1/49,Vitest593,Chromium963; Windows1164/4,WebView2 63/0/5.
+Naprawy942c3f3d/fc80d880: metadata101→0 i kolejnośćStop RED0/1→10/0/0, Clippy0.
+MacierzCore30ma transport/wejścia30/30, ale same„Nie” i tylko metadaneDone1:
+semantykaNOT_ACCEPTED, #58 otwarte. Nowe źródła wymagają własnegoCI/przeglądu.
+[Pełny raport i dowody](../reviews/2026-11-12-ci192-and-fixes.md).
+
+**Decyzje właściciela12.11:** zatwierdzony projekt telefonu jako podpis ADR0019–0023
+(D.0), własnyWSS/E2E, pierwsze parowanie lokalne, osobne dowody zgód, WWW bez kluczaAPI.
+Pierwsza ścieżka #78: wyszukiwanie w przeglądarce bez kluczaAPI. Nie oznacza to
+wdrożonego transportu/embeddingu; konkretne poprawki Brokera nadal osobno do przeglądu.
+[Zapis zgody i zakres](../reviews/2026-11-12-owner-decisions.md).
+
+**Najnowsze CI12.11, kod372bfcd5:** CI191 **10/10**; RustLinux3631/0/28,
+Windows3653/0/49; Vitest593, Chromium **963/963** bez pominięć/flaky.
+Windows115 **3/4**, WebView263/0/5. Nowa macierz Core8B zatrzymała się na pierwszym
+przypadku: FirstToken60s,0 odpowiedzi,29NOT_RUN, semantykaNOT_EVALUATED.
+#58 pozostaje otwarte; nie zmieniono limitów ani nie ukryto czerwonego testu.
+[Raport i dowody](../reviews/2026-11-12-execution-records-personas.md).
+Poniższe wcześniejsze wyniki i blokady podpisu zachowują historię; aktualna decyzja D.0 jest powyżej.
+
 **Korekta po CI190:**45df ma8/10zadań (UI960/1; ten sam błąd bramki zbiorczej),
 RustLinux3630/0/27,Windows3652/0/48; Windows1144/4,WebView263/0/5.
 Kodf03: odtworzone przepełnienie przycisku i ściśnięty tytuł, dwaRED0/2→48/48;
@@ -435,8 +456,8 @@ Plan: [`41-tryb-dla-dzieci.md`](41-tryb-dla-dzieci.md) (zlecenie właściciela 2
 
 | ID  | Zadanie                                                                   | Stan  | Data | Uwagi                                            |
 | --- | ------------------------------------------------------------------------- | ----- | ---- | ------------------------------------------------ |
-| D.0 | Podpis właściciela pod ADR 0019–0023                                      | czeka | —    | bez tego nie powstaje kod                        |
-| D.1 | `remote-gateway`: sesje klientów, ACL, ramki, wznowienie                  | czeka | —    | po B.1–B.3, B.5                                  |
+| D.0 | Podpis właściciela pod ADR 0019–0023 | zrobione | 2026-11-12 | zatwierdzony konkretny projekt; [zakres zgody](../reviews/2026-11-12-owner-decisions.md), implementacja/Broker nadal osobno |
+| D.1 | `remote-gateway`: sesje klientów, ACL, ramki, wznowienie | w toku | 2026-11-12 | pierwszy format lib-client-wire:55testów, wersja/bajty/ID; bez transportu/ACL/wykonawcy. [Zakres](../reviews/2026-11-12-client-wire-foundation.md) |
 | D.2 | `device-pairing`: QR, klucze urządzeń, lista, odwołanie                   | czeka | —    |                                                  |
 | D.3 | `remote-relay`: przekaźnik szyfrogramu + obraz kontenera + instrukcja     | czeka | —    |                                                  |
 | D.4 | Kanał E2E (wzorzec Noise) i test „przekaźnik nie widzi treści”            | czeka | —    |                                                  |

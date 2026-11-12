@@ -1,0 +1,46 @@
+{
+  "source_base": "5f265ba3acd7248c8c92f9066f9813bcd72f4cec",
+  "scope": "Cargo dependency resolution only, not Tauri native compilation",
+  "files": [
+    {
+      "path": "ci192-shell-failure-decoded.json",
+      "bytes": 77531,
+      "sha256": "019c7803a4b3bf40882d0d352352dd0dd06e93f4f17b4dd137d9a3134b635417"
+    },
+    {
+      "path": "shell-lock-red.json",
+      "bytes": 572,
+      "sha256": "fbe803a44261a2926e0f3d42be9745d3c2f6e34098892f85c0c4348f42d20cf1"
+    },
+    {
+      "path": "shell-lock-red.log",
+      "bytes": 282,
+      "sha256": "08c2ee2c91345dd00f5ef1172bd1c839756a50edcffa79be9b74e737f57318b6"
+    },
+    {
+      "path": "shell-lock-update.json",
+      "bytes": 573,
+      "sha256": "35c0f33556311ee7d502f7c41e243d902d5914cabc2400bb49e92feb39b2ef05"
+    },
+    {
+      "path": "shell-lock-update.log",
+      "bytes": 278,
+      "sha256": "3189f5058bd505c1eb32d2ac0aee19aa8f6622529697651061a91d161421efd7"
+    },
+    {
+      "path": "shell-lock-green.json",
+      "bytes": 605,
+      "sha256": "845797459275aa5273c526369f6d8cadb558b2c858549e3ca6054762f6db516a"
+    },
+    {
+      "path": "shell-lock-green.log",
+      "bytes": 5141761,
+      "sha256": "fa2f0a43d612778f2adbd0ed35bb8b1366194ce78fc2fa1760a197c337011a66"
+    }
+  ],
+  "archive": {
+    "bytes": 411286,
+    "sha256": "a389569f7e4334fef824da948b10b77ef7d9a12d5e86e9a76f9746de596afe7e"
+  },
+  "nested_lock_sha256": "4b870482cf35f950d5f92826ac21273c9cdfd8261b3ca231e74c3faf111afdef"
+}

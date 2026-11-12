@@ -2,10 +2,17 @@
 
 | Pole | Wartość |
 |---|---|
-| Status | Proponowany — czeka na podpis właściciela |
+| Status | Projekt zatwierdzony przez właściciela12.11.2026 z doprecyzowaniem poniżej |
 | Data | 2026-10-09 |
 | Powiązane | decyzja właściciela nr 2 z 2026-10-09; plan v6: `docs/plan/09-dostep-zdalny-i-bezpieczenstwo.md` (zgody zdalne, zabezpieczenia, R3), `03-roadmapa.md` (D.5, E.4); ADR 0021; `docs/modules/safety-broker/SPEC.md`, `docs/modules/broker-ui/SPEC.md` |
 | Zmienia | ADR 0003 („zatwierdzenia tylko w Broker-UI, tylko z fizycznego wejścia”) i ADR 0015 (potwierdzenia wymagane przez poziomy L0–L4 mogą przyjść z urządzenia sparowanego). Obszar Jądra bezpieczeństwa — **wymaga przeglądu i akceptacji człowieka** (bramka #7) |
+
+## Podpis właściciela12.11.2026
+
+Właściciel zatwierdził konkretny [pakiet projektu](../reviews/2026-11-11-remote-design-review.md)
+jako podpis ADR0019–0023. [Zapis decyzji i zakres](../reviews/2026-11-12-owner-decisions.md).
+To zatwierdzenie architektury, bez odbioru implementacji; chronione poprawki Brokera
+i polityk nadal wymagają konkretnego przeglądu.
 
 ## Kontekst
 

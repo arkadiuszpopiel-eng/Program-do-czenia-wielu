@@ -22,11 +22,11 @@ Każda decyzja techniczna z `docs/PLAN.md` §1.2 ma swój ADR. Decyzje są odwra
 | [0016](0016-jeden-wykonawca-recenzja-w-swiezym-kontekscie.md) | Jeden wykonawca (Claude Code); recenzja w świeżym kontekście zamiast drugiego modelu | Zaakceptowany |
 | [0017](0017-strategia-wieloplatformowa.md) | Strategia wieloplatformowa: Windows 11 pierwszy, potem panel WWW, Android 15+ i Linux | **Proponowany** |
 | [0018](0018-fabryka-platform-i-kontrakty-niezalezne-od-systemu.md) | Fabryka platform (`platform-select`) i kontrakty Brokera niezależne od systemu | **Proponowany** |
-| [0019](0019-protokol-niezalezny-od-transportu.md) | Protokół klient–host niezależny od transportu (ramki z wersją, `seq`, ACL, typy TS generowane) | **Proponowany** |
-| [0020](0020-host-bez-okna.md) | Host bez okna: binarka `alfa-host`, okno Tauri jako klient lokalny | **Proponowany** |
-| [0021](0021-dostep-zdalny-przekaznik-e2e-i-parowanie.md) | Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń | **Proponowany** |
-| [0022](0022-zgody-zdalne-dowod-urzadzenia-sparowanego.md) | Zgody zdalne: dowód urządzenia sparowanego (`PairedDevice`) | **Proponowany** |
-| [0023](0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.md) | Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów | **Proponowany** |
+| [0019](0019-protokol-niezalezny-od-transportu.md) | Protokół klient–host niezależny od transportu (ramki z wersją, `seq`, ACL, typy TS generowane) | **Projekt zaakceptowany12.11.2026; implementacja do przeglądu** |
+| [0020](0020-host-bez-okna.md) | Host bez okna: binarka `alfa-host`, okno Tauri jako klient lokalny | **Projekt zaakceptowany12.11.2026; implementacja do przeglądu** |
+| [0021](0021-dostep-zdalny-przekaznik-e2e-i-parowanie.md) | Dostęp zdalny: przekaźnik, kanał end-to-end i parowanie urządzeń | **Projekt zaakceptowany12.11.2026; implementacja do przeglądu** |
+| [0022](0022-zgody-zdalne-dowod-urzadzenia-sparowanego.md) | Zgody zdalne: dowód urządzenia sparowanego (`PairedDevice`) | **Projekt zaakceptowany12.11.2026; implementacja do przeglądu** |
+| [0023](0023-tryb-bez-komputera-klucz-api-i-scalanie-rozmow.md) | Tryb bez komputera: klucz API na urządzeniu i scalanie rozmów | **Projekt zaakceptowany12.11.2026; implementacja do przeglądu** |
 | [0024](0024-licencja-silnika-mowy.md) | Licencja silnika mowy (następca Pipera na GPL-3.0) | **Proponowany** |
 | [0025](0025-kamery-i-biometria-twarzy.md) | Kamery i biometria twarzy: zgoda, dane tylko lokalnie, rozpoznanie nie jest autoryzacją | **Zaakceptowany** (2026-10-11) |
 | [0026](0026-glos-z-chmury-jako-opcja.md) | Głos agentek z chmury jako opcja obok głosu lokalnego (domyślnie wyłączony, nigdy w sesji prywatnej) | **Proponowany** |
@@ -35,6 +35,6 @@ Każda decyzja techniczna z `docs/PLAN.md` §1.2 ma swój ADR. Decyzje są odwra
 | [0029](0029-konta-dzieci.md) | Konta dzieci: przedziały wieku, podgląd rodzica, zgoda na chmurę, odznaki osobiste | **Przyjęty** |
 
 | [0030](0030-sqlcipher-rustsec-2026-0459.md) | Naprawiony SQLCipher bez wyjątku advisory RUSTSEC-2026-0459 | **Proponowany; wąska łatka licencji zatwierdzona** |
-| [0031](0031-wbudowana-przegladarka-webview2.md) | Wbudowana przeglądarka WebView2, dodatki i rzeczywiste wyszukiwanie | **Proponowany** |
+| [0031](0031-wbudowana-przegladarka-webview2.md) | Wbudowana przeglądarka WebView2, dodatki i rzeczywiste wyszukiwanie | **Proponowany; pierwsza ścieżka bezAPI wybrana12.11** |
 
 Statusy: **Zaakceptowany** — obowiązuje; dopisek „(spike …)" oznacza, że wartości liczbowe lub wykonalność potwierdza wskazany spike w F0 bez zmiany kierunku. **Tymczasowy** — kierunek przyjęty, ale ADR wraca do przeglądu po wskazanym spike'u. **Proponowany** — projekt przygotowany przez sesję AI; nie obowiązuje do podpisu właściciela.
