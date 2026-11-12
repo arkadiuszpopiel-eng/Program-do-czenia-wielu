@@ -1,0 +1,28 @@
+{
+  "source": "372bfcd550f1a4f37a48580d050bc20de28ca270",
+  "run": 43150453166,
+  "parts": [
+    {
+      "part": 1,
+      "passed": 321,
+      "log_json_sha256": "4d18df00997888718e4b6e38642745e45347aa13ac1bea6ae7d257fb17a03469"
+    },
+    {
+      "part": 2,
+      "passed": 321,
+      "log_json_sha256": "f746c915001aa8b000b107b158b0f496be95b2c7d97956ab8e5f231e2b056693"
+    },
+    {
+      "part": 3,
+      "passed": 321,
+      "log_json_sha256": "d8d844095486dff156bf79cc8862311efa9aae5c6c299ac77781a03a1d230627"
+    }
+  ],
+  "unique_expected": 963,
+  "unique_passed": 963,
+  "failed": 0,
+  "skipped": 0,
+  "flaky": 0,
+  "scope": "GitHub headless Chromium/fake IPC; source-title inventory matched against all pass lines, line offsets deliberately ignored (Node source maps differ)",
+  "not_hardware_acceptance": true
+}
