@@ -42,6 +42,11 @@ pub enum RejectReason {
         /// Czego brakuje.
         missing: MissingCapability,
     },
+    /// Model lokalny nie jest dopuszczony do roli kodowania/trudnego zadania.
+    ModelRole {
+        /// Wymagany profil, bez treści zadania lub danych sesji.
+        required: String,
+    },
     /// Limit kosztów (`cost-meter` → `Block`).
     Budget {
         /// Szczegóły limitu.
@@ -78,6 +83,7 @@ impl fmt::Display for RejectReason {
                 write!(f, "jurysdykcja {jurisdiction} niedozwolona w tej sesji")
             }
             Self::Capability { missing } => write!(f, "model nie obsługuje: {missing:?}"),
+            Self::ModelRole { required } => f.write_str(required),
             Self::Budget { notice } => {
                 let scope = match &notice.scope {
                     BudgetScope::Monthly => "miesięczny".to_owned(),

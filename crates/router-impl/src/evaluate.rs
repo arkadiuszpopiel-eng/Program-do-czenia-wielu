@@ -24,6 +24,7 @@ pub(crate) struct Inputs<'a> {
     pub breakers: &'a BTreeMap<ProviderId, CircuitBreaker>,
     pub windows: &'a BTreeMap<ProviderId, PlanWindow>,
     pub now_ms: u64,
+    pub expert_work: bool,
 }
 
 /// Wynik oceny.
@@ -177,6 +178,14 @@ fn evaluate(
             .check(&model)
             .map_err(|missing| RejectReason::Capability { missing })?,
         None => warnings.push(RouteWarning::UnknownCapabilities),
+    }
+    if inputs.expert_work
+        && reg.kind == RouteKind::Local
+        && !crate::expert_local::permitted(reg, &cand.model)
+    {
+        return Err(RejectReason::ModelRole {
+            required: crate::expert_local::REQUIREMENT.into(),
+        });
     }
     if let Some(b) = inputs.breakers.get(&cand.provider) {
         b.admits(inputs.now_ms)

@@ -1,5 +1,11 @@
 # 57 — role modeli: lokalny 27B do kodu, mniejsze do rozmowy, pomoc chmury
 
+**Kandydat implementacji12.11:** bramka lokalnych ról, odkrywanie profilu eksperckiego,
+obsługa przypięć/wyłączonego rankingu/eskalacji i rozdzielenie research są w osobnej
+gałęzi do przeglądu. [Raport kodu i testów](../reviews/2026-11-12-router-expert-roles.md).
+Nie zainstalowano ani nie odebrano27B; poniższy zapis decyzji zachowuje historię
+etapu sprzed wdrożenia, a pozostałe testy sprzętu/API pozostają wymagane.
+
 **Decyzja właściciela z 12.11.2026.** Kodowanie i trudne zadania lokalne mają
 korzystać wyłącznie z modelu klasy **Qwen3.8-27B Q4**. Słabsze modele służą agentkom
 lokalnie do rozmowy, wyszukiwania informacji i prostszej nauki. Skonfigurowane modele
@@ -8,7 +14,7 @@ narzędziach, gdy model lokalny nie daje rady. Dalsza eskalacja zależy od trudn
 i dotychczasowej hierarchii. Decyzja zastępuje przypisywanie 8–12B głównego kodowania
 z wcześniejszego planu55; nie odbiera małym modelom roli rozmówczyń.
 
-**Stan: wybór ról zapisany, runtime jeszcze nie przełączony.** Nie zainstalowano
+**Stan historyczny PR88: wybór ról zapisany, runtime jeszcze nie przełączony.** Nie zainstalowano
 27B, nie zmieniono produkcyjnych ustawień, progów evals ani polityk bezpieczeństwa.
 Nie uznajemy liczby parametrów za wynik testu kodowania. Poprzednie błędne odpowiedzi
 8B/11B/14B pozostają w [pełnej diagnozie](../reviews/2026-11-12-cpu-extended-models.md).

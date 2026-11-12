@@ -85,7 +85,8 @@ pub fn class_floor(class: TaskClass) -> Difficulty {
 pub fn class_from_policy(policy: &str) -> Option<TaskClass> {
     match policy {
         "code" => Some(TaskClass::Code),
-        "planning" | "review" | "research" => Some(TaskClass::Planning),
+        "planning" | "review" => Some(TaskClass::Planning),
+        "research" => Some(TaskClass::Conversation),
         "gui-vision" | "gui_vision" => Some(TaskClass::GuiVision),
         "summarize" => Some(TaskClass::Summarize),
         "conversation" | "chat" => Some(TaskClass::Conversation),

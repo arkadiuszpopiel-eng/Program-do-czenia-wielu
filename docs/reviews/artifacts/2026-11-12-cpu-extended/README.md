@@ -31,7 +31,7 @@ telefonu, mikrofonu ani prawdziwego API. Nie ma sekretów lub danych właścicie
 - `cpu-extended-*`, `cpu-grounding-*`, `cpu-system-*`: receipty, logi, końcowe żądania,
   teksty, pomiary, hipotezy zadeklarowane przed próbami i oceny.
   `exit0` potwierdza transport/wejście, nie prawdziwość odpowiedzi.
-- `cpu-docs-*`: formatowanie zmienionych Markdown, generator katalogu i HTML oraz weryfikacja HTML: wszystkie exit0.
+- `cpu-docs-*`: wszystkie polecenia zakończone exit0. Prettier pomija `docs` przez `.prettierignore`, więc ten wynik **nie poświadcza formatowania Markdown**. Generator katalogu, HTML i weryfikacja HTML wykonane osobno.
 - `cpu-final-format`, `cpu-final-controls`, `cpu-final-clippy`: końcowe0;
   kontrole3/0/4ignored, bez uruchamiania pominiętych testów wielopersonowych.
 - `cpu-reasoning-build` i `cpu-grounding-build`: niezaliczone kompilacje101,

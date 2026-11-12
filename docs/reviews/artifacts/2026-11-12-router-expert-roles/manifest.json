@@ -1,0 +1,323 @@
+{
+  "base": "a836bb578bd6c8036b65b278b7e598b7a4654731",
+  "scope": "Router local-role eligibility RED/GREEN and research classification; fake Linux providers, no27B inference or real API/GPU",
+  "files": [
+    {
+      "path": "archive-expert-roles-config.json",
+      "bytes": 1026,
+      "sha256": "b51e974c189762b8c19527a16353320d7912f533ec80d2554fc45a98cadd9eaa"
+    },
+    {
+      "path": "archive_evidence.py",
+      "bytes": 1315,
+      "sha256": "fb3a0904f85c3ebbdbd5eb78cd2145bf1c95209bf19627dbf7c48fa669d895a7"
+    },
+    {
+      "path": "expert-roles-app-core.json",
+      "bytes": 1299,
+      "sha256": "ae2894185ca22f6bcf8af0bcdc213ac06213783588df70a57cabb7e8a4644432"
+    },
+    {
+      "path": "expert-roles-app-core.log",
+      "bytes": 20996,
+      "sha256": "384ad8fd2d1af53246b3b2568d0fda2c10b2cedfab5831e1d61a71851258e7d9"
+    },
+    {
+      "path": "expert-roles-app-modules.json",
+      "bytes": 1020,
+      "sha256": "23067061ba58f620465753cf1f9d660e1d439aad410f08a9ab085f549b74d74b"
+    },
+    {
+      "path": "expert-roles-app-modules.log",
+      "bytes": 11823,
+      "sha256": "a173f0e4825f42486be812b70cb47a6631783a96f18d5fa82c896ea86139f059"
+    },
+    {
+      "path": "expert-roles-cache-retired.json",
+      "bytes": 551,
+      "sha256": "903a97d5a862d9d0902769afa9d00caf0eacb7dffc78ee7550b30a77fcace486"
+    },
+    {
+      "path": "expert-roles-clippy.json",
+      "bytes": 1128,
+      "sha256": "1335f2e618cfa3a54e99b14a47e2c61ed7c2d973509042f61a664107313a66ba"
+    },
+    {
+      "path": "expert-roles-clippy.log",
+      "bytes": 1914,
+      "sha256": "6b09cda49aa3ff7e6791b3f921fa2a1047d18d11843f0e8869617385bb953052"
+    },
+    {
+      "path": "expert-roles-docs-catalog.json",
+      "bytes": 1280,
+      "sha256": "20ce86ed0331928d886e4d249ec7456f05c7b90e318676164c25285f86f6b1b7"
+    },
+    {
+      "path": "expert-roles-docs-catalog.log",
+      "bytes": 71,
+      "sha256": "79f3beb5b560b992a29b28865c4665c145c23f0e96f8ec0c0d7cb25e96ecc6b1"
+    },
+    {
+      "path": "expert-roles-docs-html.json",
+      "bytes": 1317,
+      "sha256": "938c890b826c513cdf32bbe39d8205651203f057e3155dbae781fe9ff1f194a9"
+    },
+    {
+      "path": "expert-roles-docs-html.log",
+      "bytes": 48,
+      "sha256": "799b806ffabf3c5107a53339ba1703cc19876f8e7cc38e7405e8667ff69894f8"
+    },
+    {
+      "path": "expert-roles-docs-verify.json",
+      "bytes": 1481,
+      "sha256": "c9ff3d1fbdc9402500135f079e44b7506f9a4dab2fac42ae146b1ec41b954036"
+    },
+    {
+      "path": "expert-roles-docs-verify.log",
+      "bytes": 59,
+      "sha256": "fe5b128b366e7a0950161f536acf1076dc3dc41d5b07acd8deac39ebb9befe3b"
+    },
+    {
+      "path": "expert-roles-edge-red.json",
+      "bytes": 825,
+      "sha256": "12ec8a8130a6509503d9220f01218075b0c073697e705217b64183c19309c2fd"
+    },
+    {
+      "path": "expert-roles-edge-red.log",
+      "bytes": 1910,
+      "sha256": "d141e5c302b6e5d5697cfde6f0c3cd883b9932bfc27b602e4d2a0dc64b1c67b5"
+    },
+    {
+      "path": "expert-roles-fmt-check.json",
+      "bytes": 1181,
+      "sha256": "618b770febec5ad1a5231885102444f0927a6d1ed6a32841ebfa9906a96f982e"
+    },
+    {
+      "path": "expert-roles-fmt-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "expert-roles-followup-red.json",
+      "bytes": 916,
+      "sha256": "27df17609e86d5217a1bd6dea441621b427cf7faf436e0218dc94b7fda713e4e"
+    },
+    {
+      "path": "expert-roles-followup-red.log",
+      "bytes": 950,
+      "sha256": "6f892bd7c9d72b830365ab0d3ee6910632727751f8688c65515287f4d8824e70"
+    },
+    {
+      "path": "expert-roles-format-coverage.json",
+      "bytes": 963,
+      "sha256": "2f1d1e905b9db0ba5e3cd1717852b24e52fe7b06da50ffd4c92c8b2a99bf4183"
+    },
+    {
+      "path": "expert-roles-format-coverage.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "expert-roles-format-final.json",
+      "bytes": 963,
+      "sha256": "0b1defcc6f1b9d1a90a6c4a185743e192aff83748f6f6cfab0267a4c7bffd0e3"
+    },
+    {
+      "path": "expert-roles-format-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "expert-roles-format.json",
+      "bytes": 745,
+      "sha256": "98679c3061b0d8974e931673fffaef6b1a29c064a6b6eaecd4f84f7e9a72990c"
+    },
+    {
+      "path": "expert-roles-format.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "expert-roles-green.json",
+      "bytes": 823,
+      "sha256": "f13a66278c9020ba0a30b99d676d6af52efba6c82723b26fc9e5854bc70e1711"
+    },
+    {
+      "path": "expert-roles-green.log",
+      "bytes": 896,
+      "sha256": "501b2f917f6f555dfb01fcfda15d8ca1d22ad17180779ad80ec1f21a64b2711d"
+    },
+    {
+      "path": "expert-roles-module-after-space.json",
+      "bytes": 875,
+      "sha256": "6e153f57cb753022275c65130eb2a085247c7e859d019eb3ef6013206ca49f0f"
+    },
+    {
+      "path": "expert-roles-module-after-space.log",
+      "bytes": 12082,
+      "sha256": "971593f687c7ab3480b4b73b6acfa34acf561fa788fb85cc10a32c77e0a97479"
+    },
+    {
+      "path": "expert-roles-module-coverage.json",
+      "bytes": 1091,
+      "sha256": "8cd3c7eba98d90882992e4e85be3a1568881dfe19809ec01ec30c650a91e124b"
+    },
+    {
+      "path": "expert-roles-module-coverage.log",
+      "bytes": 8463,
+      "sha256": "cadb01367cdf5cc1a3995dd1c94a8b247d739723064f3bbd0cd1e689ed9e69e5"
+    },
+    {
+      "path": "expert-roles-module-final.json",
+      "bytes": 1091,
+      "sha256": "54208f8d24023338794defc1656d7c2ccc655c5574f25c80669a4e0f3421e0b1"
+    },
+    {
+      "path": "expert-roles-module-final.log",
+      "bytes": 8759,
+      "sha256": "b62beb725183886c870cc6aa05a7d5db18c55dcc160e4e54ca664bfacefc50f0"
+    },
+    {
+      "path": "expert-roles-module-tests.json",
+      "bytes": 875,
+      "sha256": "5ad03b8aa370a7f61a0f3a178ca878d7ff95e6fe7c1f4c120fcd90ef06939e7f"
+    },
+    {
+      "path": "expert-roles-module-tests.log",
+      "bytes": 9795,
+      "sha256": "520536d449b2a80c1acbad9b440dc410fadbbd94a9f0012ad883357a59247fa1"
+    },
+    {
+      "path": "expert-roles-previous-ci199.json",
+      "bytes": 626,
+      "sha256": "24c266dc24accd3085eb5dabd9a02e148d78e85a824df145515cea8b2043f305"
+    },
+    {
+      "path": "expert-roles-red.json",
+      "bytes": 597,
+      "sha256": "2cc179a3dfcffa42fdd7c068093fbafd69dff25f07f941766ad087e8a0f1b474"
+    },
+    {
+      "path": "expert-roles-red.log",
+      "bytes": 4570,
+      "sha256": "227b1dbac568c3925a5563cf20cace5ea12dafc82f4e844216e2248580b4ca3a"
+    },
+    {
+      "path": "expert-roles-source/crates/router-contract/src/decision.rs",
+      "bytes": 8145,
+      "sha256": "45607d63ff41b1b39320e6b8394878d8e3de707de2f3fff134a8d17feaeb1dcd"
+    },
+    {
+      "path": "expert-roles-source/crates/router-contract/src/rung.rs",
+      "bytes": 9195,
+      "sha256": "4aec611d9ba129962d2e9d423b6882724a9244406c15b61df80ee397973a380c"
+    },
+    {
+      "path": "expert-roles-source/crates/router-contract/src/tests.rs",
+      "bytes": 11338,
+      "sha256": "fc7db4ab4f980741578b142ed8872a07c6221ec629bfabe62f9343294361872a"
+    },
+    {
+      "path": "expert-roles-source/crates/router-impl/src/evaluate.rs",
+      "bytes": 7201,
+      "sha256": "147fbfc18346e95ec192cf72be7009b5e6b124e68eb0092b9fb4720571c27a3d"
+    },
+    {
+      "path": "expert-roles-source/crates/router-impl/src/expert_local.rs",
+      "bytes": 2921,
+      "sha256": "372701d7f688a9dc28ceb5109dc061498e90980f7d53e174b780df174474626d"
+    },
+    {
+      "path": "expert-roles-source/crates/router-impl/src/lib.rs",
+      "bytes": 1544,
+      "sha256": "e290b575a61a0fa0d0f34f1f673d235d0603a2c688dbbd38a1be7d3c787fd048"
+    },
+    {
+      "path": "expert-roles-source/crates/router-impl/src/routing.rs",
+      "bytes": 15434,
+      "sha256": "384e96e186aaff8cf5bc55db2fa0532c3fcc8bd5960d96189c712569704c2cc4"
+    },
+    {
+      "path": "expert-roles-source/crates/router-impl/tests/decisions.rs",
+      "bytes": 15973,
+      "sha256": "9741da9e5f4c594e426e5ae736de820200663c063b80bd643032485a368d27e1"
+    },
+    {
+      "path": "expert-roles-source/crates/router-impl/tests/difficulty.rs",
+      "bytes": 12535,
+      "sha256": "9859f20ed5c61daafc7d7a85feba427ae5b5d067df0824a1307ac76b8d1430e2"
+    },
+    {
+      "path": "expert-roles-source/crates/router-impl/tests/expert_roles.rs",
+      "bytes": 11021,
+      "sha256": "c10fa4a17a1e8a5c3a25d22959cb070d0e25bc833f5b642ac0b589a6451ffb84"
+    },
+    {
+      "path": "expert-roles-source/crates/router-impl/tests/main_local_assistance.rs",
+      "bytes": 9810,
+      "sha256": "b11e34e3f6fa2f0b0644db84275127f4f24afeb0712744784d2d4ef433d965e0"
+    },
+    {
+      "path": "expert-roles-verification-summary.json",
+      "bytes": 1364,
+      "sha256": "ec523b19721e1276005015d2034dd5b71aa8fe7041554ef2c22e5d944a7fa15d"
+    },
+    {
+      "path": "run_expert_integration.py",
+      "bytes": 812,
+      "sha256": "9524d595716cbb76fd18ac55f36ae1a45063e699da9f80ecc97cfe1627697daf"
+    },
+    {
+      "path": "run_logged.py",
+      "bytes": 1445,
+      "sha256": "bbd46a1c502c0cd290527ed19ebc25685da06567c84bcab399b06a69aa2938ce"
+    }
+  ],
+  "sources": [
+    {
+      "path": "crates/router-contract/src/decision.rs",
+      "sha256": "45607d63ff41b1b39320e6b8394878d8e3de707de2f3fff134a8d17feaeb1dcd"
+    },
+    {
+      "path": "crates/router-contract/src/rung.rs",
+      "sha256": "4aec611d9ba129962d2e9d423b6882724a9244406c15b61df80ee397973a380c"
+    },
+    {
+      "path": "crates/router-contract/src/tests.rs",
+      "sha256": "fc7db4ab4f980741578b142ed8872a07c6221ec629bfabe62f9343294361872a"
+    },
+    {
+      "path": "crates/router-impl/src/expert_local.rs",
+      "sha256": "372701d7f688a9dc28ceb5109dc061498e90980f7d53e174b780df174474626d"
+    },
+    {
+      "path": "crates/router-impl/src/evaluate.rs",
+      "sha256": "147fbfc18346e95ec192cf72be7009b5e6b124e68eb0092b9fb4720571c27a3d"
+    },
+    {
+      "path": "crates/router-impl/src/routing.rs",
+      "sha256": "384e96e186aaff8cf5bc55db2fa0532c3fcc8bd5960d96189c712569704c2cc4"
+    },
+    {
+      "path": "crates/router-impl/src/lib.rs",
+      "sha256": "e290b575a61a0fa0d0f34f1f673d235d0603a2c688dbbd38a1be7d3c787fd048"
+    },
+    {
+      "path": "crates/router-impl/tests/expert_roles.rs",
+      "sha256": "c10fa4a17a1e8a5c3a25d22959cb070d0e25bc833f5b642ac0b589a6451ffb84"
+    },
+    {
+      "path": "crates/router-impl/tests/difficulty.rs",
+      "sha256": "9859f20ed5c61daafc7d7a85feba427ae5b5d067df0824a1307ac76b8d1430e2"
+    },
+    {
+      "path": "crates/router-impl/tests/main_local_assistance.rs",
+      "sha256": "b11e34e3f6fa2f0b0644db84275127f4f24afeb0712744784d2d4ef433d965e0"
+    },
+    {
+      "path": "crates/router-impl/tests/decisions.rs",
+      "sha256": "9741da9e5f4c594e426e5ae736de820200663c063b80bd643032485a368d27e1"
+    }
+  ],
+  "archive_sha256": "0d741f12441f348990071ac38277c7fbdce2a25c51c8b0b595d0ca7b76b09565"
+}

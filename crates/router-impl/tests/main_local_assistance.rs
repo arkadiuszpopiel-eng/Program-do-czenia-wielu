@@ -107,7 +107,7 @@ fn eight_to_twelve_billion_is_the_main_rung() {
     assert_eq!(rung_by_name("bielik-1.5b-v3.0-instruct-q8_0"), Rung::Light);
 }
 #[test]
-fn ordinary_work_uses_main_then_light_cloud_for_every_persona() {
+fn conversation_uses_small_local_but_code_uses_cloud_for_every_persona() {
     let (c, _, _) = setup(None);
     for persona in ["Alfa", "Beta", "Gama", "Delta", "Luna własna"] {
         for class in [
@@ -117,8 +117,13 @@ fn ordinary_work_uses_main_then_light_cloud_for_every_persona() {
         ] {
             let r = req(&format!("{persona}: przygotuj krótką odpowiedź"));
             let d = choose(&c, class, &r);
-            assert_eq!(d.chosen.model, MAIN);
-            assert!([LUNA, HAIKU].contains(&d.fallbacks[0].model.as_str()));
+            if class == TaskClass::Conversation {
+                assert_eq!(d.chosen.model, MAIN);
+                assert!([LUNA, HAIKU].contains(&d.fallbacks[0].model.as_str()));
+            } else {
+                assert!([LUNA, HAIKU].contains(&d.chosen.model.as_str()));
+                assert!(d.targets().all(|x| x.model != MAIN));
+            }
             assert!(!d.targets().any(|x| x.provider.as_str() == "local-light"));
         }
     }

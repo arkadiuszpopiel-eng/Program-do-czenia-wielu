@@ -315,3 +315,23 @@ fn errors_events_and_schemas() {
         assert!(!r.to_string().is_empty());
     }
 }
+
+#[test]
+fn model_role_rejection_has_stable_code_and_readable_error() {
+    let r = RejectReason::ModelRole {
+        required: "wymagany profil ekspercki".into(),
+    };
+    assert_eq!(serde_json::to_value(&r).unwrap()["code"], "model_role");
+    assert_eq!(
+        serde_json::from_value::<RejectReason>(serde_json::to_value(&r).unwrap()).unwrap(),
+        r
+    );
+    assert_eq!(r.to_string(), "wymagany profil ekspercki");
+    let e = RouteError::NoRoute {
+        class: TaskClass::Code,
+        rejected: vec![(c("local:small"), r)],
+    };
+    assert_eq!(e.to_provider_error().kind, ProviderErrorKind::Unsupported);
+    assert!(e.to_string().contains("wymagany profil ekspercki"));
+    assert!(decision_schema().to_string().contains("model_role"));
+}

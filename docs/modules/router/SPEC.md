@@ -1,6 +1,27 @@
 # router — SPEC (v1, F1)
 
-## Role modeli — zlecenie właściciela10.11.2026
+## Role lokalne — korekta właściciela 12.11.2026
+
+Kod i Planning oraz rozmowa/GUI z jawną trudnością Hard lub istniejącymi sygnałami
+kodu/kontekstu kodu wymagają wybranego profilu Qwen3.8-27B Q4 albo dopuszczonej chmury.
+Bramka roli jest niezależna od rankingu: słaby lokalny model odpada także z fallbacków,
+przypięcia, review i przy wyłączonym doborze trudności. Profil ma dokładny identyfikator
+`qwen3.8-27b-ud-q4-k-m` albo `qwen3.8-27b-q4-0` i wpis możliwości w rejestrze adaptera.
+Sama liczba parametrów lub ręczny szczebel Strong nie daje kwalifikacji. Lista nie
+poświadcza jakości; adapter nadal weryfikuje model/dostępność, a osobny odbiór sprzętu,
+pełny hash i testy kodowania pozostają wymagane. Brak zasobów/trasy → czytelny błąd.
+Automatyczny dobór lokalny odkrywa profil także obok małego modelu domyślnego.
+Jawne kolejki i eskalacja zachowują kolejność, ale nie omijają bramki. Prosta rozmowa,
+streszczenia i embeddingi zachowują dotychczasowe role. Prywatność, możliwości,
+zdrowie, budżet i zakaz powtarzania rozpoczętych efektów bez zmian.
+
+Rola `research` oznacza Conversation: proste WWW może użyć małego modelu; jawne Hard
+i sygnały kodu/trudnej pracy nadal wymagają profilu eksperckiego. Wskazówka zadania
+nie może ukryć kodu w samym żądaniu, a eskalacja po profilu eksperckim zachowuje rolę.
+
+Starszy zapis poniżej opisuje stan z10.11; nowa reguła ma pierwszeństwo dla kodu.
+
+## Historyczne role modeli — zlecenie właściciela10.11.2026
 
 Automatyczna główna praca na profilu lokalnym8–12B zaczyna się lokalnie; lekka chmura
 Luna/Haiku/odpowiednik z dostępnego konta jest pomocą przy problemie. Brak modelu lub konta
@@ -59,9 +80,10 @@ Zdarzenia (bez treści): `router.decision`, `router.fallback` (z → na, przyczy
 - Obwód per dostawca: `failures` błędów w `window` → otwarty na `cooldown`, potem jedna próba half-open. Nie liczą się:
   `InvalidRequest`, `PrivacyBlocked`, `Unsupported`, anulowanie; 429 → osobne okno (reaktywnie: `retry-after`, bez nagłówka
   30 s × 2ⁿ ≤ 1 h).
-- Polityka domyślna (automatyczna z zarejestrowanych dostawców): bez kluczy API wszystko na model lokalny (profil A);
-  z kluczem — rozmowa/kod/planowanie/wizja/streszczanie przez API (lokalny jako fallback/offline), głos-szybka i embeddingi
-  najpierw lokalnie. Nowy klucz (stan konta ≠ `Unconfigured`) widoczny bez restartu.
+- Automatyczna pula kandydatów powstaje z modeli lokalnych i skonfigurowanych kont API.
+  Zanim powstanie decyzja, bramka roli usuwa niedopuszczone lokalne modele dla kodu/trudnej pracy;
+  brak właściwego modelu i chmury daje NoRoute, także bez kluczy. Prosta rozmowa oraz zadania
+  pomocnicze mogą pozostać lokalne. Nowy klucz (stan ≠ Unconfigured) widoczny bez restartu.
 
 ## Zależności
 `core-bus/config/log-contract`, `accounts-hub-contract` (stany kont), `compliance-contract` (status tras, tagi), `cost-meter-contract` (budżety), `providers-api/local-contract` (capabilities, health), `agent-backends-contract` (F4).
@@ -70,7 +92,8 @@ Zdarzenia (bez treści): `router.decision`, `router.fallback` (z → na, przyczy
 - Deterministyczny: ta sama polityka + stan = ta sama decyzja (testowalne; bez LLM w pętli).
 - Sesja „prywatne" nigdy nie kieruje do trasy CN / „może trenować"; sesja `tainted` → `net.egress` wymaga potwierdzenia (Broker, F3).
 - Trasa wyłączona w rejestrze zgodności lub konto `Unconfigured` = niewidoczna dla routera (0 wywołań).
-- Zaawansowana rozmowa domyślnie przez API chmurowe; lokalny 3–4B tylko dla komend, fallbacku i offline — ale bez kluczy lokalny jest jedyną trasą.
+- Brak klucza nie uprawnia do kodowania na małym modelu. Bez dozwolonego profilu lokalnego
+  kodu i trasy chmurowej zadanie jest jawnie zatrzymywane; prostsze zadania zachowują tryb offline.
 - Fallback nie gubi wiadomości: żądanie powtarzane na kolejnym celu z tą samą historią.
 - Wagi routera zmienia tylko `improver` w R0 po bramce ewaluacyjnej; tagi/budżety — nigdy.
 
