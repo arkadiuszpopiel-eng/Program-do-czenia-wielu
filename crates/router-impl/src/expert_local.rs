@@ -43,11 +43,14 @@ pub(crate) fn required(
     {
         return true;
     }
+    // Sam kod w zapytaniu badawczym jest tematem wyszukiwania; trudność nadal obowiązuje.
+    let research = constraints.hint.class.as_deref() == Some("research");
     let strategy = core.difficulty_policy().strategy;
     let qualifies = |e: providers_contract::Estimate| {
-        e.signals
-            .iter()
-            .any(|s| matches!(s, Signal::Code | Signal::CodeContext))
+        (!research
+            && e.signals
+                .iter()
+                .any(|s| matches!(s, Signal::Code | Signal::CodeContext)))
             || e.level(strategy) == Difficulty::Hard
     };
     constraints

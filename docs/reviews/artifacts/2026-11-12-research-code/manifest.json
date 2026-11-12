@@ -1,0 +1,127 @@
+{
+  "base": "62f8e57351030aac2edb89ed64b8d7b70bd1bc0c",
+  "scope": "Explicit research code-query routing, controlled providers, no inference/API/hardware acceptance",
+  "files": [
+    {
+      "path": "archive-research-code-config.json",
+      "bytes": 565,
+      "sha256": "6e5c77fe5064f4e3ffff0566493dbb2bcbfbf52495db80b3728fb5421075f174"
+    },
+    {
+      "path": "archive_evidence.py",
+      "bytes": 1315,
+      "sha256": "fb3a0904f85c3ebbdbd5eb78cd2145bf1c95209bf19627dbf7c48fa669d895a7"
+    },
+    {
+      "path": "research-code-clippy.json",
+      "bytes": 724,
+      "sha256": "00479b62bf4f05fe0d0506c0c86160c22040066f98a27416636faa15562cbb7d"
+    },
+    {
+      "path": "research-code-clippy.log",
+      "bytes": 148,
+      "sha256": "7c2f6000b8d3010ee25a9c28e8d056d1c5b9832a307af26c8314b2988ee7b99a"
+    },
+    {
+      "path": "research-code-docs-catalog.json",
+      "bytes": 892,
+      "sha256": "cc07179da05e6eae19ab4dbcee8fcca27b44f1ae7fa6b4e78da091c6bbfc3097"
+    },
+    {
+      "path": "research-code-docs-catalog.log",
+      "bytes": 71,
+      "sha256": "79f3beb5b560b992a29b28865c4665c145c23f0e96f8ec0c0d7cb25e96ecc6b1"
+    },
+    {
+      "path": "research-code-docs-html.json",
+      "bytes": 929,
+      "sha256": "f217bd58a1efc47d60a029ad4a0fcb69482b444156a4357bac9aecabd41a60bc"
+    },
+    {
+      "path": "research-code-docs-html.log",
+      "bytes": 48,
+      "sha256": "799b806ffabf3c5107a53339ba1703cc19876f8e7cc38e7405e8667ff69894f8"
+    },
+    {
+      "path": "research-code-docs-verify.json",
+      "bytes": 1093,
+      "sha256": "b46947d215ded04be12be6831c33c53db70c27e2cf9d11cbd1a62da01b0812db"
+    },
+    {
+      "path": "research-code-docs-verify.log",
+      "bytes": 59,
+      "sha256": "fe5b128b366e7a0950161f536acf1076dc3dc41d5b07acd8deac39ebb9befe3b"
+    },
+    {
+      "path": "research-code-fmt-check.json",
+      "bytes": 584,
+      "sha256": "bc697e3673ae9d632711f5acb876c594a310643bfc53e2665947496e24cc6bdb"
+    },
+    {
+      "path": "research-code-fmt-check.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research-code-format.json",
+      "bytes": 559,
+      "sha256": "fcd70152a0de041fc0a74c04befe9f2c8a35a8ebddcf3ead7b8cc21db6d4cfdd"
+    },
+    {
+      "path": "research-code-format.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "research-code-green.json",
+      "bytes": 687,
+      "sha256": "fc0fed2e9e5751cd04d2b2483424ebe5b208b9db27ff639466f5310b3ff99138"
+    },
+    {
+      "path": "research-code-green.log",
+      "bytes": 8532,
+      "sha256": "9e1dd8cdecfd22f31e32a0cd49b3f346c7cfa54eeb5d49edda61136b3646b438"
+    },
+    {
+      "path": "research-code-parent-ci200.json",
+      "bytes": 555,
+      "sha256": "99b469ce6dd0e9af17b0168eae9418417bfde58d1ff646de30c2e31ead64f186"
+    },
+    {
+      "path": "research-code-red.json",
+      "bytes": 685,
+      "sha256": "99c07284a023676ae07ba5adeb51d139ec83dcfab33fc05d333bf90cd010bf4f"
+    },
+    {
+      "path": "research-code-red.log",
+      "bytes": 973,
+      "sha256": "1fb7f7a3d56a8f44ad985fdb568236e030b754bafd9ed58e55e789aba47b5b99"
+    },
+    {
+      "path": "research-code-source/crates/router-impl/src/expert_local.rs",
+      "bytes": 3124,
+      "sha256": "5e5e7d5bff9aed007572567496fcd282a8f740e9c0f9db121b0e9fdc7372821a"
+    },
+    {
+      "path": "research-code-source/crates/router-impl/tests/expert_roles.rs",
+      "bytes": 11918,
+      "sha256": "1bac6a6439278f118a47ac6c005062a4a80f364bf53ca18aecd18d68fa82a849"
+    },
+    {
+      "path": "run_logged.py",
+      "bytes": 1445,
+      "sha256": "bbd46a1c502c0cd290527ed19ebc25685da06567c84bcab399b06a69aa2938ce"
+    }
+  ],
+  "sources": [
+    {
+      "path": "crates/router-impl/src/expert_local.rs",
+      "sha256": "5e5e7d5bff9aed007572567496fcd282a8f740e9c0f9db121b0e9fdc7372821a"
+    },
+    {
+      "path": "crates/router-impl/tests/expert_roles.rs",
+      "sha256": "1bac6a6439278f118a47ac6c005062a4a80f364bf53ca18aecd18d68fa82a849"
+    }
+  ],
+  "archive_sha256": "f8ec1e9616f769edbe8bcf7fd97728ebaea5d5915e763eada3ebc395de7ab992"
+}

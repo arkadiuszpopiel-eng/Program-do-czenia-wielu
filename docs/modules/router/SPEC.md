@@ -15,8 +15,10 @@ Jawne kolejki i eskalacja zachowują kolejność, ale nie omijają bramki. Prost
 streszczenia i embeddingi zachowują dotychczasowe role. Prywatność, możliwości,
 zdrowie, budżet i zakaz powtarzania rozpoczętych efektów bez zmian.
 
-Rola `research` oznacza Conversation: proste WWW może użyć małego modelu; jawne Hard
-i sygnały kodu/trudnej pracy nadal wymagają profilu eksperckiego. Wskazówka zadania
+Rola `research` oznacza Conversation: proste WWW może użyć małego modelu. Sam kod
+w wyszukiwanej frazie jest tematem, nie poleceniem programowania. Jawne Hard lub
+oszacowanie trudności Hard nadal wymagają profilu eksperckiego; typowane Code/Planning
+nie korzystają z wyjątku research. Wskazówka zadania
 nie może ukryć kodu w samym żądaniu, a eskalacja po profilu eksperckim zachowuje rolę.
 
 Starszy zapis poniżej opisuje stan z10.11; nowa reguła ma pierwszeństwo dla kodu.
