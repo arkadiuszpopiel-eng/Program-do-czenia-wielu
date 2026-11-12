@@ -10,13 +10,11 @@ mod common;
 mod probe_model;
 
 use app_core::dto::{AlfaEvent, SessionTemplate, SettingValue, WorkdirChoice};
-use app_core::ports::{BrainChoice, BrainError, BrainPort, BrainRequest, HeadlessShell};
+use app_core::ports::HeadlessShell;
 use app_core::{AppCore, AppPaths};
-use async_trait::async_trait;
-use providers_contract::{
-    CancellationToken, ChatRequest, Cost, CostEstimate, ModelInfo, ModelProvider,
-    ProviderCapabilities, ProviderError, ProviderHealth, ProviderId, ProviderStream, Usage,
-};
+#[path = "support/local_probe_brain.rs"]
+mod local_probe_brain;
+use local_probe_brain::{BoundedProvider, LocalBrain};
 use providers_local_impl::{LocalProvider, Sidecar, TokioLauncher};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
@@ -36,71 +34,8 @@ fn profile_order() -> [&'static str; 2] {
     }
 }
 
-struct LocalBrain {
-    provider: Arc<dyn ModelProvider>,
-    model: String,
-    seen: Mutex<Vec<(String, ChatRequest)>>,
-    sent: Arc<Mutex<Vec<ChatRequest>>>,
-}
-
-/// Jawny budżet tej próby integracji; nie zmienia ustawień produkcyjnego adaptera.
-struct BoundedProvider(LocalProvider, Arc<Mutex<Vec<ChatRequest>>>);
-
-#[async_trait]
-impl ModelProvider for BoundedProvider {
-    fn id(&self) -> &ProviderId {
-        self.0.id()
-    }
-    fn capabilities(&self) -> ProviderCapabilities {
-        self.0.capabilities()
-    }
-    fn stream(&self, mut request: ChatRequest, cancel: CancellationToken) -> ProviderStream {
-        request.params.max_tokens = Some(96);
-        request.params.temperature = Some(0.0);
-        self.1.lock().unwrap().push(request.clone());
-        self.0.stream(request, cancel)
-    }
-    fn health(&self) -> ProviderHealth {
-        self.0.health()
-    }
-    fn estimate_cost(&self, request: &ChatRequest) -> Option<CostEstimate> {
-        self.0.estimate_cost(request)
-    }
-    fn cost(&self, model: &str, usage: &Usage) -> Option<Cost> {
-        self.0.cost(model, usage)
-    }
-    async fn list_models(&self) -> Result<Vec<ModelInfo>, ProviderError> {
-        self.0.list_models().await
-    }
-}
-
-#[async_trait]
-impl BrainPort for LocalBrain {
-    async fn choose(&self, req: &BrainRequest) -> Result<BrainChoice, BrainError> {
-        if let Some(chat) = &req.chat {
-            self.seen
-                .lock()
-                .unwrap()
-                .push((req.agent.clone(), chat.clone()));
-        }
-        Ok(BrainChoice {
-            provider: self.provider.clone(),
-            provider_id: "local".into(),
-            provider_name: "llama.cpp (Cloud CPU)".into(),
-            account: None,
-            model: self.model.clone(),
-            context_window: Some(8192),
-            routed: false,
-            route: None,
-        })
-    }
-    fn keys_configured(&self) -> bool {
-        false
-    }
-}
-
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
-#[ignore = "rzeczywisty model lokalny; ALFA_LIVE_* — raport, bez mikrofonu i Windows"]
+#[ignore = "rzeczywisty model lokalny; ALFA_LIVE_* — raport, bez mikrofonu i GPU"]
 async fn all_personas_on_local_model() {
     let (models, config, model) = probe_model::configuration();
     let sidecar = Sidecar::new(config, Arc::new(TokioLauncher::default()), None, None).unwrap();
@@ -174,7 +109,7 @@ async fn all_personas_on_local_model() {
                     "provider_request_system":sent.system, "provider_request_user":sent.messages.last().map(|m| m.visible_text()),
                     "provider_request_tool_count":sent.tools.len()}));
                 if let Ok(path) = std::env::var("ALFA_LIVE_REPORT") {
-                    let report = serde_json::json!({"model":model,"platform":"Linux Cloud CPU; headless core, no microphone", "max_tokens":96, "temperature":0.0, "query":live_query(), "results":results});
+                    let report = serde_json::json!({"model":model,"platform":format!("{} CPU; headless core, no microphone", std::env::consts::OS), "max_tokens":96, "temperature":0.0, "query":live_query(), "results":results});
                     std::fs::write(path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
                 }
                 assert!(answer.error.is_none(), "{agent}/{mode}: {:?}", answer.error);
@@ -357,7 +292,7 @@ async fn custom_persona_on_local_model_after_catalog_and_cast_restart() {
                 "provider_request_tool_count":sent.tools.len()
             }));
             let report = serde_json::json!({
-                "model":model, "platform":"Linux Cloud CPU; headless core, no microphone",
+                "model":model, "platform":format!("{} CPU; headless core, no microphone", std::env::consts::OS),
                 "max_tokens":96, "temperature":0.0, "query":live_query(), "results":results
             });
             std::fs::write(&report_path, serde_json::to_string_pretty(&report).unwrap()).unwrap();
