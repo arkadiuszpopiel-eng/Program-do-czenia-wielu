@@ -39,7 +39,8 @@ async fn run(
     // Własna sesja każdego narzędzia: obca treść z jednego wywołania (oznaczenie sesji) nie
     // zmienia decyzji Brokera dla następnych; prośba o zatwierdzenie wygasa po 2 s. Narzędzia
     // przeglądarki dzielą sesję z `browser_open` (przeglądarka należy do sesji).
-    let session = if m.name.starts_with("browser_") {
+    // Wyszukanie otwiera własną stronę: osobna sesja zachowuje formularz innych prób.
+    let session = if m.name.starts_with("browser_") && m.name != "browser_search" {
         rig.browser_session.clone()
     } else {
         rig.core

@@ -1,0 +1,95 @@
+{
+  "base": "8b66e957fb6e0c6cb53df2334e2851817a637cf1",
+  "scope": "Complete CI193 failure8/10 and Windows117 success4/4; native CPU30 negative answers, metadata-only Done not accepted as positive real-action control; combined local regression receipt after fix included",
+  "files": [
+    {
+      "path": "browser-integrated-regression.json",
+      "bytes": 1537,
+      "sha256": "f0a192807c13201ace4ad4b3dfa45fa1fbf2d26f60d405a7d08f0bb3c82e3368"
+    },
+    {
+      "path": "browser-integrated-regression.log",
+      "bytes": 2190,
+      "sha256": "aecb66c5179c64c29090b3bb35c66377c4006f64606c22d3f619cb352d4e7197"
+    },
+    {
+      "path": "ci193-rust-counts.json",
+      "bytes": 411,
+      "sha256": "03dd3a9a48b917f39829c513430f79c2ec53040a842e3007940d5a49ea8bb940"
+    },
+    {
+      "path": "ci193-rust-linux-decoded.json",
+      "bytes": 1056994,
+      "sha256": "ce092f1f90cde25873a2a234533b95b796d63f625ddcd1ee64d436e7b2a9fb65"
+    },
+    {
+      "path": "ci193-rust-windows-decoded.json",
+      "bytes": 1093488,
+      "sha256": "f9453f9c29a874ac21e8c547b06766cd69474a6a5b265078832ac63b540df0db"
+    },
+    {
+      "path": "jobs-43159904243.json",
+      "bytes": 23282,
+      "sha256": "d9e2e830bbe934abd82f70e3e4e0eb3c12100a33d02d7d7c932876b4309c789b"
+    },
+    {
+      "path": "jobs-43159904279.json",
+      "bytes": 9947,
+      "sha256": "1aecaa54cd0676b15e5f84c2c23eec51add1dd188b25506982fa3ae124ae7b5e"
+    },
+    {
+      "path": "windows117-artifacts-decoded.json",
+      "bytes": 1964,
+      "sha256": "8d527e10c04808cbb0f537b062e412af6fd016e6999f578b3848bf95d0490212"
+    },
+    {
+      "path": "windows117-live/core-records-screen.json",
+      "bytes": 168250,
+      "sha256": "c08b63aacff3ca162b132ca7948d422cfb11c889bef697284b6e855ebe76cc86"
+    },
+    {
+      "path": "windows117-live/live-report.json",
+      "bytes": 61588,
+      "sha256": "540e150b74849786bcd6693831d5d4cc20ba19893a48ff5b3f58d88e59cf8cca"
+    },
+    {
+      "path": "windows117-live/tts-alfa.wav",
+      "bytes": 101038,
+      "sha256": "ea8311e48eb06bc2a5bda9a9db8696cefb6c8f6802f5e6c122d34df4c4f3260b"
+    },
+    {
+      "path": "windows117-live-decoded.json",
+      "bytes": 206570,
+      "sha256": "613c3cfd233bee7a525396d8ff2b2ecff8e08acc130eb001dbc019d03bd074dc"
+    },
+    {
+      "path": "windows117-manual-review.json",
+      "bytes": 9443,
+      "sha256": "64b13d767756b3abeaa21c118b81deab2bf5248b8f0454b3e150f16057a0acb2"
+    },
+    {
+      "path": "windows117-webview-decoded.json",
+      "bytes": 141968,
+      "sha256": "302dd11edd3604dbe53e6d5a87a45a4c2edce014f025d42a38c0b54e2021ce55"
+    }
+  ],
+  "sources": [
+    {
+      "path": "crates/app-core/tests/tool_diag.rs",
+      "sha256": "5afd698ffd2d0e34e2a6a96958412763c60063d1419f7b7208677daae83a1a81"
+    },
+    {
+      "path": "crates/app-core/tests/tool_rig/wzorzec.json",
+      "sha256": "92abb071f700c0e046433946cbe180d52b8bccd030a2a91bbfa52f0a83aed44f"
+    },
+    {
+      "path": "crates/app-chat/src/finish.rs",
+      "sha256": "faad7df0710e2d1ba6217751a10589ec39f75a24553b6c2e14543526ee5cf8f1"
+    },
+    {
+      "path": "crates/app-core/tests/finish_order.rs",
+      "sha256": "42ba0b9236b545a26c4ae3004b8deab9deec5504bc44afe5c54136f64452ecb8"
+    }
+  ],
+  "archive_sha256": "e7dd6202e4d652b4dcc4256103e5306b936375b35b8163c3b9fb7a0f4b0d1313"
+}

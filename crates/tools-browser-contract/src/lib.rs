@@ -16,11 +16,15 @@
 
 mod convert;
 mod ext;
+mod search;
+#[cfg(test)]
+mod tests_search;
 
 pub use convert::{check_args, normalize_host, render_nodes, sample_args};
 pub use ext::{
     ConsoleArgs, ConsoleOut, KeyArgs, NavArgs, ScrollArgs, SelectArgs, WaitArgs, WaitOut,
 };
+pub use search::{SearchArgs, SearchEngine, SearchOutput, SearchStage};
 
 use risk_classifier_contract::Reversibility;
 use safety_broker_contract::TaintSource;
@@ -255,6 +259,7 @@ pub fn manifests() -> Vec<ToolManifest> {
         ),
     ];
     all.extend(ext::manifests_ext(manifest));
+    all.push(search::manifest());
     all
 }
 

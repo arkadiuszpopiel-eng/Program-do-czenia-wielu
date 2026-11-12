@@ -9,6 +9,7 @@ F6, P1.
 ## Kontrakt
 ```rust
 browser_open { url, extra_hosts? } → PageOut { url, title, blocked_hosts, downloads, approved_hosts }
+browser_search { engine: duckduckgo|google|bing, query } → PageOut + { search_engine, search_stage: navigation_only }
 browser_read { max_nodes?, max_chars? } → ReadOutput { page, nodes: [NodeOut{node,depth,role,name,value?,password}], text, truncated }
 browser_click { node } → PageOut          browser_type { node, text, submit? } → PageOut
 browser_screenshot { max_side? } → obraz PNG     browser_close {} → zamknięcie, zgody hostów wygasają
@@ -19,6 +20,15 @@ pub struct BrowserTools; impl BrowserTools { pub fn new(BrowserToolsDeps { brows
                                              pub fn close_all(&self) -> usize /* kill-switch */ }
 ```
 Zdarzenia: `tool.browser.open` (host, liczba zablokowanych), `tool.browser.act` (narzędzie, host), `tool.browser.download` (ścieżka, rozmiar) — bez treści stron.
+
+12.11.2026 właściciel wybrał pierwsze wyszukiwanie w przeglądarce bezAPI. `browser_search`
+koduje frazę jako jeden parametr q znanego silnika (bez domyślnego wyboru) i wywołuje tę samą
+ścieżkę `browser_open`/Broker/BrowserPort. Każda próba, także dla już zatwierdzonego hosta,
+wymaga kontroli Brokera; nie dodaje automatycznie CDN ani innych hostów. Istniejący limitURL
+obowiązuje po kodowaniuUTF8. Wynik potwierdza tylko nawigację, nie odczyt/ranking źródeł;
+następny krok to `browser_read`, następnie ocena/cytowanie. CAPTCHA i brak wyników wymagają
+jawnego zgłoszenia po odczycie. To nadal istniejący backendEdge/Chrome, nie osadzonyWebView2
+ani produkcyjny adapterSearchPort. Bez kluczaAPI, cookie/tokenów użytkownika i nowych polityk.
 
 ## Zależności
 `tools-common-contract`, `platform-apps-contract` (`BrowserPort`, `EgressFilter`), `safety-broker-contract`, `compliance-contract` (deny-lista domen dostawców), `core-bus-contract`.

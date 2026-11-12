@@ -11,6 +11,7 @@
 
 mod ops;
 mod out;
+mod search;
 mod session;
 
 use std::sync::Arc;
@@ -132,6 +133,7 @@ impl Tool for BrowserTool {
             );
         }
         let r = match m.name.as_str() {
+            "browser_search" => core.search(args, ctx, m).await,
             "browser_open" => core.open(args, ctx, m).await,
             "browser_read" => core.read(args, ctx).await,
             "browser_screenshot" => core.screenshot(args, ctx).await,

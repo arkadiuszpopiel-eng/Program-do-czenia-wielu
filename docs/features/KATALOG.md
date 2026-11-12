@@ -4,7 +4,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 [45-testy-ai.md](../plan/45-testy-ai.md). Ślad = identyfikator funkcji w kodzie testu danego poziomu;
 „bieg aplikacji” = polecenie wywołane w ostatnim biegu prawdziwej aplikacji na tej maszynie (tylko informacja).
 
-**Razem: 611 funkcji, z testem 611 (100 %), w długu 0.**
+**Razem: 612 funkcji, z testem 612 (100 %), w długu 0.**
 
 | Rodzaj | Funkcji | Z testem | rdzeń | interfejs | przeglądarka | aplikacja | eval | przegląd ogólny |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -12,7 +12,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | Polecenia palety i skróty | 63 | 63 (100 %) | 2 | 7 | 9 | 3 | 0 | 51 |
 | Strony Ustawień | 38 | 38 (100 %) | 0 | 3 | 34 | 13 | 0 | 38 |
 | Ustawienia | 103 | 103 (100 %) | 23 | 12 | 7 | 10 | 2 | 103 |
-| Narzędzia agentek | 81 | 81 (100 %) | 80 | 1 | 1 | 3 | 52 | 81 |
+| Narzędzia agentek | 82 | 82 (100 %) | 81 | 1 | 1 | 3 | 52 | 82 |
 | Zdarzenia rdzenia | 41 | 41 (100 %) | 35 | 25 | 5 | 1 | 1 | 41 |
 
 ## Polecenia rdzenia
@@ -537,6 +537,7 @@ Plik generowany: `node scripts/features.mjs` (nie edytuj ręcznie). Zasady i sys
 | `browser_read` | rdzeń, eval, przegląd ogólny |  |
 | `browser_screenshot` | rdzeń, eval, przegląd ogólny |  |
 | `browser_scroll` | rdzeń, przegląd ogólny |  |
+| `browser_search` | rdzeń, przegląd ogólny |  |
 | `browser_select` | rdzeń, przegląd ogólny |  |
 | `browser_type` | rdzeń, eval, przegląd ogólny |  |
 | `browser_wait` | rdzeń, przegląd ogólny |  |

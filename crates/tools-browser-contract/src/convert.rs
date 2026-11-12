@@ -24,6 +24,11 @@ pub fn check_args(tool: &str, args: &serde_json::Value) -> Result<(), String> {
     let v = args.clone();
     let e = |e: serde_json::Error| e.to_string();
     match tool {
+        "browser_search" => {
+            let a: crate::SearchArgs = serde_json::from_value(v)
+                .map_err(|_| "niepoprawny format wyszukiwania".to_owned())?;
+            a.navigation().map(|_| ())
+        }
         "browser_open" => {
             let a: OpenArgs = serde_json::from_value(v).map_err(e)?;
             check_navigation_url(&a.url).map_err(|e| e.to_string())?;
@@ -58,6 +63,7 @@ pub fn check_args(tool: &str, args: &serde_json::Value) -> Result<(), String> {
 /// Przykładowe poprawne argumenty.
 pub fn sample_args(tool: &str) -> serde_json::Value {
     match tool {
+        "browser_search" => serde_json::json!({"engine": "duckduckgo", "query": "Rust async"}),
         "browser_open" => serde_json::json!({"url": "https://example.com/"}),
         "browser_click" => serde_json::json!({"node": 1}),
         "browser_type" => serde_json::json!({"node": 1, "text": "szukaj"}),
