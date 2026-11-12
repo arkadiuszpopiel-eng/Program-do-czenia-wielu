@@ -1,0 +1,93 @@
+{
+  "base": "5f265ba3acd7248c8c92f9066f9813bcd72f4cec",
+  "scope": "Complete CI192 failure8/10 and Windows116 success4/4; native CPU30 answers retained but metadata-only Done fixture not accepted as real-action control",
+  "files": [
+    {
+      "path": "ci192-rust-counts.json",
+      "bytes": 385,
+      "sha256": "30de4a33150c32e7844db3cd2fde8cec618f37bb89447dee37e0020ba3d2c14e"
+    },
+    {
+      "path": "ci192-rust-linux-decoded.json",
+      "bytes": 1090721,
+      "sha256": "7ffc613906797dfbfe830c304c52414863c2a1e994fdae10b509c1ac1e4032d7"
+    },
+    {
+      "path": "ci192-rust-windows-decoded.json",
+      "bytes": 1091648,
+      "sha256": "3eb74c084780c3b4d0ae5693703fae8ec5a17b5c2d8a5260064fc1781d873693"
+    },
+    {
+      "path": "ci192-shell-failure-decoded.json",
+      "bytes": 77531,
+      "sha256": "019c7803a4b3bf40882d0d352352dd0dd06e93f4f17b4dd137d9a3134b635417"
+    },
+    {
+      "path": "ci192-ui-1-decoded.json",
+      "bytes": 94813,
+      "sha256": "193d34d886aafe368e748319047bc67e1bbef2877dc232d33ddce33e7f632fc2"
+    },
+    {
+      "path": "ci192-ui-2-decoded.json",
+      "bytes": 94062,
+      "sha256": "8f3ee78565296702780089400e46ff73637c264f772ec7684b5c34110bb3cda8"
+    },
+    {
+      "path": "ci192-ui-3-decoded.json",
+      "bytes": 95385,
+      "sha256": "7068604767cbbc36d579d0ec4bc8a92bd07c31a012c5f2a9c02779f994d8dfee"
+    },
+    {
+      "path": "ci192-ui-controls-decoded.json",
+      "bytes": 182382,
+      "sha256": "4f31d62208c92624db94a801a63fff10341366f73788c2dcb54ce600ad5e6f91"
+    },
+    {
+      "path": "ci192-ui-verification.json",
+      "bytes": 466,
+      "sha256": "5341ea408ff7c88c20c2d8ba8bbcd59aa7b8f6fcb7b06a7fe859da30dea1bbd0"
+    },
+    {
+      "path": "jobs-43156731318.json",
+      "bytes": 23282,
+      "sha256": "d817e7f81aca4d7db2baa2cf7b33ae0a3c437b1d42fc9fda48475f3d468ed60f"
+    },
+    {
+      "path": "jobs-43156731379.json",
+      "bytes": 9947,
+      "sha256": "2800122e943adf2dbb52b2a492ebfad7b9a4041ca89b226c34e9c782032626e7"
+    },
+    {
+      "path": "windows116-live/core-records-screen.json",
+      "bytes": 168290,
+      "sha256": "00a1774c57387d74ba35dc49a839a0c556229c5a77590901017678634184937d"
+    },
+    {
+      "path": "windows116-live/live-report.json",
+      "bytes": 61370,
+      "sha256": "d07e1c03ad86a5141d7a2d6a327440e557c424f07169faefa32f0058f2f1e879"
+    },
+    {
+      "path": "windows116-live/tts-alfa.wav",
+      "bytes": 103824,
+      "sha256": "f5dcaa67302d28563a87942421252da5f0ef6979b8e6e39d5a01e00954d9faca"
+    },
+    {
+      "path": "windows116-live-decoded.json",
+      "bytes": 207221,
+      "sha256": "928217c42bf924a5b1289da8a033f37c086e3ffa7dd31fff8c1c797fb44bc683"
+    },
+    {
+      "path": "windows116-manual-review.json",
+      "bytes": 20069,
+      "sha256": "3f28420024b132bfc51e09b5a31457afcb92bbeb6eaf91bac3c699912823ba15"
+    },
+    {
+      "path": "windows116-webview-decoded.json",
+      "bytes": 141210,
+      "sha256": "5b325e86093e869c717ef8c7a2baa8b62a6ff34c8e13454011e1b6de713c33aa"
+    }
+  ],
+  "sources": [],
+  "archive_sha256": "9d7e0c0288876e610098743d206228ffd27633b744081210b957c343a5ce80f5"
+}

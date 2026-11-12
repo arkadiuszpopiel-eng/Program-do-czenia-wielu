@@ -1,0 +1,122 @@
+{
+  "base": "8b66e957fb6e0c6cb53df2334e2851817a637cf1",
+  "scope": "CI193 integration regression on both Rust OS; local Linux fake ports; unchanged 81 previous baseline rows, only browser_search:ok added",
+  "files": [
+    {
+      "path": "browser-diag-baseline-before.json",
+      "bytes": 2008,
+      "sha256": "b6cdc5add6686156597ce63a5963e9cd55a9460a9e385b242cc143d3146b18ee"
+    },
+    {
+      "path": "browser-diag-baseline-verification.json",
+      "bytes": 189,
+      "sha256": "408f017aa2441b1fcf63b74e6e4e49c747a90975fda25c74343dfb9f9c77a044"
+    },
+    {
+      "path": "browser-diag-clippy.json",
+      "bytes": 671,
+      "sha256": "542b2afc5ffbcaf1293ed8eb1edbe4a39fa97c1457845e70cd282fb03a0fcded"
+    },
+    {
+      "path": "browser-diag-clippy.log",
+      "bytes": 137,
+      "sha256": "56b47be71f478d102d27910debe1315e4811ff6c1b5721d7fd2453bd53559d52"
+    },
+    {
+      "path": "browser-diag-format.json",
+      "bytes": 578,
+      "sha256": "7e193f64f0637b178c67e94f5695dcdae5d551bd52d197f7a26d3fce80367dc0"
+    },
+    {
+      "path": "browser-diag-format.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "browser-diag-generate.json",
+      "bytes": 627,
+      "sha256": "656bd509f7b0be16e53a62c42622edc482b2e4970ad9d7719e359bbf1eecb1cd"
+    },
+    {
+      "path": "browser-diag-generate.log",
+      "bytes": 410,
+      "sha256": "358848f27cc1f025dcee8e04d52f93f7501ac279f7a84c3b35a36e11a7007a6d"
+    },
+    {
+      "path": "browser-diag-green-report/raport.json",
+      "bytes": 126037,
+      "sha256": "f7b8625cb9f70867ee8c62a12e89ff7043b42da5764e1931bf285efd3b823254"
+    },
+    {
+      "path": "browser-diag-green-report/raport.md",
+      "bytes": 14004,
+      "sha256": "ee9da3e104c57c90acac47658bc6d9828466622731d1729fe9343c3e8463e6db"
+    },
+    {
+      "path": "browser-diag-green.json",
+      "bytes": 633,
+      "sha256": "3568196714c274108ac426a49e585096da2f6fa5a1a6ddc787d60cb14432d712"
+    },
+    {
+      "path": "browser-diag-green.log",
+      "bytes": 410,
+      "sha256": "53e9dbfef79aee4b7d4577abc721362888e5f44ef8daa691b17a6fd532e9213d"
+    },
+    {
+      "path": "browser-diag-isolated-report/raport.json",
+      "bytes": 126118,
+      "sha256": "79cddf7de1050852380e48ee3d471f13c73257e2a7b0191b5ca40ccc859dd082"
+    },
+    {
+      "path": "browser-diag-isolated-report/raport.md",
+      "bytes": 14082,
+      "sha256": "254264d3e653df5470c923a3e817524cc27d05e4800bbea35effd9b2cbce79fb"
+    },
+    {
+      "path": "browser-diag-isolated.json",
+      "bytes": 587,
+      "sha256": "907fae819b69497a6c560497c2cea8a311f0f4fc051116fa4aa9fe32e7335b4f"
+    },
+    {
+      "path": "browser-diag-isolated.log",
+      "bytes": 1074,
+      "sha256": "c67f3818cfd4fa1c2e5b2879ab86ced24965807d7738bd7ea223df28b14cc4c2"
+    },
+    {
+      "path": "ci193-rust-counts.json",
+      "bytes": 411,
+      "sha256": "03dd3a9a48b917f39829c513430f79c2ec53040a842e3007940d5a49ea8bb940"
+    },
+    {
+      "path": "ci193-rust-linux-decoded.json",
+      "bytes": 1056994,
+      "sha256": "ce092f1f90cde25873a2a234533b95b796d63f625ddcd1ee64d436e7b2a9fb65"
+    },
+    {
+      "path": "ci193-rust-windows-decoded.json",
+      "bytes": 1093488,
+      "sha256": "f9453f9c29a874ac21e8c547b06766cd69474a6a5b265078832ac63b540df0db"
+    },
+    {
+      "path": "jobs-43159904243.json",
+      "bytes": 23282,
+      "sha256": "d9e2e830bbe934abd82f70e3e4e0eb3c12100a33d02d7d7c932876b4309c789b"
+    },
+    {
+      "path": "jobs-43159904279.json",
+      "bytes": 9947,
+      "sha256": "1aecaa54cd0676b15e5f84c2c23eec51add1dd188b25506982fa3ae124ae7b5e"
+    }
+  ],
+  "sources": [
+    {
+      "path": "crates/app-core/tests/tool_diag.rs",
+      "sha256": "5afd698ffd2d0e34e2a6a96958412763c60063d1419f7b7208677daae83a1a81"
+    },
+    {
+      "path": "crates/app-core/tests/tool_rig/wzorzec.json",
+      "sha256": "92abb071f700c0e046433946cbe180d52b8bccd030a2a91bbfa52f0a83aed44f"
+    }
+  ],
+  "archive_sha256": "10f4d2ad769078b207bd25dfcc55b4bb162836b8447d173e8e4e78f2c1b9a93b"
+}

@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 121 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 72 |
-| Linie Rust (z testami) | 482 991 |
-| Testy (`#[test]`, `#[tokio::test]`) | 3744 |
+| Linie Rust (z testami) | 483 042 |
+| Testy (`#[test]`, `#[tokio::test]`) | 3745 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -151,8 +151,8 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `app-api` | — | — | — | pojedynczy | 8626 | 40 | — |  |
 | `app-bridges` | — | — | — | pojedynczy | 1192 | 9 | — |  |
 | `app-broker` | — | — | — | pojedynczy | 5667 | 36 | — |  |
-| `app-chat` | — | — | — | pojedynczy | 7880 | 43 | — |  |
-| `app-core` | — | — | — | pojedynczy | 26 580 | 221 | — |  |
+| `app-chat` | — | — | — | pojedynczy | 7882 | 43 | — |  |
+| `app-core` | — | — | — | pojedynczy | 26 629 | 222 | — |  |
 | `app-diag` | — | — | — | pojedynczy | 547 | 3 | — |  |
 | `app-files` | — | — | — | pojedynczy | 8014 | 59 | — |  |
 | `app-gui` | — | — | — | pojedynczy | 1184 | 8 | — |  |

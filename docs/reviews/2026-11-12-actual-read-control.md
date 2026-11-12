@@ -1,5 +1,11 @@
 # #58 — rzeczywista operacja przed pytaniem o historię
 
+**Po integracji poprawek #83 i diagnostyki wyszukiwania:** dziewięć celów app-core
+**17/0/2ignored**, Clippy app-core+app-chat/all-targets0 bez ostrzeżeń.
+Nowy test i workflow mają identyczne bajty z wcześniej sprawdzonym źródłem.
+Nie ponawiano rzeczywistej próby modelu; wcześniejsza porażka poniżej pozostaje.
+[Komendy i hashe po integracji](artifacts/2026-11-12-actual-read-integrated/README.md).
+
 Windows116 na5f265ba3 ukończył30/30transportu i wejścia, lecz wszystkie odpowiedzi
 zaczynają się „Nie”. Dziesięć pozytywnych wpisówmacierzy ma tylko TurnMeta,
 `tool:null` i `origin:turn_metadata_only`, bez Replay/akcji. Nie wystarczają do odbioru

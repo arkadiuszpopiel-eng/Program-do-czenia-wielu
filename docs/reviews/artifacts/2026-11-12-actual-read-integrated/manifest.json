@@ -1,0 +1,72 @@
+{
+  "base": "5c29d04d3f73341f605eaa66d8398483b76bb7da",
+  "scope": "Integrated browser/terminal repairs plus authentic TEMP-read input control:17/0/2ignored, app-chat+app-core all-targets Clippy0; no repeated real-model attempt",
+  "files": [
+    {
+      "path": "actual-read-final-source.json",
+      "bytes": 712,
+      "sha256": "41958eeb5afe13bf1ac2b3d53c755475425f7a0e644a9237d4c13c0ad3b9d26e"
+    },
+    {
+      "path": "actual-read-integrated-clippy.json",
+      "bytes": 2022,
+      "sha256": "4df06cd390ff84128ca64e501909a853f6f83c1a4a7bc180d63986d51794012a"
+    },
+    {
+      "path": "actual-read-integrated-clippy.log",
+      "bytes": 225,
+      "sha256": "eac7c130eff0284c7d4ed0cf0bc800b3ef114610c8c546f370c4b39c4d781adf"
+    },
+    {
+      "path": "actual-read-integrated-format.json",
+      "bytes": 1968,
+      "sha256": "4aa1be62f6b1dd526b2cc7c55bc9029bbf626f04c8672918810ecf5cfd415614"
+    },
+    {
+      "path": "actual-read-integrated-format.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "actual-read-integrated-regression.json",
+      "bytes": 2250,
+      "sha256": "5cb6a8e3373167568a9a7aa77e446d0e3fbaf5298ca3222d055644139162d813"
+    },
+    {
+      "path": "actual-read-integrated-regression.log",
+      "bytes": 3565,
+      "sha256": "52be8b458191d024e8a85f2d8f52c9c8e5c7559c7e3cbb3941f5ca172cac4ada"
+    }
+  ],
+  "sources": [
+    {
+      "path": "crates/app-core/tests/execution_actual_read.rs",
+      "sha256": "9c6b72cd48fda47d43f9990da7ad06c7f76937e02fd83e922b89488132c8b8a0"
+    },
+    {
+      "path": "crates/app-core/tests/support/executed_read.rs",
+      "sha256": "b811c0491bf564fbb0c2cf03cf98a9da7e3d2d2dd0a86c43a192d06d250c8137"
+    },
+    {
+      "path": ".github/workflows/rehearsal.yml",
+      "sha256": "ab38565bdfa43176cca51e3a49d182c1f2482693a32aace0ffdc8acba18b9b58"
+    },
+    {
+      "path": "crates/app-chat/src/finish.rs",
+      "sha256": "faad7df0710e2d1ba6217751a10589ec39f75a24553b6c2e14543526ee5cf8f1"
+    },
+    {
+      "path": "crates/app-core/tests/finish_order.rs",
+      "sha256": "42ba0b9236b545a26c4ae3004b8deab9deec5504bc44afe5c54136f64452ecb8"
+    },
+    {
+      "path": "crates/app-core/tests/tool_diag.rs",
+      "sha256": "5afd698ffd2d0e34e2a6a96958412763c60063d1419f7b7208677daae83a1a81"
+    },
+    {
+      "path": "crates/app-core/tests/tool_rig/wzorzec.json",
+      "sha256": "92abb071f700c0e046433946cbe180d52b8bccd030a2a91bbfa52f0a83aed44f"
+    }
+  ],
+  "archive_sha256": "61b7b85bcd1df65f90b0595cc313c7fb7a549d9c7719aebffb31b2dda99d774c"
+}

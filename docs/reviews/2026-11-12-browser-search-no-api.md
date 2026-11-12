@@ -1,5 +1,11 @@
 # Wyszukiwanie w przeglądarce bez klucza API — pierwszy przyrost
 
+**Aktualizacja integracji:** CI193 na8b66 ma8/10, Windows1174/4. W obu zadaniachRust
+nowe wyszukiwanie naruszało wspólną stronę testową; poprawiona izolacja i jeden nowy
+wpis wzorca dają lokalne2/0/0, wszystkie81wcześniejszych wyników bez zmian.
+[Dokładna przyczyna i dowody](2026-11-12-browser-diag.md). Poniższe zapisy „w toku”
+opisują stan przed zakończeniemCI192/193, nie najnowszy wynik.
+
 Właściciel wybrał tę ścieżkę jako pierwszą w #78. [Zapis decyzji](2026-11-12-owner-decisions.md).
 Nowe narzędzie `browser_search` jest w rzeczywistym zestawie narzędzi agentek. Wymaga
 jawnego silnika DuckDuckGo/Google/Bing i frazy; nie wybiera domyślnego endpointu.

@@ -8,6 +8,7 @@
   "browser_read": "ok",
   "browser_screenshot": "ok",
   "browser_scroll": "ok",
+  "browser_search": "ok",
   "browser_select": "ok",
   "browser_type": "ok",
   "browser_wait": "ok",
