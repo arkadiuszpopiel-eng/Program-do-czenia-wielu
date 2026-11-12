@@ -194,6 +194,7 @@ parts.push(
   '',
   `/** Ładunek kanału \`alfa://events\`. */\nexport type IpcEventFrame = ${type(schema.event_frame)};`,
   `/** Odrzucenie komendy. */\nexport type IpcError = ${type(schema.error)};`,
+  `/** Format polecenia zdalnego; nie dowód tożsamości ani zgody. */\nexport type IpcRemoteCommand = ${type(schema.remote_command)};`,
   '',
   '/** Powód, dla którego polecenie wymaga lokalnej maszyny (B.5, `crates/app-api/data/local-only.json`). */',
   "export type LocalReason = 'system_dialog' | 'asset_preview' | 'host_path' | 'host_desktop';",

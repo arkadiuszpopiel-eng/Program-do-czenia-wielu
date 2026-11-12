@@ -4,7 +4,10 @@
 Brama klientów po stronie hosta: prowadzi sesje klientów (okno lokalne, urządzenia sparowane), sprawdza, które
 polecenia wolno wywołać danemu klientowi, numeruje zdarzenia i obsługuje wznowienie po przerwie. Moduł
 **nie** szyfruje kanału sam z siebie poza użyciem uzgodnionych kluczy, nie paruje urządzeń (`device-pairing`),
-nie zatwierdza działań i nie wytwarza dowodów zgody — tylko je przenosi do Brokera. Stan: propozycja.
+nie zatwierdza działań i nie wytwarza dowodów zgody — tylko je przenosi do Brokera.
+Projekt D.0 zatwierdzony12.11.2026. Moduł wykonawczy nadal planowany; pierwszy przyrost
+`lib-client-wire` dostarcza tylko czysty format ramki (schema Rust→TS), wersję, jawny limit bajtów
+i rosnące ID. Bez sieci/ACL/parowania/dispatchera; [zakres biblioteki](../../../crates/lib-client-wire/README.md).
 
 ## Fala i priorytet
 Plan v6, **etap D** (zadanie D.1), po B.1–B.3 i B.5 oraz po podpisie ADR 0019–0023 (D.0). Priorytet: do
@@ -79,7 +82,7 @@ połączenia i gubienie ramek, klient testowy z dowolną ACL; służy też jako 
 
 ## Otwarte pytania
 - ADR 0019 — rozmiar bufora zdarzeń, limit ramki, lista poleceń `local_only` i ich zdalnych odpowiedników.
-- ADR 0021 — dobór wzorca Noise (niepotwierdzony); czy kanał E2E żyje w tym module, czy w osobnej bibliotece
+- ADR 0021 — wzorzec Noise_XX_25519_ChaChaPoly_SHA256 zatwierdzony w D.0; czy kanał E2E żyje w tym module, czy w osobnej bibliotece
   `lib-*` wspólnej dla hosta i klientów.
 - ADR 0022 — jak brama przekazuje `DeviceApprovalProof` do Brokera działającego w osobnym procesie.
 - ADR 0020 — przeniesienie bramy z procesu aplikacji do `alfa-host` bez zrywania sparowanych urządzeń.
