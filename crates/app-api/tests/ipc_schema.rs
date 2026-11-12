@@ -60,3 +60,17 @@ fn tool_status_retains_legacy_wire_values_and_confirmation() {
         assert_eq!(serde_json::to_value(status).unwrap(), value);
     }
 }
+
+#[test]
+fn builder_library_role_id_is_optional_for_older_clients() {
+    let legacy = serde_json::json!({
+        "persona": "luna", "name": "Luna", "color": "color.agent.custom-2",
+        "role": "Czytelniczka", "autonomy": "L1", "hash": "synthetic"
+    });
+    let entry: app_api::dto::BuilderAgentInfo = serde_json::from_value(legacy.clone()).unwrap();
+    assert_eq!(serde_json::to_value(entry).unwrap(), legacy);
+    let mut current = legacy;
+    current["role_id"] = serde_json::json!("czytelniczka");
+    let entry: app_api::dto::BuilderAgentInfo = serde_json::from_value(current.clone()).unwrap();
+    assert_eq!(serde_json::to_value(entry).unwrap(), current);
+}

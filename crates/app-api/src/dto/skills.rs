@@ -165,6 +165,10 @@ pub struct BuilderAgentInfo {
     pub name: String,
     pub color: String,
     pub role: String,
+    /// Identyfikator roli do przypisania w rozmowie; `role` jest nazwą do wyświetlenia.
+    /// Brak w starszych odpowiedziach nie uprawnia klienta do zgadywania ID.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub role_id: Option<String>,
     pub autonomy: AutonomyLevel,
     pub hash: String,
 }

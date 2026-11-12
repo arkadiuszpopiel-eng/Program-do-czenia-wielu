@@ -41,9 +41,18 @@ async fn create_persona(core: &AppCore, session: &str) {
     let saved = core.builder_save(draft(), dry.hash).await.unwrap();
     assert_eq!(saved.persona, "luna");
     assert_eq!(saved.role, "czytelniczka");
-    core.agents_set_roles(session.into(), saved.persona, vec![saved.role])
-        .await
-        .unwrap();
+    let library = core.builder_library().await.unwrap();
+    let entry = library.iter().find(|a| a.persona == saved.persona).unwrap();
+    assert_eq!(entry.role, "Czytelniczka", "nazwa do wyświetlenia");
+    let wire = serde_json::to_value(entry).unwrap();
+    assert_eq!(wire["role_id"], saved.role, "ID do przypisania, nie nazwa");
+    core.agents_set_roles(
+        session.into(),
+        saved.persona,
+        vec![wire["role_id"].as_str().unwrap().into()],
+    )
+    .await
+    .unwrap();
 }
 
 async fn ask(h: &mut Harness, session: &str) -> ChatRequest {
