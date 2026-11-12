@@ -4,6 +4,48 @@
 [Zakres zgody](2026-11-12-owner-decisions.md). Poniższe wcześniejsze wpisy „czeka na podpis”
 pozostają historią; nie są aktualną blokadą projektu. Transport i embedding nadal niewdrożone.
 
+## Najnowszy wynik: CI191 zakończone, Windows115 z jedną porażką
+
+Źródło **372bfcd550f1a4f37a48580d050bc20de28ca270**, [draftPR80](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/pull/80).
+[CI191](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/43150453166)
+**10/10 zadań zielonych**. RustLinux **3631/0/28**, Windows **3653/0/49** (passed/failed/ignored),
+po1149 podsumowań libtest i osobny harness no_alloc. Clippy na obu systemach zaliczone.
+Vitest **593/593**; headlessLinux/Chromium **963/963**,321+321+321,
+bez pominięć/flaky, bez braków i pokrycia nakładającego się między częściami.
+Naprawa fontów zaliczyła pełny przebieg; wcześniejszych porażek nie usunięto z historii.
+
+[Windows115](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/43150453104)
+**3/4 zadań**, wynik failure. Prawdziwa aplikacja WebView2 **63/0/5 pominiętych**;
+HuggingFace i setupPS5.1/7 zaliczone. Pominięcia: pełny profil instancji, logowanieCLI,
+natywny eksport, globalne skróty dyktowania i czytania. To nie odbiór pełnych praw/GPU/mikrofonu.
+
+Nowy test **Core→LocalProvider→Qwen8B** wykonał pierwszy z30 przypadków
+(Alfa/Standard/pusty zapis). Wejście poprawne,0 rzeczywistych narzędzi,0 tekstu,
+błąd **FirstToken60s**, całość **78353ms**; pozostałe **29 NOT_RUN**, semantyka
+**NOT_EVALUATED**. Test zachował raport i zatrzymał swój sidecar. Nie wyłączono testu,
+nie zastosowano continue-on-error i nie podniesiono limitów. **#58 nadal otwarte.**
+
+Wcześniejszy prosty test silników w tym samym jobie zaliczony: Qwen8B pierwszy token20627ms,
+96tokenów/7,01tok/s; Bielik4.5B16285ms,76tokenów/4,73tok/s. Bielik1.5B wyłącznie pomocniczy.
+11B NOT_RUN_CPU_BUDGET; potrzebne9275>8192. PiperTTFB1112ms, audio2173ms,RTF0,512;
+STT z nagrania WER0,56650ms,RTF26,07, fallbackCUDA→CPU. Nie był to prawdziwy mikrofon.
+Sukces prostego narzędzia testowego nie dowodzi prawdziwego sprawdzenia plików przez Core.
+
+Diagnoza bez zmian progów: przybliżona ramkaChatML ma1079tokenów; osobny natywny
+CloudCPU prefill256 dał18,338402tok/s. To sugeruje koszt wejścia blisko60s, ale nie ustala
+przyczyny porażki Windows. Nie przenosimy wydajności CPU na RTX206012GB.
+Hipotezy odrzucone na podstawie źródła: MAIN_MODEL już wymusza enable_thinking=false,
+a --threads-batch domyślnie bierze --threads. Nie dodano zbędnych flag ani ślepego ponowienia.
+Kod wyjścia odłączonego benchmarku niedostępny; kompletny JSON i stan zombie zachowano.
+
+[Pełne dowody, manifesty i ograniczenia](artifacts/2026-11-12-ci191/README.md).
+Dalsze kroki: profilowanie rzeczywistego prefilla/serwera z identycznym wejściem,
+odbiór macierzy na docelowymGPU, osobna ocena semantyki każdej odpowiedzi.
+Zatwierdzony projekt D.0 i wybór przeglądarki bezAPI umożliwiają prace nad transportem;
+nie zastępują przeglądu konkretnych poprawek Brokera ani odbioru telefonu.
+
+## Historia poprzedniego przebiegu — poniższe „jeszcze niewykonane” dotyczą chwili zapisu
+
 ## Aktualizacja po CI190 — karta zgody i rzeczywisty Core8B
 
 CI190 dla `45df9fe8` zakończone **8/10 zadań**, wynik ogólny failure. Rust:
