@@ -1,5 +1,10 @@
 # 57 — role modeli: lokalny 27B do kodu, mniejsze do rozmowy, pomoc chmury
 
+**Korekta prostego research12.11:** kod w wyszukiwanej frazie nie wymusza sam
+profilu Kod; Hard i typowane Code/Planning nadal wymagają eksperta. Router81/0/0,
+Clippy0. Wyniki integracji poprzedniego przyrostu należą do62f8e573.
+[Regresja i zakres walidacji](../reviews/2026-11-12-research-code-query.md).
+
 **Kandydat implementacji12.11:** bramka lokalnych ról, odkrywanie profilu eksperckiego,
 obsługa przypięć/wyłączonego rankingu/eskalacji i rozdzielenie research są w osobnej
 gałęzi do przeglądu. [Raport kodu i testów](../reviews/2026-11-12-router-expert-roles.md).

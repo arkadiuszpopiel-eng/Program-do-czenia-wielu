@@ -1,5 +1,10 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Korekta prostego research12.11:** kod w wyszukiwanej frazie nie wymusza sam
+profilu Kod; Hard i typowane Code/Planning nadal wymagają eksperta. Router81/0/0,
+Clippy0. Wyniki integracji poprzedniego przyrostu należą do62f8e573.
+[Regresja i zakres walidacji](../reviews/2026-11-12-research-code-query.md).
+
 **Przyrost routera12.11 — kandydat do przeglądu:** osobna bramka roli wyklucza
 słabe lokalne modele z Kod/Planning i rozpoznanych trudnych zadań, także w zapasie,
 przypięciu i review. Research prostegoWWW używa Conversation; trudne nadal wymaga

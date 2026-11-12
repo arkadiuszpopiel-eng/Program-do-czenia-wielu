@@ -1,5 +1,9 @@
 # Kod i trudne zadania bez słabego lokalnego fallbacku
 
+**Uzupełnienie po62f8e573:** [osobna korekta research](2026-11-12-research-code-query.md)
+pozwala szukać dokumentacji zawierającej kod bez wymuszania roli programistycznej.
+Poniższe137 kontroli dotyczą62f8e573; nowa korekta ma własny zapis81 testów routera.
+
 Przyrost na bazie a836bb57 / PR88, zgodny z decyzją właściciela i
 [planem 57](../plan/57-role-modeli-27b-i-pomoc-chmury.md). Dotyczy modułu routera;
 nie instaluje modelu 27B, nie podnosi uprawnień i nie zmienia polityk bezpieczeństwa.

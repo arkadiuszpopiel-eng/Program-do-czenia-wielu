@@ -314,3 +314,23 @@ fn cloud_budget_block_cannot_reenable_small_local_coding() {
     register(&c, "openai", CLOUD, RouteKind::Api);
     assert!(decide(&c, TaskClass::Code, &req("Zadanie")).is_err());
 }
+
+#[tokio::test(start_paused = true)]
+async fn simple_research_about_code_does_not_become_a_coding_task() {
+    let c = Arc::new(RouterCore::default());
+    let small = register(&c, "local", SMALL, RouteKind::Local);
+    let expert = register(&c, "expert", EXPERT, RouteKind::Local);
+    let mut r = req("Znajdź dokumentację: fn main() {}");
+    r.meta.route.class = Some("research".into());
+    assert_eq!(
+        decide(&c, TaskClass::Code, &r).unwrap().chosen.model,
+        EXPERT,
+        "typowana klasa Kod nadal wymaga eksperta"
+    );
+    let routed = RoutedProvider::new(c, TaskClass::Planning);
+    assert_eq!(text(&collect(&routed, r.clone()).await), "local odpowiada");
+    assert_eq!(small.requests().len(), 1);
+    assert!(expert.requests().is_empty());
+    r.meta.route.difficulty = Some(Difficulty::Hard);
+    assert_eq!(text(&collect(&routed, r).await), "expert odpowiada");
+}
