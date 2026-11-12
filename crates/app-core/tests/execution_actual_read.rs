@@ -73,7 +73,18 @@ async fn capture_actual_read_on_local_model() {
     let report_path = std::env::var("ALFA_ACTUAL_READ_REPORT").expect("osobny raport");
     let (mut a, secrets) = executed_read::fixture().await;
     drop(a.h.core);
-    let (models, config, model) = probe_model::configuration();
+    let (models, mut config, model) = probe_model::configuration();
+    // Osobna, jawnie zlecona diagnozaCPU; zwykły przebieg i produkcja bez zmian.
+    let diagnostic_seconds = std::env::var("ALFA_CPU_DIAGNOSTIC_SECONDS")
+        .ok()
+        .map(|v| v.parse::<u64>().expect("sekundy diagnozyCPU"));
+    if let Some(seconds) = diagnostic_seconds {
+        assert!((1..=1800).contains(&seconds));
+        config.startup_timeout = std::time::Duration::from_secs(seconds);
+        config.timeouts.first_token = std::time::Duration::from_secs(seconds);
+        config.timeouts.idle = std::time::Duration::from_secs(seconds);
+    }
+    let turn_seconds = diagnostic_seconds.map_or(120, |s| s * 3 + 120);
     let sidecar = Sidecar::new(config, Arc::new(TokioLauncher::default()), None, None).unwrap();
     let sent = Arc::new(Mutex::new(Vec::new()));
     let brain = Arc::new(LocalBrain {
@@ -103,7 +114,7 @@ async fn capture_actual_read_on_local_model() {
             .unwrap()
             .assistant_turn_id
             .unwrap();
-    let (finished, first_text_ms) = wait_live(&mut events, &turn, started).await;
+    let (finished, first_text_ms) = wait_live(&mut events, &turn, started, turn_seconds).await;
     if !finished {
         a.h.core.turns_stop(a.sid.clone()).await.unwrap();
     }
@@ -122,7 +133,9 @@ async fn capture_actual_read_on_local_model() {
         && answer.author == "delta";
     let report = serde_json::json!({"format":"alfa-actual-read-live-v1","platform":std::env::consts::OS,
         "scope":"Core+native TEMP fs_read (scripted tool choice), then rebuilt Core+LocalProvider CPU; no GUI/mic/GPU/API/CLI or owner files",
-        "model":model,"agent":"delta","mode":"standard","context":8192,"max_tokens":96,"temperature":0.0,
+        "model":model,"agent":"delta","mode":"standard","context":8192,
+        "max_tokens":request.as_ref().and_then(|r|r.params.max_tokens),"temperature":0.0,
+        "cpu_diagnostic_seconds":diagnostic_seconds,"turn_observation_seconds":turn_seconds,
         "prior_action":"native fs_read returned fresh random TEMP content; persisted Replay checked; file contents not forwarded",
         "current_turn_tools":answer.tools.len(),"input_ok":input_ok,"transport_ok":transport_ok,
         "elapsed_ms":started.elapsed().as_millis(),"first_text_core_ms":first_text_ms,"request":request,"records":facts,
@@ -140,10 +153,11 @@ async fn wait_live(
     events: &mut tokio::sync::broadcast::Receiver<app_core::EventBatch>,
     turn: &str,
     started: std::time::Instant,
+    turn_seconds: u64,
 ) -> (bool, Option<u128>) {
     use app_core::dto::AlfaEvent;
     let mut first = None;
-    let done=tokio::time::timeout(std::time::Duration::from_secs(120),async{
+    let done=tokio::time::timeout(std::time::Duration::from_secs(turn_seconds),async{
         loop {match events.recv().await {
             Ok(frame)=>{
                 for e in frame.iter(){if let AlfaEvent::TextDelta{turn_id,text,..}=e && turn_id==turn && !text.trim().is_empty() && first.is_none(){first=Some(started.elapsed().as_millis());}}

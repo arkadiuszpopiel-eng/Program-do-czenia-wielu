@@ -31,7 +31,19 @@ impl ModelProvider for BoundedProvider {
         self.0.capabilities()
     }
     fn stream(&self, mut request: ChatRequest, cancel: CancellationToken) -> ProviderStream {
-        request.params.max_tokens = Some(96);
+        let tokens = if std::env::var_os("ALFA_CPU_DIAGNOSTIC_SECONDS").is_some() {
+            std::env::var("ALFA_CPU_DIAGNOSTIC_MAX_TOKENS")
+                .ok()
+                .map(|v| {
+                    let value = v.parse::<u32>().expect("tokeny diagnozyCPU");
+                    assert!((1..=2048).contains(&value));
+                    value
+                })
+                .unwrap_or(96)
+        } else {
+            96
+        };
+        request.params.max_tokens = Some(tokens);
         request.params.temperature = Some(0.0);
         self.1.lock().unwrap().push(request.clone());
         self.0.stream(request, cancel)
