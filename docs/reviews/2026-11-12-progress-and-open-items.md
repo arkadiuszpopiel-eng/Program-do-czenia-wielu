@@ -61,8 +61,9 @@ tego jako 20/30 zgodności z rzeczywistymi czynnościami i nie zamykamy #58.
 Mocniejsza lokalna próba po prawdziwym fs_read: Delta/Standard, Qwen8B CPU,
 poprawne wejście, **0 tekstu, FirstToken 60 s, 99337 ms łącznie, exit 101**.
 Semantyka **NOT_EVALUATED**, bez ponowienia lub podwyższania limitów. Surowa odpowiedź
-Windows tej kontroli będzie osobnym artefaktem actual-read-screen.json; jeśli
-wcześniejszy krok macierzy nie przejdzie, kontrola pozostanie NOT_RUN.
+Windows tej kontroli będzie osobnym artefaktem actual-read-screen.json. Na źródle
+a2b47cf2 niezaliczona wcześniejsza macierz pomija nową kontrolę; dalsza korekta
+pozwala wykonać ją niezależnie po zaliczonym buildzie, wciąż sekwencyjnie.
 
 Rzeczywiste WebView2 w Windows115/116/117: po **63/0/5 pominiętych**. Pominięcia
 obejmują pełny dostęp, logowanie CLAUDE, natywne SaveAs, globalne dyktowanie i odczyt
