@@ -1,0 +1,51 @@
+{
+  "observed_at_utc": "2026-11-12T13:42:58.607062+00:00",
+  "official": {
+    "repo": "Qwen/Qwen3.8-27B",
+    "revision": "37561816e66b5b9153b1b64c10968c18c1e6f4a0",
+    "url": "https://huggingface.co/Qwen/Qwen3.8-27B/tree/37561816e66b5b9153b1b64c10968c18c1e6f4a0",
+    "license": "apache-2.0",
+    "parameters_from_safetensors_metadata": 27781427952,
+    "architecture": [
+      "Qwen3_5ForConditionalGeneration"
+    ],
+    "model_type": "qwen3_5",
+    "text_config": {
+      "num_hidden_layers": 64,
+      "hidden_size": 5120,
+      "max_position_embeddings": 262144,
+      "num_key_value_heads": 4,
+      "head_dim": 256,
+      "full_attention_interval": 4
+    }
+  },
+  "community_quantization": {
+    "repo": "unsloth/Qwen3.8-27B-GGUF",
+    "revision": "4af51b3542f775b0a8e4b310bfb3f17e01c306c9",
+    "files": [
+      {
+        "file": "Qwen3.8-27B-Q4_0.gguf",
+        "bytes": 16056478688,
+        "GiB": 14.95376107096672,
+        "publisher_lfs_sha256": "ede16c7b36e578ca87a8c70e011e4b4633a32c831c0ce76d0f474582384e671d",
+        "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4af51b3542f775b0a8e4b310bfb3f17e01c306c9/Qwen3.8-27B-Q4_0.gguf",
+        "full_weight_downloaded_or_hashed_here": false
+      },
+      {
+        "file": "Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "bytes": 16564259744,
+        "GiB": 15.426669031381607,
+        "publisher_lfs_sha256": "1bce504dfecd84153666928a41d8a66706f0158d3a317bc5196b72819d7dc529",
+        "url": "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4af51b3542f775b0a8e4b310bfb3f17e01c306c9/Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "full_weight_downloaded_or_hashed_here": false
+      }
+    ]
+  },
+  "comparison": {
+    "target_gpu": "RTX2060 12GB, unchanged by owner so far",
+    "assumed_gpu_bytes_upper_bound": 12884901888,
+    "Q4_K_M_weights_exceed_gpu_bytes": true,
+    "includes_context_buffers_voice": false
+  },
+  "limits": "Public metadata only. LFS SHA is publisher-declared, not a verified local download. No inference, tool-calling, CUDA/VRAM, microphone, API-account, licence-policy or runtime acceptance."
+}

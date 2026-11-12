@@ -1,5 +1,12 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Nowa decyzja właściciela 12.11 — role modeli:** lokalne kodowanie/trudne zadania
+na modelu klasy Qwen3.8-27B Q4; mniejsze modele do rozmowy i prostego wyszukiwania,
+chmura Luna/Haiku lub mocniejsza jako wsparcie. Zastępuje wcześniejsze przypisanie
+8–12B do głównego kodowania. Q4_K_M ma 16,56 GB samych wag i nie mieści się w całości
+w RTX 2060 12 GB. To zapis kierunku, bez przełączenia runtime lub odbioru modelu.
+[Macierz ról, źródła, luka obecnego routera i plan testów](57-role-modeli-27b-i-pomoc-chmury.md).
+
 **Końcowy wynik diagnozy CPU:** 14B ze stałą regułą także **1/2**: poprawnie
 wskazuje prawdziwy odczyt, lecz fałszywie potwierdza działania w pustej sesji.
 Brak kwalifikacji głównego modelu; nie przełączono produkcji. Wszystkie11 prób

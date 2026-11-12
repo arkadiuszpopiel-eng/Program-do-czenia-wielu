@@ -1,0 +1,40 @@
+{
+  "scope": "Public metadata and documentation-only validation; no weight download/inference/hardware/API acceptance",
+  "files": [
+    {
+      "path": "model-roles-docs-build-final.json",
+      "bytes": 5927,
+      "sha256": "e1a2aff33808628e42c5052f5306fa3901e8d150eea28c0d752af4297ef2c561"
+    },
+    {
+      "path": "model-roles-docs-build-final.log",
+      "bytes": 48,
+      "sha256": "799b806ffabf3c5107a53339ba1703cc19876f8e7cc38e7405e8667ff69894f8"
+    },
+    {
+      "path": "model-roles-docs-verify-final.json",
+      "bytes": 5928,
+      "sha256": "b025663afc99b25853e53a56cdb12011ecc6b5e4a7893e347ba0bb1428beccbd"
+    },
+    {
+      "path": "model-roles-docs-verify-final.log",
+      "bytes": 59,
+      "sha256": "fe5b128b366e7a0950161f536acf1076dc3dc41d5b07acd8deac39ebb9befe3b"
+    },
+    {
+      "path": "official-config.json",
+      "bytes": 3637,
+      "sha256": "7718cd6bf3d6521d5550966d4ab8484fc81a01347d74b7e52163070f35ca7f35"
+    },
+    {
+      "path": "previous-ci198-windows122-status.json",
+      "bytes": 896,
+      "sha256": "757e149c19cf8132ca2fd62b4a0e15afd9f52a68bb0bba0c4727a3fc0bb5cd3b"
+    },
+    {
+      "path": "qwen38-27b-public-metadata.json",
+      "bytes": 2091,
+      "sha256": "9ff4c8bdedfca256fa6206e32c372d733df76e179ce0542eda15ac2ec2cb7b33"
+    }
+  ]
+}
