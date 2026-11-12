@@ -270,19 +270,6 @@ impl ChatEngine {
                 host.account_trouble(account, error).await;
             }
         }
-        match (&outcome.error, outcome.stop) {
-            (Some(error), _) => self.emit(AlfaEvent::Error {
-                session_id: sid.clone(),
-                turn_id: tid.clone(),
-                error: error.clone(),
-            }),
-            (None, Some(reason)) => self.emit(AlfaEvent::Stop {
-                session_id: sid.clone(),
-                turn_id: tid.clone(),
-                reason,
-            }),
-            (None, None) => {}
-        }
         if outcome.status != TurnStatus::Error || outcome.chosen.is_some() {
             self.timeline_model_call(req, &tid, &outcome, usage.as_ref());
         }
@@ -295,6 +282,21 @@ impl ChatEngine {
             {
                 rt.gens.remove(&req.session);
             }
+        }
+        // Odbiorca Stop/Error może od razu pytać o stan albo zatrzymać pozostałe sesje.
+        // Fakty i oś czasu muszą być już zapisane, a własna generacja usunięta ze stanu.
+        match (&outcome.error, outcome.stop) {
+            (Some(error), _) => self.emit(AlfaEvent::Error {
+                session_id: sid.clone(),
+                turn_id: tid.clone(),
+                error: error.clone(),
+            }),
+            (None, Some(reason)) => self.emit(AlfaEvent::Stop {
+                session_id: sid.clone(),
+                turn_id: tid.clone(),
+                reason,
+            }),
+            (None, None) => {}
         }
         self.emit(AlfaEvent::ActivityChanged {
             session_id: sid,

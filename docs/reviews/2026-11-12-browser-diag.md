@@ -21,3 +21,11 @@ Nie zmieniono progów evals, budżetów, polityk lub produkcyjnego Brokera.
 pierwotne czerwoneCI. Lokalne próby używają atrap i nie dowodzą odczytu realnych
 wynikówWWW, jakości rankingu, osadzeniaWebView2 lub działania telefonu.
 Nowy head nadal wymaga własnegoCI i niezależnego przeglądu przed merge.
+
+Po integracji opublikowanej bazyPR81 (fb1bd5f0, poprawki lockfile i #83) ponowiono
+wspólnie tylko dotknięte kontrole: tool_diag/finish_order/spy/spy_work/spy_modes/errors
+**12/0/0**. Dokumentację regenerowano z kodu po scaleniu; bez ręcznej edycjiHTML.
+Windows117, kod8b66: WebView2 **63/0/5**, Runtime156.0.4314.58; macierzCore30/30
+transportu i wejścia,30odpowiedzi„Nie”,0NOT_RUN, pierwszytekst4475–32594ms.
+Ponownie dodatni fixture to jedynieTurnMeta, więc semantykaNOT_ACCEPTED.
+[Pełne dowodyCI193/Windows117 i integracji](artifacts/2026-11-12-ci193/README.md).

@@ -1,5 +1,8 @@
 # Pierwszy format klient–host po zatwierdzeniu D.0
 
+**PełneCI192 zakończone:**8/10, Windows1164/4; zachowane dwie porażki i przygotowane naprawy.
+[Wyniki przypisane do źródła i ograniczenia](2026-11-12-ci192-and-fixes.md).
+
 Właściciel zatwierdził projekt telefonu jako podpis ADR0019–0023 i pierwsze wyszukiwanie
 w przeglądarce bezAPI. [Dokładny zakres](2026-11-12-owner-decisions.md).
 Ten przyrost realizuje wyłącznie format polecenia przyszłego kanału, bez włączenia dostępu.
