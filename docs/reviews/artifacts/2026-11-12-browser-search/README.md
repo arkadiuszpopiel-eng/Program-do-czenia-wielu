@@ -9,7 +9,7 @@
 - catalog-red:0/1 (spis nie zawiera nowego browser_search), potem oficjalny generator1/1,
   następnie zwykły test bez trybu aktualizacji1/1. Spis zmieniony dokładnie o1nazwę.
 - Clippyworkspace/all-targets0bezostrzeżeń; deny4OK (bazowe ostrzeżenia zachowane).
-- fmt/graf1812krawędzi/generatorTS/docs104/format/lint:0; oba lockfile sprawdzone metadata--locked.
+- fmt/graf1811krawędzi/generatorTS/docs104/format/lint:0; oba lockfile sprawdzone metadata--locked.
   Starsze wersje/źródła/checksums paczek nie zmieniły się, doszła krawędź doform_urlencoded1.2.2.
 - Katalog funkcji612/612 ma ślad testu; nie jest liczbą zaliczonych prób runtime.
 

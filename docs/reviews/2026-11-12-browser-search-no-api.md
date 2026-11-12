@@ -42,7 +42,7 @@ musi przejść osobny odbiór izolacji. Nie zmieniono Brokera, deny-list, polity
 
 Trzy pominięcia: real_git_and_cargo_tests, measure_on_local_model, real_machine_description.
 Nie wykonano rzeczywistego silnikaWWW/WindowsBrowserPort, GPU, mikrofonu lub telefonu.
-Testy używają syntetycznych stron i atrapy przeglądarki; Broker ma prawdziwy silnik z atrapy.
+Testy używają syntetycznych stron i atrapy przeglądarki; Broker korzysta z rzeczywistego silnika i portów testowych.
 Nie wysyłano prywatnych zapytań ani nie czytano sekretów. Błędy kompilacji samych testów
 E0603 iE0599 zachowane; nie są behawioralnymRED. [Pełne logi, źródła i hashe](artifacts/2026-11-12-browser-search/README.md).
 
