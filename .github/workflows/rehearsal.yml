@@ -201,6 +201,7 @@ jobs:
           ALFA_LIVE_CATALOG: "1"
         run: cargo test -p app-models --test live_catalog -- --ignored --nocapture
       - name: Build ekranu Core na rzeczywistym modelu
+        id: build_records
         if: github.event_name != 'schedule'
         run: cargo test --locked -p app-core --test execution_records_live --test execution_actual_read --no-run
       - name: Zapis gałęzi — macierz Core i Qwen8B na CPU
@@ -216,7 +217,7 @@ jobs:
           exit $LASTEXITCODE
       - name: Rzeczywisty odczyt TEMP — kontrola Core i Qwen8B
         id: actual_read_control
-        if: github.event_name != 'schedule'
+        if: ${{ !cancelled() && github.event_name != 'schedule' && steps.build_records.outcome == 'success' }}
         shell: pwsh
         run: |
           $env:ALFA_LIVE_SERVER = Join-Path $env:ALFA_LIVE_DIR 'local\sidecars\llama-cpu\llama-server.exe'

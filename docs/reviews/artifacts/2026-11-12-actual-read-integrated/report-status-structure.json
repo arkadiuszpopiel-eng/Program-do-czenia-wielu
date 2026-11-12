@@ -2,7 +2,48 @@
   "yaml": "valid",
   "triggers": "unchanged",
   "concurrency": "unchanged",
-  "all_jobs_commands_timeouts_conditions_except_report_text": "unchanged",
-  "diff": "step ID, outcome in summary environment, absence wording classified using actual step outcome",
-  "PS_runtime": "NOT_RUN locally; no pwsh available; text-only reporting change"
+  "commands_timeouts_other_jobs": "unchanged",
+  "allowed_diff": [
+    "build and test step IDs",
+    "actual read runs after successful build even if earlier matrix fails, unless cancelled/scheduled",
+    "outcome in summary environment and missing-report wording"
+  ],
+  "manual_condition_review": [
+    {
+      "build": "success",
+      "matrix": "success",
+      "cancelled": false,
+      "event": "pull_request",
+      "actual_read": "RUN"
+    },
+    {
+      "build": "success",
+      "matrix": "failure",
+      "cancelled": false,
+      "event": "pull_request",
+      "actual_read": "RUN"
+    },
+    {
+      "build": "failure",
+      "matrix": "skipped",
+      "cancelled": false,
+      "event": "pull_request",
+      "actual_read": "NOT_RUN"
+    },
+    {
+      "build": "success",
+      "matrix": "failure",
+      "cancelled": true,
+      "event": "pull_request",
+      "actual_read": "NOT_RUN"
+    },
+    {
+      "build": "skipped",
+      "matrix": "skipped",
+      "cancelled": false,
+      "event": "schedule",
+      "actual_read": "NOT_RUN"
+    }
+  ],
+  "PS_runtime": "NOT_RUN locally; command -v pwsh returned no executable"
 }
