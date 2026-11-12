@@ -1,6 +1,19 @@
 # Raport prac i otwartych spraw — 12 listopada 2026
 
 To zapis wykonanych przyrostów, a nie deklaracja zakończenia jakości Enterprise.
+
+**Dalsza kontrola Windows:** Windows118 na fb1bd5f0 zakończyło się **3/4 failure**:
+Core8B bez tekstu, FirstToken60s,78243ms,29NOT_RUN; semantykaNOT_EVALUATED.
+[Pełne zachowane dane](artifacts/2026-11-12-windows118/README.md). Windows120 na
+a2b47cf2 ujawniło #85 w WebView2: **62/1/5**. Test wyprzedzał asynchroniczne
+anulowanie; poprawka czeka na done przed jednym retry w niezmienionym limicie15s.
+Linux: Core tasks3/0/0, lint/format0, tylko kolekcja68 testów, nowy WindowsGREEN
+wymagany. [Przyczyna i dowody #85](2026-11-12-webview-task-wait.md).
+Korekta workflow pozwala wykonać niezależną kontrolę prawdziwego odczytu po zaliczonym
+buildzie także po błędzie starszej macierzy, wciąż kolejno; brak raportu oznacza
+NOT_RUN tylko gdy krok faktycznie pominięto. Inne budżety/wyzwalacze bez zmian.
+Poniższe wpisy „w toku” zachowują stan poszczególnych wcześniejszych publikacji.
+
 Projekt telefonu i ścieżka wyszukiwania bez klucza API są zatwierdzone przez
 właściciela. [Zakres zgody](2026-11-12-owner-decisions.md) nie obejmuje jeszcze
 konkretnych zmian chronionego Brokera. Nie zmieniano polityk, progów evals ani
@@ -61,8 +74,9 @@ tego jako 20/30 zgodności z rzeczywistymi czynnościami i nie zamykamy #58.
 Mocniejsza lokalna próba po prawdziwym fs_read: Delta/Standard, Qwen8B CPU,
 poprawne wejście, **0 tekstu, FirstToken 60 s, 99337 ms łącznie, exit 101**.
 Semantyka **NOT_EVALUATED**, bez ponowienia lub podwyższania limitów. Surowa odpowiedź
-Windows tej kontroli będzie osobnym artefaktem actual-read-screen.json; jeśli
-wcześniejszy krok macierzy nie przejdzie, kontrola pozostanie NOT_RUN.
+Windows tej kontroli będzie osobnym artefaktem actual-read-screen.json. Na źródle
+a2b47cf2 niezaliczona wcześniejsza macierz pomija nową kontrolę; dalsza korekta
+pozwala wykonać ją niezależnie po zaliczonym buildzie, wciąż sekwencyjnie.
 
 Rzeczywiste WebView2 w Windows115/116/117: po **63/0/5 pominiętych**. Pominięcia
 obejmują pełny dostęp, logowanie CLAUDE, natywne SaveAs, globalne dyktowanie i odczyt
@@ -80,7 +94,7 @@ zaznaczenia. Nie są zaliczeniem tych funkcji ani odbiorem fizycznego sprzętu.
 - Gałąź test/records-real-action dodaje kontrolę autentycznego odczytu i osobny krok
   Windows. Testy z portami testowymi oraz prawdziwym plikiem nie są odbiorem decyzji8B.
 
-Karty **#22, #41, #48, #58, #68, #69, #77, #78 i #83 pozostają otwarte**. Część
+Karty **#22, #41, #48, #58, #68, #69, #77, #78, #83 i #85 pozostają otwarte**. Część
 przyczyn jest naprawiona w kandydacie, ale pełny odbiór i niezależny przegląd trwają.
 Żaden tekst modelu, wpis Done lub zielony transport nie poświadcza samodzielnie akcji.
 

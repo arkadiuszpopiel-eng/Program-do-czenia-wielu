@@ -130,6 +130,14 @@ test('wyzwalacze i zadania: tworzenie, uruchomienie, sterowanie, sprzątanie', a
     await settled(main, command, args);
   }
   await settled(main, 'tasks_cancel', { taskId: task.id });
+  // Cancel zgłasza zatrzymanie; aktywny wykonawca kończy się w punkcie atomowym.
+  // Ponowienie wymaga rzeczywistego końca, nie samego przyjęcia żądania Stop.
+  await expect
+    .poll(async () => {
+      const tasks = await call<{ id: string; state: string }[]>(main, 'tasks_list');
+      return tasks.find((t) => t.id === task.id)?.state;
+    })
+    .toBe('done');
   const again = await call<{ id: string }>(main, 'tasks_retry', { taskId: task.id });
   expect(again.id).not.toBe(task.id);
   await settled(main, 'tasks_cancel', { taskId: again.id });

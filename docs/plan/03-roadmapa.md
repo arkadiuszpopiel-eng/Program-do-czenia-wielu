@@ -1,5 +1,11 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Odbiór Windows — #85:** Windows120 na a2b47cf2 ma WebView2 62/1/5.
+Test ponawiał zadanie przed końcem asynchronicznego anulowania; poprawka czeka
+na done w dotychczasowym expect15s. Core tasks3/0/0, lint/format0; listowanie68
+nie jest zaliczeniem testówWindows. Windows118 ponownie CoreFirstToken60s,
+0tekstu,29NOT_RUN. [Przyczyna i zachowane błędy](../reviews/2026-11-12-webview-task-wait.md).
+
 **Dalszy odbiór #58:** autentyczny fs_read TEMP → Replay → odbudowanyCore ma
 poprawne wejście; modelCPU Delta/Standard nie zwrócił tekstu (FirstToken60s,
 99337ms,101), semantykaNOT_EVALUATED, bez ponowienia. Nowy krokWindows osobno

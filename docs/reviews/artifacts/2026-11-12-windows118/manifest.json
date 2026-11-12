@@ -1,0 +1,33 @@
+{
+  "base": "fb1bd5f063b6b67a276399b66ba0be37aa3ec6c0",
+  "scope": "Complete Windows118:3/4failure; actual CoreCPU first case timed out,0text,29NOT_RUN; CI194 independent and still pending at snapshot",
+  "files": [
+    {
+      "path": "snapshot-jobs-43169813635.json",
+      "bytes": 9947,
+      "sha256": "52c1879597151e96b0f68eeed58008996fa9e98351f980ce6b2453d2f6a6a8f2"
+    },
+    {
+      "path": "windows118-live/core-records-screen.json",
+      "bytes": 7748,
+      "sha256": "f5474a97ae6c72b56120c021d3f7a24850974394d99ab763939477ecda7e630b"
+    },
+    {
+      "path": "windows118-live/live-report.json",
+      "bytes": 61711,
+      "sha256": "5b69d2e5bcb9040153c06274ddcdd1297c9ce3f08eaa604317fddc2e30efaf2f"
+    },
+    {
+      "path": "windows118-live/tts-alfa.wav",
+      "bytes": 101596,
+      "sha256": "fac55cc49a7028477a3dfe28c45d5e1e801af56e8077e683472f38f24886d107"
+    },
+    {
+      "path": "windows118-live-decoded.json",
+      "bytes": 152374,
+      "sha256": "e364f836ef0d9c8ff25bca208f820f6e1af8d3272570ccbbf1b2d60a30d61ce0"
+    }
+  ],
+  "sources": [],
+  "archive_sha256": "7727d4e4c8bc462d1005460d9de97290cca6549aa3b8ce2311dad831355fe868"
+}

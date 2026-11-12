@@ -30,9 +30,20 @@ Model i serwer zweryfikowaneSHA; przed próbą czytano wagi, więc brak deklarac
 [Surowy raport, komendy, błędy, źródła i hashe](artifacts/2026-11-12-actual-read/README.md).
 
 WorkflowWindows przygotowany do osobnej próby actual-read-screen.json po dotychczasowej
-macierzy30. Jeżeli wcześniejszy krok nie przejdzie, nowy zostanie niewykonany i opisany
-jakoNOT_RUN. Bez harmonogramu, bez nowych progów/timeoutów lub continue-on-error.
+macierzy30. Na źródlea2b47cf2 błąd wcześniejszego kroku pomija tę próbę; ten wynik
+pozostaje w historii. Dalsza korekta pozwala wykonać niezależną kontrolę po ukończonej
+kompilacji także wtedy, gdy stara macierz nie przejdzie. Anulowanie, harmonogram
+lub niezaliczony build nadal ją pomijają. Kroki są kolejne, nigdy równoległe.
+Bez nowych progów/timeoutów lub continue-on-error.
 Raporty silników i starejmacierzy pozostają oddzielne i zachowane.
+
+Korekta raportowania po przeglądzie: brak pliku sam w sobie nie dowodzi pominięcia.
+Krok ma własny ID, a podsumowanie odczytuje jego rzeczywisty outcome. NOT_RUN tylko
+dla skipped; przy pozostałych stanach brak raportu jest wynikiem niepotwierdzonym.
+Nie zmieniono komend, limitów, wyzwalaczy lub współbieżności. Powyżej opisano
+jedyną zmianę warunku wykonania: niezależność od wyniku starszej macierzy.
+Sprawdzenie struktury całego YAML:0; lokalny PowerShell niewykonany (brak pwsh).
+[Zapis kontroli](artifacts/2026-11-12-actual-read-integrated/report-status-structure.json).
 
 **#58 pozostaje otwarte.** Brak zaliczonej odpowiedzi na tej mocniejszej kontroli;
 brak odbioru wszystkich person, pięciu trybów, GPU12GB, telefonu, prawdziwegoAPI i mikrofonu.
