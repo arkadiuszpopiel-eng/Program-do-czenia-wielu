@@ -1,0 +1,82 @@
+{
+  "base": "a2b47cf284bbfb5454d4e807e5da5717e4d5f60e",
+  "scope": "Real Windows120 WebView2 RED62/1/5: async cancellation before retry; local Core tasks3/0/0 with fake model, lint/format/listing only, real Windows GREEN pending",
+  "files": [
+    {
+      "path": "task-cancel-contract.json",
+      "bytes": 550,
+      "sha256": "c77ea3984bbf21ac6d5d673c5f6459c934e6f4dcc4903b94fd83917cd4d6665b"
+    },
+    {
+      "path": "task-cancel-contract.log",
+      "bytes": 505,
+      "sha256": "2f39f1f525962e90dde950e9095de549c843ae65f6035518a988a81742ebc8fe"
+    },
+    {
+      "path": "webview-wait-format.json",
+      "bytes": 611,
+      "sha256": "a0762685f5df0862f8b0cd252200071612beb3f157988c4ff95d30dc7d197d61"
+    },
+    {
+      "path": "webview-wait-format.log",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "webview-wait-install.json",
+      "bytes": 574,
+      "sha256": "022986b65ef5e44a43b6190643513276376d2e1feed42b8d4b7d685eb046e3b2"
+    },
+    {
+      "path": "webview-wait-install.log",
+      "bytes": 641,
+      "sha256": "068e3b2f93c0f0b515d369b943e981211456090741b21d7412558b69f64583b4"
+    },
+    {
+      "path": "webview-wait-lint.json",
+      "bytes": 529,
+      "sha256": "ee10e9f59421b3a56ef3d6ff2242945848fd9adbc1ce1e145429929329723744"
+    },
+    {
+      "path": "webview-wait-lint.log",
+      "bytes": 570,
+      "sha256": "826e4f572844a6edca48872a5a247fa8603ff3e7f85218fdd34eccfdf9e4ae12"
+    },
+    {
+      "path": "webview-wait-list.json",
+      "bytes": 661,
+      "sha256": "0c113f846c90454bc5a2add7665a7bbd3b5c5ceeb3c9fb6c900bd9c1b005f7b3"
+    },
+    {
+      "path": "webview-wait-list.log",
+      "bytes": 7024,
+      "sha256": "2385ed3d63d80c8771a86d3500603e53d029b8ba18b71f57177e2aae2c4cd3cb"
+    },
+    {
+      "path": "webview-wait-source.json",
+      "bytes": 630,
+      "sha256": "19db87bb829ba7cad3531f54b7d94cc662564a20e08733b7e2990e25b034a74e"
+    },
+    {
+      "path": "windows120-artifacts-decoded.json",
+      "bytes": 1062,
+      "sha256": "24d594d085acb3684e9c795bcf15639f4c0d3e446b6e4c0fcde930dbf6d5fd2a"
+    },
+    {
+      "path": "windows120-webview-decoded.json",
+      "bytes": 140268,
+      "sha256": "07ebca31884d7632889c92d427a07ecf7bf42eb9e54f05d27e28d34c09c9c914"
+    }
+  ],
+  "sources": [
+    {
+      "path": "apps/desktop/ui/e2e-app/z-lifecycle.spec.ts",
+      "sha256": "763cd69f225da2a87dc9edcc1f7773a74d1d37ae6e3c6068fc8fad8ba6d01a83"
+    },
+    {
+      "path": "apps/desktop/ui/playwright.app.config.ts",
+      "sha256": "5a6b9e54e2fa0747d80573ffa1451c0654417d0345634c8f9f205da238a8d32d"
+    }
+  ],
+  "archive_sha256": "88746295c9156169a7eca26b057805dccf6203a8df09dec3ef23539698aba301"
+}
