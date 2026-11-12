@@ -1,5 +1,11 @@
 # 03 — Roadmapa (dokument żywy)
 
+**Dalszy odbiór #58:** autentyczny fs_read TEMP → Replay → odbudowanyCore ma
+poprawne wejście; modelCPU Delta/Standard nie zwrócił tekstu (FirstToken60s,
+99337ms,101), semantykaNOT_EVALUATED, bez ponowienia. Nowy krokWindows osobno
+po macierzy30. Regresje po integracji #83/browser_diag:17/0/2ignored, Clippy0.
+[Pełny raport prac i otwartych spraw](../reviews/2026-11-12-progress-and-open-items.md).
+
 **Aktualizacja12.11 — CI192 zakończone:** kod5f265ba3, CI8/10 (lockfileTauri iWindows spy),
 Linux3646/0/28,Windows3667/1/49,Vitest593,Chromium963; Windows1164/4,WebView2 63/0/5.
 Naprawy942c3f3d/fc80d880: metadata101→0 i kolejnośćStop RED0/1→10/0/0, Clippy0.
