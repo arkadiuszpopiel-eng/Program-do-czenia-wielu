@@ -1,0 +1,27 @@
+{
+  "base": "7112cfe1058e89f1668f8895293c751578181295",
+  "scope": "Real Windows121 WebView2:63/0/5, z-lifecycle tasks case passed331ms after8-line waiting fix; prior Windows120 RED62/1/5 preserved, no rerun/retries/budget changes. Whole workflow CPU model job still pending.",
+  "files": [
+    {
+      "path": "webview-wait-source.json",
+      "bytes": 630,
+      "sha256": "19db87bb829ba7cad3531f54b7d94cc662564a20e08733b7e2990e25b034a74e"
+    },
+    {
+      "path": "windows121-webview-decoded.json",
+      "bytes": 141286,
+      "sha256": "1270be41b56773824fc6072aca1c8c2fa24447b9b854d642d06f27a4ef405b76"
+    }
+  ],
+  "sources": [
+    {
+      "path": "apps/desktop/ui/e2e-app/z-lifecycle.spec.ts",
+      "sha256": "763cd69f225da2a87dc9edcc1f7773a74d1d37ae6e3c6068fc8fad8ba6d01a83"
+    },
+    {
+      "path": "apps/desktop/ui/playwright.app.config.ts",
+      "sha256": "5a6b9e54e2fa0747d80573ffa1451c0654417d0345634c8f9f205da238a8d32d"
+    }
+  ],
+  "archive_sha256": "eccbd4f730ad9ca6fbaa5beda7c8b1bbd4be423faf3c29fcb3ff3f5c6988cda4"
+}
