@@ -202,7 +202,7 @@ jobs:
         run: cargo test -p app-models --test live_catalog -- --ignored --nocapture
       - name: Build ekranu Core na rzeczywistym modelu
         if: github.event_name != 'schedule'
-        run: cargo test --locked -p app-core --test execution_records_live --no-run
+        run: cargo test --locked -p app-core --test execution_records_live --test execution_actual_read --no-run
       - name: Zapis gałęzi — macierz Core i Qwen8B na CPU
         if: github.event_name != 'schedule'
         shell: pwsh
@@ -214,6 +214,31 @@ jobs:
           $env:ALFA_RECORDS_LIVE_CASES = '30'
           cargo test --locked -p app-core --test execution_records_live -- --ignored --nocapture
           exit $LASTEXITCODE
+      - name: Rzeczywisty odczyt TEMP — kontrola Core i Qwen8B
+        if: github.event_name != 'schedule'
+        shell: pwsh
+        run: |
+          $env:ALFA_LIVE_SERVER = Join-Path $env:ALFA_LIVE_DIR 'local\sidecars\llama-cpu\llama-server.exe'
+          $env:ALFA_LIVE_MODELS_DIR = Join-Path $env:ALFA_LIVE_DIR 'local\models'
+          $env:ALFA_LIVE_MODEL = 'qwen3-8b-q4-k-m'
+          $env:ALFA_ACTUAL_READ_REPORT = Join-Path $env:ALFA_LIVE_DIR 'actual-read-screen.json'
+          cargo test --locked -p app-core --test execution_actual_read capture_actual_read_on_local_model -- --ignored --exact --nocapture
+          exit $LASTEXITCODE
+      - name: Odpowiedź po rzeczywistym odczycie — dane do przeglądu
+        if: always() && github.event_name != 'schedule'
+        shell: pwsh
+        run: |
+          $path = Join-Path $env:ALFA_LIVE_DIR 'actual-read-screen.json'
+          if (-not (Test-Path -LiteralPath $path)) {
+            'Rzeczywisty odczyt + model: próba niewykonana (brak raportu).'
+            exit 0
+          }
+          $r = Get-Content -LiteralPath $path -Raw -Encoding utf8 | ConvertFrom-Json
+          'TEMP: wybór fs_read był skryptowany; odczyt i Replay są rzeczywiste. Model odpowiada dopiero w następnej turze.'
+          "Transport: $($r.transport_ok); wejście: $($r.input_ok); narzędzia bieżącej tury: $($r.current_turn_tools)"
+          "Odpowiedź: $($r.text)"
+          "Ocena: $($r.semantic_acceptance)"
+          if ($r.error) { "Błąd: $($r.error | ConvertTo-Json -Compress)" }
       - name: Odpowiedzi Core do przeglądu semantyki
         if: always() && github.event_name != 'schedule'
         shell: pwsh
@@ -295,6 +320,7 @@ jobs:
             ${{ env.ALFA_LIVE_DIR }}/live-report.json
             ${{ env.ALFA_LIVE_DIR }}/tts-alfa.wav
             ${{ env.ALFA_LIVE_DIR }}/core-records-screen.json
+            ${{ env.ALFA_LIVE_DIR }}/actual-read-screen.json
           if-no-files-found: warn
           retention-days: 30
 

@@ -1,0 +1,79 @@
+{
+  "scope": "Actual owned TEMP fs_read with scripted tool choice; real LocalProvider CPU query failed before text; no GUI/GPU/mic/API/owner files",
+  "files": [
+    {
+      "path": "actual-read-input.json",
+      "bytes": 666,
+      "sha256": "c10cad86c42e4ba4ac888f6cb7f19d348a7291d632fbf0dd296599591c4a24e4"
+    },
+    {
+      "path": "actual-read-input.log",
+      "bytes": 20426,
+      "sha256": "400f645c255b7078c33afe1ba1bb267c6b4c7ad21e4166db727c9d299b860853"
+    },
+    {
+      "path": "actual-read-input-capture.json",
+      "bytes": 769,
+      "sha256": "dc3f287052156fa38c769d45d617a1ae17455f68c499a6eee3a687a69a73d306"
+    },
+    {
+      "path": "actual-read-input-capture.log",
+      "bytes": 600,
+      "sha256": "6ff19006a833de8daf1f798bb0a1776212f096caeeaa7de3cfcda564387f4c96"
+    },
+    {
+      "path": "actual-read-native.json",
+      "bytes": 1108,
+      "sha256": "532ca1a3d99fd0c219cecd9c95cd90be60d5a223879a31d760e2de0441c6f5aa"
+    },
+    {
+      "path": "actual-read-native.log",
+      "bytes": 807,
+      "sha256": "3057f8b67c4a53f8f9bc5141f79a1b09855303e0de570a1260f38f787b960464"
+    },
+    {
+      "path": "actual-read-regression.json",
+      "bytes": 792,
+      "sha256": "ce31735f10f5634dc03c00ab44cdc9d7972ae5387e333eed8b122b9464ec31bc"
+    },
+    {
+      "path": "actual-read-regression.log",
+      "bytes": 1509,
+      "sha256": "e1e8b47d87a82236b7b298485362cbd2915eba35ffdd2c7a0fc34a46f6b72a96"
+    },
+    {
+      "path": "actual-read-clippy.json",
+      "bytes": 717,
+      "sha256": "7d344b3e1d3ea8e8bc078f45cb385eebce7c1403c1b9c3691ff4aa931505c29b"
+    },
+    {
+      "path": "actual-read-clippy.log",
+      "bytes": 20358,
+      "sha256": "14875125c01b2858261f65bd5661a872c472f72499729ea9dd8a560515eccad1"
+    },
+    {
+      "path": "actual-read-native-report.json",
+      "bytes": 5843,
+      "sha256": "dd768c8181c7f2881af6004d9ca5e9ca1f162acc27f8f7d4bb724172a8a1beda"
+    },
+    {
+      "path": "actual-read-request.json",
+      "bytes": 3874,
+      "sha256": "d9675b9f2f7823eb413ad3d242bbfa2b6b856df897c46cc48790d3166cf90541"
+    },
+    {
+      "path": "actual-read-pins.json",
+      "bytes": 575,
+      "sha256": "93f0a5c5ff425b1934dc5284743f6d63ae8efacbe49b632cebf2a948380bb8b6"
+    },
+    {
+      "path": "actual-read-final-source.json",
+      "bytes": 712,
+      "sha256": "41958eeb5afe13bf1ac2b3d53c755475425f7a0e644a9237d4c13c0ad3b9d26e"
+    }
+  ],
+  "archive": {
+    "bytes": 10027,
+    "sha256": "02320365cde01c51c68676a3c19c48cacf3dcb01ec01022f59281dad3298f574"
+  }
+}
