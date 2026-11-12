@@ -738,6 +738,11 @@ export interface BuilderAgentInfo {
   readonly name: string;
   readonly persona: string;
   readonly role: string;
+  /**
+   * Identyfikator roli do przypisania w rozmowie; `role` jest nazwą do wyświetlenia.
+   * Brak w starszych odpowiedziach nie uprawnia klienta do zgadywania ID.
+   */
+  readonly role_id?: string | null;
 }
 
 /** Raport testu na sucho (zaliczony = warunek zapisu tego samego hasha). */

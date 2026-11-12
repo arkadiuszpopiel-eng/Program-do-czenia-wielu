@@ -2669,6 +2669,13 @@
         },
         "role": {
           "type": "string"
+        },
+        "role_id": {
+          "description": "Identyfikator roli do przypisania w rozmowie; `role` jest nazwą do wyświetlenia.\nBrak w starszych odpowiedziach nie uprawnia klienta do zgadywania ID.",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "required": [
