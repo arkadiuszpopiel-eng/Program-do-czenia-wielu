@@ -1,5 +1,12 @@
 # Raport prac i otwartych spraw — 12 listopada 2026
 
+**Aktualizacja 07:24 UTC:** Windows121 na **7112cfe1** ma ukończony etap
+„E2E prawdziwej aplikacji (Playwright przez CDP do WebView2)” z wynikiem **success**
+oraz zapisany artefakt. Job jest jeszcze w fazie zapisu cache, cały workflow/model
+nadal w toku; nie deklarujemy jego pełnego zaliczenia ani nieodczytanych liczników.
+To nowy kod czekania na done z #85. Karta pozostaje otwarta do niezależnego przeglądu.
+[Surowy stan kroków z 07:23 UTC](artifacts/2026-11-12-followup/windows121-ui-step-snapshot.json).
+
 **Najnowszy zapis: 12.11.2026, 07:17 UTC (08:17 Europe/Warsaw).**
 Kod najnowszego kandydata: **7112cfe1058e89f1668f8895293c751578181295**,
 [PR86](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/pull/86).

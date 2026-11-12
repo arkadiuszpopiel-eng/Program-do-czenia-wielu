@@ -13,3 +13,8 @@ Artefakt13922503553, ZIP97947B, SHA256
 Archiwum zawiera niezmienione rozpakowane odpowiedzi/WAV/logi, osobną ocenę i snapshoty
 pozostałych jobów. CI197/Windows121 na7112cfe1 są nowe i w toku, bez zaliczenia.
 Brak nowych modeli/sekretów, odbioruGPU/mikrofonu/fizycznego telefonu lubAPI.
+
+Późniejszy plik windows121-ui-step-snapshot.json (poza niezmienionym archiwum)
+zapisuje stan07:23UTC: nowy etapWebView2/7112cfe1 i upload artefaktu **success**,
+post-cache jeszcze w toku. Nie zawiera odczytanych liczników przypadków i nie
+stanowi zakończenia całego workflow; brak deklaracji nieodczytanych wyników.
