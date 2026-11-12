@@ -1,0 +1,353 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Action completed."
+    }
+  ],
+  "structuredContent": {
+    "jobs": [
+      {
+        "id": 131032589662,
+        "name": "Silniki na żywo (CPU)",
+        "status": "in_progress",
+        "conclusion": null,
+        "run_id": 43173642177,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run dtolnay/rust-toolchain@stable",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Run Swatinem/rust-cache@v2",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Wolne miejsce na dyskach i katalog testu",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Build testu na żywo",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Pobranie, rozpakowanie i uruchomienie silników",
+            "status": "in_progress",
+            "conclusion": null,
+            "number": 7
+          },
+          {
+            "name": "Build ekranu Core na rzeczywistym modelu",
+            "status": "pending",
+            "conclusion": null,
+            "number": 8
+          },
+          {
+            "name": "Zapis gałęzi — macierz Core i Qwen8B na CPU",
+            "status": "pending",
+            "conclusion": null,
+            "number": 9
+          },
+          {
+            "name": "Rzeczywisty odczyt TEMP — kontrola Core i Qwen8B",
+            "status": "pending",
+            "conclusion": null,
+            "number": 10
+          },
+          {
+            "name": "Odpowiedź po rzeczywistym odczycie — dane do przeglądu",
+            "status": "pending",
+            "conclusion": null,
+            "number": 11
+          },
+          {
+            "name": "Odpowiedzi Core do przeglądu semantyki",
+            "status": "pending",
+            "conclusion": null,
+            "number": 12
+          },
+          {
+            "name": "Podsumowanie (SHA-256, układ archiwów, czasy)",
+            "status": "pending",
+            "conclusion": null,
+            "number": 13
+          },
+          {
+            "name": "Artefakt z raportem",
+            "status": "pending",
+            "conclusion": null,
+            "number": 14
+          },
+          {
+            "name": "Post Run Swatinem/rust-cache@v2",
+            "status": "pending",
+            "conclusion": null,
+            "number": 27
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "pending",
+            "conclusion": null,
+            "number": 28
+          }
+        ]
+      },
+      {
+        "id": 131032589937,
+        "name": "Prawdziwa aplikacja — E2E przez CDP (WebView2)",
+        "status": "in_progress",
+        "conclusion": null,
+        "run_id": 43173642177,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run pnpm/action-setup@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Run pnpm install --frozen-lockfile",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Build UI (frontendDist)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Run dtolnay/rust-toolchain@stable",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Run Swatinem/rust-cache@v2",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Runner — miejsce, WebView2 Runtime, sesja, ekran",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Build powłoki (debug, cechy e2e + tauri/custom-protocol)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "E2E prawdziwej aplikacji (Playwright przez CDP do WebView2)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          },
+          {
+            "name": "Artefakt (zrzuty, raport Playwright, konsola, logi)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Post Run Swatinem/rust-cache@v2",
+            "status": "in_progress",
+            "conclusion": null,
+            "number": 21
+          },
+          {
+            "name": "Post Run actions/setup-node@v4",
+            "status": "pending",
+            "conclusion": null,
+            "number": 22
+          },
+          {
+            "name": "Post Run pnpm/action-setup@v4",
+            "status": "pending",
+            "conclusion": null,
+            "number": 23
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "pending",
+            "conclusion": null,
+            "number": 24
+          }
+        ]
+      },
+      {
+        "id": 131032589987,
+        "name": "Hugging Face — adresy z katalogów modeli",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 43173642177,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Adresy plików z katalogów (HEAD)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Modele GGUF — rozmiar i SHA-256 (API Hugging Face)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          }
+        ]
+      },
+      {
+        "id": 131032590162,
+        "name": "setup-dev.ps1 (PowerShell 5.1 i 7)",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 43173642177,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run dtolnay/rust-toolchain@stable",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Run pnpm/action-setup@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Windows PowerShell 5.1 (powershell -File … -Ci)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "PowerShell 7 (pwsh -File … -Ci)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "install-on-drive.ps1 -Drive D -Ci (PowerShell 5.1 i 7)",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Post Run actions/setup-node@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14
+          },
+          {
+            "name": "Post Run pnpm/action-setup@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17
+          }
+        ]
+      }
+    ]
+  },
+  "isError": false
+}

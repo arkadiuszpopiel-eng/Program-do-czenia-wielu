@@ -73,16 +73,7 @@ pub async fn fixture() -> (common::agents::Agents, Arc<dyn SecretStore>) {
 }
 
 pub fn checked_records(request: &providers_contract::ChatRequest) -> Option<serde_json::Value> {
-    let notes: Vec<_> = request
-        .messages
-        .iter()
-        .filter(|m| m.role == providers_contract::Role::User)
-        .filter_map(|m| {
-            m.visible_text()
-                .strip_prefix("[Zapis czynności aplikacji]\n")
-                .map(str::to_owned)
-        })
-        .collect();
+    let notes = record_notes(request);
     if notes.len() != 1 || notes[0].len() > 1536 {
         return None;
     }
@@ -99,4 +90,46 @@ pub fn checked_records(request: &providers_contract::ChatRequest) -> Option<serd
         && !raw.contains("owned-read-")
         && request.tools.is_empty())
     .then_some(v)
+}
+
+pub fn checked_empty_records(
+    request: &providers_contract::ChatRequest,
+) -> Option<serde_json::Value> {
+    let notes = record_notes(request);
+    if notes.len() != 1 || notes[0].len() > 1536 {
+        return None;
+    }
+    let v: serde_json::Value = serde_json::from_str(&notes[0]).ok()?;
+    (v["source"] == "application_execution_records"
+        && v["scope"] == "selected_branch_before_current_turn"
+        && v["counts"]["recorded_done"] == 0
+        && v["counts"]["needs_confirmation"] == 0
+        && v["counts"]["unverified"] == 0
+        && v["records"].as_array()?.is_empty()
+        && request.tools.is_empty())
+    .then_some(v)
+}
+
+fn record_notes(request: &providers_contract::ChatRequest) -> Vec<String> {
+    let marker = "[Zapis czynności aplikacji]\n";
+    let user: Vec<_> = request
+        .messages
+        .iter()
+        .filter(|m| m.role == providers_contract::Role::User)
+        .filter_map(|m| m.visible_text().strip_prefix(marker).map(str::to_owned))
+        .collect();
+    if std::env::var_os("ALFA_CPU_DIAGNOSTIC_SECONDS").is_some()
+        && std::env::var("ALFA_CPU_DIAGNOSTIC_RECORDS_SYSTEM").as_deref() == Ok("1")
+    {
+        if !user.is_empty() {
+            return Vec::new();
+        }
+        return request
+            .system
+            .as_deref()
+            .and_then(|s| s.rsplit_once(marker))
+            .map(|(_, s)| vec![s.to_owned()])
+            .unwrap_or_default();
+    }
+    user
 }

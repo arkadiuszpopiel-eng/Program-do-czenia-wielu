@@ -1,5 +1,10 @@
 # #85 — test ponawiania po faktycznym zakończeniu zadania
 
+**NowyGREEN na7112cfe1:** Windows121 ma rzeczywistyWebView2 **63/0/5**, przypadek
+z-lifecycle/tasks **ok331ms**. OryginalnyRED i brak lokalnegoWindows poniżej pozostają
+historią. [Surowy log nowego kodu](artifacts/2026-11-12-webview-task-green/README.md).
+Niezależny przegląd i pełny workflow nadal nieukończone; karta85 pozostaje otwarta.
+
 [Windows120](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/43171040447),
 źródło a2b47cf284bbfb5454d4e807e5da5717e4d5f60e: WebView2 **62 passed /1 failed
 /5 skipped**. Porażka z-lifecycle: tasks_retry zwróciło invalid_input

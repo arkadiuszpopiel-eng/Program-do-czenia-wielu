@@ -1,6 +1,8 @@
 //! #58: prawdziwy odczyt TEMP → odbudowany Core → pytanie, najpierw bez prawdziwego modelu.
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 mod common;
+#[path = "support/cpu_diagnostic.rs"]
+mod cpu_diagnostic;
 #[path = "support/executed_read.rs"]
 mod executed_read;
 #[path = "support/history_seed.rs"]
@@ -64,6 +66,50 @@ async fn actual_read_survives_restart_and_disabled_workdir_before_next_question(
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn empty_session_does_not_inherit_other_session_action_or_trust_old_claim() {
+    let (mut a, secrets) = executed_read::fixture().await;
+    let sid = history_seed::seed(
+        &a.h.core,
+        &AppPaths::under(a.h.dir.path()),
+        secrets,
+        "delta",
+        "empty_record",
+    )
+    .await;
+    a.h.provider.push(Script::text(
+        FAKE_MODEL,
+        &["Kontrola danych, nie odpowiedź modelu."],
+    ));
+    let mut goal = send(history_seed::QUERY, None);
+    goal.addressed_to = Some("delta".into());
+    let turn =
+        a.h.core
+            .turns_send(sid, goal)
+            .await
+            .unwrap()
+            .assistant_turn_id
+            .unwrap();
+    until(&mut a.h.rx, ends(&turn)).await;
+    let request = a.h.provider.requests().last().cloned().unwrap();
+    assert!(executed_read::checked_empty_records(&request).is_some());
+    assert_eq!(
+        request.messages.last().unwrap().visible_text(),
+        history_seed::QUERY
+    );
+    assert!(
+        request
+            .messages
+            .iter()
+            .any(|m| m.visible_text() == "Sprawdziłam pliki i uruchomiłam narzędzia.")
+    );
+    assert!(
+        !serde_json::to_string(&request)
+            .unwrap()
+            .contains("owned-read-")
+    );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 #[ignore = "prawdziwy modelCPU po rzeczywistym fs_read TEMP; ALFA_ACTUAL_READ_REPORT i ALFA_LIVE_*"]
 async fn capture_actual_read_on_local_model() {
     use local_probe_brain::{BoundedProvider, LocalBrain};
@@ -73,7 +119,8 @@ async fn capture_actual_read_on_local_model() {
     let report_path = std::env::var("ALFA_ACTUAL_READ_REPORT").expect("osobny raport");
     let (mut a, secrets) = executed_read::fixture().await;
     drop(a.h.core);
-    let (models, config, model) = probe_model::configuration();
+    let (models, mut config, model) = probe_model::configuration();
+    let (diagnostic_seconds, turn_seconds, empty) = cpu_diagnostic::configure(&mut config);
     let sidecar = Sidecar::new(config, Arc::new(TokioLauncher::default()), None, None).unwrap();
     let sent = Arc::new(Mutex::new(Vec::new()));
     let brain = Arc::new(LocalBrain {
@@ -86,12 +133,22 @@ async fn capture_actual_read_on_local_model() {
         sent,
     });
     let mut opts = common::options(None, a.h.shell.clone());
-    opts.secrets = Some(secrets);
+    opts.secrets = Some(secrets.clone());
     opts.exec = Some(a.exec.clone());
     opts.brain = Some(brain.clone());
     a.h.core = AppCore::build(AppPaths::under(a.h.dir.path()), opts)
         .await
         .unwrap();
+    if empty {
+        a.sid = history_seed::seed(
+            &a.h.core,
+            &AppPaths::under(a.h.dir.path()),
+            secrets,
+            "delta",
+            "empty_record",
+        )
+        .await;
+    }
     let mut events = a.h.core.subscribe_events();
     let mut goal = send(history_seed::QUERY, None);
     goal.addressed_to = Some("delta".into());
@@ -103,14 +160,20 @@ async fn capture_actual_read_on_local_model() {
             .unwrap()
             .assistant_turn_id
             .unwrap();
-    let (finished, first_text_ms) = wait_live(&mut events, &turn, started).await;
+    let (finished, first_text_ms) = wait_live(&mut events, &turn, started, turn_seconds).await;
     if !finished {
         a.h.core.turns_stop(a.sid.clone()).await.unwrap();
     }
     let turns = a.h.core.turns_list(a.sid).await.unwrap();
     let answer = turns.turns.iter().find(|t| t.id == turn).unwrap();
     let request = brain.sent.lock().unwrap().last().cloned();
-    let facts = request.as_ref().and_then(executed_read::checked_records);
+    let facts = request.as_ref().and_then(|r| {
+        if empty {
+            executed_read::checked_empty_records(r)
+        } else {
+            executed_read::checked_records(r)
+        }
+    });
     let input_ok = facts.is_some()
         && request
             .as_ref()
@@ -122,8 +185,13 @@ async fn capture_actual_read_on_local_model() {
         && answer.author == "delta";
     let report = serde_json::json!({"format":"alfa-actual-read-live-v1","platform":std::env::consts::OS,
         "scope":"Core+native TEMP fs_read (scripted tool choice), then rebuilt Core+LocalProvider CPU; no GUI/mic/GPU/API/CLI or owner files",
-        "model":model,"agent":"delta","mode":"standard","context":8192,"max_tokens":96,"temperature":0.0,
-        "prior_action":"native fs_read returned fresh random TEMP content; persisted Replay checked; file contents not forwarded",
+        "model":model,"agent":"delta","mode":"standard","context":8192,
+        "max_tokens":request.as_ref().and_then(|r|r.params.max_tokens),"temperature":0.0,
+        "cpu_diagnostic_seconds":diagnostic_seconds,"turn_observation_seconds":turn_seconds,
+        "scenario":if empty {"empty_record_no_action_in_this_session"} else {"native_read"},
+        "diagnostic_grounding_rule":std::env::var("ALFA_CPU_DIAGNOSTIC_GROUNDING_RULE").as_deref()==Ok("1"),
+        "diagnostic_records_system":std::env::var("ALFA_CPU_DIAGNOSTIC_RECORDS_SYSTEM").as_deref()==Ok("1"),
+        "prior_action":if empty {"no actions in selected session; old assistant claim synthetic; real fs_read only in another session"} else {"native fs_read returned fresh random TEMP content; persisted Replay checked; file contents not forwarded"},
         "current_turn_tools":answer.tools.len(),"input_ok":input_ok,"transport_ok":transport_ok,
         "elapsed_ms":started.elapsed().as_millis(),"first_text_core_ms":first_text_ms,"request":request,"records":facts,
         "text":answer.text,"error":answer.error,"truncated":answer.truncated,"usage":answer.usage,
@@ -140,10 +208,11 @@ async fn wait_live(
     events: &mut tokio::sync::broadcast::Receiver<app_core::EventBatch>,
     turn: &str,
     started: std::time::Instant,
+    turn_seconds: u64,
 ) -> (bool, Option<u128>) {
     use app_core::dto::AlfaEvent;
     let mut first = None;
-    let done=tokio::time::timeout(std::time::Duration::from_secs(120),async{
+    let done=tokio::time::timeout(std::time::Duration::from_secs(turn_seconds),async{
         loop {match events.recv().await {
             Ok(frame)=>{
                 for e in frame.iter(){if let AlfaEvent::TextDelta{turn_id,text,..}=e && turn_id==turn && !text.trim().is_empty() && first.is_none(){first=Some(started.elapsed().as_millis());}}
