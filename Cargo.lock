@@ -603,6 +603,7 @@ dependencies = [
  "futures-util",
  "jsonschema",
  "lib-markdown",
+ "lib-openai-compat",
  "lib-quick",
  "lib-sqlstore",
  "mcp-impl",
