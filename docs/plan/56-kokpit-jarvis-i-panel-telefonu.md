@@ -1,5 +1,20 @@
 # 56 — kokpit Jarvis, kafelki telefonu i panel zdalny
 
+**11.11 — rozszerzenie właściciela:** mapa świata i systemy Jarvisa. Kod `2f3cf3e3`
+dodaje opcjonalny Atlas: mapa offline28kB, odczyt stanów aplikacji i skróty do ustawień,
+diagnostyki oraz agentek. Dwie regresje CSS naprawione:32→44px kontrolek telefonu
+i ukrycie dodatkowego przycisku na małym ekranie. Końcowe41/41Chromium,573/573Vitest,
+typy0/0,build/lint/format/generator0. [Raport i zrzuty](../reviews/2026-11-11-jarvis-atlas.md).
+To fake/headlessLinux; fizyczny telefon i nowy pełny CI są odrębnymi kontrolami.
+
+[#69 — konkretny pakiet decyzji](../reviews/2026-11-11-remote-design-review.md) obejmuje
+bramę, WSS/E2E, parowanie i dowód zgód. Złożono pytanie właścicielowi o podpis
+ADR0019–0023; do odpowiedzi nie zaczynamy zależnego kodu transportu. Konkretna zmiana
+Brokera nadal wymaga osobnego przeglądu. Nie jest to wdrożone sterowanie telefonem.
+[#78 — WebView2 i dodatki](../ADR/0031-wbudowana-przegladarka-webview2.md) ma nowy projekt;
+wybór konta produkcyjnej wyszukiwarki pozostaje odrębny od przeglądarki.
+[#58 — zachowane porażki nowego Cloud](../reviews/2026-11-11-ledger-diagnosis.md).
+
 Nowe zlecenie właściciela10.11.2026: sprawdzić błędy i zgodność założeń, dopracować opcjonalny
 filmowy Jarvis i kafelki mobilne, ocenić kontrolę przez telefon, następnie rozpocząć panel.
 Poprzednie nocne terminy są zamknięte; automatyzacje pozostają wyłączone.

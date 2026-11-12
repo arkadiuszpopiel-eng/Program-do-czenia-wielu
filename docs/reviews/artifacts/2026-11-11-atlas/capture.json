@@ -1,0 +1,35 @@
+{
+  "scope": "headless Linux Chromium + fake IPC; not physical phone/WebView2",
+  "results": [
+    {
+      "width": 1280,
+      "height": 900,
+      "errors": [],
+      "external": [],
+      "layout": {
+        "scrollWidth": 1280,
+        "viewport": 1280
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "errors": [],
+      "external": [],
+      "layout": {
+        "scrollWidth": 390,
+        "viewport": 390
+      }
+    },
+    {
+      "width": 320,
+      "height": 568,
+      "errors": [],
+      "external": [],
+      "layout": {
+        "scrollWidth": 320,
+        "viewport": 320
+      }
+    }
+  ]
+}

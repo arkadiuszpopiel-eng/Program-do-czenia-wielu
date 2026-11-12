@@ -1,5 +1,21 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Aktualizacja11.11:** nowe zlecenie obejmuje #58/#78/#68/#69/#22/#41/#48. Baza
+`bfd69b97` ma pełne **CI18810/10 i Windows1114/4**; #79 już zamknięta w zakresie
+argumentów pełnego odciążeniaGPU. Nowy kod UI`2f3cf3e3`: Atlas Jarvisa, mapa offline,
+rzeczywiste stany i poprawione cele dotykowe; lokalne41/41,Vitest573/573,typy0/0,
+lint/build/format/generator0. [Raport](../reviews/2026-11-11-jarvis-atlas.md).
+Własny pełny CI nowego heada jest wymagany; wyników poprzednika nie przenosimy.
+
+#58 nadal niezaliczone: dwa ekrany CPU dały po1timeout60s i2niewykonane, bez odpowiedzi;
+krótka diagnoza serwera działa, ale nie jest oceną semantyki. Laboratoryjnego host-call
+nie wdrożono jako rzekomej akcji modelu. [Dane i dalsza naprawa](../reviews/2026-11-11-ledger-diagnosis.md).
+Właściciel wskazał kierunek wbudowanej przeglądarki; [projekt WebView2](../ADR/0031-wbudowana-przegladarka-webview2.md)
+wykorzystuje istniejący runtime i BrowserPort. `net_search` nadal nie ma dostawcy.
+[Pakiet dostępu z telefonu](../reviews/2026-11-11-remote-design-review.md) czeka na podpis
+ADR0019–0023; nie zmieniono Brokera ani polityk. Otwarte:22,41,48,58,68,69,77,78.
+Poniższe wpisy z10.11 zachowują historię wcześniejszych przyrostów i nie są bieżącym harmonogramem.
+
 **Stan testów z 10.11:** bb13c48d (kod69e33656) ma [CI187](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565989)
 **10/10**, Linux3604/0/27, Windows3626/0/48, po1145celów; Chromium945, Vitest573;
 [Windows110](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565976) **4/4**, WebView2 63/0/5.

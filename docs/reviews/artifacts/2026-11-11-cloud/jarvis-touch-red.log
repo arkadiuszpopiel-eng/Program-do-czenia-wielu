@@ -1,0 +1,41 @@
+
+Running 1 test using 1 worker
+
+(node:25463) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25463) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 320x568 light: offline, dotyk i klawiatura (6.9s)
+[31mTesting stopped early after 1 maximum allowed failures.[39m
+
+
+  1) [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 320x568 light: offline, dotyk i klawiatura
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeHidden[2m([22m[2m)[22m failed
+
+    Locator:  getByRole('dialog', { name: 'Mapa i systemy', exact: true }).locator('.systems-head button')
+    Expected: hidden
+    Received: visible
+    Timeout:  5000ms
+
+    Call log:
+    [2m  - Expect "toBeHidden" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('dialog', { name: 'Mapa i systemy', exact: true }).locator('.systems-head button')[22m
+    [2m    9 × locator resolved to <button type="button" class="btn secondary md  svelte-1yoa587">…</button>[22m
+    [2m      - unexpected value "visible"[22m
+
+
+      52 |       const dialog = page.getByRole('dialog', { name: 'Mapa i systemy', exact: true });
+      53 |       await expect(dialog).toBeVisible();
+    > 54 |       if (viewport.width <= 640) await expect(dialog.locator('.systems-head button')).toBeHidden();
+         |                                                                                       ^
+      55 |       for (const button of await dialog.getByRole('button').all()) {
+      56 |         const box = await button.boundingBox();
+      57 |         if (box) {
+        at /workspace/wt-jarvis/apps/desktop/ui/e2e/cockpit-systems.spec.ts:54:87
+
+    Error Context: test-results/cockpit-systems-atlas-320x-07f53--offline-dotyk-i-klawiatura-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 320x568 light: offline, dotyk i klawiatura
+  1 error was not a part of any test, see above for details

@@ -1,0 +1,63 @@
+{
+  "state": "completed",
+  "start": "2026-11-11T19:12:51.323558+00:00",
+  "entry": {
+    "id": "qwen3-8b-q4-k-m",
+    "name": "Qwen3-8B (Q4_K_M, główny)",
+    "url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/resolve/7c41481f57cb95916b40956ab2f0b139b296d974/Qwen3-8B-Q4_K_M.gguf",
+    "file": "Qwen3-8B-Q4_K_M.gguf",
+    "size_mb": 4795,
+    "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+    "params_b": 8.2,
+    "quant": "Q4_K_M",
+    "layers": 36,
+    "ctx": 40960,
+    "vram_mb": 5345,
+    "ram_mb": 5545,
+    "kv_mb_per_1k_ctx": 144,
+    "tools": true,
+    "license": "Apache-2.0"
+  },
+  "total_bytes": 5027783488,
+  "preserved_prefix_bytes": 1851392000,
+  "max_chunk_s": 1200,
+  "retries": 0,
+  "parts": [
+    {
+      "index": 0,
+      "start": 1851392000,
+      "end": 2645489871,
+      "bytes": 794097872,
+      "state": "completed",
+      "sha256": "8ef21c59f13abb08adc0279db22f6093c288121fbc0fb3a59dd85efc3fc09b72"
+    },
+    {
+      "index": 1,
+      "start": 2645489872,
+      "end": 3439587743,
+      "bytes": 794097872,
+      "state": "completed",
+      "sha256": "7a1588b49dfe04e3493cc4212c5187ccc24690200fbdb56737d2bb3cc3bf2f5e"
+    },
+    {
+      "index": 2,
+      "start": 3439587744,
+      "end": 4233685615,
+      "bytes": 794097872,
+      "state": "completed",
+      "sha256": "68dbd90bd10783879b2f013a8f72fed39b8ea6da3bab575ff835338138f9db57"
+    },
+    {
+      "index": 3,
+      "start": 4233685616,
+      "end": 5027783487,
+      "bytes": 794097872,
+      "state": "completed",
+      "sha256": "df3772436246f9ce531529da04d68c88c505756ef17d39b9f324519b796ff3cd"
+    }
+  ],
+  "actual_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+  "bytes": 5027783488,
+  "verification": "MATCH",
+  "end": "2026-11-11T19:21:29.364932+00:00"
+}

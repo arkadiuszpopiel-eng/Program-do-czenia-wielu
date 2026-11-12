@@ -1,0 +1,8 @@
+
+> @alfa/desktop-ui@0.0.85 check /workspace/wt-jarvis/apps/desktop/ui
+> svelte-check --tsconfig ./tsconfig.json --fail-on-warnings
+
+Loading svelte-check in workspace: /workspace/wt-jarvis/apps/desktop/ui
+Getting Svelte diagnostics...
+
+svelte-check found 0 errors and 0 warnings

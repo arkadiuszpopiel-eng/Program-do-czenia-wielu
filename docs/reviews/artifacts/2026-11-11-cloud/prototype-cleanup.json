@@ -1,0 +1,15 @@
+{
+  "at": "2026-11-11T20:08:10.133430+00:00",
+  "files": [
+    {
+      "path": "/workspace/wt-ledger-core-test/crates/app-core/tests/execution_ledger_context.rs",
+      "sha256": "9cd8ea99cd7da8c0642b72e73f01f1d72c3595aaeb82b359778fd79c7a2dd19e",
+      "action": "removeownuntrackedprototype afterarchive, not productcode"
+    },
+    {
+      "path": "/workspace/wt-ledger-core-test/crates/app-core/tests/support/history_seed.rs",
+      "sha256": "df83b1751754fa18cb6a382641d41f571c41bb9a829466888d793d7f31b94084",
+      "action": "removeownuntrackedprototype afterarchive, not productcode"
+    }
+  ]
+}

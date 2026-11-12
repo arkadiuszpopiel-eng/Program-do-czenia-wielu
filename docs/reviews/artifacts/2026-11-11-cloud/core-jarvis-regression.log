@@ -1,0 +1,69 @@
+   Compiling app-core v0.0.85 (/workspace/wt-ledger-core-test/crates/app-core)
+    Finished `test` profile [unoptimized] target(s) in 51.60s
+     Running tests/autonomy_guard.rs (/workspace/target-repair/debug/deps/autonomy_guard-e23c7ff850407b91)
+
+running 1 test
+test lowered_levels_come_back_when_a_late_broker_starts_with_defaults ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.27s
+
+     Running tests/autonomy_notice.rs (/workspace/target-repair/debug/deps/autonomy_notice-d103ec88190d5202)
+
+running 1 test
+test remembered_raise_missing_after_restart_is_announced_once ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 46.22s
+
+     Running tests/autonomy_raises.rs (/workspace/target-repair/debug/deps/autonomy_raises-c80fcdee9e18516f)
+
+running 4 tests
+test raise_without_approval_does_not_override_the_owners_lowering ... ok
+test raise_approved_on_a_new_profile_is_adopted_and_announced ... ok
+test approving_the_first_of_two_cards_is_adopted ... ok
+test raise_approved_in_broker_window_is_adopted_announced_and_kept has been running for over 60 seconds
+test raise_approved_in_broker_window_is_adopted_announced_and_kept ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 64.25s
+
+     Running tests/autonomy_standing.rs (/workspace/target-repair/debug/deps/autonomy_standing-8601b0a9b1c64e3b)
+
+running 3 tests
+test pending_raise_postpones_adoption_without_reverting_the_switch ... ok
+test without_the_judge_record_the_owner_lowering_returns ... ok
+test level_remembered_by_the_judge_is_adopted_not_reverted ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 50.13s
+
+     Running tests/jarvis.rs (/workspace/target-repair/debug/deps/jarvis-2e1c2d6eba7fb1a1)
+
+running 5 tests
+test each_persona_can_use_jarvis_independently_without_changing_permissions ... ok
+test common_default_can_be_overridden_per_persona_and_survives_restart ... ok
+test background_task_uses_assigned_personas_jarvis_profile ... ok
+test delegate_gets_her_own_profile_and_parent_keeps_standard ... ok
+test jarvis_reaches_agent_run_and_keeps_selected_reply_style ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.62s
+
+     Running tests/jarvis_custom.rs (/workspace/target-repair/debug/deps/jarvis_custom-346ad181ecad4686)
+
+running 2 tests
+test delegation_to_builder_persona_uses_her_identity_and_read_only_role ... ok
+test builder_persona_keeps_roles_and_jarvis_after_restart ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.21s
+
+     Running tests/jarvis_voice.rs (/workspace/target-repair/debug/deps/jarvis_voice-627c7d284a9961d5)
+
+running 1 test
+test voice_addressing_uses_each_personas_jarvis_profile ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.71s
+
+     Running tests/model_routing.rs (/workspace/target-repair/debug/deps/model_routing-245b8e7aa3ac700a)
+
+running 2 tests
+test preview_explains_the_choice_and_bad_input_is_refused ... ok
+test chat_picks_light_medium_or_strong_model_by_difficulty ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.66s

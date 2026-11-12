@@ -1,5 +1,16 @@
 # 03 — Roadmapa (dokument żywy)
 
+**11.11 — obecny przyrost:** kodUI`2f3cf3e3`: Atlas Jarvisa, zarys świata offline,
+stany aplikacji, skróty i poprawione cele dotykowe32→44px. Końcowe41/41Chromium,
+573/573Vitest,typy0/0,lint/build/format/generator0; [raport i ograniczenia](../reviews/2026-11-11-jarvis-atlas.md).
+Baza`bfd69b97` zakończyłaCI18810/10 iWindows1114/4; nowy head wymaga własnego CI.
+#79 zamknięta w zakresie kodu argumentówGPU. **22,41,48,58,68,69,77,78 nadal otwarte.**
+#58: w nowymCloud oba ekranyCPU bez odpowiedzi, po1timeout60s/2niewykonane;
+[zachowane dane](../reviews/2026-11-11-ledger-diagnosis.md). Sprzęt i API niewykonane.
+[Projekt przeglądarki #78](../ADR/0031-wbudowana-przegladarka-webview2.md) oraz
+[pakiet telefonu #69](../reviews/2026-11-11-remote-design-review.md) nie oznaczają wdrożenia.
+Starych harmonogramów nie wznawiano; dawne wyniki niżej są historią.
+
 **Stan testów z 10.11:** bb13c48d (kod69e33656) ma [CI187](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565989)
 **10/10**, Linux3604/0/27, Windows3626/0/48, po1145celów; Chromium945, Vitest573;
 [Windows110](https://github.com/arkadiuszpopiel-eng/Program-do-czenia-wielu/actions/runs/42921565976) **4/4**, WebView2 63/0/5.
@@ -383,6 +394,7 @@ Zlecenie właściciela 8.11; [plan nocny 54](54-jarvis-i-tryby-2026-11-08.md), [
 | J.3 | Zakres każdego z pięciu trybów i odporność na spóźnione odpowiedzi | w toku | 2026-11-08 | jawny wybór rozmowa / globalnie; Plan i kłódka zachowują zakres rozmowy; regresje wyścigu żądań; karta #25: Plan bez rozmowy nie zmienia poziomu globalnego, Alt+M pomija niedostępny Plan |
 | J.4 | Próby wszystkich person na rzeczywistym modelu i w torze głosowym | w toku | 2026-11-08 | Linux Cloud CPU i syntetyczne audio; Windows i mikrofon pozostają osobną próbą |
 | J.5 | Regresje CI i raport nocny | w toku | 2026-11-09 | pełny Linux169a6004:3492/0/24; nowy12d44af4 --all-features3495/0/25; CI159 Windows3516/5/45, oba testy kolejki #39 zaliczone; CI156 zawieszony zachowano jako historię; lokalny UI877/2/0, osobno CI156 UI879/879 i573 jednostkowe; WebView2 rehearsal78:61/1/5; #35–36:15 testów; #38:16 wariantów+10 powtórzeń; #40:3 testy viewportu, CI159 Chromium890/890+573 jednostkowe; Windows80 dokowanie zaliczone, całość60/1/6, diagnostyka #42 wskazała klik za modalem Głosu; #47:RED+2/2 po zamknięciu modalu, Windows82 już62/0/5, kłódka3,0s; CI160 Windows3516/5/46, WebView81:60/1/6; #45–46 potwierdzone CI161 Windows3521/0/46,14/14 w poprawianych celach, Clippy0; CI162Windows3521/0/46 i UI901/901; #51 prywatnałatkaClippy0+4/4, niecommitowana; #52 HTTP504 silników83 dwa razy; chroniona łatka Brokera otwarta |
+| J.6 | Atlas Jarvisa, mapa offline i cele dotykowe | w toku | 2026-11-11 | kod2f3cf3e3,41/41Chromium,573Vitest,typy0/0; dwie regresje CSS naprawione; pełny nowyCI i fizyczny telefon pozostają osobno; [raport](../reviews/2026-11-11-jarvis-atlas.md) |
 
 ## Etap K — Alfa dla dzieci: nauka, zabawa, podgląd rodzica
 

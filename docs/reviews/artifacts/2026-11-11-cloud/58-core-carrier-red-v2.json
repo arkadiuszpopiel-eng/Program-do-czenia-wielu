@@ -1,0 +1,23 @@
+{
+  "command": [
+    "cargo",
+    "+1.94.1",
+    "test",
+    "--locked",
+    "-p",
+    "app-core",
+    "--test",
+    "execution_ledger_context",
+    "host_ledger_read_reaches_the_actual_provider_without_creating_business_actions",
+    "-j2",
+    "--",
+    "--exact"
+  ],
+  "start": "2026-11-11T19:08:46.015816+00:00",
+  "end": "2026-11-11T19:25:58.881450+00:00",
+  "exit": 101,
+  "log_sha256": "d0fa64dcf0cfb83c84587575aa51e3e7d51fc03596933894608304ce031cebf7",
+  "scope": "actualCorefixture withscriptedmodel; basebfunchanged; compilefailureisnotvalidRED",
+  "valid_red": true,
+  "result": "0 passed; 1 failed; 0 ignored; 1 filtered; missing actual applicationledger context"
+}

@@ -1,0 +1,95 @@
+
+Running 41 tests using 2 workers
+
+(node:22658) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22659) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22659) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22658) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   1 [chromium] › e2e/cockpit-systems.spec.ts:3:1 › mapa i systemy otwierają się z kokpitu bez zmiany trybu zgód (1.1m)
+  ✘   2 [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 320x568 light: offline, dotyk i klawiatura (1.1m)
+(node:22881) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22888) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22888) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22881) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   3 [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 390x844 light: offline, dotyk i klawiatura (9.2s)
+  ✘   4 [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 320x568 dark: offline, dotyk i klawiatura (399ms)
+
+
+  1) [chromium] › e2e/cockpit-systems.spec.ts:3:1 › mapa i systemy otwierają się z kokpitu bez zmiany trybu zgód
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: frame.evaluate: Test timeout of 60000ms exceeded.
+
+       at helpers.ts:56
+
+      54 |   // Ramka kanwy (`sandbox=""`, bez skryptów): axe nie może się do niej wstrzyknąć, a próba
+      55 |   // zawieszała analizę do końca limitu testu. Nazwę ramki sprawdzają testy kanwy.
+    > 56 |   const results = await new AxeBuilder({ page })
+         |                   ^
+      57 |     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      58 |     .exclude('iframe[sandbox=""]')
+      59 |     .analyze();
+        at AxeBuilder.runPartialRecursive (/workspace/wt-jarvis/node_modules/.pnpm/@axe-core+playwright@4.11.3_playwright-core@1.56.1/node_modules/@axe-core/playwright/dist/index.mjs:283:34)
+        at AxeBuilder.analyze (/workspace/wt-jarvis/node_modules/.pnpm/@axe-core+playwright@4.11.3_playwright-core@1.56.1/node_modules/@axe-core/playwright/dist/index.mjs:210:28)
+        at expectAccessible (/workspace/wt-jarvis/apps/desktop/ui/e2e/helpers.ts:56:19)
+        at /workspace/wt-jarvis/apps/desktop/ui/e2e/cockpit-systems.spec.ts:16:3
+
+  2) [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 320x568 light: offline, dotyk i klawiatura
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: page.evaluate: Test timeout of 60000ms exceeded.
+     Please check out https://github.com/dequelabs/axe-core-npm/blob/develop/packages/playwright/error-handling.md
+
+       at helpers.ts:56
+
+      54 |   // Ramka kanwy (`sandbox=""`, bez skryptów): axe nie może się do niej wstrzyknąć, a próba
+      55 |   // zawieszała analizę do końca limitu testu. Nazwę ramki sprawdzają testy kanwy.
+    > 56 |   const results = await new AxeBuilder({ page })
+         |                   ^
+      57 |     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      58 |     .exclude('iframe[sandbox=""]')
+      59 |     .analyze();
+        at AxeBuilder.analyze (/workspace/wt-jarvis/node_modules/.pnpm/@axe-core+playwright@4.11.3_playwright-core@1.56.1/node_modules/@axe-core/playwright/dist/index.mjs:218:13)
+        at expectAccessible (/workspace/wt-jarvis/apps/desktop/ui/e2e/helpers.ts:56:19)
+        at /workspace/wt-jarvis/apps/desktop/ui/e2e/cockpit-systems.spec.ts:64:7
+
+    Error Context: test-results/cockpit-systems-atlas-320x-07f53--offline-dotyk-i-klawiatura-chromium/error-context.md
+
+  3) [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 390x844 light: offline, dotyk i klawiatura
+
+    Test was interrupted.
+
+    Error: page.goto: Test ended.
+    Call log:
+    [2m  - navigating to "http://127.0.0.1:4173/?style=next&theme=light", waiting until "load"[22m
+
+
+       at helpers.ts:11
+
+       9 |   await page.emulateMedia({ colorScheme: opts.theme ?? 'light', reducedMotion: 'reduce' });
+      10 |   const query = opts.scenario ? `?scenario=${opts.scenario}` : '';
+    > 11 |   await page.goto(`${opts.path ?? '/'}${query}`);
+         |              ^
+      12 | }
+      13 |
+      14 | /** Wybiera opcję z listy wyboru Alfy (przycisk `combobox` + własna lista opcji). */
+        at openApp (/workspace/wt-jarvis/apps/desktop/ui/e2e/helpers.ts:11:14)
+        at /workspace/wt-jarvis/apps/desktop/ui/e2e/cockpit-systems.spec.ts:41:7
+
+  2 failed
+    [chromium] › e2e/cockpit-systems.spec.ts:3:1 › mapa i systemy otwierają się z kokpitu bez zmiany trybu zgód
+    [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 320x568 light: offline, dotyk i klawiatura
+  2 interrupted
+    [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 320x568 dark: offline, dotyk i klawiatura
+    [chromium] › e2e/cockpit-systems.spec.ts:54:5 › atlas 390x844 light: offline, dotyk i klawiatura
+  37 did not run

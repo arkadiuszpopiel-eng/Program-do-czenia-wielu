@@ -1,0 +1,26 @@
+{
+  "atlas-390x844.png": {
+    "bytes": 98622,
+    "sha256": "a6d78be9c448148fc56352762869132f763b8aa703a540c00b2043f0767b2223"
+  },
+  "atlas-320x568.png": {
+    "bytes": 61496,
+    "sha256": "2cf3b0b111586670b36f86f310ac561f9a67eee3bfed2eef29a2d02e69dd47ca"
+  },
+  "before-320x568.png": {
+    "bytes": 51204,
+    "sha256": "543a50c6a02c4992f31f31946b8e58010de5228cfd40b6e5287000b1de4dd530"
+  },
+  "atlas-1280x900.png": {
+    "bytes": 234703,
+    "sha256": "de3587116cc3c3e2c9832ada86e0f884f3282e7937bac5b84cb20d4b4e2720ab"
+  },
+  "before-1280x900.png": {
+    "bytes": 213727,
+    "sha256": "2986cdb19e02561d50a26e031be9f81866807378e3485fe5e020acc86f10499f"
+  },
+  "before-390x844.png": {
+    "bytes": 110360,
+    "sha256": "0f34c3eb77ed743c4eda952b7675ebb7693b629d6d43e060b93a7717bfbb3e93"
+  }
+}

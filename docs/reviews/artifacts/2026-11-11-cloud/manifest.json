@@ -1,0 +1,166 @@
+{
+  "raw-logs-manifest.json": {
+    "bytes": 2711,
+    "sha256": "c556cf5fc58289e2f58cdd54751956769c56809bae26378e30dd8b643463028d"
+  },
+  "jarvis-format.log": {
+    "bytes": 167,
+    "sha256": "7a86a844bf6cf0d5eb5b3fc5193aacce82811c8b23e85ad929c236a3ee1e9b83"
+  },
+  "main-model-first-attempt.json": {
+    "bytes": 801,
+    "sha256": "1390e24f3733a83e3e29192601767f1bc85efb85f4205d559cb2cd906024723e"
+  },
+  "jarvis-touch-red.log": {
+    "bytes": 2189,
+    "sha256": "8b2b0eab14699446a9b1a96cfd686b80f72141dc6aa12aad6e629870909b8993"
+  },
+  "jarvis-e2e-existing.log": {
+    "bytes": 3701,
+    "sha256": "a412a62f03095a5af6c021c157587c076d2da91325a58ccd5dc46c4324d64ddd"
+  },
+  "jarvis-check-final.log": {
+    "bytes": 278,
+    "sha256": "d0458b9e9d827ca11ce84ac1d8cf46ab8e481ed3b556de15691e38dcd0a29e99"
+  },
+  "jarvis-final-checks.json": {
+    "bytes": 1033,
+    "sha256": "866c05b9e325b91e633398a05563889579fa65b24f1b2d596967a64b9ba55c50"
+  },
+  "jarvis-e2e-v1-stop.json": {
+    "bytes": 173,
+    "sha256": "fd5be489118f632b555c72388b973c28247f3aa7ccbd4cada78f6f0cc4e26694"
+  },
+  "core-jarvis-regression.json": {
+    "bytes": 822,
+    "sha256": "15f399d05a237a2b57add360729c3b7059c285b454719dc06b928ccba976441d"
+  },
+  "58-core-carrier-red-v2.json": {
+    "bytes": 679,
+    "sha256": "15a81b21de089491a6e590eb056f40d0ed5c89458824e64aeeeeb4e6003e80d1"
+  },
+  "jarvis-systems-red.log": {
+    "bytes": 1675,
+    "sha256": "37c7a44828b978118fe1adc882d996ca3e3ad944219c25a41e5263c91331a5df"
+  },
+  "prototype-cleanup.json": {
+    "bytes": 602,
+    "sha256": "6938ce599d18554c6fea69feea4a4fed2f81bca18b2e947a6f02335f4bc14e7d"
+  },
+  "probe_host_ledger.py": {
+    "bytes": 10253,
+    "sha256": "be1e6afc86eaa41b75c48bd701c4fbb44d40eaab20d935598b49939f51d6b2fd"
+  },
+  "jarvis-e2e-v2-isolated.log": {
+    "bytes": 1731,
+    "sha256": "9ee997f9904dcd5068bb0d5fee7bf29766114276c2084dfd41260773742c682b"
+  },
+  "core-jarvis-regression.log": {
+    "bytes": 3314,
+    "sha256": "6a5c45fc629a61f37e8e79f40f63306dc7b6c5eac54bf5a5a3d672b1954543c9"
+  },
+  "58-core-carrier-red-v2.log": {
+    "bytes": 33166,
+    "sha256": "d0fa64dcf0cfb83c84587575aa51e3e7d51fc03596933894608304ce031cebf7"
+  },
+  "jarvis-format-final-v3.log": {
+    "bytes": 66,
+    "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+  },
+  "server-verified.json": {
+    "bytes": 301,
+    "sha256": "7acbd39f6ba0eb7ece5b329f1ed16e37daced37fb04f5ebd4b8d3bdb70d81d69"
+  },
+  "jarvis-vitest.log": {
+    "bytes": 545,
+    "sha256": "7129b940c44f31b80106917a4cbb8c3dc3378feb2a7046e0b657b96e4d5c7e33"
+  },
+  "58-core-carrier-red.log": {
+    "bytes": 15149,
+    "sha256": "23ca108d1114e4a00fea555e27f5d53361633aafcd9218531b0c77907d837aaa"
+  },
+  "jarvis-diff-final.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "jarvis-build-final.log": {
+    "bytes": 11783,
+    "sha256": "816876370ca31871325abb6597acf37841e526c05014cc9f497dbe246a44acc3"
+  },
+  "diagnose_minimal.py": {
+    "bytes": 10422,
+    "sha256": "b6cb54fa140cdd132c2667dd4744f55976d90a5d3a8da20a98f775699a782a82"
+  },
+  "main-model-range-download.json": {
+    "bytes": 1813,
+    "sha256": "8098fc1def69fe2114e34b705308b1a266f8f20a9b778bd8048fbb858d910134"
+  },
+  "phone-touch-red.log": {
+    "bytes": 1749,
+    "sha256": "fdb574c01ca417afc2a3617690fa0fafd4a5a92d3f0aa106cfff1da074663ec8"
+  },
+  "58-core-carrier-red.json": {
+    "bytes": 690,
+    "sha256": "e15e2f07970a2b957cbdc6cb82d10cb3b1dead2ae8e28a1a7bf832980f65d972"
+  },
+  "main-model-entry.json": {
+    "bytes": 516,
+    "sha256": "838cad518e16cf9798939cf5d57f5fafb5f76855b3ff3ddcccaf3c3f15a6080b"
+  },
+  "jarvis-lint-final.log": {
+    "bytes": 548,
+    "sha256": "a0971b7f6632008ff78fa4fa7bd6510c3d87ae44ecf01d69efeff2c0311a7c49"
+  },
+  "raw-logs.tar.gz": {
+    "bytes": 23820,
+    "sha256": "a6db95c1badabb0b2d023f398d02bf2b8a92a7fe88e4917f591b5f286ca0cba3"
+  },
+  "capture_jarvis.mjs": {
+    "bytes": 2088,
+    "sha256": "c59cba45418676d54dc1d6a138458193daef8eca1daab72eb0c904010082fc56"
+  },
+  "jarvis-e2e-final.log": {
+    "bytes": 5045,
+    "sha256": "e76e467ae15d60ca34ef0038fd2771cc9d4bda077167ab398d92a3eb7717468a"
+  },
+  "jarvis-e2e-v1.log": {
+    "bytes": 5706,
+    "sha256": "c85299694b9fcd7b2221777c71c63f4278780aca65933242fb2c4088dfaa1a2f"
+  },
+  "raw-current_text_only/server.log": {
+    "bytes": 1037,
+    "sha256": "c95fcdf9102ddd2d6c4aa785ebcefcad2cae335b4bfd8a96537312c7309e0674"
+  },
+  "raw-current_text_only/status.json": {
+    "bytes": 2291,
+    "sha256": "5ca70ad27d981f72bb9c0d8d01c1cf815321375287f9a5b8c4234bb335b2a5a8"
+  },
+  "raw-current_text_only/empty_record-request.json": {
+    "bytes": 3198,
+    "sha256": "130ec09aafdf7270445cc06f8f9c9589c20425f79c4f43fb2bcce116026beaf3"
+  },
+  "raw-host_lookup/server.log": {
+    "bytes": 1037,
+    "sha256": "cf3603d707adae11cea094a0431b7f0c47b95a51b86f094f3653cde69775c7bd"
+  },
+  "raw-host_lookup/status.json": {
+    "bytes": 2285,
+    "sha256": "d39d736cc74d55e00b21902f37edb97d2e33fe16ba1763e4343ab9389b2248ca"
+  },
+  "raw-host_lookup/empty_record-request.json": {
+    "bytes": 4008,
+    "sha256": "c18816580d97cff7742ed59a6cf5e16db028d09d0fcfc53730799d99da9afc39"
+  },
+  "raw-diag_minimal/server.log": {
+    "bytes": 17874,
+    "sha256": "d4bad31c0328c1ecdd47e40333db612b27182824f4757fd1e9ec4d8e8f9b0a2c"
+  },
+  "raw-diag_minimal/status.json": {
+    "bytes": 3256,
+    "sha256": "272dc521eafc083a6155ed71101f95b6873ee0fea5f68dec0cab5fadc7a5fcb0"
+  },
+  "raw-diag_minimal/empty_record-request.json": {
+    "bytes": 243,
+    "sha256": "edc3e0ca93ee20f9e3e4d498c5f8b49ac640f3102d8d2d94dd52cad7259e181f"
+  }
+}
