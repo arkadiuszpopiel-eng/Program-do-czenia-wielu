@@ -107,6 +107,7 @@
             {#each cast as person (person.id)}
               <button
                 type="button"
+                class:systems-person-wide={personInfo(person.id).name.length > 24}
                 onclick={() => {
                   onclose();
                   openPersonControls(app, person.id);
