@@ -150,7 +150,15 @@
   cursor: pointer;
 }
 .systems-crew button > svg {
+  flex-shrink: 0;
   margin-left: auto;
+}
+.systems-crew button.systems-person-wide {
+  grid-column: span 2;
+}
+.systems-crew button > span:not(.systems-avatar) {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .systems-crew button:hover {
   border-color: var(--atlas-accent);

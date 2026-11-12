@@ -1,5 +1,6 @@
 // Atrapa: aplikacja, agentki, koszty, ustawienia, oś czasu, pliki, uprawnienia, urządzenia, głos, system.
 import { CommandError } from '../command-error';
+import { builtinPerson } from '@alfa/ui-kit';
 import type { AlfaClient } from '../client';
 import type { AutonomyLevel, EventLevel } from '../types';
 import type { GrantView, MaxAccess } from '../types-hub';
@@ -50,7 +51,9 @@ export function agentsApi(core: FakeCore, chat: FakeChat): AlfaClient['agents'] 
     setRoles: (sid, agent, roleIds) => core.reply(core.setAgent(sid, agent, { role_ids: roleIds })),
     applyCast: (sid, template) => {
       const cast = chat.castFor(template);
-      core.agents[sid] = core.agentsOf(sid).map((a) => ({ ...a, role_ids: cast[a.id] }));
+      core.agents[sid] = core
+        .agentsOf(sid)
+        .map((a) => ({ ...a, role_ids: builtinPerson(a.id) ? cast[a.id] : [] }));
       core.emit([{ type: 'AgentsChanged', session_id: sid, agents: core.agents[sid] ?? [] }]);
       return core.reply(undefined);
     },

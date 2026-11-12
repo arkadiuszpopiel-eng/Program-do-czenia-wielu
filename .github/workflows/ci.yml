@@ -187,6 +187,14 @@ jobs:
       - name: E2E + axe (Playwright)
         timeout-minutes: 30
         run: pnpm --filter @alfa/desktop-ui test:e2e --shard=${{ matrix.shard }}/3
+      - name: Dowody niezaliczonej części UI
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-e2e-failure-${{ matrix.shard }}
+          path: apps/desktop/ui/test-results
+          if-no-files-found: warn
+          retention-days: 14
 
   # Zachowujemy nazwę dotychczasowej bramki: nie jest zielona po samym buildzie.
   ui:

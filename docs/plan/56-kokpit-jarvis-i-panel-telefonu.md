@@ -1,5 +1,24 @@
 # 56 — kokpit Jarvis, kafelki telefonu i panel zdalny
 
+**Korekta po CI190:**45df ma8/10zadań (UI960/1; ten sam błąd bramki zbiorczej),
+RustLinux3630/0/27,Windows3652/0/48; Windows1144/4,WebView263/0/5.
+Kodf03: odtworzone przepełnienie przycisku i ściśnięty tytuł, dwaRED0/2→48/48;
+pełny nowy zestaw963 w przygotowaniu. Testye95: natywny Core/LocalProvider,
+macierz30 przygotowana do osobnej oceny odpowiedzi, jeszcze niewykonana.
+[Raport i ograniczenia](../reviews/2026-11-12-execution-records-personas.md).
+
+**12.11 — fakty czynności i własne persony:** kod UI `894798a7`, backend `c7664edc`,
+test formatu `c2c461e7`. Naprawiono brak danych wybranej gałęzi w kontekście kolejnej
+tury, awarie kart/kokpitu dla własnych person oraz przypisanie roli z Kreatora.
+Pełny Rust na c502: **3628/0/27**, 71/71 etapów i pełny spis celów. Core/API na c766:
+15/0/0; kodek: 1 integracja, 30 przypadków/60 ciał, dostawca jako atrapa. Vitest na32a:
+593/593; pełne UI na894: **961/961 po powtórzeniu całej drugiej części**. Pierwotna
+porażka345/1/615 zachowana, przyczyna opóźnienia niepotwierdzona; bez zmiany limitów.
+Nowa próba prawdziwego8B: dwa timeouty60s, cztery niewykonane, **NOT_EVALUATED**.
+CI189/Windows113 dla cd55 nadal queued; kandydat ma osobną gałąź, bez własnego CI.
+Karty22/41/48/58/68/69/77/78 pozostają otwarte. [Raport i surowe dane](../reviews/2026-11-12-execution-records-personas.md).
+Linux/Chromium/fake nie jest odbiorem Windows/WebView2, telefonu, API, RTX12GB lub mikrofonu.
+
 **11.11 — rozszerzenie właściciela:** mapa świata i systemy Jarvisa. Kod `2f3cf3e3`
 dodaje opcjonalny Atlas: mapa offline28kB, odczyt stanów aplikacji i skróty do ustawień,
 diagnostyki oraz agentek. Dwie regresje CSS naprawione:32→44px kontrolek telefonu

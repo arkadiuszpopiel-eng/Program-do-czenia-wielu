@@ -1,6 +1,6 @@
 // Skryptowany strumień odpowiedzi atrapy: myślenie → kroki narzędzi → (karta zatwierdzenia) →
 // tekst ~100 tokenów/s → Usage → Stop. Anulowanie (`Stop`) w dowolnym momencie.
-import type { AgentId } from '@alfa/ui-kit';
+import type { PersonaId } from '@alfa/ui-kit';
 import type { RenderedBlock, Turn, TurnError, TurnUsage } from '../types';
 import type { AlfaEvent } from '../types-system';
 import { changedBlocks, renderBlocks, tokenize } from './render';
@@ -15,12 +15,12 @@ export interface StreamHost {
   /** Przebiegi agentek (Replay) — kroki narzędzi trafiają też tutaj. */
   readonly runs?: FakeRuns;
   /** Wywoływane po zakończeniu (także błędem / anulowaniem). */
-  finished(turn: Turn, agent: AgentId, usage: TurnUsage | null): void;
+  finished(turn: Turn, agent: PersonaId, usage: TurnUsage | null): void;
 }
 
 interface Active {
   readonly turn: Turn;
-  readonly agent: AgentId;
+  readonly agent: PersonaId;
   timer: number | null;
   stop: (reason: 'cancelled') => void;
 }

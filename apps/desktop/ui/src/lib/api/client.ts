@@ -2,7 +2,7 @@
 // opisane w COMMANDS.md) i `FakeAlfaClient` (w pamięci, deterministyczny — Storybook, testy, dev).
 // Metody oznaczone „intencja" nie wykonują akcji w UI: przekazują życzenie do rdzenia
 // (np. zatwierdzenie → okno Brokera, zapis pliku → natywny dialog, czytanie na głos → TTS).
-import type { AgentId } from '@alfa/ui-kit';
+import type { AgentId, PersonaId } from '@alfa/ui-kit';
 import type {
   AgentState,
   ArtifactAction,
@@ -159,7 +159,7 @@ export interface TurnsApi extends ArenaTurnsApi {
 export interface AgentsApi {
   list(sessionId: string): Promise<readonly AgentState[]>;
   /** Zmiana obsady jest natychmiastowa i trafia do dziennika (PLAN §9.2). */
-  setRoles(sessionId: string, agent: AgentId, roleIds: readonly string[]): Promise<void>;
+  setRoles(sessionId: string, agent: PersonaId, roleIds: readonly string[]): Promise<void>;
   applyCast(sessionId: string, template: CastTemplateId): Promise<void>;
   /** Przebiegi agentek z krokami (Replay na Osi czasu). */
   runs(sessionId: string): Promise<readonly AgentRunDetail[]>;

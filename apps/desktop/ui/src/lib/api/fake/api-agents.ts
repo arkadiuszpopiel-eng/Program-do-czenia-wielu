@@ -1,6 +1,6 @@
 // Atrapa: przebiegi agentek z narzędziami (Replay krok po kroku), wiadomość w trakcie zadania,
 // „uruchom w terminalu", katalog roboczy sesji. Kroki emitowane przez strumień (`stream.ts`).
-import type { AgentId } from '@alfa/ui-kit';
+import type { PersonaId } from '@alfa/ui-kit';
 import type {
   AgentRun,
   AgentRunDetail,
@@ -184,7 +184,7 @@ export class FakeRuns {
     this.core.emit([{ type: 'AgentRunUpdated', session_id: run.session_id, run }]);
   }
 
-  begin(sessionId: string, turnId: string, agent: AgentId, goal: string): string {
+  begin(sessionId: string, turnId: string, agent: PersonaId, goal: string): string {
     this.counter++;
     const id = `${sessionId}:r${this.counter + 1}`;
     const run: AgentRun = {

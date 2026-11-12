@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Avatar, Button, Checkbox, Select, Switch, agentIds, agents } from '@alfa/ui-kit';
+  import { Avatar, Button, Checkbox, Select, Switch, agentIds, personInfo } from '@alfa/ui-kit';
   import { useApp } from '../../../state/context';
 
   const app = useApp();
@@ -56,12 +56,14 @@
         onclick={() => (app.selectedAgent = agent)}
       >
         <Avatar {agent} size={28} decorative />
-        {agents[agent].name}
+        {personInfo(agent).name}
       </button>
     {/each}
   </div>
   <h3>
-    {agents[id].name} · {en ? 'Security and tool access' : 'Bezpieczeństwo i dostęp do narzędzi'}
+    {personInfo(id).name} · {en
+      ? 'Security and tool access'
+      : 'Bezpieczeństwo i dostęp do narzędzi'}
   </h3>
   <p>
     {en

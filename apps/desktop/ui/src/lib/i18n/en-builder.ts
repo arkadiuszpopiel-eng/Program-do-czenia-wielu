@@ -62,6 +62,11 @@ export const enBuilder: Record<keyof typeof plBuilder, Message> = {
   'builder.saved': 'Agent {name} saved.',
   'builder.library': 'Agents from the builder',
   'builder.libraryEmpty': 'No agents created yet.',
+  'builder.use': 'Add to this conversation',
+  'builder.remove': 'Detach role from this conversation',
+  'builder.missingRole':
+    'This older entry has no role ID. Refresh the library after updating the core.',
+  'builder.needsSession': 'Open a conversation to assign this agent to it.',
   'builder.policy.conversation': 'conversation',
   'builder.policy.planning': 'planning',
   'builder.policy.gui-vision': 'screen work',

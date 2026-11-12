@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { agentHex, type AgentId, type Theme } from '../tokens';
+  import type { Theme } from '../tokens';
+  import { personHex } from '../person-info';
 
   interface Props {
     /** Poziom głośności 0–1 (fikcyjny w makiecie; docelowo z VAD/odtwarzacza). */
     level?: number;
-    agent?: AgentId;
+    agent?: string;
     size?: number;
     /** Zatrzymuje animację (okno ukryte/zminimalizowane, „bez animacji"). */
     paused?: boolean;
@@ -41,7 +42,7 @@
     let running = true;
 
     const draw = () => {
-      const color = agentHex(agent, resolveTheme());
+      const color = personHex(agent, resolveTheme());
       const target = Math.max(0, Math.min(1, level));
       smooth += (target - smooth) * 0.25;
       if (!reduced) phase += 0.04 + smooth * 0.08;

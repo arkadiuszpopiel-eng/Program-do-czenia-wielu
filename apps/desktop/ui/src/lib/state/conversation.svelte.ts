@@ -1,6 +1,6 @@
 // Stan jednej rozmowy: drzewo gałęzi (append-only) + adnotacje widoku + stosowanie strumienia.
 // Zdarzenia przychodzą paczkami raz na klatkę (RafBatcher w AppState) — tu tylko mutacje stanu.
-import type { AgentId } from '@alfa/ui-kit';
+import type { PersonaId } from '@alfa/ui-kit';
 import type { AlfaClient } from '../api/client';
 import type { ModelProfile, Turn, TurnAnnotation } from '../api/types';
 import type { ChatStreamEvent } from '../api/types-system';
@@ -123,7 +123,7 @@ export class ConversationState {
   /** Odrzuca przy błędzie: composer przywraca szkic (tekst użytkownika nie ginie). */
   async send(
     text: string,
-    addressed: AgentId | null,
+    addressed: PersonaId | null,
     profile: ModelProfile | null,
     attachments: readonly string[] = [],
   ): Promise<void> {

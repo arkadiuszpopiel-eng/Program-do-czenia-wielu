@@ -7,7 +7,7 @@
     Chip,
     Select,
     agentIds,
-    agents,
+    personInfo,
     type AgentId,
   } from '@alfa/ui-kit';
   import type { CastTemplateId } from '../../api/types';
@@ -86,7 +86,7 @@
             working={st?.status === 'working'}
           />
           <div class="who">
-            <span class="name">{agents[id].name}</span>
+            <span class="name">{personInfo(id).name}</span>
             <span class="persona">{t(`persona.${id}`)}</span>
           </div>
           <span class="status" class:live={st && st.status !== 'idle'}
@@ -107,7 +107,7 @@
             size="sm"
             variant="ghost"
             aria-expanded={editing === id}
-            aria-label={t('agents.editRoles', { name: agents[id].name })}
+            aria-label={t('agents.editRoles', { name: personInfo(id).name })}
             onclick={() => (editing = editing === id ? null : id)}
           >
             {t('agents.editRolesShort')}
@@ -116,7 +116,7 @@
         {#if editing === id}
           <fieldset class="role-editor">
             <legend class="alfa-visually-hidden"
-              >{t('agents.editRoles', { name: agents[id].name })}</legend
+              >{t('agents.editRoles', { name: personInfo(id).name })}</legend
             >
             {#key rolesRev}
               {#each ROLES as role (role)}

@@ -1,9 +1,10 @@
 <!-- Mapa referencyjna offline; żadnych domyślonych lokalizacji lub połączeń na globie. -->
 <script lang="ts">
   import { Dialog } from 'bits-ui';
-  import { Button, agents } from '@alfa/ui-kit';
+  import { Button, personInfo } from '@alfa/ui-kit';
   import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
   import { useApp } from '../../state/context';
+  import { openPersonControls } from '../../logic/person-controls';
   import { systemsCopy } from './systems-copy';
   import world from './assets/world-land.svg';
   import './systems.css';
@@ -106,15 +107,15 @@
             {#each cast as person (person.id)}
               <button
                 type="button"
+                class:systems-person-wide={personInfo(person.id).name.length > 24}
                 onclick={() => {
                   onclose();
-                  app.selectedAgent = person.id;
-                  app.openPanel('agents');
+                  openPersonControls(app, person.id);
                 }}
               >
-                <span class="systems-avatar" aria-hidden="true">{agents[person.id].glyph}</span>
+                <span class="systems-avatar" aria-hidden="true">{personInfo(person.id).glyph}</span>
                 <span
-                  >{agents[person.id].name}<small
+                  >{personInfo(person.id).name}<small
                     >{app.i18n.t(`agentStatus.${person.status}`)}</small
                   ></span
                 >

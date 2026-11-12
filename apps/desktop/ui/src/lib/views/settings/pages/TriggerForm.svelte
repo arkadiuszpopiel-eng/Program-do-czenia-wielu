@@ -10,6 +10,7 @@
     SegmentedControl,
     Select,
     TextField,
+    personInfo,
     agents as AGENTS,
   } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
@@ -131,7 +132,7 @@
             <Button size="sm" variant="secondary" onclick={() => useDuty(duty)}
               >{t(duty.name)}</Button
             >
-            <span class="hint">{t(duty.when)} · {AGENTS[duty.agent].name}</span>
+            <span class="hint">{t(duty.when)} · {personInfo(duty.agent).name}</span>
           </li>
         {/each}
       </ul>

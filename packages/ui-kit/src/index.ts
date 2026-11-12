@@ -1,6 +1,7 @@
 // @alfa/ui-kit — tokeny designu i komponenty Svelte 5 (runes) Alfy.
 // CSS: importuj '@alfa/ui-kit/tokens.css' i '@alfa/ui-kit/base.css' raz w aplikacji.
 export * from './tokens';
+export * from './person-info';
 export type * from './types';
 
 export { default as Button } from './components/Button.svelte';

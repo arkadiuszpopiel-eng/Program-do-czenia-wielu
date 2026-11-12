@@ -1,0 +1,6 @@
+{
+  "archive_sha256": "88ef2b026fec86e33f48876256838ce3942f329cc0fad68a8d1e346a8eff230d",
+  "archive_bytes": 5427639,
+  "files": 65,
+  "scope": "Original local logs/outputs; GitHub decoded logs explicitly named; original downloaded ZIP bytes retained with GitHub matching SHA. Synthetic fixtures, no user sessions or credentials."
+}

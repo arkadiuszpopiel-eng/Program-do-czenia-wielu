@@ -3,10 +3,11 @@
   import Undo2 from '@lucide/svelte/icons/undo-2';
   import Avatar from './Avatar.svelte';
   import Button from './Button.svelte';
-  import { agents, type AgentId, type RiskLevel } from '../tokens';
+  import { type RiskLevel } from '../tokens';
+  import { personInfo } from '../person-info';
 
   interface Props {
-    agent: AgentId;
+    agent: string;
     /** Co agentka chce zrobić. */
     what: string;
     /** Dlaczego. */
@@ -45,7 +46,7 @@
   }: Props = $props();
 
   const text = $derived<ApprovalLabels>({
-    title: `${agents[agent].name} prosi o zatwierdzenie`,
+    title: `${personInfo(agent).name} prosi o zatwierdzenie`,
     what: 'Co',
     why: 'Dlaczego',
     reversible: 'Cofalne',
@@ -90,7 +91,7 @@
     {#if status === 'pending'}
       <span class="hint">{text.hint}</span>
       {#if onopenbroker}
-        <Button variant="primary" size="sm" onclick={onopenbroker}>{text.open}</Button>
+        <Button variant="primary" size="sm" wrap onclick={onopenbroker}>{text.open}</Button>
       {/if}
     {:else}
       <span class="done" role="status">{text.status[status]}</span>
@@ -121,10 +122,13 @@
   .head {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--alfa-space-2);
   }
   .who {
     flex: 1;
+    min-width: min(100%, 12ch);
+    overflow-wrap: anywhere;
     font-weight: var(--alfa-weight-semibold);
   }
   .risk {
@@ -170,5 +174,10 @@
   .done {
     color: var(--alfa-color-text-muted);
     font-weight: var(--alfa-weight-semibold);
+  }
+  @media (max-width: 640px) {
+    .foot > :global(.btn) {
+      min-height: 44px;
+    }
   }
 </style>

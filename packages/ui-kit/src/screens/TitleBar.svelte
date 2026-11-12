@@ -5,13 +5,13 @@
   import ChevronDown from '@lucide/svelte/icons/chevron-down';
   import Avatar from '../components/Avatar.svelte';
   import IconButton from '../components/IconButton.svelte';
-  import { agentIds, type AgentId } from '../tokens';
+  import { agentIds } from '../tokens';
 
   interface Props {
     project: string;
     session: string;
     /** Agentka, która mówi/pracuje (świeci jej awatar). */
-    activeAgent?: AgentId;
+    activeAgent?: string;
     profile?: string;
     autonomy?: string;
     cost?: string;

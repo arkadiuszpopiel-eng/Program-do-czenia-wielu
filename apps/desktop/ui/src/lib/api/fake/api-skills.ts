@@ -380,10 +380,12 @@ export class FakeBuilder {
               name: p.name,
               color: p.color,
               role: p.role_name,
+              role_id: p.role_id,
               autonomy: p.autonomy,
               hash,
             },
           ];
+          core.savedPersonas.add(p.persona_id);
           return { persona: p.persona_id, role: p.role_id, hash };
         }),
       voicePreview: () => core.reply(undefined),

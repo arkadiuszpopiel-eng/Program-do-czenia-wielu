@@ -8,7 +8,7 @@ const pl = {
   crew: 'Obsada tej rozmowy',
   empty: 'Wybierz rozmowę, aby zobaczyć jej obsadę.',
   unknown: 'Stan nieznany',
-  profile: 'Preferowany profil modeli',
+  profile: 'Profil modeli',
   profileNote: 'Wybór profilu nie potwierdza wykonania ani dostępności konkretnego modelu.',
   network: 'Internet',
   online: 'Połączenie dostępne',
@@ -43,7 +43,7 @@ const en: typeof pl = {
   crew: 'Conversation cast',
   empty: 'Choose a conversation to see its cast.',
   unknown: 'Status unknown',
-  profile: 'Preferred model profile',
+  profile: 'Model profile',
   profileNote:
     'A profile selection does not confirm execution or availability of a particular model.',
   network: 'Internet',

@@ -1,5 +1,5 @@
 // Atrapa: sesje i tury (append-only, gałęzie, strumień, kolejka offline, 429).
-import type { AgentId } from '@alfa/ui-kit';
+import type { AgentId, PersonaId } from '@alfa/ui-kit';
 import { fakeReadAloud } from './read-aloud';
 import type { AlfaClient } from '../client';
 import type { Turn, TurnError, TurnUsage } from '../types';
@@ -25,7 +25,7 @@ export class FakeChat {
     });
   }
 
-  private finished(turn: Turn, agent: AgentId, usage: TurnUsage | null): void {
+  private finished(turn: Turn, agent: PersonaId, usage: TurnUsage | null): void {
     const { core } = this;
     const sid = turn.session_id;
     core.setAgent(sid, agent, { status: 'idle', activity: null });
@@ -94,7 +94,14 @@ export class FakeChat {
         provider: 'local',
       };
     }
-    if(this.core.scenario==='task-paused'){return {code:'task_paused',message:'Osiągnięto limit; stan zapisany lokalnie.',retry_at:null,provider:null};}
+    if (this.core.scenario === 'task-paused') {
+      return {
+        code: 'task_paused',
+        message: 'Osiągnięto limit; stan zapisany lokalnie.',
+        retry_at: null,
+        provider: null,
+      };
+    }
     return null;
   }
 
@@ -133,7 +140,7 @@ export class FakeChat {
     sessionId: string,
     parentId: string | null,
     text: string,
-    addressed: AgentId | null,
+    addressed: PersonaId | null,
     attachments: readonly TurnAttachment[] = [],
   ): Turn {
     const { core } = this;

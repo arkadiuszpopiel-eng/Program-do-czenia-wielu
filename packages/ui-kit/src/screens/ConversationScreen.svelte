@@ -9,7 +9,8 @@
   import Chip from '../components/Chip.svelte';
   import Avatar from '../components/Avatar.svelte';
   import Toast from '../components/Toast.svelte';
-  import { agentIds, agents, type AgentId } from '../tokens';
+  import { agentIds, type AgentId } from '../tokens';
+  import { personInfo } from '../person-info';
   import type { ActivityInfo, ChatMessage, MicState, SessionItem } from '../types';
 
   interface Props {
@@ -43,9 +44,8 @@
     onsettings,
   }: Props = $props();
 
-  const activeAgent = $derived<AgentId | undefined>(
-    activity?.agent ??
-      (messages.find((m) => m.streaming && m.author !== 'user')?.author as AgentId | undefined),
+  const activeAgent = $derived<string | undefined>(
+    activity?.agent ?? messages.find((m) => m.streaming && m.author !== 'user')?.author,
   );
   let draft = $state('');
   let tab = $state('agents');
@@ -116,7 +116,7 @@
                 <li class="agent">
                   <Avatar agent={id} size={32} speaking={activeAgent === id} />
                   <span class="agent-text">
-                    <span class="agent-name">{agents[id].name}</span>
+                    <span class="agent-name">{personInfo(id).name}</span>
                     <span class="agent-role">{roles[id]}</span>
                   </span>
                   <span class="agent-state">{activeAgent === id ? 'pracuje' : 'gotowa'}</span>

@@ -1,0 +1,485 @@
+{
+  "scope": "60 synthetic Core+productionCodec bodies; noHTTP/model; 30cases, not60independentrequests",
+  "files": [
+    {
+      "file": "jarvis-alfa-empty_record-native.json",
+      "sha256": "3c658e36f858193593dfe8379706ab47837e188e3806d60de5e3368e614c7e57",
+      "bytes": 12187,
+      "messages": 5,
+      "tools": 2,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-alfa-empty_record-schema.json",
+      "sha256": "a5f3b3219cf0cf0bf94de984a4120cc61eb07fe9267fd69e17cf963570c73e2a",
+      "bytes": 17636,
+      "messages": 5,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-alfa-needs_confirmation-native.json",
+      "sha256": "3615186f19dc65dad32d2aca02b693f198cde55cb3e78c8e7f2794b3a39befbd",
+      "bytes": 12331,
+      "messages": 5,
+      "tools": 2,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-alfa-needs_confirmation-schema.json",
+      "sha256": "0ed665acdc370f681e50e75739bafb8e44bebd52b5adcf0da7fb7320701632ec",
+      "bytes": 17780,
+      "messages": 5,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-alfa-recorded_done-native.json",
+      "sha256": "d2e38b71d5f0e89f69a48dad9000b4b1328e52ccb6ffd893aae523c6668cff8b",
+      "bytes": 12299,
+      "messages": 5,
+      "tools": 2,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-alfa-recorded_done-schema.json",
+      "sha256": "5927e960f4b6a4baec5ed168f0fc513d671730c6f19dd0258067a67efae35510",
+      "bytes": 17748,
+      "messages": 5,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-beta-empty_record-native.json",
+      "sha256": "85ba1ddc38402c9b9abcb8f2d712254087145ba4667744f3f1caa1079f801835",
+      "bytes": 29338,
+      "messages": 6,
+      "tools": 15,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-beta-empty_record-schema.json",
+      "sha256": "1e10bbcc6a140ce5e1ee9607bdfac1f4f71f9cd9d15424a9555622cf9514cb10",
+      "bytes": 53555,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-beta-needs_confirmation-native.json",
+      "sha256": "ffccafcfbb708be83efec9766d9091f80a418372c363f203de3083c9b3a9d8f7",
+      "bytes": 29482,
+      "messages": 6,
+      "tools": 15,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-beta-needs_confirmation-schema.json",
+      "sha256": "62f48334deb3c07caca09b6d651c876a7793ee20f064e861bcfb02996d114576",
+      "bytes": 53699,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-beta-recorded_done-native.json",
+      "sha256": "b773d63f7643ff207c024d59e6a376b87a1ec077bf06ecf26a0921c9d444a82f",
+      "bytes": 29450,
+      "messages": 6,
+      "tools": 15,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-beta-recorded_done-schema.json",
+      "sha256": "e325415a74933bf58e8301401eff89f16ac5237d5553e8314195c5acfd84035b",
+      "bytes": 53667,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-delta-empty_record-native.json",
+      "sha256": "7ce2efc017b28f326488021157e4de745b946c68c29c92ade0cf0bc82018b0d2",
+      "bytes": 24902,
+      "messages": 6,
+      "tools": 14,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-delta-empty_record-schema.json",
+      "sha256": "82d76455299a8b2ce3c62d0d11ed9145e87d795952d5f2b2c569d3752b278ac0",
+      "bytes": 44800,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-delta-needs_confirmation-native.json",
+      "sha256": "098cf7d4dd6a54d715e1e989bbf41a8b8b55d0e3c707fa12ba72a2043162d5e9",
+      "bytes": 25047,
+      "messages": 6,
+      "tools": 14,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-delta-needs_confirmation-schema.json",
+      "sha256": "fc67e597799c391b93db6917811e435d2e76efacc0c9916dcee8040a040668a7",
+      "bytes": 44945,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-delta-recorded_done-native.json",
+      "sha256": "f9a0818da516b1dbf43a7cd9571800315b456921cfa5999ce77eb0bbd8613fac",
+      "bytes": 25015,
+      "messages": 6,
+      "tools": 14,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-delta-recorded_done-schema.json",
+      "sha256": "930afafe0f32fc7550afd2d744fe5408952604c835aaca4a1f9dacac8980caa4",
+      "bytes": 44913,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-gama-empty_record-native.json",
+      "sha256": "a630f4f81473855aa6f58bf667e86e0656ba31c6b2965cbeac55720030f15cd7",
+      "bytes": 29720,
+      "messages": 6,
+      "tools": 21,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-gama-empty_record-schema.json",
+      "sha256": "67613151a5e38072f4cc02930322aafc60dede34eba63d287f07736bb65c54d4",
+      "bytes": 55389,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-gama-needs_confirmation-native.json",
+      "sha256": "469880054664bbf30ee395a6cb31c2f9ae5cba134baa1a56d531998009134e1f",
+      "bytes": 29864,
+      "messages": 6,
+      "tools": 21,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-gama-needs_confirmation-schema.json",
+      "sha256": "3055dc75ca5390b7232fa1dd314c189eef7f21e090727f3af1920e5cbf1aa94a",
+      "bytes": 55533,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-gama-recorded_done-native.json",
+      "sha256": "50a412a356280520c5c70c1803a48be300d0ea665657e5324cd8624e706e978c",
+      "bytes": 29832,
+      "messages": 6,
+      "tools": 21,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-gama-recorded_done-schema.json",
+      "sha256": "5a5970b2a7565830ea33a331b9a152d01064a63df2d401d37c01dbc988b1a12b",
+      "bytes": 55501,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-luna-empty_record-native.json",
+      "sha256": "4f4690813a113a5b209e7a5b8d65da5811693be576a32bbf72eb8138662f9b65",
+      "bytes": 12608,
+      "messages": 6,
+      "tools": 5,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-luna-empty_record-schema.json",
+      "sha256": "7d733707d98b68fd39a02ff9944ac67a4feab83d100362f060db04a24b940f78",
+      "bytes": 20906,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-luna-needs_confirmation-native.json",
+      "sha256": "d672efaec8875aa9e3e7c7f28b04e2170d42b870b21336d900619139fe0424c8",
+      "bytes": 12752,
+      "messages": 6,
+      "tools": 5,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-luna-needs_confirmation-schema.json",
+      "sha256": "1958d5516231dcc602f375ac8d280002162624ae83b72818c28133af9c4c766b",
+      "bytes": 21050,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "jarvis-luna-recorded_done-native.json",
+      "sha256": "9035e0c52f7cd2aa382f42b4191b784954c5b43c90b11b8618ab8478e77afd56",
+      "bytes": 12720,
+      "messages": 6,
+      "tools": 5,
+      "response_format": false
+    },
+    {
+      "file": "jarvis-luna-recorded_done-schema.json",
+      "sha256": "fe1e6bc3af8e14b21b0884f86690f779a51981ca4cddcc0b5d295df81f4f3765",
+      "bytes": 21018,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-alfa-empty_record-native.json",
+      "sha256": "bba3eba4af2b1acfdfed4e5223d5c396256c64312df06f5a5492cfdc2705a1bf",
+      "bytes": 11189,
+      "messages": 5,
+      "tools": 2,
+      "response_format": false
+    },
+    {
+      "file": "standard-alfa-empty_record-schema.json",
+      "sha256": "3a98737009a44190d088c31aec5c06019f43f97dae70c394577c0563664dad90",
+      "bytes": 16638,
+      "messages": 5,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-alfa-needs_confirmation-native.json",
+      "sha256": "ac9f17613b1daf1bd07218166760f8202066182df04a05427f318913910e8cbf",
+      "bytes": 11337,
+      "messages": 5,
+      "tools": 2,
+      "response_format": false
+    },
+    {
+      "file": "standard-alfa-needs_confirmation-schema.json",
+      "sha256": "f18b95a56f8a2381ed4b5b040ba6b7ccd85920ac42bd40e63de848e4ee5b28a2",
+      "bytes": 16786,
+      "messages": 5,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-alfa-recorded_done-native.json",
+      "sha256": "02f4db472afec04402952f2baf0eff4dbf23862e83e0a681bb2fea12e748c29a",
+      "bytes": 11305,
+      "messages": 5,
+      "tools": 2,
+      "response_format": false
+    },
+    {
+      "file": "standard-alfa-recorded_done-schema.json",
+      "sha256": "3f690b585e84223c35caab7c6d579742cb0611ca9028f36441b7646b2ff15a6a",
+      "bytes": 16754,
+      "messages": 5,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-beta-empty_record-native.json",
+      "sha256": "72197b3fcc355fdb05698c80e574ad78c437846a7ffb3a6a1530970db92cf8b8",
+      "bytes": 27595,
+      "messages": 6,
+      "tools": 15,
+      "response_format": false
+    },
+    {
+      "file": "standard-beta-empty_record-schema.json",
+      "sha256": "c603315521b394ca4997adcd91c74fef034df0d6249be4ec44100754e8fd6d58",
+      "bytes": 51812,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-beta-needs_confirmation-native.json",
+      "sha256": "fd9a0194b0f81e14e96481fc84cb63bf29640e919ea1763284eb8ac7a5f76a07",
+      "bytes": 27739,
+      "messages": 6,
+      "tools": 15,
+      "response_format": false
+    },
+    {
+      "file": "standard-beta-needs_confirmation-schema.json",
+      "sha256": "eb072fd517fe1cb2650627cf016ce87bdba0c7a6fcd21e30ba74c0d0826e52e9",
+      "bytes": 51956,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-beta-recorded_done-native.json",
+      "sha256": "019a1521f15c31ca2795b32c180664742e120c3c291336cbc11a36378e2090e2",
+      "bytes": 27707,
+      "messages": 6,
+      "tools": 15,
+      "response_format": false
+    },
+    {
+      "file": "standard-beta-recorded_done-schema.json",
+      "sha256": "de40cda3bb6dde9e791506e382d46e94e33866c6241bbf7cbb1d6c65734fa009",
+      "bytes": 51924,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-delta-empty_record-native.json",
+      "sha256": "06f3dd5b1baaa71bcd4e025d03969cb53d46ec3cf77f401a49f382830e6cf4f3",
+      "bytes": 23158,
+      "messages": 6,
+      "tools": 14,
+      "response_format": false
+    },
+    {
+      "file": "standard-delta-empty_record-schema.json",
+      "sha256": "0e7b923a90183c25f59cd10ab47bb6dfd49c8a3a3b743df4a91ab0f658b5ce15",
+      "bytes": 43056,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-delta-needs_confirmation-native.json",
+      "sha256": "e6966b089b1ba998e71f28197a165e72370db861f29344811483801a7e352188",
+      "bytes": 23303,
+      "messages": 6,
+      "tools": 14,
+      "response_format": false
+    },
+    {
+      "file": "standard-delta-needs_confirmation-schema.json",
+      "sha256": "f9028044f7459acb734767c084cbb721c4d88c406ba2d27c220397233ac0ac7a",
+      "bytes": 43201,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-delta-recorded_done-native.json",
+      "sha256": "70d94f630af30241dab5c6025b3bd4a74ddeb7b865c1e5a9cd1cd9f3e175b74d",
+      "bytes": 23271,
+      "messages": 6,
+      "tools": 14,
+      "response_format": false
+    },
+    {
+      "file": "standard-delta-recorded_done-schema.json",
+      "sha256": "66cbec0eb77c47912fe749a28753ee39c60dc01efe10d67f8a43331100e2c56f",
+      "bytes": 43169,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-gama-empty_record-native.json",
+      "sha256": "bfccfa3eee4e10070488cb2641e14fc1c2009eb3117faf2b47325d769e9d40e9",
+      "bytes": 27977,
+      "messages": 6,
+      "tools": 21,
+      "response_format": false
+    },
+    {
+      "file": "standard-gama-empty_record-schema.json",
+      "sha256": "df39cd3387e6b1cd17d413321b6b3c9211ffe7ba213605ee85c9e8beb8fc7d87",
+      "bytes": 53646,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-gama-needs_confirmation-native.json",
+      "sha256": "cf8a271870154aec9f108bda0c14c2105599a4d6eb9bff2d8fc758a728badebd",
+      "bytes": 28121,
+      "messages": 6,
+      "tools": 21,
+      "response_format": false
+    },
+    {
+      "file": "standard-gama-needs_confirmation-schema.json",
+      "sha256": "5b4f1cc498b9feb82489e43045748c3e557fb2acf8b3d6b45627e353cb7eaa69",
+      "bytes": 53790,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-gama-recorded_done-native.json",
+      "sha256": "904b2bcde6c2f356b94e2418b02870ecf98cbdcd2f13b2ff8dbe906ce0807969",
+      "bytes": 28089,
+      "messages": 6,
+      "tools": 21,
+      "response_format": false
+    },
+    {
+      "file": "standard-gama-recorded_done-schema.json",
+      "sha256": "1cf7b48ff396e16d6aae431090be530ff00f9cfd222399f175920926b16305b1",
+      "bytes": 53758,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-luna-empty_record-native.json",
+      "sha256": "4b80027aac7b08221c6928922126a500347c9f38e8ce7e862a9477aceaecfed3",
+      "bytes": 10866,
+      "messages": 6,
+      "tools": 5,
+      "response_format": false
+    },
+    {
+      "file": "standard-luna-empty_record-schema.json",
+      "sha256": "2afadd729d6ba1306d8499fae3dead13c6bb61be2db62bc6f9f81bc7dc40cf32",
+      "bytes": 19164,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-luna-needs_confirmation-native.json",
+      "sha256": "c71811d7436879da345db92711f8f5d7b3131a4ec0048f31a06369a82679fe4c",
+      "bytes": 11759,
+      "messages": 6,
+      "tools": 5,
+      "response_format": false
+    },
+    {
+      "file": "standard-luna-needs_confirmation-schema.json",
+      "sha256": "51dc456722a5ab0d1e919f1089eba05d12b5ed7c01f01172ab1be82a6f785993",
+      "bytes": 20057,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    },
+    {
+      "file": "standard-luna-recorded_done-native.json",
+      "sha256": "3a3943d56385de56814ca7f2a5232bce7d2a04c1eae460fbf6e036b71b70838c",
+      "bytes": 11727,
+      "messages": 6,
+      "tools": 5,
+      "response_format": false
+    },
+    {
+      "file": "standard-luna-recorded_done-schema.json",
+      "sha256": "efadfbf92efa944683d5eda57ab59eba57b7f0be6e89d96199aaab3cf7bb9912",
+      "bytes": 20025,
+      "messages": 6,
+      "tools": 0,
+      "response_format": true
+    }
+  ]
+}

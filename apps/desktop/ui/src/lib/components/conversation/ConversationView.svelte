@@ -1,6 +1,6 @@
 <!-- Kolumna rozmowy: stany systemowe, wyszukiwanie, wiadomości (lub pusty stan), kapsuła aktywności, composer. -->
 <script lang="ts">
-  import { ActivityCapsule, agents } from '@alfa/ui-kit';
+  import { ActivityCapsule, personInfo } from '@alfa/ui-kit';
   import { useApp } from '../../state/context';
   import LoadFailed from '../shell/LoadFailed.svelte';
   import ChatComposer from './ChatComposer.svelte';
@@ -71,7 +71,7 @@
           labels={{
             step: t('activity.step', { step: activity.step, total: activity.total_steps }),
             stop: t('activity.stop'),
-            stopLabel: t('activity.stopLabel', { name: agents[activity.agent].name }),
+            stopLabel: t('activity.stopLabel', { name: personInfo(activity.agent).name }),
             progress: t('activity.progress'),
           }}
         />

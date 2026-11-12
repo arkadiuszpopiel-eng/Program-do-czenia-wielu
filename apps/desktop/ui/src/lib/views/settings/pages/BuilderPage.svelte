@@ -17,6 +17,7 @@
   import LoadFailed from '../../../components/shell/LoadFailed.svelte';
   import Loading from '../../../components/shell/Loading.svelte';
   import { emptyDraft } from '../../../logic/work';
+  import { setBuilderRole } from '../../../logic/builder-assignment';
   import { load } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
   import BuilderForm from './BuilderForm.svelte';
@@ -116,6 +117,25 @@
   async function voice() {
     await step(() => app.client.builder.voicePreview(draft));
   }
+
+  function assigned(a: BuilderAgentInfo): boolean {
+    const role = a.role_id;
+    return (
+      !!role &&
+      !!app.agents[app.activeId ?? '']?.some((p) => p.id === a.persona && p.role_ids.includes(role))
+    );
+  }
+
+  async function assign(a: BuilderAgentInfo) {
+    const sid = app.activeId;
+    if (!sid || !a.role_id) return;
+    const enabled = !assigned(a);
+    const role = a.role_id;
+    await step(async () => {
+      const states = await setBuilderRole(app.client, sid, a.persona, role, enabled);
+      app.agents[sid] = [...states];
+    });
+  }
 </script>
 
 <section class="wk-card" aria-labelledby="bd-title">
@@ -182,6 +202,17 @@
         <li>
           <strong>{a.name}</strong>
           <span class="wk-meta">{a.role} · {a.autonomy} · {colorLabel(a.color)}</span>
+          <div class="wk-actions">
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={busy || !app.activeId || !a.role_id}
+              aria-label="{t(assigned(a) ? 'builder.remove' : 'builder.use')}: {a.name}"
+              onclick={() => assign(a)}>{t(assigned(a) ? 'builder.remove' : 'builder.use')}</Button
+            >
+          </div>
+          {#if !a.role_id}<small class="wk-meta">{t('builder.missingRole')}</small>{/if}
+          {#if !app.activeId}<small class="wk-meta">{t('builder.needsSession')}</small>{/if}
         </li>
       {/each}
     </ul>

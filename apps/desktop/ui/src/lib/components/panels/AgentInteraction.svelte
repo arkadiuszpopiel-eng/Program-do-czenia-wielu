@@ -1,6 +1,6 @@
 <!-- Jarvis jest sposobem współpracy konkretnej persony; zmiana dotyczy kolejnego zadania. -->
 <script lang="ts">
-  import { Button, Select, agents, type AgentId } from '@alfa/ui-kit';
+  import { Button, Select, personInfo, type AgentId } from '@alfa/ui-kit';
   import { useApp } from '../../state/context';
 
   interface Props {
@@ -17,7 +17,9 @@
   const jarvis = $derived(effective === 'jarvis');
   let busy = $state(false);
   const label = $derived(
-    en ? `${agents[agent].name} — interaction style` : `${agents[agent].name} — sposób współpracy`,
+    en
+      ? `${personInfo(agent).name} — interaction style`
+      : `${personInfo(agent).name} — sposób współpracy`,
   );
   const options = $derived([
     { value: 'inherit', label: en ? 'Use common setting' : 'Jak ustawienie wspólne' },
@@ -54,8 +56,8 @@
     </p>
     <p class="hint">
       {en
-        ? `Turn on the microphone in Voice and address ${agents[agent].name} by name.`
-        : `Włącz mikrofon w panelu Głos i zwróć się do agentki po imieniu: ${agents[agent].name}.`}
+        ? `Turn on the microphone in Voice and address ${personInfo(agent).name} by name.`
+        : `Włącz mikrofon w panelu Głos i zwróć się do agentki po imieniu: ${personInfo(agent).name}.`}
     </p>
     <div class="actions">
       <Button size="sm" variant="ghost" onclick={() => app.openPanel('voice')}

@@ -5,7 +5,7 @@
 -->
 <script lang="ts">
   import { Dialog } from 'bits-ui';
-  import { Button, SanitizedHtml, TextField, agents as AGENTS } from '@alfa/ui-kit';
+  import { Button, SanitizedHtml, TextField, personInfo } from '@alfa/ui-kit';
   import { errorText } from '../../api/command-error';
   import type { BoardItem } from '../../api/types-board';
   import { boardMarkdown, filterBoard } from '../../logic/board';
@@ -27,7 +27,7 @@
   });
 
   function agentName(id: string): string {
-    return (AGENTS as Record<string, { name: string } | undefined>)[id]?.name ?? id;
+    return personInfo(id).name;
   }
 
   async function unpin(id: string) {

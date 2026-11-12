@@ -133,6 +133,7 @@
 }
 .cockpit-footer .cockpit-cast {
   flex: 1 1 300px;
+  min-width: 0;
   margin-top: 0;
 }
 .cockpit-phone {
@@ -163,6 +164,8 @@
   align-items: center;
   gap: 6px;
   min-height: 32px;
+  max-width: 100%;
+  min-width: 0;
   padding: 4px;
   background: transparent;
   border: 0;
@@ -174,6 +177,10 @@
 .cockpit-agent-status {
   color: var(--alfa-color-text-muted);
   font-size: 11px;
+}
+.cockpit-person-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .cockpit-state {
   width: 6px;

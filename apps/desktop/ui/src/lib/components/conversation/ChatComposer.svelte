@@ -5,19 +5,11 @@
   Załączniki: spinacz, wklejenie (czyta rdzeń), przeciągnięcie, zdjęcie z kamery — artefakty sesji.
 -->
 <script lang="ts">
-  import {
-    Chip,
-    Composer,
-    Menu,
-    MicButton,
-    agentIds,
-    agents,
-    type AgentId,
-    type MenuItem,
-  } from '@alfa/ui-kit';
+  import { Chip, Composer, MicButton, personInfo, type PersonaId } from '@alfa/ui-kit';
   import Workflow from '@lucide/svelte/icons/workflow';
   import CameraSnapButton from './CameraSnapButton.svelte';
   import ComposerStatus from './ComposerStatus.svelte';
+  import ComposerRecipient from './ComposerRecipient.svelte';
   import {
     SentHistory,
     addressedAgent,
@@ -26,6 +18,7 @@
     type Trigger,
   } from '../../logic/composer';
   import { fuzzyRank } from '../../logic/fuzzy';
+  import { crewChoices } from '../../logic/crew-choices';
   import { lastUserTurn } from '../../logic/turn-tree';
   import { useApp } from '../../state/context';
   import { openPipelines } from '../../state/board-dialog.svelte';
@@ -66,7 +59,7 @@
   let textarea = $state<HTMLTextAreaElement | null>(null);
   let trigger = $state<Trigger | null>(null);
   let active = $state(0);
-  let chosenAgent = $state<AgentId | null>(null);
+  let chosenAgent = $state<PersonaId | null>(null);
   let profileMenuOpen = $state(false);
 
   const att = new AttachmentsState(app);
@@ -85,7 +78,10 @@
 
   // Profil wybrany w pasku pisania jest ustawieniem (ten sam wszędzie) — rdzeń bierze go domyślnie.
   const effectiveProfile = $derived(currentProfile(app));
-  const agentList = agentIds.map((id) => ({ id, name: agents[id].name }));
+  const agentList = $derived(crewChoices(app.agents[app.activeId ?? ''] ?? []));
+  $effect(() => {
+    if (chosenAgent && !agentList.some((a) => a.id === chosenAgent)) chosenAgent = null;
+  });
 
   const suggestions = $derived.by((): Suggestion[] => {
     if (!trigger) return [];
@@ -201,7 +197,7 @@
         await app.client.agents.steer(app.activeId, text);
         app.toasts.show({
           kind: 'info',
-          message: t('composer.steered', { name: agents[run.agent].name }),
+          message: t('composer.steered', { name: personInfo(run.agent).name }),
         });
         return;
       } catch {
@@ -211,7 +207,7 @@
     if (!conv) await app.newSession();
     const target = conv ?? app.conversation;
     if (!target) return;
-    await target.send(text, chosenAgent ?? addressedAgent(text, agentList), null, files);
+    await target.send(text, addressedAgent(text, agentList) ?? chosenAgent, null, files);
     att.sent(files);
   }
 
@@ -242,20 +238,6 @@
     runCommand(app, 'voice.mic');
   }
 
-  const agentItems = $derived<MenuItem[]>([
-    {
-      id: 'auto',
-      label: t('composer.agentAutoHint'),
-      checked: chosenAgent === null,
-      onSelect: () => (chosenAgent = null),
-    },
-    ...agentIds.map((id) => ({
-      id,
-      label: agents[id].name,
-      checked: chosenAgent === id,
-      onSelect: () => (chosenAgent = id),
-    })),
-  ]);
   const micLabels = $derived({
     off: { label: t('mic.off'), hint: t('mic.hint.off') },
     listening: { label: t('mic.listening'), hint: t('mic.hint.on') },
@@ -292,7 +274,7 @@
     onattach={() => void att.pick()}
     lang={app.i18n.locale}
     placeholder={steering
-      ? t('composer.steerPlaceholder', { name: agents[steering.agent].name })
+      ? t('composer.steerPlaceholder', { name: personInfo(steering.agent).name })
       : t('composer.placeholder')}
     labels={{
       field: t('composer.label'),
@@ -335,27 +317,7 @@
           {#snippet icon()}<Workflow size={13} strokeWidth={1.75} />{/snippet}
           <span class="short">{t('sessions.pipelinesBtn')}</span>
         </Chip>
-        <Menu
-          items={agentItems}
-          label={t('composer.agent', {
-            name: chosenAgent ? agents[chosenAgent].name : t('composer.agentAuto'),
-          })}
-          align="end"
-        >
-          {#snippet trigger(props)}
-            <Chip
-              {...props}
-              agent={chosenAgent ?? undefined}
-              size="sm"
-              onclick={props.onclick}
-              label={t('composer.agent', {
-                name: chosenAgent ? agents[chosenAgent].name : t('composer.agentAuto'),
-              })}
-            >
-              {chosenAgent ? agents[chosenAgent].name : t('composer.agentAuto')} ▾
-            </Chip>
-          {/snippet}
-        </Menu>{/if}
+        <ComposerRecipient choices={agentList} bind:chosen={chosenAgent} />{/if}
       <ComposerStatus bind:profileOpen={profileMenuOpen} />
     {/snippet}
     {#snippet trailing()}

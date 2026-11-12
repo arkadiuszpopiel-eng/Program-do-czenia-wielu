@@ -1,0 +1,434 @@
+[
+  {
+    "phase": "integration-007",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-core#0.0.85",
+      "target": "jarvis_live",
+      "kind": [
+        "test"
+      ],
+      "fresh": true,
+      "path": "/workspace/target-repair/debug/deps/jarvis_live-92dc61c6c5f72467",
+      "bytes": 305830536,
+      "sha256": "25e3c4d28f6ebbe8e1b6eddf7f70d5ca9b6ec250f70b5200c769cbeab5299578"
+    },
+    "test": "all_personas_on_local_model",
+    "reason": "rzeczywisty model lokalny; ALFA_LIVE_* — raport, bez mikrofonu i Windows"
+  },
+  {
+    "phase": "integration-007",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-core#0.0.85",
+      "target": "jarvis_live",
+      "kind": [
+        "test"
+      ],
+      "fresh": true,
+      "path": "/workspace/target-repair/debug/deps/jarvis_live-92dc61c6c5f72467",
+      "bytes": 305830536,
+      "sha256": "25e3c4d28f6ebbe8e1b6eddf7f70d5ca9b6ec250f70b5200c769cbeab5299578"
+    },
+    "test": "custom_persona_on_local_model_after_catalog_and_cast_restart",
+    "reason": "własna persona i lokalny Bielik; ALFA_LIVE_*, bez mikrofonu i narzędzi"
+  },
+  {
+    "phase": "integration-010",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-broker#0.0.85",
+      "target": "review",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/review-06668659e785c0c9",
+      "bytes": 22838248,
+      "sha256": "4b0b8f5684ae25c7c05ce8d193852b5531d41f9ebb4d49acdba810d95b9f254c"
+    },
+    "test": "service_config_location_does_not_follow_user_environment",
+    "reason": "P3-02: ścieżka konfiguracji usługi ze zmiennej środowiskowej (decyzja człowieka)"
+  },
+  {
+    "phase": "integration-010",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/safety-broker-contract#0.0.85",
+      "target": "review",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/review-672b435ef0b6061a",
+      "bytes": 2757496,
+      "sha256": "9df1893a4ed3330c89300083299202f38479343c3498d94de4b996089daf0afa"
+    },
+    "test": "file_access_on_a_network_share_is_egress",
+    "reason": "W3-09: propozycja dla Jądra — wymaga decyzji i przeglądu człowieka"
+  },
+  {
+    "phase": "integration-012",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-core#0.0.85",
+      "target": "tool_approvals",
+      "kind": [
+        "test"
+      ],
+      "fresh": true,
+      "path": "/workspace/target-repair/debug/deps/tool_approvals-7b82635292baafcb",
+      "bytes": 310098280,
+      "sha256": "a57437b4091c544f4eb6dfb0288b794f305690f52de22d4276790d05d7f6da72"
+    },
+    "test": "waiting_tools_run_after_owner_approval_in_broker_window",
+    "reason": "wymaga ręcznej zgody właściciela w oknie Sędziego Cieni"
+  },
+  {
+    "phase": "integration-018",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/platform-windows-impl#0.0.85",
+      "target": "camera_hw",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/camera_hw-4fc822655a622abc",
+      "bytes": 1161152,
+      "sha256": "bc147fd13ad0d449dac473bfde754834d480f6918c0a9466a39519a1c575d6d9"
+    },
+    "test": "first_camera_delivers_changing_frames",
+    "reason": "wymaga kamery; uruchamiany ręcznie na sprzęcie"
+  },
+  {
+    "phase": "integration-026",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-agents#0.0.85",
+      "target": "dev_live",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/dev_live-675a39569142c9e3",
+      "bytes": 12992008,
+      "sha256": "7b855800f08305f9989e26dbcd9e4fa5acdf72dbc6691e47f1fb7569c88ff6cf"
+    },
+    "test": "real_git_and_cargo_tests",
+    "reason": "uruchamia prawdziwy git i cargo (kilkanaście sekund)"
+  },
+  {
+    "phase": "integration-030",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-agents#0.0.85",
+      "target": "eval_tools",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/eval_tools-f1adfe87388fb30b",
+      "bytes": 104433832,
+      "sha256": "f446e845d51d6cd4f4b424f2806c50598404fea05e90465ff2cbb3124d54323e"
+    },
+    "test": "measure_on_local_model",
+    "reason": "pomiar na modelu lokalnym — uruchamia użytkownik (evals/F3/tools/README.md)"
+  },
+  {
+    "phase": "integration-030",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-judge#0.0.85",
+      "target": "eval_judge",
+      "kind": [
+        "test"
+      ],
+      "fresh": true,
+      "path": "/workspace/target-repair/debug/deps/eval_judge-b4716383109c0b4a",
+      "bytes": 31347016,
+      "sha256": "701b9d639b946c8d6e3b96f9bc1497e67adf79807b1e24d7d16f6e261354b70e"
+    },
+    "test": "measure_on_local_model",
+    "reason": "pomiar na modelu lokalnym — uruchamia użytkownik (evals/Z4/judge/README.md)"
+  },
+  {
+    "phase": "integration-031",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/voice-pipeline-impl#0.0.85",
+      "target": "f2_eval",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/f2_eval-a5985fcc6de26c70",
+      "bytes": 6091592,
+      "sha256": "295883f36bd2b4895234a96c7a932ade21ec4500e00fd1b68f9164cdf6205723"
+    },
+    "test": "real_models_on_corpus",
+    "reason": "wymaga korpusu nagrań i whisper.cpp na maszynie użytkownika"
+  },
+  {
+    "phase": "integration-039",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/lib-embed#0.0.85",
+      "target": "it",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/it-5062df2d92cf1a94",
+      "bytes": 100485856,
+      "sha256": "76fd165e8f333bc444fe6e8c25cadd66631863514a3b5a344ccfe50d8eb3e810"
+    },
+    "test": "dump::dump_toy_models",
+    "reason": "generator referencji — uruchamiany ręcznie"
+  },
+  {
+    "phase": "integration-039",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/lib-embed#0.0.85",
+      "target": "it",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/it-5062df2d92cf1a94",
+      "bytes": 100485856,
+      "sha256": "76fd165e8f333bc444fe6e8c25cadd66631863514a3b5a344ccfe50d8eb3e810"
+    },
+    "test": "model::real_model_semantic_sanity",
+    "reason": "wymaga prawdziwego modelu (ALFA_EMBED_MODEL)"
+  },
+  {
+    "phase": "integration-039",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/lib-embed#0.0.85",
+      "target": "it",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/it-5062df2d92cf1a94",
+      "bytes": 100485856,
+      "sha256": "76fd165e8f333bc444fe6e8c25cadd66631863514a3b5a344ccfe50d8eb3e810"
+    },
+    "test": "xlmr::e5_small_shaped_latency_and_ram",
+    "reason": "pomiar (~0,5 GB modelu, build --release)"
+  },
+  {
+    "phase": "integration-041",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/voice-wake-impl#0.0.85",
+      "target": "kws_onnx",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/kws_onnx-c17ceb144bfe6b1c",
+      "bytes": 86457224,
+      "sha256": "8dec47fd0960186595726d3607311f03a973a68286ce6df6283f32b8d81aa0e7"
+    },
+    "test": "real_model",
+    "reason": "wymaga modelu KWS spoza repo (ALFA_KWS_MODEL)"
+  },
+  {
+    "phase": "integration-042",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-diag#0.0.85",
+      "target": "live",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/live-5d8a90d06c14f323",
+      "bytes": 14520288,
+      "sha256": "76672d93d6cc535e872e27e8d03c609766ca57a8ce42de175b9a359da3b089a5"
+    },
+    "test": "live_quick_and_system_disk",
+    "reason": "obciąża procesor, pamięć i dysk C: (ok. minuty)"
+  },
+  {
+    "phase": "integration-042",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-models#0.0.85",
+      "target": "live_catalog",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/live_catalog-3eb0eb97da4e8205",
+      "bytes": 133738640,
+      "sha256": "a41644fa0f0f6e2ee2dd51654a04cab195bc01b1138b0dca292575e24008c141"
+    },
+    "test": "live_catalog_cpu_engines",
+    "reason": "pobiera duże GGUF i uruchamia rzeczywiste silniki; ALFA_LIVE_CATALOG=1"
+  },
+  {
+    "phase": "integration-042",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/platform-windows-diag-impl#0.0.85",
+      "target": "live",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/live-6f01c98717e86754",
+      "bytes": 1383904,
+      "sha256": "61784e22834107d01d0f447b26510d0110bfa8b77040aed6dcdbbe2ed57cf4bb"
+    },
+    "test": "live_snapshot",
+    "reason": "czyta prawdziwy system (kilka-kilkanaście sekund)"
+  },
+  {
+    "phase": "integration-042",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/platform-windows-diag-impl#0.0.85",
+      "target": "live",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/live-6f01c98717e86754",
+      "bytes": 1383904,
+      "sha256": "61784e22834107d01d0f447b26510d0110bfa8b77040aed6dcdbbe2ed57cf4bb"
+    },
+    "test": "live_snapshot_stopped_after_limit_keeps_read_parts",
+    "reason": "czyta prawdziwy system (kilka sekund)"
+  },
+  {
+    "phase": "integration-043",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/providers-local-impl#0.0.85",
+      "target": "live_ping",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/live_ping-659f32e52dc95481",
+      "bytes": 30526320,
+      "sha256": "e08beb014f850d4b29f638b8b46818dae12c78f595876501a0f4d017a62fe33a"
+    },
+    "test": "cold_and_warm_request_keep_transport_and_visible_budgets_separate",
+    "reason": "rzeczywisty model CPU; ALFA_PING_*; surowy raport i TTFT oddzielnie od pingów"
+  },
+  {
+    "phase": "integration-048",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/lib-markdown#0.0.85",
+      "target": "perf",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/perf-b4972b256ddf2274",
+      "bytes": 5518800,
+      "sha256": "db553459512989a7a640ebe495204460ff66b8d6d0aeac74a406f39d5c2f598a"
+    },
+    "test": "render_100_kb_under_budget",
+    "reason": "pomiar wydajności; uruchamiać w release"
+  },
+  {
+    "phase": "integration-058",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-agents#0.0.85",
+      "target": "software_live",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/software_live-6f678410b7d86eff",
+      "bytes": 3445560,
+      "sha256": "d43a2501a9832bdb8964a51953e1014e4eae045d4eb5657ebdc69d606ac1ec18"
+    },
+    "test": "real_machine_description",
+    "reason": "prawdziwy komputer: uruchamia `--version` zainstalowanych programów"
+  },
+  {
+    "phase": "integration-058",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/lib-sqlstore#0.0.85",
+      "target": "sqlite_security",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/sqlite_security-bf91a4427da54a6c",
+      "bytes": 8844728,
+      "sha256": "f7c2dba1bee6b64b2ff55ecfe955eaa1007acf5570696ca1c03fd3be379c7f3c"
+    },
+    "test": "capture_legacy_encrypted_wal_fixture",
+    "reason": "jednorazowo zachowuje syntetyczną bazę i WAL starego silnika, ALFA_SQLCIPHER_FIXTURE_DIR"
+  },
+  {
+    "phase": "integration-058",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/voice-speaker-impl#0.0.85",
+      "target": "speaker",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/speaker-b7b3f56321079bab",
+      "bytes": 97258024,
+      "sha256": "0c4962dc0c1648a5a805ab62361ab0c14fe46569674b1c243388fe6d540c92c4"
+    },
+    "test": "real_model",
+    "reason": "wymaga modelu mówcy spoza repo (ALFA_SPEAKER_MODEL)"
+  },
+  {
+    "phase": "integration-064",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/voice-vad-impl#0.0.85",
+      "target": "vad",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/vad-cc9f1eb67927904a",
+      "bytes": 89262432,
+      "sha256": "9c656a1234b5b50f3c1729390f269473b08422107200788238949ad82f6245e7"
+    },
+    "test": "silero_real_model",
+    "reason": "wymaga modelu Silero VAD (ALFA_SILERO_VAD) i nagrania mowy (ALFA_SPEECH_WAV)"
+  },
+  {
+    "phase": "integration-065",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/safety-broker-contract#0.0.85",
+      "target": "wave5_proposals",
+      "kind": [
+        "test"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/wave5_proposals-06aa28bd01ffe0da",
+      "bytes": 2700728,
+      "sha256": "288e585e7c3556ab5967b21eaca4a900f4ce373779ffb7351642b25ec95bf416"
+    },
+    "test": "gui_control_of_password_managers_is_a_kernel_block",
+    "reason": "propozycja PT-25 dla Sędziego Cieni (Jądro) — wymaga decyzji i przeglądu człowieka"
+  },
+  {
+    "phase": "libraries",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/agent-backends-impl#0.0.85",
+      "target": "agent_backends_impl",
+      "kind": [
+        "lib"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/agent_backends_impl-371a66e4959c22fb",
+      "bytes": 4938816,
+      "sha256": "ec35076352f23762b86415dbf06b35068ce422ab58241492a4273d80fd987947"
+    },
+    "test": "agy::parse::tests::real_agy_sample_from_file",
+    "reason": "wymaga zapisu z prawdziwego agy"
+  },
+  {
+    "phase": "libraries",
+    "target": {
+      "package_id": "path+file:///workspace/wt-ledger-core-test/crates/app-modules#0.0.85",
+      "target": "app_modules",
+      "kind": [
+        "lib"
+      ],
+      "fresh": false,
+      "path": "/workspace/target-repair/debug/deps/app_modules-11c082be0335cf1c",
+      "bytes": 52668840,
+      "sha256": "fd20361a0ef1c340c80dcec15bea1ad230eeef7cf6bf069ba98f2c638db8bf25"
+    },
+    "test": "probe::tests::builtin_catalog_has_azure_openai",
+    "reason": "Azure OpenAI czeka na decyzję właściciela o rejestrze zgodności — wraca po przeniesieniu wpisu do katalogu"
+  }
+]

@@ -7,12 +7,12 @@
   import VolumeX from '@lucide/svelte/icons/volume-x';
   import BellOff from '@lucide/svelte/icons/bell-off';
   import type { MicState } from '../types';
-  import type { AgentId } from '../tokens';
+  import { personVar } from '../person-info';
 
   interface Props {
     state: MicState;
     /** Agentka, która mówi (dla stanu speaking) — kolor akcentu. */
-    agent?: AgentId;
+    agent?: string;
     /** Poziom głośności 0–1 (dla stanu hearing) — wypełnienie tła. */
     level?: number;
     /** Pełna etykieta obok ikony (domyślnie tak; w composerze — tylko ikona + tooltip). */
@@ -48,7 +48,7 @@
   const active = $derived(state === 'listening' || state === 'hearing');
   const accent = $derived(
     state === 'speaking' && agent
-      ? `var(--alfa-agent-${agent})`
+      ? personVar(agent)
       : active
         ? 'var(--alfa-color-success)'
         : state === 'processing'

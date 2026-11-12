@@ -10,10 +10,10 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { SPEECH_LEVEL_FRESH_MS, avatarState, mouthOpen } from '../avatar-state.svelte';
-  import { agents, type AgentId } from '../tokens';
+  import { personInfo, personVar, personSoftVar } from '../person-info';
 
   interface Props {
-    agent: AgentId;
+    agent: string;
     /** Rozmiar w px (siatka 4 px). */
     size?: 20 | 24 | 28 | 32 | 40 | 64;
     /** Agentka właśnie mówi. */
@@ -37,7 +37,7 @@
     decorative = false,
     words,
   }: Props = $props();
-  const meta = $derived(agents[agent]);
+  const meta = $derived(personInfo(agent));
   const status = $derived(speaking ? 'mówi' : working ? 'pracuje' : undefined);
   const aria = $derived(label ?? `${meta.name}${status ? ` (${status})` : ''}`);
   const animated = $derived(avatarState.style === 'animated');
@@ -100,8 +100,8 @@
   class:large
   class:measured
   style:--size="{size}px"
-  style:--accent="var(--alfa-agent-{agent})"
-  style:--soft="var(--alfa-agent-{agent}-soft)"
+  style:--accent={personVar(agent)}
+  style:--soft={personSoftVar(agent)}
   style:--open={open}
   role={decorative ? undefined : 'img'}
   aria-label={decorative ? undefined : aria}

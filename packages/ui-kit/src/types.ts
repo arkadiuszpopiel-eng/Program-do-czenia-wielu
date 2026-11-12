@@ -1,4 +1,5 @@
-import type { AgentId, RiskLevel } from './tokens';
+import type { RiskLevel } from './tokens';
+import type { PersonaId } from './person-info';
 
 /** Stan mikrofonu (PLAN.md §14.9): zawsze ikona + tekst, nigdy sam kolor. */
 export type MicState =
@@ -23,7 +24,7 @@ export interface ApprovalRequest {
 
 export interface ChatMessage {
   readonly id: string;
-  readonly author: 'user' | AgentId;
+  readonly author: 'user' | PersonaId;
   readonly role?: string;
   readonly text: string;
   readonly time: string;
@@ -43,7 +44,7 @@ export interface SessionItem {
 }
 
 export interface ActivityInfo {
-  readonly agent: AgentId;
+  readonly agent: PersonaId;
   readonly description: string;
   readonly step: number;
   readonly totalSteps: number;
@@ -61,7 +62,7 @@ export interface CommandItem {
 
 /** Fragment napisów na żywo: słowa już wypowiedziane (prefix) są podświetlane. */
 export interface CaptionLine {
-  readonly speaker: 'user' | AgentId;
+  readonly speaker: 'user' | PersonaId;
   readonly text: string;
   /** Liczba znaków już wypowiedzianych / zatwierdzonych. */
   readonly spokenChars: number;
