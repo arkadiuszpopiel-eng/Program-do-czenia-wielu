@@ -5,18 +5,11 @@
   Załączniki: spinacz, wklejenie (czyta rdzeń), przeciągnięcie, zdjęcie z kamery — artefakty sesji.
 -->
 <script lang="ts">
-  import {
-    Chip,
-    Composer,
-    Menu,
-    MicButton,
-    personInfo,
-    type PersonaId,
-    type MenuItem,
-  } from '@alfa/ui-kit';
+  import { Chip, Composer, MicButton, personInfo, type PersonaId } from '@alfa/ui-kit';
   import Workflow from '@lucide/svelte/icons/workflow';
   import CameraSnapButton from './CameraSnapButton.svelte';
   import ComposerStatus from './ComposerStatus.svelte';
+  import ComposerRecipient from './ComposerRecipient.svelte';
   import {
     SentHistory,
     addressedAgent,
@@ -245,20 +238,6 @@
     runCommand(app, 'voice.mic');
   }
 
-  const agentItems = $derived<MenuItem[]>([
-    {
-      id: 'auto',
-      label: t('composer.agentAutoHint'),
-      checked: chosenAgent === null,
-      onSelect: () => (chosenAgent = null),
-    },
-    ...agentList.map(({ id }) => ({
-      id,
-      label: personInfo(id).name,
-      checked: chosenAgent === id,
-      onSelect: () => (chosenAgent = id),
-    })),
-  ]);
   const micLabels = $derived({
     off: { label: t('mic.off'), hint: t('mic.hint.off') },
     listening: { label: t('mic.listening'), hint: t('mic.hint.on') },
@@ -338,27 +317,7 @@
           {#snippet icon()}<Workflow size={13} strokeWidth={1.75} />{/snippet}
           <span class="short">{t('sessions.pipelinesBtn')}</span>
         </Chip>
-        <Menu
-          items={agentItems}
-          label={t('composer.agent', {
-            name: chosenAgent ? personInfo(chosenAgent).name : t('composer.agentAuto'),
-          })}
-          align="end"
-        >
-          {#snippet trigger(props)}
-            <Chip
-              {...props}
-              agent={chosenAgent ?? undefined}
-              size="sm"
-              onclick={props.onclick}
-              label={t('composer.agent', {
-                name: chosenAgent ? personInfo(chosenAgent).name : t('composer.agentAuto'),
-              })}
-            >
-              {chosenAgent ? personInfo(chosenAgent).name : t('composer.agentAuto')} ▾
-            </Chip>
-          {/snippet}
-        </Menu>{/if}
+        <ComposerRecipient choices={agentList} bind:chosen={chosenAgent} />{/if}
       <ComposerStatus bind:profileOpen={profileMenuOpen} />
     {/snippet}
     {#snippet trailing()}

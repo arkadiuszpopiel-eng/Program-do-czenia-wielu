@@ -81,8 +81,8 @@
             }}
           >
             <span class="cockpit-state" data-status={person.status} aria-hidden="true"></span>
-            {personInfo(person.id).name}<span class="cockpit-agent-status"
-              >{app.i18n.t(`agentStatus.${person.status}`)}</span
+            <span class="cockpit-person-name">{personInfo(person.id).name}</span><span
+              class="cockpit-agent-status">{app.i18n.t(`agentStatus.${person.status}`)}</span
             >
           </button>
         {/each}

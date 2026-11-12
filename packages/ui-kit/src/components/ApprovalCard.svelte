@@ -126,6 +126,8 @@
   }
   .who {
     flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
     font-weight: var(--alfa-weight-semibold);
   }
   .risk {

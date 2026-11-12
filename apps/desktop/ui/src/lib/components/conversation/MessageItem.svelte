@@ -262,6 +262,8 @@
     min-height: 28px;
   }
   .name {
+    min-width: 0;
+    overflow-wrap: anywhere;
     font-weight: var(--alfa-weight-semibold);
     font-size: var(--alfa-font-size-sm);
   }

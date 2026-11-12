@@ -51,9 +51,15 @@ test('persona z identyfikatorem 64 znaki mieści się na telefonie 320px', async
     .getByRole('button', { name: new RegExp(id) });
   await expect(person).toBeVisible();
   expect(await person.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBeTruthy();
+  expect(
+    await person.evaluate(
+      (el) => el.getBoundingClientRect().right <= el.parentElement!.getBoundingClientRect().right,
+    ),
+  ).toBeTruthy();
   await page.getByRole('button', { name: 'Mapa i systemy', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: 'Mapa i systemy', exact: true });
   const entry = dialog.getByRole('button', { name: new RegExp(id) });
+  await entry.scrollIntoViewIfNeeded();
   await expect(entry).toBeVisible();
   expect(await entry.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBeTruthy();
   await page.screenshot({ path: test.info().outputPath('custom-320.png') });
@@ -62,5 +68,6 @@ test('persona z identyfikatorem 64 znaki mieści się na telefonie 320px', async
   await page.getByRole('menuitemcheckbox', { name: id, exact: true }).click();
   const composer = page.locator('form.composer');
   expect(await composer.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBeTruthy();
+  await page.screenshot({ path: test.info().outputPath('recipient-320.png') });
   expect(pageErrors.get(page)).toEqual([]);
 });
