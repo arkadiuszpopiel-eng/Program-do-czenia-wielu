@@ -137,6 +137,8 @@ uuid.workspace = true
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls-native-roots"] }
 
 [dev-dependencies]
+# Kontrola rzeczywistego formatu żądań lokalnych po przejściu przez Core (#48).
+lib-openai-compat = { path = "../lib-openai-compat" }
 pc-diag-fake = { path = "../pc-diag-fake" }
 # Diagnostyka narzędzi agentek na atrapach (`tests/tool_diag.rs`).
 platform-apps-contract = { path = "../platform-apps-contract" }
