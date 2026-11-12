@@ -1,6 +1,7 @@
 //! Dobór modelu według trudności (zgłoszenie właściciela 2026-10-14): łatwe → lekki model, kod →
 //! model średni (lokalny Qwen 27B), trudne → mocny (Opus, GPT Sol); sprawdzanie na lekkim;
-//! po odrzuceniu odpowiedzi — szczebel wyżej; przypięcie i klasy bez doboru bez zmian.
+//! po odrzuceniu odpowiedzi — szczebel wyżej. Bramka roli12.11 usuwa słabe lokalne modele
+//! z kodu i trudnych zadań, także podczas review, przypięcia i po wyłączeniu rankingu.
 
 #![allow(clippy::unwrap_used, clippy::expect_used)]
 
@@ -20,7 +21,7 @@ use support::*;
 const OPUS: &str = "claude-opus-5-5";
 const SOL: &str = "gpt-6-sol";
 const LUNA: &str = "gpt-6-luna";
-const QWEN: &str = "qwen3-27b-instruct-q4_k_m";
+const QWEN: &str = "qwen3.8-27b-ud-q4-k-m";
 const BIELIK: &str = "bielik-4.5b-v3.0-instruct-q8_0";
 
 fn c(provider: &str, model: &str) -> Candidate {
@@ -29,7 +30,6 @@ fn c(provider: &str, model: &str) -> Candidate {
 
 struct Setup {
     core: Arc<RouterCore>,
-    anthropic: FakeProvider,
     local: FakeProvider,
     light: FakeProvider,
 }
@@ -38,7 +38,7 @@ struct Setup {
 fn setup() -> Setup {
     let core = Arc::new(RouterCore::default());
     let anthropic = fake("anthropic");
-    let local = fake("local");
+    let local = fake("local").with_model(QWEN, caps(false, true));
     let light = fake("local-light");
     core.register(Arc::new(anthropic.clone()), RouteKind::Api);
     core.register(Arc::new(fake("openai")), RouteKind::Api);
@@ -62,12 +62,7 @@ fn setup() -> Setup {
         policy.classes.insert(class, list.clone());
     }
     core.set_policy(Some(policy));
-    Setup {
-        core,
-        anthropic,
-        local,
-        light,
-    }
+    Setup { core, local, light }
 }
 
 fn ask(text: &str) -> ChatRequest {
@@ -131,7 +126,7 @@ fn code_starts_on_medium_rung_local_first_then_strong_models() {
     // Prosta prośba w klasie „Kod” nie schodzi poniżej średniego szczebla.
     assert_eq!(
         order(&s.core, TaskClass::Code, &ask("dodaj komentarz")),
-        [QWEN, LUNA, OPUS, SOL, BIELIK]
+        [QWEN, LUNA, OPUS, SOL]
     );
     let r = ask("dodaj komentarz");
     let note = s
@@ -151,12 +146,12 @@ fn hard_task_starts_on_strong_models() {
     let s = setup();
     assert_eq!(
         order(&s.core, TaskClass::Conversation, &ask(HARD)),
-        [OPUS, SOL, QWEN, LUNA, BIELIK]
+        [QWEN, OPUS, SOL, LUNA]
     );
 }
 
 #[test]
-fn review_runs_on_light_rung_and_rejection_escalates_one_rung_up() {
+fn code_review_keeps_expert_role_and_escalates_one_rung_up() {
     let s = setup();
     let review = RouteHint {
         review: true,
@@ -164,8 +159,8 @@ fn review_runs_on_light_rung_and_rejection_escalates_one_rung_up() {
     };
     assert_eq!(
         order(&s.core, TaskClass::Code, &with_hint(HARD, review)),
-        [BIELIK, QWEN, LUNA, OPUS, SOL],
-        "sprawdzanie — lekki model, mimo klasy „Kod” i trudnej treści"
+        [QWEN, LUNA, OPUS, SOL],
+        "sprawdzanie kodu zachowuje profil ekspert, bez słabego lokalnego fallbacku"
     );
     // Odpowiedź Qwena odrzucona → poprawka zaczyna od mocnych, Qwen na końcu.
     let fix = RouteHint {
@@ -175,7 +170,7 @@ fn review_runs_on_light_rung_and_rejection_escalates_one_rung_up() {
     };
     assert_eq!(
         order(&s.core, TaskClass::Code, &with_hint("popraw", fix.clone())),
-        [OPUS, SOL, LUNA, BIELIK, QWEN]
+        [OPUS, SOL, LUNA, QWEN]
     );
     // Odrzucony mocny model → inny mocny, potem reszta, odrzucony na końcu.
     let again = RouteHint {
@@ -184,7 +179,7 @@ fn review_runs_on_light_rung_and_rejection_escalates_one_rung_up() {
     };
     assert_eq!(
         order(&s.core, TaskClass::Code, &with_hint("popraw", again)),
-        [SOL, QWEN, LUNA, BIELIK, OPUS]
+        [SOL, QWEN, LUNA, OPUS]
     );
     // Podnoszenie wyłączone w ustawieniach — zwykła kolejność średniego szczebla.
     s.core.set_difficulty_policy(DifficultyPolicy {
@@ -193,7 +188,7 @@ fn review_runs_on_light_rung_and_rejection_escalates_one_rung_up() {
     });
     assert_eq!(
         order(&s.core, TaskClass::Code, &with_hint("popraw", fix)),
-        [QWEN, LUNA, OPUS, SOL, BIELIK]
+        [QWEN, LUNA, OPUS, SOL]
     );
 }
 
@@ -224,7 +219,7 @@ fn strategy_manual_rungs_and_api_first_ties() {
     assert_eq!(s.core.automatic_rung(&c("openai", LUNA)), Rung::Standard);
     assert_eq!(
         order(&s.core, TaskClass::Conversation, &ask(HARD)),
-        [OPUS, SOL, LUNA, QWEN, BIELIK],
+        [OPUS, SOL, LUNA, QWEN],
         "ręczny szczebel GPT Luna = mocny; remis bez „najpierw lokalny” — kolejność kolejki"
     );
 }
@@ -267,11 +262,8 @@ async fn routed_provider_answers_with_the_chosen_rung_and_role_class() {
         "local-light odpowiada"
     );
     assert_eq!(s.light.requests().last().unwrap().model, BIELIK);
-    assert_eq!(
-        text(&collect(&chat, ask(HARD)).await),
-        "anthropic odpowiada"
-    );
-    assert_eq!(s.anthropic.requests().last().unwrap().model, OPUS);
+    assert_eq!(text(&collect(&chat, ask(HARD)).await), "local odpowiada");
+    assert_eq!(s.local.requests().last().unwrap().model, QWEN);
     // Delegacja do Koderki: klasa roli ze wskazówki → „Kod” (średni szczebel).
     let code = RouteHint {
         class: Some("code".into()),
@@ -345,7 +337,7 @@ fn manual_queue_keeps_its_order_unless_reordering_is_allowed() {
     );
     assert_eq!(
         order(&s.core, TaskClass::Conversation, &fix),
-        [OPUS, SOL, LUNA, BIELIK, QWEN]
+        [OPUS, SOL, LUNA, QWEN]
     );
     // Włączone „zmieniaj też kolejki ręczne”.
     s.core.set_difficulty_policy(DifficultyPolicy {

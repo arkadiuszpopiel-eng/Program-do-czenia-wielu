@@ -1,5 +1,12 @@
 # 55 — niezawodność lokalnie, w chmurze i wyszukiwanie WWW
 
+**Przyrost routera12.11 — kandydat do przeglądu:** osobna bramka roli wyklucza
+słabe lokalne modele z Kod/Planning i rozpoznanych trudnych zadań, także w zapasie,
+przypięciu i review. Research prostegoWWW używa Conversation; trudne nadal wymaga
+profilu eksperckiego. Router80/0/0, app-modules50/0/1ignored, app-core7/0/0; Clippy/format0. Nie zainstalowano27B,
+nie odebrano GPU/API i nie zamknięto #58/#77.
+[Przyczyna, RED i dokładne kontrole](../reviews/2026-11-12-router-expert-roles.md).
+
 **Nowa decyzja właściciela 12.11 — role modeli:** lokalne kodowanie/trudne zadania
 na modelu klasy Qwen3.8-27B Q4; mniejsze modele do rozmowy i prostego wyszukiwania,
 chmura Luna/Haiku lub mocniejsza jako wsparcie. Zastępuje wcześniejsze przypisanie

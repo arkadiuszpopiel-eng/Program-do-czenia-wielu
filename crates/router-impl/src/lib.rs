@@ -15,6 +15,7 @@
 mod clock;
 mod difficulty;
 mod evaluate;
+mod expert_local;
 mod fallback;
 mod gate;
 mod helpers;

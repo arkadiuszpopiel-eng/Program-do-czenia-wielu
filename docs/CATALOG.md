@@ -12,8 +12,8 @@ crate’ów się składa, jak jest duży i gdzie leży jego specyfikacja. Grupy 
 | Moduły (wspólna baza nazwy) | 121 |
 | Specyfikacje w indeksie | 89 |
 | Manifesty `module.toml` | 72 |
-| Linie Rust (z testami) | 483 200 |
-| Testy (`#[test]`, `#[tokio::test]`) | 3746 |
+| Linie Rust (z testami) | 483 654 |
+| Testy (`#[test]`, `#[tokio::test]`) | 3760 |
 
 Kolumna „Crate’y”: C — `-contract`, I — `-impl`, F — `-fake`; „pojedynczy” — crate bez trójki.
 Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności między crate’ami: [`crates/README.md`](../crates/README.md).
@@ -68,7 +68,7 @@ Stan kryteriów akceptacji: [`STATUS.md`](STATUS.md). Zasady zależności międz
 | `providers` | — | — | — | C · F | 5481 | 55 | kontrakt wspólny: providers-api, providers-local |  |
 | `providers-api` | F1 | provider | inproc | I | 6425 | 61 | [providers-api](modules/providers-api/SPEC.md) | Adaptery `ModelProvider` dla Anthropic, OpenAI i endpointów zgodnych; strumień z anulowaniem. |
 | `providers-local` | F1 | provider | process | I | 8413 | 92 | [providers-local](modules/providers-local/SPEC.md) | llama.cpp jako sidecar `llama-server`, pobieranie modelu z SHA-256, fallback GPU → CPU. |
-| `router` | F1 | service | inproc | C · I · F | 6658 | 66 | [router](modules/router/SPEC.md) | Wybór trasy wg klasy zadania i ograniczeń, fallback ≤ 2 s, circuit breaker, decyzja z uzasadnieniem. |
+| `router` | F1 | service | inproc | C · I · F | 7112 | 80 | [router](modules/router/SPEC.md) | Wybór trasy wg klasy zadania i ograniczeń, fallback ≤ 2 s, circuit breaker, decyzja z uzasadnieniem. |
 
 ## Głos
 

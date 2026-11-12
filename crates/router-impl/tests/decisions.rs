@@ -128,7 +128,7 @@ async fn private_session_and_jurisdiction() {
         jurisdiction_allow: vec!["EU".into()],
         ..Constraints::default()
     };
-    let d = core.route(TaskClass::Code, &eu_only, None).unwrap();
+    let d = core.route(TaskClass::Conversation, &eu_only, None).unwrap();
     assert_eq!(d.chosen, cand("eu-cloud"));
     assert!(
         d.targets().any(|c| c == &cand("local")),

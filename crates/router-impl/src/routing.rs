@@ -239,6 +239,19 @@ impl RouterCore {
             // według trudności): na laptopie jest kilka razy wolniejszy niż główny (próba
             // obowiązków 0.0.51 — wieczór ponad 10 min zamiast 46 s w 0.0.48).
         }
+        for expert in crate::expert_local::candidates(self) {
+            for class in [
+                TaskClass::Conversation,
+                TaskClass::Code,
+                TaskClass::Planning,
+                TaskClass::GuiVision,
+            ] {
+                let list = policy.classes.entry(class).or_default();
+                if !list.contains(&expert) {
+                    list.push(expert.clone());
+                }
+            }
+        }
         let global = self.global.read().unwrap_or_else(|p| p.into_inner());
         crate::helpers::put_first(&mut policy.classes, &global);
         policy
@@ -296,6 +309,15 @@ impl RouterCore {
         {
             rest = self.arrange(class, rest, note, constraints.hint.review);
         }
+        let expert_work = crate::expert_local::required(self, class, constraints, request);
+        if expert_work
+            && self.difficulty_policy().local_first
+            && self.difficulty_policy().enabled
+            && !self.manual_queue(class)
+            && constraints.hint.escalate_from.is_none()
+        {
+            crate::expert_local::prefer(self, &mut rest);
+        }
         let list = pinned.into_iter().chain(rest);
         let now = self.clock.now_ms();
         // Migawka stanu obwodów — bez trzymania blokady podczas wywołań dostawców.
@@ -309,6 +331,7 @@ impl RouterCore {
             breakers: &breakers,
             windows: &windows,
             now_ms: now,
+            expert_work,
         };
         let mut allowed = Vec::new();
         let mut rejected = Vec::new();
