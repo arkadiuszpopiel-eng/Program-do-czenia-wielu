@@ -11,6 +11,8 @@ Umiejętności i Kreator agentek w aplikacji (kategoria `app-*`).
   albo formularza, podgląd persony (odmiana imienia, kolor, głos v0, rola, narzędzia, limity, hash),
   test na sucho (decyzje polityki dla scenariusza), zapis tylko po zaliczonym teście tego samego
   hasha i nie głosem; sufit autonomii z Brokera (nigdy L4), odsłuch głosu v0 (mówczyni bazowa).
+  Biblioteka zwraca osobno nazwę `role` i identyfikator `role_id` z zapisanego manifestu;
+  przypisanie do rozmowy używa ID, zachowując dotychczasowe role i limity.
 - `open(WorkDeps)` — oba moduły; zdrowie w rejestrze przez `Work::health`.
 
 Testy: `crates/app-core/tests/computer.rs` (propozycja → przegląd → zatwierdzenie hashem → zadanie;

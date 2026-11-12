@@ -309,6 +309,7 @@ impl BuilderApp {
                 name: m.persona.name.clone(),
                 color: m.persona.color.to_string(),
                 role: m.role.name.clone(),
+                role_id: Some(m.role.id.to_string()),
                 autonomy: level(m.limits.autonomy),
                 hash: agent_builder_contract::manifest_hash(m).unwrap_or_default(),
             })
