@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { agents } from '@alfa/ui-kit';
+  import { personInfo } from '@alfa/ui-kit';
   import Radar from '@lucide/svelte/icons/radar';
   import MessagesSquare from '@lucide/svelte/icons/messages-square';
   import Users from '@lucide/svelte/icons/users';
@@ -11,6 +11,7 @@
   import Globe from '@lucide/svelte/icons/globe';
   import Lazy from '../shell/Lazy.svelte';
   import { useApp } from '../../state/context';
+  import { openPersonControls } from '../../logic/person-controls';
   import { cockpitCopy } from './copy';
   import './cockpit.css';
   const app = useApp();
@@ -76,12 +77,11 @@
           <button
             type="button"
             onclick={() => {
-              app.selectedAgent = person.id;
-              app.openPanel('agents');
+              openPersonControls(app, person.id);
             }}
           >
             <span class="cockpit-state" data-status={person.status} aria-hidden="true"></span>
-            {agents[person.id].name}<span class="cockpit-agent-status"
+            {personInfo(person.id).name}<span class="cockpit-agent-status"
               >{app.i18n.t(`agentStatus.${person.status}`)}</span
             >
           </button>

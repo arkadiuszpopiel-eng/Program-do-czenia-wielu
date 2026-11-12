@@ -28,6 +28,9 @@ import { defaultValues } from './settings-schema';
 
 export type FakeScenario =
   | 'default'
+  /** Własna persona z publicznego kontraktu Core; nie ma wpisu w czterech tokenach UI. */
+  | 'custom-persona'
+  | 'custom-persona-long'
   | 'empty'
   | 'first-run'
   | 'offline'
@@ -65,6 +68,8 @@ export const SLOW_CORE_MS = 1_500;
 
 export const FAKE_SCENARIOS: readonly FakeScenario[] = [
   'default',
+  'custom-persona',
+  'custom-persona-long',
   'empty',
   'first-run',
   'offline',
@@ -134,6 +139,7 @@ export class FakeCore {
   readonly annotations: Record<string, TurnAnnotation> = {};
   readonly drafts: Record<string, string> = {};
   readonly agents: Record<string, AgentState[]> = {};
+  readonly savedPersonas = new Set<string>();
   readonly sessionCost: Record<string, number> = { 's-q3': 108 };
   timeline: TimelineEvent[];
   artifacts: ArtifactInfo[];
@@ -256,6 +262,16 @@ export class FakeCore {
             : topic
               ? seedSmall(sessionId, now, topic)
               : [];
+      if (this.scenario.startsWith('custom-persona')) {
+        // Ostatnia odpowiedź pozostaje w oknie wirtualizacji także na telefonie.
+        const answer = list.reduce(
+          (last, turn, index) => (turn.author === 'user' ? last : index),
+          -1,
+        );
+        const id = this.scenario === 'custom-persona-long' ? 'w'.repeat(64) : 'luna';
+        // Symulacja identyfikatora własnej persony z publicznego kontraktu Core.
+        list = list.map((turn, index) => (index === answer ? { ...turn, author: id } : turn));
+      }
       this.turns.set(sessionId, list);
     }
     return list;
@@ -280,12 +296,24 @@ export class FakeCore {
         status: CAST_STATES.find((state) => state === this.cast[index]) ?? 'idle',
         activity: null,
       }));
+      if (this.scenario.startsWith('custom-persona')) {
+        const id = this.scenario === 'custom-persona-long' ? 'w'.repeat(64) : 'luna';
+        list.push({
+          id,
+          role_ids: ['czytelniczka'],
+          status: 'idle',
+          activity: null,
+        });
+      }
       this.agents[sessionId] = list;
     }
+    for (const id of this.savedPersonas)
+      if (!list.some((a) => a.id === id))
+        list.push({ id, role_ids: [], status: 'idle', activity: null });
     return list;
   }
 
-  setAgent(sessionId: string, agent: AgentId, patch: Partial<AgentState>): void {
+  setAgent(sessionId: string, agent: string, patch: Partial<AgentState>): void {
     const list = this.agentsOf(sessionId).map((a) => (a.id === agent ? { ...a, ...patch } : a));
     this.agents[sessionId] = list;
     this.emit([{ type: 'AgentsChanged', session_id: sessionId, agents: list }]);

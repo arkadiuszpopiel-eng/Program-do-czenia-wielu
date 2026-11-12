@@ -2,10 +2,10 @@
   import Square from '@lucide/svelte/icons/square';
   import Avatar from './Avatar.svelte';
   import Button from './Button.svelte';
-  import { agents, type AgentId } from '../tokens';
+  import { personInfo, personVar } from '../person-info';
 
   interface Props {
-    agent: AgentId;
+    agent: string;
     /** Opis bieżącego kroku, np. „edytuję raport.docx". */
     description: string;
     step: number;
@@ -25,7 +25,7 @@
     labels = {},
   }: Props = $props();
 
-  const name = $derived(agents[agent].name);
+  const name = $derived(personInfo(agent).name);
   const pct = $derived(totalSteps > 0 ? Math.min(100, Math.round((step / totalSteps) * 100)) : 0);
   const elapsed = $derived(
     `${Math.floor(elapsedSeconds / 60)}:${String(elapsedSeconds % 60).padStart(2, '0')}`,
@@ -41,7 +41,7 @@
 
 <div
   class="capsule"
-  style:--accent="var(--alfa-agent-{agent})"
+  style:--accent={personVar(agent)}
   role="status"
   aria-live="polite"
   aria-label="{name} · {description} · {text.step} · {elapsed}"

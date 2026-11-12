@@ -1,10 +1,10 @@
 // PLIK GENEROWANY — nie edytuj ręcznie. Źródło: typy Rust w `crates/app-api` → schemat
 // `packages/schemas/ipc.v1.json` → `node scripts/gen-ipc-types.mjs` (ADR 0013).
 
-import type { AgentId } from '@alfa/ui-kit';
+import type { PersonaId } from '@alfa/ui-kit';
 
 /** Autor tury: użytkownik albo jedna z agentek. */
-export type Author = 'user' | AgentId;
+export type Author = 'user' | PersonaId;
 /** Przeznaczenie modelu rozpoznane po nazwie (`ModelInfo.purpose`). */
 export type ModelPurpose =
   | 'chat'
@@ -76,7 +76,7 @@ export interface Account {
 
 /** Przypisania konta. */
 export interface AccountAssignment {
-  readonly agents: readonly AgentId[];
+  readonly agents: readonly PersonaId[];
   readonly task_classes: readonly string[];
   readonly voice_stt: boolean;
   readonly voice_tts: boolean;
@@ -105,7 +105,7 @@ export type AccountState =
 
 /** Kapsuła aktywności. */
 export interface ActivityInfo {
-  readonly agent: AgentId;
+  readonly agent: PersonaId;
   readonly description: string;
   readonly session_id: string;
   readonly started_at: string;
@@ -152,7 +152,7 @@ export interface AgentDraft {
 
 /** Przebieg agentki (nagłówek; kroki — `AgentRunDetail.steps` / zdarzenie `AgentStep`). */
 export interface AgentRun {
-  readonly agent: AgentId;
+  readonly agent: PersonaId;
   /** Most CLI (`claude_code`, `codex`) — zdarzenia niezweryfikowane przez Alfę. */
   readonly bridge?: string | null;
   readonly budget: RunBudgetView;
@@ -183,7 +183,7 @@ export interface AgentRunDetail {
 /** Agentka w sesji. */
 export interface AgentState {
   readonly activity: string | null;
-  readonly id: AgentId;
+  readonly id: PersonaId;
   readonly role_ids: readonly string[];
   readonly status: AgentStatus;
 }
@@ -457,7 +457,7 @@ export type ArtifactAction = 'open' | 'reveal' | 'copy' | 'save_as';
 
 /** Artefakt (plik wyjściowy) sesji. */
 export interface ArtifactInfo {
-  readonly agent: AgentId | null;
+  readonly agent: PersonaId | null;
   readonly created_at: string;
   readonly id: string;
   readonly mime: string;
@@ -738,6 +738,11 @@ export interface BuilderAgentInfo {
   readonly name: string;
   readonly persona: string;
   readonly role: string;
+  /**
+   * Identyfikator roli do przypisania w rozmowie; `role` jest nazwą do wyświetlenia.
+   * Brak w starszych odpowiedziach nie uprawnia klienta do zgadywania ID.
+   */
+  readonly role_id?: string | null;
 }
 
 /** Raport testu na sucho (zaliczony = warunek zapisu tego samego hasha). */
@@ -3036,7 +3041,7 @@ export interface SelfTestView {
 
 /** Opcje wysłania wiadomości. */
 export interface SendOptions {
-  readonly addressed_to: AgentId | null;
+  readonly addressed_to: PersonaId | null;
   /** Identyfikatory załączników przygotowanych w composerze (`attachments_*`). */
   readonly attachments?: readonly string[];
   readonly parent_id: string | null;
@@ -3515,7 +3520,7 @@ export interface ThinkingInfo {
 
 /** Zdarzenie osi czasu v0. */
 export interface TimelineEvent {
-  readonly agent: AgentId | null;
+  readonly agent: PersonaId | null;
   readonly cost: Money | null;
   readonly detail: string | null;
   readonly id: string;
@@ -3674,7 +3679,7 @@ export interface TtsEngineView {
 
 /** Tura (węzeł drzewa gałęzi, append-only). */
 export interface Turn {
-  readonly addressed_to: AgentId | null;
+  readonly addressed_to: PersonaId | null;
   approval: ApprovalPending | null;
   /** Załączniki tury (artefakty sesji; pole pomijane, gdy brak). */
   readonly attachments?: readonly TurnAttachment[];
@@ -3893,7 +3898,7 @@ export type VoiceMode = 'toggle' | 'ptt';
 
 /** Pigułka głosowa. */
 export interface VoicePillState {
-  readonly agent: AgentId;
+  readonly agent: PersonaId;
   readonly level: number;
   readonly mic: MicState;
   /** Transkrypt częściowy wypowiedzi użytkownika (szary w UI). */
@@ -3913,7 +3918,7 @@ export type VoiceState = 'unavailable' | 'off' | 'active';
 
 /** Stan potoku głosu (pasek tytułu, Ustawienia → Głos). */
 export interface VoiceStatus {
-  readonly agent: AgentId;
+  readonly agent: PersonaId;
   readonly missing: readonly string[];
   readonly mode: VoiceMode;
   readonly muted: boolean;

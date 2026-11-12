@@ -19,32 +19,32 @@ const schema = JSON.parse(readFileSync(SCHEMA, 'utf8'));
 const defs = schema.$defs;
 
 /**
- * Zawężenie po stronie okna (B.1 etap 2): Rust trzyma te pola jako napis, a interfejs zna zamkniętą
- * listę wartości (cztery agentki, przeznaczenie i klasa modelu). Klucz `Typ.pole`; pierwszy element —
+ * Aliasy po stronie okna: identyfikatory person są otwarte (także Kreator), a klasy modeli
+ * mają zamknięte słowniki. Klucz `Typ.pole`; pierwszy element —
  * typ, który musi wyjść ze schematu (inny = rozjazd z Rustem, generator przerywa), drugi — typ w oknie.
  */
 const NARROW = {
-  'AccountAssignment.agents': ['readonly string[]', 'readonly AgentId[]'],
-  'ActivityInfo.agent': ['string', 'AgentId'],
-  'AgentRun.agent': ['string', 'AgentId'],
-  'AgentState.id': ['string', 'AgentId'],
-  'ArtifactInfo.agent': ['string | null', 'AgentId | null'],
+  'AccountAssignment.agents': ['readonly string[]', 'readonly PersonaId[]'],
+  'ActivityInfo.agent': ['string', 'PersonaId'],
+  'AgentRun.agent': ['string', 'PersonaId'],
+  'AgentState.id': ['string', 'PersonaId'],
+  'ArtifactInfo.agent': ['string | null', 'PersonaId | null'],
   'GpuView.role': ['string', 'GpuRole'],
   'ModelInfo.purpose': ['string', 'ModelPurpose'],
   'ModelInfo.tier': ['string', 'ModelTier'],
-  'SendOptions.addressed_to': ['string | null', 'AgentId | null'],
-  'TimelineEvent.agent': ['string | null', 'AgentId | null'],
-  'Turn.addressed_to': ['string | null', 'AgentId | null'],
+  'SendOptions.addressed_to': ['string | null', 'PersonaId | null'],
+  'TimelineEvent.agent': ['string | null', 'PersonaId | null'],
+  'Turn.addressed_to': ['string | null', 'PersonaId | null'],
   'Turn.author': ['string', 'Author'],
-  'VoicePillState.agent': ['string', 'AgentId'],
-  'VoiceStatus.agent': ['string', 'AgentId'],
+  'VoicePillState.agent': ['string', 'PersonaId'],
+  'VoiceStatus.agent': ['string', 'PersonaId'],
 };
 /** Słowniki zawężeń (wartości z dokumentacji pól w Rust). */
 const VOCABULARY = [
-  "import type { AgentId } from '@alfa/ui-kit';",
+  "import type { PersonaId } from '@alfa/ui-kit';",
   '',
   '/** Autor tury: użytkownik albo jedna z agentek. */',
-  "export type Author = 'user' | AgentId;",
+  "export type Author = 'user' | PersonaId;",
   '/** Przeznaczenie modelu rozpoznane po nazwie (`ModelInfo.purpose`). */',
   'export type ModelPurpose =',
   "  | 'chat' | 'reasoning' | 'embedding' | 'speech' | 'transcription'",

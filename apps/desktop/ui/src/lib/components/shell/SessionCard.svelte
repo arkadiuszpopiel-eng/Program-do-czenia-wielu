@@ -4,7 +4,7 @@
   listy. Enter otwiera, F2 zmienia nazwę, Delete usuwa; strzałki obsługuje siatka (`onmove`).
 -->
 <script lang="ts">
-  import { Avatar, IconButton, Menu, agents, type MenuItem } from '@alfa/ui-kit';
+  import { Avatar, IconButton, Menu, personInfo, type MenuItem } from '@alfa/ui-kit';
   import Ellipsis from '@lucide/svelte/icons/ellipsis';
   import Pin from '@lucide/svelte/icons/pin';
   import Archive from '@lucide/svelte/icons/archive';
@@ -41,7 +41,7 @@
     const id = card?.snippet_author;
     if (!id) return '';
     if (id === 'user') return t('conv.you');
-    return isStandardAgent(id) ? agents[id].name : id;
+    return isStandardAgent(id) ? personInfo(id).name : id;
   });
   const label = $derived(
     [
@@ -153,7 +153,7 @@
               {#each cast as id (id)}<Avatar agent={id} size={20} decorative />{/each}
               <span class="alfa-visually-hidden"
                 >{t('sessions.card.agents', {
-                  names: cast.map((id) => agents[id].name).join(', '),
+                  names: cast.map((id) => personInfo(id).name).join(', '),
                 })}</span
               >
             </span>

@@ -5,7 +5,7 @@
   Agentki.
 -->
 <script lang="ts">
-  import { Avatar, Menu, agentIds, agents, type AgentId } from '@alfa/ui-kit';
+  import { Avatar, Menu, agentIds, personInfo, type AgentId } from '@alfa/ui-kit';
   import { useApp } from '../../state/context';
   import { agentNavigation } from '../../state/agent-navigation.svelte';
 
@@ -14,7 +14,7 @@
   const states = $derived(app.activeId ? (app.agents[app.activeId] ?? []) : []);
   const en = $derived(app.i18n.locale === 'en');
   function items(id: AgentId) {
-    const name = agents[id].name;
+    const name = personInfo(id).name;
     const configure = () => {
       app.selectedAgent = id;
       app.openSettings('agents');
@@ -70,7 +70,7 @@
     const status = app.speechAgent === id ? 'speaking' : (state?.status ?? 'idle');
     const role = (state?.role_ids ?? []).map((r) => app.i18n.tk(`role.${r}`)).join(', ') || '—';
     const label = t('titlebar.agent', {
-      name: agents[id].name,
+      name: personInfo(id).name,
       role,
       status: t(`agentStatus.${status}`),
     });

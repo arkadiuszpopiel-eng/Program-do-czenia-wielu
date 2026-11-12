@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { agents } from '../tokens';
+  import { personInfo, personVar } from '../person-info';
   import type { CaptionLine } from '../types';
 
   interface Props {
@@ -7,7 +7,7 @@
   }
 
   let { lines }: Props = $props();
-  const who = (l: CaptionLine) => (l.speaker === 'user' ? 'Ty' : agents[l.speaker].name);
+  const who = (l: CaptionLine) => (l.speaker === 'user' ? 'Ty' : personInfo(l.speaker).name);
 </script>
 
 <div class="captions" aria-live="polite" aria-atomic="false" aria-label="Napisy na żywo">
@@ -18,9 +18,7 @@
       class="line"
       class:user={line.speaker === 'user'}
       class:partial={line.partial}
-      style:--accent={line.speaker === 'user'
-        ? 'var(--alfa-color-text)'
-        : `var(--alfa-agent-${line.speaker})`}
+      style:--accent={line.speaker === 'user' ? 'var(--alfa-color-text)' : personVar(line.speaker)}
     >
       <span class="who">{who(line)}</span>
       <span class="spoken">{line.text.slice(0, spoken)}</span><span class="pending"

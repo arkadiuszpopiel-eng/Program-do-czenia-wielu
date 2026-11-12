@@ -1,6 +1,6 @@
 // Eksport rozmowy do Markdown / HTML / JSON z menu wiadomości, menu sesji i palety poleceń: rdzeń składa
 // plik (HTML renderowany w Rust, bez skryptów) i pyta o miejsce natywnym dialogiem.
-import { agents as AGENTS } from '@alfa/ui-kit';
+import { personInfo } from '@alfa/ui-kit';
 import type { ConversationFormat } from '../api/types-files';
 import { conversationMarkdown } from '../logic/conversation-copy';
 import type { AppState } from './app.svelte';
@@ -33,13 +33,12 @@ export async function copyConversation(app: AppState): Promise<void> {
     app.toasts.show({ kind: 'warning', message: t('copyConv.empty') });
     return;
   }
-  const names = AGENTS as Record<string, { name: string } | undefined>;
   const text = conversationMarkdown(
     app.sessions.active?.title ?? t('copyConv.untitled'),
     conv.path,
     {
       you: t('copyConv.you'),
-      agent: (id) => names[id]?.name ?? id,
+      agent: (id) => personInfo(id).name,
       when: app.i18n.dateTime,
       aiNote: t('copyConv.aiNote'),
     },

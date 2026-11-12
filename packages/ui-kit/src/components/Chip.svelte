@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
-  import type { AgentId, SemanticColor } from '../tokens';
+  import type { SemanticColor } from '../tokens';
+  import { personVar } from '../person-info';
 
   interface Props extends Omit<HTMLButtonAttributes, 'onclick' | 'children'> {
     /** Akcent agentki (pierścień/tekst w jej kolorze). */
-    agent?: AgentId;
+    agent?: string;
     tone?: SemanticColor;
     size?: 'sm' | 'md';
     /** Chip klikalny (np. wybór agentki w composerze) — renderuje <button>. */
@@ -33,7 +34,7 @@
   }: Props = $props();
 
   const accent = $derived(
-    agent ? `var(--alfa-agent-${agent})` : tone ? `var(--alfa-color-${tone})` : undefined,
+    agent ? personVar(agent) : tone ? `var(--alfa-color-${tone})` : undefined,
   );
 </script>
 

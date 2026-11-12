@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
   import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
-  import type { AgentId } from '@alfa/ui-kit';
+  import type { PersonaId } from '@alfa/ui-kit';
   import type { AutonomyLevel } from '../../api/types';
   import { acceptPlan, type PlanAccept } from '../../logic/plan-mode';
   import { showError } from '../../state/attempt';
@@ -14,7 +14,7 @@
   interface Props {
     conv: ConversationState;
     /** Agentka, która przygotowała plan — dostaje polecenie wykonania. */
-    agent: AgentId | null;
+    agent: PersonaId | null;
   }
   let { conv, agent }: Props = $props();
 

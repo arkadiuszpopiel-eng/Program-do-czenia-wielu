@@ -12,7 +12,7 @@
   import Chip from '../components/Chip.svelte';
   import IconButton from '../components/IconButton.svelte';
   import ApprovalCard from '../components/ApprovalCard.svelte';
-  import { agents } from '../tokens';
+  import { personInfo, personVar } from '../person-info';
   import type { ChatMessage } from '../types';
 
   interface Props {
@@ -31,12 +31,14 @@
 <article
   class="msg"
   class:user={isUser}
-  aria-label={isUser ? 'Twoja wiadomość' : `Wiadomość agentki ${agent ? agents[agent].name : ''}`}
+  aria-label={isUser
+    ? 'Twoja wiadomość'
+    : `Wiadomość agentki ${agent ? personInfo(agent).name : ''}`}
 >
   <header class="head">
     {#if agent}
       <Avatar {agent} size={24} speaking={message.streaming} />
-      <span class="name" style:color="var(--alfa-agent-{agent})">{agents[agent].name}</span>
+      <span class="name" style:color={personVar(agent)}>{personInfo(agent).name}</span>
       {#if message.role}<Chip size="sm" {agent}>{message.role}</Chip>{/if}
     {:else}
       <span class="name">Ty</span>

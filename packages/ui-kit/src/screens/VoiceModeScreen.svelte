@@ -8,11 +8,11 @@
   import MicButton from '../components/MicButton.svelte';
   import Button from '../components/Button.svelte';
   import Avatar from '../components/Avatar.svelte';
-  import { agents, type AgentId } from '../tokens';
+  import { personInfo, personVar } from '../person-info';
   import type { CaptionLine, MicState } from '../types';
 
   interface Props {
-    agent: AgentId;
+    agent: string;
     micState: MicState;
     lines: readonly CaptionLine[];
     /** Fikcyjny poziom głośności 0–1; gdy `simulate`, generowany lokalnie. */
@@ -43,11 +43,11 @@
   });
 </script>
 
-<main class="voice" style:--accent="var(--alfa-agent-{agent})">
+<main class="voice" style:--accent={personVar(agent)}>
   <header class="top">
     <span class="who"
       ><Avatar {agent} size={24} speaking={micState === 'speaking'} />
-      {agents[agent].name} · Mówczyni</span
+      {personInfo(agent).name} · Mówczyni</span
     >
     <MicButton state={micState} {agent} level={shownLevel} />
   </header>

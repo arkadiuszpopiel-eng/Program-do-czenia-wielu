@@ -3,14 +3,14 @@
   Wybór wskaźnikiem nie zabiera fokusu z pola (preventDefault na pointerdown).
 -->
 <script lang="ts" module>
-  import type { AgentId } from '@alfa/ui-kit';
+  import { personVar, type PersonaId } from '@alfa/ui-kit';
 
   export interface Suggestion {
     readonly id: string;
     readonly label: string;
     readonly hint: string;
     readonly insert: string;
-    readonly agent?: AgentId;
+    readonly agent?: PersonaId;
   }
 </script>
 
@@ -38,9 +38,7 @@
         onaccept(s);
       }}
     >
-      <span class="s-label" style:color={s.agent ? `var(--alfa-agent-${s.agent})` : undefined}
-        >{s.label}</span
-      >
+      <span class="s-label" style:color={s.agent ? personVar(s.agent) : undefined}>{s.label}</span>
       <span class="s-hint">{s.hint}</span>
     </li>
   {/each}

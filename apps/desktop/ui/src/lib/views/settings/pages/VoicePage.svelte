@@ -7,7 +7,7 @@
 <script lang="ts">
   import type { SettingDef } from '../../../api/types-system';
   import SettingRow from '../SettingRow.svelte';
-  import { Avatar, Button, Select, agentIds, agents } from '@alfa/ui-kit';
+  import { Avatar, Button, Select, agentIds, personInfo } from '@alfa/ui-kit';
   import type { AudioDevice } from '../../../api/types-hub';
   import { load, showError } from '../../../state/attempt';
   import { useApp } from '../../../state/context';
@@ -193,10 +193,10 @@
     {#each agentIds as id (id)}
       <li class="voice" id="voice-agent-{id}" class:selected={app.selectedAgent === id}>
         <Avatar agent={id} size={40} speaking={app.speechAgent === id} decorative />
-        <span class="name">{agents[id].name}</span>
+        <span class="name">{personInfo(id).name}</span>
         <span class="muted">{t(`voice.bible.${id}`)}</span>
         <Button wrap size="sm" variant="ghost" onclick={() => void preview(id)}
-          >{t('voice.preview', { name: agents[id].name })}</Button
+          >{t('voice.preview', { name: personInfo(id).name })}</Button
         >
       </li>
     {/each}

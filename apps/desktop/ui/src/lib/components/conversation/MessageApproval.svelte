@@ -2,13 +2,13 @@
      zatwierdzanie nigdy w WebView; przy zerwanym łączu z Brokerem (bezpieczny stan) wyjaśnia,
      że prośba zostanie odrzucona. -->
 <script lang="ts">
-  import { ApprovalCard, agents, type AgentId } from '@alfa/ui-kit';
+  import { ApprovalCard, personInfo, type PersonaId } from '@alfa/ui-kit';
   import type { ApprovalPending } from '../../api/types';
   import { useApp } from '../../state/context';
   import DenyFeedback from './DenyFeedback.svelte';
 
   interface Props {
-    agent: AgentId;
+    agent: PersonaId;
     approval: ApprovalPending;
   }
 
@@ -40,7 +40,7 @@
   status={approval.status}
   onopenbroker={app.broker.safeState ? undefined : openBroker}
   labels={{
-    title: t('approval.title', { name: agents[agent].name }),
+    title: t('approval.title', { name: personInfo(agent).name }),
     what: t('approval.what'),
     why: t('approval.why'),
     reversible: t('approval.reversible'),

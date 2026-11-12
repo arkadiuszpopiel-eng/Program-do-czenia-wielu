@@ -1,17 +1,17 @@
 // Czyste pomocniki F8: imię agentki (także spoza obsady standardowej), kodowanie strumienia
 // terminala (base64 ↔ bajty, UTF-8), profil terminala dla mostu CLI, pusty szkic Kreatora
 // i domyślne parametry umiejętności ze schematu JSON.
-import { agents, type AgentId } from '@alfa/ui-kit';
+import { builtinPerson, personInfo, type AgentId } from '@alfa/ui-kit';
 import type { AgentDraft, TerminalProfileId } from '../api/types-work';
 
 /** Imię agentki do wyświetlenia (agentki z Kreatora — identyfikator persony). */
 export function agentName(id: string): string {
-  return (agents as Readonly<Record<string, { name: string } | undefined>>)[id]?.name ?? id;
+  return personInfo(id).name;
 }
 
 /** Czy identyfikator należy do obsady standardowej (awatar z ui-kit). */
 export function isStandardAgent(id: string): id is AgentId {
-  return Object.prototype.hasOwnProperty.call(agents, id);
+  return builtinPerson(id);
 }
 
 /** Ramka `output` (base64) → bajty dla emulatora terminala. */

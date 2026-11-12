@@ -61,6 +61,11 @@ export const plBuilder = {
   'builder.saved': 'Zapisano agentkę {name}.',
   'builder.library': 'Agentki z Kreatora',
   'builder.libraryEmpty': 'Nie utworzono jeszcze żadnej agentki.',
+  'builder.use': 'Dodaj do tej rozmowy',
+  'builder.remove': 'Odłącz rolę od tej rozmowy',
+  'builder.missingRole':
+    'Starszy zapis nie zawiera identyfikatora roli. Odśwież bibliotekę po aktualizacji rdzenia.',
+  'builder.needsSession': 'Otwórz rozmowę, aby przypisać do niej tę agentkę.',
   'builder.policy.conversation': 'rozmowa',
   'builder.policy.planning': 'planowanie',
   'builder.policy.gui-vision': 'obsługa ekranu',

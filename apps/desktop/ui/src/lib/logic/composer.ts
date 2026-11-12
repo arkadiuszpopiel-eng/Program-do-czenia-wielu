@@ -90,7 +90,7 @@ export function addressedAgent<T extends string>(
   text: string,
   agents: readonly { id: T; name: string }[],
 ): T | null {
-  const match = /(?:^|\s)@([\p{L}]+)/u.exec(text);
+  const match = /(?:^|\s)@([\p{L}\p{N}_-]+)/u.exec(text);
   if (!match?.[1]) return null;
   const name = match[1].toLowerCase();
   return agents.find((a) => a.name.toLowerCase() === name || a.id === name)?.id ?? null;

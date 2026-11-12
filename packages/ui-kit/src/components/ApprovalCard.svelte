@@ -3,10 +3,11 @@
   import Undo2 from '@lucide/svelte/icons/undo-2';
   import Avatar from './Avatar.svelte';
   import Button from './Button.svelte';
-  import { agents, type AgentId, type RiskLevel } from '../tokens';
+  import { type RiskLevel } from '../tokens';
+  import { personInfo } from '../person-info';
 
   interface Props {
-    agent: AgentId;
+    agent: string;
     /** Co agentka chce zrobić. */
     what: string;
     /** Dlaczego. */
@@ -45,7 +46,7 @@
   }: Props = $props();
 
   const text = $derived<ApprovalLabels>({
-    title: `${agents[agent].name} prosi o zatwierdzenie`,
+    title: `${personInfo(agent).name} prosi o zatwierdzenie`,
     what: 'Co',
     why: 'Dlaczego',
     reversible: 'Cofalne',

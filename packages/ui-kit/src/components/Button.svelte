@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
   import type { Snippet } from 'svelte';
-  import type { AgentId } from '../tokens';
+  import { personVar } from '../person-info';
 
   type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
   type Size = 'sm' | 'md';
@@ -10,7 +10,7 @@
     variant?: Variant;
     size?: Size;
     /** Kolor akcentu agentki dla wariantu primary/ghost. */
-    agent?: AgentId;
+    agent?: string;
     loading?: boolean;
     /** Długi napis może zawinąć się w wąskiej karcie, zachowując całą treść. */
     wrap?: boolean;
@@ -38,7 +38,7 @@
   {type}
   class="btn {variant} {size} {className}"
   class:wrap
-  style:--accent={agent ? `var(--alfa-agent-${agent})` : undefined}
+  style:--accent={agent ? personVar(agent) : undefined}
   style:--accent-fill={agent ? 'var(--accent)' : undefined}
   style:--accent-glow={agent ? 'none' : undefined}
   disabled={disabled || loading}

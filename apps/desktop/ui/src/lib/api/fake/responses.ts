@@ -1,5 +1,5 @@
 // Skrypty odpowiedzi atrapy — deterministyczne (zależne tylko od treści i numeru wariantu).
-import type { AgentId } from '@alfa/ui-kit';
+import type { PersonaId } from '@alfa/ui-kit';
 import type { ApprovalPending, ToolIcon } from '../types';
 import {
   CANVAS_ARTIFACTS_REPLY,
@@ -20,7 +20,7 @@ export interface ScriptTool {
 }
 
 export interface ResponseScript {
-  readonly agent: AgentId;
+  readonly agent: PersonaId;
   readonly role_id: string;
   readonly text: string;
   readonly thinkingMs: number;
@@ -40,7 +40,7 @@ const PLAN_REPLY =
   '3. Duplikaty usunę do Kosza — każdy krok da się cofnąć.\n\n' +
   'Ryzyko: pliki otwarte w Excelu pominę. Wykonać ten plan?';
 
-const base = (agent: AgentId, role_id: string, text: string): ResponseScript => ({
+const base = (agent: PersonaId, role_id: string, text: string): ResponseScript => ({
   agent,
   role_id,
   text,
@@ -55,7 +55,7 @@ const has = (text: string, ...words: string[]): boolean =>
 
 export function pickResponse(
   input: string,
-  addressed: AgentId | null,
+  addressed: PersonaId | null,
   variant: number,
 ): ResponseScript {
   const v = variant % 2;

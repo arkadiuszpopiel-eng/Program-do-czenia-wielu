@@ -10,7 +10,8 @@
     SanitizedHtml,
     Skeleton,
     VariantSwitcher,
-    agents,
+    personInfo,
+    personVar,
   } from '@alfa/ui-kit';
   import Brain from '@lucide/svelte/icons/brain';
   import Clock from '@lucide/svelte/icons/clock';
@@ -21,10 +22,9 @@
   import { useApp } from '../../state/context';
   import type { ConversationState } from '../../state/conversation.svelte';
   import CodeBlock from './CodeBlock.svelte';
-  const loadApproval = () => import('./MessageApproval.svelte'); // tylko przy oczekującej zgodzie
-  import Lazy from '../shell/Lazy.svelte';
   import { isContinued } from '../../logic/turn-tree';
   import MessageActions from './MessageActions.svelte';
+  import MessageWork from './MessageWork.svelte';
   import MessageAttachments from './MessageAttachments.svelte';
   import ToolSteps from './ToolSteps.svelte';
   import { readingMark, voiceOf } from './reading-mark.svelte';
@@ -39,7 +39,7 @@
   const app = useApp();
   const { t } = app.i18n;
   const agent = $derived(turn.author === 'user' ? null : turn.author);
-  const name = $derived(agent ? agents[agent].name : t('conv.you'));
+  const name = $derived(agent ? personInfo(agent).name : t('conv.you'));
   const siblings = $derived(conv.siblings(turn));
   const annotation = $derived(conv.annotations[turn.id]);
   const streaming = $derived(turn.status === 'streaming');
@@ -96,11 +96,6 @@
     node.setSelectionRange(node.value.length, node.value.length);
   }
   import HiddenMessage from './HiddenMessage.svelte';
-  // Błąd tury jest rzadki — jego widok ładowany leniwie, poza budżetem startowym okna.
-  const loadError = () => import('./MessageError.svelte');
-  // Karty kroków agentki (intencje, „Cofnij”) — tylko pod odpowiedziami z narzędziami.
-  const loadAgentCards = () => import('./AgentCards.svelte');
-  const loadContinuation = () => import('./ContinuationCard.svelte'); // rzadka, z dialogiem
 </script>
 
 {#if annotation?.hidden}
@@ -121,7 +116,7 @@
       // Z zaznaczonym tekstem prawy przycisk otwiera menu „Kopiuj”, bez przypinania wiadomości.
       if (!document.getSelection()?.toString()) pinned = !pinned;
     }}
-    style:--accent={agent ? `var(--alfa-agent-${agent})` : undefined}
+    style:--accent={agent ? personVar(agent) : undefined}
   >
     <header class="head">
       {#if agent}
@@ -132,7 +127,7 @@
         <span class="name">{name}</span>
         {#if turn.addressed_to}
           <span class="addressed"
-            >{t('conv.addressed', { name: agents[turn.addressed_to].name })}</span
+            >{t('conv.addressed', { name: personInfo(turn.addressed_to).name })}</span
           >
         {/if}
       {/if}
@@ -222,28 +217,7 @@
       <p class="note">{t('conv.heardPrefix', { text: turn.heard_prefix })}</p>
     {/if}
 
-    {#if turn.approval && agent}
-      <div class="indent"><Lazy load={loadApproval} label={t('common.loading')} props={{ agent, approval: turn.approval }} /></div>
-    {/if}
-
-    {#if agent && turn.tools.length}
-      <div class="indent">
-        <Lazy load={loadAgentCards} props={{ turn }} label={t('common.loading')} />
-      </div>
-    {/if}
-
-    {#if turn.error?.code === 'task_paused' && !isContinued(conv.tree,turn)}
-      <Lazy load={loadContinuation} label={t('common.loading')}
-        props={{ oncontinue: () => void act(() => conv.continueTurn(turn)) }} />
-    {:else if turn.error}
-      <div class="indent">
-        <Lazy
-          load={loadError}
-          props={{ turn, error: turn.error, conv }}
-          label={t('common.loading')}
-        />
-      </div>
-    {/if}
+    <MessageWork {turn} {conv} />
 
     {#if turn.usage && agent && !streaming && app.bool('ui.reply_details', true)}
       <p class="usage">
@@ -326,7 +300,6 @@
   .usage,
   .note,
   .edit,
-  .indent,
   .continue,
   .msg > :global(.tools) {
     margin-left: 32px;

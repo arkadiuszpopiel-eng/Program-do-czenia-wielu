@@ -13,7 +13,7 @@
     Switch,
     TextField,
     agentIds,
-    agents,
+    personInfo,
     type AgentId,
   } from '@alfa/ui-kit';
   import { errorText } from '../../../api/command-error';
@@ -264,7 +264,7 @@
         <legend>{t('wiz.agents')}</legend>
         {#each agentIds as id (id)}
           <Checkbox
-            label={agents[id].name}
+            label={personInfo(id).name}
             checked={assigned.includes(id)}
             onchange={(on) => (assigned = toggleIn(assigned, id, on))}
           />
